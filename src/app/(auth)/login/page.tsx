@@ -7,7 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { NeonGradientText } from "@/components/shared/neon-gradient-text";
+import Image from "next/image";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -41,9 +41,10 @@ export default function LoginPage() {
     <div className="space-y-8">
       {/* Header */}
       <div className="text-center space-y-2">
-        <NeonGradientText as="h1" className="text-3xl font-bold">
-          ScalingFlow
-        </NeonGradientText>
+        <div className="flex items-center justify-center gap-3">
+          <Image src="/icons/icon-192.png" alt="ScalingFlow" width={40} height={40} className="rounded-[8px]" />
+          <h1 className="text-3xl font-bold text-text-primary">ScalingFlow</h1>
+        </div>
         <p className="text-text-secondary">
           Connecte-toi pour accéder à ton cockpit.
         </p>

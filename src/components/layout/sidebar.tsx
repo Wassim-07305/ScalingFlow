@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ChevronLeft, X } from "lucide-react";
@@ -33,13 +34,20 @@ export function Sidebar() {
       >
         {/* Logo */}
         <div className="flex h-14 items-center justify-between px-4">
-          {!sidebarCollapsed && (
-            <Link href="/" className="flex items-center gap-2">
-              <span className="text-base font-bold text-text-primary">
+          <Link href="/" className="flex items-center gap-2">
+            <Image
+              src="/icons/icon-192.png"
+              alt="ScalingFlow"
+              width={28}
+              height={28}
+              className="rounded-[6px]"
+            />
+            {!sidebarCollapsed && (
+              <span className="text-sm font-semibold text-text-primary">
                 ScalingFlow
               </span>
-            </Link>
-          )}
+            )}
+          </Link>
           <button
             onClick={() => {
               if (sidebarMobileOpen) {
