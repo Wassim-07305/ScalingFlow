@@ -56,14 +56,10 @@ export async function updateSession(request: NextRequest) {
       return NextResponse.redirect(url);
     }
 
-    // Redirect authenticated users away from auth pages
-    if (
-      user &&
-      (request.nextUrl.pathname === "/login" ||
-        request.nextUrl.pathname === "/register")
-    ) {
+    // Redirect authenticated users away from auth pages to dashboard
+    if (user && isPublicRoute) {
       const url = request.nextUrl.clone();
-      url.pathname = "/";
+      url.pathname = "/onboarding";
       return NextResponse.redirect(url);
     }
   } catch {
