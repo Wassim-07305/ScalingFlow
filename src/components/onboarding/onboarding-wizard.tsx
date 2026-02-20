@@ -225,7 +225,7 @@ export function OnboardingWizard() {
 
       {/* Error */}
       {error && (
-        <div className="rounded-[12px] bg-neon-red/10 border border-neon-red/20 p-3 text-sm text-neon-red">
+        <div className="rounded-[8px] bg-danger/10 border border-danger/20 p-3 text-sm text-danger">
           {error}
         </div>
       )}
@@ -242,7 +242,7 @@ export function OnboardingWizard() {
           {/* Step 0: Skills */}
           {store.step === 0 && (
             <div className="space-y-4">
-              <h2 className="text-xl font-bold font-[family-name:var(--font-display)]">
+              <h2 className="text-xl font-bold">
                 Quelles sont tes compétences ?
               </h2>
               <p className="text-text-secondary text-sm">
@@ -256,9 +256,9 @@ export function OnboardingWizard() {
                       key={skill.label}
                       onClick={() => toggleArrayItem("skills", skill.label)}
                       className={cn(
-                        "flex items-center gap-3 rounded-[12px] border p-3 text-left transition-all duration-200",
+                        "flex items-center gap-3 rounded-[8px] border p-3 text-left transition-all duration-200",
                         isSelected
-                          ? "border-neon-orange bg-neon-orange-glow text-neon-orange"
+                          ? "border-accent bg-accent-muted text-accent"
                           : "border-border-default bg-bg-secondary text-text-secondary hover:border-border-hover"
                       )}
                     >
@@ -274,7 +274,7 @@ export function OnboardingWizard() {
           {/* Step 1: Experience */}
           {store.step === 1 && (
             <div className="space-y-4">
-              <h2 className="text-xl font-bold font-[family-name:var(--font-display)]">
+              <h2 className="text-xl font-bold">
                 Quel est ton niveau d'expérience ?
               </h2>
               <div className="grid gap-3">
@@ -284,7 +284,7 @@ export function OnboardingWizard() {
                     className={cn(
                       "cursor-pointer transition-all duration-200",
                       store.experienceLevel === level.value
-                        ? "border-neon-orange bg-neon-orange-glow"
+                        ? "border-accent bg-accent-muted"
                         : "hover:border-border-hover"
                     )}
                     onClick={() =>
@@ -313,7 +313,7 @@ export function OnboardingWizard() {
           {/* Step 2: Revenue */}
           {store.step === 2 && (
             <div className="space-y-6">
-              <h2 className="text-xl font-bold font-[family-name:var(--font-display)]">
+              <h2 className="text-xl font-bold">
                 Tes revenus actuels et objectifs
               </h2>
               <div className="space-y-4">
@@ -346,7 +346,7 @@ export function OnboardingWizard() {
           {/* Step 3: Industries */}
           {store.step === 3 && (
             <div className="space-y-4">
-              <h2 className="text-xl font-bold font-[family-name:var(--font-display)]">
+              <h2 className="text-xl font-bold">
                 Dans quelles industries as-tu travaillé ?
               </h2>
               <div className="flex flex-wrap gap-2">
@@ -359,7 +359,7 @@ export function OnboardingWizard() {
                       className={cn(
                         "rounded-full px-4 py-2 text-sm font-medium border transition-all duration-200",
                         isSelected
-                          ? "border-neon-blue bg-neon-blue-glow text-neon-blue"
+                          ? "border-accent bg-accent-muted text-accent"
                           : "border-border-default text-text-secondary hover:border-border-hover"
                       )}
                     >
@@ -374,7 +374,7 @@ export function OnboardingWizard() {
           {/* Step 4: Objectives */}
           {store.step === 4 && (
             <div className="space-y-4">
-              <h2 className="text-xl font-bold font-[family-name:var(--font-display)]">
+              <h2 className="text-xl font-bold">
                 Quels sont tes objectifs ?
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -385,9 +385,9 @@ export function OnboardingWizard() {
                       key={obj}
                       onClick={() => toggleArrayItem("objectives", obj)}
                       className={cn(
-                        "rounded-[12px] border p-3 text-left text-sm font-medium transition-all duration-200",
+                        "rounded-[8px] border p-3 text-left text-sm font-medium transition-all duration-200",
                         isSelected
-                          ? "border-neon-cyan bg-neon-cyan-glow text-neon-cyan"
+                          ? "border-accent bg-accent-muted text-accent"
                           : "border-border-default text-text-secondary hover:border-border-hover"
                       )}
                     >
@@ -402,7 +402,7 @@ export function OnboardingWizard() {
           {/* Step 5: Budget */}
           {store.step === 5 && (
             <div className="space-y-4">
-              <h2 className="text-xl font-bold font-[family-name:var(--font-display)]">
+              <h2 className="text-xl font-bold">
                 Quel est ton budget pub mensuel ?
               </h2>
               <div className="grid gap-3">
@@ -412,7 +412,7 @@ export function OnboardingWizard() {
                     className={cn(
                       "cursor-pointer transition-all duration-200",
                       store.budgetMonthly === budget.value
-                        ? "border-neon-orange bg-neon-orange-glow"
+                        ? "border-accent bg-accent-muted"
                         : "hover:border-border-hover"
                     )}
                     onClick={() => store.setField("budgetMonthly", budget.value)}

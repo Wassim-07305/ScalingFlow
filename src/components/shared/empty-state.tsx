@@ -26,10 +26,10 @@ export function EmptyState({
         className
       )}
     >
-      <div className="flex h-16 w-16 items-center justify-center rounded-full bg-bg-tertiary mb-4">
-        <Icon className="h-8 w-8 text-text-muted" />
+      <div className="flex h-12 w-12 items-center justify-center rounded-[8px] bg-bg-tertiary mb-4">
+        <Icon className="h-6 w-6 text-text-muted" />
       </div>
-      <h3 className="text-lg font-semibold font-[family-name:var(--font-display)] text-text-primary mb-2">
+      <h3 className="text-base font-semibold text-text-primary mb-1">
         {title}
       </h3>
       <p className="text-sm text-text-secondary max-w-sm mb-6">{description}</p>

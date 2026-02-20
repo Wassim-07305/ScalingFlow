@@ -15,12 +15,12 @@ const MOCK_DATA = {
   badges: 5,
   rank: 23,
   modules: [
-    { name: "Onboarding", icon: Target, progress: 100, color: "text-neon-green" },
-    { name: "Offre", icon: Star, progress: 85, color: "text-neon-orange" },
-    { name: "Funnel", icon: Target, progress: 40, color: "text-neon-blue" },
-    { name: "Academy", icon: BookOpen, progress: 58, color: "text-neon-cyan" },
-    { name: "Ads", icon: Megaphone, progress: 25, color: "text-neon-purple" },
-    { name: "Contenu", icon: PenTool, progress: 10, color: "text-neon-orange" },
+    { name: "Onboarding", icon: Target, progress: 100, color: "text-accent" },
+    { name: "Offre", icon: Star, progress: 85, color: "text-accent" },
+    { name: "Funnel", icon: Target, progress: 40, color: "text-info" },
+    { name: "Academy", icon: BookOpen, progress: 58, color: "text-accent" },
+    { name: "Ads", icon: Megaphone, progress: 25, color: "text-[#A78BFA]" },
+    { name: "Contenu", icon: PenTool, progress: 10, color: "text-accent" },
   ],
 };
 
@@ -38,12 +38,12 @@ export function ProgressOverview({ className }: ProgressOverviewProps) {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-xl bg-neon-orange/15 flex items-center justify-center">
-                <Zap className="h-6 w-6 text-neon-orange" />
+              <div className="w-12 h-12 rounded-xl bg-accent/15 flex items-center justify-center">
+                <Zap className="h-6 w-6 text-accent" />
               </div>
               <div>
                 <p className="text-xs text-text-muted">Total XP</p>
-                <p className="text-2xl font-bold text-neon-orange">
+                <p className="text-2xl font-bold text-accent">
                   <AnimatedCounter value={MOCK_DATA.totalXp} />
                 </p>
               </div>
@@ -61,12 +61,12 @@ export function ProgressOverview({ className }: ProgressOverviewProps) {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-xl bg-neon-red/15 flex items-center justify-center">
-                <Flame className="h-6 w-6 text-neon-red" />
+              <div className="w-12 h-12 rounded-xl bg-danger/15 flex items-center justify-center">
+                <Flame className="h-6 w-6 text-danger" />
               </div>
               <div>
                 <p className="text-xs text-text-muted">Streak</p>
-                <p className="text-2xl font-bold text-neon-red">
+                <p className="text-2xl font-bold text-danger">
                   <AnimatedCounter value={MOCK_DATA.streak} /> jours
                 </p>
               </div>
@@ -77,12 +77,12 @@ export function ProgressOverview({ className }: ProgressOverviewProps) {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-xl bg-neon-cyan/15 flex items-center justify-center">
-                <Trophy className="h-6 w-6 text-neon-cyan" />
+              <div className="w-12 h-12 rounded-xl bg-accent/15 flex items-center justify-center">
+                <Trophy className="h-6 w-6 text-accent" />
               </div>
               <div>
                 <p className="text-xs text-text-muted">Classement</p>
-                <p className="text-2xl font-bold text-neon-cyan">
+                <p className="text-2xl font-bold text-accent">
                   #<AnimatedCounter value={MOCK_DATA.rank} />
                 </p>
               </div>
@@ -125,11 +125,11 @@ export function ProgressOverview({ className }: ProgressOverviewProps) {
               <div key={badge} className="flex flex-col items-center gap-1">
                 <div className={cn(
                   "w-14 h-14 rounded-2xl flex items-center justify-center",
-                  i < MOCK_DATA.badges ? "bg-neon-orange/15" : "bg-bg-tertiary opacity-40"
+                  i < MOCK_DATA.badges ? "bg-accent/15" : "bg-bg-tertiary opacity-40"
                 )}>
                   <Star className={cn(
                     "h-7 w-7",
-                    i < MOCK_DATA.badges ? "text-neon-orange" : "text-text-muted"
+                    i < MOCK_DATA.badges ? "text-accent" : "text-text-muted"
                   )} />
                 </div>
                 <span className="text-[10px] text-text-muted">{badge}</span>

@@ -51,16 +51,16 @@ const actions = [
 ];
 
 const colorStyles = {
-  orange: "bg-neon-orange-glow text-neon-orange hover:shadow-[0_0_20px_rgba(255,107,44,0.2)]",
-  blue: "bg-neon-blue-glow text-neon-blue hover:shadow-[0_0_20px_rgba(59,130,246,0.2)]",
-  cyan: "bg-neon-cyan-glow text-neon-cyan hover:shadow-[0_0_20px_rgba(6,214,160,0.2)]",
-  purple: "bg-neon-purple-glow text-neon-purple hover:shadow-[0_0_20px_rgba(139,92,246,0.2)]",
+  orange: "bg-accent-muted text-accent",
+  blue: "bg-info/12 text-info",
+  cyan: "bg-accent-muted text-accent",
+  purple: "bg-[rgba(139,92,246,0.12)] text-[#A78BFA]",
 };
 
 export function QuickActions() {
   return (
     <div>
-      <h3 className="text-lg font-semibold font-[family-name:var(--font-display)] text-text-primary mb-4">
+      <h3 className="text-lg font-semibold text-text-primary mb-4">
         Actions rapides
       </h3>
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -69,7 +69,7 @@ export function QuickActions() {
             key={action.href}
             href={action.href}
             className={cn(
-              "flex flex-col items-center gap-2 rounded-[16px] border border-border-default bg-bg-secondary p-4 transition-all duration-300 hover:border-border-hover",
+              "flex flex-col items-center gap-2 rounded-[12px] border border-border-default bg-bg-secondary p-4 transition-all duration-300 hover:border-border-hover",
               colorStyles[action.color]
             )}
           >

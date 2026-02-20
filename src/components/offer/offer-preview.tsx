@@ -34,7 +34,7 @@ export function OfferPreview({ offer, onRegenerate, className }: OfferPreviewPro
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <h2 className="text-2xl font-bold font-[family-name:var(--font-display)] text-text-primary">
+          <h2 className="text-2xl font-bold text-text-primary">
             {name}
           </h2>
           {positioning && (
@@ -53,10 +53,10 @@ export function OfferPreview({ offer, onRegenerate, className }: OfferPreviewPro
       {mechanism.name && (
         <GlowCard glowColor="orange">
           <div className="flex items-center gap-2 mb-4">
-            <Zap className="h-5 w-5 text-neon-orange" />
+            <Zap className="h-5 w-5 text-accent" />
             <h3 className="text-lg font-semibold text-text-primary">Mécanisme Unique</h3>
           </div>
-          <p className="text-neon-orange font-medium mb-3">{mechanism.name}</p>
+          <p className="text-accent font-medium mb-3">{mechanism.name}</p>
           {mechanism.description && (
             <p className="text-text-secondary text-sm mb-4">{mechanism.description}</p>
           )}
@@ -64,7 +64,7 @@ export function OfferPreview({ offer, onRegenerate, className }: OfferPreviewPro
             <div className="space-y-3">
               {mechanism.steps.map((step: string, index: number) => (
                 <div key={index} className="flex items-start gap-3">
-                  <span className="flex-shrink-0 w-7 h-7 rounded-full bg-neon-orange/15 text-neon-orange text-sm font-bold flex items-center justify-center">
+                  <span className="flex-shrink-0 w-7 h-7 rounded-full bg-accent-muted text-accent text-sm font-bold flex items-center justify-center">
                     {index + 1}
                   </span>
                   <p className="text-text-secondary text-sm pt-0.5">{step}</p>
@@ -88,7 +88,7 @@ export function OfferPreview({ offer, onRegenerate, className }: OfferPreviewPro
               </span>
             )}
             {pricing.real_price > 0 && (
-              <span className="text-4xl font-bold text-neon-orange">
+              <span className="text-4xl font-bold text-accent">
                 {pricing.real_price?.toLocaleString("fr-FR")} &euro;
               </span>
             )}
@@ -98,7 +98,7 @@ export function OfferPreview({ offer, onRegenerate, className }: OfferPreviewPro
               {pricing.value_breakdown.map((item: { item: string; value: number }, i: number) => (
                 <div key={i} className="flex justify-between py-2 border-b border-border-default/50">
                   <span className="text-text-primary text-sm">{item.item}</span>
-                  <span className="text-neon-cyan font-medium text-sm">
+                  <span className="text-accent font-medium text-sm">
                     {item.value?.toLocaleString("fr-FR")} &euro;
                   </span>
                 </div>
@@ -120,7 +120,7 @@ export function OfferPreview({ offer, onRegenerate, className }: OfferPreviewPro
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Shield className="h-5 w-5 text-neon-cyan" />
+              <Shield className="h-5 w-5 text-accent" />
               Garanties
             </CardTitle>
           </CardHeader>
@@ -129,7 +129,7 @@ export function OfferPreview({ offer, onRegenerate, className }: OfferPreviewPro
               {guarantees.map((g: { type: string; description: string; duration: string }, i: number) => (
                 <div key={i} className="p-4 rounded-xl bg-bg-tertiary border border-border-default">
                   <div className="flex items-center gap-2 mb-2">
-                    <CheckCircle className="h-4 w-4 text-neon-cyan" />
+                    <CheckCircle className="h-4 w-4 text-accent" />
                     <span className="font-medium text-text-primary text-sm">{g.type}</span>
                   </div>
                   <p className="text-text-secondary text-xs">{g.description}</p>
@@ -159,7 +159,7 @@ export function OfferPreview({ offer, onRegenerate, className }: OfferPreviewPro
           <Card>
             <CardHeader>
               <CardTitle className="text-base flex items-center gap-2">
-                <Gift className="h-4 w-4 text-neon-orange" />
+                <Gift className="h-4 w-4 text-accent" />
                 Élément No-Brainer
               </CardTitle>
             </CardHeader>
@@ -174,10 +174,10 @@ export function OfferPreview({ offer, onRegenerate, className }: OfferPreviewPro
       {oto && (
         <GlowCard glowColor="blue">
           <h3 className="text-lg font-semibold text-text-primary mb-2">OTO (One-Time Offer)</h3>
-          {oto.name && <p className="text-neon-blue font-medium">{oto.name}</p>}
+          {oto.name && <p className="text-info font-medium">{oto.name}</p>}
           {oto.description && <p className="text-text-secondary text-sm mt-1">{oto.description}</p>}
           {oto.price > 0 && (
-            <p className="text-neon-orange font-bold text-xl mt-2">
+            <p className="text-accent font-bold text-xl mt-2">
               {oto.price?.toLocaleString("fr-FR")} &euro;
             </p>
           )}

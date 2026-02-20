@@ -30,7 +30,7 @@ export default function AdsPage() {
             className={cn(
               "flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all",
               activeTab === tab.key
-                ? "bg-neon-orange text-white shadow-[0_0_20px_rgba(255,107,44,0.3)]"
+                ? "bg-accent text-white"
                 : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
             )}
           >

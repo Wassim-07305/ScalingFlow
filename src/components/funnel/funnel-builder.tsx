@@ -64,7 +64,7 @@ export function FunnelBuilder({ className }: FunnelBuilderProps) {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Sparkles className="h-5 w-5 text-neon-orange" />
+              <Sparkles className="h-5 w-5 text-accent" />
               Générer ton funnel
             </CardTitle>
             <CardDescription>
@@ -84,7 +84,7 @@ export function FunnelBuilder({ className }: FunnelBuilderProps) {
                 </React.Fragment>
               ))}
             </div>
-            {error && <p className="text-sm text-neon-red">{error}</p>}
+            {error && <p className="text-sm text-danger">{error}</p>}
             <Button size="lg" onClick={handleGenerate}>
               <Sparkles className="h-4 w-4 mr-2" />
               Générer le funnel complet
@@ -112,7 +112,7 @@ export function FunnelBuilder({ className }: FunnelBuilderProps) {
             className={cn(
               "flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all",
               activePage === page.type
-                ? "bg-neon-orange text-white shadow-[0_0_20px_rgba(255,107,44,0.3)]"
+                ? "bg-accent text-white"
                 : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
             )}
           >
@@ -135,13 +135,13 @@ export function FunnelBuilder({ className }: FunnelBuilderProps) {
               <ul className="space-y-2">
                 {pageData.bullet_points?.map((bp: string, i: number) => (
                   <li key={i} className="flex items-start gap-2 text-sm text-text-secondary">
-                    <span className="text-neon-orange mt-0.5">&#x2714;</span>
+                    <span className="text-accent mt-0.5">&#x2714;</span>
                     {bp}
                   </li>
                 ))}
               </ul>
-              <div className="mt-4 p-3 rounded-lg bg-neon-orange/10 border border-neon-orange/20">
-                <p className="text-sm font-medium text-neon-orange">CTA: {pageData.cta_text}</p>
+              <div className="mt-4 p-3 rounded-lg bg-accent-muted border border-accent/20">
+                <p className="text-sm font-medium text-accent">CTA: {pageData.cta_text}</p>
               </div>
               {pageData.social_proof_text && (
                 <p className="mt-3 text-xs text-text-muted italic">{pageData.social_proof_text}</p>
@@ -163,7 +163,7 @@ export function FunnelBuilder({ className }: FunnelBuilderProps) {
               <ul className="space-y-2">
                 {pageData.benefit_bullets?.map((b: string, i: number) => (
                   <li key={i} className="flex items-start gap-2 text-sm text-text-secondary">
-                    <span className="text-neon-blue mt-0.5">&#x2714;</span>
+                    <span className="text-info mt-0.5">&#x2714;</span>
                     {b}
                   </li>
                 ))}
@@ -201,7 +201,7 @@ export function FunnelBuilder({ className }: FunnelBuilderProps) {
               <ol className="space-y-2">
                 {pageData.next_steps?.map((step: string, i: number) => (
                   <li key={i} className="flex items-start gap-3 text-sm text-text-secondary">
-                    <span className="flex-shrink-0 w-6 h-6 rounded-full bg-neon-cyan/15 text-neon-cyan text-xs font-bold flex items-center justify-center">
+                    <span className="flex-shrink-0 w-6 h-6 rounded-full bg-accent-muted text-accent text-xs font-bold flex items-center justify-center">
                       {i + 1}
                     </span>
                     {step}
@@ -210,7 +210,7 @@ export function FunnelBuilder({ className }: FunnelBuilderProps) {
               </ol>
               {pageData.upsell_headline && (
                 <div className="mt-6 p-4 rounded-xl bg-bg-tertiary border border-border-default">
-                  <p className="font-medium text-neon-blue">{pageData.upsell_headline}</p>
+                  <p className="font-medium text-info">{pageData.upsell_headline}</p>
                   <p className="text-sm text-text-secondary mt-1">{pageData.upsell_description}</p>
                   <Badge variant="blue" className="mt-2">{pageData.upsell_cta}</Badge>
                 </div>

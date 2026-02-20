@@ -14,7 +14,7 @@ export function NeonGradientText({
   return (
     <Component
       className={cn(
-        "bg-clip-text text-transparent bg-gradient-to-r from-neon-orange via-neon-blue to-neon-cyan font-[family-name:var(--font-display)]",
+        "text-accent font-semibold",
         className
       )}
     >

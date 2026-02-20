@@ -85,16 +85,16 @@ export function ModuleList({ className }: ModuleListProps) {
               <div className="flex items-start gap-4">
                 <div className={cn(
                   "flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center",
-                  mod.status === "completed" ? "bg-neon-green/15" :
-                  mod.status === "in_progress" ? "bg-neon-orange/15" :
-                  mod.status === "locked" ? "bg-bg-tertiary" : "bg-neon-blue/15"
+                  mod.status === "completed" ? "bg-accent/15" :
+                  mod.status === "in_progress" ? "bg-accent/15" :
+                  mod.status === "locked" ? "bg-bg-tertiary" : "bg-info/15"
                 )}>
                   {mod.status === "completed" ? (
-                    <CheckCircle className="h-6 w-6 text-neon-green" />
+                    <CheckCircle className="h-6 w-6 text-accent" />
                   ) : mod.status === "locked" ? (
                     <Lock className="h-6 w-6 text-text-muted" />
                   ) : (
-                    <PlayCircle className="h-6 w-6 text-neon-orange" />
+                    <PlayCircle className="h-6 w-6 text-accent" />
                   )}
                 </div>
 

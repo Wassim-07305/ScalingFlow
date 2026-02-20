@@ -31,9 +31,9 @@ export function DailyTasks({ className }: DailyTasksProps) {
   const progress = (completedCount / tasks.length) * 100;
 
   const priorityColor: Record<string, string> = {
-    high: "text-neon-red",
-    medium: "text-neon-orange",
-    low: "text-neon-cyan",
+    high: "text-danger",
+    medium: "text-accent",
+    low: "text-accent",
   };
 
   return (
@@ -41,7 +41,7 @@ export function DailyTasks({ className }: DailyTasksProps) {
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2">
-            <Target className="h-5 w-5 text-neon-orange" />
+            <Target className="h-5 w-5 text-accent" />
             Tâches du jour
           </CardTitle>
           <Badge variant="default">
@@ -51,7 +51,7 @@ export function DailyTasks({ className }: DailyTasksProps) {
         </div>
         <div className="w-full h-2 rounded-full bg-bg-tertiary overflow-hidden">
           <div
-            className="h-full rounded-full bg-gradient-to-r from-neon-orange to-neon-cyan transition-all duration-500"
+            className="h-full rounded-full bg-gradient-to-r from-accent to-accent transition-all duration-500"
             style={{ width: `${progress}%` }}
           />
         </div>

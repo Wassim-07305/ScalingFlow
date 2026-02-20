@@ -25,7 +25,7 @@ export function MilestoneTracker({ className }: MilestoneTrackerProps) {
     <Card className={cn(className)}>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Trophy className="h-5 w-5 text-neon-orange" />
+          <Trophy className="h-5 w-5 text-accent" />
           Milestones
         </CardTitle>
       </CardHeader>
@@ -37,17 +37,17 @@ export function MilestoneTracker({ className }: MilestoneTrackerProps) {
               <div key={milestone.id} className="relative flex items-start gap-4 pl-12">
                 <div className="absolute left-2.5">
                   {milestone.status === "completed" ? (
-                    <CheckCircle className="h-5 w-5 text-neon-green" />
+                    <CheckCircle className="h-5 w-5 text-accent" />
                   ) : milestone.status === "in_progress" ? (
-                    <Circle className="h-5 w-5 text-neon-orange animate-pulse" />
+                    <Circle className="h-5 w-5 text-accent animate-pulse" />
                   ) : (
                     <Lock className="h-5 w-5 text-text-muted" />
                   )}
                 </div>
                 <div className={cn(
                   "flex-1 p-3 rounded-xl",
-                  milestone.status === "completed" ? "bg-neon-green/5 border border-neon-green/20" :
-                  milestone.status === "in_progress" ? "bg-neon-orange/5 border border-neon-orange/20" :
+                  milestone.status === "completed" ? "bg-accent/5 border border-accent/20" :
+                  milestone.status === "in_progress" ? "bg-accent/5 border border-accent/20" :
                   "bg-bg-tertiary border border-border-default opacity-60"
                 )}>
                   <div className="flex items-center justify-between">

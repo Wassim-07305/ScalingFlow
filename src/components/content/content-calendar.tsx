@@ -93,14 +93,14 @@ export function ContentCalendar({ className }: ContentCalendarProps) {
                 className={cn(
                   "min-h-[80px] p-1.5 rounded-lg border transition-all",
                   day ? "border-border-default bg-bg-secondary hover:border-border-hover" : "border-transparent",
-                  isToday && "border-neon-orange/50 bg-neon-orange/5"
+                  isToday && "border-accent/50 bg-accent/5"
                 )}
               >
                 {day && (
                   <>
                     <span className={cn(
                       "text-xs font-medium",
-                      isToday ? "text-neon-orange" : "text-text-muted"
+                      isToday ? "text-accent" : "text-text-muted"
                     )}>
                       {day}
                     </span>

@@ -70,7 +70,7 @@ export function PostGenerator({ className }: PostGeneratorProps) {
             className={cn(
               "flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all",
               platform === p.key
-                ? "bg-neon-blue text-white"
+                ? "bg-accent text-white"
                 : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
             )}
           >
@@ -82,7 +82,7 @@ export function PostGenerator({ className }: PostGeneratorProps) {
 
       {posts.length === 0 ? (
         <div className="text-center py-12">
-          {error && <p className="text-sm text-neon-red mb-4">{error}</p>}
+          {error && <p className="text-sm text-danger mb-4">{error}</p>}
           <Button size="lg" onClick={handleGenerate}>
             <Sparkles className="h-4 w-4 mr-2" />
             Générer des posts {platform}
@@ -120,7 +120,7 @@ export function PostGenerator({ className }: PostGeneratorProps) {
                 {post.hashtags?.length > 0 && (
                   <div className="flex flex-wrap gap-1 mt-3">
                     {post.hashtags.map((h: string, j: number) => (
-                      <span key={j} className="text-xs text-neon-blue">{h}</span>
+                      <span key={j} className="text-xs text-info">{h}</span>
                     ))}
                   </div>
                 )}

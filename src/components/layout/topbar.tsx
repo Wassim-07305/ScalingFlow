@@ -36,20 +36,20 @@ export function Topbar() {
   return (
     <header
       className={cn(
-        "sticky top-0 z-30 flex h-16 items-center justify-between border-b border-border-default bg-bg-primary/80 backdrop-blur-xl px-6 transition-all duration-300",
-        sidebarCollapsed ? "lg:ml-[72px]" : "lg:ml-[260px]"
+        "sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border-default bg-bg-primary/90 backdrop-blur-sm px-6 transition-all duration-200",
+        sidebarCollapsed ? "lg:ml-[64px]" : "lg:ml-[220px]"
       )}
     >
       {/* Left: Mobile menu + Search */}
       <div className="flex items-center gap-4">
         <button
           onClick={() => setSidebarMobileOpen(true)}
-          className="lg:hidden flex h-9 w-9 items-center justify-center rounded-[8px] text-text-muted hover:text-text-primary hover:bg-bg-tertiary transition-colors"
+          className="lg:hidden flex h-8 w-8 items-center justify-center rounded-[6px] text-text-muted hover:text-text-primary hover:bg-bg-tertiary transition-colors duration-150"
         >
           <Menu className="h-5 w-5" />
         </button>
 
-        <div className="hidden sm:flex items-center gap-2 rounded-[12px] bg-bg-tertiary border border-border-default px-3 py-2 w-64">
+        <div className="hidden sm:flex items-center gap-2 rounded-[8px] bg-bg-tertiary border border-border-default px-3 py-1.5 w-60">
           <Search className="h-4 w-4 text-text-muted" />
           <input
             type="text"
@@ -60,18 +60,18 @@ export function Topbar() {
       </div>
 
       {/* Right: Notifications + Profile */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2">
         {/* Notifications */}
         <Button variant="ghost" size="icon" className="relative">
-          <Bell className="h-5 w-5" />
-          <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-neon-orange shadow-[0_0_6px_rgba(255,107,44,0.5)]" />
+          <Bell className="h-4 w-4" />
+          <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-accent" />
         </Button>
 
         {/* Profile dropdown */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="flex items-center gap-2 rounded-[12px] p-1.5 hover:bg-bg-tertiary transition-colors">
-              <Avatar className="h-8 w-8">
+            <button className="flex items-center gap-2 rounded-[8px] p-1.5 hover:bg-bg-tertiary transition-colors duration-150">
+              <Avatar className="h-7 w-7">
                 <AvatarImage src={profile?.avatar_url || undefined} />
                 <AvatarFallback>{initials}</AvatarFallback>
               </Avatar>
@@ -92,7 +92,7 @@ export function Topbar() {
               Paramètres
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleSignOut} className="text-neon-red focus:text-neon-red">
+            <DropdownMenuItem onClick={handleSignOut} className="text-danger focus:text-danger">
               Se déconnecter
             </DropdownMenuItem>
           </DropdownMenuContent>

@@ -34,7 +34,6 @@ export function AnimatedCounter({
       const elapsed = timestamp - startRef.current;
       const progress = Math.min(elapsed / duration, 1);
 
-      // Ease out cubic
       const eased = 1 - Math.pow(1 - progress, 3);
       setDisplayValue(startValue + diff * eased);
 
@@ -53,7 +52,7 @@ export function AnimatedCounter({
   return (
     <span
       className={cn(
-        "font-[family-name:var(--font-mono)] tabular-nums",
+        "font-mono tabular-nums",
         className
       )}
     >

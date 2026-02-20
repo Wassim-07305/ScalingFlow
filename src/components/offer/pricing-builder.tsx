@@ -116,7 +116,7 @@ export function PricingBuilder({
           {valueBreakdown.length > 0 && (
             <div className="flex justify-between mt-3 pt-3 border-t border-border-default">
               <span className="text-sm font-medium text-text-secondary">Valeur totale</span>
-              <span className="text-sm font-bold text-neon-cyan">
+              <span className="text-sm font-bold text-accent">
                 {totalValue.toLocaleString("fr-FR")} &euro;
               </span>
             </div>

@@ -66,7 +66,7 @@ export default function SalesPage() {
             className={cn(
               "flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all",
               activeType === type.key
-                ? "bg-neon-orange text-white shadow-[0_0_20px_rgba(255,107,44,0.3)]"
+                ? "bg-accent text-white"
                 : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
             )}
           >
@@ -102,7 +102,7 @@ export default function SalesPage() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Sparkles className="h-5 w-5 text-neon-orange" />
+              <Sparkles className="h-5 w-5 text-accent" />
               Générateur de scripts
             </CardTitle>
             <CardDescription>
@@ -110,7 +110,7 @@ export default function SalesPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {error && <p className="text-sm text-neon-red mb-4">{error}</p>}
+            {error && <p className="text-sm text-danger mb-4">{error}</p>}
             <Button size="lg" onClick={handleGenerate}>
               <Sparkles className="h-4 w-4 mr-2" />
               Générer le script

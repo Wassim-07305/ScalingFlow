@@ -26,7 +26,7 @@ export default function SettingsPage() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <User className="h-5 w-5 text-neon-blue" />
+              <User className="h-5 w-5 text-info" />
               Profil
             </CardTitle>
           </CardHeader>
@@ -51,7 +51,7 @@ export default function SettingsPage() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <CreditCard className="h-5 w-5 text-neon-orange" />
+              <CreditCard className="h-5 w-5 text-accent" />
               Abonnement
             </CardTitle>
             <CardDescription>Gère ton abonnement ScalingFlow</CardDescription>
@@ -80,7 +80,7 @@ export default function SettingsPage() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Bell className="h-5 w-5 text-neon-cyan" />
+              <Bell className="h-5 w-5 text-accent" />
               Notifications
             </CardTitle>
           </CardHeader>
@@ -100,7 +100,7 @@ export default function SettingsPage() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Shield className="h-5 w-5 text-neon-red" />
+              <Shield className="h-5 w-5 text-danger" />
               Sécurité
             </CardTitle>
           </CardHeader>

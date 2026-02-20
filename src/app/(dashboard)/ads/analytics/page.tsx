@@ -6,10 +6,10 @@ import { AnimatedCounter } from "@/components/shared/animated-counter";
 import { TrendingUp, Eye, MousePointer, DollarSign, ArrowUpRight, ArrowDownRight } from "lucide-react";
 
 const MOCK_METRICS = [
-  { label: "ROAS", value: 3.2, suffix: "x", change: "+0.4", positive: true, icon: TrendingUp, color: "text-neon-green" },
-  { label: "CPA Moyen", value: 6.5, suffix: "€", change: "-1.2€", positive: true, icon: DollarSign, color: "text-neon-orange" },
-  { label: "CTR Moyen", value: 4.8, suffix: "%", change: "+0.6%", positive: true, icon: MousePointer, color: "text-neon-blue" },
-  { label: "CPM", value: 12.3, suffix: "€", change: "+2.1€", positive: false, icon: Eye, color: "text-neon-cyan" },
+  { label: "ROAS", value: 3.2, suffix: "x", change: "+0.4", positive: true, icon: TrendingUp, color: "text-accent" },
+  { label: "CPA Moyen", value: 6.5, suffix: "€", change: "-1.2€", positive: true, icon: DollarSign, color: "text-accent" },
+  { label: "CTR Moyen", value: 4.8, suffix: "%", change: "+0.6%", positive: true, icon: MousePointer, color: "text-info" },
+  { label: "CPM", value: 12.3, suffix: "€", change: "+2.1€", positive: false, icon: Eye, color: "text-accent" },
 ];
 
 export default function AnalyticsPage() {
@@ -31,11 +31,11 @@ export default function AnalyticsPage() {
               </p>
               <div className="flex items-center gap-1 mt-1">
                 {metric.positive ? (
-                  <ArrowUpRight className="h-3 w-3 text-neon-green" />
+                  <ArrowUpRight className="h-3 w-3 text-accent" />
                 ) : (
-                  <ArrowDownRight className="h-3 w-3 text-neon-red" />
+                  <ArrowDownRight className="h-3 w-3 text-danger" />
                 )}
-                <span className={`text-xs ${metric.positive ? "text-neon-green" : "text-neon-red"}`}>
+                <span className={`text-xs ${metric.positive ? "text-accent" : "text-danger"}`}>
                   {metric.change}
                 </span>
                 <span className="text-xs text-text-muted">vs mois dernier</span>

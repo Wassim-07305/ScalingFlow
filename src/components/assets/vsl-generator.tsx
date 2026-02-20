@@ -47,7 +47,7 @@ export function VSLGenerator({ className }: VSLGeneratorProps) {
   if (!script) {
     return (
       <div className={cn("text-center py-12", className)}>
-        {error && <p className="text-sm text-neon-red mb-4">{error}</p>}
+        {error && <p className="text-sm text-danger mb-4">{error}</p>}
         <Button size="lg" onClick={handleGenerate}>
           <Sparkles className="h-4 w-4 mr-2" />
           Générer le script VSL
@@ -77,7 +77,7 @@ export function VSLGenerator({ className }: VSLGeneratorProps) {
             className={cn(
               "px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all",
               activeSection === i
-                ? "bg-neon-blue text-white"
+                ? "bg-accent text-white"
                 : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
             )}
           >
@@ -90,7 +90,7 @@ export function VSLGenerator({ className }: VSLGeneratorProps) {
         <GlowCard glowColor="blue">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
-              <Play className="h-4 w-4 text-neon-blue" />
+              <Play className="h-4 w-4 text-accent" />
               <h3 className="font-semibold text-text-primary">{sections[activeSection].name}</h3>
             </div>
             <Badge variant="muted">{sections[activeSection].duration}</Badge>

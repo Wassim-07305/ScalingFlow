@@ -137,7 +137,7 @@ export function PostFeed({ className }: PostFeedProps) {
             className={cn(
               "px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all",
               activeCategory === cat
-                ? "bg-neon-orange text-white"
+                ? "bg-accent text-white"
                 : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
             )}
           >
@@ -179,17 +179,17 @@ export function PostFeed({ className }: PostFeedProps) {
                   onClick={() => toggleLike(post.id)}
                   className={cn(
                     "flex items-center gap-1.5 text-sm transition-colors",
-                    post.liked ? "text-neon-red" : "text-text-muted hover:text-neon-red"
+                    post.liked ? "text-danger" : "text-text-muted hover:text-danger"
                   )}
                 >
                   <Heart className={cn("h-4 w-4", post.liked && "fill-current")} />
                   {post.likes}
                 </button>
-                <button className="flex items-center gap-1.5 text-sm text-text-muted hover:text-neon-blue transition-colors">
+                <button className="flex items-center gap-1.5 text-sm text-text-muted hover:text-info transition-colors">
                   <MessageCircle className="h-4 w-4" />
                   {post.comments}
                 </button>
-                <button className="flex items-center gap-1.5 text-sm text-text-muted hover:text-neon-cyan transition-colors">
+                <button className="flex items-center gap-1.5 text-sm text-text-muted hover:text-accent transition-colors">
                   <Share2 className="h-4 w-4" />
                 </button>
               </div>

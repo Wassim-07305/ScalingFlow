@@ -16,12 +16,12 @@ export function PageHeader({
   return (
     <div
       className={cn(
-        "flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8",
+        "flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6",
         className
       )}
     >
       <div>
-        <h1 className="text-2xl font-bold font-[family-name:var(--font-display)] text-text-primary">
+        <h1 className="text-xl font-semibold text-text-primary">
           {title}
         </h1>
         {description && (

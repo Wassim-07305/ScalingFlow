@@ -55,7 +55,7 @@ export function CreativeGenerator({ className }: CreativeGeneratorProps) {
   if (variations.length === 0) {
     return (
       <div className={cn("text-center py-12", className)}>
-        {error && <p className="text-sm text-neon-red mb-4">{error}</p>}
+        {error && <p className="text-sm text-danger mb-4">{error}</p>}
         <Button size="lg" onClick={handleGenerate}>
           <Sparkles className="h-4 w-4 mr-2" />
           Générer 5 variations
@@ -98,7 +98,7 @@ export function CreativeGenerator({ className }: CreativeGeneratorProps) {
             <div className="space-y-3">
               <div>
                 <p className="text-xs text-text-muted mb-1">Hook</p>
-                <p className="text-sm font-medium text-neon-orange">{v.hook}</p>
+                <p className="text-sm font-medium text-accent">{v.hook}</p>
               </div>
               <div>
                 <p className="text-xs text-text-muted mb-1">Body</p>
@@ -108,8 +108,8 @@ export function CreativeGenerator({ className }: CreativeGeneratorProps) {
                 <p className="text-xs text-text-muted mb-1">Headline</p>
                 <p className="text-sm font-medium text-text-primary">{v.headline}</p>
               </div>
-              <div className="p-2 rounded-lg bg-neon-orange/10 border border-neon-orange/20">
-                <p className="text-sm font-medium text-neon-orange text-center">{v.cta}</p>
+              <div className="p-2 rounded-lg bg-accent/10 border border-accent/20">
+                <p className="text-sm font-medium text-accent text-center">{v.cta}</p>
               </div>
               <div className="flex items-center gap-2 pt-2">
                 <Target className="h-3 w-3 text-text-muted" />

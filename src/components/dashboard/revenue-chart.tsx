@@ -32,8 +32,8 @@ export function RevenueChart() {
             <AreaChart data={data}>
               <defs>
                 <linearGradient id="revenueGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#FF6B2C" stopOpacity={0.3} />
-                  <stop offset="100%" stopColor="#FF6B2C" stopOpacity={0} />
+                  <stop offset="0%" stopColor="#34D399" stopOpacity={0.2} />
+                  <stop offset="100%" stopColor="#34D399" stopOpacity={0} />
                 </linearGradient>
               </defs>
               <CartesianGrid
@@ -43,13 +43,13 @@ export function RevenueChart() {
               />
               <XAxis
                 dataKey="month"
-                stroke="#4A4A6A"
+                stroke="#5C6370"
                 fontSize={12}
                 tickLine={false}
                 axisLine={false}
               />
               <YAxis
-                stroke="#4A4A6A"
+                stroke="#5C6370"
                 fontSize={12}
                 tickLine={false}
                 axisLine={false}
@@ -57,11 +57,10 @@ export function RevenueChart() {
               />
               <Tooltip
                 contentStyle={{
-                  backgroundColor: "#22223A",
+                  backgroundColor: "#1C1F23",
                   border: "1px solid rgba(255,255,255,0.06)",
-                  borderRadius: "12px",
-                  backdropFilter: "blur(12px)",
-                  color: "#F1F1F6",
+                  borderRadius: "8px",
+                  color: "#FFFFFF",
                   fontSize: "13px",
                 }}
                 formatter={(value) => [`${value}€`, "Revenu"]}
@@ -69,7 +68,7 @@ export function RevenueChart() {
               <Area
                 type="monotone"
                 dataKey="revenue"
-                stroke="#FF6B2C"
+                stroke="#34D399"
                 strokeWidth={2}
                 fill="url(#revenueGradient)"
               />

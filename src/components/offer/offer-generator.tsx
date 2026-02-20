@@ -75,7 +75,7 @@ export function OfferGenerator({ className, marketAnalysisId, marketName }: Offe
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Sparkles className="h-5 w-5 text-neon-orange" />
+              <Sparkles className="h-5 w-5 text-accent" />
               Générer une offre
             </CardTitle>
             <CardDescription>
@@ -89,7 +89,7 @@ export function OfferGenerator({ className, marketAnalysisId, marketName }: Offe
                 <Badge variant="default">{marketName}</Badge>
               </div>
             )}
-            {error && <p className="text-sm text-neon-red">{error}</p>}
+            {error && <p className="text-sm text-danger">{error}</p>}
             <Button size="lg" onClick={handleGenerate}>
               <Sparkles className="h-4 w-4 mr-2" />
               Générer mon offre

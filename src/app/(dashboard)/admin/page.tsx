@@ -33,10 +33,10 @@ export default function AdminPage() {
       {/* KPIs */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
         {[
-          { label: "Utilisateurs", value: MOCK_STATS.totalUsers, icon: Users, color: "text-neon-blue" },
-          { label: "Actifs", value: MOCK_STATS.activeUsers, icon: Activity, color: "text-neon-green" },
-          { label: "MRR", value: MOCK_STATS.mrr, suffix: "€", icon: DollarSign, color: "text-neon-orange" },
-          { label: "Conversion", value: MOCK_STATS.conversionRate, suffix: "%", icon: TrendingUp, color: "text-neon-cyan" },
+          { label: "Utilisateurs", value: MOCK_STATS.totalUsers, icon: Users, color: "text-info" },
+          { label: "Actifs", value: MOCK_STATS.activeUsers, icon: Activity, color: "text-accent" },
+          { label: "MRR", value: MOCK_STATS.mrr, suffix: "€", icon: DollarSign, color: "text-accent" },
+          { label: "Conversion", value: MOCK_STATS.conversionRate, suffix: "%", icon: TrendingUp, color: "text-accent" },
         ].map((kpi) => (
           <Card key={kpi.label}>
             <CardContent className="pt-6">

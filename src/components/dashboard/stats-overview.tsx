@@ -51,24 +51,24 @@ const STATS: StatCard[] = [
 
 const colorMap = {
   orange: {
-    bg: "bg-neon-orange-glow",
-    text: "text-neon-orange",
-    icon: "text-neon-orange",
+    bg: "bg-accent-muted",
+    text: "text-accent",
+    icon: "text-accent",
   },
   blue: {
-    bg: "bg-neon-blue-glow",
-    text: "text-neon-blue",
-    icon: "text-neon-blue",
+    bg: "bg-info/12",
+    text: "text-info",
+    icon: "text-info",
   },
   cyan: {
-    bg: "bg-neon-cyan-glow",
-    text: "text-neon-cyan",
-    icon: "text-neon-cyan",
+    bg: "bg-accent-muted",
+    text: "text-accent",
+    icon: "text-accent",
   },
   purple: {
-    bg: "bg-neon-purple-glow",
-    text: "text-neon-purple",
-    icon: "text-neon-purple",
+    bg: "bg-[rgba(139,92,246,0.12)]",
+    text: "text-[#A78BFA]",
+    icon: "text-[#A78BFA]",
   },
 };
 
@@ -94,7 +94,7 @@ export function StatsOverview() {
                   <p
                     className={cn(
                       "mt-1 text-xs font-medium",
-                      stat.change > 0 ? "text-neon-cyan" : "text-neon-red"
+                      stat.change > 0 ? "text-accent" : "text-danger"
                     )}
                   >
                     {stat.change > 0 ? "+" : ""}
@@ -105,7 +105,7 @@ export function StatsOverview() {
               </div>
               <div
                 className={cn(
-                  "flex h-10 w-10 items-center justify-center rounded-[12px]",
+                  "flex h-10 w-10 items-center justify-center rounded-[8px]",
                   colors.bg
                 )}
               >

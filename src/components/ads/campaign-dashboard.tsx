@@ -60,10 +60,10 @@ export function CampaignDashboard({ className }: CampaignDashboardProps) {
       {/* KPIs */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {[
-          { label: "Dépensé", value: totalSpent, suffix: " €", icon: DollarSign, color: "text-neon-orange" },
-          { label: "Impressions", value: totalImpressions, icon: Eye, color: "text-neon-blue" },
-          { label: "Clics", value: totalClicks, icon: MousePointer, color: "text-neon-cyan" },
-          { label: "Conversions", value: totalConversions, icon: TrendingUp, color: "text-neon-green" },
+          { label: "Dépensé", value: totalSpent, suffix: " €", icon: DollarSign, color: "text-accent" },
+          { label: "Impressions", value: totalImpressions, icon: Eye, color: "text-info" },
+          { label: "Clics", value: totalClicks, icon: MousePointer, color: "text-accent" },
+          { label: "Conversions", value: totalConversions, icon: TrendingUp, color: "text-accent" },
         ].map((kpi) => (
           <Card key={kpi.label}>
             <CardContent className="pt-6">
@@ -108,15 +108,15 @@ export function CampaignDashboard({ className }: CampaignDashboardProps) {
                 <div className="flex items-center gap-6 text-right">
                   <div>
                     <p className="text-xs text-text-muted">CTR</p>
-                    <p className="text-sm font-medium text-neon-blue">{campaign.ctr}%</p>
+                    <p className="text-sm font-medium text-info">{campaign.ctr}%</p>
                   </div>
                   <div>
                     <p className="text-xs text-text-muted">CPA</p>
-                    <p className="text-sm font-medium text-neon-orange">{campaign.cpa}€</p>
+                    <p className="text-sm font-medium text-accent">{campaign.cpa}€</p>
                   </div>
                   <div>
                     <p className="text-xs text-text-muted">Conv.</p>
-                    <p className="text-sm font-medium text-neon-cyan">{campaign.conversions}</p>
+                    <p className="text-sm font-medium text-accent">{campaign.conversions}</p>
                   </div>
                 </div>
               </div>

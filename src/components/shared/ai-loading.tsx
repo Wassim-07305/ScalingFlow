@@ -19,60 +19,15 @@ export function AILoading({
         className
       )}
     >
-      {/* Neon pulse rings */}
-      <div className="relative w-16 h-16">
+      {/* Spinner */}
+      <div className="relative w-10 h-10">
         <motion.div
-          className="absolute inset-0 rounded-full border-2 border-neon-orange"
-          animate={{
-            scale: [1, 1.5, 1],
-            opacity: [0.8, 0, 0.8],
-          }}
+          className="absolute inset-0 rounded-full border-2 border-border-default border-t-accent"
+          animate={{ rotate: 360 }}
           transition={{
-            duration: 2,
+            duration: 1,
             repeat: Infinity,
-            ease: "easeInOut",
-          }}
-        />
-        <motion.div
-          className="absolute inset-0 rounded-full border-2 border-neon-blue"
-          animate={{
-            scale: [1, 1.5, 1],
-            opacity: [0.8, 0, 0.8],
-          }}
-          transition={{
-            duration: 2,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: 0.5,
-          }}
-        />
-        <motion.div
-          className="absolute inset-0 rounded-full border-2 border-neon-cyan"
-          animate={{
-            scale: [1, 1.5, 1],
-            opacity: [0.8, 0, 0.8],
-          }}
-          transition={{
-            duration: 2,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: 1,
-          }}
-        />
-        {/* Center dot */}
-        <motion.div
-          className="absolute inset-[6px] rounded-full bg-neon-orange"
-          animate={{
-            boxShadow: [
-              "0 0 20px rgba(255,107,44,0.5)",
-              "0 0 40px rgba(255,107,44,0.8)",
-              "0 0 20px rgba(255,107,44,0.5)",
-            ],
-          }}
-          transition={{
-            duration: 1.5,
-            repeat: Infinity,
-            ease: "easeInOut",
+            ease: "linear",
           }}
         />
       </div>

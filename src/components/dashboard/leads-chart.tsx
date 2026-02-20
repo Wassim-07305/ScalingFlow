@@ -37,32 +37,31 @@ export function LeadsChart() {
               />
               <XAxis
                 dataKey="week"
-                stroke="#4A4A6A"
+                stroke="#5C6370"
                 fontSize={12}
                 tickLine={false}
                 axisLine={false}
               />
               <YAxis
-                stroke="#4A4A6A"
+                stroke="#5C6370"
                 fontSize={12}
                 tickLine={false}
                 axisLine={false}
               />
               <Tooltip
                 contentStyle={{
-                  backgroundColor: "#22223A",
+                  backgroundColor: "#1C1F23",
                   border: "1px solid rgba(255,255,255,0.06)",
-                  borderRadius: "12px",
-                  backdropFilter: "blur(12px)",
-                  color: "#F1F1F6",
+                  borderRadius: "8px",
+                  color: "#FFFFFF",
                   fontSize: "13px",
                 }}
                 formatter={(value) => [String(value), "Leads"]}
               />
               <Bar
                 dataKey="leads"
-                fill="#3B82F6"
-                radius={[6, 6, 0, 0]}
+                fill="#34D399"
+                radius={[4, 4, 0, 0]}
                 maxBarSize={40}
               />
             </BarChart>

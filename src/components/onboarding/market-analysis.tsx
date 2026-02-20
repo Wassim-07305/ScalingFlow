@@ -24,7 +24,7 @@ export function MarketAnalysis({ result, onSelect }: MarketAnalysisProps) {
   return (
     <div className="max-w-3xl mx-auto space-y-6">
       <div className="text-center space-y-2">
-        <h2 className="text-2xl font-bold font-[family-name:var(--font-display)]">
+        <h2 className="text-2xl font-bold">
           3 opportunités identifiées
         </h2>
         <p className="text-text-secondary">
@@ -48,8 +48,8 @@ export function MarketAnalysis({ result, onSelect }: MarketAnalysisProps) {
               <Card
                 className={cn(
                   "cursor-pointer transition-all duration-300",
-                  isSelected && "border-neon-orange shadow-[0_0_20px_rgba(255,107,44,0.2)]",
-                  isRecommended && !isSelected && "border-neon-cyan/50"
+                  isSelected && "border-accent",
+                  isRecommended && !isSelected && "border-accent/50"
                 )}
                 onClick={() => setExpandedIndex(isExpanded ? null : index)}
               >
@@ -82,14 +82,14 @@ export function MarketAnalysis({ result, onSelect }: MarketAnalysisProps) {
                     {/* Problems */}
                     <div>
                       <h4 className="text-sm font-semibold text-text-primary flex items-center gap-2 mb-2">
-                        <Target className="h-4 w-4 text-neon-orange" />
+                        <Target className="h-4 w-4 text-accent" />
                         Problèmes identifiés
                       </h4>
                       <ul className="space-y-1">
                         {market.problems.map((problem) => (
                           <li
                             key={problem}
-                            className="text-sm text-text-secondary pl-4 relative before:content-['•'] before:absolute before:left-0 before:text-neon-orange"
+                            className="text-sm text-text-secondary pl-4 relative before:content-['•'] before:absolute before:left-0 before:text-accent"
                           >
                             {problem}
                           </li>
@@ -100,7 +100,7 @@ export function MarketAnalysis({ result, onSelect }: MarketAnalysisProps) {
                     {/* Avatar */}
                     <div>
                       <h4 className="text-sm font-semibold text-text-primary flex items-center gap-2 mb-2">
-                        <Users className="h-4 w-4 text-neon-blue" />
+                        <Users className="h-4 w-4 text-info" />
                         Avatar client : {market.avatar.name}
                       </h4>
                       <p className="text-sm text-text-secondary">
@@ -118,7 +118,7 @@ export function MarketAnalysis({ result, onSelect }: MarketAnalysisProps) {
                     {/* Demand signals */}
                     <div>
                       <h4 className="text-sm font-semibold text-text-primary flex items-center gap-2 mb-2">
-                        <TrendingUp className="h-4 w-4 text-neon-cyan" />
+                        <TrendingUp className="h-4 w-4 text-accent" />
                         Signaux de demande
                       </h4>
                       <div className="flex flex-wrap gap-1">
@@ -131,9 +131,9 @@ export function MarketAnalysis({ result, onSelect }: MarketAnalysisProps) {
                     </div>
 
                     {/* Why good fit */}
-                    <div className="rounded-[12px] bg-bg-tertiary p-3">
+                    <div className="rounded-[8px] bg-bg-tertiary p-3">
                       <p className="text-sm text-text-secondary">
-                        <span className="text-neon-orange font-semibold">Pourquoi ce marché : </span>
+                        <span className="text-accent font-semibold">Pourquoi ce marché : </span>
                         {market.why_good_fit}
                       </p>
                     </div>

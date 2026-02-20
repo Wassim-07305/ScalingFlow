@@ -34,7 +34,7 @@ export function LeaderboardTable({ className }: LeaderboardTableProps) {
     <Card className={cn(className)}>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Trophy className="h-5 w-5 text-neon-orange" />
+          <Trophy className="h-5 w-5 text-accent" />
           Classement Global
         </CardTitle>
       </CardHeader>
@@ -45,7 +45,7 @@ export function LeaderboardTable({ className }: LeaderboardTableProps) {
               key={user.rank}
               className={cn(
                 "flex items-center gap-4 p-3 rounded-xl transition-all",
-                user.rank <= 3 ? "bg-neon-orange/5 border border-neon-orange/10" : "bg-bg-tertiary"
+                user.rank <= 3 ? "bg-accent/5 border border-accent/10" : "bg-bg-tertiary"
               )}
             >
               {/* Rank */}
@@ -71,7 +71,7 @@ export function LeaderboardTable({ className }: LeaderboardTableProps) {
 
               {/* Streak */}
               <div className="flex items-center gap-1">
-                <Flame className="h-3.5 w-3.5 text-neon-red" />
+                <Flame className="h-3.5 w-3.5 text-danger" />
                 <span className="text-xs text-text-muted">{user.streak}j</span>
               </div>
 
@@ -82,9 +82,9 @@ export function LeaderboardTable({ className }: LeaderboardTableProps) {
 
               {/* Change */}
               {user.change === "up" ? (
-                <TrendingUp className="h-4 w-4 text-neon-green" />
+                <TrendingUp className="h-4 w-4 text-accent" />
               ) : user.change === "down" ? (
-                <TrendingDown className="h-4 w-4 text-neon-red" />
+                <TrendingDown className="h-4 w-4 text-danger" />
               ) : (
                 <Minus className="h-4 w-4 text-text-muted" />
               )}

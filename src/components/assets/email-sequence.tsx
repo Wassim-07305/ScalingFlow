@@ -47,7 +47,7 @@ export function EmailSequence({ className }: EmailSequenceProps) {
   if (!sequence) {
     return (
       <div className={cn("text-center py-12", className)}>
-        {error && <p className="text-sm text-neon-red mb-4">{error}</p>}
+        {error && <p className="text-sm text-danger mb-4">{error}</p>}
         <Button size="lg" onClick={handleGenerate}>
           <Sparkles className="h-4 w-4 mr-2" />
           Générer la séquence email
@@ -83,21 +83,21 @@ export function EmailSequence({ className }: EmailSequenceProps) {
             <div className={cn(
               "absolute left-3.5 top-4 w-3 h-3 rounded-full border-2",
               expandedEmail === i
-                ? "bg-neon-orange border-neon-orange"
+                ? "bg-accent border-accent"
                 : "bg-bg-tertiary border-border-default"
             )} />
 
             <Card
               className={cn(
                 "cursor-pointer transition-all",
-                expandedEmail === i && "border-neon-orange/30"
+                expandedEmail === i && "border-accent/30"
               )}
               onClick={() => setExpandedEmail(expandedEmail === i ? null : i)}
             >
               <CardHeader className="py-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <Mail className="h-4 w-4 text-neon-blue" />
+                    <Mail className="h-4 w-4 text-info" />
                     <div>
                       <CardTitle className="text-sm">{email.subject}</CardTitle>
                       <p className="text-xs text-text-muted mt-0.5">Jour {email.day}</p>
@@ -121,8 +121,8 @@ export function EmailSequence({ className }: EmailSequenceProps) {
                   <div className="text-sm text-text-secondary whitespace-pre-wrap mb-4">
                     {email.body}
                   </div>
-                  <div className="p-2 rounded-lg bg-neon-orange/10 border border-neon-orange/20 inline-block">
-                    <span className="text-sm font-medium text-neon-orange">{email.cta_text}</span>
+                  <div className="p-2 rounded-lg bg-accent-muted border border-accent/20 inline-block">
+                    <span className="text-sm font-medium text-accent">{email.cta_text}</span>
                   </div>
                 </CardContent>
               )}

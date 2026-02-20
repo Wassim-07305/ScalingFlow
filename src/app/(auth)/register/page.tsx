@@ -95,7 +95,7 @@ export default function RegisterPage() {
         </div>
 
         {error && (
-          <div className="rounded-[12px] bg-neon-red/10 border border-neon-red/20 p-3 text-sm text-neon-red">
+          <div className="rounded-[8px] bg-danger/10 border border-danger/20 p-3 text-sm text-danger">
             {error}
           </div>
         )}
@@ -110,7 +110,7 @@ export default function RegisterPage() {
         Déjà un compte ?{" "}
         <Link
           href="/login"
-          className="text-neon-blue hover:underline font-medium"
+          className="text-info hover:underline font-medium"
         >
           Se connecter
         </Link>
