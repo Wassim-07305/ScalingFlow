@@ -4,13 +4,15 @@ import React from "react";
 import { PageHeader } from "@/components/layout/page-header";
 import { VSLGenerator } from "@/components/assets/vsl-generator";
 import { EmailSequence } from "@/components/assets/email-sequence";
+import { GenerationHistory } from "@/components/shared/generation-history";
 import { cn } from "@/lib/utils/cn";
-import { Video, Mail, MessageSquare } from "lucide-react";
+import { Video, Mail, MessageSquare, History } from "lucide-react";
 
 const TABS = [
   { key: "vsl", label: "Script VSL", icon: Video },
   { key: "email", label: "Séquence Email", icon: Mail },
   { key: "sms", label: "Séquence SMS", icon: MessageSquare },
+  { key: "history", label: "Historique", icon: History },
 ] as const;
 
 export default function AssetsPage() {
@@ -47,6 +49,15 @@ export default function AssetsPage() {
         <div className="text-center py-12">
           <p className="text-text-secondary">Module SMS bientôt disponible</p>
         </div>
+      )}
+      {activeTab === "history" && (
+        <GenerationHistory
+          table="sales_assets"
+          titleField="title"
+          subtitleField="asset_type"
+          statusField="status"
+          emptyMessage="Aucun asset généré pour le moment."
+        />
       )}
     </div>
   );

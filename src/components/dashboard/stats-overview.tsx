@@ -1,53 +1,20 @@
 "use client";
 
-import { DollarSign, Users, TrendingUp, Flame } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Package, FileText, GitBranch, Flame } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { AnimatedCounter } from "@/components/shared/animated-counter";
 import { cn } from "@/lib/utils/cn";
+import { useUser } from "@/hooks/use-user";
+import { createClient } from "@/lib/supabase/client";
 
 interface StatCard {
   label: string;
   value: number;
-  prefix?: string;
   suffix?: string;
-  change?: number;
   icon: React.ElementType;
   color: "orange" | "blue" | "cyan" | "purple";
 }
-
-const STATS: StatCard[] = [
-  {
-    label: "Revenu mensuel",
-    value: 8450,
-    prefix: "",
-    suffix: "€",
-    change: 23,
-    icon: DollarSign,
-    color: "orange",
-  },
-  {
-    label: "Leads générés",
-    value: 142,
-    change: 12,
-    icon: Users,
-    color: "blue",
-  },
-  {
-    label: "Taux de conversion",
-    value: 4.2,
-    suffix: "%",
-    change: 0.8,
-    icon: TrendingUp,
-    color: "cyan",
-  },
-  {
-    label: "Streak",
-    value: 7,
-    suffix: " jours",
-    icon: Flame,
-    color: "orange",
-  },
-];
 
 const colorMap = {
   orange: {
@@ -73,9 +40,80 @@ const colorMap = {
 };
 
 export function StatsOverview() {
+  const { user, profile, loading: userLoading } = useUser();
+  const [counts, setCounts] = useState({
+    offers: 0,
+    assets: 0,
+    funnels: 0,
+  });
+  const [countsLoading, setCountsLoading] = useState(true);
+
+  useEffect(() => {
+    if (!user) return;
+
+    const fetchCounts = async () => {
+      setCountsLoading(true);
+      const supabase = createClient();
+
+      const [offersRes, assetsRes, funnelsRes] = await Promise.all([
+        supabase
+          .from("offers")
+          .select("id", { count: "exact", head: true })
+          .eq("user_id", user.id),
+        supabase
+          .from("sales_assets")
+          .select("id", { count: "exact", head: true })
+          .eq("user_id", user.id),
+        supabase
+          .from("funnels")
+          .select("id", { count: "exact", head: true })
+          .eq("user_id", user.id),
+      ]);
+
+      setCounts({
+        offers: offersRes.count ?? 0,
+        assets: assetsRes.count ?? 0,
+        funnels: funnelsRes.count ?? 0,
+      });
+      setCountsLoading(false);
+    };
+
+    fetchCounts();
+  }, [user]);
+
+  const isLoading = userLoading || countsLoading;
+
+  const stats: StatCard[] = [
+    {
+      label: "Nombre d'offres",
+      value: counts.offers,
+      icon: Package,
+      color: "orange",
+    },
+    {
+      label: "Assets créés",
+      value: counts.assets,
+      icon: FileText,
+      color: "blue",
+    },
+    {
+      label: "Funnels créés",
+      value: counts.funnels,
+      icon: GitBranch,
+      color: "cyan",
+    },
+    {
+      label: "Streak",
+      value: profile?.streak_days ?? 0,
+      suffix: " jours",
+      icon: Flame,
+      color: "purple",
+    },
+  ];
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      {STATS.map((stat) => {
+      {stats.map((stat) => {
         const colors = colorMap[stat.color];
         return (
           <Card key={stat.label} className="relative overflow-hidden">
@@ -83,25 +121,16 @@ export function StatsOverview() {
               <div>
                 <p className="text-sm text-text-secondary">{stat.label}</p>
                 <div className="mt-2 text-2xl font-bold text-text-primary">
-                  <AnimatedCounter
-                    value={stat.value}
-                    prefix={stat.prefix}
-                    suffix={stat.suffix}
-                    decimals={stat.suffix === "%" ? 1 : 0}
-                  />
+                  {isLoading ? (
+                    <span className="inline-block h-7 w-16 animate-pulse rounded bg-white/10" />
+                  ) : (
+                    <AnimatedCounter
+                      value={stat.value}
+                      suffix={stat.suffix}
+                      decimals={0}
+                    />
+                  )}
                 </div>
-                {stat.change !== undefined && (
-                  <p
-                    className={cn(
-                      "mt-1 text-xs font-medium",
-                      stat.change > 0 ? "text-accent" : "text-danger"
-                    )}
-                  >
-                    {stat.change > 0 ? "+" : ""}
-                    {stat.change}
-                    {stat.suffix === "%" ? " pts" : "%"} vs mois dernier
-                  </p>
-                )}
               </div>
               <div
                 className={cn(

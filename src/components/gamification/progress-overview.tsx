@@ -1,35 +1,116 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils/cn";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { AnimatedCounter } from "@/components/shared/animated-counter";
 import { Flame, Zap, Trophy, Star, Target, BookOpen, Megaphone, PenTool } from "lucide-react";
+import { useUser } from "@/hooks/use-user";
+import { createClient } from "@/lib/supabase/client";
 
-const MOCK_DATA = {
-  totalXp: 3450,
-  level: 7,
-  nextLevelXp: 5000,
-  streak: 12,
-  badges: 5,
-  rank: 23,
-  modules: [
-    { name: "Onboarding", icon: Target, progress: 100, color: "text-accent" },
-    { name: "Offre", icon: Star, progress: 85, color: "text-accent" },
-    { name: "Funnel", icon: Target, progress: 40, color: "text-info" },
-    { name: "Academy", icon: BookOpen, progress: 58, color: "text-accent" },
-    { name: "Ads", icon: Megaphone, progress: 25, color: "text-[#A78BFA]" },
-    { name: "Contenu", icon: PenTool, progress: 10, color: "text-accent" },
-  ],
-};
+/** Liste de tous les badges possibles */
+const ALL_BADGES = [
+  "Explorateur",
+  "Premier pas",
+  "Créateur",
+  "Stratège",
+  "Flamme",
+  "Scaler",
+  "Expert",
+  "Légende",
+];
+
+interface ModuleProgress {
+  name: string;
+  icon: typeof Target;
+  progress: number;
+  color: string;
+}
 
 interface ProgressOverviewProps {
   className?: string;
 }
 
 export function ProgressOverview({ className }: ProgressOverviewProps) {
-  const levelProgress = (MOCK_DATA.totalXp / MOCK_DATA.nextLevelXp) * 100;
+  const { user, profile, loading: userLoading } = useUser();
+  const [modules, setModules] = useState<ModuleProgress[]>([]);
+  const [rank, setRank] = useState<number | null>(null);
+  const [dataLoading, setDataLoading] = useState(true);
+
+  useEffect(() => {
+    if (!user) return;
+
+    const fetchModuleProgress = async () => {
+      const supabase = createClient();
+
+      // Requetes paralleles pour compter les items par module + rang
+      const [offersRes, funnelsRes, adsRes, contentRes, leaderboardRes] =
+        await Promise.all([
+          supabase
+            .from("offers")
+            .select("id", { count: "exact", head: true })
+            .eq("user_id", user.id),
+          supabase
+            .from("funnels")
+            .select("id", { count: "exact", head: true })
+            .eq("user_id", user.id),
+          supabase
+            .from("ad_creatives")
+            .select("id", { count: "exact", head: true })
+            .eq("user_id", user.id),
+          supabase
+            .from("content_pieces")
+            .select("id", { count: "exact", head: true })
+            .eq("user_id", user.id),
+          supabase
+            .from("leaderboard_scores")
+            .select("rank_position")
+            .eq("user_id", user.id)
+            .single(),
+        ]);
+
+      // Calcul progression onboarding
+      const onboardingProgress = profile?.onboarding_completed
+        ? 100
+        : Math.round(((profile?.onboarding_step ?? 0) / 6) * 100);
+
+      const offerProgress = (offersRes.count ?? 0) >= 1 ? 100 : 0;
+      const funnelProgress = (funnelsRes.count ?? 0) >= 1 ? 100 : 0;
+      const academyProgress = 0; // Pas de donnees video_progress pour le moment
+      const adsProgress = (adsRes.count ?? 0) >= 1 ? 100 : 0;
+      const contentProgress = (contentRes.count ?? 0) >= 1 ? 100 : 0;
+
+      setModules([
+        { name: "Onboarding", icon: Target, progress: onboardingProgress, color: "text-accent" },
+        { name: "Offre", icon: Star, progress: offerProgress, color: "text-accent" },
+        { name: "Funnel", icon: Target, progress: funnelProgress, color: "text-info" },
+        { name: "Academy", icon: BookOpen, progress: academyProgress, color: "text-accent" },
+        { name: "Ads", icon: Megaphone, progress: adsProgress, color: "text-[#A78BFA]" },
+        { name: "Contenu", icon: PenTool, progress: contentProgress, color: "text-accent" },
+      ]);
+
+      // Rang depuis leaderboard_scores
+      if (leaderboardRes.data?.rank_position) {
+        setRank(leaderboardRes.data.rank_position);
+      }
+
+      setDataLoading(false);
+    };
+
+    fetchModuleProgress();
+  }, [user, profile]);
+
+  const isLoading = userLoading || dataLoading;
+
+  const totalXp = profile?.xp_points ?? 0;
+  const level = profile?.level ?? 1;
+  const nextLevelXp = level * 1000;
+  const streak = profile?.streak_days ?? 0;
+  const badges = profile?.badges ?? [];
+
+  const levelProgress = nextLevelXp > 0 ? (totalXp / nextLevelXp) * 100 : 0;
 
   return (
     <div className={cn("space-y-6", className)}>
@@ -44,16 +125,20 @@ export function ProgressOverview({ className }: ProgressOverviewProps) {
               <div>
                 <p className="text-xs text-text-muted">Total XP</p>
                 <p className="text-2xl font-bold text-accent">
-                  <AnimatedCounter value={MOCK_DATA.totalXp} />
+                  {isLoading ? (
+                    <span className="inline-block w-16 h-7 bg-bg-tertiary rounded animate-pulse" />
+                  ) : (
+                    <AnimatedCounter value={totalXp} />
+                  )}
                 </p>
               </div>
             </div>
             <div className="mt-3">
               <div className="flex justify-between text-xs text-text-muted mb-1">
-                <span>Niveau {MOCK_DATA.level}</span>
-                <span>Niveau {MOCK_DATA.level + 1}</span>
+                <span>Niveau {level}</span>
+                <span>Niveau {level + 1}</span>
               </div>
-              <Progress value={levelProgress} className="h-2" />
+              <Progress value={isLoading ? 0 : levelProgress} className="h-2" />
             </div>
           </CardContent>
         </Card>
@@ -67,7 +152,11 @@ export function ProgressOverview({ className }: ProgressOverviewProps) {
               <div>
                 <p className="text-xs text-text-muted">Streak</p>
                 <p className="text-2xl font-bold text-danger">
-                  <AnimatedCounter value={MOCK_DATA.streak} /> jours
+                  {isLoading ? (
+                    <span className="inline-block w-16 h-7 bg-bg-tertiary rounded animate-pulse" />
+                  ) : (
+                    <><AnimatedCounter value={streak} /> jours</>
+                  )}
                 </p>
               </div>
             </div>
@@ -83,7 +172,15 @@ export function ProgressOverview({ className }: ProgressOverviewProps) {
               <div>
                 <p className="text-xs text-text-muted">Classement</p>
                 <p className="text-2xl font-bold text-accent">
-                  #<AnimatedCounter value={MOCK_DATA.rank} />
+                  {isLoading ? (
+                    <span className="inline-block w-10 h-7 bg-bg-tertiary rounded animate-pulse" />
+                  ) : rank !== null ? (
+                    <>
+                      #<AnimatedCounter value={rank} />
+                    </>
+                  ) : (
+                    <span className="text-text-muted">&mdash;</span>
+                  )}
                 </p>
               </div>
             </div>
@@ -98,18 +195,33 @@ export function ProgressOverview({ className }: ProgressOverviewProps) {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {MOCK_DATA.modules.map((mod) => (
-              <div key={mod.name} className="flex items-center gap-4">
-                <mod.icon className={cn("h-5 w-5", mod.color)} />
-                <div className="flex-1">
-                  <div className="flex justify-between mb-1">
-                    <span className="text-sm text-text-primary">{mod.name}</span>
-                    <span className="text-sm text-text-muted">{mod.progress}%</span>
+            {isLoading ? (
+              Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="flex items-center gap-4">
+                  <div className="h-5 w-5 bg-bg-tertiary rounded animate-pulse" />
+                  <div className="flex-1">
+                    <div className="flex justify-between mb-1">
+                      <span className="inline-block w-20 h-4 bg-bg-tertiary rounded animate-pulse" />
+                      <span className="inline-block w-8 h-4 bg-bg-tertiary rounded animate-pulse" />
+                    </div>
+                    <Progress value={0} className="h-2" />
                   </div>
-                  <Progress value={mod.progress} className="h-2" />
                 </div>
-              </div>
-            ))}
+              ))
+            ) : (
+              modules.map((mod) => (
+                <div key={mod.name} className="flex items-center gap-4">
+                  <mod.icon className={cn("h-5 w-5", mod.color)} />
+                  <div className="flex-1">
+                    <div className="flex justify-between mb-1">
+                      <span className="text-sm text-text-primary">{mod.name}</span>
+                      <span className="text-sm text-text-muted">{mod.progress}%</span>
+                    </div>
+                    <Progress value={mod.progress} className="h-2" />
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </CardContent>
       </Card>
@@ -121,28 +233,23 @@ export function ProgressOverview({ className }: ProgressOverviewProps) {
         </CardHeader>
         <CardContent>
           <div className="flex flex-wrap gap-3">
-            {["Explorateur", "Premier pas", "Créateur", "Stratège", "Flamme"].map((badge, i) => (
-              <div key={badge} className="flex flex-col items-center gap-1">
-                <div className={cn(
-                  "w-14 h-14 rounded-2xl flex items-center justify-center",
-                  i < MOCK_DATA.badges ? "bg-accent/15" : "bg-bg-tertiary opacity-40"
-                )}>
-                  <Star className={cn(
-                    "h-7 w-7",
-                    i < MOCK_DATA.badges ? "text-accent" : "text-text-muted"
-                  )} />
+            {ALL_BADGES.map((badge) => {
+              const unlocked = badges.includes(badge);
+              return (
+                <div key={badge} className="flex flex-col items-center gap-1">
+                  <div className={cn(
+                    "w-14 h-14 rounded-2xl flex items-center justify-center",
+                    unlocked ? "bg-accent/15" : "bg-bg-tertiary opacity-40"
+                  )}>
+                    <Star className={cn(
+                      "h-7 w-7",
+                      unlocked ? "text-accent" : "text-text-muted"
+                    )} />
+                  </div>
+                  <span className="text-[10px] text-text-muted">{badge}</span>
                 </div>
-                <span className="text-[10px] text-text-muted">{badge}</span>
-              </div>
-            ))}
-            {["Scaler", "Expert", "Légende"].map((badge) => (
-              <div key={badge} className="flex flex-col items-center gap-1">
-                <div className="w-14 h-14 rounded-2xl flex items-center justify-center bg-bg-tertiary opacity-40">
-                  <Star className="h-7 w-7 text-text-muted" />
-                </div>
-                <span className="text-[10px] text-text-muted">{badge}</span>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </CardContent>
       </Card>
