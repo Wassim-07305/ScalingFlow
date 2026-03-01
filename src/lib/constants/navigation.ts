@@ -1,6 +1,5 @@
 import {
   LayoutDashboard,
-  Compass,
   Globe,
   Package,
   Palette,
@@ -23,7 +22,6 @@ import type { NavItem, NavSection } from "@/lib/types/appshell";
 
 export const NAV_ITEMS: NavItem[] = [
   { label: "Dashboard", href: "/", icon: LayoutDashboard, roles: ["user", "admin"] },
-  { label: "Onboarding", href: "/onboarding", icon: Compass, roles: ["user", "admin"] },
   { label: "Marché", href: "/market", icon: Globe, roles: ["user", "admin"] },
   { label: "Offre", href: "/offer", icon: Package, roles: ["user", "admin"] },
   { label: "Marque", href: "/brand", icon: Palette, roles: ["user", "admin"] },
@@ -50,7 +48,7 @@ export const NAV_SECTIONS: NavSection[] = [
   {
     label: "Business",
     items: NAV_ITEMS.filter((i) =>
-      ["/onboarding", "/market", "/offer", "/brand"].includes(i.href)
+      ["/market", "/offer", "/brand"].includes(i.href)
     ),
   },
   {

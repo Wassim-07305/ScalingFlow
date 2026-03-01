@@ -2,11 +2,12 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 export async function updateSession(request: NextRequest) {
-  // Define public routes (no auth required)
   const publicRoutes = ["/login", "/register"];
   const isPublicRoute = publicRoutes.some(
     (route) => request.nextUrl.pathname === route
   );
+  const isOnboarding = request.nextUrl.pathname === "/onboarding";
+  const isApiRoute = request.nextUrl.pathname.startsWith("/api/");
 
   let supabaseResponse = NextResponse.next({
     request,
@@ -17,7 +18,6 @@ export async function updateSession(request: NextRequest) {
     const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
     if (!supabaseUrl || !supabaseKey) {
-      // No Supabase config — allow public routes, block protected
       if (!isPublicRoute) {
         const url = request.nextUrl.clone();
         url.pathname = "/login";
@@ -56,14 +56,35 @@ export async function updateSession(request: NextRequest) {
       return NextResponse.redirect(url);
     }
 
-    // Redirect authenticated users away from auth pages to dashboard
+    // Authenticated user on public route → check onboarding status
     if (user && isPublicRoute) {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("onboarding_completed")
+        .eq("id", user.id)
+        .single();
+
       const url = request.nextUrl.clone();
-      url.pathname = "/onboarding";
+      url.pathname = profile?.onboarding_completed ? "/" : "/onboarding";
       return NextResponse.redirect(url);
     }
+
+    // Authenticated user on protected routes (not onboarding, not API)
+    // → if onboarding not completed, force them to /onboarding
+    if (user && !isOnboarding && !isApiRoute && !isPublicRoute) {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("onboarding_completed")
+        .eq("id", user.id)
+        .single();
+
+      if (profile && !profile.onboarding_completed) {
+        const url = request.nextUrl.clone();
+        url.pathname = "/onboarding";
+        return NextResponse.redirect(url);
+      }
+    }
   } catch {
-    // If Supabase errors out, allow public routes through
     if (!isPublicRoute) {
       const url = request.nextUrl.clone();
       url.pathname = "/login";
