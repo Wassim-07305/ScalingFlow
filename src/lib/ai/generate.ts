@@ -1,4 +1,4 @@
-import { anthropic, AI_MODEL } from "./anthropic";
+import { groq, AI_MODEL } from "./anthropic";
 
 interface GenerateOptions {
   prompt: string;
@@ -13,19 +13,25 @@ export async function generateText({
   maxTokens = 4096,
   temperature = 0.7,
 }: GenerateOptions): Promise<string> {
-  const message = await anthropic.messages.create({
+  const messages: { role: "system" | "user"; content: string }[] = [];
+
+  if (systemPrompt) {
+    messages.push({ role: "system", content: systemPrompt });
+  }
+  messages.push({ role: "user", content: prompt });
+
+  const completion = await groq.chat.completions.create({
     model: AI_MODEL,
     max_tokens: maxTokens,
     temperature,
-    system: systemPrompt,
-    messages: [{ role: "user", content: prompt }],
+    messages,
   });
 
-  const block = message.content[0];
-  if (block.type === "text") {
-    return block.text;
+  const content = completion.choices[0]?.message?.content;
+  if (!content) {
+    throw new Error("Pas de réponse de l'IA");
   }
-  throw new Error("Unexpected response type from Anthropic");
+  return content;
 }
 
 export async function generateJSON<T>({
@@ -73,20 +79,25 @@ export async function* streamText({
   maxTokens = 4096,
   temperature = 0.7,
 }: GenerateOptions): AsyncGenerator<string> {
-  const stream = anthropic.messages.stream({
+  const messages: { role: "system" | "user"; content: string }[] = [];
+
+  if (systemPrompt) {
+    messages.push({ role: "system", content: systemPrompt });
+  }
+  messages.push({ role: "user", content: prompt });
+
+  const stream = await groq.chat.completions.create({
     model: AI_MODEL,
     max_tokens: maxTokens,
     temperature,
-    system: systemPrompt,
-    messages: [{ role: "user", content: prompt }],
+    messages,
+    stream: true,
   });
 
-  for await (const event of stream) {
-    if (
-      event.type === "content_block_delta" &&
-      event.delta.type === "text_delta"
-    ) {
-      yield event.delta.text;
+  for await (const chunk of stream) {
+    const content = chunk.choices[0]?.delta?.content;
+    if (content) {
+      yield content;
     }
   }
 }
