@@ -6,7 +6,6 @@ import {
   Card,
   CardHeader,
   CardTitle,
-  CardDescription,
   CardContent,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -18,12 +17,11 @@ import { useUser } from "@/hooks/use-user";
 import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils/cn";
+import { SubscriptionCard } from "@/components/settings/subscription-card";
 import {
   User,
-  CreditCard,
   Bell,
   Shield,
-  ExternalLink,
   Loader2,
   Eye,
   EyeOff,
@@ -195,43 +193,7 @@ export default function SettingsPage() {
         </Card>
 
         {/* Abonnement */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <CreditCard className="h-5 w-5 text-accent" />
-              Abonnement
-            </CardTitle>
-            <CardDescription>
-              Gere ton abonnement ScalingFlow
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-text-primary">
-                  Plan actuel
-                </p>
-                <p className="text-xs text-text-muted">
-                  {profile?.subscription_status === "active"
-                    ? "Actif"
-                    : "Inactif"}
-                </p>
-              </div>
-              <Badge
-                variant={
-                  profile?.subscription_status === "active" ? "cyan" : "muted"
-                }
-              >
-                {profile?.subscription_status === "active" ? "Pro" : "Gratuit"}
-              </Badge>
-            </div>
-            <Separator />
-            <Button variant="outline" size="sm">
-              <ExternalLink className="h-4 w-4 mr-2" />
-              Gerer l&apos;abonnement
-            </Button>
-          </CardContent>
-        </Card>
+        <SubscriptionCard />
 
         {/* Notifications */}
         <Card>

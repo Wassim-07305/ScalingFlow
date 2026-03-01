@@ -35,7 +35,7 @@ const CATEGORIES = [
 type Category = (typeof CATEGORIES)[number];
 
 interface PostProfile {
-  display_name: string | null;
+  full_name: string | null;
   avatar_url: string | null;
 }
 
@@ -103,7 +103,7 @@ export function PostFeed({ className }: PostFeedProps) {
 
     const { data, error } = await supabase
       .from("community_posts")
-      .select("*, profiles:user_id(display_name, avatar_url)")
+      .select("*, profiles:user_id(full_name, avatar_url)")
       .order("pinned", { ascending: false })
       .order("created_at", { ascending: false });
 
@@ -275,7 +275,7 @@ export function PostFeed({ className }: PostFeedProps) {
 
     const { data, error } = await supabase
       .from("community_comments")
-      .select("*, profiles:user_id(display_name, avatar_url)")
+      .select("*, profiles:user_id(full_name, avatar_url)")
       .eq("post_id", postId)
       .order("created_at", { ascending: true });
 
@@ -308,7 +308,7 @@ export function PostFeed({ className }: PostFeedProps) {
     const { data, error } = await supabase
       .from("community_comments")
       .insert({ post_id: postId, user_id: user.id, content })
-      .select("*, profiles:user_id(display_name, avatar_url)")
+      .select("*, profiles:user_id(full_name, avatar_url)")
       .single();
 
     if (error) {
@@ -463,9 +463,9 @@ export function PostFeed({ className }: PostFeedProps) {
         <div className="space-y-4">
           {filteredPosts.map((post) => {
             const displayName =
-              post.profiles?.display_name || "Membre ScalingFlow";
+              post.profiles?.full_name || "Membre ScalingFlow";
             const avatarUrl = post.profiles?.avatar_url;
-            const initials = getInitials(post.profiles?.display_name);
+            const initials = getInitials(post.profiles?.full_name);
             const isCommentsExpanded = expandedComments.has(post.id);
             const postComments = comments[post.id] || [];
             const isLoadingComments = loadingComments.has(post.id);
@@ -573,10 +573,10 @@ export function PostFeed({ className }: PostFeedProps) {
                           )}
                           {postComments.map((comment) => {
                             const cName =
-                              comment.profiles?.display_name ||
+                              comment.profiles?.full_name ||
                               "Membre ScalingFlow";
                             const cInitials = getInitials(
-                              comment.profiles?.display_name
+                              comment.profiles?.full_name
                             );
                             const cAvatar = comment.profiles?.avatar_url;
 

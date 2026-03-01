@@ -39,6 +39,20 @@ export default function RegisterPage() {
       return;
     }
 
+    // Envoyer l'email de bienvenue (non bloquant)
+    try {
+      await fetch("/api/email/send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          template: "welcome",
+          data: { firstName: fullName.split(" ")[0] },
+        }),
+      });
+    } catch {
+      // L'échec de l'email ne doit pas bloquer l'inscription
+    }
+
     router.push("/onboarding");
     router.refresh();
   };
