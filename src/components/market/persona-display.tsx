@@ -95,7 +95,7 @@ export function PersonaDisplay({ persona }: PersonaDisplayProps) {
       </div>
 
       {/* Niveau 1 : Demographique */}
-      {activeTab === "demo" && (
+      {activeTab === "demo" && persona.niveau_1_demo && (
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -115,7 +115,7 @@ export function PersonaDisplay({ persona }: PersonaDisplayProps) {
       )}
 
       {/* Niveau 2 : Psychographique */}
-      {activeTab === "psycho" && (
+      {activeTab === "psycho" && persona.niveau_2_psycho && (
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -125,26 +125,26 @@ export function PersonaDisplay({ persona }: PersonaDisplayProps) {
           </CardHeader>
           <CardContent className="space-y-5">
             <SectionBlock title="Desirs profonds">
-              <TagList items={persona.niveau_2_psycho.desirs_profonds} variant="default" />
+              <TagList items={persona.niveau_2_psycho.desirs_profonds ?? []} variant="default" />
             </SectionBlock>
             <SectionBlock title="Peurs">
-              <TagList items={persona.niveau_2_psycho.peurs} variant="red" />
+              <TagList items={persona.niveau_2_psycho.peurs ?? []} variant="red" />
             </SectionBlock>
             <SectionBlock title="Frustrations">
-              <TagList items={persona.niveau_2_psycho.frustrations} variant="yellow" />
+              <TagList items={persona.niveau_2_psycho.frustrations ?? []} variant="yellow" />
             </SectionBlock>
             <SectionBlock title="Objections a l'achat">
-              <TagList items={persona.niveau_2_psycho.objections_achat} variant="purple" />
+              <TagList items={persona.niveau_2_psycho.objections_achat ?? []} variant="purple" />
             </SectionBlock>
             <SectionBlock title="Croyances limitantes">
-              <TagList items={persona.niveau_2_psycho.croyances_limitantes} variant="muted" />
+              <TagList items={persona.niveau_2_psycho.croyances_limitantes ?? []} variant="muted" />
             </SectionBlock>
           </CardContent>
         </Card>
       )}
 
       {/* Niveau 3 : Langage */}
-      {activeTab === "langage" && (
+      {activeTab === "langage" && persona.niveau_3_langage && (
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -155,7 +155,7 @@ export function PersonaDisplay({ persona }: PersonaDisplayProps) {
           <CardContent className="space-y-5">
             <SectionBlock title="Expressions courantes">
               <div className="space-y-1.5">
-                {persona.niveau_3_langage.expressions_courantes.map((expr, i) => (
+                {(persona.niveau_3_langage.expressions_courantes ?? []).map((expr, i) => (
                   <p key={i} className="text-sm text-text-primary italic">
                     &laquo; {expr} &raquo;
                   </p>
@@ -163,11 +163,11 @@ export function PersonaDisplay({ persona }: PersonaDisplayProps) {
               </div>
             </SectionBlock>
             <SectionBlock title="Mots-cles de recherche">
-              <TagList items={persona.niveau_3_langage.mots_cles_recherche} variant="blue" />
+              <TagList items={persona.niveau_3_langage.mots_cles_recherche ?? []} variant="blue" />
             </SectionBlock>
             <SectionBlock title="Phrases de douleur (verbatim)">
               <div className="space-y-1.5">
-                {persona.niveau_3_langage.phrases_douleur.map((phrase, i) => (
+                {(persona.niveau_3_langage.phrases_douleur ?? []).map((phrase, i) => (
                   <p key={i} className="text-sm text-danger/80 italic">
                     &laquo; {phrase} &raquo;
                   </p>
@@ -176,7 +176,7 @@ export function PersonaDisplay({ persona }: PersonaDisplayProps) {
             </SectionBlock>
             <SectionBlock title="Phrases de desir (verbatim)">
               <div className="space-y-1.5">
-                {persona.niveau_3_langage.phrases_desir.map((phrase, i) => (
+                {(persona.niveau_3_langage.phrases_desir ?? []).map((phrase, i) => (
                   <p key={i} className="text-sm text-accent italic">
                     &laquo; {phrase} &raquo;
                   </p>
@@ -193,7 +193,7 @@ export function PersonaDisplay({ persona }: PersonaDisplayProps) {
       )}
 
       {/* Niveau 4 : Parcours d'achat */}
-      {activeTab === "parcours" && (
+      {activeTab === "parcours" && persona.niveau_4_parcours && (
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -203,16 +203,16 @@ export function PersonaDisplay({ persona }: PersonaDisplayProps) {
           </CardHeader>
           <CardContent className="space-y-5">
             <SectionBlock title="Declencheurs d'achat">
-              <TagList items={persona.niveau_4_parcours.declencheurs_achat} variant="default" />
+              <TagList items={persona.niveau_4_parcours.declencheurs_achat ?? []} variant="default" />
             </SectionBlock>
             <SectionBlock title="Sources d'information">
-              <TagList items={persona.niveau_4_parcours.sources_info} variant="blue" />
+              <TagList items={persona.niveau_4_parcours.sources_info ?? []} variant="blue" />
             </SectionBlock>
             <SectionBlock title="Criteres de decision">
-              <TagList items={persona.niveau_4_parcours.criteres_decision} variant="purple" />
+              <TagList items={persona.niveau_4_parcours.criteres_decision ?? []} variant="purple" />
             </SectionBlock>
             <SectionBlock title="Obstacles a l'achat">
-              <TagList items={persona.niveau_4_parcours.obstacles_achat} variant="red" />
+              <TagList items={persona.niveau_4_parcours.obstacles_achat ?? []} variant="red" />
             </SectionBlock>
             <SectionBlock title="Timeline de decision">
               <p className="text-sm text-text-primary">
@@ -220,7 +220,7 @@ export function PersonaDisplay({ persona }: PersonaDisplayProps) {
               </p>
             </SectionBlock>
             <SectionBlock title="Influenceurs / Prescripteurs">
-              <TagList items={persona.niveau_4_parcours.influenceurs} variant="muted" />
+              <TagList items={persona.niveau_4_parcours.influenceurs ?? []} variant="muted" />
             </SectionBlock>
           </CardContent>
         </Card>

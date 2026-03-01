@@ -44,7 +44,7 @@ export function NameGenerator({ brandId, names, selectedName: initialSelected, c
     }
   };
 
-  if (!names || names.length === 0) {
+  if (!names || !Array.isArray(names) || names.length === 0) {
     return (
       <div className={cn("text-center py-12", className)}>
         <Sparkles className="h-12 w-12 text-text-muted mx-auto mb-3" />

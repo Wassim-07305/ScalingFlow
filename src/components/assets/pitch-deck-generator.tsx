@@ -18,13 +18,18 @@ import type { PitchDeckResult } from "@/lib/ai/prompts/pitch-deck";
 
 interface PitchDeckGeneratorProps {
   className?: string;
+  initialData?: PitchDeckResult;
 }
 
-export function PitchDeckGenerator({ className }: PitchDeckGeneratorProps) {
+export function PitchDeckGenerator({ className, initialData }: PitchDeckGeneratorProps) {
   const [loading, setLoading] = React.useState(false);
-  const [deck, setDeck] = React.useState<PitchDeckResult | null>(null);
+  const [deck, setDeck] = React.useState<PitchDeckResult | null>(initialData || null);
   const [error, setError] = React.useState<string | null>(null);
   const [activeSlide, setActiveSlide] = React.useState(0);
+
+  React.useEffect(() => {
+    if (initialData) setDeck(initialData);
+  }, [initialData]);
 
   const handleGenerate = async () => {
     setLoading(true);

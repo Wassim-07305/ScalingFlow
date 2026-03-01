@@ -21,6 +21,7 @@ import type { LeadMagnetResult } from "@/lib/ai/prompts/lead-magnet";
 
 interface LeadMagnetGeneratorProps {
   className?: string;
+  initialData?: LeadMagnetResult;
 }
 
 type LeadMagnetType = LeadMagnetResult["type"];
@@ -63,15 +64,19 @@ const LEAD_MAGNET_TYPES: {
   },
 ];
 
-export function LeadMagnetGenerator({ className }: LeadMagnetGeneratorProps) {
+export function LeadMagnetGenerator({ className, initialData }: LeadMagnetGeneratorProps) {
   const [loading, setLoading] = React.useState(false);
   const [leadMagnet, setLeadMagnet] = React.useState<LeadMagnetResult | null>(
-    null
+    initialData || null
   );
   const [error, setError] = React.useState<string | null>(null);
   const [selectedType, setSelectedType] = React.useState<LeadMagnetType | null>(
     null
   );
+
+  React.useEffect(() => {
+    if (initialData) setLeadMagnet(initialData);
+  }, [initialData]);
 
   const handleGenerate = async () => {
     if (!selectedType) return;

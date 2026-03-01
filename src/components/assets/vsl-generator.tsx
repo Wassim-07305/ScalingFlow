@@ -10,14 +10,20 @@ import { Sparkles, Clock, Play } from "lucide-react";
 
 interface VSLGeneratorProps {
   className?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  initialData?: any;
 }
 
-export function VSLGenerator({ className }: VSLGeneratorProps) {
+export function VSLGenerator({ className, initialData }: VSLGeneratorProps) {
   const [loading, setLoading] = React.useState(false);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [script, setScript] = React.useState<any>(null);
+  const [script, setScript] = React.useState<any>(initialData || null);
   const [error, setError] = React.useState<string | null>(null);
   const [activeSection, setActiveSection] = React.useState(0);
+
+  React.useEffect(() => {
+    if (initialData) setScript(initialData);
+  }, [initialData]);
 
   const handleGenerate = async () => {
     setLoading(true);

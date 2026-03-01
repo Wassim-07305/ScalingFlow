@@ -34,7 +34,16 @@ export function CreativeGenerator({ className }: CreativeGeneratorProps) {
       if (!response.ok) throw new Error("Erreur lors de la génération");
       const data = await response.json();
       const raw = data.ai_raw_response || data;
-      setVariations(raw.variations || []);
+      const creatives = raw.ad_creatives || raw.variations || [];
+      // Map API fields to component expected fields
+      setVariations(creatives.map((c: Record<string, unknown>) => ({
+        hook: c.hook || "",
+        body: c.ad_copy || c.body || "",
+        headline: c.headline || "",
+        cta: c.cta || "",
+        estimated_format: c.creative_type || c.estimated_format || "image",
+        angle: c.angle || "",
+      })));
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erreur");
     } finally {

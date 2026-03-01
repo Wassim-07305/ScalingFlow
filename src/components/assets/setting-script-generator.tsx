@@ -22,6 +22,7 @@ import type { SettingScriptResult } from "@/lib/ai/prompts/setting-script";
 
 interface SettingScriptGeneratorProps {
   className?: string;
+  initialData?: SettingScriptResult;
 }
 
 const TABS = [
@@ -37,11 +38,16 @@ type TabKey = (typeof TABS)[number]["key"];
 
 export function SettingScriptGenerator({
   className,
+  initialData,
 }: SettingScriptGeneratorProps) {
   const [loading, setLoading] = React.useState(false);
-  const [script, setScript] = React.useState<SettingScriptResult | null>(null);
+  const [script, setScript] = React.useState<SettingScriptResult | null>(initialData || null);
   const [error, setError] = React.useState<string | null>(null);
   const [activeTab, setActiveTab] = React.useState<TabKey>("opening");
+
+  React.useEffect(() => {
+    if (initialData) setScript(initialData);
+  }, [initialData]);
 
   const handleGenerate = async () => {
     setLoading(true);

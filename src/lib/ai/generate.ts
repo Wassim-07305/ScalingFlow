@@ -51,7 +51,21 @@ export async function generateJSON<T>({
 
   // Extract JSON from potential markdown code blocks
   const jsonMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/);
-  const jsonStr = jsonMatch ? jsonMatch[1].trim() : text.trim();
+  let jsonStr = jsonMatch ? jsonMatch[1].trim() : text.trim();
+
+  // Sanitize unescaped control characters inside JSON string values
+  // Groq/Llama sometimes returns newlines/tabs inside string literals
+  jsonStr = jsonStr.replace(
+    /"(?:[^"\\]|\\.)*"/g,
+    (match) => match.replace(/[\x00-\x1f]/g, (ch) => {
+      switch (ch) {
+        case "\n": return "\\n";
+        case "\r": return "\\r";
+        case "\t": return "\\t";
+        default: return "";
+      }
+    })
+  );
 
   return JSON.parse(jsonStr) as T;
 }

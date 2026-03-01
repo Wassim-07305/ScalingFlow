@@ -10,14 +10,20 @@ import { Sparkles, Mail, ChevronDown, ChevronUp } from "lucide-react";
 
 interface EmailSequenceProps {
   className?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  initialData?: any;
 }
 
-export function EmailSequence({ className }: EmailSequenceProps) {
+export function EmailSequence({ className, initialData }: EmailSequenceProps) {
   const [loading, setLoading] = React.useState(false);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [sequence, setSequence] = React.useState<any>(null);
+  const [sequence, setSequence] = React.useState<any>(initialData || null);
   const [error, setError] = React.useState<string | null>(null);
   const [expandedEmail, setExpandedEmail] = React.useState<number | null>(0);
+
+  React.useEffect(() => {
+    if (initialData) setSequence(initialData);
+  }, [initialData]);
 
   const handleGenerate = async () => {
     setLoading(true);

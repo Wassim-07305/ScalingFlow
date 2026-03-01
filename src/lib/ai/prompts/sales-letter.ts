@@ -5,7 +5,6 @@ export interface SalesLetterResult {
     name: string;
     content: string;
   }[];
-  full_letter: string;
   estimated_word_count: number;
 }
 
@@ -171,7 +170,8 @@ Réponds UNIQUEMENT en JSON valide avec la structure suivante :
       "content": "..."
     }
   ],
-  "full_letter": "La lettre de vente complète assemblée, prête à être publiée...",
   "estimated_word_count": 2500
-}`;
+}
+
+IMPORTANT : Ne PAS inclure de champ "full_letter". Retourne uniquement headline, sub_headline, sections et estimated_word_count.`;
 }

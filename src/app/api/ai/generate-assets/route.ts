@@ -47,11 +47,27 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { offerId, assetType } = body;
+    let { offerId, assetType } = body;
 
-    if (!offerId || !assetType) {
+    // Map short type names from components to valid asset types
+    const TYPE_MAP: Record<string, string> = {
+      vsl: "vsl_script",
+      email: "email_sequence",
+      sms: "sms_sequence",
+      sales: "sales_script",
+      case_study: "case_study",
+      pitch_deck: "pitch_deck",
+      sales_letter: "sales_letter",
+      setting_script: "setting_script",
+      lead_magnet: "lead_magnet",
+    };
+    if (body.type && !assetType) {
+      assetType = TYPE_MAP[body.type] || body.type;
+    }
+
+    if (!assetType) {
       return NextResponse.json(
-        { error: "offerId et assetType sont requis" },
+        { error: "assetType est requis" },
         { status: 400 }
       );
     }
@@ -61,6 +77,25 @@ export async function POST(req: NextRequest) {
         {
           error: `Type d'asset invalide. Types acceptés : ${VALID_ASSET_TYPES.join(", ")}`,
         },
+        { status: 400 }
+      );
+    }
+
+    // Auto-fetch latest offer if offerId not provided
+    if (!offerId) {
+      const { data: latestOffer } = await supabase
+        .from("offers")
+        .select("id")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .single();
+      offerId = latestOffer?.id;
+    }
+
+    if (!offerId) {
+      return NextResponse.json(
+        { error: "Aucune offre trouvée. Génère d'abord une offre." },
         { status: 400 }
       );
     }
@@ -162,24 +197,30 @@ export async function POST(req: NextRequest) {
 
     // Save asset to database
     // DB columns: title (text), content (text), ai_raw_response (jsonb)
+    // Map types not yet in DB check constraint to valid types
+    const DB_ASSET_TYPE_MAP: Record<string, string> = {
+      setting_script: "sales_script", // setting_script not in DB constraint yet
+    };
+    const dbAssetType = DB_ASSET_TYPE_MAP[assetType] || assetType;
     const { data: asset, error: saveError } = await supabase
       .from("sales_assets")
       .insert({
         user_id: user.id,
         offer_id: offerId,
-        asset_type: assetType,
+        asset_type: dbAssetType,
         title: `${assetType} — ${offer.offer_name}`,
         content: JSON.stringify(generatedAsset),
         ai_raw_response: generatedAsset,
+        metadata: dbAssetType !== assetType ? { original_type: assetType } : null,
         status: "draft",
       })
       .select()
       .single();
 
     if (saveError) {
-      console.error("Error saving asset:", saveError);
+      console.error("Error saving asset:", saveError.message, saveError.code, saveError.details);
       return NextResponse.json(
-        { error: "Erreur lors de la sauvegarde de l'asset" },
+        { error: `Erreur lors de la sauvegarde: ${saveError.message}` },
         { status: 500 }
       );
     }
@@ -200,9 +241,10 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(asset);
   } catch (error) {
-    console.error("Error generating asset:", error);
+    const errMsg = error instanceof Error ? error.message : String(error);
+    console.error("Error generating asset:", errMsg, error);
     return NextResponse.json(
-      { error: "Erreur lors de la génération de l'asset" },
+      { error: `Erreur lors de la génération de l'asset: ${errMsg}` },
       { status: 500 }
     );
   }

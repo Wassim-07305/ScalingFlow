@@ -9,6 +9,7 @@ interface GlowCardProps extends React.HTMLAttributes<HTMLDivElement> {
 
 export function GlowCard({
   className,
+  glowColor: _glowColor,
   hoverable = true,
   children,
   ...props

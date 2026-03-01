@@ -41,7 +41,6 @@ export default function BrandPage() {
   const [selectedName, setSelectedName] = React.useState<string | null>(null);
   const [generated, setGenerated] = React.useState<BrandIdentityResult | null>(null);
   const [offerId, setOfferId] = React.useState<string | null>(null);
-  const supabase = createClient();
 
   // Fetch existing brand identity
   React.useEffect(() => {
@@ -49,60 +48,66 @@ export default function BrandPage() {
 
     const fetchBrand = async () => {
       setLoading(true);
+      try {
+        const supabase = createClient();
 
-      // Fetch latest brand identity
-      const { data: brand } = await supabase
-        .from("brand_identities")
-        .select("*")
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: false })
-        .limit(1)
-        .single();
+        // Fetch latest brand identity
+        const { data: brand } = await supabase
+          .from("brand_identities")
+          .select("*")
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .single();
 
-      if (brand) {
-        setBrandId(brand.id);
-        setSelectedName(brand.selected_name);
-        setOfferId(brand.offer_id);
+        if (brand) {
+          setBrandId(brand.id);
+          setSelectedName(brand.selected_name);
+          setOfferId(brand.offer_id);
 
-        // Reconstruct generated data from DB
-        const brandNames = brand.brand_names as unknown as BrandIdentityResult["noms"] | null;
-        const artDirection = brand.art_direction as unknown as BrandIdentityResult["direction_artistique"] | null;
-        const logoConcept = brand.logo_concept
-          ? (typeof brand.logo_concept === "string"
-              ? JSON.parse(brand.logo_concept)
-              : brand.logo_concept) as BrandIdentityResult["logo_concept"]
-          : null;
-        const brandKit = brand.brand_kit as unknown as BrandIdentityResult["brand_kit"] | null;
+          // Reconstruct generated data from DB
+          const brandNames = brand.brand_names as unknown as BrandIdentityResult["noms"] | null;
+          const artDirection = brand.art_direction as unknown as BrandIdentityResult["direction_artistique"] | null;
+          let logoConcept: BrandIdentityResult["logo_concept"] | null = null;
+          try {
+            logoConcept = brand.logo_concept
+              ? (typeof brand.logo_concept === "string"
+                  ? JSON.parse(brand.logo_concept)
+                  : brand.logo_concept) as BrandIdentityResult["logo_concept"]
+              : null;
+          } catch {
+            // logo_concept may be malformed JSON — ignore
+          }
+          const brandKit = brand.brand_kit as unknown as BrandIdentityResult["brand_kit"] | null;
 
-        if (brandNames || artDirection || logoConcept || brandKit) {
-          setGenerated({
-            noms: brandNames || [],
-            direction_artistique: artDirection || {
-              palette: [],
-              typographies: [],
-              style_visuel: "",
-              moodboard_description: "",
-            },
-            logo_concept: logoConcept || {
-              description: "",
-              forme: "",
-              symbolisme: "",
-              variations: [],
-            },
-            brand_kit: brandKit || {
-              mission: "",
-              vision: "",
-              valeurs: [],
-              ton: "",
-              do_list: [],
-              dont_list: [],
-            },
-          });
+          if (brandNames || artDirection || logoConcept || brandKit) {
+            setGenerated({
+              noms: brandNames || [],
+              direction_artistique: artDirection || {
+                palette: [],
+                typographies: [],
+                style_visuel: "",
+                moodboard_description: "",
+              },
+              logo_concept: logoConcept || {
+                description: "",
+                forme: "",
+                symbolisme: "",
+                variations: [],
+              },
+              brand_kit: brandKit || {
+                mission: "",
+                vision: "",
+                valeurs: [],
+                ton: "",
+                do_list: [],
+                dont_list: [],
+              },
+            });
+          }
         }
-      }
 
-      // Also fetch user's latest offer for generation context
-      if (!offerId) {
+        // Also fetch user's latest offer for generation context
         const { data: offers } = await supabase
           .from("offers")
           .select("id")
@@ -113,13 +118,16 @@ export default function BrandPage() {
         if (offers && offers.length > 0) {
           setOfferId(offers[0].id);
         }
+      } catch (err) {
+        console.error("Error fetching brand:", err);
+      } finally {
+        setLoading(false);
       }
-
-      setLoading(false);
     };
 
     fetchBrand();
-  }, [user, supabase, offerId]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
 
   const handleGenerate = async () => {
     setGenerating(true);
@@ -293,7 +301,7 @@ function LogoConceptView({
             <div className="flex flex-wrap gap-2">
               {concept.variations.map((v, i) => (
                 <Badge key={i} variant="muted">
-                  {v}
+                  {typeof v === "string" ? v : (v as { type?: string; description?: string }).description || (v as { type?: string }).type || JSON.stringify(v)}
                 </Badge>
               ))}
             </div>
@@ -351,7 +359,7 @@ function BrandKitView({
           <div className="flex flex-wrap gap-2">
             {kit.valeurs.map((v, i) => (
               <Badge key={i} variant="default">
-                {v}
+                {typeof v === "string" ? v : JSON.stringify(v)}
               </Badge>
             ))}
           </div>
@@ -381,7 +389,7 @@ function BrandKitView({
             {kit.do_list.map((item, i) => (
               <div key={i} className="flex items-start gap-2">
                 <CheckCircle className="h-3.5 w-3.5 text-accent mt-0.5 shrink-0" />
-                <p className="text-sm text-text-secondary">{item}</p>
+                <p className="text-sm text-text-secondary">{typeof item === "string" ? item : JSON.stringify(item)}</p>
               </div>
             ))}
           </CardContent>
@@ -397,7 +405,7 @@ function BrandKitView({
             {kit.dont_list.map((item, i) => (
               <div key={i} className="flex items-start gap-2">
                 <XCircle className="h-3.5 w-3.5 text-danger mt-0.5 shrink-0" />
-                <p className="text-sm text-text-secondary">{item}</p>
+                <p className="text-sm text-text-secondary">{typeof item === "string" ? item : JSON.stringify(item)}</p>
               </div>
             ))}
           </CardContent>

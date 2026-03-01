@@ -18,13 +18,18 @@ import type { SalesLetterResult } from "@/lib/ai/prompts/sales-letter";
 
 interface SalesLetterGeneratorProps {
   className?: string;
+  initialData?: SalesLetterResult;
 }
 
-export function SalesLetterGenerator({ className }: SalesLetterGeneratorProps) {
+export function SalesLetterGenerator({ className, initialData }: SalesLetterGeneratorProps) {
   const [loading, setLoading] = React.useState(false);
-  const [letter, setLetter] = React.useState<SalesLetterResult | null>(null);
+  const [letter, setLetter] = React.useState<SalesLetterResult | null>(initialData || null);
   const [error, setError] = React.useState<string | null>(null);
   const [showFullLetter, setShowFullLetter] = React.useState(false);
+
+  React.useEffect(() => {
+    if (initialData) setLetter(initialData);
+  }, [initialData]);
 
   const handleGenerate = async () => {
     setLoading(true);
@@ -105,7 +110,7 @@ export function SalesLetterGenerator({ className }: SalesLetterGeneratorProps) {
       </div>
 
       {/* Full letter — expandable */}
-      {letter.full_letter && (
+      {(letter as SalesLetterResult & { full_letter?: string }).full_letter && (
         <div>
           <button
             onClick={() => setShowFullLetter(!showFullLetter)}
@@ -126,7 +131,7 @@ export function SalesLetterGenerator({ className }: SalesLetterGeneratorProps) {
             <Card className="mt-3">
               <CardContent className="py-4">
                 <p className="text-sm text-text-secondary whitespace-pre-wrap">
-                  {letter.full_letter}
+                  {(letter as SalesLetterResult & { full_letter?: string }).full_letter}
                 </p>
               </CardContent>
             </Card>

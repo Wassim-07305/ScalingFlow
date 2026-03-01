@@ -32,8 +32,33 @@ export function FunnelBuilder({ className }: FunnelBuilderProps) {
   const [funnelData, setFunnelData] = React.useState<any>(null);
   const [activePage, setActivePage] = React.useState<"optin" | "vsl" | "thankyou">("optin");
   const [error, setError] = React.useState<string | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [offers, setOffers] = React.useState<any[]>([]);
+  const [selectedOfferId, setSelectedOfferId] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    const fetchOffers = async () => {
+      try {
+        const { createClient } = await import("@/lib/supabase/client");
+        const supabase = createClient();
+        const { data } = await supabase
+          .from("offers")
+          .select("id, offer_name")
+          .order("created_at", { ascending: false });
+        if (data && data.length > 0) {
+          setOffers(data);
+          setSelectedOfferId(data[0].id);
+        }
+      } catch {}
+    };
+    fetchOffers();
+  }, []);
 
   const handleGenerate = async () => {
+    if (!selectedOfferId) {
+      setError("Aucune offre disponible. Génère d'abord une offre.");
+      return;
+    }
     setLoading(true);
     setError(null);
 
@@ -41,12 +66,12 @@ export function FunnelBuilder({ className }: FunnelBuilderProps) {
       const response = await fetch("/api/ai/generate-funnel", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({}),
+        body: JSON.stringify({ offerId: selectedOfferId }),
       });
 
       if (!response.ok) throw new Error("Erreur lors de la génération");
       const data = await response.json();
-      setFunnelData(data.ai_raw_response || data);
+      setFunnelData(data.funnel_data || data);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erreur");
     } finally {
@@ -84,8 +109,22 @@ export function FunnelBuilder({ className }: FunnelBuilderProps) {
                 </React.Fragment>
               ))}
             </div>
+            {offers.length > 1 && (
+              <div>
+                <label className="text-sm text-text-secondary mb-1 block">Offre a utiliser</label>
+                <select
+                  value={selectedOfferId || ""}
+                  onChange={(e) => setSelectedOfferId(e.target.value)}
+                  className="w-full rounded-lg border border-border-default bg-bg-secondary px-3 py-2 text-sm text-text-primary"
+                >
+                  {offers.map((o) => (
+                    <option key={o.id} value={o.id}>{o.offer_name}</option>
+                  ))}
+                </select>
+              </div>
+            )}
             {error && <p className="text-sm text-danger">{error}</p>}
-            <Button size="lg" onClick={handleGenerate}>
+            <Button size="lg" onClick={handleGenerate} disabled={!selectedOfferId}>
               <Sparkles className="h-4 w-4 mr-2" />
               Générer le funnel complet
             </Button>

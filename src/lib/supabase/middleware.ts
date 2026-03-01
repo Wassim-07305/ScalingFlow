@@ -3,7 +3,7 @@ import { NextResponse, type NextRequest } from "next/server";
 
 export async function updateSession(request: NextRequest) {
   // Define public routes (no auth required)
-  const publicRoutes = ["/", "/login", "/register"];
+  const publicRoutes = ["/login", "/register"];
   const isPublicRoute = publicRoutes.some(
     (route) => request.nextUrl.pathname === route
   );
