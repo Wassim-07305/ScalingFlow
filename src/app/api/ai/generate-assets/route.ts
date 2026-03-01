@@ -6,8 +6,22 @@ import { emailSequencePrompt } from "@/lib/ai/prompts/email-sequence";
 import { smsSequencePrompt } from "@/lib/ai/prompts/sms-sequence";
 import { salesScriptPrompt } from "@/lib/ai/prompts/sales-script";
 import { caseStudyPrompt } from "@/lib/ai/prompts/case-study";
+import { pitchDeckPrompt } from "@/lib/ai/prompts/pitch-deck";
+import { salesLetterPrompt } from "@/lib/ai/prompts/sales-letter";
+import { settingScriptPrompt } from "@/lib/ai/prompts/setting-script";
+import { leadMagnetPrompt } from "@/lib/ai/prompts/lead-magnet";
+import { awardXP } from "@/lib/gamification/xp-engine";
 
-type AssetType = "vsl_script" | "email_sequence" | "sms_sequence" | "sales_script" | "case_study";
+type AssetType =
+  | "vsl_script"
+  | "email_sequence"
+  | "sms_sequence"
+  | "sales_script"
+  | "case_study"
+  | "pitch_deck"
+  | "sales_letter"
+  | "setting_script"
+  | "lead_magnet";
 
 const VALID_ASSET_TYPES: AssetType[] = [
   "vsl_script",
@@ -15,6 +29,10 @@ const VALID_ASSET_TYPES: AssetType[] = [
   "sms_sequence",
   "sales_script",
   "case_study",
+  "pitch_deck",
+  "sales_letter",
+  "setting_script",
+  "lead_magnet",
 ];
 
 export async function POST(req: NextRequest) {
@@ -66,10 +84,15 @@ export async function POST(req: NextRequest) {
 
     // Generate the appropriate prompt based on asset type
     let prompt: string;
+    let maxTokens = 4096;
 
     switch (assetType as AssetType) {
       case "vsl_script":
-        prompt = vslScriptPrompt(offer.offer_data || offer, avatar);
+        prompt = vslScriptPrompt(
+          offer.offer_data || offer,
+          avatar,
+          body.structure || "dsl"
+        );
         break;
 
       case "email_sequence":
@@ -103,6 +126,29 @@ export async function POST(req: NextRequest) {
         );
         break;
 
+      case "pitch_deck":
+        prompt = pitchDeckPrompt(offer.offer_data || offer, avatar);
+        maxTokens = 6000;
+        break;
+
+      case "sales_letter":
+        prompt = salesLetterPrompt(offer.offer_data || offer, avatar);
+        maxTokens = 8000;
+        break;
+
+      case "setting_script":
+        prompt = settingScriptPrompt(offer.offer_data || offer, avatar);
+        break;
+
+      case "lead_magnet":
+        prompt = leadMagnetPrompt(
+          offer.offer_data || offer,
+          avatar,
+          body.leadMagnetType || "checklist"
+        );
+        maxTokens = 6000;
+        break;
+
       default:
         return NextResponse.json(
           { error: "Type d'asset non supporté" },
@@ -112,17 +158,19 @@ export async function POST(req: NextRequest) {
 
     // Generate asset using AI
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const generatedAsset: any = await generateJSON({ prompt, maxTokens: 4096 });
+    const generatedAsset: any = await generateJSON({ prompt, maxTokens });
 
     // Save asset to database
+    // DB columns: title (text), content (text), ai_raw_response (jsonb)
     const { data: asset, error: saveError } = await supabase
       .from("sales_assets")
       .insert({
         user_id: user.id,
         offer_id: offerId,
         asset_type: assetType,
-        asset_name: `${assetType} — ${offer.offer_name}`,
-        asset_data: generatedAsset,
+        title: `${assetType} — ${offer.offer_name}`,
+        content: JSON.stringify(generatedAsset),
+        ai_raw_response: generatedAsset,
         status: "draft",
       })
       .select()
@@ -135,6 +183,20 @@ export async function POST(req: NextRequest) {
         { status: 500 }
       );
     }
+
+    // Award XP based on asset type (non-blocking)
+    const assetXPMap: Record<string, string> = {
+      vsl_script: "generation.vsl",
+      email_sequence: "generation.email",
+      sms_sequence: "generation.sms",
+      sales_script: "generation.ads",
+      case_study: "generation.ads",
+      pitch_deck: "generation.pitch_deck",
+      sales_letter: "generation.sales_letter",
+      setting_script: "generation.setting_script",
+      lead_magnet: "generation.lead_magnet",
+    };
+    try { await awardXP(user.id, assetXPMap[assetType] || "generation.vsl"); } catch {}
 
     return NextResponse.json(asset);
   } catch (error) {

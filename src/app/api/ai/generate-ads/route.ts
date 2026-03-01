@@ -3,6 +3,15 @@ import { createClient } from "@/lib/supabase/server";
 import { generateJSON } from "@/lib/ai/generate";
 import { adCopyPrompt } from "@/lib/ai/prompts/ad-copy";
 import { adHooksPrompt } from "@/lib/ai/prompts/ad-hooks";
+import {
+  buildVideoAdScriptPrompt,
+  type VideoAdScriptResult,
+} from "@/lib/ai/prompts/video-ad-scripts";
+import {
+  buildDMScriptsPrompt,
+  type DMScriptsResult,
+} from "@/lib/ai/prompts/dm-scripts";
+import { awardXP } from "@/lib/gamification/xp-engine";
 
 export async function POST(req: NextRequest) {
   try {
@@ -12,36 +21,118 @@ export async function POST(req: NextRequest) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+      return NextResponse.json({ error: "Non autorise" }, { status: 401 });
     }
 
     const body = await req.json();
-    const { offerId } = body;
+    const { offerId, adType } = body;
 
-    if (!offerId) {
+    // Recuperer le profil pour le contexte
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", user.id)
+      .single();
+
+    // Recuperer la derniere offre si offerId pas fourni
+    let offer;
+    if (offerId) {
+      const { data, error: offerError } = await supabase
+        .from("offers")
+        .select("*, market_analyses(*)")
+        .eq("id", offerId)
+        .eq("user_id", user.id)
+        .single();
+
+      if (offerError || !data) {
+        return NextResponse.json(
+          { error: "Offre introuvable" },
+          { status: 404 }
+        );
+      }
+      offer = data;
+    } else {
+      const { data } = await supabase
+        .from("offers")
+        .select("*, market_analyses(*)")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .single();
+      offer = data;
+    }
+
+    const avatar = offer?.market_analyses?.avatar || {};
+    const market = offer?.market_analyses?.market || profile?.target_market || "";
+    const offerContext = offer
+      ? `${offer.offer_name} - ${offer.positioning || ""} - ${offer.unique_mechanism || ""}`
+      : "Offre de consulting/formation";
+    const avatarContext =
+      typeof avatar === "object" ? JSON.stringify(avatar, null, 2) : String(avatar);
+
+    // --- Video Ad Scripts ---
+    if (adType === "video_ad") {
+      const prompt = buildVideoAdScriptPrompt(offerContext, avatarContext);
+      const result = await generateJSON<VideoAdScriptResult>({
+        prompt,
+        maxTokens: 4096,
+      });
+
+      // Sauvegarder chaque script video
+      for (const script of result.scripts || []) {
+        await supabase.from("ad_creatives").insert({
+          user_id: user.id,
+          creative_type: "video",
+          ad_copy: script.corps,
+          headline: `Video Ad ${script.duree}`,
+          hook: script.hook,
+          cta: script.cta,
+          angle: script.angle,
+          status: "draft",
+        });
+      }
+
+      // Award XP (non-blocking)
+      try { await awardXP(user.id, "generation.ads"); } catch {}
+
+      return NextResponse.json({ adType: "video_ad", result });
+    }
+
+    // --- DM Scripts ---
+    if (adType === "dm_scripts") {
+      const prompt = buildDMScriptsPrompt(offerContext, avatarContext);
+      const result = await generateJSON<DMScriptsResult>({
+        prompt,
+        maxTokens: 4096,
+      });
+
+      // Sauvegarder les sequences de prospection
+      for (let i = 0; i < (result.prospection || []).length; i++) {
+        const seq = result.prospection[i];
+        await supabase.from("ad_creatives").insert({
+          user_id: user.id,
+          creative_type: "dm",
+          ad_copy: `Opener: ${seq.opener}\n\nFollow-up 1: ${seq.follow_up_1}\n\nFollow-up 2: ${seq.follow_up_2}\n\nClosing: ${seq.closing}`,
+          headline: `Sequence DM #${i + 1}`,
+          hook: seq.opener,
+          cta: seq.closing,
+          status: "draft",
+        });
+      }
+
+      // Award XP (non-blocking)
+      try { await awardXP(user.id, "generation.ads"); } catch {}
+
+      return NextResponse.json({ adType: "dm_scripts", result });
+    }
+
+    // --- Mode par defaut : Ad copy + hooks (existant) ---
+    if (!offer) {
       return NextResponse.json(
-        { error: "offerId est requis" },
+        { error: "Aucune offre trouvee. Creez d'abord une offre." },
         { status: 400 }
       );
     }
-
-    // Fetch offer with related market analysis
-    const { data: offer, error: offerError } = await supabase
-      .from("offers")
-      .select("*, market_analyses(*)")
-      .eq("id", offerId)
-      .eq("user_id", user.id)
-      .single();
-
-    if (offerError || !offer) {
-      return NextResponse.json(
-        { error: "Offre introuvable" },
-        { status: 404 }
-      );
-    }
-
-    const avatar = offer.market_analyses?.avatar || {};
-    const market = offer.market_analyses?.market || "";
 
     // Generate ad copy variations
     const adCopyProm = adCopyPrompt(
@@ -54,12 +145,18 @@ export async function POST(req: NextRequest) {
       avatar
     );
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const generatedAdCopy: any = await generateJSON({ prompt: adCopyProm, maxTokens: 4096 });
+    const generatedAdCopy: any = await generateJSON({
+      prompt: adCopyProm,
+      maxTokens: 4096,
+    });
 
     // Generate ad hooks
     const hooksProm = adHooksPrompt(market, avatar);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const generatedHooks: any = await generateJSON({ prompt: hooksProm, maxTokens: 4096 });
+    const generatedHooks: any = await generateJSON({
+      prompt: hooksProm,
+      maxTokens: 4096,
+    });
 
     // Save each ad variation to the database
     const adCreatives = [];
@@ -89,6 +186,9 @@ export async function POST(req: NextRequest) {
       adCreatives.push(adCreative);
     }
 
+    // Award XP (non-blocking)
+    try { await awardXP(user.id, "generation.ads"); } catch {}
+
     return NextResponse.json({
       ad_creatives: adCreatives,
       hooks: generatedHooks.hooks || [],
@@ -96,7 +196,7 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.error("Error generating ads:", error);
     return NextResponse.json(
-      { error: "Erreur lors de la génération des publicités" },
+      { error: "Erreur lors de la generation des publicites" },
       { status: 500 }
     );
   }

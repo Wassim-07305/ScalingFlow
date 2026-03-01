@@ -42,9 +42,10 @@ function formatDuration(minutes: number | null): string {
 
 interface DailyTasksProps {
   className?: string;
+  refreshKey?: number;
 }
 
-export function DailyTasks({ className }: DailyTasksProps) {
+export function DailyTasks({ className, refreshKey }: DailyTasksProps) {
   const { user, loading: userLoading } = useUser();
   const [tasks, setTasks] = React.useState<Task[]>([]);
   const [loading, setLoading] = React.useState(true);
@@ -76,7 +77,7 @@ export function DailyTasks({ className }: DailyTasksProps) {
     };
 
     fetchTasks();
-  }, [user, userLoading, supabase]);
+  }, [user, userLoading, supabase, refreshKey]);
 
   const toggleTask = async (taskId: string) => {
     const task = tasks.find((t) => t.id === taskId);

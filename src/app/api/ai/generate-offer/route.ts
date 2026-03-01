@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { generateJSON } from "@/lib/ai/generate";
 import { offerCreationPrompt } from "@/lib/ai/prompts/offer-creation";
+import { awardXP } from "@/lib/gamification/xp-engine";
 
 export async function POST(req: NextRequest) {
   try {
@@ -88,6 +89,9 @@ export async function POST(req: NextRequest) {
         { status: 500 }
       );
     }
+
+    // Award XP (non-blocking)
+    try { await awardXP(user.id, "generation.offer"); } catch {}
 
     return NextResponse.json(offer);
   } catch (error) {

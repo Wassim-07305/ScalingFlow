@@ -8,30 +8,94 @@ export interface OnboardingData {
   budgetMonthly: number;
 }
 
-export function marketAnalysisPrompt(data: OnboardingData): string {
-  return `Tu es un expert en stratégie marketing et business development spécialisé dans l'IA et l'automatisation pour les freelances et agences.
+export interface VaultSkill {
+  category: string;
+  level: "debutant" | "intermediaire" | "avance" | "expert";
+  details?: string;
+}
+
+export interface MarketAnalysisContext {
+  // Donnees onboarding de base
+  skills: string[];
+  experienceLevel: string;
+  currentRevenue: number;
+  targetRevenue: number;
+  industries: string[];
+  objectives: string[];
+  budgetMonthly: number;
+  // Contexte enrichi Phase 1
+  parcours?: "A1" | "A2" | "A3" | "B" | "C";
+  country?: string;
+  language?: string;
+  vaultSkills?: VaultSkill[];
+  expertiseAnswers?: Record<string, string>;
+  situation?: string;
+}
+
+const PARCOURS_CONTEXT: Record<string, string> = {
+  A1: "Parcours A1 — Zero a Freelance : L'utilisateur part de zero, n'a pas encore de clients. Il doit identifier un marche viable, creer une offre simple et obtenir ses premiers clients rapidement. Privilegier des marches accessibles avec des cycles de vente courts.",
+  A2: "Parcours A2 — Zero a Agence IA : L'utilisateur veut monter une agence de services IA. Il a des competences techniques mais peu d'experience business. Privilegier des marches B2B avec une forte demande en automatisation et IA.",
+  A3: "Parcours A3 — Zero a SaaS/Infoproduit : L'utilisateur veut creer un produit scalable (SaaS ou formation). Privilegier des marches avec un probleme recurrent, ou un produit digital peut remplacer du service.",
+  B: "Parcours B — Freelance a Agence : L'utilisateur est deja freelance avec des clients. Il veut scaler en montant une agence. Privilegier l'extension de son marche actuel, la productisation de ses services, et l'identification de services adjacents.",
+  C: "Parcours C — Scale & Optimize : L'utilisateur a deja un business qui tourne. Il veut optimiser, augmenter ses marges et scaler. Privilegier l'analyse de ses marches existants, l'identification de segments sous-exploites et les opportunites d'up-sell/cross-sell.",
+};
+
+function buildVaultContext(vaultSkills?: VaultSkill[], expertiseAnswers?: Record<string, string>): string {
+  let context = "";
+
+  if (vaultSkills && vaultSkills.length > 0) {
+    context += "\n## COFFRE DE COMPETENCES (VAULT)\n";
+    context += "L'utilisateur a les competences suivantes :\n";
+    for (const skill of vaultSkills) {
+      context += `- ${skill.category} (niveau : ${skill.level})${skill.details ? ` — ${skill.details}` : ""}\n`;
+    }
+    context += "\nUtilise ces competences pour identifier des marches ou il a un avantage competitif naturel.\n";
+  }
+
+  if (expertiseAnswers && Object.keys(expertiseAnswers).length > 0) {
+    context += "\n## REPONSES D'EXPERTISE\n";
+    context += "Voici les reponses de l'utilisateur sur son expertise :\n";
+    for (const [question, answer] of Object.entries(expertiseAnswers)) {
+      context += `- **${question}** : ${answer}\n`;
+    }
+    context += "\nCes reponses revelent ses points forts et ses domaines d'expertise. Utilise-les pour affiner le positionnement recommande.\n";
+  }
+
+  return context;
+}
+
+export function marketAnalysisPrompt(data: MarketAnalysisContext): string {
+  const parcoursContext = data.parcours ? PARCOURS_CONTEXT[data.parcours] || "" : "";
+  const vaultContext = buildVaultContext(data.vaultSkills, data.expertiseAnswers);
+  const countryContext = data.country ? `\n- Pays cible : ${data.country}` : "";
+  const languageContext = data.language ? `\n- Langue du client : ${data.language}` : "";
+  const situationContext = data.situation ? `\n- Situation actuelle : ${data.situation}` : "";
+
+  return `Tu es un expert en strategie marketing et business development specialise dans l'IA et l'automatisation pour les freelances et agences.
 
 ## CONTEXTE UTILISATEUR
-- Compétences : ${data.skills.join(", ")}
-- Niveau d'expérience : ${data.experienceLevel}
-- Industries passées : ${data.industries.join(", ")}
-- Revenu actuel : ${data.currentRevenue}€/mois
-- Objectif : ${data.targetRevenue}€/mois
-- Budget ads : ${data.budgetMonthly}€/mois
+- Competences : ${data.skills.join(", ")}
+- Niveau d'experience : ${data.experienceLevel}
+- Industries passees : ${data.industries.join(", ")}
+- Revenu actuel : ${data.currentRevenue}EUR/mois
+- Objectif : ${data.targetRevenue}EUR/mois
+- Budget ads : ${data.budgetMonthly}EUR/mois${countryContext}${languageContext}${situationContext}
+
+${parcoursContext ? `## PARCOURS UTILISATEUR\n${parcoursContext}\n` : ""}${vaultContext}
 
 ## TA MISSION
-Analyse le marché et identifie les 3 meilleures opportunités de positionnement pour cet utilisateur. Pour chaque opportunité :
+Analyse le marche et identifie les 3 meilleures opportunites de positionnement pour cet utilisateur.${data.country ? ` Concentre-toi sur le marche ${data.country}.` : ""}${data.language ? ` Redige ton analyse en ${data.language}.` : ""} Pour chaque opportunite :
 
-1. **Marché cible** : industrie/niche spécifique qui a besoin d'infrastructure IA
-2. **Problèmes spécifiques** : 3-5 problèmes concrets que cette niche rencontre
-3. **Score de viabilité** (0-100) basé sur : taille du marché, urgence du besoin, capacité à payer, niveau de concurrence, adéquation avec les compétences de l'utilisateur
-4. **Positionnement recommandé** : angle unique d'attaque
-5. **Avatar client** : persona détaillé (nom, rôle, CA, problèmes quotidiens, désirs, objections)
+1. **Marche cible** : industrie/niche specifique qui a besoin d'infrastructure IA
+2. **Problemes specifiques** : 3-5 problemes concrets que cette niche rencontre
+3. **Score de viabilite** (0-100) base sur : taille du marche, urgence du besoin, capacite a payer, niveau de concurrence, adequation avec les competences de l'utilisateur${data.vaultSkills ? " et son coffre de competences" : ""}
+4. **Positionnement recommande** : angle unique d'attaque${data.parcours ? " adapte au parcours " + data.parcours : ""}
+5. **Avatar client** : persona detaille (nom, role, CA, problemes quotidiens, desirs, objections)
 6. **Concurrents principaux** : 3-5 concurrents avec forces/faiblesses
-7. **Signaux de demande** : indices concrets que ce marché est prêt
+7. **Signaux de demande** : indices concrets que ce marche est pret
 
-## FORMAT DE RÉPONSE
-Réponds en JSON structuré :
+## FORMAT DE REPONSE
+Reponds en JSON structure :
 {
   "markets": [
     {

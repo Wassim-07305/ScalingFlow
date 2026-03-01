@@ -3,23 +3,68 @@
 import React from "react";
 import { PageHeader } from "@/components/layout/page-header";
 import { OfferGenerator } from "@/components/offer/offer-generator";
+import { CategoryOSWizard } from "@/components/offer/category-os-wizard";
+import { OfferScoreCard } from "@/components/offer/offer-score-card";
 import { GenerationHistory } from "@/components/shared/generation-history";
 import { cn } from "@/lib/utils/cn";
-import { Sparkles, History } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
+import { useUser } from "@/hooks/use-user";
+import { Sparkles, Crosshair, BarChart3, History } from "lucide-react";
 
 const TABS = [
-  { key: "generate", label: "Générer", icon: Sparkles },
+  { key: "generate", label: "Generer", icon: Sparkles },
+  { key: "positioning", label: "Positionnement", icon: Crosshair },
+  { key: "score", label: "Score", icon: BarChart3 },
   { key: "history", label: "Historique", icon: History },
 ] as const;
 
 export default function OfferPage() {
+  const { user } = useUser();
   const [activeTab, setActiveTab] = React.useState<string>("generate");
+  const [latestOfferId, setLatestOfferId] = React.useState<string | null>(null);
+  const [marketAnalysisId, setMarketAnalysisId] = React.useState<string | null>(null);
+  const [marketName, setMarketName] = React.useState<string | null>(null);
+  const supabase = createClient();
+
+  // Fetch user's latest offer and market analysis
+  React.useEffect(() => {
+    if (!user) return;
+
+    const fetchData = async () => {
+      // Get selected market analysis
+      const { data: market } = await supabase
+        .from("market_analyses")
+        .select("id, market_name")
+        .eq("user_id", user.id)
+        .eq("selected", true)
+        .single();
+
+      if (market) {
+        setMarketAnalysisId(market.id);
+        setMarketName(market.market_name);
+      }
+
+      // Get latest offer
+      const { data: offers } = await supabase
+        .from("offers")
+        .select("id")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false })
+        .limit(1);
+
+      if (offers && offers.length > 0) {
+        setLatestOfferId(offers[0].id);
+      }
+    };
+
+    fetchData();
+  }, [user, supabase]);
 
   return (
     <div>
       <PageHeader
-        title="Création d'Offre"
-        description="Génère ton offre irrésistible avec l'IA."
+        title="Creation d'Offre"
+        description="Genere ton offre irresistible avec l'IA."
       />
 
       <div className="flex gap-2 mb-6">
@@ -40,14 +85,25 @@ export default function OfferPage() {
         ))}
       </div>
 
-      {activeTab === "generate" && <OfferGenerator />}
+      {activeTab === "generate" && (
+        <OfferGenerator
+          marketAnalysisId={marketAnalysisId || undefined}
+          marketName={marketName || undefined}
+        />
+      )}
+      {activeTab === "positioning" && (
+        <CategoryOSWizard offerId={latestOfferId || undefined} />
+      )}
+      {activeTab === "score" && (
+        <OfferScoreCard offerId={latestOfferId || undefined} />
+      )}
       {activeTab === "history" && (
         <GenerationHistory
           table="offers"
           titleField="offer_name"
           subtitleField="positioning"
           statusField="status"
-          emptyMessage="Aucune offre générée pour le moment."
+          emptyMessage="Aucune offre generee pour le moment."
         />
       )}
     </div>

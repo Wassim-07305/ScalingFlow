@@ -1,0 +1,466 @@
+"use client";
+
+import React, { useEffect, useState, useCallback } from "react";
+import { PageHeader } from "@/components/layout/page-header";
+import { PersonaDisplay } from "@/components/market/persona-display";
+import { CompetitorGrid } from "@/components/market/competitor-grid";
+import { cn } from "@/lib/utils/cn";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { createClient } from "@/lib/supabase/client";
+import { useUser } from "@/hooks/use-user";
+import { toast } from "sonner";
+import { format } from "date-fns";
+import { fr } from "date-fns/locale";
+import type { PersonaForgeResult } from "@/lib/ai/prompts/persona-forge";
+import type { Database } from "@/types/database";
+import {
+  BarChart3,
+  User,
+  Swords,
+  ChevronDown,
+  ChevronUp,
+  Loader2,
+  Sparkles,
+  TrendingUp,
+  Target,
+  AlertTriangle,
+} from "lucide-react";
+
+type MarketAnalysis = Database["public"]["Tables"]["market_analyses"]["Row"];
+type Competitor = Database["public"]["Tables"]["competitors"]["Row"];
+
+const TABS = [
+  { key: "analyse", label: "Analyse", icon: BarChart3 },
+  { key: "persona", label: "Persona", icon: User },
+  { key: "concurrence", label: "Concurrence", icon: Swords },
+] as const;
+
+type TabKey = (typeof TABS)[number]["key"];
+
+export default function MarketPage() {
+  const { user } = useUser();
+  const supabase = createClient();
+
+  const [activeTab, setActiveTab] = useState<TabKey>("analyse");
+  const [analyses, setAnalyses] = useState<MarketAnalysis[]>([]);
+  const [selectedAnalysis, setSelectedAnalysis] = useState<MarketAnalysis | null>(null);
+  const [expandedAnalysis, setExpandedAnalysis] = useState<string | null>(null);
+  const [competitors, setCompetitors] = useState<Competitor[]>([]);
+  const [loadingPersona, setLoadingPersona] = useState(false);
+  const [loadingCompetitors, setLoadingCompetitors] = useState(false);
+  const [loadingData, setLoadingData] = useState(true);
+
+  // Charger les analyses de marche
+  const loadAnalyses = useCallback(async () => {
+    if (!user) return;
+    setLoadingData(true);
+
+    const { data, error } = await supabase
+      .from("market_analyses")
+      .select("*")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      toast.error("Erreur lors du chargement des analyses");
+      console.error(error);
+    } else if (data) {
+      setAnalyses(data);
+      // Selectionner la premiere analyse par defaut (ou celle marquee selected)
+      const selected = data.find((a) => a.selected) || data[0];
+      if (selected) {
+        setSelectedAnalysis(selected);
+      }
+    }
+    setLoadingData(false);
+  }, [user, supabase]);
+
+  // Charger les concurrents de l'analyse selectionnee
+  const loadCompetitors = useCallback(async () => {
+    if (!user || !selectedAnalysis) return;
+
+    const { data, error } = await supabase
+      .from("competitors")
+      .select("*")
+      .eq("user_id", user.id)
+      .eq("market_analysis_id", selectedAnalysis.id)
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error(error);
+    } else {
+      setCompetitors(data || []);
+    }
+  }, [user, selectedAnalysis, supabase]);
+
+  useEffect(() => {
+    loadAnalyses();
+  }, [loadAnalyses]);
+
+  useEffect(() => {
+    loadCompetitors();
+  }, [loadCompetitors]);
+
+  // Generer le persona
+  const handleGeneratePersona = async () => {
+    if (!selectedAnalysis) return;
+    setLoadingPersona(true);
+
+    try {
+      const res = await fetch("/api/ai/generate-persona", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ market_analysis_id: selectedAnalysis.id }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || "Erreur inconnue");
+      }
+
+      const persona = await res.json();
+      // Mettre a jour l'analyse locale
+      setSelectedAnalysis({ ...selectedAnalysis, persona });
+      setAnalyses((prev) =>
+        prev.map((a) =>
+          a.id === selectedAnalysis.id ? { ...a, persona } : a
+        )
+      );
+      toast.success("Persona genere avec succes !");
+    } catch (error) {
+      console.error(error);
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Erreur lors de la generation du persona"
+      );
+    } finally {
+      setLoadingPersona(false);
+    }
+  };
+
+  // Analyser les concurrents
+  const handleAnalyzeCompetitors = async () => {
+    if (!selectedAnalysis) return;
+    setLoadingCompetitors(true);
+
+    try {
+      const res = await fetch("/api/ai/analyze-competitors", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ market_analysis_id: selectedAnalysis.id }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || "Erreur inconnue");
+      }
+
+      await res.json();
+      // Recharger les concurrents depuis la DB
+      await loadCompetitors();
+      toast.success("Analyse concurrentielle terminee !");
+    } catch (error) {
+      console.error(error);
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Erreur lors de l'analyse concurrentielle"
+      );
+    } finally {
+      setLoadingCompetitors(false);
+    }
+  };
+
+  const persona = selectedAnalysis?.persona as PersonaForgeResult | null;
+
+  return (
+    <div>
+      <PageHeader
+        title="Etude de marche"
+        description="Analyse ton marche, cree ton avatar client et identifie tes concurrents."
+      />
+
+      {/* Tabs */}
+      <div className="flex gap-2 mb-6">
+        {TABS.map((tab) => (
+          <button
+            key={tab.key}
+            onClick={() => setActiveTab(tab.key)}
+            className={cn(
+              "flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all",
+              activeTab === tab.key
+                ? "bg-accent text-white"
+                : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
+            )}
+          >
+            <tab.icon className="h-4 w-4" />
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Selection de l'analyse */}
+      {analyses.length > 1 && (
+        <div className="mb-6">
+          <label className="text-sm text-text-muted mb-2 block">
+            Marche selectionne
+          </label>
+          <div className="flex flex-wrap gap-2">
+            {analyses.map((a) => (
+              <button
+                key={a.id}
+                onClick={() => setSelectedAnalysis(a)}
+                className={cn(
+                  "px-3 py-1.5 rounded-lg text-sm font-medium transition-all border",
+                  selectedAnalysis?.id === a.id
+                    ? "bg-accent/10 border-accent text-accent"
+                    : "bg-bg-tertiary border-border-default text-text-secondary hover:border-border-hover"
+                )}
+              >
+                {a.market_name}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Loading state */}
+      {loadingData && (
+        <div className="flex items-center justify-center py-20">
+          <Loader2 className="h-6 w-6 animate-spin text-accent" />
+          <span className="ml-2 text-sm text-text-secondary">
+            Chargement des analyses...
+          </span>
+        </div>
+      )}
+
+      {/* Empty state */}
+      {!loadingData && analyses.length === 0 && (
+        <Card>
+          <CardContent className="flex flex-col items-center justify-center py-12">
+            <BarChart3 className="h-12 w-12 text-text-muted mb-4" />
+            <h3 className="text-lg font-medium text-text-primary mb-2">
+              Aucune analyse de marche
+            </h3>
+            <p className="text-sm text-text-secondary text-center max-w-md">
+              Lance une analyse de marche depuis l&apos;onboarding pour voir tes
+              resultats ici.
+            </p>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* TAB: Analyse */}
+      {activeTab === "analyse" && !loadingData && analyses.length > 0 && (
+        <div className="space-y-4">
+          {analyses.map((analysis) => {
+            const isExpanded = expandedAnalysis === analysis.id;
+            const aiData = analysis.ai_raw_response as Record<string, unknown> | null;
+
+            return (
+              <Card key={analysis.id}>
+                <CardHeader
+                  className="cursor-pointer"
+                  onClick={() =>
+                    setExpandedAnalysis(isExpanded ? null : analysis.id)
+                  }
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <CardTitle>{analysis.market_name}</CardTitle>
+                      {analysis.selected && (
+                        <Badge variant="default">Recommande</Badge>
+                      )}
+                      {analysis.viability_score !== null && (
+                        <Badge
+                          variant={
+                            analysis.viability_score >= 70
+                              ? "default"
+                              : analysis.viability_score >= 50
+                                ? "yellow"
+                                : "red"
+                          }
+                        >
+                          <TrendingUp className="h-3 w-3 mr-1" />
+                          {analysis.viability_score}/100
+                        </Badge>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-text-muted">
+                        {format(new Date(analysis.created_at), "d MMM yyyy", {
+                          locale: fr,
+                        })}
+                      </span>
+                      {isExpanded ? (
+                        <ChevronUp className="h-4 w-4 text-text-muted" />
+                      ) : (
+                        <ChevronDown className="h-4 w-4 text-text-muted" />
+                      )}
+                    </div>
+                  </div>
+                  {analysis.market_description && (
+                    <p className="text-sm text-text-secondary mt-1">
+                      {analysis.market_description}
+                    </p>
+                  )}
+                </CardHeader>
+
+                {isExpanded && (
+                  <CardContent className="space-y-4 border-t border-border-default pt-4">
+                    {/* Positionnement */}
+                    {analysis.recommended_positioning && (
+                      <div>
+                        <h4 className="text-sm font-medium text-text-muted mb-1 flex items-center gap-1.5">
+                          <Target className="h-3.5 w-3.5" />
+                          Positionnement recommande
+                        </h4>
+                        <p className="text-sm text-text-primary">
+                          {analysis.recommended_positioning}
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Problemes */}
+                    {analysis.problems && analysis.problems.length > 0 && (
+                      <div>
+                        <h4 className="text-sm font-medium text-text-muted mb-2 flex items-center gap-1.5">
+                          <AlertTriangle className="h-3.5 w-3.5" />
+                          Problemes identifies
+                        </h4>
+                        <div className="flex flex-wrap gap-1.5">
+                          {analysis.problems.map((p, i) => (
+                            <Badge key={i} variant="yellow" className="text-xs">
+                              {p}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Signaux de demande */}
+                    {analysis.demand_signals && (
+                      <div>
+                        <h4 className="text-sm font-medium text-text-muted mb-2 flex items-center gap-1.5">
+                          <TrendingUp className="h-3.5 w-3.5" />
+                          Signaux de demande
+                        </h4>
+                        <div className="flex flex-wrap gap-1.5">
+                          {(analysis.demand_signals as string[]).map((s, i) => (
+                            <Badge key={i} variant="default" className="text-xs">
+                              {s}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Why good fit */}
+                    {aiData && typeof aiData === "object" && "why_good_fit" in aiData && (
+                      <div>
+                        <h4 className="text-sm font-medium text-text-muted mb-1">
+                          Pourquoi ce marche est adapte
+                        </h4>
+                        <p className="text-sm text-text-secondary">
+                          {aiData.why_good_fit as string}
+                        </p>
+                      </div>
+                    )}
+                  </CardContent>
+                )}
+              </Card>
+            );
+          })}
+        </div>
+      )}
+
+      {/* TAB: Persona */}
+      {activeTab === "persona" && !loadingData && selectedAnalysis && (
+        <div>
+          {persona ? (
+            <PersonaDisplay persona={persona} />
+          ) : (
+            <Card>
+              <CardContent className="flex flex-col items-center justify-center py-12">
+                <User className="h-12 w-12 text-text-muted mb-4" />
+                <h3 className="text-lg font-medium text-text-primary mb-2">
+                  Aucun persona genere
+                </h3>
+                <p className="text-sm text-text-secondary text-center max-w-md mb-6">
+                  Genere un avatar client ultra-detaille sur 4 niveaux pour le
+                  marche &laquo; {selectedAnalysis.market_name} &raquo;.
+                </p>
+                <Button
+                  onClick={handleGeneratePersona}
+                  disabled={loadingPersona}
+                >
+                  {loadingPersona ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Generation en cours...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="h-4 w-4" />
+                      Generer le Persona
+                    </>
+                  )}
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+      )}
+
+      {/* TAB: Concurrence */}
+      {activeTab === "concurrence" && !loadingData && selectedAnalysis && (
+        <div>
+          {competitors.length > 0 ? (
+            <CompetitorGrid
+              competitors={competitors.map((c) => ({
+                name: c.competitor_name,
+                positioning: c.positioning || "",
+                pricing_estimate: c.pricing || "",
+                strengths: c.strengths || [],
+                weaknesses: c.weaknesses || [],
+                differentiation: c.gap_opportunity || "",
+              }))}
+            />
+          ) : (
+            <Card>
+              <CardContent className="flex flex-col items-center justify-center py-12">
+                <Swords className="h-12 w-12 text-text-muted mb-4" />
+                <h3 className="text-lg font-medium text-text-primary mb-2">
+                  Aucune analyse concurrentielle
+                </h3>
+                <p className="text-sm text-text-secondary text-center max-w-md mb-6">
+                  Lance une analyse IA des concurrents du marche
+                  &laquo; {selectedAnalysis.market_name} &raquo;.
+                </p>
+                <Button
+                  onClick={handleAnalyzeCompetitors}
+                  disabled={loadingCompetitors}
+                >
+                  {loadingCompetitors ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Analyse en cours...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="h-4 w-4" />
+                      Analyser les concurrents
+                    </>
+                  )}
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}

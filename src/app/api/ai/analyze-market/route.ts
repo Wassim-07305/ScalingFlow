@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { generateJSON } from "@/lib/ai/generate";
-import { marketAnalysisPrompt, type OnboardingData } from "@/lib/ai/prompts/market-analysis";
+import { marketAnalysisPrompt, type MarketAnalysisContext } from "@/lib/ai/prompts/market-analysis";
 import type { MarketAnalysisResult } from "@/types/ai";
+import { awardXP } from "@/lib/gamification/xp-engine";
 
 export async function POST(req: NextRequest) {
   try {
@@ -12,10 +13,10 @@ export async function POST(req: NextRequest) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+      return NextResponse.json({ error: "Non autorise" }, { status: 401 });
     }
 
-    const body: OnboardingData = await req.json();
+    const body: MarketAnalysisContext = await req.json();
 
     const result = await generateJSON<MarketAnalysisResult>({
       prompt: marketAnalysisPrompt(body),
@@ -40,6 +41,9 @@ export async function POST(req: NextRequest) {
         selected: i === result.recommended_market_index,
       });
     }
+
+    // Award XP (non-blocking)
+    try { await awardXP(user.id, "generation.market_analysis"); } catch {}
 
     return NextResponse.json(result);
   } catch (error) {

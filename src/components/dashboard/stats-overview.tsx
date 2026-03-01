@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Package, FileText, GitBranch, Flame } from "lucide-react";
+import { Package, FileText, GitBranch, Flame, PenTool, Megaphone } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { AnimatedCounter } from "@/components/shared/animated-counter";
 import { cn } from "@/lib/utils/cn";
@@ -45,6 +45,8 @@ export function StatsOverview() {
     offers: 0,
     assets: 0,
     funnels: 0,
+    ads: 0,
+    content: 0,
   });
   const [countsLoading, setCountsLoading] = useState(true);
 
@@ -55,7 +57,7 @@ export function StatsOverview() {
       setCountsLoading(true);
       const supabase = createClient();
 
-      const [offersRes, assetsRes, funnelsRes] = await Promise.all([
+      const [offersRes, assetsRes, funnelsRes, adsRes, contentRes] = await Promise.all([
         supabase
           .from("offers")
           .select("id", { count: "exact", head: true })
@@ -68,12 +70,22 @@ export function StatsOverview() {
           .from("funnels")
           .select("id", { count: "exact", head: true })
           .eq("user_id", user.id),
+        supabase
+          .from("ad_creatives")
+          .select("id", { count: "exact", head: true })
+          .eq("user_id", user.id),
+        supabase
+          .from("content_pieces")
+          .select("id", { count: "exact", head: true })
+          .eq("user_id", user.id),
       ]);
 
       setCounts({
         offers: offersRes.count ?? 0,
         assets: assetsRes.count ?? 0,
         funnels: funnelsRes.count ?? 0,
+        ads: adsRes.count ?? 0,
+        content: contentRes.count ?? 0,
       });
       setCountsLoading(false);
     };
@@ -85,34 +97,46 @@ export function StatsOverview() {
 
   const stats: StatCard[] = [
     {
-      label: "Nombre d'offres",
+      label: "Offres",
       value: counts.offers,
       icon: Package,
       color: "orange",
     },
     {
-      label: "Assets créés",
-      value: counts.assets,
-      icon: FileText,
-      color: "blue",
-    },
-    {
-      label: "Funnels créés",
+      label: "Funnels",
       value: counts.funnels,
       icon: GitBranch,
       color: "cyan",
     },
     {
+      label: "Publicités",
+      value: counts.ads,
+      icon: Megaphone,
+      color: "blue",
+    },
+    {
+      label: "Contenus",
+      value: counts.content,
+      icon: PenTool,
+      color: "purple",
+    },
+    {
+      label: "Assets",
+      value: counts.assets,
+      icon: FileText,
+      color: "blue",
+    },
+    {
       label: "Streak",
       value: profile?.streak_days ?? 0,
-      suffix: " jours",
+      suffix: "j",
       icon: Flame,
-      color: "purple",
+      color: "orange",
     },
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
       {stats.map((stat) => {
         const colors = colorMap[stat.color];
         return (

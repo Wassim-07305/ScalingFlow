@@ -7,6 +7,13 @@ import { useOnboardingStore } from "@/stores/onboarding-store";
 import { createClient } from "@/lib/supabase/client";
 import { useUser } from "@/hooks/use-user";
 import { StepIndicator } from "@/components/shared/step-indicator";
+import { StepIdentity } from "@/components/onboarding/step-identity";
+import { StepSituation } from "@/components/onboarding/step-situation";
+import { StepSkillsVault } from "@/components/onboarding/step-skills-vault";
+import { StepExpertise } from "@/components/onboarding/step-expertise";
+import { StepParcours } from "@/components/onboarding/step-parcours";
+import { StepObjectives } from "@/components/onboarding/step-objectives";
+import { StepResources } from "@/components/onboarding/step-resources";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -32,7 +39,11 @@ import {
 } from "lucide-react";
 
 const STEPS = [
+  "Identité",
+  "Situation",
   "Compétences",
+  "Expertise",
+  "Parcours",
   "Expérience",
   "Revenus",
   "Industries",
@@ -74,17 +85,6 @@ const INDUSTRIES = [
   "Logistique",
 ];
 
-const OBJECTIVES = [
-  "Trouver ma niche",
-  "Créer une offre irrésistible",
-  "Générer des leads",
-  "Lancer des pubs Meta",
-  "Créer un funnel de vente",
-  "Scaler mon activité",
-  "Structurer mon delivery",
-  "Automatiser mon business",
-];
-
 const BUDGETS = [
   { value: 0, label: "0€ - Pas de budget" },
   { value: 500, label: "500€/mois" },
@@ -105,7 +105,7 @@ export function OnboardingWizard() {
   const [error, setError] = useState<string | null>(null);
 
   const toggleArrayItem = (
-    key: "skills" | "industries" | "objectives",
+    key: "skills" | "industries" | "objectives" | "formations",
     item: string
   ) => {
     const current = store[key];
@@ -121,17 +121,25 @@ export function OnboardingWizard() {
 
   const canProceed = () => {
     switch (store.step) {
-      case 0:
-        return store.skills.length > 0;
-      case 1:
+      case 0: // Identity
+        return store.firstName.trim() !== "" && store.lastName.trim() !== "";
+      case 1: // Situation
+        return store.situation !== "";
+      case 2: // Vault Skills
+        return store.vaultSkills.length > 0;
+      case 3: // Expertise
+        return true; // Optionnel
+      case 4: // Parcours
+        return store.parcours !== "";
+      case 5: // Experience
         return store.experienceLevel !== "";
-      case 2:
+      case 6: // Revenue
         return store.currentRevenue >= 0 && store.targetRevenue > 0;
-      case 3:
+      case 7: // Industries
         return store.industries.length > 0;
-      case 4:
+      case 8: // Objectives
         return store.objectives.length > 0;
-      case 5:
+      case 9: // Budget
         return true;
       default:
         return false;
@@ -147,13 +155,26 @@ export function OnboardingWizard() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          firstName: store.firstName,
+          lastName: store.lastName,
+          country: store.country,
+          language: store.language,
+          situation: store.situation,
+          situationDetails: store.situationDetails,
           skills: store.skills,
+          vaultSkills: store.vaultSkills,
+          expertiseAnswers: store.expertiseAnswers,
+          parcours: store.parcours,
           experienceLevel: store.experienceLevel,
           currentRevenue: store.currentRevenue,
           targetRevenue: store.targetRevenue,
           industries: store.industries,
           objectives: store.objectives,
           budgetMonthly: store.budgetMonthly,
+          hoursPerWeek: store.hoursPerWeek,
+          deadline: store.deadline,
+          teamSize: store.teamSize,
+          formations: store.formations,
         }),
       });
 
@@ -177,14 +198,31 @@ export function OnboardingWizard() {
       .from("profiles")
       .update({
         onboarding_completed: true,
-        onboarding_step: 7,
+        onboarding_step: 11,
+        first_name: store.firstName,
+        last_name: store.lastName,
+        country: store.country,
+        language: store.language,
+        situation: store.situation || null,
+        situation_details: store.situationDetails,
         skills: store.skills,
-        experience_level: store.experienceLevel as "beginner" | "intermediate" | "advanced",
+        vault_skills: store.vaultSkills,
+        expertise_answers: store.expertiseAnswers,
+        parcours: store.parcours || null,
+        experience_level: store.experienceLevel as
+          | "beginner"
+          | "intermediate"
+          | "advanced",
         current_revenue: store.currentRevenue,
         target_revenue: store.targetRevenue,
         industries: store.industries,
         objectives: store.objectives,
         budget_monthly: store.budgetMonthly,
+        hours_per_week: store.hoursPerWeek,
+        deadline: store.deadline,
+        team_size: store.teamSize,
+        formations: store.formations,
+        vault_completed: true,
         selected_market: market.name,
         market_viability_score: market.viability_score,
         niche: market.name,
@@ -196,14 +234,14 @@ export function OnboardingWizard() {
   };
 
   const handleNext = () => {
-    if (store.step === 5) {
+    if (store.step === 9) {
       handleAnalyze();
     } else {
       store.nextStep();
     }
   };
 
-  // Show analysis results
+  // Afficher les resultats d'analyse
   if (analysisResult) {
     return (
       <MarketAnalysis
@@ -213,24 +251,24 @@ export function OnboardingWizard() {
     );
   }
 
-  // Show loading
+  // Afficher le chargement
   if (isAnalyzing) {
     return <AILoading text="Analyse de ton marché en cours" />;
   }
 
   return (
     <div className="max-w-2xl mx-auto space-y-8">
-      {/* Step indicator */}
+      {/* Indicateur de steps */}
       <StepIndicator steps={STEPS} currentStep={store.step} />
 
-      {/* Error */}
+      {/* Erreur */}
       {error && (
         <div className="rounded-[8px] bg-danger/10 border border-danger/20 p-3 text-sm text-danger">
           {error}
         </div>
       )}
 
-      {/* Step content */}
+      {/* Contenu du step */}
       <AnimatePresence mode="wait">
         <motion.div
           key={store.step}
@@ -239,43 +277,26 @@ export function OnboardingWizard() {
           exit={{ opacity: 0, x: -20 }}
           transition={{ duration: 0.2 }}
         >
-          {/* Step 0: Skills */}
-          {store.step === 0 && (
-            <div className="space-y-4">
-              <h2 className="text-xl font-bold">
-                Quelles sont tes compétences ?
-              </h2>
-              <p className="text-text-secondary text-sm">
-                Sélectionne toutes les compétences que tu maîtrises.
-              </p>
-              <div className="grid grid-cols-2 gap-3">
-                {SKILLS.map((skill) => {
-                  const isSelected = store.skills.includes(skill.label);
-                  return (
-                    <button
-                      key={skill.label}
-                      onClick={() => toggleArrayItem("skills", skill.label)}
-                      className={cn(
-                        "flex items-center gap-3 rounded-[8px] border p-3 text-left transition-all duration-200",
-                        isSelected
-                          ? "border-accent bg-accent-muted text-accent"
-                          : "border-border-default bg-bg-secondary text-text-secondary hover:border-border-hover"
-                      )}
-                    >
-                      <skill.icon className="h-5 w-5 shrink-0" />
-                      <span className="text-sm font-medium">{skill.label}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          )}
+          {/* Step 0: Identity */}
+          {store.step === 0 && <StepIdentity store={store} />}
 
-          {/* Step 1: Experience */}
-          {store.step === 1 && (
+          {/* Step 1: Situation */}
+          {store.step === 1 && <StepSituation store={store} />}
+
+          {/* Step 2: Vault Skills */}
+          {store.step === 2 && <StepSkillsVault store={store} />}
+
+          {/* Step 3: Expertise */}
+          {store.step === 3 && <StepExpertise store={store} />}
+
+          {/* Step 4: Parcours */}
+          {store.step === 4 && <StepParcours store={store} />}
+
+          {/* Step 5: Experience */}
+          {store.step === 5 && (
             <div className="space-y-4">
               <h2 className="text-xl font-bold">
-                Quel est ton niveau d'expérience ?
+                Quel est ton niveau d&apos;expérience ?
               </h2>
               <div className="grid gap-3">
                 {EXPERIENCE_LEVELS.map((level) => (
@@ -310,31 +331,37 @@ export function OnboardingWizard() {
             </div>
           )}
 
-          {/* Step 2: Revenue */}
-          {store.step === 2 && (
+          {/* Step 6: Revenue */}
+          {store.step === 6 && (
             <div className="space-y-6">
               <h2 className="text-xl font-bold">
                 Tes revenus actuels et objectifs
               </h2>
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label>Revenu mensuel actuel (€)</Label>
+                  <Label>Revenu mensuel actuel (EUR)</Label>
                   <Input
                     type="number"
                     value={store.currentRevenue || ""}
                     onChange={(e) =>
-                      store.setField("currentRevenue", Number(e.target.value))
+                      store.setField(
+                        "currentRevenue",
+                        Number(e.target.value)
+                      )
                     }
                     placeholder="Ex: 5000"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Objectif de revenu mensuel (€)</Label>
+                  <Label>Objectif de revenu mensuel (EUR)</Label>
                   <Input
                     type="number"
                     value={store.targetRevenue || ""}
                     onChange={(e) =>
-                      store.setField("targetRevenue", Number(e.target.value))
+                      store.setField(
+                        "targetRevenue",
+                        Number(e.target.value)
+                      )
                     }
                     placeholder="Ex: 30000"
                   />
@@ -343,8 +370,8 @@ export function OnboardingWizard() {
             </div>
           )}
 
-          {/* Step 3: Industries */}
-          {store.step === 3 && (
+          {/* Step 7: Industries */}
+          {store.step === 7 && (
             <div className="space-y-4">
               <h2 className="text-xl font-bold">
                 Dans quelles industries as-tu travaillé ?
@@ -371,36 +398,13 @@ export function OnboardingWizard() {
             </div>
           )}
 
-          {/* Step 4: Objectives */}
-          {store.step === 4 && (
-            <div className="space-y-4">
-              <h2 className="text-xl font-bold">
-                Quels sont tes objectifs ?
-              </h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {OBJECTIVES.map((obj) => {
-                  const isSelected = store.objectives.includes(obj);
-                  return (
-                    <button
-                      key={obj}
-                      onClick={() => toggleArrayItem("objectives", obj)}
-                      className={cn(
-                        "rounded-[8px] border p-3 text-left text-sm font-medium transition-all duration-200",
-                        isSelected
-                          ? "border-accent bg-accent-muted text-accent"
-                          : "border-border-default text-text-secondary hover:border-border-hover"
-                      )}
-                    >
-                      {obj}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
+          {/* Step 8: Objectives & Constraints */}
+          {store.step === 8 && (
+            <StepObjectives store={store} toggleArrayItem={toggleArrayItem} />
           )}
 
-          {/* Step 5: Budget */}
-          {store.step === 5 && (
+          {/* Step 9: Budget */}
+          {store.step === 9 && (
             <div className="space-y-4">
               <h2 className="text-xl font-bold">
                 Quel est ton budget pub mensuel ?
@@ -415,7 +419,9 @@ export function OnboardingWizard() {
                         ? "border-accent bg-accent-muted"
                         : "hover:border-border-hover"
                     )}
-                    onClick={() => store.setField("budgetMonthly", budget.value)}
+                    onClick={() =>
+                      store.setField("budgetMonthly", budget.value)
+                    }
                   >
                     <p className="font-semibold text-text-primary">
                       {budget.label}
@@ -439,7 +445,7 @@ export function OnboardingWizard() {
           Retour
         </Button>
         <Button onClick={handleNext} disabled={!canProceed()}>
-          {store.step === 5 ? "Analyser mon marché" : "Suivant"}
+          {store.step === 9 ? "Analyser mon marché" : "Suivant"}
           <ArrowRight className="h-4 w-4 ml-2" />
         </Button>
       </div>

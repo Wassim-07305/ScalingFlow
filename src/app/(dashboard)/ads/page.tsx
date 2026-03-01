@@ -4,13 +4,17 @@ import React from "react";
 import { PageHeader } from "@/components/layout/page-header";
 import { CreativeGenerator } from "@/components/ads/creative-generator";
 import { CampaignDashboard } from "@/components/ads/campaign-dashboard";
+import { VideoAdGenerator } from "@/components/ads/video-ad-generator";
+import { DMScriptGenerator } from "@/components/ads/dm-script-generator";
 import { GenerationHistory } from "@/components/shared/generation-history";
 import { cn } from "@/lib/utils/cn";
-import { Sparkles, BarChart3, History } from "lucide-react";
+import { Sparkles, BarChart3, Video, MessageSquare, History } from "lucide-react";
 
 const TABS = [
-  { key: "creatives", label: "Créatives IA", icon: Sparkles },
+  { key: "creatives", label: "Creatives IA", icon: Sparkles },
   { key: "campaigns", label: "Campagnes", icon: BarChart3 },
+  { key: "video_ads", label: "Video Ads", icon: Video },
+  { key: "dm_scripts", label: "Scripts DM", icon: MessageSquare },
   { key: "history", label: "Historique", icon: History },
 ] as const;
 
@@ -20,17 +24,17 @@ export default function AdsPage() {
   return (
     <div>
       <PageHeader
-        title="Publicités"
-        description="Crée et gère tes campagnes publicitaires."
+        title="Publicites"
+        description="Cree et gere tes campagnes publicitaires."
       />
 
-      <div className="flex gap-2 mb-6">
+      <div className="flex gap-2 mb-6 overflow-x-auto pb-1">
         {TABS.map((tab) => (
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
             className={cn(
-              "flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all",
+              "flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all whitespace-nowrap",
               activeTab === tab.key
                 ? "bg-accent text-white"
                 : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
@@ -44,13 +48,15 @@ export default function AdsPage() {
 
       {activeTab === "creatives" && <CreativeGenerator />}
       {activeTab === "campaigns" && <CampaignDashboard />}
+      {activeTab === "video_ads" && <VideoAdGenerator />}
+      {activeTab === "dm_scripts" && <DMScriptGenerator />}
       {activeTab === "history" && (
         <GenerationHistory
           table="ad_creatives"
           titleField="headline"
           subtitleField="ad_copy"
           statusField="status"
-          emptyMessage="Aucune créative générée pour le moment."
+          emptyMessage="Aucune creative generee pour le moment."
         />
       )}
     </div>

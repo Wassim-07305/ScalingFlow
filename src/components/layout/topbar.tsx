@@ -1,10 +1,10 @@
 "use client";
 
-import { Bell, Menu, Search } from "lucide-react";
+import { Menu, Search } from "lucide-react";
 import { useAppStore } from "@/stores/app-store";
 import { useUser } from "@/hooks/use-user";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
+import { NotificationBell } from "@/components/layout/notification-bell";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -62,10 +62,7 @@ export function Topbar() {
       {/* Right: Notifications + Profile */}
       <div className="flex items-center gap-2">
         {/* Notifications */}
-        <Button variant="ghost" size="icon" className="relative">
-          <Bell className="h-4 w-4" />
-          <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-accent" />
-        </Button>
+        <NotificationBell />
 
         {/* Profile dropdown */}
         <DropdownMenu>

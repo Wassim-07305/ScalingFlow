@@ -1,7 +1,9 @@
 import {
   LayoutDashboard,
   Compass,
+  Globe,
   Package,
+  Palette,
   Filter,
   FileText,
   Megaphone,
@@ -12,6 +14,7 @@ import {
   Trophy,
   Users,
   Handshake,
+  Bot,
   Settings,
   type LucideIcon,
 } from "lucide-react";
@@ -26,7 +29,9 @@ export interface NavItem {
 export const NAV_ITEMS: NavItem[] = [
   { label: "Dashboard", href: "/", icon: LayoutDashboard },
   { label: "Onboarding", href: "/onboarding", icon: Compass },
+  { label: "Marche", href: "/market", icon: Globe },
   { label: "Offre", href: "/offer", icon: Package },
+  { label: "Marque", href: "/brand", icon: Palette },
   { label: "Funnel", href: "/funnel", icon: Filter },
   { label: "Assets", href: "/assets", icon: FileText },
   { label: "Ads", href: "/ads", icon: Megaphone },
@@ -37,6 +42,7 @@ export const NAV_ITEMS: NavItem[] = [
   { label: "Leaderboard", href: "/leaderboard", icon: Trophy },
   { label: "Communauté", href: "/community", icon: Users },
   { label: "Vente", href: "/sales", icon: Handshake },
+  { label: "Assistant IA", href: "/assistant", icon: Bot },
 ];
 
 export const NAV_BOTTOM: NavItem[] = [

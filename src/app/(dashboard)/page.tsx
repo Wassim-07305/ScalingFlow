@@ -2,8 +2,11 @@
 
 import { PageHeader } from "@/components/layout/page-header";
 import { StatsOverview } from "@/components/dashboard/stats-overview";
+import { ProgressBar } from "@/components/dashboard/progress-bar";
 import { RevenueChart } from "@/components/dashboard/revenue-chart";
 import { LeadsChart } from "@/components/dashboard/leads-chart";
+import { NextTasks } from "@/components/dashboard/next-tasks";
+import { ActivityFeed } from "@/components/dashboard/activity-feed";
 import { QuickActions } from "@/components/dashboard/quick-actions";
 
 export default function DashboardPage() {
@@ -17,6 +20,15 @@ export default function DashboardPage() {
       <div className="space-y-6">
         {/* KPI Cards */}
         <StatsOverview />
+
+        {/* Progress Bars (XP + Roadmap) */}
+        <ProgressBar />
+
+        {/* Tasks + Activity */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <NextTasks />
+          <ActivityFeed />
+        </div>
 
         {/* Charts Row */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
