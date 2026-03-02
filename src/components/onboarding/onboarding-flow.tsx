@@ -162,7 +162,7 @@ export function OnboardingFlow() {
   const [loaded, setLoaded] = useState(false);
 
   const router = useRouter();
-  const { user } = useUser();
+  const { user, loading: userLoading } = useUser();
   const supabase = createClient();
 
   /* ── Visible questions (filter showWhen) ── */
@@ -178,7 +178,11 @@ export function OnboardingFlow() {
   /* ── Load profile on mount (resume) ── */
 
   useEffect(() => {
-    if (!user || loaded) return;
+    if (userLoading || loaded) return;
+    if (!user) {
+      setLoaded(true);
+      return;
+    }
 
     const load = async () => {
       const { data: profile } = await supabase
@@ -196,7 +200,8 @@ export function OnboardingFlow() {
         if (profile.situation) r.situation = profile.situation;
         if (profile.situation_details)
           r.situationDetails = profile.situation_details;
-        if (profile.vault_skills) r.vaultSkills = profile.vault_skills;
+        if (Array.isArray(profile.vault_skills))
+          r.vaultSkills = profile.vault_skills;
         if (profile.expertise_answers) {
           const ea = profile.expertise_answers as Record<string, string>;
           Object.entries(ea).forEach(([k, v]) => {
@@ -210,8 +215,10 @@ export function OnboardingFlow() {
           r.currentRevenue = String(profile.current_revenue);
         if (profile.target_revenue)
           r.targetRevenue = String(profile.target_revenue);
-        if (profile.industries) r.industries = profile.industries;
-        if (profile.objectives) r.objectives = profile.objectives;
+        if (Array.isArray(profile.industries))
+          r.industries = profile.industries;
+        if (Array.isArray(profile.objectives))
+          r.objectives = profile.objectives;
         if (profile.budget_monthly != null)
           r.budgetMonthly = String(profile.budget_monthly);
 
@@ -232,7 +239,7 @@ export function OnboardingFlow() {
 
     load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user]);
+  }, [user, userLoading]);
 
   /* ── Auto-focus inputs on step change ── */
 
@@ -763,7 +770,7 @@ export function OnboardingFlow() {
               animate="center"
               exit="exit"
               transition={{ duration: 0.3, ease: "easeOut" }}
-              className="w-full max-w-2xl"
+              className="flex w-full max-w-2xl flex-col items-center"
             >
               {renderQuestion()}
             </motion.div>

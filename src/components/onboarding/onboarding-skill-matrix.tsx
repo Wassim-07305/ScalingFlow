@@ -35,8 +35,10 @@ export function OnboardingSkillMatrix({
   value,
   onChange,
 }: OnboardingSkillMatrixProps) {
+  const safeValue = Array.isArray(value) ? value : [];
+
   const getLevel = (name: string) => {
-    const skill = value.find((s) => s.name === name);
+    const skill = safeValue.find((s) => s.name === name);
     return skill?.level;
   };
 
@@ -44,12 +46,11 @@ export function OnboardingSkillMatrix({
     name: string,
     level: "debutant" | "intermediaire" | "avance"
   ) => {
-    const existing = value.find((s) => s.name === name);
+    const existing = safeValue.find((s) => s.name === name);
     if (existing?.level === level) {
-      // Toggle off
-      onChange(value.filter((s) => s.name !== name));
+      onChange(safeValue.filter((s) => s.name !== name));
     } else {
-      const filtered = value.filter((s) => s.name !== name);
+      const filtered = safeValue.filter((s) => s.name !== name);
       onChange([...filtered, { name, level }]);
     }
   };
