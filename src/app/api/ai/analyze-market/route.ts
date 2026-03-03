@@ -47,9 +47,10 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(result);
   } catch (error) {
-    console.error("Market analysis error:", error);
+    const message = error instanceof Error ? error.message : String(error);
+    console.error("Market analysis error:", message, error);
     return NextResponse.json(
-      { error: "Erreur lors de l'analyse de marché" },
+      { error: `Erreur analyse : ${message}` },
       { status: 500 }
     );
   }

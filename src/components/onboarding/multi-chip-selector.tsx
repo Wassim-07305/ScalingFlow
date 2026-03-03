@@ -35,10 +35,10 @@ export function MultiChipSelector({
             key={opt.value}
             onClick={() => toggle(opt.value)}
             className={cn(
-              "rounded-full border-2 px-5 py-2.5 text-sm font-medium transition-all duration-200",
+              "rounded-xl border-2 px-5 py-3 text-base font-medium transition-all duration-200",
               selected
-                ? "border-emerald-400 bg-emerald-500/20 text-white shadow-lg shadow-emerald-500/10"
-                : "border-white/10 bg-white/5 text-white/70 hover:border-white/30"
+                ? "scale-105 border-emerald-400 bg-emerald-500/20 text-white shadow-lg shadow-emerald-500/20"
+                : "border-white/10 bg-white/5 text-white/70 hover:border-white/30 hover:bg-white/10 hover:text-white"
             )}
           >
             {opt.label}

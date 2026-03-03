@@ -9,7 +9,7 @@ import { ArrowRight, Sparkles, CheckCircle } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useUser } from "@/hooks/use-user";
 import { cn } from "@/lib/utils/cn";
-import { AnimatedBackground } from "./animated-background";
+import { AnimatedBackground, onboardingBg } from "./animated-background";
 import { OnboardingProgressBar } from "./onboarding-progress-bar";
 import { OnboardingTopBar } from "./onboarding-top-bar";
 import { ChipSelector } from "./chip-selector";
@@ -376,11 +376,17 @@ export function OnboardingFlow() {
         }),
       });
 
-      if (!res.ok) throw new Error("Erreur analyse");
+      if (!res.ok) {
+        const errorBody = await res.json().catch(() => null);
+        const msg = errorBody?.error || `Erreur serveur (${res.status})`;
+        throw new Error(msg);
+      }
       const data: MarketAnalysisResult = await res.json();
       setAnalysisResult(data);
-    } catch {
-      setError("Erreur lors de l'analyse. Reessaie.");
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Erreur inconnue";
+      console.error("Market analysis failed:", message);
+      setError(`Erreur lors de l'analyse : ${message}`);
     } finally {
       setIsAnalyzing(false);
     }
@@ -522,11 +528,11 @@ export function OnboardingFlow() {
       /* ── Text input ── */
       case "text":
         return (
-          <div className="w-full max-w-md space-y-6">
-            <div className="text-center">
-              <h2 className="text-2xl font-bold sm:text-3xl">{q.title}</h2>
+          <div className="w-full max-w-lg">
+            <div className="mb-8">
+              <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">{q.title}</h2>
               {q.subtitle && (
-                <p className="mt-2 text-sm text-white/50">{q.subtitle}</p>
+                <p className="mt-2 text-base text-white/40">{q.subtitle}</p>
               )}
             </div>
             <input
@@ -535,7 +541,7 @@ export function OnboardingFlow() {
               value={String(fieldValue || "")}
               onChange={(e) => setField(q.field!, e.target.value)}
               placeholder={q.placeholder}
-              className="w-full border-b-2 border-white/20 bg-transparent pb-3 text-center text-2xl font-medium text-white outline-none placeholder:text-white/25 focus:border-emerald-400"
+              className="w-full border-b-2 border-white/20 bg-transparent pb-3 text-2xl font-medium text-white outline-none placeholder:text-white/25 transition-colors focus:border-emerald-400 sm:text-3xl"
             />
           </div>
         );
@@ -543,9 +549,9 @@ export function OnboardingFlow() {
       /* ── Euro input ── */
       case "text-euro":
         return (
-          <div className="w-full max-w-md space-y-6">
-            <div className="text-center">
-              <h2 className="text-2xl font-bold sm:text-3xl">{q.title}</h2>
+          <div className="w-full max-w-lg">
+            <div className="mb-8">
+              <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">{q.title}</h2>
             </div>
             <div className="relative">
               <input
@@ -554,9 +560,9 @@ export function OnboardingFlow() {
                 value={String(fieldValue || "")}
                 onChange={(e) => setField(q.field!, e.target.value)}
                 placeholder={q.placeholder}
-                className="w-full border-b-2 border-white/20 bg-transparent pb-3 pr-14 text-center text-2xl font-medium text-white outline-none placeholder:text-white/25 focus:border-emerald-400"
+                className="w-full border-b-2 border-white/20 bg-transparent pb-3 pr-14 text-2xl font-medium text-white outline-none placeholder:text-white/25 transition-colors focus:border-emerald-400 sm:text-3xl"
               />
-              <span className="absolute bottom-3 right-0 text-lg text-white/40">
+              <span className="absolute bottom-3 right-0 text-lg text-white/30">
                 EUR
               </span>
             </div>
@@ -566,11 +572,11 @@ export function OnboardingFlow() {
       /* ── Textarea ── */
       case "textarea":
         return (
-          <div className="w-full max-w-lg space-y-6">
-            <div className="text-center">
-              <h2 className="text-xl font-bold sm:text-2xl">{q.title}</h2>
+          <div className="w-full max-w-lg">
+            <div className="mb-8">
+              <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">{q.title}</h2>
               {q.subtitle && (
-                <p className="mt-2 text-sm text-white/50">{q.subtitle}</p>
+                <p className="mt-2 text-base text-white/40">{q.subtitle}</p>
               )}
             </div>
             <textarea
@@ -578,8 +584,8 @@ export function OnboardingFlow() {
               value={String(fieldValue || "")}
               onChange={(e) => setField(q.field!, e.target.value)}
               placeholder={q.placeholder}
-              rows={4}
-              className="w-full resize-none rounded-xl border-2 border-white/10 bg-white/5 p-4 text-base text-white outline-none placeholder:text-white/25 focus:border-emerald-400"
+              rows={3}
+              className="w-full resize-none rounded-xl border-2 border-white/20 bg-white/5 px-5 py-4 text-lg text-white outline-none placeholder:text-white/25 transition-colors focus:border-emerald-400"
             />
           </div>
         );
@@ -587,11 +593,11 @@ export function OnboardingFlow() {
       /* ── Single-select chips (auto-advance) ── */
       case "chips":
         return (
-          <div className="w-full max-w-lg space-y-6">
-            <div className="text-center">
-              <h2 className="text-2xl font-bold sm:text-3xl">{q.title}</h2>
+          <div className="w-full max-w-lg">
+            <div className="mb-8">
+              <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">{q.title}</h2>
               {q.subtitle && (
-                <p className="mt-2 text-sm text-white/50">{q.subtitle}</p>
+                <p className="mt-2 text-base text-white/40">{q.subtitle}</p>
               )}
             </div>
             <ChipSelector
@@ -608,11 +614,11 @@ export function OnboardingFlow() {
       /* ── Multi-select chips ── */
       case "chips-multi":
         return (
-          <div className="w-full max-w-lg space-y-6">
-            <div className="text-center">
-              <h2 className="text-2xl font-bold sm:text-3xl">{q.title}</h2>
+          <div className="w-full max-w-lg">
+            <div className="mb-8">
+              <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">{q.title}</h2>
               {q.subtitle && (
-                <p className="mt-2 text-sm text-white/50">{q.subtitle}</p>
+                <p className="mt-2 text-base text-white/40">{q.subtitle}</p>
               )}
             </div>
             <MultiChipSelector
@@ -630,17 +636,17 @@ export function OnboardingFlow() {
         const details = (formData.situationDetails as SituationDetails) || {};
 
         return (
-          <div className="w-full max-w-lg space-y-6">
-            <div className="text-center">
-              <h2 className="text-2xl font-bold sm:text-3xl">{q.title}</h2>
+          <div className="w-full max-w-lg">
+            <div className="mb-8">
+              <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">{q.title}</h2>
               {q.subtitle && (
-                <p className="mt-2 text-sm text-white/50">{q.subtitle}</p>
+                <p className="mt-2 text-base text-white/40">{q.subtitle}</p>
               )}
             </div>
-            <div className="space-y-4">
+            <div className="space-y-5">
               {fields.map((f, idx) => (
-                <div key={f.key} className="space-y-2">
-                  <label className="text-sm font-medium text-white/60">
+                <div key={f.key}>
+                  <label className="mb-2 block text-sm font-medium text-white/50">
                     {f.label}
                   </label>
                   <input
@@ -660,7 +666,7 @@ export function OnboardingFlow() {
                       setField("situationDetails", updated);
                     }}
                     placeholder={f.placeholder}
-                    className="w-full rounded-xl border-2 border-white/10 bg-white/5 px-4 py-3 text-base text-white outline-none placeholder:text-white/25 focus:border-emerald-400"
+                    className="w-full rounded-xl border-2 border-white/20 bg-white/5 px-5 py-3.5 text-lg text-white outline-none placeholder:text-white/25 transition-colors focus:border-emerald-400"
                   />
                 </div>
               ))}
@@ -672,11 +678,11 @@ export function OnboardingFlow() {
       /* ── Skill matrix ── */
       case "skill-matrix":
         return (
-          <div className="w-full max-w-lg space-y-6">
-            <div className="text-center">
-              <h2 className="text-2xl font-bold sm:text-3xl">{q.title}</h2>
+          <div className="w-full max-w-lg">
+            <div className="mb-8">
+              <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">{q.title}</h2>
               {q.subtitle && (
-                <p className="mt-2 text-sm text-white/50">{q.subtitle}</p>
+                <p className="mt-2 text-base text-white/40">{q.subtitle}</p>
               )}
             </div>
             <OnboardingSkillMatrix
@@ -689,11 +695,11 @@ export function OnboardingFlow() {
       /* ── Summary ── */
       case "summary":
         return (
-          <div className="w-full max-w-2xl space-y-6">
-            <div className="text-center">
-              <h2 className="text-2xl font-bold sm:text-3xl">{q.title}</h2>
+          <div className="w-full max-w-2xl">
+            <div className="mb-8">
+              <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">{q.title}</h2>
               {q.subtitle && (
-                <p className="mt-2 text-sm text-white/50">{q.subtitle}</p>
+                <p className="mt-2 text-base text-white/40">{q.subtitle}</p>
               )}
             </div>
             <OnboardingSummary
@@ -716,7 +722,7 @@ export function OnboardingFlow() {
 
   if (analysisResult) {
     return (
-      <div className="relative min-h-dvh bg-[#0B0E11] text-white">
+      <div className={cn("relative min-h-dvh text-white", onboardingBg)}>
         <AnimatedBackground />
         <div className="relative z-10 flex min-h-dvh flex-col items-center justify-center px-6 py-12">
           <MarketAnalysis
@@ -734,7 +740,7 @@ export function OnboardingFlow() {
 
   if (isAnalyzing) {
     return (
-      <div className="relative min-h-dvh bg-[#0B0E11] text-white">
+      <div className={cn("relative min-h-dvh text-white", onboardingBg)}>
         <AnimatedBackground />
         <div className="relative z-10 flex min-h-dvh flex-col items-center justify-center">
           <AILoading text="Analyse de ton marche en cours" />
@@ -749,7 +755,7 @@ export function OnboardingFlow() {
 
   if (!loaded) {
     return (
-      <div className="relative min-h-dvh bg-[#0B0E11] text-white">
+      <div className={cn("relative min-h-dvh text-white", onboardingBg)}>
         <AnimatedBackground />
         <div className="relative z-10 flex min-h-dvh items-center justify-center">
           <div className="h-8 w-8 animate-spin rounded-full border-2 border-white/20 border-t-emerald-400" />
@@ -764,6 +770,8 @@ export function OnboardingFlow() {
 
   const isWelcome = currentQuestion?.type === "welcome";
   const isSummary = currentQuestion?.type === "summary";
+  const isChips = currentQuestion?.type === "chips";
+  const showNav = !isWelcome && !isChips;
 
   const handleButtonClick = () => {
     if (isSummary) {
@@ -774,7 +782,7 @@ export function OnboardingFlow() {
   };
 
   return (
-    <div className="relative min-h-dvh bg-[#0B0E11] text-white">
+    <div className={cn("relative min-h-dvh text-white", onboardingBg)}>
       <AnimatedBackground />
       <OnboardingProgressBar step={step} total={totalSteps} />
 
@@ -798,12 +806,11 @@ export function OnboardingFlow() {
               animate="center"
               exit="exit"
               transition={{ duration: 0.3, ease: "easeOut" }}
-              className="flex w-full flex-col items-center"
             >
               {renderQuestion()}
 
-              {/* Inline navigation — below question (Rivia style) */}
-              {!isWelcome && (
+              {/* Inline navigation — below question, left-aligned (Rivia style) */}
+              {showNav && (
                 <div className="mt-8 flex items-center gap-4">
                   <button
                     onClick={handleButtonClick}

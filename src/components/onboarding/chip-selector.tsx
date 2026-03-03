@@ -51,17 +51,17 @@ export function ChipSelector({
         : "grid-cols-1";
 
   return (
-    <div className="space-y-3">
-      <div className={cn("grid gap-3", gridClass)}>
+    <div className="space-y-4">
+      <div className="flex flex-wrap gap-3">
         {options.map((opt) => (
           <button
             key={opt.value}
             onClick={() => handleSelect(opt.value)}
             className={cn(
-              "rounded-xl border-2 px-5 py-4 text-left transition-all duration-200",
+              "rounded-xl border-2 px-5 py-3 text-left transition-all duration-200",
               value === opt.value
-                ? "scale-[1.02] border-emerald-400 bg-emerald-500/20 text-white shadow-lg shadow-emerald-500/10"
-                : "border-white/10 bg-white/5 text-white/70 hover:border-white/30 hover:bg-white/10"
+                ? "scale-105 border-emerald-400 bg-emerald-500/20 text-white shadow-lg shadow-emerald-500/20"
+                : "border-white/10 bg-white/5 text-white/70 hover:border-white/30 hover:bg-white/10 hover:text-white"
             )}
           >
             <span className="text-base font-medium">{opt.label}</span>
@@ -78,7 +78,7 @@ export function ChipSelector({
               onChange("");
             }}
             className={cn(
-              "rounded-xl border-2 border-dashed px-5 py-4 text-left transition-all duration-200",
+              "rounded-xl border-2 border-dashed px-5 py-3 text-left transition-all duration-200",
               showOther
                 ? "border-emerald-400 bg-emerald-500/10"
                 : "border-white/10 text-white/40 hover:border-white/30"
@@ -101,7 +101,7 @@ export function ChipSelector({
             }
           }}
           placeholder={otherPlaceholder}
-          className="w-full border-b-2 border-white/20 bg-transparent pb-3 text-xl font-medium text-white outline-none placeholder:text-white/25 focus:border-emerald-400"
+          className="w-full rounded-xl border-2 border-white/20 bg-white/5 px-5 py-3 text-lg text-white outline-none placeholder:text-white/30 transition-colors focus:border-emerald-400"
         />
       )}
     </div>

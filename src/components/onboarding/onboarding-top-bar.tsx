@@ -17,14 +17,14 @@ export function OnboardingTopBar({
   isFirst,
 }: OnboardingTopBarProps) {
   return (
-    <div className="relative z-10 flex items-center justify-between px-6 py-4">
+    <div className="relative z-10 flex items-center justify-between px-6 py-5">
       <button
         onClick={onBack}
         disabled={isFirst}
-        className={`rounded-full p-2 transition-all ${
+        className={`flex h-10 w-10 items-center justify-center rounded-xl transition-all ${
           isFirst
-            ? "pointer-events-none opacity-0"
-            : "text-white/50 hover:bg-white/10 hover:text-white"
+            ? "cursor-not-allowed opacity-0"
+            : "bg-white/5 text-white/60 hover:bg-white/10 hover:text-white"
         }`}
       >
         <ArrowLeft className="h-5 w-5" />
@@ -38,7 +38,7 @@ export function OnboardingTopBar({
           height={24}
           className="rounded"
         />
-        <span className="text-sm font-semibold text-white/70">ScalingFlow</span>
+        <span className="text-sm text-white/60">ScalingFlow</span>
       </div>
 
       <span className="text-sm tabular-nums text-white/30">
