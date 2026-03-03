@@ -484,14 +484,14 @@ export function OnboardingFlow() {
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ type: "spring", stiffness: 200, delay: 0.2 }}
-              className="mb-8 flex h-24 w-24 items-center justify-center rounded-3xl bg-gradient-to-br from-emerald-500 to-teal-600 shadow-2xl shadow-emerald-500/30"
+              className="mb-8 h-24 w-24 overflow-hidden rounded-3xl shadow-2xl shadow-emerald-500/30"
             >
               <Image
                 src="/icons/icon-192.png"
                 alt="ScalingFlow"
-                width={48}
-                height={48}
-                className="rounded-xl"
+                width={96}
+                height={96}
+                className="h-full w-full object-cover"
               />
             </motion.div>
             <motion.h1
