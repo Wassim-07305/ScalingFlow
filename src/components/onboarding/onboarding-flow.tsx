@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import confetti from "canvas-confetti";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight, Sparkles, CheckCircle } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useUser } from "@/hooks/use-user";
 import { cn } from "@/lib/utils/cn";
@@ -474,19 +474,48 @@ export function OnboardingFlow() {
       case "welcome":
         return (
           <div className="flex flex-col items-center text-center">
-            <Image
-              src="/icons/icon-192.png"
-              alt="ScalingFlow"
-              width={80}
-              height={80}
-              className="mb-6 rounded-2xl"
-            />
-            <h1 className="text-3xl font-bold sm:text-4xl">{q.title}</h1>
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ type: "spring", stiffness: 200, delay: 0.2 }}
+              className="mb-8 flex h-24 w-24 items-center justify-center rounded-3xl bg-gradient-to-br from-emerald-500 to-teal-600 shadow-2xl shadow-emerald-500/30"
+            >
+              <Image
+                src="/icons/icon-192.png"
+                alt="ScalingFlow"
+                width={48}
+                height={48}
+                className="rounded-xl"
+              />
+            </motion.div>
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              className="mb-4 text-4xl font-bold tracking-tight sm:text-5xl"
+            >
+              {q.title}
+            </motion.h1>
             {q.subtitle && (
-              <p className="mt-4 max-w-md text-base text-white/50">
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.6 }}
+                className="mb-10 max-w-md text-lg text-white/50"
+              >
                 {q.subtitle}
-              </p>
+              </motion.p>
             )}
+            <motion.button
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.8 }}
+              onClick={goNext}
+              className="group flex items-center gap-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 px-8 py-4 text-lg font-semibold text-white shadow-xl shadow-emerald-500/25 transition-all duration-200 hover:scale-105 hover:shadow-2xl hover:shadow-emerald-500/40"
+            >
+              C&apos;est parti
+              <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+            </motion.button>
           </div>
         );
 
@@ -736,10 +765,6 @@ export function OnboardingFlow() {
   const isWelcome = currentQuestion?.type === "welcome";
   const isSummary = currentQuestion?.type === "summary";
 
-  let buttonLabel = "Continuer";
-  if (isWelcome) buttonLabel = "C'est parti";
-  if (isSummary) buttonLabel = "Lancer l'analyse IA";
-
   const handleButtonClick = () => {
     if (isSummary) {
       handleAnalyze();
@@ -748,33 +773,22 @@ export function OnboardingFlow() {
     }
   };
 
-  if (!loaded) {
-    return (
-      <div className="flex min-h-dvh items-center justify-center bg-[#0B0E11]">
-        <AnimatedBackground />
-        <AILoading text="Chargement" />
-      </div>
-    );
-  }
-
   return (
     <div className="relative min-h-dvh bg-[#0B0E11] text-white">
       <AnimatedBackground />
       <OnboardingProgressBar step={step} total={totalSteps} />
 
       <div className="relative z-10 flex min-h-dvh flex-col">
-        {/* Top bar (hidden on welcome) */}
-        {!isWelcome && (
-          <OnboardingTopBar
-            onBack={goPrev}
-            step={step}
-            total={totalSteps}
-            isFirst={step === 0}
-          />
-        )}
+        {/* Top bar — always visible, back invisible on welcome */}
+        <OnboardingTopBar
+          onBack={goPrev}
+          step={step}
+          total={totalSteps}
+          isFirst={isWelcome || step === 0}
+        />
 
-        {/* Content */}
-        <div className="flex flex-1 flex-col items-center justify-center px-6 pb-32">
+        {/* Content — vertically centered */}
+        <div className="relative z-10 mx-auto flex w-full max-w-2xl flex-1 flex-col justify-center px-6 py-8">
           <AnimatePresence mode="wait" custom={direction}>
             <motion.div
               key={currentQuestion?.id || step}
@@ -784,43 +798,51 @@ export function OnboardingFlow() {
               animate="center"
               exit="exit"
               transition={{ duration: 0.3, ease: "easeOut" }}
-              className="flex w-full max-w-2xl flex-col items-center"
+              className="flex w-full flex-col items-center"
             >
               {renderQuestion()}
+
+              {/* Inline navigation — below question (Rivia style) */}
+              {!isWelcome && (
+                <div className="mt-8 flex items-center gap-4">
+                  <button
+                    onClick={handleButtonClick}
+                    disabled={!canProceed()}
+                    className={cn(
+                      "flex items-center gap-2 rounded-xl text-base font-semibold text-white transition-all",
+                      isSummary
+                        ? "bg-gradient-to-r from-emerald-500 to-teal-500 px-7 py-3.5 shadow-lg shadow-emerald-500/25 hover:scale-105 hover:shadow-xl hover:shadow-emerald-500/40 disabled:opacity-50"
+                        : "bg-emerald-500 px-6 py-3 hover:bg-emerald-400 disabled:opacity-50"
+                    )}
+                  >
+                    {isSummary ? (
+                      <>
+                        <Sparkles className="h-4 w-4" />
+                        Lancer l&apos;analyse IA
+                      </>
+                    ) : (
+                      <>
+                        OK
+                        <CheckCircle className="h-4 w-4" />
+                      </>
+                    )}
+                  </button>
+                  <span className="text-sm text-white/25">
+                    Appuie sur{" "}
+                    <kbd className="rounded bg-white/10 px-1.5 py-0.5 font-mono text-xs">
+                      Entree
+                    </kbd>
+                  </span>
+                </div>
+              )}
             </motion.div>
           </AnimatePresence>
-        </div>
-
-        {/* Bottom button */}
-        <div className="fixed bottom-0 left-0 right-0 z-20 flex justify-center bg-gradient-to-t from-[#0B0E11] via-[#0B0E11]/80 to-transparent px-6 pb-8 pt-12">
-          <button
-            onClick={handleButtonClick}
-            disabled={!canProceed()}
-            className={cn(
-              "flex items-center gap-2 rounded-full px-8 py-3.5 text-base font-semibold transition-all duration-300",
-              canProceed()
-                ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/25 hover:bg-emerald-400 hover:shadow-emerald-500/40"
-                : "cursor-not-allowed bg-white/10 text-white/30"
-            )}
-          >
-            {isSummary ? (
-              <>
-                <Sparkles className="h-5 w-5" />
-                {buttonLabel}
-              </>
-            ) : (
-              <>
-                {buttonLabel}
-                <ArrowRight className="h-5 w-5" />
-              </>
-            )}
-          </button>
         </div>
       </div>
 
       {/* Error toast */}
       {error && (
-        <div className="fixed bottom-24 left-1/2 z-50 -translate-x-1/2 rounded-xl border border-red-500/30 bg-red-500/20 px-6 py-3 text-sm text-red-300 backdrop-blur">
+        <div className="fixed bottom-8 left-1/2 z-50 -translate-x-1/2 rounded-xl border border-red-500/30 bg-red-500/20 px-6 py-3 text-sm text-red-300 backdrop-blur">
           {error}
         </div>
       )}
