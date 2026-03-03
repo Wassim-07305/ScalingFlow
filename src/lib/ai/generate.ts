@@ -1,10 +1,30 @@
 import { groq, AI_MODEL } from "./anthropic";
 
+const MAX_RETRIES = 3;
+const RETRY_DELAY_MS = 1000;
+
 interface GenerateOptions {
   prompt: string;
   systemPrompt?: string;
   maxTokens?: number;
   temperature?: number;
+}
+
+async function withRetry<T>(fn: () => Promise<T>): Promise<T> {
+  let lastError: unknown;
+  for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+    try {
+      return await fn();
+    } catch (err) {
+      lastError = err;
+      const msg = err instanceof Error ? err.message : String(err);
+      const isRetryable = /connection|timeout|econnreset|socket|network/i.test(msg);
+      if (!isRetryable || attempt === MAX_RETRIES - 1) throw err;
+      console.warn(`AI retry ${attempt + 1}/${MAX_RETRIES}: ${msg}`);
+      await new Promise((r) => setTimeout(r, RETRY_DELAY_MS * (attempt + 1)));
+    }
+  }
+  throw lastError;
 }
 
 export async function generateText({
@@ -20,12 +40,14 @@ export async function generateText({
   }
   messages.push({ role: "user", content: prompt });
 
-  const completion = await groq.chat.completions.create({
-    model: AI_MODEL,
-    max_tokens: maxTokens,
-    temperature,
-    messages,
-  });
+  const completion = await withRetry(() =>
+    groq.chat.completions.create({
+      model: AI_MODEL,
+      max_tokens: maxTokens,
+      temperature,
+      messages,
+    })
+  );
 
   const content = completion.choices[0]?.message?.content;
   if (!content) {
