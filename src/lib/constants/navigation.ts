@@ -21,21 +21,21 @@ import type { NavItem, NavSection } from "@/lib/types/appshell";
 // ─── Tous les items de navigation ─────────────────────────────
 
 export const NAV_ITEMS: NavItem[] = [
-  { label: "Dashboard", href: "/", icon: LayoutDashboard, roles: ["user", "admin"] },
-  { label: "Marché", href: "/market", icon: Globe, roles: ["user", "admin"] },
-  { label: "Offre", href: "/offer", icon: Package, roles: ["user", "admin"] },
-  { label: "Marque", href: "/brand", icon: Palette, roles: ["user", "admin"] },
-  { label: "Funnel", href: "/funnel", icon: Filter, roles: ["user", "admin"] },
-  { label: "Assets", href: "/assets", icon: FileText, roles: ["user", "admin"] },
-  { label: "Ads", href: "/ads", icon: Megaphone, roles: ["user", "admin"] },
-  { label: "Contenu", href: "/content", icon: PenTool, roles: ["user", "admin"] },
-  { label: "Vente", href: "/sales", icon: Handshake, roles: ["user", "admin"] },
-  { label: "Academy", href: "/academy", icon: GraduationCap, roles: ["user", "admin"] },
-  { label: "Roadmap", href: "/roadmap", icon: Map, roles: ["user", "admin"] },
-  { label: "Progression", href: "/progress", icon: TrendingUp, roles: ["user", "admin"] },
-  { label: "Leaderboard", href: "/leaderboard", icon: Trophy, roles: ["user", "admin"] },
-  { label: "Communauté", href: "/community", icon: Users, roles: ["user", "admin"] },
-  { label: "Assistant IA", href: "/assistant", icon: Bot, roles: ["user", "admin"] },
+  { label: "Dashboard", href: "/", icon: LayoutDashboard, roles: ["user", "student", "admin", "coach"] },
+  { label: "Marché", href: "/market", icon: Globe, roles: ["user", "student", "admin", "coach"] },
+  { label: "Offre", href: "/offer", icon: Package, roles: ["user", "student", "admin", "coach"] },
+  { label: "Marque", href: "/brand", icon: Palette, roles: ["user", "student", "admin", "coach"] },
+  { label: "Funnel", href: "/funnel", icon: Filter, roles: ["user", "student", "admin", "coach"] },
+  { label: "Assets", href: "/assets", icon: FileText, roles: ["user", "student", "admin", "coach"] },
+  { label: "Ads", href: "/ads", icon: Megaphone, roles: ["user", "student", "admin", "coach"] },
+  { label: "Contenu", href: "/content", icon: PenTool, roles: ["user", "student", "admin", "coach"] },
+  { label: "Vente", href: "/sales", icon: Handshake, roles: ["user", "student", "admin", "coach"] },
+  { label: "Academy", href: "/academy", icon: GraduationCap, roles: ["user", "student", "admin", "coach"] },
+  { label: "Roadmap", href: "/roadmap", icon: Map, roles: ["user", "student", "admin", "coach"] },
+  { label: "Progression", href: "/progress", icon: TrendingUp, roles: ["user", "student", "admin", "coach"] },
+  { label: "Leaderboard", href: "/leaderboard", icon: Trophy, roles: ["user", "student", "admin", "coach"] },
+  { label: "Communauté", href: "/community", icon: Users, roles: ["user", "student", "admin", "coach"] },
+  { label: "Assistant IA", href: "/assistant", icon: Bot, roles: ["user", "student", "admin", "coach"] },
 ];
 
 // ─── Sections sidebar ─────────────────────────────────────────
