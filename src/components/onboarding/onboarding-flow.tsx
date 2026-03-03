@@ -185,56 +185,61 @@ export function OnboardingFlow() {
     }
 
     const load = async () => {
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", user.id)
-        .single();
+      try {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", user.id)
+          .single();
 
-      if (profile) {
-        const r: Record<string, unknown> = { ...INITIAL_FORM_DATA };
-        if (profile.first_name) r.firstName = profile.first_name;
-        if (profile.last_name) r.lastName = profile.last_name;
-        if (profile.country) r.country = profile.country;
-        if (profile.language) r.language = profile.language;
-        if (profile.situation) r.situation = profile.situation;
-        if (profile.situation_details)
-          r.situationDetails = profile.situation_details;
-        if (Array.isArray(profile.vault_skills))
-          r.vaultSkills = profile.vault_skills;
-        if (profile.expertise_answers) {
-          const ea = profile.expertise_answers as Record<string, string>;
-          Object.entries(ea).forEach(([k, v]) => {
-            r[`expertise_${k}`] = v;
-          });
+        if (profile) {
+          const r: Record<string, unknown> = { ...INITIAL_FORM_DATA };
+          if (profile.first_name) r.firstName = profile.first_name;
+          if (profile.last_name) r.lastName = profile.last_name;
+          if (profile.country) r.country = profile.country;
+          if (profile.language) r.language = profile.language;
+          if (profile.situation) r.situation = profile.situation;
+          if (profile.situation_details)
+            r.situationDetails = profile.situation_details;
+          if (Array.isArray(profile.vault_skills))
+            r.vaultSkills = profile.vault_skills;
+          if (profile.expertise_answers) {
+            const ea = profile.expertise_answers as Record<string, string>;
+            Object.entries(ea).forEach(([k, v]) => {
+              r[`expertise_${k}`] = v;
+            });
+          }
+          if (profile.parcours) r.parcours = profile.parcours;
+          if (profile.experience_level)
+            r.experienceLevel = profile.experience_level;
+          if (profile.current_revenue)
+            r.currentRevenue = String(profile.current_revenue);
+          if (profile.target_revenue)
+            r.targetRevenue = String(profile.target_revenue);
+          if (Array.isArray(profile.industries))
+            r.industries = profile.industries;
+          if (Array.isArray(profile.objectives))
+            r.objectives = profile.objectives;
+          if (profile.budget_monthly != null)
+            r.budgetMonthly = String(profile.budget_monthly);
+
+          // Compute visible questions from restored data for correct step
+          const restoredVisible = QUESTIONS.filter(
+            (q) => !q.showWhen || q.showWhen(r)
+          );
+          const resumeStep = Math.min(
+            Math.max(profile.onboarding_step || 0, 0),
+            restoredVisible.length - 1
+          );
+
+          setFormData(r);
+          if (resumeStep > 0) setStep(resumeStep);
         }
-        if (profile.parcours) r.parcours = profile.parcours;
-        if (profile.experience_level)
-          r.experienceLevel = profile.experience_level;
-        if (profile.current_revenue)
-          r.currentRevenue = String(profile.current_revenue);
-        if (profile.target_revenue)
-          r.targetRevenue = String(profile.target_revenue);
-        if (Array.isArray(profile.industries))
-          r.industries = profile.industries;
-        if (Array.isArray(profile.objectives))
-          r.objectives = profile.objectives;
-        if (profile.budget_monthly != null)
-          r.budgetMonthly = String(profile.budget_monthly);
-
-        // Compute visible questions from restored data for correct step
-        const restoredVisible = QUESTIONS.filter(
-          (q) => !q.showWhen || q.showWhen(r)
-        );
-        const resumeStep = Math.min(
-          Math.max(profile.onboarding_step || 0, 0),
-          restoredVisible.length - 1
-        );
-
-        setFormData(r);
-        if (resumeStep > 0) setStep(resumeStep);
+      } catch (err) {
+        console.error("Failed to load profile:", err);
+      } finally {
+        setLoaded(true);
       }
-      setLoaded(true);
     };
 
     load();
@@ -742,6 +747,15 @@ export function OnboardingFlow() {
       goNext();
     }
   };
+
+  if (!loaded) {
+    return (
+      <div className="flex min-h-dvh items-center justify-center bg-[#0B0E11]">
+        <AnimatedBackground />
+        <AILoading text="Chargement" />
+      </div>
+    );
+  }
 
   return (
     <div className="relative min-h-dvh bg-[#0B0E11] text-white">
