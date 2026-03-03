@@ -21,8 +21,10 @@ import {
   CheckCircle,
   XCircle,
   Target,
+  History,
 } from "lucide-react";
 import { toast } from "sonner";
+import { GenerationHistory } from "@/components/shared/generation-history";
 import type { BrandIdentityResult } from "@/lib/ai/prompts/brand-identity";
 
 const TABS = [
@@ -30,6 +32,7 @@ const TABS = [
   { key: "direction", label: "Direction Artistique", icon: Palette },
   { key: "logo", label: "Logo", icon: Hexagon },
   { key: "kit", label: "Kit de Marque", icon: BookOpen },
+  { key: "history", label: "Historique", icon: History },
 ] as const;
 
 export default function BrandPage() {
@@ -156,6 +159,67 @@ export default function BrandPage() {
     }
   };
 
+  const handleHistorySelect = async (item: { id: string }) => {
+    try {
+      const supabase = createClient();
+      const { data, error } = await supabase
+        .from("brand_identities")
+        .select("*")
+        .eq("id", item.id)
+        .single();
+      if (error || !data) {
+        toast.error("Impossible de charger cette identité");
+        return;
+      }
+
+      setBrandId(data.id);
+      setSelectedName(data.selected_name);
+      setOfferId(data.offer_id);
+
+      const brandNames = data.brand_names as unknown as BrandIdentityResult["noms"] | null;
+      const artDirection = data.art_direction as unknown as BrandIdentityResult["direction_artistique"] | null;
+      let logoConcept = null;
+      try {
+        logoConcept = data.logo_concept
+          ? (typeof data.logo_concept === "string"
+              ? JSON.parse(data.logo_concept)
+              : data.logo_concept)
+          : null;
+      } catch {
+        // logo_concept may be malformed JSON — ignore
+      }
+      const brandKit = data.brand_kit as unknown as BrandIdentityResult["brand_kit"] | null;
+
+      setGenerated({
+        noms: brandNames || [],
+        direction_artistique: artDirection || {
+          palette: [],
+          typographies: [],
+          style_visuel: "",
+          moodboard_description: "",
+        },
+        logo_concept: logoConcept || {
+          description: "",
+          forme: "",
+          symbolisme: "",
+          variations: [],
+        },
+        brand_kit: brandKit || {
+          mission: "",
+          vision: "",
+          valeurs: [],
+          ton: "",
+          do_list: [],
+          dont_list: [],
+        },
+      });
+      setActiveTab("nom");
+      toast.success("Identité de marque chargée depuis l'historique");
+    } catch {
+      toast.error("Erreur lors du chargement");
+    }
+  };
+
   if (loading) {
     return (
       <div>
@@ -213,7 +277,15 @@ export default function BrandPage() {
       </div>
 
       {/* Tab Content */}
-      {!generated ? (
+      {activeTab === "history" ? (
+        <GenerationHistory
+          table="brand_identities"
+          titleField="selected_name"
+          statusField="status"
+          emptyMessage="Aucune identité de marque générée pour le moment."
+          onSelect={handleHistorySelect}
+        />
+      ) : !generated ? (
         <EmptyState
           icon={Palette}
           title="Aucune identite de marque"

@@ -15,14 +15,22 @@ import type { CarouselResult } from "@/lib/ai/prompts/carousel-content";
 
 interface CarouselGeneratorProps {
   className?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  initialData?: any;
 }
 
-export function CarouselGenerator({ className }: CarouselGeneratorProps) {
+export function CarouselGenerator({ className, initialData }: CarouselGeneratorProps) {
   const [loading, setLoading] = React.useState(false);
   const [result, setResult] = React.useState<CarouselResult | null>(null);
   const [error, setError] = React.useState<string | null>(null);
   const [topic, setTopic] = React.useState("");
   const [copiedField, setCopiedField] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    if (initialData) {
+      setResult(initialData as CarouselResult);
+    }
+  }, [initialData]);
 
   const handleGenerate = async () => {
     if (!topic.trim()) {

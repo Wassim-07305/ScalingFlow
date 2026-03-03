@@ -15,15 +15,23 @@ import type { YouTubeScriptResult } from "@/lib/ai/prompts/youtube-scripts";
 
 interface YouTubeGeneratorProps {
   className?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  initialData?: any;
 }
 
-export function YouTubeGenerator({ className }: YouTubeGeneratorProps) {
+export function YouTubeGenerator({ className, initialData }: YouTubeGeneratorProps) {
   const [loading, setLoading] = React.useState(false);
   const [result, setResult] = React.useState<YouTubeScriptResult | null>(null);
   const [error, setError] = React.useState<string | null>(null);
   const [topic, setTopic] = React.useState("");
   const [showFullScript, setShowFullScript] = React.useState(false);
   const [copiedField, setCopiedField] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    if (initialData) {
+      setResult(initialData as YouTubeScriptResult);
+    }
+  }, [initialData]);
 
   const handleGenerate = async () => {
     if (!topic.trim()) {

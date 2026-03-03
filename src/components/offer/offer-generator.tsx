@@ -14,13 +14,22 @@ interface OfferGeneratorProps {
   className?: string;
   marketAnalysisId?: string;
   marketName?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  initialData?: any;
 }
 
-export function OfferGenerator({ className, marketAnalysisId, marketName }: OfferGeneratorProps) {
+export function OfferGenerator({ className, marketAnalysisId, marketName, initialData }: OfferGeneratorProps) {
   const [loading, setLoading] = React.useState(false);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [generatedOffer, setGeneratedOffer] = React.useState<any>(null);
   const [error, setError] = React.useState<string | null>(null);
+
+  // Charger les donnees historiques quand initialData change
+  React.useEffect(() => {
+    if (initialData) {
+      setGeneratedOffer(initialData);
+    }
+  }, [initialData]);
 
   const handleGenerate = async () => {
     if (!marketAnalysisId) {

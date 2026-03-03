@@ -13,13 +13,21 @@ import type { InstagramProfileResult } from "@/lib/ai/prompts/instagram-profile"
 
 interface InstagramOptimizerProps {
   className?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  initialData?: any;
 }
 
-export function InstagramOptimizer({ className }: InstagramOptimizerProps) {
+export function InstagramOptimizer({ className, initialData }: InstagramOptimizerProps) {
   const [loading, setLoading] = React.useState(false);
   const [result, setResult] = React.useState<InstagramProfileResult | null>(null);
   const [error, setError] = React.useState<string | null>(null);
   const [copiedField, setCopiedField] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    if (initialData) {
+      setResult(initialData as InstagramProfileResult);
+    }
+  }, [initialData]);
 
   const handleGenerate = async () => {
     setLoading(true);

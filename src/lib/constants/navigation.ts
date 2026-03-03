@@ -15,6 +15,7 @@ import {
   Handshake,
   Bot,
   Settings,
+  Archive,
 } from "lucide-react";
 import type { NavItem, NavSection } from "@/lib/types/appshell";
 
@@ -22,6 +23,7 @@ import type { NavItem, NavSection } from "@/lib/types/appshell";
 
 export const NAV_ITEMS: NavItem[] = [
   { label: "Dashboard", href: "/", icon: LayoutDashboard, roles: ["user", "student", "admin", "coach"] },
+  { label: "Vault", href: "/vault", icon: Archive, roles: ["user", "student", "admin", "coach"] },
   { label: "Marché", href: "/market", icon: Globe, roles: ["user", "student", "admin", "coach"] },
   { label: "Offre", href: "/offer", icon: Package, roles: ["user", "student", "admin", "coach"] },
   { label: "Marque", href: "/brand", icon: Palette, roles: ["user", "student", "admin", "coach"] },
@@ -48,7 +50,7 @@ export const NAV_SECTIONS: NavSection[] = [
   {
     label: "Business",
     items: NAV_ITEMS.filter((i) =>
-      ["/market", "/offer", "/brand"].includes(i.href)
+      ["/vault", "/market", "/offer", "/brand"].includes(i.href)
     ),
   },
   {
@@ -81,6 +83,7 @@ export const NAV_SECTIONS: NavSection[] = [
 
 export const BREADCRUMB_LABELS: Record<string, string> = {
   onboarding: "Onboarding",
+  vault: "Vault",
   market: "Marché",
   offer: "Offre",
   brand: "Marque",
@@ -104,6 +107,7 @@ export const BREADCRUMB_LABELS: Record<string, string> = {
 
 export const QUICK_LINKS = [
   { label: "Dashboard", href: "/", icon: LayoutDashboard },
+  { label: "Vault", href: "/vault", icon: Archive },
   { label: "Offre", href: "/offer", icon: Package },
   { label: "Marché", href: "/market", icon: Globe },
   { label: "Funnel", href: "/funnel", icon: Filter },

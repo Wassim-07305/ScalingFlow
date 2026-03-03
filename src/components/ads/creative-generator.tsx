@@ -11,14 +11,30 @@ import { Sparkles, Image, Video, Target, Copy } from "lucide-react";
 
 interface CreativeGeneratorProps {
   className?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  initialData?: any;
 }
 
-export function CreativeGenerator({ className }: CreativeGeneratorProps) {
+export function CreativeGenerator({ className, initialData }: CreativeGeneratorProps) {
   const [loading, setLoading] = React.useState(false);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [variations, setVariations] = React.useState<any[]>([]);
   const [error, setError] = React.useState<string | null>(null);
   const [copiedIndex, setCopiedIndex] = React.useState<number | null>(null);
+
+  React.useEffect(() => {
+    if (initialData) {
+      const creatives = initialData.ad_creatives || initialData.variations || (Array.isArray(initialData) ? initialData : []);
+      setVariations(creatives.map((c: Record<string, unknown>) => ({
+        hook: c.hook || "",
+        body: c.ad_copy || c.body || "",
+        headline: c.headline || "",
+        cta: c.cta || "",
+        estimated_format: c.creative_type || c.estimated_format || "image",
+        angle: c.angle || "",
+      })));
+    }
+  }, [initialData]);
 
   const handleGenerate = async () => {
     setLoading(true);

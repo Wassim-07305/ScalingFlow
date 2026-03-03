@@ -13,6 +13,8 @@ import type { StoriesResult } from "@/lib/ai/prompts/stories-scripts";
 
 interface StoriesGeneratorProps {
   className?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  initialData?: any;
 }
 
 const TYPE_CONFIG = {
@@ -43,11 +45,18 @@ const TYPE_CONFIG = {
   },
 };
 
-export function StoriesGenerator({ className }: StoriesGeneratorProps) {
+export function StoriesGenerator({ className, initialData }: StoriesGeneratorProps) {
   const [loading, setLoading] = React.useState(false);
   const [stories, setStories] = React.useState<StoriesResult["stories"]>([]);
   const [error, setError] = React.useState<string | null>(null);
   const [copiedIndex, setCopiedIndex] = React.useState<number | null>(null);
+
+  React.useEffect(() => {
+    if (initialData) {
+      const result = initialData as StoriesResult;
+      setStories(result.stories || []);
+    }
+  }, [initialData]);
 
   const handleGenerate = async () => {
     setLoading(true);

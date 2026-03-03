@@ -5,7 +5,8 @@ import { GlowCard } from "@/components/shared/glow-card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { RefreshCw, CheckCircle, Shield, Zap, Gift } from "lucide-react";
+import { RefreshCw, CheckCircle, Shield, Zap, Gift, FileDown } from "lucide-react";
+import { exportToPDF } from "@/lib/utils/export-pdf";
 
 interface OfferPreviewProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -41,12 +42,27 @@ export function OfferPreview({ offer, onRegenerate, className }: OfferPreviewPro
             <p className="mt-2 text-text-secondary max-w-2xl">{positioning}</p>
           )}
         </div>
-        {onRegenerate && (
-          <Button variant="outline" size="sm" onClick={onRegenerate}>
-            <RefreshCw className="h-4 w-4 mr-2" />
-            Régénérer
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => exportToPDF({
+              title: name,
+              subtitle: "Offre generee par ScalingFlow",
+              content: raw,
+              filename: `offre-${name.toLowerCase().replace(/[^a-z0-9]+/g, "-")}.pdf`,
+            })}
+          >
+            <FileDown className="h-4 w-4 mr-1" />
+            PDF
           </Button>
-        )}
+          {onRegenerate && (
+            <Button variant="outline" size="sm" onClick={onRegenerate}>
+              <RefreshCw className="h-4 w-4 mr-2" />
+              Régénérer
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* Unique Mechanism */}

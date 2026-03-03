@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils/cn";
 import { createClient } from "@/lib/supabase/client";
 import { useUser } from "@/hooks/use-user";
 import { Sparkles, Crosshair, BarChart3, History } from "lucide-react";
+import { toast } from "sonner";
 
 const TABS = [
   { key: "generate", label: "Generer", icon: Sparkles },
@@ -24,6 +25,8 @@ export default function OfferPage() {
   const [latestOfferId, setLatestOfferId] = React.useState<string | null>(null);
   const [marketAnalysisId, setMarketAnalysisId] = React.useState<string | null>(null);
   const [marketName, setMarketName] = React.useState<string | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [loadedData, setLoadedData] = React.useState<any>(null);
   const supabase = createClient();
 
   // Fetch user's latest offer and market analysis
@@ -60,6 +63,27 @@ export default function OfferPage() {
     fetchData();
   }, [user, supabase]);
 
+  const handleHistorySelect = async (item: { id: string }) => {
+    try {
+      const { data, error } = await supabase
+        .from("offers")
+        .select("ai_raw_response, offer_name, positioning, unique_mechanism, pricing_strategy, guarantees, risk_reversal, delivery_structure, oto_offer, full_document")
+        .eq("id", item.id)
+        .single();
+
+      if (error || !data) {
+        toast.error("Impossible de charger cette offre");
+        return;
+      }
+
+      setLoadedData(data.ai_raw_response || data);
+      setActiveTab("generate");
+      toast.success("Offre chargee depuis l'historique");
+    } catch {
+      toast.error("Erreur lors du chargement");
+    }
+  };
+
   return (
     <div>
       <PageHeader
@@ -89,6 +113,7 @@ export default function OfferPage() {
         <OfferGenerator
           marketAnalysisId={marketAnalysisId || undefined}
           marketName={marketName || undefined}
+          initialData={loadedData}
         />
       )}
       {activeTab === "positioning" && (
@@ -104,6 +129,7 @@ export default function OfferPage() {
           subtitleField="positioning"
           statusField="status"
           emptyMessage="Aucune offre generee pour le moment."
+          onSelect={handleHistorySelect}
         />
       )}
     </div>

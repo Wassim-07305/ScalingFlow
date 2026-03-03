@@ -13,6 +13,8 @@ import type { ContentStrategyResult } from "@/lib/ai/prompts/content-strategy";
 interface StrategyOverviewProps {
   className?: string;
   onStrategyGenerated?: (result: ContentStrategyResult) => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  initialData?: any;
 }
 
 const PILIER_CONFIG = {
@@ -22,10 +24,16 @@ const PILIER_CONFIG = {
   convert: { label: "Convert", icon: Zap, color: "bg-warning", textColor: "text-warning" },
 } as const;
 
-export function StrategyOverview({ className, onStrategyGenerated }: StrategyOverviewProps) {
+export function StrategyOverview({ className, onStrategyGenerated, initialData }: StrategyOverviewProps) {
   const [loading, setLoading] = React.useState(false);
   const [strategy, setStrategy] = React.useState<ContentStrategyResult | null>(null);
   const [error, setError] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    if (initialData) {
+      setStrategy(initialData as ContentStrategyResult);
+    }
+  }, [initialData]);
 
   const handleGenerate = async () => {
     setLoading(true);

@@ -13,6 +13,8 @@ import type { ReelsScriptsResult } from "@/lib/ai/prompts/reels-scripts";
 
 interface ReelsGeneratorProps {
   className?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  initialData?: any;
 }
 
 const PILIER_BADGE: Record<string, "default" | "blue" | "cyan" | "purple" | "yellow"> = {
@@ -22,13 +24,20 @@ const PILIER_BADGE: Record<string, "default" | "blue" | "cyan" | "purple" | "yel
   convert: "yellow",
 };
 
-export function ReelsGenerator({ className }: ReelsGeneratorProps) {
+export function ReelsGenerator({ className, initialData }: ReelsGeneratorProps) {
   const [loading, setLoading] = React.useState(false);
   const [scripts, setScripts] = React.useState<ReelsScriptsResult["scripts"]>([]);
   const [error, setError] = React.useState<string | null>(null);
   const [batchNumber, setBatchNumber] = React.useState(1);
   const [expandedScript, setExpandedScript] = React.useState<number | null>(null);
   const [copiedIndex, setCopiedIndex] = React.useState<number | null>(null);
+
+  React.useEffect(() => {
+    if (initialData) {
+      const result = initialData as ReelsScriptsResult;
+      setScripts(result.scripts || []);
+    }
+  }, [initialData]);
 
   const handleGenerate = async (batch?: number) => {
     setLoading(true);

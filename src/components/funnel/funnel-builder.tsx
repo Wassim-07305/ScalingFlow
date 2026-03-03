@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AILoading } from "@/components/shared/ai-loading";
 import { GlowCard } from "@/components/shared/glow-card";
-import { Sparkles, FileText, Video, Gift, ChevronRight } from "lucide-react";
+import { Sparkles, FileText, Video, Gift, ChevronRight, FileDown } from "lucide-react";
+import { exportToPDF } from "@/lib/utils/export-pdf";
 
 interface FunnelPage {
   type: "optin" | "vsl" | "thankyou";
@@ -24,9 +25,11 @@ const FUNNEL_PAGES: FunnelPage[] = [
 
 interface FunnelBuilderProps {
   className?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  initialData?: any;
 }
 
-export function FunnelBuilder({ className }: FunnelBuilderProps) {
+export function FunnelBuilder({ className, initialData }: FunnelBuilderProps) {
   const [loading, setLoading] = React.useState(false);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [funnelData, setFunnelData] = React.useState<any>(null);
@@ -35,6 +38,13 @@ export function FunnelBuilder({ className }: FunnelBuilderProps) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [offers, setOffers] = React.useState<any[]>([]);
   const [selectedOfferId, setSelectedOfferId] = React.useState<string | null>(null);
+
+  // Charger les donnees historiques quand initialData change
+  React.useEffect(() => {
+    if (initialData) {
+      setFunnelData(initialData);
+    }
+  }, [initialData]);
 
   React.useEffect(() => {
     const fetchOffers = async () => {
@@ -260,6 +270,19 @@ export function FunnelBuilder({ className }: FunnelBuilderProps) {
       )}
 
       <div className="flex gap-3">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => exportToPDF({
+            title: "Funnel de Conversion",
+            subtitle: "Genere par ScalingFlow",
+            content: funnelData,
+            filename: "funnel-scalingflow.pdf",
+          })}
+        >
+          <FileDown className="h-4 w-4 mr-1" />
+          PDF
+        </Button>
         <Button variant="outline" onClick={() => { setFunnelData(null); handleGenerate(); }}>
           Régénérer
         </Button>

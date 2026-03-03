@@ -12,6 +12,8 @@ import type { ContentStrategyResult } from "@/lib/ai/prompts/content-strategy";
 
 interface EditorialCalendarProps {
   className?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  initialData?: any;
 }
 
 type CalendarItem = ContentStrategyResult["calendrier"][number];
@@ -30,13 +32,20 @@ const PILIER_LABEL: Record<string, string> = {
   convert: "Convert",
 };
 
-export function EditorialCalendar({ className }: EditorialCalendarProps) {
+export function EditorialCalendar({ className, initialData }: EditorialCalendarProps) {
   const [loading, setLoading] = React.useState(false);
   const [items, setItems] = React.useState<CalendarItem[]>([]);
   const [view, setView] = React.useState<"grid" | "list">("grid");
   const [filter, setFilter] = React.useState<string | null>(null);
   const [expandedDay, setExpandedDay] = React.useState<number | null>(null);
   const [error, setError] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    if (initialData) {
+      const result = initialData as ContentStrategyResult;
+      setItems(result.calendrier || []);
+    }
+  }, [initialData]);
 
   const handleGenerate = async () => {
     setLoading(true);

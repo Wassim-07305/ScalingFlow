@@ -8,6 +8,8 @@ import { VideoAdGenerator } from "@/components/ads/video-ad-generator";
 import { DMScriptGenerator } from "@/components/ads/dm-script-generator";
 import { GenerationHistory } from "@/components/shared/generation-history";
 import { cn } from "@/lib/utils/cn";
+import { createClient } from "@/lib/supabase/client";
+import { toast } from "sonner";
 import { Sparkles, BarChart3, Video, MessageSquare, History } from "lucide-react";
 
 const TABS = [
@@ -20,6 +22,37 @@ const TABS = [
 
 export default function AdsPage() {
   const [activeTab, setActiveTab] = React.useState<string>("creatives");
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [loadedData, setLoadedData] = React.useState<Record<string, any>>({});
+
+  const handleHistorySelect = async (item: { id: string }) => {
+    try {
+      const supabase = createClient();
+      const { data, error } = await supabase
+        .from("ad_creatives")
+        .select("creative_type, ai_raw_response, ad_copy, headline, hook, cta, video_script, angle")
+        .eq("id", item.id)
+        .single();
+      if (error || !data) {
+        toast.error("Impossible de charger ce creative");
+        return;
+      }
+      const parsed = data.ai_raw_response || data;
+      const typeMap: Record<string, string> = {
+        image: "creatives",
+        carousel: "creatives",
+        video_script: "video_ads",
+        video_ad: "video_ads",
+        dm_scripts: "dm_scripts",
+      };
+      const tabKey = typeMap[data.creative_type] || "creatives";
+      setLoadedData((prev) => ({ ...prev, [tabKey]: parsed }));
+      setActiveTab(tabKey);
+      toast.success("Creative chargee depuis l'historique");
+    } catch {
+      toast.error("Erreur lors du chargement");
+    }
+  };
 
   return (
     <div>
@@ -46,10 +79,10 @@ export default function AdsPage() {
         ))}
       </div>
 
-      {activeTab === "creatives" && <CreativeGenerator />}
+      {activeTab === "creatives" && <CreativeGenerator initialData={loadedData.creatives} />}
       {activeTab === "campaigns" && <CampaignDashboard />}
-      {activeTab === "video_ads" && <VideoAdGenerator />}
-      {activeTab === "dm_scripts" && <DMScriptGenerator />}
+      {activeTab === "video_ads" && <VideoAdGenerator initialData={loadedData.video_ads} />}
+      {activeTab === "dm_scripts" && <DMScriptGenerator initialData={loadedData.dm_scripts} />}
       {activeTab === "history" && (
         <GenerationHistory
           table="ad_creatives"
@@ -57,6 +90,7 @@ export default function AdsPage() {
           subtitleField="ad_copy"
           statusField="status"
           emptyMessage="Aucune creative generee pour le moment."
+          onSelect={handleHistorySelect}
         />
       )}
     </div>

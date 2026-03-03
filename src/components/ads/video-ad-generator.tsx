@@ -13,6 +13,8 @@ import type { VideoAdScriptResult } from "@/lib/ai/prompts/video-ad-scripts";
 
 interface VideoAdGeneratorProps {
   className?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  initialData?: any;
 }
 
 const DURATION_CONFIG = {
@@ -21,11 +23,18 @@ const DURATION_CONFIG = {
   "60s": { label: "60 secondes", badge: "purple" as const, platform: "YouTube Ads" },
 };
 
-export function VideoAdGenerator({ className }: VideoAdGeneratorProps) {
+export function VideoAdGenerator({ className, initialData }: VideoAdGeneratorProps) {
   const [loading, setLoading] = React.useState(false);
   const [scripts, setScripts] = React.useState<VideoAdScriptResult["scripts"]>([]);
   const [error, setError] = React.useState<string | null>(null);
   const [copiedIndex, setCopiedIndex] = React.useState<number | null>(null);
+
+  React.useEffect(() => {
+    if (initialData) {
+      const result = initialData as VideoAdScriptResult;
+      setScripts(result.scripts || []);
+    }
+  }, [initialData]);
 
   const handleGenerate = async () => {
     setLoading(true);

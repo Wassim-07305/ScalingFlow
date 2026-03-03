@@ -13,14 +13,22 @@ import type { DMScriptsResult } from "@/lib/ai/prompts/dm-scripts";
 
 interface DMScriptGeneratorProps {
   className?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  initialData?: any;
 }
 
-export function DMScriptGenerator({ className }: DMScriptGeneratorProps) {
+export function DMScriptGenerator({ className, initialData }: DMScriptGeneratorProps) {
   const [loading, setLoading] = React.useState(false);
   const [result, setResult] = React.useState<DMScriptsResult | null>(null);
   const [error, setError] = React.useState<string | null>(null);
   const [activeSubTab, setActiveSubTab] = React.useState<"prospection" | "retargeting">("prospection");
   const [copiedField, setCopiedField] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    if (initialData) {
+      setResult(initialData as DMScriptsResult);
+    }
+  }, [initialData]);
 
   const handleGenerate = async () => {
     setLoading(true);
