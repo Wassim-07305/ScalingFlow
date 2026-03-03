@@ -1,5 +1,6 @@
-import { groq, AI_MODEL } from "./anthropic";
+import { AI_MODEL } from "./anthropic";
 
+const GROQ_BASE_URL = "https://api.groq.com/openai/v1";
 const MAX_RETRIES = 3;
 const RETRY_DELAY_MS = 1000;
 
@@ -10,17 +11,36 @@ interface GenerateOptions {
   temperature?: number;
 }
 
-async function withRetry<T>(fn: () => Promise<T>): Promise<T> {
+interface GroqChatResponse {
+  choices: { message: { content: string }; finish_reason: string }[];
+}
+
+async function groqFetch(body: Record<string, unknown>): Promise<GroqChatResponse> {
   let lastError: unknown;
+
   for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
     try {
-      return await fn();
+      const res = await fetch(`${GROQ_BASE_URL}/chat/completions`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${process.env.GROQ_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+      });
+
+      if (!res.ok) {
+        const errBody = await res.text();
+        throw new Error(`Groq API ${res.status}: ${errBody}`);
+      }
+
+      return (await res.json()) as GroqChatResponse;
     } catch (err) {
       lastError = err;
       const msg = err instanceof Error ? err.message : String(err);
-      const isRetryable = /connection|timeout|econnreset|socket|network/i.test(msg);
+      const isRetryable = /connection|timeout|econnreset|socket|network|fetch failed/i.test(msg);
       if (!isRetryable || attempt === MAX_RETRIES - 1) throw err;
-      console.warn(`AI retry ${attempt + 1}/${MAX_RETRIES}: ${msg}`);
+      console.warn(`Groq retry ${attempt + 1}/${MAX_RETRIES}: ${msg}`);
       await new Promise((r) => setTimeout(r, RETRY_DELAY_MS * (attempt + 1)));
     }
   }
@@ -40,16 +60,14 @@ export async function generateText({
   }
   messages.push({ role: "user", content: prompt });
 
-  const completion = await withRetry(() =>
-    groq.chat.completions.create({
-      model: AI_MODEL,
-      max_tokens: maxTokens,
-      temperature,
-      messages,
-    })
-  );
+  const data = await groqFetch({
+    model: AI_MODEL,
+    max_tokens: maxTokens,
+    temperature,
+    messages,
+  });
 
-  const content = completion.choices[0]?.message?.content;
+  const content = data.choices[0]?.message?.content;
   if (!content) {
     throw new Error("Pas de réponse de l'IA");
   }
@@ -122,18 +140,50 @@ export async function* streamText({
   }
   messages.push({ role: "user", content: prompt });
 
-  const stream = await groq.chat.completions.create({
-    model: AI_MODEL,
-    max_tokens: maxTokens,
-    temperature,
-    messages,
-    stream: true,
+  const res = await fetch(`${GROQ_BASE_URL}/chat/completions`, {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${process.env.GROQ_API_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model: AI_MODEL,
+      max_tokens: maxTokens,
+      temperature,
+      messages,
+      stream: true,
+    }),
   });
 
-  for await (const chunk of stream) {
-    const content = chunk.choices[0]?.delta?.content;
-    if (content) {
-      yield content;
+  if (!res.ok || !res.body) {
+    throw new Error(`Groq stream error: ${res.status}`);
+  }
+
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = "";
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+
+    buffer += decoder.decode(value, { stream: true });
+    const lines = buffer.split("\n");
+    buffer = lines.pop() || "";
+
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (!trimmed || !trimmed.startsWith("data: ")) continue;
+      const data = trimmed.slice(6);
+      if (data === "[DONE]") return;
+
+      try {
+        const parsed = JSON.parse(data);
+        const content = parsed.choices?.[0]?.delta?.content;
+        if (content) yield content;
+      } catch {
+        // skip malformed chunks
+      }
     }
   }
 }
