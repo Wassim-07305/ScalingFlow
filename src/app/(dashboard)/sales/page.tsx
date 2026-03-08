@@ -8,15 +8,18 @@ import { Badge } from "@/components/ui/badge";
 import { AILoading } from "@/components/shared/ai-loading";
 import { GlowCard } from "@/components/shared/glow-card";
 import { GenerationHistory } from "@/components/shared/generation-history";
-import { Sparkles, Phone, FileText, Copy, History, FileDown } from "lucide-react";
+import { CallAnalyzer } from "@/components/sales/call-analyzer";
+import { Sparkles, Phone, FileText, Copy, History, FileDown, Mic } from "lucide-react";
 import { exportToPDF } from "@/lib/utils/export-pdf";
-import { cn } from "@/lib/utils/cn";
+import { TabBar } from "@/components/shared/tab-bar";
 import { createClient } from "@/lib/supabase/client";
+import { useUser } from "@/hooks/use-user";
 import { toast } from "sonner";
 
 const TABS = [
   { key: "discovery", label: "Appel Découverte", icon: Phone },
   { key: "closing", label: "Script de Closing", icon: FileText },
+  { key: "call_analysis", label: "Analyse Call", icon: Mic },
   { key: "history", label: "Historique", icon: History },
 ] as const;
 
@@ -27,6 +30,39 @@ export default function SalesPage() {
   const [error, setError] = React.useState<string | null>(null);
   const [activeTab, setActiveTab] = React.useState<string>("discovery");
   const [copied, setCopied] = React.useState(false);
+  const { user } = useUser();
+
+  React.useEffect(() => {
+    if (!user) return;
+    const loadLatest = async () => {
+      const supabase = createClient();
+      const { data } = await supabase
+        .from("sales_assets")
+        .select("asset_type, ai_raw_response, content, metadata")
+        .eq("user_id", user.id)
+        .eq("asset_type", "sales_script")
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .single();
+
+      if (data) {
+        let parsed = data.ai_raw_response;
+        if (!parsed && data.content) {
+          try {
+            parsed = typeof data.content === "string" ? JSON.parse(data.content) : data.content;
+          } catch { /* ignore */ }
+        }
+        if (parsed) {
+          setScript(parsed);
+          const metadata = data.metadata as { scriptType?: string } | null;
+          if (metadata?.scriptType === "closing") {
+            setActiveTab("closing");
+          }
+        }
+      }
+    };
+    loadLatest();
+  }, [user]);
 
   const activeType = activeTab === "history" ? "discovery" : activeTab;
 
@@ -176,28 +212,7 @@ export default function SalesPage() {
         description="Scripts et outils pour closer tes prospects."
       />
 
-      <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
-        {TABS.map((tab) => (
-          <button
-            key={tab.key}
-            onClick={() => {
-              setActiveTab(tab.key);
-              if (tab.key !== "history") {
-                setScript(null);
-              }
-            }}
-            className={cn(
-              "flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all whitespace-nowrap",
-              activeTab === tab.key
-                ? "bg-accent text-white"
-                : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
-            )}
-          >
-            <tab.icon className="h-4 w-4" />
-            {tab.label}
-          </button>
-        ))}
-      </div>
+      <TabBar tabs={TABS} activeTab={activeTab} onTabChange={setActiveTab} />
 
       {activeTab === "history" ? (
         <GenerationHistory
@@ -209,6 +224,8 @@ export default function SalesPage() {
           emptyMessage="Aucun script de vente généré pour le moment."
           onSelect={handleHistorySelect}
         />
+      ) : activeTab === "call_analysis" ? (
+        <CallAnalyzer />
       ) : (
         renderGenerator()
       )}

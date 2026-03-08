@@ -4,8 +4,9 @@ import React from "react";
 import { PageHeader } from "@/components/layout/page-header";
 import { FunnelBuilder } from "@/components/funnel/funnel-builder";
 import { GenerationHistory } from "@/components/shared/generation-history";
-import { cn } from "@/lib/utils/cn";
+import { TabBar } from "@/components/shared/tab-bar";
 import { createClient } from "@/lib/supabase/client";
+import { useUser } from "@/hooks/use-user";
 import { Sparkles, History } from "lucide-react";
 import { toast } from "sonner";
 
@@ -15,10 +16,30 @@ const TABS = [
 ] as const;
 
 export default function FunnelPage() {
+  const { user } = useUser();
   const [activeTab, setActiveTab] = React.useState<string>("generate");
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [loadedData, setLoadedData] = React.useState<any>(null);
   const supabase = createClient();
+
+  // Auto-load latest funnel on mount
+  React.useEffect(() => {
+    if (!user) return;
+    const loadLatest = async () => {
+      const { data } = await supabase
+        .from("funnels")
+        .select("id, ai_raw_response, optin_page, vsl_page, thankyou_page, funnel_name")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .single();
+
+      if (data?.ai_raw_response) {
+        setLoadedData(data.ai_raw_response);
+      }
+    };
+    loadLatest();
+  }, [user, supabase]);
 
   const handleHistorySelect = async (item: { id: string }) => {
     try {
@@ -48,23 +69,7 @@ export default function FunnelPage() {
         description="Construis ton funnel de conversion avec copy IA."
       />
 
-      <div className="flex gap-2 mb-6">
-        {TABS.map((tab) => (
-          <button
-            key={tab.key}
-            onClick={() => setActiveTab(tab.key)}
-            className={cn(
-              "flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all",
-              activeTab === tab.key
-                ? "bg-accent text-white"
-                : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
-            )}
-          >
-            <tab.icon className="h-4 w-4" />
-            {tab.label}
-          </button>
-        ))}
-      </div>
+      <TabBar tabs={TABS} activeTab={activeTab} onTabChange={setActiveTab} />
 
       {activeTab === "generate" && <FunnelBuilder initialData={loadedData} />}
       {activeTab === "history" && (

@@ -153,8 +153,8 @@ export function GenerationHistory({
         <Card
           key={item.id}
           className={cn(
-            "transition-all",
-            onSelect && "cursor-pointer hover:border-border-hover"
+            "transition-all duration-200 group",
+            onSelect && "cursor-pointer hover:border-accent/20 hover:shadow-md hover:shadow-accent/5"
           )}
           onClick={() => onSelect?.(item)}
         >
@@ -185,7 +185,7 @@ export function GenerationHistory({
                   </Badge>
                 )}
                 {onSelect && (
-                  <ChevronRight className="h-4 w-4 text-text-muted" />
+                  <ChevronRight className="h-4 w-4 text-text-muted transition-transform group-hover:translate-x-0.5 group-hover:text-accent" />
                 )}
               </div>
             </div>

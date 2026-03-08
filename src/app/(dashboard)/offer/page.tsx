@@ -3,19 +3,23 @@
 import React from "react";
 import { PageHeader } from "@/components/layout/page-header";
 import { OfferGenerator } from "@/components/offer/offer-generator";
+import { OtoGenerator } from "@/components/offer/oto-generator";
 import { CategoryOSWizard } from "@/components/offer/category-os-wizard";
 import { OfferScoreCard } from "@/components/offer/offer-score-card";
+import { DeliveryDesigner } from "@/components/offer/delivery-designer";
 import { GenerationHistory } from "@/components/shared/generation-history";
-import { cn } from "@/lib/utils/cn";
+import { TabBar } from "@/components/shared/tab-bar";
 import { createClient } from "@/lib/supabase/client";
 import { useUser } from "@/hooks/use-user";
-import { Sparkles, Crosshair, BarChart3, History } from "lucide-react";
+import { Sparkles, Crosshair, BarChart3, Gift, Settings, History } from "lucide-react";
 import { toast } from "sonner";
 
 const TABS = [
   { key: "generate", label: "Generer", icon: Sparkles },
   { key: "positioning", label: "Positionnement", icon: Crosshair },
   { key: "score", label: "Score", icon: BarChart3 },
+  { key: "oto", label: "Offre OTO", icon: Gift },
+  { key: "delivery", label: "Delivery", icon: Settings },
   { key: "history", label: "Historique", icon: History },
 ] as const;
 
@@ -50,13 +54,17 @@ export default function OfferPage() {
       // Get latest offer
       const { data: offers } = await supabase
         .from("offers")
-        .select("id")
+        .select("id, ai_raw_response, offer_name, positioning, unique_mechanism, pricing_strategy, guarantees, risk_reversal, delivery_structure, oto_offer, delivery_data, full_document")
         .eq("user_id", user.id)
         .order("created_at", { ascending: false })
         .limit(1);
 
       if (offers && offers.length > 0) {
         setLatestOfferId(offers[0].id);
+        // Auto-load last offer data into generator
+        if (offers[0].ai_raw_response) {
+          setLoadedData(offers[0].ai_raw_response);
+        }
       }
     };
 
@@ -67,7 +75,7 @@ export default function OfferPage() {
     try {
       const { data, error } = await supabase
         .from("offers")
-        .select("ai_raw_response, offer_name, positioning, unique_mechanism, pricing_strategy, guarantees, risk_reversal, delivery_structure, oto_offer, full_document")
+        .select("ai_raw_response, offer_name, positioning, unique_mechanism, pricing_strategy, guarantees, risk_reversal, delivery_structure, oto_offer, delivery_data, full_document")
         .eq("id", item.id)
         .single();
 
@@ -91,23 +99,7 @@ export default function OfferPage() {
         description="Genere ton offre irresistible avec l'IA."
       />
 
-      <div className="flex gap-2 mb-6">
-        {TABS.map((tab) => (
-          <button
-            key={tab.key}
-            onClick={() => setActiveTab(tab.key)}
-            className={cn(
-              "flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all",
-              activeTab === tab.key
-                ? "bg-accent text-white"
-                : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
-            )}
-          >
-            <tab.icon className="h-4 w-4" />
-            {tab.label}
-          </button>
-        ))}
-      </div>
+      <TabBar tabs={TABS} activeTab={activeTab} onTabChange={setActiveTab} />
 
       {activeTab === "generate" && (
         <OfferGenerator
@@ -121,6 +113,12 @@ export default function OfferPage() {
       )}
       {activeTab === "score" && (
         <OfferScoreCard offerId={latestOfferId || undefined} />
+      )}
+      {activeTab === "oto" && (
+        <OtoGenerator offerId={latestOfferId || undefined} initialData={loadedData} />
+      )}
+      {activeTab === "delivery" && (
+        <DeliveryDesigner offerId={latestOfferId || undefined} initialData={loadedData} />
       )}
       {activeTab === "history" && (
         <GenerationHistory

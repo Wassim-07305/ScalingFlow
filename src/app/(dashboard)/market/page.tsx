@@ -4,6 +4,10 @@ import React, { useEffect, useState, useCallback } from "react";
 import { PageHeader } from "@/components/layout/page-header";
 import { PersonaDisplay } from "@/components/market/persona-display";
 import { CompetitorGrid } from "@/components/market/competitor-grid";
+import { ParcoursSelector } from "@/components/market/parcours-selector";
+import { PainIdentifier } from "@/components/market/pain-identifier";
+import { GenerationHistory } from "@/components/shared/generation-history";
+import { TabBar } from "@/components/shared/tab-bar";
 import { cn } from "@/lib/utils/cn";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -16,9 +20,12 @@ import { fr } from "date-fns/locale";
 import type { PersonaForgeResult } from "@/lib/ai/prompts/persona-forge";
 import type { Database } from "@/types/database";
 import {
+  Compass,
   BarChart3,
   User,
   Swords,
+  Flame,
+  History,
   ChevronDown,
   ChevronUp,
   Loader2,
@@ -32,18 +39,19 @@ type MarketAnalysis = Database["public"]["Tables"]["market_analyses"]["Row"];
 type Competitor = Database["public"]["Tables"]["competitors"]["Row"];
 
 const TABS = [
+  { key: "parcours", label: "Parcours", icon: Compass },
   { key: "analyse", label: "Analyse", icon: BarChart3 },
   { key: "persona", label: "Persona", icon: User },
   { key: "concurrence", label: "Concurrence", icon: Swords },
+  { key: "pains", label: "Pains", icon: Flame },
+  { key: "history", label: "Historique", icon: History },
 ] as const;
-
-type TabKey = (typeof TABS)[number]["key"];
 
 export default function MarketPage() {
   const { user } = useUser();
   const supabase = createClient();
 
-  const [activeTab, setActiveTab] = useState<TabKey>("analyse");
+  const [activeTab, setActiveTab] = useState<string>("analyse");
   const [analyses, setAnalyses] = useState<MarketAnalysis[]>([]);
   const [selectedAnalysis, setSelectedAnalysis] = useState<MarketAnalysis | null>(null);
   const [expandedAnalysis, setExpandedAnalysis] = useState<string | null>(null);
@@ -174,6 +182,17 @@ export default function MarketPage() {
     }
   };
 
+  // Charger une analyse depuis l'historique
+  const handleHistorySelectAnalysis = (item: { id: string }) => {
+    const found = analyses.find((a) => a.id === item.id);
+    if (found) {
+      setSelectedAnalysis(found);
+      setExpandedAnalysis(found.id);
+      setActiveTab("analyse");
+      toast.success("Analyse chargee depuis l'historique");
+    }
+  };
+
   const persona = selectedAnalysis?.persona as PersonaForgeResult | null;
 
   return (
@@ -184,23 +203,7 @@ export default function MarketPage() {
       />
 
       {/* Tabs */}
-      <div className="flex gap-2 mb-6">
-        {TABS.map((tab) => (
-          <button
-            key={tab.key}
-            onClick={() => setActiveTab(tab.key)}
-            className={cn(
-              "flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all",
-              activeTab === tab.key
-                ? "bg-accent text-white"
-                : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
-            )}
-          >
-            <tab.icon className="h-4 w-4" />
-            {tab.label}
-          </button>
-        ))}
-      </div>
+      <TabBar tabs={TABS} activeTab={activeTab} onTabChange={setActiveTab} />
 
       {/* Selection de l'analyse */}
       {analyses.length > 1 && (
@@ -460,6 +463,28 @@ export default function MarketPage() {
             </Card>
           )}
         </div>
+      )}
+
+      {/* TAB: Parcours */}
+      {activeTab === "parcours" && <ParcoursSelector />}
+
+      {/* TAB: Pains */}
+      {activeTab === "pains" && !loadingData && selectedAnalysis && (
+        <PainIdentifier
+          marketAnalysisId={selectedAnalysis.id}
+          existingPains={selectedAnalysis.bleeding_neck_pains as React.ComponentProps<typeof PainIdentifier>["existingPains"]}
+        />
+      )}
+
+      {/* TAB: Historique */}
+      {activeTab === "history" && (
+        <GenerationHistory
+          table="market_analyses"
+          titleField="market_name"
+          subtitleField="market_description"
+          emptyMessage="Aucune analyse de marche pour le moment."
+          onSelect={handleHistorySelectAnalysis}
+        />
       )}
     </div>
   );

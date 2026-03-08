@@ -4,13 +4,16 @@ import React from "react";
 import { PageHeader } from "@/components/layout/page-header";
 import { VSLGenerator } from "@/components/assets/vsl-generator";
 import { EmailSequence } from "@/components/assets/email-sequence";
+import { SmsSequenceGenerator } from "@/components/assets/sms-sequence-generator";
+import { CaseStudyGenerator } from "@/components/assets/case-study-generator";
 import { PitchDeckGenerator } from "@/components/assets/pitch-deck-generator";
 import { SalesLetterGenerator } from "@/components/assets/sales-letter-generator";
 import { SettingScriptGenerator } from "@/components/assets/setting-script-generator";
 import { LeadMagnetGenerator } from "@/components/assets/lead-magnet-generator";
 import { GenerationHistory } from "@/components/shared/generation-history";
-import { cn } from "@/lib/utils/cn";
+import { TabBar } from "@/components/shared/tab-bar";
 import { createClient } from "@/lib/supabase/client";
+import { useUser } from "@/hooks/use-user";
 import { toast } from "sonner";
 import {
   Video,
@@ -20,6 +23,7 @@ import {
   FileText,
   Phone,
   Magnet,
+  Users,
   History,
 } from "lucide-react";
 
@@ -31,6 +35,7 @@ const TABS = [
   { key: "sales_letter", label: "Sales Letter", icon: FileText },
   { key: "setting_script", label: "Script Setting", icon: Phone },
   { key: "lead_magnet", label: "Lead Magnet", icon: Magnet },
+  { key: "case_study", label: "Etude de cas", icon: Users },
   { key: "history", label: "Historique", icon: History },
 ] as const;
 
@@ -43,12 +48,38 @@ const ASSET_TYPE_TO_TAB: Record<string, string> = {
   sales_letter: "sales_letter",
   sales_script: "setting_script",
   lead_magnet: "lead_magnet",
+  case_study: "case_study",
 };
 
 export default function AssetsPage() {
   const [activeTab, setActiveTab] = React.useState<string>("vsl");
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [loadedData, setLoadedData] = React.useState<Record<string, any>>({});
+  const { user } = useUser();
+
+  React.useEffect(() => {
+    if (!user) return;
+    const loadLatest = async () => {
+      const supabase = createClient();
+      const { data } = await supabase
+        .from("sales_assets")
+        .select("asset_type, ai_raw_response, metadata")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .single();
+
+      if (data?.ai_raw_response) {
+        const metadata = data.metadata as { original_type?: string } | null;
+        const assetType = metadata?.original_type || data.asset_type;
+        const tabKey = ASSET_TYPE_TO_TAB[assetType] || ASSET_TYPE_TO_TAB[data.asset_type];
+        if (tabKey) {
+          setLoadedData((prev) => ({ ...prev, [tabKey]: data.ai_raw_response }));
+        }
+      }
+    };
+    loadLatest();
+  }, [user]);
 
   const handleHistorySelect = async (item: { id: string; subtitle?: string }) => {
     try {
@@ -105,35 +136,16 @@ export default function AssetsPage() {
         description="Genere tes scripts VSL, emails, pitch decks et plus avec l'IA."
       />
 
-      <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
-        {TABS.map((tab) => (
-          <button
-            key={tab.key}
-            onClick={() => setActiveTab(tab.key)}
-            className={cn(
-              "flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all whitespace-nowrap",
-              activeTab === tab.key
-                ? "bg-accent text-white"
-                : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
-            )}
-          >
-            <tab.icon className="h-4 w-4" />
-            {tab.label}
-          </button>
-        ))}
-      </div>
+      <TabBar tabs={TABS} activeTab={activeTab} onTabChange={setActiveTab} />
 
       {activeTab === "vsl" && <VSLGenerator initialData={loadedData.vsl} />}
       {activeTab === "email" && <EmailSequence initialData={loadedData.email} />}
-      {activeTab === "sms" && (
-        <div className="text-center py-12">
-          <p className="text-text-secondary">Module SMS bientot disponible</p>
-        </div>
-      )}
+      {activeTab === "sms" && <SmsSequenceGenerator initialData={loadedData.sms} />}
       {activeTab === "pitch_deck" && <PitchDeckGenerator initialData={loadedData.pitch_deck} />}
       {activeTab === "sales_letter" && <SalesLetterGenerator initialData={loadedData.sales_letter} />}
       {activeTab === "setting_script" && <SettingScriptGenerator initialData={loadedData.setting_script} />}
       {activeTab === "lead_magnet" && <LeadMagnetGenerator initialData={loadedData.lead_magnet} />}
+      {activeTab === "case_study" && <CaseStudyGenerator initialData={loadedData.case_study} />}
       {activeTab === "history" && (
         <GenerationHistory
           table="sales_assets"
