@@ -5,6 +5,7 @@ import { generateJSON } from "@/lib/ai/generate";
 import { marketAnalysisPrompt, type MarketAnalysisContext } from "@/lib/ai/prompts/market-analysis";
 import type { MarketAnalysisResult } from "@/types/ai";
 import { awardXP } from "@/lib/gamification/xp-engine";
+import { notifyGeneration } from "@/lib/notifications/create";
 import { buildFullVaultContext } from "@/lib/ai/vault-context";
 
 export const maxDuration = 60;
@@ -60,6 +61,7 @@ export async function POST(req: NextRequest) {
 
     // Award XP (non-blocking)
     try { await awardXP(user.id, "generation.market_analysis"); } catch {}
+    try { await notifyGeneration(user.id, "generation.market_analysis"); } catch {}
 
     return NextResponse.json(result);
   } catch (error) {

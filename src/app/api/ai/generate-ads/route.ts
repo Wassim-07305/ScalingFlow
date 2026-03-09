@@ -14,6 +14,7 @@ import {
 } from "@/lib/ai/prompts/dm-scripts";
 import { buildFullVaultContext } from "@/lib/ai/vault-context";
 import { awardXP } from "@/lib/gamification/xp-engine";
+import { notifyGeneration } from "@/lib/notifications/create";
 
 export async function POST(req: NextRequest) {
   try {
@@ -104,6 +105,7 @@ export async function POST(req: NextRequest) {
 
       // Award XP (non-blocking)
       try { await awardXP(user.id, "generation.ads"); } catch {}
+    try { await notifyGeneration(user.id, "generation.ads"); } catch {}
 
       return NextResponse.json({ adType: "video_ad", result });
     }
@@ -132,6 +134,7 @@ export async function POST(req: NextRequest) {
 
       // Award XP (non-blocking)
       try { await awardXP(user.id, "generation.ads"); } catch {}
+    try { await notifyGeneration(user.id, "generation.ads"); } catch {}
 
       return NextResponse.json({ adType: "dm_scripts", result });
     }
@@ -198,6 +201,7 @@ export async function POST(req: NextRequest) {
 
     // Award XP (non-blocking)
     try { await awardXP(user.id, "generation.ads"); } catch {}
+    try { await notifyGeneration(user.id, "generation.ads"); } catch {}
 
     return NextResponse.json({
       ad_creatives: adCreatives,

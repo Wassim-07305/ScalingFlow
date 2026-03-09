@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { generateJSON } from "@/lib/ai/generate";
 import { buildCategoryOSPrompt, type CategoryOSResult } from "@/lib/ai/prompts/category-os";
 import { awardXP } from "@/lib/gamification/xp-engine";
+import { notifyGeneration } from "@/lib/notifications/create";
 import { buildFullVaultContext } from "@/lib/ai/vault-context";
 
 export async function POST(req: NextRequest) {
@@ -112,6 +113,7 @@ export async function POST(req: NextRequest) {
 
     // Award XP (non-blocking)
     try { await awardXP(user.id, "generation.category_os"); } catch {}
+    try { await notifyGeneration(user.id, "generation.category_os"); } catch {}
 
     return NextResponse.json(categoryOS);
   } catch (error) {

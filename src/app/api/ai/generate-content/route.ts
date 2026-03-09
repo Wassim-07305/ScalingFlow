@@ -25,6 +25,7 @@ import {
 } from "@/lib/ai/prompts/carousel-content";
 import { buildFullVaultContext } from "@/lib/ai/vault-context";
 import { awardXP } from "@/lib/gamification/xp-engine";
+import { notifyGeneration } from "@/lib/notifications/create";
 
 export async function POST(req: NextRequest) {
   try {
@@ -122,6 +123,7 @@ export async function POST(req: NextRequest) {
 
       // Award XP (non-blocking)
       try { await awardXP(user.id, "generation.content_strategy"); } catch {}
+    try { await notifyGeneration(user.id, "generation.content_strategy"); } catch {}
 
       return NextResponse.json({ contentType: "strategy", result });
     }
@@ -154,6 +156,7 @@ export async function POST(req: NextRequest) {
 
       // Award XP (non-blocking)
       try { await awardXP(user.id, "generation.reels"); } catch {}
+    try { await notifyGeneration(user.id, "generation.reels"); } catch {}
 
       return NextResponse.json({ contentType: "reels", result });
     }
@@ -184,6 +187,7 @@ export async function POST(req: NextRequest) {
 
       // Award XP (non-blocking)
       try { await awardXP(user.id, "generation.youtube"); } catch {}
+    try { await notifyGeneration(user.id, "generation.youtube"); } catch {}
 
       return NextResponse.json({ contentType: "youtube", result });
     }
@@ -208,6 +212,7 @@ export async function POST(req: NextRequest) {
 
       // Award XP (non-blocking)
       try { await awardXP(user.id, "generation.stories"); } catch {}
+    try { await notifyGeneration(user.id, "generation.stories"); } catch {}
 
       return NextResponse.json({ contentType: "stories", result });
     }
@@ -238,6 +243,7 @@ export async function POST(req: NextRequest) {
 
       // Award XP (non-blocking)
       try { await awardXP(user.id, "generation.carousel"); } catch {}
+    try { await notifyGeneration(user.id, "generation.carousel"); } catch {}
 
       return NextResponse.json({ contentType: "carousel", result });
     }
@@ -276,6 +282,7 @@ export async function POST(req: NextRequest) {
 
     // Award XP (non-blocking)
     try { await awardXP(user.id, "generation.content_strategy"); } catch {}
+    try { await notifyGeneration(user.id, "generation.content_strategy"); } catch {}
 
     return NextResponse.json({
       market: marketContext,

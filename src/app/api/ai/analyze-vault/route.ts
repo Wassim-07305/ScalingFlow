@@ -8,6 +8,7 @@ import {
   type VaultAnalysis,
 } from "@/lib/ai/prompts/vault-analysis";
 import { awardXP } from "@/lib/gamification/xp-engine";
+import { notifyGeneration } from "@/lib/notifications/create";
 
 export async function POST(req: NextRequest) {
   try {
@@ -48,6 +49,7 @@ export async function POST(req: NextRequest) {
 
     // Award XP (non-blocking)
     try { await awardXP(user.id, "generation.vault_analysis"); } catch {}
+    try { await notifyGeneration(user.id, "generation.vault_analysis"); } catch {}
 
     return NextResponse.json(result);
   } catch (error) {

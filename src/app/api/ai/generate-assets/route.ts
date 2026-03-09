@@ -12,6 +12,7 @@ import { salesLetterPrompt } from "@/lib/ai/prompts/sales-letter";
 import { settingScriptPrompt } from "@/lib/ai/prompts/setting-script";
 import { leadMagnetPrompt } from "@/lib/ai/prompts/lead-magnet";
 import { awardXP } from "@/lib/gamification/xp-engine";
+import { notifyGeneration } from "@/lib/notifications/create";
 import { buildFullVaultContext } from "@/lib/ai/vault-context";
 
 type AssetType =

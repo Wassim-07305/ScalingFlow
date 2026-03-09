@@ -5,6 +5,7 @@ import { generateJSON } from "@/lib/ai/generate";
 import { offerCreationPrompt } from "@/lib/ai/prompts/offer-creation";
 import { buildFullVaultContext } from "@/lib/ai/vault-context";
 import { awardXP } from "@/lib/gamification/xp-engine";
+import { notifyGeneration } from "@/lib/notifications/create";
 
 export async function POST(req: NextRequest) {
   try {
@@ -107,6 +108,7 @@ export async function POST(req: NextRequest) {
 
     // Award XP (non-blocking)
     try { await awardXP(user.id, "generation.offer"); } catch {}
+    try { await notifyGeneration(user.id, "generation.offer"); } catch {}
 
     return NextResponse.json(offer);
   } catch (error) {

@@ -7,6 +7,7 @@ import {
   type CompetitorAnalysisResult,
 } from "@/lib/ai/prompts/competitor-analysis";
 import { awardXP } from "@/lib/gamification/xp-engine";
+import { notifyGeneration } from "@/lib/notifications/create";
 import { buildFullVaultContext } from "@/lib/ai/vault-context";
 
 export async function POST(req: NextRequest) {
@@ -98,6 +99,7 @@ export async function POST(req: NextRequest) {
 
     // Award XP (non-blocking)
     try { await awardXP(user.id, "generation.competitors"); } catch {}
+    try { await notifyGeneration(user.id, "generation.competitors"); } catch {}
 
     return NextResponse.json(result);
   } catch (error) {

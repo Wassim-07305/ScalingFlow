@@ -9,6 +9,7 @@ import {
   type VaultContextData,
 } from "@/lib/ai/prompts/persona-forge";
 import { awardXP } from "@/lib/gamification/xp-engine";
+import { notifyGeneration } from "@/lib/notifications/create";
 import { buildFullVaultContext } from "@/lib/ai/vault-context";
 
 export async function POST(req: NextRequest) {
@@ -103,6 +104,7 @@ export async function POST(req: NextRequest) {
 
     // Award XP (non-blocking)
     try { await awardXP(user.id, "generation.persona"); } catch {}
+    try { await notifyGeneration(user.id, "generation.persona"); } catch {}
 
     return NextResponse.json(result);
   } catch (error) {

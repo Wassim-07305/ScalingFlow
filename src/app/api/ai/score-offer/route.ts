@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { generateJSON } from "@/lib/ai/generate";
 import { buildOfferScoringPrompt, type OfferScoreResult } from "@/lib/ai/prompts/offer-scoring";
 import { awardXP } from "@/lib/gamification/xp-engine";
+import { notifyGeneration } from "@/lib/notifications/create";
 import { buildFullVaultContext } from "@/lib/ai/vault-context";
 
 export async function POST(req: NextRequest) {
@@ -75,6 +76,7 @@ export async function POST(req: NextRequest) {
 
     // Award XP (non-blocking)
     try { await awardXP(user.id, "validation.offer"); } catch {}
+    try { await notifyGeneration(user.id, "validation.offer"); } catch {}
 
     return NextResponse.json(score);
   } catch (error) {

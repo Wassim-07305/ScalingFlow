@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { generateJSON } from "@/lib/ai/generate";
 import { funnelCopyPrompt } from "@/lib/ai/prompts/funnel-copy";
 import { awardXP } from "@/lib/gamification/xp-engine";
+import { notifyGeneration } from "@/lib/notifications/create";
 import { buildFullVaultContext } from "@/lib/ai/vault-context";
 
 export async function POST(req: NextRequest) {
@@ -93,6 +94,7 @@ export async function POST(req: NextRequest) {
 
     // Award XP (non-blocking)
     try { await awardXP(user.id, "generation.funnel"); } catch {}
+    try { await notifyGeneration(user.id, "generation.funnel"); } catch {}
 
     return NextResponse.json(funnel);
   } catch (error) {

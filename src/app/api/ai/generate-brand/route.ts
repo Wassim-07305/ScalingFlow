@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { generateJSON } from "@/lib/ai/generate";
 import { buildBrandIdentityPrompt, type BrandIdentityResult } from "@/lib/ai/prompts/brand-identity";
 import { awardXP } from "@/lib/gamification/xp-engine";
+import { notifyGeneration } from "@/lib/notifications/create";
 import { buildFullVaultContext } from "@/lib/ai/vault-context";
 
 export async function POST(req: NextRequest) {
@@ -125,6 +126,7 @@ export async function POST(req: NextRequest) {
 
     // Award XP (non-blocking)
     try { await awardXP(user.id, "generation.brand"); } catch {}
+    try { await notifyGeneration(user.id, "generation.brand"); } catch {}
 
     return NextResponse.json({ ...brand, generated: brandIdentity });
   } catch (error) {

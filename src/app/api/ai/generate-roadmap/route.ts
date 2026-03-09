@@ -7,6 +7,7 @@ import {
   type RoadmapResult,
 } from "@/lib/ai/prompts/roadmap-generator";
 import { awardXP } from "@/lib/gamification/xp-engine";
+import { notifyGeneration } from "@/lib/notifications/create";
 import { buildFullVaultContext } from "@/lib/ai/vault-context";
 
 export async function POST(req: NextRequest) {
@@ -102,6 +103,7 @@ export async function POST(req: NextRequest) {
 
     // Award XP (non-blocking)
     try { await awardXP(user.id, "milestone.completed"); } catch {}
+    try { await notifyGeneration(user.id, "milestone.completed"); } catch {}
 
     return NextResponse.json({
       tasks_count: result.tasks.length,
