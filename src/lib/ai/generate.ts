@@ -1,8 +1,17 @@
+import Anthropic from "@anthropic-ai/sdk";
 import { AI_MODEL } from "./anthropic";
 
 const OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1";
 const MAX_RETRIES = 3;
 const RETRY_DELAY_MS = 1000;
+
+// Initialize Anthropic client if API key is available
+const anthropic = process.env.ANTHROPIC_API_KEY
+  ? new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
+  : null;
+
+// Use Anthropic API directly when available, otherwise fallback to OpenRouter
+const USE_ANTHROPIC_DIRECT = Boolean(anthropic && process.env.ANTHROPIC_API_KEY);
 
 interface GenerateOptions {
   prompt: string;
@@ -13,6 +22,29 @@ interface GenerateOptions {
 
 interface ChatResponse {
   choices: { message: { content: string }; finish_reason: string }[];
+}
+
+async function anthropicGenerate(
+  systemPrompt: string | undefined,
+  userPrompt: string,
+  maxTokens: number,
+  temperature: number
+): Promise<string> {
+  if (!anthropic) throw new Error("Anthropic client not initialized");
+
+  const response = await anthropic.messages.create({
+    model: "claude-sonnet-4-20250514",
+    max_tokens: maxTokens,
+    temperature,
+    system: systemPrompt || undefined,
+    messages: [{ role: "user", content: userPrompt }],
+  });
+
+  const textBlock = response.content.find((c) => c.type === "text");
+  if (!textBlock || textBlock.type !== "text") {
+    throw new Error("No text response from Anthropic");
+  }
+  return textBlock.text;
 }
 
 async function openRouterFetch(body: Record<string, unknown>): Promise<ChatResponse> {
@@ -53,6 +85,16 @@ export async function generateText({
   maxTokens = 4096,
   temperature = 0.7,
 }: GenerateOptions): Promise<string> {
+  // Try Anthropic direct API first if available
+  if (USE_ANTHROPIC_DIRECT) {
+    try {
+      return await anthropicGenerate(systemPrompt, prompt, maxTokens, temperature);
+    } catch (err) {
+      console.warn("Anthropic direct API failed, falling back to OpenRouter:", err);
+    }
+  }
+
+  // Fallback to OpenRouter
   const messages: { role: "system" | "user"; content: string }[] = [];
 
   if (systemPrompt) {
@@ -69,7 +111,7 @@ export async function generateText({
 
   const content = data.choices[0]?.message?.content;
   if (!content) {
-    throw new Error("Pas de réponse de l'IA");
+    throw new Error("Pas de reponse de l'IA");
   }
   return content;
 }
@@ -132,6 +174,32 @@ export async function* streamText({
   maxTokens = 4096,
   temperature = 0.7,
 }: GenerateOptions): AsyncGenerator<string> {
+  // Try Anthropic direct streaming first if available
+  if (USE_ANTHROPIC_DIRECT && anthropic) {
+    try {
+      const stream = anthropic.messages.stream({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: maxTokens,
+        temperature,
+        system: systemPrompt || undefined,
+        messages: [{ role: "user", content: prompt }],
+      });
+
+      for await (const event of stream) {
+        if (
+          event.type === "content_block_delta" &&
+          event.delta.type === "text_delta"
+        ) {
+          yield event.delta.text;
+        }
+      }
+      return;
+    } catch (err) {
+      console.warn("Anthropic stream failed, falling back to OpenRouter:", err);
+    }
+  }
+
+  // Fallback to OpenRouter streaming
   const messages: { role: "system" | "user"; content: string }[] = [];
 
   if (systemPrompt) {
