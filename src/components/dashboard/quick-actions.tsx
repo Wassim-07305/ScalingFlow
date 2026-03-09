@@ -9,45 +9,48 @@ import {
   FileText,
   Handshake,
   ArrowRight,
+  MessageSquare,
+  Rocket,
+  BarChart3,
 } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
 const actions = [
   {
-    label: "Créer une offre",
-    description: "Génère ton positionnement, pricing et garanties",
+    label: "Creer une offre",
+    description: "Genere ton positionnement, pricing et garanties",
     href: "/offer",
     icon: Package,
     color: "orange" as const,
   },
   {
-    label: "Générer un funnel",
+    label: "Generer un funnel",
     description: "Page opt-in, VSL et remerciement",
     href: "/funnel",
     icon: Filter,
     color: "blue" as const,
   },
   {
-    label: "Créer des pubs",
-    description: "Hooks, creatives et scripts vidéo",
+    label: "Creer des pubs",
+    description: "Hooks, creatives et scripts video",
     href: "/ads/creatives",
     icon: Megaphone,
     color: "cyan" as const,
   },
   {
-    label: "Générer du contenu",
+    label: "Generer du contenu",
     description: "Reels, posts, stories et carrousels",
     href: "/content",
     icon: PenTool,
     color: "purple" as const,
   },
   {
-    label: "Sales assets",
-    description: "Emails, SMS, VSL et lettres de vente",
-    href: "/assets",
-    icon: FileText,
-    color: "orange" as const,
+    label: "Prospection",
+    description: "Scripts DM, appels et workflow outbound",
+    href: "/prospection",
+    icon: MessageSquare,
+    color: "cyan" as const,
   },
   {
     label: "Scripts de vente",
@@ -55,6 +58,20 @@ const actions = [
     href: "/sales",
     icon: Handshake,
     color: "blue" as const,
+  },
+  {
+    label: "Guide lancement",
+    description: "Checklist 10 jours pour lancer tes ads",
+    href: "/launch",
+    icon: Rocket,
+    color: "orange" as const,
+  },
+  {
+    label: "Analytics",
+    description: "Performance, A/B tests et optimisations IA",
+    href: "/analytics",
+    icon: BarChart3,
+    color: "purple" as const,
   },
 ];
 

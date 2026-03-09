@@ -2,8 +2,10 @@
 
 import React, { useEffect, useState, useCallback } from "react";
 import { PageHeader } from "@/components/layout/page-header";
+import { TabBar } from "@/components/shared/tab-bar";
 import { PersonaDisplay } from "@/components/market/persona-display";
 import { CompetitorGrid } from "@/components/market/competitor-grid";
+import { PainIdentifier } from "@/components/market/pain-identifier";
 import { cn } from "@/lib/utils/cn";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -20,6 +22,7 @@ import {
   BarChart3,
   User,
   Swords,
+  Flame,
   ChevronDown,
   ChevronUp,
   Loader2,
@@ -35,6 +38,7 @@ type Competitor = Database["public"]["Tables"]["competitors"]["Row"];
 const TABS = [
   { key: "analyse", label: "Analyse", icon: BarChart3 },
   { key: "persona", label: "Persona", icon: User },
+  { key: "pains", label: "Pains", icon: Flame },
   { key: "concurrence", label: "Concurrence", icon: Swords },
 ] as const;
 
@@ -192,23 +196,7 @@ export default function MarketPage() {
       />
 
       {/* Tabs */}
-      <div className="flex gap-2 mb-6">
-        {TABS.map((tab) => (
-          <button
-            key={tab.key}
-            onClick={() => setActiveTab(tab.key)}
-            className={cn(
-              "flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all",
-              activeTab === tab.key
-                ? "bg-accent text-white"
-                : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
-            )}
-          >
-            <tab.icon className="h-4 w-4" />
-            {tab.label}
-          </button>
-        ))}
-      </div>
+      <TabBar tabs={TABS} activeTab={activeTab} onTabChange={(key) => setActiveTab(key as TabKey)} />
 
       {/* Selection de l'analyse */}
       {analyses.length > 1 && (
@@ -421,6 +409,14 @@ export default function MarketPage() {
             </Card>
           )}
         </div>
+      )}
+
+      {/* TAB: Pains */}
+      {activeTab === "pains" && !loadingData && selectedAnalysis && (
+        <PainIdentifier
+          marketAnalysisId={selectedAnalysis.id}
+          existingPains={null}
+        />
       )}
 
       {/* TAB: Concurrence */}

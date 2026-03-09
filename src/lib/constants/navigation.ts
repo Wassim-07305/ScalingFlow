@@ -18,6 +18,9 @@ import {
   Archive,
   CreditCard,
   ShieldCheck,
+  BarChart3,
+  MessageSquare,
+  Rocket,
 } from "lucide-react";
 import type { NavItem, NavSection } from "@/lib/types/appshell";
 
@@ -33,7 +36,10 @@ export const NAV_ITEMS: NavItem[] = [
   { label: "Assets", href: "/assets", icon: FileText, roles: ["user", "student", "admin", "coach"] },
   { label: "Ads", href: "/ads", icon: Megaphone, roles: ["user", "student", "admin", "coach"] },
   { label: "Contenu", href: "/content", icon: PenTool, roles: ["user", "student", "admin", "coach"] },
+  { label: "Prospection", href: "/prospection", icon: MessageSquare, roles: ["user", "student", "admin", "coach"] },
   { label: "Vente", href: "/sales", icon: Handshake, roles: ["user", "student", "admin", "coach"] },
+  { label: "Lancement", href: "/launch", icon: Rocket, roles: ["user", "student", "admin", "coach"] },
+  { label: "Analytics", href: "/analytics", icon: BarChart3, roles: ["user", "student", "admin", "coach"] },
   { label: "Academy", href: "/academy", icon: GraduationCap, roles: ["user", "student", "admin", "coach"] },
   { label: "Roadmap", href: "/roadmap", icon: Map, roles: ["user", "student", "admin", "coach"] },
   { label: "Progression", href: "/progress", icon: TrendingUp, roles: ["user", "student", "admin", "coach"] },
@@ -60,7 +66,13 @@ export const NAV_SECTIONS: NavSection[] = [
   {
     label: "Acquisition",
     items: NAV_ITEMS.filter((i) =>
-      ["/funnel", "/assets", "/ads", "/content", "/sales"].includes(i.href)
+      ["/funnel", "/assets", "/ads", "/content", "/prospection", "/sales"].includes(i.href)
+    ),
+  },
+  {
+    label: "Performance",
+    items: NAV_ITEMS.filter((i) =>
+      ["/launch", "/analytics"].includes(i.href)
     ),
   },
   {
@@ -95,7 +107,10 @@ export const BREADCRUMB_LABELS: Record<string, string> = {
   assets: "Assets",
   ads: "Publicités",
   content: "Contenu",
+  prospection: "Prospection",
   sales: "Vente",
+  launch: "Lancement",
+  analytics: "Analytics",
   academy: "Academy",
   roadmap: "Roadmap",
   progress: "Progression",
@@ -118,9 +133,12 @@ export const QUICK_LINKS = [
   { label: "Assets", href: "/assets", icon: FileText },
   { label: "Ads", href: "/ads", icon: Megaphone },
   { label: "Contenu", href: "/content", icon: PenTool },
+  { label: "Prospection", href: "/prospection", icon: MessageSquare },
+  { label: "Vente", href: "/sales", icon: Handshake },
+  { label: "Lancement", href: "/launch", icon: Rocket },
+  { label: "Analytics", href: "/analytics", icon: BarChart3 },
   { label: "Academy", href: "/academy", icon: GraduationCap },
   { label: "Roadmap", href: "/roadmap", icon: Map },
-  { label: "Vente", href: "/sales", icon: Handshake },
   { label: "Assistant IA", href: "/assistant", icon: Bot },
   { label: "Communauté", href: "/community", icon: Users },
   { label: "Paramètres", href: "/settings", icon: Settings },

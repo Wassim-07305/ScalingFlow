@@ -2,13 +2,13 @@
 
 import React from "react";
 import { PageHeader } from "@/components/layout/page-header";
+import { TabBar } from "@/components/shared/tab-bar";
 import { PerformanceDashboard } from "@/components/analytics/performance-dashboard";
 import { OptimizationRecommendations } from "@/components/analytics/optimization-recommendations";
 import { ABTestManager } from "@/components/analytics/ab-test-manager";
 import { AttributionModel } from "@/components/analytics/attribution-model";
 import { LTVCACTracker } from "@/components/analytics/ltv-cac-tracker";
 import { MetricsHistory } from "@/components/analytics/metrics-history";
-import { cn } from "@/lib/utils/cn";
 import {
   BarChart3,
   Sparkles,
@@ -30,6 +30,25 @@ const TABS = [
 export default function AnalyticsPage() {
   const [activeTab, setActiveTab] = React.useState<string>("dashboard");
 
+  const renderContent = () => {
+    switch (activeTab) {
+      case "dashboard":
+        return <PerformanceDashboard />;
+      case "optimization":
+        return <OptimizationRecommendations />;
+      case "ab_testing":
+        return <ABTestManager />;
+      case "attribution":
+        return <AttributionModel />;
+      case "ltv_cac":
+        return <LTVCACTracker />;
+      case "history":
+        return <MetricsHistory />;
+      default:
+        return null;
+    }
+  };
+
   return (
     <div>
       <PageHeader
@@ -37,30 +56,9 @@ export default function AnalyticsPage() {
         description="Tableau de bord de performance, optimisations IA et suivi de vos metriques."
       />
 
-      <div className="flex gap-2 mb-6 overflow-x-auto pb-1">
-        {TABS.map((tab) => (
-          <button
-            key={tab.key}
-            onClick={() => setActiveTab(tab.key)}
-            className={cn(
-              "flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all whitespace-nowrap",
-              activeTab === tab.key
-                ? "bg-accent text-white"
-                : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
-            )}
-          >
-            <tab.icon className="h-4 w-4" />
-            {tab.label}
-          </button>
-        ))}
-      </div>
+      <TabBar tabs={TABS} activeTab={activeTab} onTabChange={setActiveTab} />
 
-      {activeTab === "dashboard" && <PerformanceDashboard />}
-      {activeTab === "optimization" && <OptimizationRecommendations />}
-      {activeTab === "ab_testing" && <ABTestManager />}
-      {activeTab === "attribution" && <AttributionModel />}
-      {activeTab === "ltv_cac" && <LTVCACTracker />}
-      {activeTab === "history" && <MetricsHistory />}
+      {renderContent()}
     </div>
   );
 }
