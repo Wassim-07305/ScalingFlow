@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import type { OfferScoreResult } from "@/lib/ai/prompts/offer-scoring";
+import { UpgradeWall } from "@/components/shared/upgrade-wall";
 
 const CRITERIA_LABELS: Record<string, { label: string; maxScore: number }> = {
   clarte_promesse: { label: "Clarte de la promesse", maxScore: 17 },
@@ -37,6 +38,7 @@ interface OfferScoreCardProps {
 export function OfferScoreCard({ offerId, className }: OfferScoreCardProps) {
   const [loading, setLoading] = React.useState(false);
   const [score, setScore] = React.useState<OfferScoreResult | null>(null);
+  const [usageLimited, setUsageLimited] = React.useState<{currentUsage: number; limit: number} | null>(null);
 
   const handleScore = async () => {
     if (!offerId) {
@@ -55,8 +57,9 @@ export function OfferScoreCard({ offerId, className }: OfferScoreCardProps) {
       });
 
       if (!response.ok) {
-        const err = await response.json();
-        throw new Error(err.error || "Erreur lors de l'evaluation");
+        const errData = await response.json().catch(() => ({}));
+        if (response.status === 403 && errData.usage) { setUsageLimited(errData.usage); return; }
+        throw new Error(errData.error || "Erreur lors de la generation");
       }
 
       const data: OfferScoreResult = await response.json();
@@ -68,6 +71,10 @@ export function OfferScoreCard({ offerId, className }: OfferScoreCardProps) {
       setLoading(false);
     }
   };
+
+  if (usageLimited) {
+    return <UpgradeWall currentUsage={usageLimited.currentUsage} limit={usageLimited.limit} className={className} />;
+  }
 
   if (loading) {
     return <AILoading text="Evaluation de ton offre en cours" className={className} />;

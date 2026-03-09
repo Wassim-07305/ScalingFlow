@@ -23,12 +23,12 @@ import { VideoPlayer } from "@/components/academy/video-player";
 
 interface AcademyModule {
   id: string;
-  title: string;
-  description: string | null;
+  module_name: string;
+  module_description: string | null;
   module_order: number;
-  duration_minutes: number | null;
-  category: string | null;
-  thumbnail_url: string | null;
+  total_duration_minutes: number;
+  icon: string | null;
+  color: string | null;
   video_count: number;
   completed_count: number;
 }
@@ -42,8 +42,7 @@ interface AcademyVideo {
   duration_minutes: number | null;
   video_order: number;
   watched: boolean;
-  completed_at: string | null;
-  watch_time_seconds: number;
+  watched_at: string | null;
 }
 
 interface ModuleListProps {
@@ -129,7 +128,13 @@ export function ModuleList({ className }: ModuleListProps) {
     }
 
     const enrichedModules: AcademyModule[] = (modulesData ?? []).map((m) => ({
-      ...m,
+      id: m.id,
+      module_name: m.module_name,
+      module_description: m.module_description,
+      module_order: m.module_order,
+      total_duration_minutes: m.total_duration_minutes || 0,
+      icon: m.icon,
+      color: m.color,
       video_count: videoCountByModule[m.id] || 0,
       completed_count: completedCountByModule[m.id] || 0,
     }));
@@ -168,22 +173,21 @@ export function ModuleList({ className }: ModuleListProps) {
     // Charger la progression
     let progressMap: Record<
       string,
-      { watched: boolean; watch_time_seconds: number; completed_at: string | null }
+      { watched: boolean; watched_at: string | null }
     > = {};
     if (user) {
       const videoIds = (videosData ?? []).map((v) => v.id);
       if (videoIds.length > 0) {
         const { data: progressData } = await supabase
           .from("video_progress")
-          .select("video_id, watched, watch_time_seconds, completed_at")
+          .select("video_id, watched, watched_at")
           .eq("user_id", user.id)
           .in("video_id", videoIds);
 
         for (const p of progressData ?? []) {
           progressMap[p.video_id] = {
             watched: p.watched,
-            watch_time_seconds: p.watch_time_seconds || 0,
-            completed_at: p.completed_at,
+            watched_at: p.watched_at,
           };
         }
       }
@@ -192,8 +196,7 @@ export function ModuleList({ className }: ModuleListProps) {
     const enrichedVideos: AcademyVideo[] = (videosData ?? []).map((v) => ({
       ...v,
       watched: progressMap[v.id]?.watched ?? false,
-      watch_time_seconds: progressMap[v.id]?.watch_time_seconds ?? 0,
-      completed_at: progressMap[v.id]?.completed_at ?? null,
+      watched_at: progressMap[v.id]?.watched_at ?? null,
     }));
 
     setVideos(enrichedVideos);
@@ -216,7 +219,7 @@ export function ModuleList({ className }: ModuleListProps) {
     setVideos((prev) =>
       prev.map((v) =>
         v.id === videoId
-          ? { ...v, watched: true, completed_at: new Date().toISOString() }
+          ? { ...v, watched: true, watched_at: new Date().toISOString() }
           : v
       )
     );
@@ -227,7 +230,8 @@ export function ModuleList({ className }: ModuleListProps) {
         user_id: user.id,
         video_id: videoId,
         watched: true,
-        completed_at: new Date().toISOString(),
+        watched_at: new Date().toISOString(),
+        watch_percentage: 100,
       },
       { onConflict: "user_id,video_id" }
     );
@@ -237,7 +241,7 @@ export function ModuleList({ className }: ModuleListProps) {
       setVideos((prev) =>
         prev.map((v) =>
           v.id === videoId
-            ? { ...v, watched: false, completed_at: null }
+            ? { ...v, watched: false, watched_at: null }
             : v
         )
       );
@@ -247,16 +251,24 @@ export function ModuleList({ className }: ModuleListProps) {
 
     // Mettre a jour les compteurs du module
     if (selectedModule) {
+      const newCompletedCount = selectedModule.completed_count + 1;
       setModules((prev) =>
         prev.map((m) =>
           m.id === selectedModule.id
-            ? { ...m, completed_count: m.completed_count + 1 }
+            ? { ...m, completed_count: newCompletedCount }
             : m
         )
       );
-    }
 
-    toast.success("Video marquee comme vue !");
+      // Celebration si module termine
+      if (newCompletedCount >= selectedModule.video_count) {
+        toast.success(`Module "${selectedModule.module_name}" termine ! Bravo !`);
+      } else {
+        toast.success("Video marquee comme vue !");
+      }
+    } else {
+      toast.success("Video marquee comme vue !");
+    }
   };
 
   // ---- Retour a la liste ----
@@ -296,7 +308,7 @@ export function ModuleList({ className }: ModuleListProps) {
           </Button>
           <div className="flex-1">
             <h2 className="text-lg font-semibold text-text-primary">
-              {selectedModule.title}
+              {selectedModule.module_name}
             </h2>
             <div className="flex items-center gap-3 mt-1">
               <span className="text-xs text-text-muted">
@@ -475,7 +487,7 @@ export function ModuleList({ className }: ModuleListProps) {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
                         <h3 className="font-semibold text-text-primary">
-                          {mod.title}
+                          {mod.module_name}
                         </h3>
                         {isInProgress && (
                           <Badge variant="default">En cours</Badge>
@@ -485,21 +497,16 @@ export function ModuleList({ className }: ModuleListProps) {
                         )}
                       </div>
                       <p className="text-sm text-text-secondary mb-3">
-                        {mod.description}
+                        {mod.module_description}
                       </p>
                       <div className="flex items-center gap-4">
                         <span className="text-xs text-text-muted">
                           {mod.video_count} lecons
                         </span>
-                        {mod.duration_minutes && (
+                        {mod.total_duration_minutes > 0 && (
                           <span className="text-xs text-text-muted">
-                            {formatDuration(mod.duration_minutes)}
+                            {formatDuration(mod.total_duration_minutes)}
                           </span>
-                        )}
-                        {mod.category && (
-                          <Badge variant="muted" className="text-[10px]">
-                            {mod.category}
-                          </Badge>
                         )}
                         {mod.video_count > 0 && (
                           <div className="flex items-center gap-2 flex-1 max-w-[200px]">

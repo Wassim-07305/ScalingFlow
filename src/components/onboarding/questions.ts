@@ -7,6 +7,7 @@ export type QuestionType =
   | "chips-multi"
   | "multi-field"
   | "skill-matrix"
+  | "parcours-selector"
   | "summary"
   | "market-analysis";
 
@@ -188,40 +189,13 @@ export const QUESTIONS: Question[] = [
     placeholder: "Ton avantage unique...",
   },
 
-  // 14 — Parcours
+  // 14 — Parcours (visual cards with AI recommendation)
   {
     id: "parcours",
-    type: "chips",
+    type: "parcours-selector",
     title: "Quel parcours te correspond ?",
-    subtitle: "L'IA adaptera son accompagnement en consequence.",
+    subtitle: "L'IA recommande un parcours base sur ton profil. Tu peux choisir un autre si tu preferes.",
     field: "parcours",
-    chips: [
-      {
-        value: "A1",
-        label: "Partir de Zero",
-        desc: "Tu n'as jamais lance de business en ligne.",
-      },
-      {
-        value: "A2",
-        label: "Salarie → Freelance",
-        desc: "Tu veux quitter ton job pour te lancer.",
-      },
-      {
-        value: "A3",
-        label: "Freelance → Entrepreneur",
-        desc: "Tu es freelance et veux scaler.",
-      },
-      {
-        value: "B",
-        label: "Scaler",
-        desc: "Tu as deja un business et veux passer au niveau superieur.",
-      },
-      {
-        value: "C",
-        label: "Pivoter",
-        desc: "Tu veux changer de niche ou repositionner ton offre.",
-      },
-    ],
   },
 
   // 15 — Experience

@@ -40,13 +40,11 @@ const SITUATION_LABELS: Record<string, string> = {
   entrepreneur: "Entrepreneur",
 };
 
-const PARCOURS_LABELS: Record<string, string> = {
-  A1: "Partir de Zero",
-  A2: "Salarie → Freelance",
-  A3: "Freelance → Entrepreneur",
-  B: "Scaler",
-  C: "Pivoter",
-};
+import { PARCOURS } from "@/lib/parcours";
+
+const PARCOURS_LABELS: Record<string, string> = Object.fromEntries(
+  Object.entries(PARCOURS).map(([key, def]) => [key, def.label])
+);
 
 const EXPERIENCE_LABELS: Record<string, string> = {
   beginner: "Debutant",

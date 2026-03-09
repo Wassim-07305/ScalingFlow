@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { AILoading } from "@/components/shared/ai-loading";
 import { GlowCard } from "@/components/shared/glow-card";
 import { Sparkles, Image, Video, Target, Copy } from "lucide-react";
+import { UpgradeWall } from "@/components/shared/upgrade-wall";
 
 interface CreativeGeneratorProps {
   className?: string;
@@ -21,6 +22,7 @@ export function CreativeGenerator({ className, initialData }: CreativeGeneratorP
   const [variations, setVariations] = React.useState<any[]>([]);
   const [error, setError] = React.useState<string | null>(null);
   const [copiedIndex, setCopiedIndex] = React.useState<number | null>(null);
+  const [usageLimited, setUsageLimited] = React.useState<{currentUsage: number; limit: number} | null>(null);
 
   React.useEffect(() => {
     if (initialData) {
@@ -47,7 +49,13 @@ export function CreativeGenerator({ className, initialData }: CreativeGeneratorP
         body: JSON.stringify({}),
       });
 
-      if (!response.ok) throw new Error("Erreur lors de la génération");
+      if (!response.ok) {
+        if (response.status === 403) {
+          const errData = await response.json();
+          if (errData.usage) { setUsageLimited(errData.usage); return; }
+        }
+        throw new Error("Erreur lors de la generation");
+      }
       const data = await response.json();
       const raw = data.ai_raw_response || data;
       const creatives = raw.ad_creatives || raw.variations || [];
@@ -72,6 +80,10 @@ export function CreativeGenerator({ className, initialData }: CreativeGeneratorP
     setCopiedIndex(index);
     setTimeout(() => setCopiedIndex(null), 2000);
   };
+
+  if (usageLimited) {
+    return <UpgradeWall currentUsage={usageLimited.currentUsage} limit={usageLimited.limit} className={className} />;
+  }
 
   if (loading) {
     return <AILoading text="Création de tes publicités" className={className} />;

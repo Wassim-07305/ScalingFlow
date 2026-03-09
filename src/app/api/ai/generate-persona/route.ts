@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { checkAIUsage } from "@/lib/stripe/check-usage";
 import { createClient } from "@/lib/supabase/server";
 import { generateJSON } from "@/lib/ai/generate";
 import {
@@ -8,6 +9,8 @@ import {
   type VaultContextData,
 } from "@/lib/ai/prompts/persona-forge";
 import { awardXP } from "@/lib/gamification/xp-engine";
+import { notifyGeneration } from "@/lib/notifications/create";
+import { buildFullVaultContext } from "@/lib/ai/vault-context";
 
 export async function POST(req: NextRequest) {
   try {
@@ -19,6 +22,15 @@ export async function POST(req: NextRequest) {
     if (!user) {
       return NextResponse.json({ error: "Non autorise" }, { status: 401 });
     }
+    // Check AI usage limits
+    const usage = await checkAIUsage(user.id);
+    if (!usage.allowed) {
+      return NextResponse.json(
+        { error: "Limite de generations IA atteinte", usage },
+        { status: 403 }
+      );
+    }
+
 
     const { market_analysis_id } = (await req.json()) as {
       market_analysis_id: string;
@@ -71,10 +83,11 @@ export async function POST(req: NextRequest) {
       parcours: profile?.parcours ?? undefined,
     };
 
-    const prompt = buildPersonaForgePrompt({
-      marketAnalysis: marketData,
-      vaultData,
-    });
+    const [basePrompt, vaultContext] = await Promise.all([
+      Promise.resolve(buildPersonaForgePrompt({ marketAnalysis: marketData, vaultData })),
+      buildFullVaultContext(user.id),
+    ]);
+    const prompt = vaultContext ? basePrompt + "\n" + vaultContext : basePrompt;
 
     const result = await generateJSON<PersonaForgeResult>({
       prompt,
@@ -91,6 +104,7 @@ export async function POST(req: NextRequest) {
 
     // Award XP (non-blocking)
     try { await awardXP(user.id, "generation.persona"); } catch {}
+    try { await notifyGeneration(user.id, "generation.persona"); } catch {}
 
     return NextResponse.json(result);
   } catch (error) {

@@ -10,6 +10,7 @@ import { GlowCard } from "@/components/shared/glow-card";
 import { Sparkles, Copy, ChevronDown, ChevronUp, Clock } from "lucide-react";
 import { toast } from "sonner";
 import type { ReelsScriptsResult } from "@/lib/ai/prompts/reels-scripts";
+import { UpgradeWall } from "@/components/shared/upgrade-wall";
 
 interface ReelsGeneratorProps {
   className?: string;
@@ -31,6 +32,7 @@ export function ReelsGenerator({ className, initialData }: ReelsGeneratorProps) 
   const [batchNumber, setBatchNumber] = React.useState(1);
   const [expandedScript, setExpandedScript] = React.useState<number | null>(null);
   const [copiedIndex, setCopiedIndex] = React.useState<number | null>(null);
+  const [usageLimited, setUsageLimited] = React.useState<{currentUsage: number; limit: number} | null>(null);
 
   React.useEffect(() => {
     if (initialData) {
@@ -51,7 +53,13 @@ export function ReelsGenerator({ className, initialData }: ReelsGeneratorProps) 
         body: JSON.stringify({ contentType: "reels", batchNumber: currentBatch }),
       });
 
-      if (!response.ok) throw new Error("Erreur lors de la generation");
+      if (!response.ok) {
+        if (response.status === 403) {
+          const errData = await response.json();
+          if (errData.usage) { setUsageLimited(errData.usage); return; }
+        }
+        throw new Error("Erreur lors de la generation");
+      }
       const data = await response.json();
       const result = data.result as ReelsScriptsResult;
       setScripts(result.scripts || []);
@@ -77,6 +85,10 @@ export function ReelsGenerator({ className, initialData }: ReelsGeneratorProps) 
     setTimeout(() => setCopiedIndex(null), 2000);
     toast.success("Copie !");
   };
+
+  if (usageLimited) {
+    return <UpgradeWall currentUsage={usageLimited.currentUsage} limit={usageLimited.limit} className={className} />;
+  }
 
   if (loading) {
     return <AILoading text="Generation des scripts Reels" className={className} />;

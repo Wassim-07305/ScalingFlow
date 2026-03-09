@@ -10,6 +10,7 @@ import { GlowCard } from "@/components/shared/glow-card";
 import { Sparkles, Copy, Video, Clock } from "lucide-react";
 import { toast } from "sonner";
 import type { VideoAdScriptResult } from "@/lib/ai/prompts/video-ad-scripts";
+import { UpgradeWall } from "@/components/shared/upgrade-wall";
 
 interface VideoAdGeneratorProps {
   className?: string;
@@ -28,6 +29,7 @@ export function VideoAdGenerator({ className, initialData }: VideoAdGeneratorPro
   const [scripts, setScripts] = React.useState<VideoAdScriptResult["scripts"]>([]);
   const [error, setError] = React.useState<string | null>(null);
   const [copiedIndex, setCopiedIndex] = React.useState<number | null>(null);
+  const [usageLimited, setUsageLimited] = React.useState<{currentUsage: number; limit: number} | null>(null);
 
   React.useEffect(() => {
     if (initialData) {
@@ -47,7 +49,13 @@ export function VideoAdGenerator({ className, initialData }: VideoAdGeneratorPro
         body: JSON.stringify({ adType: "video_ad" }),
       });
 
-      if (!response.ok) throw new Error("Erreur lors de la generation");
+      if (!response.ok) {
+        if (response.status === 403) {
+          const errData = await response.json();
+          if (errData.usage) { setUsageLimited(errData.usage); return; }
+        }
+        throw new Error("Erreur lors de la generation");
+      }
       const data = await response.json();
       const result = data.result as VideoAdScriptResult;
       setScripts(result.scripts || []);
@@ -68,6 +76,10 @@ export function VideoAdGenerator({ className, initialData }: VideoAdGeneratorPro
     setTimeout(() => setCopiedIndex(null), 2000);
     toast.success("Copie !");
   };
+
+  if (usageLimited) {
+    return <UpgradeWall currentUsage={usageLimited.currentUsage} limit={usageLimited.limit} className={className} />;
+  }
 
   if (loading) {
     return <AILoading text="Generation des scripts video" className={className} />;

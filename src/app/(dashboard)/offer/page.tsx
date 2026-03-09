@@ -3,23 +3,22 @@
 import React from "react";
 import { PageHeader } from "@/components/layout/page-header";
 import { OfferGenerator } from "@/components/offer/offer-generator";
-import { OtoGenerator } from "@/components/offer/oto-generator";
 import { CategoryOSWizard } from "@/components/offer/category-os-wizard";
 import { OfferScoreCard } from "@/components/offer/offer-score-card";
-import { DeliveryDesigner } from "@/components/offer/delivery-designer";
 import { GenerationHistory } from "@/components/shared/generation-history";
-import { TabBar } from "@/components/shared/tab-bar";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils/cn";
 import { createClient } from "@/lib/supabase/client";
 import { useUser } from "@/hooks/use-user";
-import { Sparkles, Crosshair, BarChart3, Gift, Settings, History } from "lucide-react";
+import { Sparkles, Crosshair, BarChart3, History, DollarSign } from "lucide-react";
 import { toast } from "sonner";
+import { PricingBuilder } from "@/components/offer/pricing-builder";
 
 const TABS = [
   { key: "generate", label: "Generer", icon: Sparkles },
   { key: "positioning", label: "Positionnement", icon: Crosshair },
+  { key: "pricing", label: "Pricing", icon: DollarSign },
   { key: "score", label: "Score", icon: BarChart3 },
-  { key: "oto", label: "Offre OTO", icon: Gift },
-  { key: "delivery", label: "Delivery", icon: Settings },
   { key: "history", label: "Historique", icon: History },
 ] as const;
 
@@ -31,6 +30,12 @@ export default function OfferPage() {
   const [marketName, setMarketName] = React.useState<string | null>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [loadedData, setLoadedData] = React.useState<any>(null);
+  const [pricingData, setPricingData] = React.useState<{
+    anchorPrice: number;
+    realPrice: number;
+    valueBreakdown: { item: string; value: number }[];
+  }>({ anchorPrice: 0, realPrice: 0, valueBreakdown: [] });
+  const [savingPricing, setSavingPricing] = React.useState(false);
   const supabase = createClient();
 
   // Fetch user's latest offer and market analysis
@@ -51,19 +56,23 @@ export default function OfferPage() {
         setMarketName(market.market_name);
       }
 
-      // Get latest offer
+      // Get latest offer with pricing
       const { data: offers } = await supabase
         .from("offers")
-        .select("id, ai_raw_response, offer_name, positioning, unique_mechanism, pricing_strategy, guarantees, risk_reversal, delivery_structure, oto_offer, delivery_data, full_document")
+        .select("id, pricing_strategy")
         .eq("user_id", user.id)
         .order("created_at", { ascending: false })
         .limit(1);
 
       if (offers && offers.length > 0) {
         setLatestOfferId(offers[0].id);
-        // Auto-load last offer data into generator
-        if (offers[0].ai_raw_response) {
-          setLoadedData(offers[0].ai_raw_response);
+        const ps = offers[0].pricing_strategy as { anchor_price?: number; real_price?: number; value_breakdown?: { item: string; value: number }[] } | null;
+        if (ps) {
+          setPricingData({
+            anchorPrice: ps.anchor_price || 0,
+            realPrice: ps.real_price || 0,
+            valueBreakdown: ps.value_breakdown || [],
+          });
         }
       }
     };
@@ -75,7 +84,7 @@ export default function OfferPage() {
     try {
       const { data, error } = await supabase
         .from("offers")
-        .select("ai_raw_response, offer_name, positioning, unique_mechanism, pricing_strategy, guarantees, risk_reversal, delivery_structure, oto_offer, delivery_data, full_document")
+        .select("ai_raw_response, offer_name, positioning, unique_mechanism, pricing_strategy, guarantees, risk_reversal, delivery_structure, oto_offer, full_document")
         .eq("id", item.id)
         .single();
 
@@ -92,6 +101,32 @@ export default function OfferPage() {
     }
   };
 
+  const handleSavePricing = async () => {
+    if (!latestOfferId) {
+      toast.error("Aucune offre a modifier. Genere d'abord une offre.");
+      return;
+    }
+    setSavingPricing(true);
+    try {
+      const { error } = await supabase
+        .from("offers")
+        .update({
+          pricing_strategy: {
+            anchor_price: pricingData.anchorPrice,
+            real_price: pricingData.realPrice,
+            value_breakdown: pricingData.valueBreakdown,
+          },
+        })
+        .eq("id", latestOfferId);
+      if (error) throw error;
+      toast.success("Strategie de prix sauvegardee !");
+    } catch {
+      toast.error("Erreur lors de la sauvegarde.");
+    } finally {
+      setSavingPricing(false);
+    }
+  };
+
   return (
     <div>
       <PageHeader
@@ -99,7 +134,23 @@ export default function OfferPage() {
         description="Genere ton offre irresistible avec l'IA."
       />
 
-      <TabBar tabs={TABS} activeTab={activeTab} onTabChange={setActiveTab} />
+      <div className="flex gap-2 mb-6">
+        {TABS.map((tab) => (
+          <button
+            key={tab.key}
+            onClick={() => setActiveTab(tab.key)}
+            className={cn(
+              "flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all",
+              activeTab === tab.key
+                ? "bg-accent text-white"
+                : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
+            )}
+          >
+            <tab.icon className="h-4 w-4" />
+            {tab.label}
+          </button>
+        ))}
+      </div>
 
       {activeTab === "generate" && (
         <OfferGenerator
@@ -111,14 +162,21 @@ export default function OfferPage() {
       {activeTab === "positioning" && (
         <CategoryOSWizard offerId={latestOfferId || undefined} />
       )}
+      {activeTab === "pricing" && (
+        <div className="space-y-4">
+          <PricingBuilder
+            anchorPrice={pricingData.anchorPrice}
+            realPrice={pricingData.realPrice}
+            valueBreakdown={pricingData.valueBreakdown}
+            onChange={setPricingData}
+          />
+          <Button onClick={handleSavePricing} disabled={savingPricing || !latestOfferId}>
+            {savingPricing ? "Sauvegarde..." : "Sauvegarder le pricing"}
+          </Button>
+        </div>
+      )}
       {activeTab === "score" && (
         <OfferScoreCard offerId={latestOfferId || undefined} />
-      )}
-      {activeTab === "oto" && (
-        <OtoGenerator offerId={latestOfferId || undefined} initialData={loadedData} />
-      )}
-      {activeTab === "delivery" && (
-        <DeliveryDesigner offerId={latestOfferId || undefined} initialData={loadedData} />
       )}
       {activeTab === "history" && (
         <GenerationHistory

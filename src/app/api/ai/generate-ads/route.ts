@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { checkAIUsage } from "@/lib/stripe/check-usage";
 import { createClient } from "@/lib/supabase/server";
 import { generateJSON } from "@/lib/ai/generate";
 import { adCopyPrompt } from "@/lib/ai/prompts/ad-copy";
@@ -11,7 +12,9 @@ import {
   buildDMScriptsPrompt,
   type DMScriptsResult,
 } from "@/lib/ai/prompts/dm-scripts";
+import { buildFullVaultContext } from "@/lib/ai/vault-context";
 import { awardXP } from "@/lib/gamification/xp-engine";
+import { notifyGeneration } from "@/lib/notifications/create";
 
 export async function POST(req: NextRequest) {
   try {
@@ -23,16 +26,24 @@ export async function POST(req: NextRequest) {
     if (!user) {
       return NextResponse.json({ error: "Non autorise" }, { status: 401 });
     }
+    // Check AI usage limits
+    const usage = await checkAIUsage(user.id);
+    if (!usage.allowed) {
+      return NextResponse.json(
+        { error: "Limite de generations IA atteinte", usage },
+        { status: 403 }
+      );
+    }
+
 
     const body = await req.json();
     const { offerId, adType } = body;
 
-    // Recuperer le profil pour le contexte
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("id", user.id)
-      .single();
+    // Recuperer le profil + vault resources pour le contexte
+    const [{ data: profile }, vaultContext] = await Promise.all([
+      supabase.from("profiles").select("*").eq("id", user.id).single(),
+      buildFullVaultContext(user.id),
+    ]);
 
     // Recuperer la derniere offre si offerId pas fourni
     let offer;
@@ -72,7 +83,7 @@ export async function POST(req: NextRequest) {
 
     // --- Video Ad Scripts ---
     if (adType === "video_ad") {
-      const prompt = buildVideoAdScriptPrompt(offerContext, avatarContext);
+      const prompt = buildVideoAdScriptPrompt(offerContext, avatarContext) + (vaultContext ? "\n" + vaultContext : "");
       const result = await generateJSON<VideoAdScriptResult>({
         prompt,
         maxTokens: 4096,
@@ -94,13 +105,14 @@ export async function POST(req: NextRequest) {
 
       // Award XP (non-blocking)
       try { await awardXP(user.id, "generation.ads"); } catch {}
+    try { await notifyGeneration(user.id, "generation.ads"); } catch {}
 
       return NextResponse.json({ adType: "video_ad", result });
     }
 
     // --- DM Scripts ---
     if (adType === "dm_scripts") {
-      const prompt = buildDMScriptsPrompt(offerContext, avatarContext);
+      const prompt = buildDMScriptsPrompt(offerContext, avatarContext) + (vaultContext ? "\n" + vaultContext : "");
       const result = await generateJSON<DMScriptsResult>({
         prompt,
         maxTokens: 4096,
@@ -122,6 +134,7 @@ export async function POST(req: NextRequest) {
 
       // Award XP (non-blocking)
       try { await awardXP(user.id, "generation.ads"); } catch {}
+    try { await notifyGeneration(user.id, "generation.ads"); } catch {}
 
       return NextResponse.json({ adType: "dm_scripts", result });
     }
@@ -188,6 +201,7 @@ export async function POST(req: NextRequest) {
 
     // Award XP (non-blocking)
     try { await awardXP(user.id, "generation.ads"); } catch {}
+    try { await notifyGeneration(user.id, "generation.ads"); } catch {}
 
     return NextResponse.json({
       ad_creatives: adCreatives,

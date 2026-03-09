@@ -10,6 +10,7 @@ import { GlowCard } from "@/components/shared/glow-card";
 import { Sparkles, Copy, Eye, MessageCircle, GraduationCap, Megaphone, Heart } from "lucide-react";
 import { toast } from "sonner";
 import type { StoriesResult } from "@/lib/ai/prompts/stories-scripts";
+import { UpgradeWall } from "@/components/shared/upgrade-wall";
 
 interface StoriesGeneratorProps {
   className?: string;
@@ -50,6 +51,7 @@ export function StoriesGenerator({ className, initialData }: StoriesGeneratorPro
   const [stories, setStories] = React.useState<StoriesResult["stories"]>([]);
   const [error, setError] = React.useState<string | null>(null);
   const [copiedIndex, setCopiedIndex] = React.useState<number | null>(null);
+  const [usageLimited, setUsageLimited] = React.useState<{currentUsage: number; limit: number} | null>(null);
 
   React.useEffect(() => {
     if (initialData) {
@@ -69,7 +71,13 @@ export function StoriesGenerator({ className, initialData }: StoriesGeneratorPro
         body: JSON.stringify({ contentType: "stories" }),
       });
 
-      if (!response.ok) throw new Error("Erreur lors de la generation");
+      if (!response.ok) {
+        if (response.status === 403) {
+          const errData = await response.json();
+          if (errData.usage) { setUsageLimited(errData.usage); return; }
+        }
+        throw new Error("Erreur lors de la generation");
+      }
       const data = await response.json();
       const result = data.result as StoriesResult;
       setStories(result.stories || []);
@@ -92,6 +100,10 @@ export function StoriesGenerator({ className, initialData }: StoriesGeneratorPro
     setTimeout(() => setCopiedIndex(null), 2000);
     toast.success("Copie !");
   };
+
+  if (usageLimited) {
+    return <UpgradeWall currentUsage={usageLimited.currentUsage} limit={usageLimited.limit} className={className} />;
+  }
 
   if (loading) {
     return <AILoading text="Generation des stories" className={className} />;

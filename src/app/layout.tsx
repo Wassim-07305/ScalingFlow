@@ -3,7 +3,10 @@ import { Providers } from "@/components/providers";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "ScalingFlow — Infrastructure IA Plug & Play",
+  title: {
+    default: "ScalingFlow — Infrastructure IA Plug & Play",
+    template: "%s | ScalingFlow",
+  },
   description:
     "La plateforme tout-en-un pour structurer, lancer et scaler ton business de services IA.",
   manifest: "/manifest.json",
@@ -11,6 +14,28 @@ export const metadata: Metadata = {
     capable: true,
     statusBarStyle: "black-translucent",
     title: "ScalingFlow",
+  },
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://scalingflow.com"),
+  openGraph: {
+    siteName: "ScalingFlow",
+    locale: "fr_FR",
+    type: "website",
+    images: [
+      {
+        url: "/icons/icon-1024.png",
+        width: 1024,
+        height: 1024,
+        alt: "ScalingFlow",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    images: ["/icons/icon-1024.png"],
+  },
+  robots: {
+    index: true,
+    follow: true,
   },
 };
 

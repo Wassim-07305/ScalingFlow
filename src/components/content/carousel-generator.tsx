@@ -12,6 +12,7 @@ import { GlowCard } from "@/components/shared/glow-card";
 import { Sparkles, Copy, Hash, Layers } from "lucide-react";
 import { toast } from "sonner";
 import type { CarouselResult } from "@/lib/ai/prompts/carousel-content";
+import { UpgradeWall } from "@/components/shared/upgrade-wall";
 
 interface CarouselGeneratorProps {
   className?: string;
@@ -25,6 +26,7 @@ export function CarouselGenerator({ className, initialData }: CarouselGeneratorP
   const [error, setError] = React.useState<string | null>(null);
   const [topic, setTopic] = React.useState("");
   const [copiedField, setCopiedField] = React.useState<string | null>(null);
+  const [usageLimited, setUsageLimited] = React.useState<{currentUsage: number; limit: number} | null>(null);
 
   React.useEffect(() => {
     if (initialData) {
@@ -48,7 +50,13 @@ export function CarouselGenerator({ className, initialData }: CarouselGeneratorP
         body: JSON.stringify({ contentType: "carousel", topic }),
       });
 
-      if (!response.ok) throw new Error("Erreur lors de la generation");
+      if (!response.ok) {
+        if (response.status === 403) {
+          const errData = await response.json();
+          if (errData.usage) { setUsageLimited(errData.usage); return; }
+        }
+        throw new Error("Erreur lors de la generation");
+      }
       const data = await response.json();
       setResult(data.result as CarouselResult);
       toast.success("Carousel genere !");
@@ -67,6 +75,10 @@ export function CarouselGenerator({ className, initialData }: CarouselGeneratorP
     setTimeout(() => setCopiedField(null), 2000);
     toast.success("Copie !");
   };
+
+  if (usageLimited) {
+    return <UpgradeWall currentUsage={usageLimited.currentUsage} limit={usageLimited.limit} className={className} />;
+  }
 
   if (loading) {
     return <AILoading text="Generation du carousel" className={className} />;

@@ -15,31 +15,17 @@ export function AILoading({
   return (
     <div
       className={cn(
-        "flex flex-col items-center justify-center gap-5 py-16",
+        "flex flex-col items-center justify-center gap-4 py-12",
         className
       )}
     >
-      {/* Spinner with glow */}
-      <div className="relative w-12 h-12">
-        <motion.div
-          className="absolute inset-0 rounded-full bg-accent/20 blur-xl"
-          animate={{ scale: [1, 1.3, 1], opacity: [0.3, 0.6, 0.3] }}
-          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-        />
+      {/* Spinner */}
+      <div className="relative w-10 h-10">
         <motion.div
           className="absolute inset-0 rounded-full border-2 border-border-default border-t-accent"
           animate={{ rotate: 360 }}
           transition={{
             duration: 1,
-            repeat: Infinity,
-            ease: "linear",
-          }}
-        />
-        <motion.div
-          className="absolute inset-1.5 rounded-full border-2 border-transparent border-b-accent/40"
-          animate={{ rotate: -360 }}
-          transition={{
-            duration: 1.5,
             repeat: Infinity,
             ease: "linear",
           }}

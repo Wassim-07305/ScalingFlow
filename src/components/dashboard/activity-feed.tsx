@@ -162,9 +162,23 @@ export function ActivityFeed() {
             ))}
           </div>
         ) : activities.length === 0 ? (
-          <p className="text-sm text-text-secondary py-6 text-center">
-            Aucune activité encore. Commence par créer ton offre !
-          </p>
+          <div className="flex flex-col items-center justify-center py-8 text-center">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-accent/10 mb-3">
+              <Zap className="h-6 w-6 text-accent" />
+            </div>
+            <p className="text-sm font-medium text-text-primary mb-1">
+              Pas encore d&apos;activité
+            </p>
+            <p className="text-xs text-text-muted mb-4">
+              Ton historique apparaîtra ici dès ta première génération.
+            </p>
+            <a
+              href="/offer"
+              className="text-xs font-medium text-accent hover:underline"
+            >
+              Créer ta première offre →
+            </a>
+          </div>
         ) : (
           <div className="space-y-1">
             {activities.map((a) => {

@@ -23,8 +23,10 @@ export function SubscriptionCard() {
 
   const isActive = profile?.subscription_status === "active";
 
-  // Determiner le plan actuel (par defaut "free" si pas d'abonnement actif)
-  const currentPlanId = isActive ? "pro" : "free";
+  // Determiner le plan actuel
+  const currentPlanId = isActive
+    ? (profile?.subscription_plan || "pro")
+    : "free";
   const currentPlan = getPlanById(currentPlanId);
   const freePlan = PLANS[0];
 

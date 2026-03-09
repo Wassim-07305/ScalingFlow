@@ -7,10 +7,12 @@ import { MilestoneTracker } from "@/components/roadmap/milestone-tracker";
 import { Button } from "@/components/ui/button";
 import { Sparkles, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { UpgradeWall } from "@/components/shared/upgrade-wall";
 
 export default function RoadmapPage() {
   const [generating, setGenerating] = React.useState(false);
   const [refreshKey, setRefreshKey] = React.useState(0);
+  const [usageLimited, setUsageLimited] = React.useState<{currentUsage: number; limit: number} | null>(null);
 
   const handleGenerate = async () => {
     setGenerating(true);
@@ -22,8 +24,9 @@ export default function RoadmapPage() {
       });
 
       if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.error || "Erreur lors de la generation");
+        const errData = await res.json().catch(() => ({}));
+        if (res.status === 403 && errData.usage) { setUsageLimited(errData.usage); return; }
+        throw new Error(errData.error || "Erreur lors de la generation");
       }
 
       const data = await res.json();
@@ -41,6 +44,10 @@ export default function RoadmapPage() {
       setGenerating(false);
     }
   };
+
+  if (usageLimited) {
+    return <UpgradeWall currentUsage={usageLimited.currentUsage} limit={usageLimited.limit} />;
+  }
 
   return (
     <div>

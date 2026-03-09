@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
+import { checkAIUsage } from "@/lib/stripe/check-usage";
 import { createClient } from "@/lib/supabase/server";
 import { generateJSON } from "@/lib/ai/generate";
 import { funnelCopyPrompt } from "@/lib/ai/prompts/funnel-copy";
 import { awardXP } from "@/lib/gamification/xp-engine";
+import { notifyGeneration } from "@/lib/notifications/create";
+import { buildFullVaultContext } from "@/lib/ai/vault-context";
 
 export async function POST(req: NextRequest) {
   try {
@@ -14,6 +17,15 @@ export async function POST(req: NextRequest) {
     if (!user) {
       return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
     }
+    // Check AI usage limits
+    const usage = await checkAIUsage(user.id);
+    if (!usage.allowed) {
+      return NextResponse.json(
+        { error: "Limite de generations IA atteinte", usage },
+        { status: 403 }
+      );
+    }
+
 
     const body = await req.json();
     const { offerId } = body;
@@ -44,7 +56,8 @@ export async function POST(req: NextRequest) {
     const avatar = offer.market_analyses?.avatar || {};
 
     // Generate funnel copy using AI
-    const prompt = funnelCopyPrompt(
+    const vaultContext = await buildFullVaultContext(user.id);
+    const basePrompt = funnelCopyPrompt(
       {
         offer_name: offer.offer_name,
         positioning: offer.positioning,
@@ -52,6 +65,7 @@ export async function POST(req: NextRequest) {
       },
       avatar
     );
+    const prompt = vaultContext ? basePrompt + "\n" + vaultContext : basePrompt;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const generatedFunnel: any = await generateJSON({ prompt, maxTokens: 4096 });
 
@@ -80,6 +94,7 @@ export async function POST(req: NextRequest) {
 
     // Award XP (non-blocking)
     try { await awardXP(user.id, "generation.funnel"); } catch {}
+    try { await notifyGeneration(user.id, "generation.funnel"); } catch {}
 
     return NextResponse.json(funnel);
   } catch (error) {

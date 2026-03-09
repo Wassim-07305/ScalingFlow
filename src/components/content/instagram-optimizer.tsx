@@ -10,6 +10,7 @@ import { GlowCard } from "@/components/shared/glow-card";
 import { Sparkles, Copy, Instagram, User, Link, LayoutGrid, Star, Bookmark } from "lucide-react";
 import { toast } from "sonner";
 import type { InstagramProfileResult } from "@/lib/ai/prompts/instagram-profile";
+import { UpgradeWall } from "@/components/shared/upgrade-wall";
 
 interface InstagramOptimizerProps {
   className?: string;
@@ -22,6 +23,7 @@ export function InstagramOptimizer({ className, initialData }: InstagramOptimize
   const [result, setResult] = React.useState<InstagramProfileResult | null>(null);
   const [error, setError] = React.useState<string | null>(null);
   const [copiedField, setCopiedField] = React.useState<string | null>(null);
+  const [usageLimited, setUsageLimited] = React.useState<{currentUsage: number; limit: number} | null>(null);
 
   React.useEffect(() => {
     if (initialData) {
@@ -40,7 +42,13 @@ export function InstagramOptimizer({ className, initialData }: InstagramOptimize
         body: JSON.stringify({}),
       });
 
-      if (!response.ok) throw new Error("Erreur lors de l'optimisation");
+      if (!response.ok) {
+        if (response.status === 403) {
+          const errData = await response.json();
+          if (errData.usage) { setUsageLimited(errData.usage); return; }
+        }
+        throw new Error("Erreur lors de la generation");
+      }
       const data = await response.json();
       setResult(data.result as InstagramProfileResult);
       toast.success("Profil Instagram optimise !");
@@ -59,6 +67,10 @@ export function InstagramOptimizer({ className, initialData }: InstagramOptimize
     setTimeout(() => setCopiedField(null), 2000);
     toast.success("Copie !");
   };
+
+  if (usageLimited) {
+    return <UpgradeWall currentUsage={usageLimited.currentUsage} limit={usageLimited.limit} className={className} />;
+  }
 
   if (loading) {
     return <AILoading text="Optimisation du profil Instagram" className={className} />;

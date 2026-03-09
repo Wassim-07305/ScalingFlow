@@ -2,7 +2,7 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 export async function updateSession(request: NextRequest) {
-  const publicRoutes = ["/login", "/register"];
+  const publicRoutes = ["/login", "/register", "/welcome", "/forgot-password", "/reset-password"];
   const isPublicRoute = publicRoutes.some(
     (route) => request.nextUrl.pathname === route
   );
@@ -20,7 +20,7 @@ export async function updateSession(request: NextRequest) {
     if (!supabaseUrl || !supabaseKey) {
       if (!isPublicRoute) {
         const url = request.nextUrl.clone();
-        url.pathname = "/login";
+        url.pathname = "/welcome";
         return NextResponse.redirect(url);
       }
       return supabaseResponse;
@@ -49,10 +49,10 @@ export async function updateSession(request: NextRequest) {
       data: { user },
     } = await supabase.auth.getUser();
 
-    // Redirect unauthenticated users to login
+    // Redirect unauthenticated users to landing page
     if (!user && !isPublicRoute) {
       const url = request.nextUrl.clone();
-      url.pathname = "/login";
+      url.pathname = "/welcome";
       return NextResponse.redirect(url);
     }
 
@@ -87,7 +87,7 @@ export async function updateSession(request: NextRequest) {
   } catch {
     if (!isPublicRoute) {
       const url = request.nextUrl.clone();
-      url.pathname = "/login";
+      url.pathname = "/welcome";
       return NextResponse.redirect(url);
     }
   }

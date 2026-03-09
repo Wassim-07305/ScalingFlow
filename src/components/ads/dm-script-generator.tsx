@@ -10,6 +10,7 @@ import { GlowCard } from "@/components/shared/glow-card";
 import { Sparkles, Copy, MessageSquare, Send, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
 import type { DMScriptsResult } from "@/lib/ai/prompts/dm-scripts";
+import { UpgradeWall } from "@/components/shared/upgrade-wall";
 
 interface DMScriptGeneratorProps {
   className?: string;
@@ -23,6 +24,7 @@ export function DMScriptGenerator({ className, initialData }: DMScriptGeneratorP
   const [error, setError] = React.useState<string | null>(null);
   const [activeSubTab, setActiveSubTab] = React.useState<"prospection" | "retargeting">("prospection");
   const [copiedField, setCopiedField] = React.useState<string | null>(null);
+  const [usageLimited, setUsageLimited] = React.useState<{currentUsage: number; limit: number} | null>(null);
 
   React.useEffect(() => {
     if (initialData) {
@@ -41,7 +43,13 @@ export function DMScriptGenerator({ className, initialData }: DMScriptGeneratorP
         body: JSON.stringify({ adType: "dm_scripts" }),
       });
 
-      if (!response.ok) throw new Error("Erreur lors de la generation");
+      if (!response.ok) {
+        if (response.status === 403) {
+          const errData = await response.json();
+          if (errData.usage) { setUsageLimited(errData.usage); return; }
+        }
+        throw new Error("Erreur lors de la generation");
+      }
       const data = await response.json();
       setResult(data.result as DMScriptsResult);
       toast.success("Scripts DM generes !");
@@ -60,6 +68,10 @@ export function DMScriptGenerator({ className, initialData }: DMScriptGeneratorP
     setTimeout(() => setCopiedField(null), 2000);
     toast.success("Copie !");
   };
+
+  if (usageLimited) {
+    return <UpgradeWall currentUsage={usageLimited.currentUsage} limit={usageLimited.limit} className={className} />;
+  }
 
   if (loading) {
     return <AILoading text="Generation des scripts DM" className={className} />;

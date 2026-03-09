@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AILoading } from "@/components/shared/ai-loading";
 import { Sparkles, Mail, ChevronDown, ChevronUp } from "lucide-react";
+import { CopyExportBar } from "@/components/shared/copy-export-bar";
+import { UpgradeWall } from "@/components/shared/upgrade-wall";
 
 interface EmailSequenceProps {
   className?: string;
@@ -20,6 +22,7 @@ export function EmailSequence({ className, initialData }: EmailSequenceProps) {
   const [sequence, setSequence] = React.useState<any>(initialData || null);
   const [error, setError] = React.useState<string | null>(null);
   const [expandedEmail, setExpandedEmail] = React.useState<number | null>(0);
+  const [usageLimited, setUsageLimited] = React.useState<{currentUsage: number; limit: number} | null>(null);
 
   React.useEffect(() => {
     if (initialData) setSequence(initialData);
@@ -36,7 +39,13 @@ export function EmailSequence({ className, initialData }: EmailSequenceProps) {
         body: JSON.stringify({ type: "email" }),
       });
 
-      if (!response.ok) throw new Error("Erreur lors de la génération");
+      if (!response.ok) {
+        if (response.status === 403) {
+          const errData = await response.json();
+          if (errData.usage) { setUsageLimited(errData.usage); return; }
+        }
+        throw new Error("Erreur lors de la generation");
+      }
       const data = await response.json();
       setSequence(data.ai_raw_response || data);
     } catch (err) {
@@ -45,6 +54,10 @@ export function EmailSequence({ className, initialData }: EmailSequenceProps) {
       setLoading(false);
     }
   };
+
+  if (usageLimited) {
+    return <UpgradeWall currentUsage={usageLimited.currentUsage} limit={usageLimited.limit} className={className} />;
+  }
 
   if (loading) {
     return <AILoading text="Rédaction de ta séquence email" className={className} />;
@@ -65,13 +78,28 @@ export function EmailSequence({ className, initialData }: EmailSequenceProps) {
 
   const emails = sequence.emails || [];
 
+  const fullEmailText = emails
+    .map((e: { day: number; subject: string; body: string; cta_text: string }) =>
+      `## Email Jour ${e.day} — ${e.subject}\n\n${e.body}\n\nCTA: ${e.cta_text}`
+    )
+    .join("\n\n---\n\n");
+
   return (
     <div className={cn("space-y-4", className)}>
-      <div className="flex items-center gap-3">
-        <h3 className="font-semibold text-text-primary">
-          {sequence.sequence_name || "Séquence Email"}
-        </h3>
-        <Badge variant="blue">{emails.length} emails</Badge>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <h3 className="font-semibold text-text-primary">
+            {sequence.sequence_name || "Séquence Email"}
+          </h3>
+          <Badge variant="blue">{emails.length} emails</Badge>
+        </div>
+        <CopyExportBar
+          copyContent={fullEmailText}
+          pdfTitle={sequence.sequence_name || "Séquence Email"}
+          pdfSubtitle={`${emails.length} emails`}
+          pdfContent={fullEmailText}
+          pdfFilename="sequence-email.pdf"
+        />
       </div>
 
       <div className="relative space-y-3">

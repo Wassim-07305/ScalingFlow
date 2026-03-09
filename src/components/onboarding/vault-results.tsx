@@ -26,10 +26,11 @@ import { Button } from "@/components/ui/button";
 import { ViabilityScore } from "@/components/onboarding/viability-score";
 import { cn } from "@/lib/utils/cn";
 import type { VaultAnalysis } from "@/lib/ai/prompts/vault-analysis";
+import { PARCOURS } from "@/lib/parcours";
 
 interface VaultResultsProps {
   analysis: VaultAnalysis;
-  onContinue: () => void;
+  onContinue?: () => void;
 }
 
 const radarLabels: Record<string, string> = {
@@ -47,13 +48,9 @@ const funnelLabels: Record<string, string> = {
   hybride: "Hybride (VSL + Social)",
 };
 
-const parcoursLabels: Record<string, string> = {
-  A1: "Freelance",
-  A2: "Agence",
-  A3: "SaaS / Produit",
-  B: "Formateur / Coach",
-  C: "E-commerce",
-};
+const parcoursLabels: Record<string, string> = Object.fromEntries(
+  Object.entries(PARCOURS).map(([key, def]) => [key, def.label])
+);
 
 const potentielVariant: Record<string, "default" | "yellow" | "red"> = {
   fort: "default",
@@ -327,12 +324,14 @@ export function VaultResults({ analysis, onContinue }: VaultResultsProps) {
       </Card>
 
       {/* Bouton Continuer */}
-      <div className="flex justify-center pb-8">
-        <Button size="lg" onClick={onContinue} className="gap-2">
-          Continuer
-          <ArrowRight className="h-4 w-4" />
-        </Button>
-      </div>
+      {onContinue && (
+        <div className="flex justify-center pb-8">
+          <Button size="lg" onClick={onContinue} className="gap-2">
+            Continuer
+            <ArrowRight className="h-4 w-4" />
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

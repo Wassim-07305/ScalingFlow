@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { checkAIUsage } from "@/lib/stripe/check-usage";
 import { createClient } from "@/lib/supabase/server";
 import { generateJSON } from "@/lib/ai/generate";
 import { contentIdeasPrompt } from "@/lib/ai/prompts/content-ideas";
@@ -22,7 +23,9 @@ import {
   buildCarouselPrompt,
   type CarouselResult,
 } from "@/lib/ai/prompts/carousel-content";
+import { buildFullVaultContext } from "@/lib/ai/vault-context";
 import { awardXP } from "@/lib/gamification/xp-engine";
+import { notifyGeneration } from "@/lib/notifications/create";
 
 export async function POST(req: NextRequest) {
   try {
@@ -34,16 +37,24 @@ export async function POST(req: NextRequest) {
     if (!user) {
       return NextResponse.json({ error: "Non autorise" }, { status: 401 });
     }
+    // Check AI usage limits
+    const usage = await checkAIUsage(user.id);
+    if (!usage.allowed) {
+      return NextResponse.json(
+        { error: "Limite de generations IA atteinte", usage },
+        { status: 403 }
+      );
+    }
+
 
     const body = await req.json();
     const { contentType, market, platform, topic, batchNumber } = body;
 
-    // Recuperer le profil + donnees du marche pour les prompts avances
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("id", user.id)
-      .single();
+    // Recuperer le profil + vault resources pour les prompts avances
+    const [{ data: profile }, vaultContext] = await Promise.all([
+      supabase.from("profiles").select("*").eq("id", user.id).single(),
+      buildFullVaultContext(user.id),
+    ]);
 
     const { data: latestAnalysis } = await supabase
       .from("market_analyses")
@@ -60,6 +71,9 @@ export async function POST(req: NextRequest) {
       .order("created_at", { ascending: false })
       .limit(1)
       .single();
+
+    // Helper to enrich prompts with vault resources
+    const withVault = (prompt: string) => vaultContext ? prompt + "\n" + vaultContext : prompt;
 
     const marketContext =
       market || latestAnalysis?.market || profile?.target_market || "Freelances et consultants IA";
@@ -78,12 +92,12 @@ export async function POST(req: NextRequest) {
 
     // --- Strategie de contenu ---
     if (contentType === "strategy") {
-      const prompt = buildContentStrategyPrompt(
+      const prompt = withVault(buildContentStrategyPrompt(
         marketContext,
         offerContext,
         personaContext,
         parcoursContext
-      );
+      ));
       const result = await generateJSON<ContentStrategyResult>({
         prompt,
         maxTokens: 8192,
@@ -109,18 +123,19 @@ export async function POST(req: NextRequest) {
 
       // Award XP (non-blocking)
       try { await awardXP(user.id, "generation.content_strategy"); } catch {}
+    try { await notifyGeneration(user.id, "generation.content_strategy"); } catch {}
 
       return NextResponse.json({ contentType: "strategy", result });
     }
 
     // --- Scripts Reels ---
     if (contentType === "reels") {
-      const prompt = buildReelsScriptsPrompt(
+      const prompt = withVault(buildReelsScriptsPrompt(
         marketContext,
         offerContext,
         personaContext,
         batchNumber || 1
-      );
+      ));
       const result = await generateJSON<ReelsScriptsResult>({
         prompt,
         maxTokens: 8192,
@@ -141,6 +156,7 @@ export async function POST(req: NextRequest) {
 
       // Award XP (non-blocking)
       try { await awardXP(user.id, "generation.reels"); } catch {}
+    try { await notifyGeneration(user.id, "generation.reels"); } catch {}
 
       return NextResponse.json({ contentType: "reels", result });
     }
@@ -153,7 +169,7 @@ export async function POST(req: NextRequest) {
           { status: 400 }
         );
       }
-      const prompt = buildYouTubeScriptPrompt(marketContext, offerContext, topic);
+      const prompt = withVault(buildYouTubeScriptPrompt(marketContext, offerContext, topic));
       const result = await generateJSON<YouTubeScriptResult>({
         prompt,
         maxTokens: 8192,
@@ -171,13 +187,14 @@ export async function POST(req: NextRequest) {
 
       // Award XP (non-blocking)
       try { await awardXP(user.id, "generation.youtube"); } catch {}
+    try { await notifyGeneration(user.id, "generation.youtube"); } catch {}
 
       return NextResponse.json({ contentType: "youtube", result });
     }
 
     // --- Stories ---
     if (contentType === "stories") {
-      const prompt = buildStoriesPrompt(marketContext, offerContext);
+      const prompt = withVault(buildStoriesPrompt(marketContext, offerContext));
       const result = await generateJSON<StoriesResult>({
         prompt,
         maxTokens: 4096,
@@ -195,6 +212,7 @@ export async function POST(req: NextRequest) {
 
       // Award XP (non-blocking)
       try { await awardXP(user.id, "generation.stories"); } catch {}
+    try { await notifyGeneration(user.id, "generation.stories"); } catch {}
 
       return NextResponse.json({ contentType: "stories", result });
     }
@@ -207,7 +225,7 @@ export async function POST(req: NextRequest) {
           { status: 400 }
         );
       }
-      const prompt = buildCarouselPrompt(marketContext, offerContext, topic);
+      const prompt = withVault(buildCarouselPrompt(marketContext, offerContext, topic));
       const result = await generateJSON<CarouselResult>({
         prompt,
         maxTokens: 4096,
@@ -225,6 +243,7 @@ export async function POST(req: NextRequest) {
 
       // Award XP (non-blocking)
       try { await awardXP(user.id, "generation.carousel"); } catch {}
+    try { await notifyGeneration(user.id, "generation.carousel"); } catch {}
 
       return NextResponse.json({ contentType: "carousel", result });
     }
@@ -257,12 +276,13 @@ export async function POST(req: NextRequest) {
     }
 
     // Generate content ideas using AI
-    const prompt = contentIdeasPrompt(marketContext, platform);
+    const prompt = withVault(contentIdeasPrompt(marketContext, platform));
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const generatedContent: any = await generateJSON({ prompt, maxTokens: 4096 });
 
     // Award XP (non-blocking)
     try { await awardXP(user.id, "generation.content_strategy"); } catch {}
+    try { await notifyGeneration(user.id, "generation.content_strategy"); } catch {}
 
     return NextResponse.json({
       market: marketContext,

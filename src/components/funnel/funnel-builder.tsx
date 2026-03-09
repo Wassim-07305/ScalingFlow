@@ -9,6 +9,7 @@ import { AILoading } from "@/components/shared/ai-loading";
 import { GlowCard } from "@/components/shared/glow-card";
 import { Sparkles, FileText, Video, Gift, ChevronRight, FileDown } from "lucide-react";
 import { exportToPDF } from "@/lib/utils/export-pdf";
+import { UpgradeWall } from "@/components/shared/upgrade-wall";
 
 interface FunnelPage {
   type: "optin" | "vsl" | "thankyou";
@@ -38,6 +39,7 @@ export function FunnelBuilder({ className, initialData }: FunnelBuilderProps) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [offers, setOffers] = React.useState<any[]>([]);
   const [selectedOfferId, setSelectedOfferId] = React.useState<string | null>(null);
+  const [usageLimited, setUsageLimited] = React.useState<{currentUsage: number; limit: number} | null>(null);
 
   // Charger les donnees historiques quand initialData change
   React.useEffect(() => {
@@ -79,7 +81,13 @@ export function FunnelBuilder({ className, initialData }: FunnelBuilderProps) {
         body: JSON.stringify({ offerId: selectedOfferId }),
       });
 
-      if (!response.ok) throw new Error("Erreur lors de la génération");
+      if (!response.ok) {
+        if (response.status === 403) {
+          const errData = await response.json();
+          if (errData.usage) { setUsageLimited(errData.usage); return; }
+        }
+        throw new Error("Erreur lors de la generation");
+      }
       const data = await response.json();
       setFunnelData(data.funnel_data || data);
     } catch (err) {
@@ -88,6 +96,10 @@ export function FunnelBuilder({ className, initialData }: FunnelBuilderProps) {
       setLoading(false);
     }
   };
+
+  if (usageLimited) {
+    return <UpgradeWall currentUsage={usageLimited.currentUsage} limit={usageLimited.limit} className={className} />;
+  }
 
   if (loading) {
     return <AILoading text="Création de ton funnel de conversion" className={className} />;

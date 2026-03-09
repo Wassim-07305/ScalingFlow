@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { checkAIUsage } from "@/lib/stripe/check-usage";
 import { createClient } from "@/lib/supabase/server";
 import { generateJSON } from "@/lib/ai/generate";
 import { vslScriptPrompt } from "@/lib/ai/prompts/vsl-script";
@@ -11,6 +12,8 @@ import { salesLetterPrompt } from "@/lib/ai/prompts/sales-letter";
 import { settingScriptPrompt } from "@/lib/ai/prompts/setting-script";
 import { leadMagnetPrompt } from "@/lib/ai/prompts/lead-magnet";
 import { awardXP } from "@/lib/gamification/xp-engine";
+import { notifyGeneration } from "@/lib/notifications/create";
+import { buildFullVaultContext } from "@/lib/ai/vault-context";
 
 type AssetType =
   | "vsl_script"
@@ -45,6 +48,15 @@ export async function POST(req: NextRequest) {
     if (!user) {
       return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
     }
+    // Check AI usage limits
+    const usage = await checkAIUsage(user.id);
+    if (!usage.allowed) {
+      return NextResponse.json(
+        { error: "Limite de generations IA atteinte", usage },
+        { status: 403 }
+      );
+    }
+
 
     const body = await req.json();
     let { offerId, assetType } = body;
@@ -189,6 +201,12 @@ export async function POST(req: NextRequest) {
           { error: "Type d'asset non supporté" },
           { status: 400 }
         );
+    }
+
+    // Inject vault context
+    const vaultContext = await buildFullVaultContext(user.id);
+    if (vaultContext) {
+      prompt = prompt + "\n" + vaultContext;
     }
 
     // Generate asset using AI

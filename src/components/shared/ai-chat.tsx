@@ -10,6 +10,63 @@ interface ChatMessage {
   content: string;
 }
 
+function renderMarkdown(text: string): React.ReactNode {
+  // Split by code blocks first
+  const parts = text.split(/(```[\s\S]*?```)/g);
+
+  return parts.map((part, i) => {
+    // Code blocks
+    if (part.startsWith("```")) {
+      const match = part.match(/```(\w+)?\n?([\s\S]*?)```/);
+      const code = match?.[2]?.trim() || part.slice(3, -3).trim();
+      return (
+        <pre key={i} className="bg-bg-primary rounded-lg p-3 my-2 overflow-x-auto text-xs font-mono border border-border-default">
+          <code>{code}</code>
+        </pre>
+      );
+    }
+
+    // Process inline markdown line by line
+    const lines = part.split("\n");
+    return lines.map((line, j) => {
+      const key = `${i}-${j}`;
+
+      // Headings
+      if (line.startsWith("### ")) return <h4 key={key} className="font-semibold text-text-primary mt-3 mb-1">{line.slice(4)}</h4>;
+      if (line.startsWith("## ")) return <h3 key={key} className="font-bold text-text-primary mt-3 mb-1">{line.slice(3)}</h3>;
+
+      // Bullet lists
+      if (/^[-*] /.test(line)) {
+        return <div key={key} className="flex gap-2 ml-2"><span className="text-accent">&#x2022;</span><span>{formatInline(line.slice(2))}</span></div>;
+      }
+
+      // Numbered lists
+      const numMatch = line.match(/^(\d+)\. /);
+      if (numMatch) {
+        return <div key={key} className="flex gap-2 ml-2"><span className="text-accent font-medium">{numMatch[1]}.</span><span>{formatInline(line.slice(numMatch[0].length))}</span></div>;
+      }
+
+      // Empty lines
+      if (!line.trim()) return <br key={key} />;
+
+      // Regular text
+      return <span key={key}>{formatInline(line)}{j < lines.length - 1 ? "\n" : ""}</span>;
+    });
+  });
+}
+
+function formatInline(text: string): React.ReactNode {
+  // Bold + inline code
+  const parts = text.split(/(\*\*[^*]+\*\*|`[^`]+`)/g);
+  return parts.map((p, i) => {
+    if (p.startsWith("**") && p.endsWith("**"))
+      return <strong key={i} className="font-semibold text-text-primary">{p.slice(2, -2)}</strong>;
+    if (p.startsWith("`") && p.endsWith("`"))
+      return <code key={i} className="bg-bg-primary px-1.5 py-0.5 rounded text-xs font-mono text-accent">{p.slice(1, -1)}</code>;
+    return p;
+  });
+}
+
 interface AIChatProps {
   agentType: string;
   agentName: string;
@@ -134,7 +191,9 @@ export function AIChat({ agentType, agentName, className }: AIChatProps) {
                   : "bg-bg-tertiary text-text-primary"
               )}
             >
-              <p className="whitespace-pre-wrap">{msg.content}</p>
+              <div className="whitespace-pre-wrap">
+                {msg.role === "assistant" ? renderMarkdown(msg.content) : msg.content}
+              </div>
               {msg.role === "assistant" &&
                 msg.content === "" &&
                 isStreaming && (

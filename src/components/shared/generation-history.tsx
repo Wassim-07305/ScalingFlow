@@ -140,9 +140,12 @@ export function GenerationHistory({
 
   if (items.length === 0) {
     return (
-      <div className={cn("text-center py-12", className)}>
-        <Inbox className="h-12 w-12 text-text-muted mx-auto mb-3" />
-        <p className="text-text-secondary">{emptyMessage}</p>
+      <div className={cn("flex flex-col items-center justify-center text-center py-12", className)}>
+        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-accent/10 mb-4">
+          <Inbox className="h-7 w-7 text-accent" />
+        </div>
+        <p className="text-sm font-medium text-text-primary mb-1">Aucun historique</p>
+        <p className="text-sm text-text-muted max-w-xs">{emptyMessage}</p>
       </div>
     );
   }
@@ -153,8 +156,8 @@ export function GenerationHistory({
         <Card
           key={item.id}
           className={cn(
-            "transition-all duration-200 group",
-            onSelect && "cursor-pointer hover:border-accent/20 hover:shadow-md hover:shadow-accent/5"
+            "transition-all",
+            onSelect && "cursor-pointer hover:border-border-hover"
           )}
           onClick={() => onSelect?.(item)}
         >
@@ -185,7 +188,7 @@ export function GenerationHistory({
                   </Badge>
                 )}
                 {onSelect && (
-                  <ChevronRight className="h-4 w-4 text-text-muted transition-transform group-hover:translate-x-0.5 group-hover:text-accent" />
+                  <ChevronRight className="h-4 w-4 text-text-muted" />
                 )}
               </div>
             </div>

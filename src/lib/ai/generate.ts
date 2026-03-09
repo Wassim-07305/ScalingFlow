@@ -1,6 +1,6 @@
 import { AI_MODEL } from "./anthropic";
 
-const GROQ_BASE_URL = "https://api.groq.com/openai/v1";
+const OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1";
 const MAX_RETRIES = 3;
 const RETRY_DELAY_MS = 1000;
 
@@ -11,19 +11,19 @@ interface GenerateOptions {
   temperature?: number;
 }
 
-interface GroqChatResponse {
+interface ChatResponse {
   choices: { message: { content: string }; finish_reason: string }[];
 }
 
-async function groqFetch(body: Record<string, unknown>): Promise<GroqChatResponse> {
+async function openRouterFetch(body: Record<string, unknown>): Promise<ChatResponse> {
   let lastError: unknown;
 
   for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
     try {
-      const res = await fetch(`${GROQ_BASE_URL}/chat/completions`, {
+      const res = await fetch(`${OPENROUTER_BASE_URL}/chat/completions`, {
         method: "POST",
         headers: {
-          "Authorization": `Bearer ${process.env.GROQ_API_KEY}`,
+          "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify(body),
@@ -31,16 +31,16 @@ async function groqFetch(body: Record<string, unknown>): Promise<GroqChatRespons
 
       if (!res.ok) {
         const errBody = await res.text();
-        throw new Error(`Groq API ${res.status}: ${errBody}`);
+        throw new Error(`OpenRouter API ${res.status}: ${errBody}`);
       }
 
-      return (await res.json()) as GroqChatResponse;
+      return (await res.json()) as ChatResponse;
     } catch (err) {
       lastError = err;
       const msg = err instanceof Error ? err.message : String(err);
       const isRetryable = /connection|timeout|econnreset|socket|network|fetch failed/i.test(msg);
       if (!isRetryable || attempt === MAX_RETRIES - 1) throw err;
-      console.warn(`Groq retry ${attempt + 1}/${MAX_RETRIES}: ${msg}`);
+      console.warn(`OpenRouter retry ${attempt + 1}/${MAX_RETRIES}: ${msg}`);
       await new Promise((r) => setTimeout(r, RETRY_DELAY_MS * (attempt + 1)));
     }
   }
@@ -60,7 +60,7 @@ export async function generateText({
   }
   messages.push({ role: "user", content: prompt });
 
-  const data = await groqFetch({
+  const data = await openRouterFetch({
     model: AI_MODEL,
     max_tokens: maxTokens,
     temperature,
@@ -94,7 +94,6 @@ export async function generateJSON<T>({
   let jsonStr = jsonMatch ? jsonMatch[1].trim() : text.trim();
 
   // Sanitize unescaped control characters inside JSON string values
-  // Groq/Llama sometimes returns newlines/tabs inside string literals
   jsonStr = jsonStr.replace(
     /"(?:[^"\\]|\\.)*"/g,
     (match) => match.replace(/[\x00-\x1f]/g, (ch) => {
@@ -140,10 +139,10 @@ export async function* streamText({
   }
   messages.push({ role: "user", content: prompt });
 
-  const res = await fetch(`${GROQ_BASE_URL}/chat/completions`, {
+  const res = await fetch(`${OPENROUTER_BASE_URL}/chat/completions`, {
     method: "POST",
     headers: {
-      "Authorization": `Bearer ${process.env.GROQ_API_KEY}`,
+      "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
@@ -156,7 +155,7 @@ export async function* streamText({
   });
 
   if (!res.ok || !res.body) {
-    throw new Error(`Groq stream error: ${res.status}`);
+    throw new Error(`OpenRouter stream error: ${res.status}`);
   }
 
   const reader = res.body.getReader();

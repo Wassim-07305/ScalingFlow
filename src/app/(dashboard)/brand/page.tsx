@@ -26,6 +26,7 @@ import {
 import { toast } from "sonner";
 import { GenerationHistory } from "@/components/shared/generation-history";
 import type { BrandIdentityResult } from "@/lib/ai/prompts/brand-identity";
+import { UpgradeWall } from "@/components/shared/upgrade-wall";
 
 const TABS = [
   { key: "nom", label: "Nom", icon: Type },
@@ -44,6 +45,7 @@ export default function BrandPage() {
   const [selectedName, setSelectedName] = React.useState<string | null>(null);
   const [generated, setGenerated] = React.useState<BrandIdentityResult | null>(null);
   const [offerId, setOfferId] = React.useState<string | null>(null);
+  const [usageLimited, setUsageLimited] = React.useState<{currentUsage: number; limit: number} | null>(null);
 
   // Fetch existing brand identity
   React.useEffect(() => {
@@ -143,8 +145,9 @@ export default function BrandPage() {
       });
 
       if (!response.ok) {
-        const err = await response.json();
-        throw new Error(err.error || "Erreur lors de la generation");
+        const errData = await response.json().catch(() => ({}));
+        if (response.status === 403 && errData.usage) { setUsageLimited(errData.usage); return; }
+        throw new Error(errData.error || "Erreur lors de la generation");
       }
 
       const data = await response.json();
@@ -219,6 +222,10 @@ export default function BrandPage() {
       toast.error("Erreur lors du chargement");
     }
   };
+
+  if (usageLimited) {
+    return <UpgradeWall currentUsage={usageLimited.currentUsage} limit={usageLimited.limit} />;
+  }
 
   if (loading) {
     return (

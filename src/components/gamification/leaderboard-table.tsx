@@ -45,16 +45,32 @@ export function LeaderboardTable({ className }: LeaderboardTableProps) {
             xp_points: number;
           } | null;
 
+          const currentRank = index + 1;
+          const previousRank = (row.rank_position as number | null) ?? currentRank;
+          const change: "up" | "down" | "same" =
+            previousRank > currentRank ? "up" :
+            previousRank < currentRank ? "down" : "same";
+
           return {
-            rank: index + 1,
+            rank: currentRank,
             name: profile?.full_name || "Anonyme",
             xp: profile?.xp_points ?? row.progress_score ?? 0,
             streak: profile?.streak_days ?? 0,
             level: profile?.level ?? 1,
-            change: "same" as const, // Pas de donnees historiques pour le moment
+            change,
           };
         });
         setEntries(mapped);
+
+        // Update rank_position for next comparison (non-blocking)
+        Promise.all(
+          data.map((row, index) =>
+            supabase
+              .from("leaderboard_scores")
+              .update({ rank_position: index + 1 })
+              .eq("id", row.id)
+          )
+        ).catch(() => {});
       }
 
       setLoading(false);

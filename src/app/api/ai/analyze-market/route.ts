@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
+import { checkAIUsage } from "@/lib/stripe/check-usage";
 import { createClient } from "@/lib/supabase/server";
 import { generateJSON } from "@/lib/ai/generate";
 import { marketAnalysisPrompt, type MarketAnalysisContext } from "@/lib/ai/prompts/market-analysis";
 import type { MarketAnalysisResult } from "@/types/ai";
 import { awardXP } from "@/lib/gamification/xp-engine";
+import { notifyGeneration } from "@/lib/notifications/create";
+import { buildFullVaultContext } from "@/lib/ai/vault-context";
 
 export const maxDuration = 60;
 
@@ -17,11 +20,23 @@ export async function POST(req: NextRequest) {
     if (!user) {
       return NextResponse.json({ error: "Non autorise" }, { status: 401 });
     }
+    // Check AI usage limits
+    const usage = await checkAIUsage(user.id);
+    if (!usage.allowed) {
+      return NextResponse.json(
+        { error: "Limite de generations IA atteinte", usage },
+        { status: 403 }
+      );
+    }
+
 
     const body: MarketAnalysisContext = await req.json();
 
+    const vaultContext = await buildFullVaultContext(user.id);
+    const basePrompt = marketAnalysisPrompt(body);
+
     const result = await generateJSON<MarketAnalysisResult>({
-      prompt: marketAnalysisPrompt(body),
+      prompt: vaultContext ? basePrompt + "\n" + vaultContext : basePrompt,
       maxTokens: 8192,
       temperature: 0.7,
     });
@@ -46,6 +61,7 @@ export async function POST(req: NextRequest) {
 
     // Award XP (non-blocking)
     try { await awardXP(user.id, "generation.market_analysis"); } catch {}
+    try { await notifyGeneration(user.id, "generation.market_analysis"); } catch {}
 
     return NextResponse.json(result);
   } catch (error) {

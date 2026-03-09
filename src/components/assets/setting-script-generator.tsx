@@ -19,6 +19,7 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import type { SettingScriptResult } from "@/lib/ai/prompts/setting-script";
+import { UpgradeWall } from "@/components/shared/upgrade-wall";
 
 interface SettingScriptGeneratorProps {
   className?: string;
@@ -44,6 +45,7 @@ export function SettingScriptGenerator({
   const [script, setScript] = React.useState<SettingScriptResult | null>(initialData || null);
   const [error, setError] = React.useState<string | null>(null);
   const [activeTab, setActiveTab] = React.useState<TabKey>("opening");
+  const [usageLimited, setUsageLimited] = React.useState<{currentUsage: number; limit: number} | null>(null);
 
   React.useEffect(() => {
     if (initialData) setScript(initialData);
@@ -60,7 +62,13 @@ export function SettingScriptGenerator({
         body: JSON.stringify({ type: "setting_script" }),
       });
 
-      if (!response.ok) throw new Error("Erreur lors de la generation");
+      if (!response.ok) {
+        if (response.status === 403) {
+          const errData = await response.json();
+          if (errData.usage) { setUsageLimited(errData.usage); return; }
+        }
+        throw new Error("Erreur lors de la generation");
+      }
       const data = await response.json();
       const raw = data.ai_raw_response || data;
       setScript(raw as SettingScriptResult);
@@ -70,6 +78,10 @@ export function SettingScriptGenerator({
       setLoading(false);
     }
   };
+
+  if (usageLimited) {
+    return <UpgradeWall currentUsage={usageLimited.currentUsage} limit={usageLimited.limit} className={className} />;
+  }
 
   if (loading) {
     return (

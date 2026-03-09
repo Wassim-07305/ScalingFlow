@@ -16,6 +16,8 @@ import {
   Bot,
   Settings,
   Archive,
+  CreditCard,
+  ShieldCheck,
 } from "lucide-react";
 import type { NavItem, NavSection } from "@/lib/types/appshell";
 
@@ -38,6 +40,8 @@ export const NAV_ITEMS: NavItem[] = [
   { label: "Leaderboard", href: "/leaderboard", icon: Trophy, roles: ["user", "student", "admin", "coach"] },
   { label: "Communauté", href: "/community", icon: Users, roles: ["user", "student", "admin", "coach"] },
   { label: "Assistant IA", href: "/assistant", icon: Bot, roles: ["user", "student", "admin", "coach"] },
+  { label: "Tarifs", href: "/pricing", icon: CreditCard, roles: ["user", "student", "admin", "coach"] },
+  { label: "Admin", href: "/admin", icon: ShieldCheck, roles: ["admin"] },
 ];
 
 // ─── Sections sidebar ─────────────────────────────────────────
@@ -74,7 +78,7 @@ export const NAV_SECTIONS: NavSection[] = [
   {
     label: "Outils",
     items: NAV_ITEMS.filter((i) =>
-      ["/assistant"].includes(i.href)
+      ["/assistant", "/pricing", "/admin"].includes(i.href)
     ),
   },
 ];
@@ -120,4 +124,6 @@ export const QUICK_LINKS = [
   { label: "Assistant IA", href: "/assistant", icon: Bot },
   { label: "Communauté", href: "/community", icon: Users },
   { label: "Paramètres", href: "/settings", icon: Settings },
+  { label: "Tarifs", href: "/pricing", icon: CreditCard },
+  { label: "Admin", href: "/admin", icon: ShieldCheck },
 ];

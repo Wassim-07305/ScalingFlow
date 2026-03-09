@@ -16,6 +16,7 @@ import { ChipSelector } from "./chip-selector";
 import { MultiChipSelector } from "./multi-chip-selector";
 import { OnboardingSkillMatrix } from "./onboarding-skill-matrix";
 import { OnboardingSummary } from "./onboarding-summary";
+import { ParcoursSelector } from "./parcours-selector";
 import { QUESTIONS } from "./questions";
 import { AILoading } from "@/components/shared/ai-loading";
 import { MarketAnalysis } from "@/components/onboarding/market-analysis";
@@ -328,6 +329,8 @@ export function OnboardingFlow() {
         return true; // Expertise questions are optional
       case "chips":
         return String(formData[field!] || "").trim() !== "";
+      case "parcours-selector":
+        return String(formData[field!] || "").trim() !== "";
       case "chips-multi":
         return ((formData[field!] as string[]) || []).length > 0;
       case "multi-field":
@@ -456,6 +459,7 @@ export function OnboardingFlow() {
       if (
         t === "textarea" ||
         t === "multi-field" ||
+        t === "parcours-selector" ||
         t === "summary" ||
         t === "welcome"
       )
@@ -688,6 +692,24 @@ export function OnboardingFlow() {
             <OnboardingSkillMatrix
               value={(fieldValue as VaultSkillCategory[]) || []}
               onChange={(v) => setField(q.field!, v)}
+            />
+          </div>
+        );
+
+      /* ── Parcours selector ── */
+      case "parcours-selector":
+        return (
+          <div className="w-full max-w-lg">
+            <div className="mb-8">
+              <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">{q.title}</h2>
+              {q.subtitle && (
+                <p className="mt-2 text-base text-white/40">{q.subtitle}</p>
+              )}
+            </div>
+            <ParcoursSelector
+              value={String(fieldValue || "")}
+              onChange={(v) => setField(q.field!, v)}
+              formData={formData}
             />
           </div>
         );

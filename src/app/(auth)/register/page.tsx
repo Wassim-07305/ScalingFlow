@@ -121,15 +121,22 @@ export default function RegisterPage() {
       </form>
 
       {/* Footer */}
-      <p className="text-center text-sm text-text-secondary">
-        Déjà un compte ?{" "}
-        <Link
-          href="/login"
-          className="text-info hover:underline font-medium"
-        >
-          Se connecter
-        </Link>
-      </p>
+      <div className="text-center space-y-2">
+        <p className="text-sm text-text-secondary">
+          Deja un compte ?{" "}
+          <Link
+            href="/login"
+            className="text-info hover:underline font-medium"
+          >
+            Se connecter
+          </Link>
+        </p>
+        <p className="text-xs text-text-muted">
+          <Link href="/welcome" className="hover:text-text-secondary transition-colors">
+            Retour a l&apos;accueil
+          </Link>
+        </p>
+      </div>
     </div>
   );
 }

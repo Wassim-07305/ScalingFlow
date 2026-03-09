@@ -11,6 +11,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { BarChart3 } from "lucide-react";
 import { useUser } from "@/hooks/use-user";
 import { createClient } from "@/lib/supabase/client";
 import { startOfWeek, endOfWeek, subWeeks, format } from "date-fns";
@@ -103,10 +104,12 @@ export function LeadsChart() {
               <div className="h-8 w-8 animate-spin rounded-full border-2 border-accent border-t-transparent" />
             </div>
           ) : !hasData ? (
-            <div className="flex h-full items-center justify-center">
-              <p className="text-sm text-text-secondary">
-                Aucune donnée encore
-              </p>
+            <div className="flex flex-col h-full items-center justify-center text-center">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-accent/10 mb-3">
+                <BarChart3 className="h-6 w-6 text-accent" />
+              </div>
+              <p className="text-sm font-medium text-text-primary mb-1">Pas encore de créations</p>
+              <p className="text-xs text-text-muted max-w-[220px]">Génère ta première offre ou funnel pour voir les stats ici.</p>
             </div>
           ) : (
             <ResponsiveContainer width="100%" height="100%">

@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
+import { checkAIUsage } from "@/lib/stripe/check-usage";
 import { createClient } from "@/lib/supabase/server";
 import { generateJSON } from "@/lib/ai/generate";
 import { offerCreationPrompt } from "@/lib/ai/prompts/offer-creation";
+import { buildFullVaultContext } from "@/lib/ai/vault-context";
 import { awardXP } from "@/lib/gamification/xp-engine";
+import { notifyGeneration } from "@/lib/notifications/create";
 
 export async function POST(req: NextRequest) {
   try {
@@ -14,6 +17,15 @@ export async function POST(req: NextRequest) {
     if (!user) {
       return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
     }
+    // Check AI usage limits
+    const usage = await checkAIUsage(user.id);
+    if (!usage.allowed) {
+      return NextResponse.json(
+        { error: "Limite de generations IA atteinte", usage },
+        { status: 403 }
+      );
+    }
+
 
     const body = await req.json();
     const { marketAnalysisId } = body;
@@ -47,8 +59,11 @@ export async function POST(req: NextRequest) {
       .eq("id", user.id)
       .single();
 
+    // Fetch vault resources context for personalization
+    const vaultContext = await buildFullVaultContext(user.id);
+
     // Generate offer using AI
-    const prompt = offerCreationPrompt(
+    const basePrompt = offerCreationPrompt(
       {
         name: marketAnalysis.market_name,
         problems: marketAnalysis.problems || [],
@@ -57,6 +72,7 @@ export async function POST(req: NextRequest) {
       },
       profile?.skills || []
     );
+    const prompt = vaultContext ? basePrompt + "\n" + vaultContext : basePrompt;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const generatedOffer: any = await generateJSON({ prompt, maxTokens: 8192 });
 
@@ -92,6 +108,7 @@ export async function POST(req: NextRequest) {
 
     // Award XP (non-blocking)
     try { await awardXP(user.id, "generation.offer"); } catch {}
+    try { await notifyGeneration(user.id, "generation.offer"); } catch {}
 
     return NextResponse.json(offer);
   } catch (error) {

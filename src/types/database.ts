@@ -53,6 +53,7 @@ export interface Database {
           show_revenue: boolean;
           stripe_customer_id: string | null;
           subscription_status: string;
+          subscription_plan: string;
           meta_access_token: string | null;
           meta_ad_account_id: string | null;
           created_at: string;
@@ -101,6 +102,7 @@ export interface Database {
           show_revenue?: boolean;
           stripe_customer_id?: string | null;
           subscription_status?: string;
+          subscription_plan?: string;
           meta_access_token?: string | null;
           meta_ad_account_id?: string | null;
         };
@@ -147,6 +149,7 @@ export interface Database {
           show_revenue?: boolean;
           stripe_customer_id?: string | null;
           subscription_status?: string;
+          subscription_plan?: string;
           meta_access_token?: string | null;
           meta_ad_account_id?: string | null;
         };
@@ -833,6 +836,8 @@ export interface Database {
           file_path: string | null;
           title: string;
           extracted_text: string | null;
+          file_size: number | null;
+          content_type: string | null;
           created_at: string;
         };
         Insert: {
@@ -843,6 +848,8 @@ export interface Database {
           file_path?: string | null;
           title?: string;
           extracted_text?: string | null;
+          file_size?: number | null;
+          content_type?: string | null;
         };
         Update: {
           resource_type?: "doc" | "youtube" | "instagram" | "transcript" | "testimonial" | "other";
@@ -850,6 +857,8 @@ export interface Database {
           file_path?: string | null;
           title?: string;
           extracted_text?: string | null;
+          file_size?: number | null;
+          content_type?: string | null;
         };
       };
       competitors: {

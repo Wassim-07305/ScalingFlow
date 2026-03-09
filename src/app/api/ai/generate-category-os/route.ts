@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
+import { checkAIUsage } from "@/lib/stripe/check-usage";
 import { createClient } from "@/lib/supabase/server";
 import { generateJSON } from "@/lib/ai/generate";
 import { buildCategoryOSPrompt, type CategoryOSResult } from "@/lib/ai/prompts/category-os";
 import { awardXP } from "@/lib/gamification/xp-engine";
+import { notifyGeneration } from "@/lib/notifications/create";
+import { buildFullVaultContext } from "@/lib/ai/vault-context";
 
 export async function POST(req: NextRequest) {
   try {
@@ -14,6 +17,15 @@ export async function POST(req: NextRequest) {
     if (!user) {
       return NextResponse.json({ error: "Non autorise" }, { status: 401 });
     }
+    // Check AI usage limits
+    const usage = await checkAIUsage(user.id);
+    if (!usage.allowed) {
+      return NextResponse.json(
+        { error: "Limite de generations IA atteinte", usage },
+        { status: 403 }
+      );
+    }
+
 
     const body = await req.json();
     const { offerId } = body;
@@ -50,7 +62,9 @@ export async function POST(req: NextRequest) {
       .eq("id", user.id)
       .single();
 
-    const prompt = buildCategoryOSPrompt({
+    const vaultContext = await buildFullVaultContext(user.id);
+
+    const basePrompt = buildCategoryOSPrompt({
       marketAnalysis: {
         market_name: marketAnalysis?.market_name || "Non defini",
         problems: marketAnalysis?.problems || [],
@@ -68,6 +82,8 @@ export async function POST(req: NextRequest) {
         expertise: profile?.expertise_answers,
       },
     });
+
+    const prompt = vaultContext ? basePrompt + "\n" + vaultContext : basePrompt;
 
     const categoryOS = await generateJSON<CategoryOSResult>({
       prompt,
@@ -97,6 +113,7 @@ export async function POST(req: NextRequest) {
 
     // Award XP (non-blocking)
     try { await awardXP(user.id, "generation.category_os"); } catch {}
+    try { await notifyGeneration(user.id, "generation.category_os"); } catch {}
 
     return NextResponse.json(categoryOS);
   } catch (error) {

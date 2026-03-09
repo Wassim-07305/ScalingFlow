@@ -9,6 +9,7 @@ import { AILoading } from "@/components/shared/ai-loading";
 import { Sparkles, LayoutGrid, List, ChevronDown, ChevronUp } from "lucide-react";
 import { toast } from "sonner";
 import type { ContentStrategyResult } from "@/lib/ai/prompts/content-strategy";
+import { UpgradeWall } from "@/components/shared/upgrade-wall";
 
 interface EditorialCalendarProps {
   className?: string;
@@ -39,6 +40,7 @@ export function EditorialCalendar({ className, initialData }: EditorialCalendarP
   const [filter, setFilter] = React.useState<string | null>(null);
   const [expandedDay, setExpandedDay] = React.useState<number | null>(null);
   const [error, setError] = React.useState<string | null>(null);
+  const [usageLimited, setUsageLimited] = React.useState<{currentUsage: number; limit: number} | null>(null);
 
   React.useEffect(() => {
     if (initialData) {
@@ -58,7 +60,13 @@ export function EditorialCalendar({ className, initialData }: EditorialCalendarP
         body: JSON.stringify({ contentType: "strategy" }),
       });
 
-      if (!response.ok) throw new Error("Erreur lors de la generation");
+      if (!response.ok) {
+        if (response.status === 403) {
+          const errData = await response.json();
+          if (errData.usage) { setUsageLimited(errData.usage); return; }
+        }
+        throw new Error("Erreur lors de la generation");
+      }
       const data = await response.json();
       const result = data.result as ContentStrategyResult;
       setItems(result.calendrier || []);
@@ -75,6 +83,10 @@ export function EditorialCalendar({ className, initialData }: EditorialCalendarP
   const filteredItems = filter
     ? items.filter((item) => item.pilier === filter)
     : items;
+
+  if (usageLimited) {
+    return <UpgradeWall currentUsage={usageLimited.currentUsage} limit={usageLimited.limit} className={className} />;
+  }
 
   if (loading) {
     return <AILoading text="Generation du plan editorial" className={className} />;

@@ -8,18 +8,29 @@ import { Badge } from "@/components/ui/badge";
 import { AILoading } from "@/components/shared/ai-loading";
 import { GlowCard } from "@/components/shared/glow-card";
 import { GenerationHistory } from "@/components/shared/generation-history";
-import { CallAnalyzer } from "@/components/sales/call-analyzer";
-import { Sparkles, Phone, FileText, Copy, History, FileDown, Mic } from "lucide-react";
+import {
+  Sparkles,
+  Phone,
+  FileText,
+  Copy,
+  History,
+  FileDown,
+  Clock,
+  MessageCircle,
+  AlertTriangle,
+  ArrowRight,
+  ChevronDown,
+  ChevronUp,
+} from "lucide-react";
 import { exportToPDF } from "@/lib/utils/export-pdf";
-import { TabBar } from "@/components/shared/tab-bar";
+import { cn } from "@/lib/utils/cn";
 import { createClient } from "@/lib/supabase/client";
-import { useUser } from "@/hooks/use-user";
 import { toast } from "sonner";
+import { UpgradeWall } from "@/components/shared/upgrade-wall";
 
 const TABS = [
   { key: "discovery", label: "Appel Découverte", icon: Phone },
   { key: "closing", label: "Script de Closing", icon: FileText },
-  { key: "call_analysis", label: "Analyse Call", icon: Mic },
   { key: "history", label: "Historique", icon: History },
 ] as const;
 
@@ -30,39 +41,7 @@ export default function SalesPage() {
   const [error, setError] = React.useState<string | null>(null);
   const [activeTab, setActiveTab] = React.useState<string>("discovery");
   const [copied, setCopied] = React.useState(false);
-  const { user } = useUser();
-
-  React.useEffect(() => {
-    if (!user) return;
-    const loadLatest = async () => {
-      const supabase = createClient();
-      const { data } = await supabase
-        .from("sales_assets")
-        .select("asset_type, ai_raw_response, content, metadata")
-        .eq("user_id", user.id)
-        .eq("asset_type", "sales_script")
-        .order("created_at", { ascending: false })
-        .limit(1)
-        .single();
-
-      if (data) {
-        let parsed = data.ai_raw_response;
-        if (!parsed && data.content) {
-          try {
-            parsed = typeof data.content === "string" ? JSON.parse(data.content) : data.content;
-          } catch { /* ignore */ }
-        }
-        if (parsed) {
-          setScript(parsed);
-          const metadata = data.metadata as { scriptType?: string } | null;
-          if (metadata?.scriptType === "closing") {
-            setActiveTab("closing");
-          }
-        }
-      }
-    };
-    loadLatest();
-  }, [user]);
+  const [usageLimited, setUsageLimited] = React.useState<{currentUsage: number; limit: number} | null>(null);
 
   const activeType = activeTab === "history" ? "discovery" : activeTab;
 
@@ -77,7 +56,13 @@ export default function SalesPage() {
         body: JSON.stringify({ type: "sales_script", scriptType: activeType }),
       });
 
-      if (!response.ok) throw new Error("Erreur lors de la génération");
+      if (!response.ok) {
+        if (response.status === 403) {
+          const errData = await response.json();
+          if (errData.usage) { setUsageLimited(errData.usage); return; }
+        }
+        throw new Error("Erreur lors de la generation");
+      }
       const data = await response.json();
       setScript(data.ai_raw_response || data);
     } catch (err) {
@@ -140,6 +125,10 @@ export default function SalesPage() {
   };
 
   const renderGenerator = () => {
+    if (usageLimited) {
+      return <UpgradeWall currentUsage={usageLimited.currentUsage} limit={usageLimited.limit} />;
+    }
+
     if (loading) {
       return <AILoading text="Rédaction de ton script de vente" />;
     }
@@ -169,13 +158,7 @@ export default function SalesPage() {
               </Button>
             </div>
           </div>
-          <GlowCard glowColor="orange">
-            <div className="prose prose-invert prose-sm max-w-none">
-              <pre className="text-text-secondary text-sm whitespace-pre-wrap font-sans">
-                {typeof script === "string" ? script : JSON.stringify(script, null, 2)}
-              </pre>
-            </div>
-          </GlowCard>
+          <SalesScriptView script={script} />
           <Button variant="outline" onClick={() => { setScript(null); handleGenerate(); }}>
             Régénérer
           </Button>
@@ -212,7 +195,28 @@ export default function SalesPage() {
         description="Scripts et outils pour closer tes prospects."
       />
 
-      <TabBar tabs={TABS} activeTab={activeTab} onTabChange={setActiveTab} />
+      <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
+        {TABS.map((tab) => (
+          <button
+            key={tab.key}
+            onClick={() => {
+              setActiveTab(tab.key);
+              if (tab.key !== "history") {
+                setScript(null);
+              }
+            }}
+            className={cn(
+              "flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all whitespace-nowrap",
+              activeTab === tab.key
+                ? "bg-accent text-white"
+                : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
+            )}
+          >
+            <tab.icon className="h-4 w-4" />
+            {tab.label}
+          </button>
+        ))}
+      </div>
 
       {activeTab === "history" ? (
         <GenerationHistory
@@ -224,11 +228,147 @@ export default function SalesPage() {
           emptyMessage="Aucun script de vente généré pour le moment."
           onSelect={handleHistorySelect}
         />
-      ) : activeTab === "call_analysis" ? (
-        <CallAnalyzer />
       ) : (
         renderGenerator()
       )}
+    </div>
+  );
+}
+
+/* ─── Structured Sales Script Renderer ─── */
+
+interface ScriptSection {
+  step: number;
+  name: string;
+  duration: string;
+  script: string;
+  key_questions?: string[];
+  transition?: string;
+  mistakes_to_avoid?: string[];
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function SalesScriptView({ script }: { script: any }) {
+  const [expandedStep, setExpandedStep] = React.useState<number | null>(0);
+
+  // Handle both { sections: [...] } and raw array formats
+  const sections: ScriptSection[] = Array.isArray(script?.sections)
+    ? script.sections
+    : Array.isArray(script)
+      ? script
+      : null;
+
+  // Fallback to raw display if structure is unexpected
+  if (!sections) {
+    return (
+      <GlowCard glowColor="orange">
+        <div className="prose prose-invert prose-sm max-w-none">
+          <pre className="text-text-secondary text-sm whitespace-pre-wrap font-sans">
+            {typeof script === "string" ? script : JSON.stringify(script, null, 2)}
+          </pre>
+        </div>
+      </GlowCard>
+    );
+  }
+
+  return (
+    <div className="space-y-3">
+      {sections.map((section, i) => {
+        const isExpanded = expandedStep === i;
+        return (
+          <Card key={i}>
+            <button
+              onClick={() => setExpandedStep(isExpanded ? null : i)}
+              className="w-full text-left"
+            >
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="flex items-center gap-3 text-base">
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-accent-muted text-xs font-bold text-accent">
+                      {section.step || i + 1}
+                    </span>
+                    {section.name}
+                  </CardTitle>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="muted" className="flex items-center gap-1">
+                      <Clock className="h-3 w-3" />
+                      {section.duration}
+                    </Badge>
+                    {isExpanded ? (
+                      <ChevronUp className="h-4 w-4 text-text-muted" />
+                    ) : (
+                      <ChevronDown className="h-4 w-4 text-text-muted" />
+                    )}
+                  </div>
+                </div>
+              </CardHeader>
+            </button>
+
+            {isExpanded && (
+              <CardContent className="space-y-4 pt-0">
+                {/* Script text */}
+                <div className="rounded-xl bg-bg-tertiary border border-border-default p-4">
+                  <p className="text-sm text-text-secondary whitespace-pre-wrap leading-relaxed">
+                    {section.script}
+                  </p>
+                </div>
+
+                {/* Key questions */}
+                {section.key_questions && section.key_questions.length > 0 && (
+                  <div>
+                    <p className="flex items-center gap-2 text-xs text-text-muted uppercase tracking-wide mb-2">
+                      <MessageCircle className="h-3.5 w-3.5" />
+                      Questions cles
+                    </p>
+                    <div className="space-y-2">
+                      {section.key_questions.map((q, j) => (
+                        <div
+                          key={j}
+                          className="flex items-start gap-2 rounded-lg bg-accent-muted/30 border border-accent/10 px-3 py-2"
+                        >
+                          <span className="text-accent text-sm mt-0.5 shrink-0">&ldquo;</span>
+                          <p className="text-sm text-text-primary italic">{q}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Transition */}
+                {section.transition && (
+                  <div className="flex items-start gap-2 p-3 rounded-xl bg-info/8 border border-info/15">
+                    <ArrowRight className="h-4 w-4 text-info mt-0.5 shrink-0" />
+                    <div>
+                      <p className="text-xs text-info font-medium uppercase tracking-wide mb-1">
+                        Transition
+                      </p>
+                      <p className="text-sm text-text-secondary">{section.transition}</p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Mistakes to avoid */}
+                {section.mistakes_to_avoid && section.mistakes_to_avoid.length > 0 && (
+                  <div>
+                    <p className="flex items-center gap-2 text-xs text-text-muted uppercase tracking-wide mb-2">
+                      <AlertTriangle className="h-3.5 w-3.5 text-warning" />
+                      Erreurs a eviter
+                    </p>
+                    <div className="space-y-1">
+                      {section.mistakes_to_avoid.map((m, j) => (
+                        <div key={j} className="flex items-start gap-2 text-sm">
+                          <span className="text-warning mt-0.5 shrink-0">&#x2717;</span>
+                          <span className="text-text-muted">{m}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            )}
+          </Card>
+        );
+      })}
     </div>
   );
 }

@@ -32,13 +32,11 @@ export interface MarketAnalysisContext {
   situation?: string;
 }
 
-const PARCOURS_CONTEXT: Record<string, string> = {
-  A1: "Parcours A1 — Zero a Freelance : L'utilisateur part de zero, n'a pas encore de clients. Il doit identifier un marche viable, creer une offre simple et obtenir ses premiers clients rapidement. Privilegier des marches accessibles avec des cycles de vente courts.",
-  A2: "Parcours A2 — Zero a Agence IA : L'utilisateur veut monter une agence de services IA. Il a des competences techniques mais peu d'experience business. Privilegier des marches B2B avec une forte demande en automatisation et IA.",
-  A3: "Parcours A3 — Zero a SaaS/Infoproduit : L'utilisateur veut creer un produit scalable (SaaS ou formation). Privilegier des marches avec un probleme recurrent, ou un produit digital peut remplacer du service.",
-  B: "Parcours B — Freelance a Agence : L'utilisateur est deja freelance avec des clients. Il veut scaler en montant une agence. Privilegier l'extension de son marche actuel, la productisation de ses services, et l'identification de services adjacents.",
-  C: "Parcours C — Scale & Optimize : L'utilisateur a deja un business qui tourne. Il veut optimiser, augmenter ses marges et scaler. Privilegier l'analyse de ses marches existants, l'identification de segments sous-exploites et les opportunites d'up-sell/cross-sell.",
-};
+import { PARCOURS } from "@/lib/parcours";
+
+const PARCOURS_CONTEXT: Record<string, string> = Object.fromEntries(
+  Object.entries(PARCOURS).map(([key, def]) => [key, def.aiContext])
+);
 
 function buildVaultContext(vaultSkills?: VaultSkill[], expertiseAnswers?: Record<string, string>): string {
   let context = "";

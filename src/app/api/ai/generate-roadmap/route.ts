@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { checkAIUsage } from "@/lib/stripe/check-usage";
 import { createClient } from "@/lib/supabase/server";
 import { generateJSON } from "@/lib/ai/generate";
 import {
@@ -6,6 +7,8 @@ import {
   type RoadmapResult,
 } from "@/lib/ai/prompts/roadmap-generator";
 import { awardXP } from "@/lib/gamification/xp-engine";
+import { notifyGeneration } from "@/lib/notifications/create";
+import { buildFullVaultContext } from "@/lib/ai/vault-context";
 
 export async function POST(req: NextRequest) {
   try {
@@ -17,6 +20,15 @@ export async function POST(req: NextRequest) {
     if (!user) {
       return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
     }
+    // Check AI usage limits
+    const usage = await checkAIUsage(user.id);
+    if (!usage.allowed) {
+      return NextResponse.json(
+        { error: "Limite de generations IA atteinte", usage },
+        { status: 403 }
+      );
+    }
+
 
     const body = await req.json();
 
@@ -40,6 +52,8 @@ export async function POST(req: NextRequest) {
       supabase.from("content_pieces").select("*", { count: "exact", head: true }).eq("user_id", user.id),
     ]);
 
+    const vaultContext = await buildFullVaultContext(user.id);
+
     const { systemPrompt, userPrompt } = buildRoadmapPrompt({
       parcours: profile?.parcours || body.parcours || "",
       situation: profile?.situation || "",
@@ -55,7 +69,7 @@ export async function POST(req: NextRequest) {
     });
 
     const result = await generateJSON<RoadmapResult>({
-      prompt: userPrompt,
+      prompt: vaultContext ? userPrompt + "\n" + vaultContext : userPrompt,
       systemPrompt,
       maxTokens: 4096,
     });
@@ -89,6 +103,7 @@ export async function POST(req: NextRequest) {
 
     // Award XP (non-blocking)
     try { await awardXP(user.id, "milestone.completed"); } catch {}
+    try { await notifyGeneration(user.id, "milestone.completed"); } catch {}
 
     return NextResponse.json({
       tasks_count: result.tasks.length,

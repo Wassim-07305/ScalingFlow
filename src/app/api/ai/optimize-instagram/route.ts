@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { checkAIUsage } from "@/lib/stripe/check-usage";
 import { createClient } from "@/lib/supabase/server";
 import { generateJSON } from "@/lib/ai/generate";
 import {
@@ -6,6 +7,8 @@ import {
   type InstagramProfileResult,
 } from "@/lib/ai/prompts/instagram-profile";
 import { awardXP } from "@/lib/gamification/xp-engine";
+import { notifyGeneration } from "@/lib/notifications/create";
+import { buildFullVaultContext } from "@/lib/ai/vault-context";
 
 export async function POST(req: NextRequest) {
   try {
@@ -17,6 +20,15 @@ export async function POST(req: NextRequest) {
     if (!user) {
       return NextResponse.json({ error: "Non autorise" }, { status: 401 });
     }
+    // Check AI usage limits
+    const usage = await checkAIUsage(user.id);
+    if (!usage.allowed) {
+      return NextResponse.json(
+        { error: "Limite de generations IA atteinte", usage },
+        { status: 403 }
+      );
+    }
+
 
     // Recuperer le profil
     const { data: profile } = await supabase
@@ -57,11 +69,14 @@ export async function POST(req: NextRequest) {
       profile?.full_name ||
       "Expert en IA et automatisation";
 
-    const prompt = buildInstagramProfilePrompt(
+    const vaultContext = await buildFullVaultContext(user.id);
+
+    const basePrompt = buildInstagramProfilePrompt(
       marketContext,
       offerContext,
       brandContext
     );
+    const prompt = vaultContext ? basePrompt + "\n" + vaultContext : basePrompt;
 
     const result = await generateJSON<InstagramProfileResult>({
       prompt,
@@ -70,6 +85,7 @@ export async function POST(req: NextRequest) {
 
     // Award XP (non-blocking)
     try { await awardXP(user.id, "generation.content_strategy"); } catch {}
+    try { await notifyGeneration(user.id, "generation.content_strategy"); } catch {}
 
     return NextResponse.json({ result });
   } catch (error) {

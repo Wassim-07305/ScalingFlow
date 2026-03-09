@@ -9,6 +9,7 @@ import { AILoading } from "@/components/shared/ai-loading";
 import { Sparkles, Target, Heart, Shield, Zap } from "lucide-react";
 import { toast } from "sonner";
 import type { ContentStrategyResult } from "@/lib/ai/prompts/content-strategy";
+import { UpgradeWall } from "@/components/shared/upgrade-wall";
 
 interface StrategyOverviewProps {
   className?: string;
@@ -28,6 +29,7 @@ export function StrategyOverview({ className, onStrategyGenerated, initialData }
   const [loading, setLoading] = React.useState(false);
   const [strategy, setStrategy] = React.useState<ContentStrategyResult | null>(null);
   const [error, setError] = React.useState<string | null>(null);
+  const [usageLimited, setUsageLimited] = React.useState<{currentUsage: number; limit: number} | null>(null);
 
   React.useEffect(() => {
     if (initialData) {
@@ -46,7 +48,13 @@ export function StrategyOverview({ className, onStrategyGenerated, initialData }
         body: JSON.stringify({ contentType: "strategy" }),
       });
 
-      if (!response.ok) throw new Error("Erreur lors de la generation");
+      if (!response.ok) {
+        if (response.status === 403) {
+          const errData = await response.json();
+          if (errData.usage) { setUsageLimited(errData.usage); return; }
+        }
+        throw new Error("Erreur lors de la generation");
+      }
       const data = await response.json();
       const result = data.result as ContentStrategyResult;
       setStrategy(result);
@@ -60,6 +68,10 @@ export function StrategyOverview({ className, onStrategyGenerated, initialData }
       setLoading(false);
     }
   };
+
+  if (usageLimited) {
+    return <UpgradeWall currentUsage={usageLimited.currentUsage} limit={usageLimited.limit} className={className} />;
+  }
 
   if (loading) {
     return <AILoading text="Creation de ta strategie de contenu" className={className} />;

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { checkAIUsage } from "@/lib/stripe/check-usage";
 import { createClient } from "@/lib/supabase/server";
 import { generateJSON } from "@/lib/ai/generate";
 import {
@@ -7,6 +8,7 @@ import {
   type VaultAnalysis,
 } from "@/lib/ai/prompts/vault-analysis";
 import { awardXP } from "@/lib/gamification/xp-engine";
+import { notifyGeneration } from "@/lib/notifications/create";
 
 export async function POST(req: NextRequest) {
   try {
@@ -18,6 +20,15 @@ export async function POST(req: NextRequest) {
     if (!user) {
       return NextResponse.json({ error: "Non autorise" }, { status: 401 });
     }
+    // Check AI usage limits
+    const usage = await checkAIUsage(user.id);
+    if (!usage.allowed) {
+      return NextResponse.json(
+        { error: "Limite de generations IA atteinte", usage },
+        { status: 403 }
+      );
+    }
+
 
     const body: VaultData = await req.json();
 
@@ -38,6 +49,7 @@ export async function POST(req: NextRequest) {
 
     // Award XP (non-blocking)
     try { await awardXP(user.id, "generation.vault_analysis"); } catch {}
+    try { await notifyGeneration(user.id, "generation.vault_analysis"); } catch {}
 
     return NextResponse.json(result);
   } catch (error) {

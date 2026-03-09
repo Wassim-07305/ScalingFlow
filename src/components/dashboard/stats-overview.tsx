@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Package, FileText, GitBranch, Flame, PenTool, Megaphone } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { AnimatedCounter } from "@/components/shared/animated-counter";
@@ -14,6 +15,7 @@ interface StatCard {
   suffix?: string;
   icon: React.ElementType;
   color: "orange" | "blue" | "cyan" | "purple";
+  href?: string;
 }
 
 const colorMap = {
@@ -40,6 +42,7 @@ const colorMap = {
 };
 
 export function StatsOverview() {
+  const router = useRouter();
   const { user, profile, loading: userLoading } = useUser();
   const [counts, setCounts] = useState({
     offers: 0,
@@ -101,30 +104,35 @@ export function StatsOverview() {
       value: counts.offers,
       icon: Package,
       color: "orange",
+      href: "/offer",
     },
     {
       label: "Funnels",
       value: counts.funnels,
       icon: GitBranch,
       color: "cyan",
+      href: "/funnel",
     },
     {
       label: "Publicités",
       value: counts.ads,
       icon: Megaphone,
       color: "blue",
+      href: "/ads",
     },
     {
       label: "Contenus",
       value: counts.content,
       icon: PenTool,
       color: "purple",
+      href: "/content",
     },
     {
       label: "Assets",
       value: counts.assets,
       icon: FileText,
       color: "blue",
+      href: "/assets",
     },
     {
       label: "Streak",
@@ -132,6 +140,7 @@ export function StatsOverview() {
       suffix: "j",
       icon: Flame,
       color: "orange",
+      href: "/progress",
     },
   ];
 
@@ -140,7 +149,11 @@ export function StatsOverview() {
       {stats.map((stat) => {
         const colors = colorMap[stat.color];
         return (
-          <Card key={stat.label} className="relative overflow-hidden">
+          <Card
+            key={stat.label}
+            className="relative overflow-hidden cursor-pointer transition-all hover:border-accent/30 hover:shadow-[0_0_15px_rgba(52,211,153,0.08)]"
+            onClick={() => stat.href && router.push(stat.href)}
+          >
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-sm text-text-secondary">{stat.label}</p>

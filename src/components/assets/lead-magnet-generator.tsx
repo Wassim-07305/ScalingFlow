@@ -18,6 +18,7 @@ import {
   Mail,
 } from "lucide-react";
 import type { LeadMagnetResult } from "@/lib/ai/prompts/lead-magnet";
+import { UpgradeWall } from "@/components/shared/upgrade-wall";
 
 interface LeadMagnetGeneratorProps {
   className?: string;
@@ -73,6 +74,7 @@ export function LeadMagnetGenerator({ className, initialData }: LeadMagnetGenera
   const [selectedType, setSelectedType] = React.useState<LeadMagnetType | null>(
     null
   );
+  const [usageLimited, setUsageLimited] = React.useState<{currentUsage: number; limit: number} | null>(null);
 
   React.useEffect(() => {
     if (initialData) setLeadMagnet(initialData);
@@ -94,7 +96,13 @@ export function LeadMagnetGenerator({ className, initialData }: LeadMagnetGenera
         }),
       });
 
-      if (!response.ok) throw new Error("Erreur lors de la generation");
+      if (!response.ok) {
+        if (response.status === 403) {
+          const errData = await response.json();
+          if (errData.usage) { setUsageLimited(errData.usage); return; }
+        }
+        throw new Error("Erreur lors de la generation");
+      }
       const data = await response.json();
       const raw = data.ai_raw_response || data;
       setLeadMagnet(raw as LeadMagnetResult);
@@ -104,6 +112,10 @@ export function LeadMagnetGenerator({ className, initialData }: LeadMagnetGenera
       setLoading(false);
     }
   };
+
+  if (usageLimited) {
+    return <UpgradeWall currentUsage={usageLimited.currentUsage} limit={usageLimited.limit} className={className} />;
+  }
 
   if (loading) {
     return (

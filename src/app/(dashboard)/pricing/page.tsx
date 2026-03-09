@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { PLANS, type Plan } from "@/lib/stripe/plans";
 import { useUser } from "@/hooks/use-user";
 import { toast } from "sonner";
-import { Check, Loader2, Sparkles, Crown, Zap } from "lucide-react";
+import { Check, Loader2, Sparkles, Crown, Zap, Shield, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 
 const PLAN_ICONS: Record<string, React.ReactNode> = {
@@ -19,10 +20,21 @@ const PLAN_ICONS: Record<string, React.ReactNode> = {
 
 export default function PricingPage() {
   const { profile } = useUser();
+  const searchParams = useSearchParams();
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
 
   const isActive = profile?.subscription_status === "active";
-  const currentPlanId = isActive ? "pro" : "free";
+  const currentPlanId = isActive
+    ? (profile?.subscription_plan || "pro")
+    : "free";
+
+  // Handle checkout success/cancel from URL params
+  useEffect(() => {
+    const checkout = searchParams.get("checkout");
+    if (checkout === "cancel") {
+      toast.info("Paiement annule. Tu peux reessayer quand tu veux.");
+    }
+  }, [searchParams]);
 
   const handleSubscribe = async (plan: Plan) => {
     if (plan.id === "free") return;
@@ -68,14 +80,22 @@ export default function PricingPage() {
               key={plan.id}
               className={cn(
                 "relative flex flex-col",
-                isPopular && "border-accent/50 shadow-[0_0_24px_rgba(52,211,153,0.08)]"
+                isPopular && "border-accent/50 shadow-[0_0_24px_rgba(52,211,153,0.08)]",
+                isCurrent && "border-accent/30"
               )}
             >
               {/* Badge populaire */}
-              {isPopular && (
+              {isPopular && !isCurrent && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                   <Badge variant="default" className="px-3 py-1 text-xs font-semibold">
                     Le plus populaire
+                  </Badge>
+                </div>
+              )}
+              {isCurrent && (
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                  <Badge variant="cyan" className="px-3 py-1 text-xs font-semibold">
+                    Ton plan actuel
                   </Badge>
                 </div>
               )}
@@ -150,14 +170,15 @@ export default function PricingPage() {
                   <Button
                     variant={isPopular ? "default" : "secondary"}
                     size="lg"
-                    className="w-full"
+                    className="w-full gap-2"
                     onClick={() => handleSubscribe(plan)}
                     disabled={loadingPlan === plan.id}
                   >
                     {loadingPlan === plan.id ? (
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      <Loader2 className="h-4 w-4 animate-spin" />
                     ) : null}
                     Commencer
+                    <ArrowRight className="h-4 w-4" />
                   </Button>
                 )}
               </CardFooter>
@@ -166,12 +187,21 @@ export default function PricingPage() {
         })}
       </div>
 
-      {/* Note */}
-      <p className="text-xs text-text-muted mt-6 max-w-2xl">
-        Tous les plans incluent un acces a la plateforme ScalingFlow. Les paiements
-        sont securises via Stripe. Tu peux annuler a tout moment depuis les
-        parametres de ton compte.
-      </p>
+      {/* Trust signals */}
+      <div className="flex items-center gap-6 mt-8 text-xs text-text-muted">
+        <div className="flex items-center gap-1.5">
+          <Shield className="h-3.5 w-3.5" />
+          Paiement securise via Stripe
+        </div>
+        <div className="flex items-center gap-1.5">
+          <Check className="h-3.5 w-3.5" />
+          Annulation a tout moment
+        </div>
+        <div className="flex items-center gap-1.5">
+          <Check className="h-3.5 w-3.5" />
+          Satisfaction garantie 14 jours
+        </div>
+      </div>
     </div>
   );
 }

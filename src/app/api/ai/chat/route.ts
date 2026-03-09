@@ -1,7 +1,9 @@
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { checkAIUsage } from "@/lib/stripe/check-usage";
 import { createClient } from "@/lib/supabase/server";
 import { createStreamingResponse, streamText } from "@/lib/ai/generate";
 import { getAgent, type AgentType } from "@/lib/ai/agents/index";
+import { buildFullVaultContext } from "@/lib/ai/vault-context";
 
 export async function POST(req: NextRequest) {
   try {
@@ -15,6 +17,15 @@ export async function POST(req: NextRequest) {
         status: 401,
       });
     }
+    // Check AI usage limits
+    const usage = await checkAIUsage(user.id);
+    if (!usage.allowed) {
+      return NextResponse.json(
+        { error: "Limite de generations IA atteinte", usage },
+        { status: 403 }
+      );
+    }
+
 
     const body = await req.json();
     const { message, agentType, conversationId } = body as {
@@ -31,46 +42,23 @@ export async function POST(req: NextRequest) {
 
     const agent = getAgent(agentType || "general");
 
-    // Fetch user context for personalization
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select(
-        "full_name, skills, experience_level, selected_market, niche, parcours, objectives"
-      )
-      .eq("id", user.id)
-      .single();
+    // Fetch full vault context (profile + resources) and latest offer
+    const [vaultContext, { data: latestOffer }] = await Promise.all([
+      buildFullVaultContext(user.id),
+      supabase
+        .from("offers")
+        .select("offer_name, positioning, unique_mechanism")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .single(),
+    ]);
 
-    // Fetch latest offer for context
-    const { data: latestOffer } = await supabase
-      .from("offers")
-      .select("offer_name, positioning, unique_mechanism")
-      .eq("user_id", user.id)
-      .order("created_at", { ascending: false })
-      .limit(1)
-      .single();
+    const offerBlock = latestOffer
+      ? `\n## Dernière offre\n- Nom : ${latestOffer.offer_name}\n- Positionnement : ${latestOffer.positioning || "Non défini"}\n- Mécanisme unique : ${latestOffer.unique_mechanism || "Non défini"}\n`
+      : "";
 
-    // Build enriched system prompt
-    const contextBlock = `
-## Contexte utilisateur
-- Nom : ${profile?.full_name || "Non renseigné"}
-- Compétences : ${profile?.skills?.join(", ") || "Non renseignées"}
-- Niveau : ${profile?.experience_level || "Non renseigné"}
-- Marché : ${profile?.selected_market || "Non défini"}
-- Niche : ${profile?.niche || "Non définie"}
-- Parcours : ${profile?.parcours || "Non défini"}
-- Objectifs : ${profile?.objectives?.join(", ") || "Non définis"}
-${
-  latestOffer
-    ? `
-## Dernière offre
-- Nom : ${latestOffer.offer_name}
-- Positionnement : ${latestOffer.positioning || "Non défini"}
-- Mécanisme unique : ${latestOffer.unique_mechanism || "Non défini"}
-`
-    : ""
-}`;
-
-    const fullSystemPrompt = `${agent.systemPrompt}\n\n${contextBlock}`;
+    const fullSystemPrompt = `${agent.systemPrompt}\n\n${vaultContext}${offerBlock}`;
 
     // Load previous messages if conversation exists
     let previousMessages: { role: string; content: string }[] = [];

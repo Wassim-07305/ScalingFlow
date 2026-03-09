@@ -12,6 +12,7 @@ import { GlowCard } from "@/components/shared/glow-card";
 import { Sparkles, Copy, ChevronDown, ChevronUp, Youtube, Image, FileText } from "lucide-react";
 import { toast } from "sonner";
 import type { YouTubeScriptResult } from "@/lib/ai/prompts/youtube-scripts";
+import { UpgradeWall } from "@/components/shared/upgrade-wall";
 
 interface YouTubeGeneratorProps {
   className?: string;
@@ -26,6 +27,7 @@ export function YouTubeGenerator({ className, initialData }: YouTubeGeneratorPro
   const [topic, setTopic] = React.useState("");
   const [showFullScript, setShowFullScript] = React.useState(false);
   const [copiedField, setCopiedField] = React.useState<string | null>(null);
+  const [usageLimited, setUsageLimited] = React.useState<{currentUsage: number; limit: number} | null>(null);
 
   React.useEffect(() => {
     if (initialData) {
@@ -49,7 +51,13 @@ export function YouTubeGenerator({ className, initialData }: YouTubeGeneratorPro
         body: JSON.stringify({ contentType: "youtube", topic }),
       });
 
-      if (!response.ok) throw new Error("Erreur lors de la generation");
+      if (!response.ok) {
+        if (response.status === 403) {
+          const errData = await response.json();
+          if (errData.usage) { setUsageLimited(errData.usage); return; }
+        }
+        throw new Error("Erreur lors de la generation");
+      }
       const data = await response.json();
       setResult(data.result as YouTubeScriptResult);
       toast.success("Script YouTube genere !");
@@ -68,6 +76,10 @@ export function YouTubeGenerator({ className, initialData }: YouTubeGeneratorPro
     setTimeout(() => setCopiedField(null), 2000);
     toast.success("Copie !");
   };
+
+  if (usageLimited) {
+    return <UpgradeWall currentUsage={usageLimited.currentUsage} limit={usageLimited.limit} className={className} />;
+  }
 
   if (loading) {
     return <AILoading text="Generation du script YouTube" className={className} />;

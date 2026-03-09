@@ -76,6 +76,7 @@ export async function POST(req: NextRequest) {
             .from("profiles")
             .update({
               subscription_status: "active",
+              subscription_plan: plan?.id || "pro",
               stripe_customer_id: session.customer as string,
             })
             .eq("id", userId);
@@ -125,7 +126,7 @@ export async function POST(req: NextRequest) {
         if (profiles && profiles.length > 0) {
           await supabase
             .from("profiles")
-            .update({ subscription_status: "canceled" })
+            .update({ subscription_status: "canceled", subscription_plan: "free" })
             .eq("id", profiles[0].id);
 
           console.log(

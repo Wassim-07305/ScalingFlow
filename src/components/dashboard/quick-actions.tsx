@@ -8,42 +8,50 @@ import {
   PenTool,
   FileText,
   Handshake,
+  ArrowRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
 const actions = [
   {
     label: "Créer une offre",
+    description: "Génère ton positionnement, pricing et garanties",
     href: "/offer",
     icon: Package,
     color: "orange" as const,
   },
   {
     label: "Générer un funnel",
+    description: "Page opt-in, VSL et remerciement",
     href: "/funnel",
     icon: Filter,
     color: "blue" as const,
   },
   {
     label: "Créer des pubs",
+    description: "Hooks, creatives et scripts vidéo",
     href: "/ads/creatives",
     icon: Megaphone,
     color: "cyan" as const,
   },
   {
     label: "Générer du contenu",
+    description: "Reels, posts, stories et carrousels",
     href: "/content",
     icon: PenTool,
     color: "purple" as const,
   },
   {
     label: "Sales assets",
+    description: "Emails, SMS, VSL et lettres de vente",
     href: "/assets",
     icon: FileText,
     color: "orange" as const,
   },
   {
     label: "Scripts de vente",
+    description: "Scripts de closing et traitement objections",
     href: "/sales",
     icon: Handshake,
     color: "blue" as const,
@@ -51,33 +59,71 @@ const actions = [
 ];
 
 const colorStyles = {
-  orange: "bg-accent-muted text-accent",
-  blue: "bg-info/12 text-info",
-  cyan: "bg-accent-muted text-accent",
-  purple: "bg-[rgba(139,92,246,0.12)] text-[#A78BFA]",
+  orange: {
+    bg: "bg-accent/10",
+    text: "text-accent",
+    hover: "hover:border-accent/30 hover:shadow-[0_0_20px_rgba(52,211,153,0.06)]",
+  },
+  blue: {
+    bg: "bg-info/10",
+    text: "text-info",
+    hover: "hover:border-info/30 hover:shadow-[0_0_20px_rgba(59,130,246,0.06)]",
+  },
+  cyan: {
+    bg: "bg-accent/10",
+    text: "text-accent",
+    hover: "hover:border-accent/30 hover:shadow-[0_0_20px_rgba(52,211,153,0.06)]",
+  },
+  purple: {
+    bg: "bg-[rgba(139,92,246,0.10)]",
+    text: "text-[#A78BFA]",
+    hover: "hover:border-[#A78BFA]/30 hover:shadow-[0_0_20px_rgba(139,92,246,0.06)]",
+  },
 };
 
 export function QuickActions() {
   return (
-    <div>
-      <h3 className="text-lg font-semibold text-text-primary mb-4">
-        Actions rapides
-      </h3>
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-        {actions.map((action) => (
-          <Link
-            key={action.href}
-            href={action.href}
-            className={cn(
-              "flex flex-col items-center gap-2 rounded-[12px] border border-border-default bg-bg-secondary p-4 transition-all duration-300 hover:border-border-hover",
-              colorStyles[action.color]
-            )}
-          >
-            <action.icon className="h-6 w-6" />
-            <span className="text-xs font-medium text-center">{action.label}</span>
-          </Link>
-        ))}
-      </div>
-    </div>
+    <Card>
+      <CardHeader>
+        <CardTitle>Actions rapides</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          {actions.map((action) => {
+            const colors = colorStyles[action.color];
+            return (
+              <Link
+                key={action.href}
+                href={action.href}
+                className={cn(
+                  "group flex items-start gap-3 rounded-xl border border-border-default bg-bg-secondary p-4 transition-all duration-300",
+                  colors.hover
+                )}
+              >
+                <div
+                  className={cn(
+                    "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl",
+                    colors.bg
+                  )}
+                >
+                  <action.icon className={cn("h-5 w-5", colors.text)} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-sm font-medium text-text-primary">
+                      {action.label}
+                    </span>
+                    <ArrowRight className="h-3.5 w-3.5 text-text-muted opacity-0 -translate-x-1 transition-all duration-200 group-hover:opacity-100 group-hover:translate-x-0" />
+                  </div>
+                  <p className="text-xs text-text-muted mt-0.5 line-clamp-1">
+                    {action.description}
+                  </p>
+                </div>
+              </Link>
+            );
+          })}
+        </div>
+      </CardContent>
+    </Card>
   );
 }

@@ -79,11 +79,11 @@ Justifie ton choix en 2-3 phrases.
 
 ### Parcours recommande
 Recommande un des parcours suivants :
-- **A1** : Parcours Freelance — pour ceux qui veulent vendre leurs competences en freelance/consulting
-- **A2** : Parcours Agence — pour ceux qui veulent creer et scaler une agence
-- **A3** : Parcours SaaS/Produit — pour ceux qui veulent creer un produit digital
-- **B** : Parcours Formateur — pour ceux qui veulent monetiser via la formation/coaching
-- **C** : Parcours E-commerce — pour ceux qui veulent vendre des produits physiques ou digitaux en e-commerce
+- **A1** : Partir de Zero — pour ceux qui n'ont pas encore de business ni d'expertise claire. L'IA guide de zero a la premiere vente.
+- **A2** : Salarie en Reconversion — pour ceux qui sont en poste et veulent se lancer comme prestataire en transformant leur expertise metier en offre.
+- **A3** : Freelance — pour les freelances/prestataires qui veulent packager, scaler ou systematiser leurs services.
+- **B** : Scaler mon Business — pour les entrepreneurs qui ont deja une offre, des clients et du CA et veulent passer au niveau superieur (5K-50K+/mois).
+- **C** : Pivoter — pour les entrepreneurs qui veulent changer de marche ou repositionner leur offre tout en gardant leur experience business.
 Justifie ton choix en 2-3 phrases.
 
 ### Prochaines etapes

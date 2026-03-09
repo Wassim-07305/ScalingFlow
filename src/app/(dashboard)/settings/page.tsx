@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
+import { useSearchParams } from "next/navigation";
 import { PageHeader } from "@/components/layout/page-header";
 import {
   Card,
@@ -37,7 +38,15 @@ const EXPERIENCE_LABELS: Record<string, string> = {
 
 export default function SettingsPage() {
   const { user, profile } = useUser();
+  const searchParams = useSearchParams();
   const supabase = createClient();
+
+  // Handle checkout success redirect
+  useEffect(() => {
+    if (searchParams.get("checkout") === "success") {
+      toast.success("Abonnement active avec succes ! Bienvenue dans le plan Pro.");
+    }
+  }, [searchParams]);
 
   // --- Profil ---
   const [fullName, setFullName] = useState("");
@@ -128,6 +137,55 @@ export default function SettingsPage() {
     toast.info("Contacte le support pour supprimer ton compte.");
   }, []);
 
+  // --- Notifications ---
+  const NOTIF_KEYS = [
+    { key: "email_progression", label: "Emails de progression" },
+    { key: "email_tasks", label: "Rappels de taches" },
+    { key: "email_academy", label: "Nouveautes Academy" },
+    { key: "email_community", label: "Activite communaute" },
+  ] as const;
+
+  type NotifPrefs = Record<string, boolean>;
+  const [notifPrefs, setNotifPrefs] = useState<NotifPrefs>(() => {
+    const meta = user?.user_metadata as NotifPrefs | undefined;
+    return NOTIF_KEYS.reduce((acc, { key }) => {
+      acc[key] = meta?.[key] !== false;
+      return acc;
+    }, {} as NotifPrefs);
+  });
+  const [savingNotifs, setSavingNotifs] = useState(false);
+
+  useEffect(() => {
+    const meta = user?.user_metadata as NotifPrefs | undefined;
+    setNotifPrefs(
+      NOTIF_KEYS.reduce((acc, { key }) => {
+        acc[key] = meta?.[key] !== false;
+        return acc;
+      }, {} as NotifPrefs)
+    );
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
+
+  const handleToggleNotif = (key: string) => {
+    setNotifPrefs((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  const handleSaveNotifs = useCallback(async () => {
+    if (!user) return;
+    setSavingNotifs(true);
+    try {
+      const { error } = await supabase.auth.updateUser({
+        data: notifPrefs,
+      });
+      if (error) throw error;
+      toast.success("Preferences de notifications sauvegardees.");
+    } catch {
+      toast.error("Erreur lors de la sauvegarde.");
+    } finally {
+      setSavingNotifs(false);
+    }
+  }, [user, notifPrefs, supabase]);
+
   // Verifier si le profil a change
   const profileChanged = fullName.trim() !== (profile?.full_name || "");
 
@@ -205,24 +263,38 @@ export default function SettingsPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {[
-                "Emails de progression",
-                "Rappels de taches",
-                "Nouveautes Academy",
-                "Activite communaute",
-              ].map((notif) => (
+              {NOTIF_KEYS.map(({ key, label }) => (
                 <div
-                  key={notif}
+                  key={key}
                   className="flex items-center justify-between py-2"
                 >
-                  <span className="text-sm text-text-primary">{notif}</span>
-                  <Badge variant="cyan">Active</Badge>
+                  <span className="text-sm text-text-primary">{label}</span>
+                  <button
+                    onClick={() => handleToggleNotif(key)}
+                    className={cn(
+                      "relative inline-flex h-6 w-11 items-center rounded-full transition-colors",
+                      notifPrefs[key] ? "bg-accent" : "bg-bg-tertiary border border-border-default"
+                    )}
+                  >
+                    <span
+                      className={cn(
+                        "inline-block h-4 w-4 rounded-full bg-white transition-transform",
+                        notifPrefs[key] ? "translate-x-6" : "translate-x-1"
+                      )}
+                    />
+                  </button>
                 </div>
               ))}
             </div>
-            <p className="text-xs text-text-muted mt-4">
-              Les preferences de notifications seront bientot configurables.
-            </p>
+            <Button
+              size="sm"
+              className="mt-4"
+              onClick={handleSaveNotifs}
+              disabled={savingNotifs}
+            >
+              {savingNotifs && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+              Sauvegarder les preferences
+            </Button>
           </CardContent>
         </Card>
 

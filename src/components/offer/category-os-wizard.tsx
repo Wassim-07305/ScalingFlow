@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import type { CategoryOSResult } from "@/lib/ai/prompts/category-os";
+import { UpgradeWall } from "@/components/shared/upgrade-wall";
 
 const STEPS = [
   { key: "new_game", label: "New Game", icon: Gamepad2, color: "text-accent" },
@@ -39,6 +40,7 @@ export function CategoryOSWizard({ offerId, className }: CategoryOSWizardProps) 
   const [loading, setLoading] = React.useState(false);
   const [result, setResult] = React.useState<CategoryOSResult | null>(null);
   const [currentStep, setCurrentStep] = React.useState(0);
+  const [usageLimited, setUsageLimited] = React.useState<{currentUsage: number; limit: number} | null>(null);
 
   const handleGenerate = async () => {
     if (!offerId) {
@@ -58,8 +60,9 @@ export function CategoryOSWizard({ offerId, className }: CategoryOSWizardProps) 
       });
 
       if (!response.ok) {
-        const err = await response.json();
-        throw new Error(err.error || "Erreur lors de la generation");
+        const errData = await response.json().catch(() => ({}));
+        if (response.status === 403 && errData.usage) { setUsageLimited(errData.usage); return; }
+        throw new Error(errData.error || "Erreur lors de la generation");
       }
 
       const data: CategoryOSResult = await response.json();
@@ -71,6 +74,10 @@ export function CategoryOSWizard({ offerId, className }: CategoryOSWizardProps) 
       setLoading(false);
     }
   };
+
+  if (usageLimited) {
+    return <UpgradeWall currentUsage={usageLimited.currentUsage} limit={usageLimited.limit} className={className} />;
+  }
 
   if (loading) {
     return <AILoading text="Generation du Category OS" className={className} />;

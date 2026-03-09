@@ -82,21 +82,37 @@ export default function LoginPage() {
           </div>
         )}
 
+        <div className="flex justify-end">
+          <Link
+            href="/forgot-password"
+            className="text-xs text-text-muted hover:text-text-secondary transition-colors"
+          >
+            Mot de passe oublie ?
+          </Link>
+        </div>
+
         <Button type="submit" className="w-full" disabled={loading}>
           {loading ? "Connexion..." : "Se connecter"}
         </Button>
       </form>
 
       {/* Footer */}
-      <p className="text-center text-sm text-text-secondary">
-        Pas encore de compte ?{" "}
-        <Link
-          href="/register"
-          className="text-info hover:underline font-medium"
-        >
-          Créer un compte
-        </Link>
-      </p>
+      <div className="text-center space-y-2">
+        <p className="text-sm text-text-secondary">
+          Pas encore de compte ?{" "}
+          <Link
+            href="/register"
+            className="text-info hover:underline font-medium"
+          >
+            Créer un compte
+          </Link>
+        </p>
+        <p className="text-xs text-text-muted">
+          <Link href="/welcome" className="hover:text-text-secondary transition-colors">
+            Retour a l&apos;accueil
+          </Link>
+        </p>
+      </div>
     </div>
   );
 }

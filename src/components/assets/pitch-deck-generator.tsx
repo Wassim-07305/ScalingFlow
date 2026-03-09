@@ -15,6 +15,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import type { PitchDeckResult } from "@/lib/ai/prompts/pitch-deck";
+import { UpgradeWall } from "@/components/shared/upgrade-wall";
 
 interface PitchDeckGeneratorProps {
   className?: string;
@@ -26,6 +27,7 @@ export function PitchDeckGenerator({ className, initialData }: PitchDeckGenerato
   const [deck, setDeck] = React.useState<PitchDeckResult | null>(initialData || null);
   const [error, setError] = React.useState<string | null>(null);
   const [activeSlide, setActiveSlide] = React.useState(0);
+  const [usageLimited, setUsageLimited] = React.useState<{currentUsage: number; limit: number} | null>(null);
 
   React.useEffect(() => {
     if (initialData) setDeck(initialData);
@@ -42,7 +44,13 @@ export function PitchDeckGenerator({ className, initialData }: PitchDeckGenerato
         body: JSON.stringify({ type: "pitch_deck" }),
       });
 
-      if (!response.ok) throw new Error("Erreur lors de la generation");
+      if (!response.ok) {
+        if (response.status === 403) {
+          const errData = await response.json();
+          if (errData.usage) { setUsageLimited(errData.usage); return; }
+        }
+        throw new Error("Erreur lors de la generation");
+      }
       const data = await response.json();
       const raw = data.ai_raw_response || data;
       setDeck(raw as PitchDeckResult);
@@ -52,6 +60,10 @@ export function PitchDeckGenerator({ className, initialData }: PitchDeckGenerato
       setLoading(false);
     }
   };
+
+  if (usageLimited) {
+    return <UpgradeWall currentUsage={usageLimited.currentUsage} limit={usageLimited.limit} className={className} />;
+  }
 
   if (loading) {
     return (

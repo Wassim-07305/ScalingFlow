@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { AILoading } from "@/components/shared/ai-loading";
 import { GlowCard } from "@/components/shared/glow-card";
 import { Sparkles, Copy, Linkedin, Twitter, Instagram } from "lucide-react";
+import { UpgradeWall } from "@/components/shared/upgrade-wall";
 
 const PLATFORMS = [
   { key: "linkedin", label: "LinkedIn", icon: Linkedin },
@@ -26,6 +27,7 @@ export function PostGenerator({ className }: PostGeneratorProps) {
   const [error, setError] = React.useState<string | null>(null);
   const [platform, setPlatform] = React.useState("linkedin");
   const [copiedIndex, setCopiedIndex] = React.useState<number | null>(null);
+  const [usageLimited, setUsageLimited] = React.useState<{currentUsage: number; limit: number} | null>(null);
 
   const handleGenerate = async () => {
     setLoading(true);
@@ -38,7 +40,13 @@ export function PostGenerator({ className }: PostGeneratorProps) {
         body: JSON.stringify({ platform }),
       });
 
-      if (!response.ok) throw new Error("Erreur lors de la génération");
+      if (!response.ok) {
+        if (response.status === 403) {
+          const errData = await response.json();
+          if (errData.usage) { setUsageLimited(errData.usage); return; }
+        }
+        throw new Error("Erreur lors de la generation");
+      }
       const data = await response.json();
       const raw = data.ai_raw_response || data;
       setPosts(raw.posts || raw.ideas || [raw]);
@@ -54,6 +62,10 @@ export function PostGenerator({ className }: PostGeneratorProps) {
     setCopiedIndex(index);
     setTimeout(() => setCopiedIndex(null), 2000);
   };
+
+  if (usageLimited) {
+    return <UpgradeWall currentUsage={usageLimited.currentUsage} limit={usageLimited.limit} className={className} />;
+  }
 
   if (loading) {
     return <AILoading text="Création de tes posts" className={className} />;

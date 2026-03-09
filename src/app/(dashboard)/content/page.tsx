@@ -12,9 +12,8 @@ import { StoriesGenerator } from "@/components/content/stories-generator";
 import { CarouselGenerator } from "@/components/content/carousel-generator";
 import { InstagramOptimizer } from "@/components/content/instagram-optimizer";
 import { GenerationHistory } from "@/components/shared/generation-history";
-import { TabBar } from "@/components/shared/tab-bar";
+import { cn } from "@/lib/utils/cn";
 import { createClient } from "@/lib/supabase/client";
-import { useUser } from "@/hooks/use-user";
 import { toast } from "sonner";
 import {
   Target,
@@ -60,27 +59,6 @@ export default function ContentPage() {
   const [activeTab, setActiveTab] = React.useState<string>("strategy");
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [loadedData, setLoadedData] = React.useState<Record<string, any>>({});
-  const { user } = useUser();
-
-  React.useEffect(() => {
-    if (!user) return;
-    const loadLatest = async () => {
-      const supabase = createClient();
-      const { data } = await supabase
-        .from("content_pieces")
-        .select("content_type, ai_raw_response")
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: false })
-        .limit(1)
-        .single();
-
-      if (data?.ai_raw_response) {
-        const tabKey = CONTENT_TYPE_TO_TAB[data.content_type] || "strategy";
-        setLoadedData((prev) => ({ ...prev, [tabKey]: data.ai_raw_response }));
-      }
-    };
-    loadLatest();
-  }, [user]);
 
   const handleHistorySelect = async (item: { id: string }) => {
     try {
@@ -111,7 +89,23 @@ export default function ContentPage() {
         description="Genere et planifie du contenu pour tes reseaux sociaux."
       />
 
-      <TabBar tabs={TABS} activeTab={activeTab} onTabChange={setActiveTab} />
+      <div className="flex gap-2 mb-6 overflow-x-auto pb-1">
+        {TABS.map((tab) => (
+          <button
+            key={tab.key}
+            onClick={() => setActiveTab(tab.key)}
+            className={cn(
+              "flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all whitespace-nowrap",
+              activeTab === tab.key
+                ? "bg-accent text-white"
+                : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
+            )}
+          >
+            <tab.icon className="h-4 w-4" />
+            {tab.label}
+          </button>
+        ))}
+      </div>
 
       {activeTab === "strategy" && <StrategyOverview initialData={loadedData.strategy} />}
       {activeTab === "reels" && <ReelsGenerator initialData={loadedData.reels} />}

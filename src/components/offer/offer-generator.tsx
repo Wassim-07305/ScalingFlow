@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { AILoading } from "@/components/shared/ai-loading";
 import { EmptyState } from "@/components/shared/empty-state";
 import { OfferPreview } from "./offer-preview";
+import { UpgradeWall } from "@/components/shared/upgrade-wall";
 
 interface OfferGeneratorProps {
   className?: string;
@@ -23,6 +24,7 @@ export function OfferGenerator({ className, marketAnalysisId, marketName, initia
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [generatedOffer, setGeneratedOffer] = React.useState<any>(null);
   const [error, setError] = React.useState<string | null>(null);
+  const [usageLimited, setUsageLimited] = React.useState<{currentUsage: number; limit: number} | null>(null);
 
   // Charger les donnees historiques quand initialData change
   React.useEffect(() => {
@@ -49,7 +51,11 @@ export function OfferGenerator({ className, marketAnalysisId, marketName, initia
       });
 
       if (!response.ok) {
-        throw new Error("Erreur lors de la génération de l'offre");
+        if (response.status === 403) {
+          const errData = await response.json();
+          if (errData.usage) { setUsageLimited(errData.usage); return; }
+        }
+        throw new Error("Erreur lors de la generation");
       }
 
       const data = await response.json();
@@ -72,6 +78,10 @@ export function OfferGenerator({ className, marketAnalysisId, marketName, initia
         className={className}
       />
     );
+  }
+
+  if (usageLimited) {
+    return <UpgradeWall currentUsage={usageLimited.currentUsage} limit={usageLimited.limit} className={className} />;
   }
 
   if (loading) {

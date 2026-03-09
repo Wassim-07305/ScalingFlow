@@ -14,7 +14,9 @@ import {
   ChevronUp,
   BookOpen,
 } from "lucide-react";
+import { CopyExportBar } from "@/components/shared/copy-export-bar";
 import type { SalesLetterResult } from "@/lib/ai/prompts/sales-letter";
+import { UpgradeWall } from "@/components/shared/upgrade-wall";
 
 interface SalesLetterGeneratorProps {
   className?: string;
@@ -26,6 +28,7 @@ export function SalesLetterGenerator({ className, initialData }: SalesLetterGene
   const [letter, setLetter] = React.useState<SalesLetterResult | null>(initialData || null);
   const [error, setError] = React.useState<string | null>(null);
   const [showFullLetter, setShowFullLetter] = React.useState(false);
+  const [usageLimited, setUsageLimited] = React.useState<{currentUsage: number; limit: number} | null>(null);
 
   React.useEffect(() => {
     if (initialData) setLetter(initialData);
@@ -42,7 +45,13 @@ export function SalesLetterGenerator({ className, initialData }: SalesLetterGene
         body: JSON.stringify({ type: "sales_letter" }),
       });
 
-      if (!response.ok) throw new Error("Erreur lors de la generation");
+      if (!response.ok) {
+        if (response.status === 403) {
+          const errData = await response.json();
+          if (errData.usage) { setUsageLimited(errData.usage); return; }
+        }
+        throw new Error("Erreur lors de la generation");
+      }
       const data = await response.json();
       const raw = data.ai_raw_response || data;
       setLetter(raw as SalesLetterResult);
@@ -52,6 +61,10 @@ export function SalesLetterGenerator({ className, initialData }: SalesLetterGene
       setLoading(false);
     }
   };
+
+  if (usageLimited) {
+    return <UpgradeWall currentUsage={usageLimited.currentUsage} limit={usageLimited.limit} className={className} />;
+  }
 
   if (loading) {
     return (
@@ -82,14 +95,28 @@ export function SalesLetterGenerator({ className, initialData }: SalesLetterGene
   return (
     <div className={cn("space-y-6", className)}>
       {/* Header */}
-      <div className="flex items-center gap-4">
-        <Badge variant="blue">
-          <FileText className="h-3 w-3 mr-1" />
-          {sections.length} sections
-        </Badge>
-        {letter.estimated_word_count && (
-          <Badge variant="muted">~{letter.estimated_word_count} mots</Badge>
-        )}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <Badge variant="blue">
+            <FileText className="h-3 w-3 mr-1" />
+            {sections.length} sections
+          </Badge>
+          {letter.estimated_word_count && (
+            <Badge variant="muted">~{letter.estimated_word_count} mots</Badge>
+          )}
+        </div>
+        <CopyExportBar
+          copyContent={
+            `# ${letter.headline}\n${letter.sub_headline ? `\n${letter.sub_headline}\n` : ""}\n` +
+            sections.map((s) => `## ${s.name}\n\n${s.content}`).join("\n\n---\n\n") +
+            ((letter as SalesLetterResult & { full_letter?: string }).full_letter
+              ? `\n\n---\n\n${(letter as SalesLetterResult & { full_letter?: string }).full_letter}`
+              : "")
+          }
+          pdfTitle="Sales Letter"
+          pdfSubtitle={letter.headline}
+          pdfFilename="sales-letter.pdf"
+        />
       </div>
 
       {/* Headline & sub-headline */}

@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { AILoading } from "@/components/shared/ai-loading";
 import { GlowCard } from "@/components/shared/glow-card";
 import { Sparkles, Clock, Play } from "lucide-react";
+import { CopyExportBar } from "@/components/shared/copy-export-bar";
+import { UpgradeWall } from "@/components/shared/upgrade-wall";
 
 interface VSLGeneratorProps {
   className?: string;
@@ -20,6 +22,7 @@ export function VSLGenerator({ className, initialData }: VSLGeneratorProps) {
   const [script, setScript] = React.useState<any>(initialData || null);
   const [error, setError] = React.useState<string | null>(null);
   const [activeSection, setActiveSection] = React.useState(0);
+  const [usageLimited, setUsageLimited] = React.useState<{currentUsage: number; limit: number} | null>(null);
 
   React.useEffect(() => {
     if (initialData) setScript(initialData);
@@ -36,7 +39,13 @@ export function VSLGenerator({ className, initialData }: VSLGeneratorProps) {
         body: JSON.stringify({ type: "vsl" }),
       });
 
-      if (!response.ok) throw new Error("Erreur lors de la génération");
+      if (!response.ok) {
+        if (response.status === 403) {
+          const errData = await response.json();
+          if (errData.usage) { setUsageLimited(errData.usage); return; }
+        }
+        throw new Error("Erreur lors de la generation");
+      }
       const data = await response.json();
       setScript(data.ai_raw_response || data);
     } catch (err) {
@@ -45,6 +54,10 @@ export function VSLGenerator({ className, initialData }: VSLGeneratorProps) {
       setLoading(false);
     }
   };
+
+  if (usageLimited) {
+    return <UpgradeWall currentUsage={usageLimited.currentUsage} limit={usageLimited.limit} className={className} />;
+  }
 
   if (loading) {
     return <AILoading text="Rédaction de ton script VSL" className={className} />;
@@ -65,14 +78,29 @@ export function VSLGenerator({ className, initialData }: VSLGeneratorProps) {
 
   const sections = script.sections || [];
 
+  const fullScriptText = sections
+    .map((s: { name: string; script: string; speaker_notes?: string }) =>
+      `## ${s.name}\n\n${s.script}${s.speaker_notes ? `\n\nNotes: ${s.speaker_notes}` : ""}`
+    )
+    .join("\n\n---\n\n");
+
   return (
     <div className={cn("space-y-6", className)}>
-      <div className="flex items-center gap-4">
-        <Badge variant="blue">
-          <Clock className="h-3 w-3 mr-1" />
-          {script.total_duration_estimate || "~15 min"}
-        </Badge>
-        <Badge variant="muted">{sections.length} sections</Badge>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <Badge variant="blue">
+            <Clock className="h-3 w-3 mr-1" />
+            {script.total_duration_estimate || "~15 min"}
+          </Badge>
+          <Badge variant="muted">{sections.length} sections</Badge>
+        </div>
+        <CopyExportBar
+          copyContent={fullScriptText}
+          pdfTitle="Script VSL"
+          pdfSubtitle={script.total_duration_estimate || "~15 min"}
+          pdfContent={fullScriptText}
+          pdfFilename="script-vsl.pdf"
+        />
       </div>
 
       <div className="flex gap-2 overflow-x-auto pb-2">
