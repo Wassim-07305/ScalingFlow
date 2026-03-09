@@ -2,8 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Package, FileText, GitBranch, Flame, PenTool, Megaphone } from "lucide-react";
-import { Card } from "@/components/ui/card";
+import { Package, FileText, GitBranch, Flame, PenTool, Megaphone, TrendingUp } from "lucide-react";
 import { AnimatedCounter } from "@/components/shared/animated-counter";
 import { cn } from "@/lib/utils/cn";
 import { useUser } from "@/hooks/use-user";
@@ -14,30 +13,51 @@ interface StatCard {
   value: number;
   suffix?: string;
   icon: React.ElementType;
-  color: "orange" | "blue" | "cyan" | "purple";
+  color: "orange" | "blue" | "cyan" | "purple" | "emerald";
   href?: string;
+  trend?: number;
 }
 
 const colorMap = {
   orange: {
-    bg: "bg-accent-muted",
-    text: "text-accent",
-    icon: "text-accent",
+    bg: "bg-orange-500/10",
+    border: "border-orange-500/20",
+    text: "text-orange-400",
+    icon: "text-orange-400",
+    glow: "hover:shadow-[0_0_20px_rgba(249,115,22,0.12)]",
+    gradient: "from-orange-500/5 to-transparent",
   },
   blue: {
-    bg: "bg-info/12",
-    text: "text-info",
-    icon: "text-info",
+    bg: "bg-blue-500/10",
+    border: "border-blue-500/20",
+    text: "text-blue-400",
+    icon: "text-blue-400",
+    glow: "hover:shadow-[0_0_20px_rgba(59,130,246,0.12)]",
+    gradient: "from-blue-500/5 to-transparent",
   },
   cyan: {
-    bg: "bg-accent-muted",
-    text: "text-accent",
-    icon: "text-accent",
+    bg: "bg-cyan-500/10",
+    border: "border-cyan-500/20",
+    text: "text-cyan-400",
+    icon: "text-cyan-400",
+    glow: "hover:shadow-[0_0_20px_rgba(6,182,212,0.12)]",
+    gradient: "from-cyan-500/5 to-transparent",
   },
   purple: {
-    bg: "bg-[rgba(139,92,246,0.12)]",
-    text: "text-[#A78BFA]",
-    icon: "text-[#A78BFA]",
+    bg: "bg-purple-500/10",
+    border: "border-purple-500/20",
+    text: "text-purple-400",
+    icon: "text-purple-400",
+    glow: "hover:shadow-[0_0_20px_rgba(139,92,246,0.12)]",
+    gradient: "from-purple-500/5 to-transparent",
+  },
+  emerald: {
+    bg: "bg-emerald-500/10",
+    border: "border-emerald-500/20",
+    text: "text-emerald-400",
+    icon: "text-emerald-400",
+    glow: "hover:shadow-[0_0_20px_rgba(52,211,153,0.12)]",
+    gradient: "from-emerald-500/5 to-transparent",
   },
 };
 
@@ -103,7 +123,7 @@ export function StatsOverview() {
       label: "Offres",
       value: counts.offers,
       icon: Package,
-      color: "orange",
+      color: "emerald",
       href: "/offer",
     },
     {
@@ -114,7 +134,7 @@ export function StatsOverview() {
       href: "/funnel",
     },
     {
-      label: "Publicités",
+      label: "Publicites",
       value: counts.ads,
       icon: Megaphone,
       color: "blue",
@@ -131,7 +151,7 @@ export function StatsOverview() {
       label: "Assets",
       value: counts.assets,
       icon: FileText,
-      color: "blue",
+      color: "orange",
       href: "/assets",
     },
     {
@@ -149,17 +169,27 @@ export function StatsOverview() {
       {stats.map((stat) => {
         const colors = colorMap[stat.color];
         return (
-          <Card
+          <div
             key={stat.label}
-            className="relative overflow-hidden cursor-pointer transition-all hover:border-accent/30 hover:shadow-[0_0_15px_rgba(52,211,153,0.08)]"
+            className={cn(
+              "group relative overflow-hidden rounded-xl border border-border-default bg-bg-secondary p-4 cursor-pointer transition-all duration-300",
+              "hover:border-transparent hover:translate-y-[-2px]",
+              colors.glow
+            )}
             onClick={() => stat.href && router.push(stat.href)}
           >
-            <div className="flex items-start justify-between">
+            {/* Gradient background on hover */}
+            <div className={cn(
+              "absolute inset-0 bg-gradient-to-br opacity-0 transition-opacity duration-300 group-hover:opacity-100",
+              colors.gradient
+            )} />
+
+            <div className="relative flex items-start justify-between">
               <div>
-                <p className="text-sm text-text-secondary">{stat.label}</p>
-                <div className="mt-2 text-2xl font-bold text-text-primary">
+                <p className="text-sm text-text-secondary font-medium">{stat.label}</p>
+                <div className="mt-1.5 text-2xl font-bold text-text-primary">
                   {isLoading ? (
-                    <span className="inline-block h-7 w-16 animate-pulse rounded bg-white/10" />
+                    <span className="inline-block h-7 w-14 animate-pulse rounded bg-white/10" />
                   ) : (
                     <AnimatedCounter
                       value={stat.value}
@@ -171,14 +201,18 @@ export function StatsOverview() {
               </div>
               <div
                 className={cn(
-                  "flex h-10 w-10 items-center justify-center rounded-[8px]",
-                  colors.bg
+                  "flex h-10 w-10 items-center justify-center rounded-xl transition-all duration-300",
+                  colors.bg,
+                  "group-hover:scale-110"
                 )}
               >
                 <stat.icon className={cn("h-5 w-5", colors.icon)} />
               </div>
             </div>
-          </Card>
+
+            {/* Subtle shine effect */}
+            <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/5 to-transparent group-hover:translate-x-full transition-transform duration-700" />
+          </div>
         );
       })}
     </div>
