@@ -2,8 +2,7 @@
 
 import React from "react";
 import { PageHeader } from "@/components/layout/page-header";
-import { PostGenerator } from "@/components/content/post-generator";
-import { ContentCalendar } from "@/components/content/content-calendar";
+import { TabBar } from "@/components/shared/tab-bar";
 import { StrategyOverview } from "@/components/content/strategy-overview";
 import { EditorialCalendar } from "@/components/content/editorial-calendar";
 import { ReelsGenerator } from "@/components/content/reels-generator";
@@ -12,7 +11,6 @@ import { StoriesGenerator } from "@/components/content/stories-generator";
 import { CarouselGenerator } from "@/components/content/carousel-generator";
 import { InstagramOptimizer } from "@/components/content/instagram-optimizer";
 import { GenerationHistory } from "@/components/shared/generation-history";
-import { cn } from "@/lib/utils/cn";
 import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
 import {
@@ -89,23 +87,7 @@ export default function ContentPage() {
         description="Genere et planifie du contenu pour tes reseaux sociaux."
       />
 
-      <div className="flex gap-2 mb-6 overflow-x-auto pb-1">
-        {TABS.map((tab) => (
-          <button
-            key={tab.key}
-            onClick={() => setActiveTab(tab.key)}
-            className={cn(
-              "flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all whitespace-nowrap",
-              activeTab === tab.key
-                ? "bg-accent text-white"
-                : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
-            )}
-          >
-            <tab.icon className="h-4 w-4" />
-            {tab.label}
-          </button>
-        ))}
-      </div>
+      <TabBar tabs={TABS} activeTab={activeTab} onTabChange={setActiveTab} />
 
       {activeTab === "strategy" && <StrategyOverview initialData={loadedData.strategy} />}
       {activeTab === "reels" && <ReelsGenerator initialData={loadedData.reels} />}
