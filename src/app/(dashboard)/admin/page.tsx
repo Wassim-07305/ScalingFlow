@@ -191,8 +191,8 @@ export default function AdminPage() {
           }))
         );
       }
-    } catch (error) {
-      console.error("Erreur chargement stats admin:", error);
+    } catch {
+      // Stats loading failed silently
     } finally {
       setLoading(false);
     }

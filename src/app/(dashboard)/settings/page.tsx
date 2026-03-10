@@ -102,8 +102,7 @@ export default function SettingsPage() {
 
       setAvatarUrl(publicUrl);
       toast.success("Photo de profil mise a jour !");
-    } catch (err) {
-      console.error("Avatar upload error:", err);
+    } catch {
       toast.error("Erreur lors de l'upload de l'avatar.");
     } finally {
       setUploadingAvatar(false);

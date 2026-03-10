@@ -67,7 +67,6 @@ export default function MarketPage() {
 
     if (error) {
       toast.error("Erreur lors du chargement des analyses");
-      console.error(error);
     } else if (data) {
       setAnalyses(data);
       // Selectionner la premiere analyse par defaut (ou celle marquee selected)
@@ -90,9 +89,7 @@ export default function MarketPage() {
       .eq("market_analysis_id", selectedAnalysis.id)
       .order("created_at", { ascending: false });
 
-    if (error) {
-      console.error(error);
-    } else {
+    if (!error) {
       setCompetitors(data || []);
     }
   }, [user, selectedAnalysis, supabase]);
@@ -133,7 +130,6 @@ export default function MarketPage() {
       );
       toast.success("Persona genere avec succes !");
     } catch (error) {
-      console.error(error);
       toast.error(
         error instanceof Error
           ? error.message
@@ -167,7 +163,6 @@ export default function MarketPage() {
       await loadCompetitors();
       toast.success("Analyse concurrentielle terminee !");
     } catch (error) {
-      console.error(error);
       toast.error(
         error instanceof Error
           ? error.message
