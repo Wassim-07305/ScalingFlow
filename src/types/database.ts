@@ -169,6 +169,7 @@ export interface Database {
           target_avatar: Json | null;
           persona: Json | null;
           schwartz_level: number | null;
+          schwartz_analysis: Json | null;
           country: string | null;
           language: string | null;
           ai_raw_response: Json | null;
@@ -189,6 +190,7 @@ export interface Database {
           target_avatar?: Json | null;
           persona?: Json | null;
           schwartz_level?: number | null;
+          schwartz_analysis?: Json | null;
           country?: string | null;
           language?: string | null;
           ai_raw_response?: Json | null;
@@ -206,6 +208,7 @@ export interface Database {
           target_avatar?: Json | null;
           persona?: Json | null;
           schwartz_level?: number | null;
+          schwartz_analysis?: Json | null;
           country?: string | null;
           language?: string | null;
           ai_raw_response?: Json | null;
