@@ -186,6 +186,12 @@ export function PostFeed({ className }: PostFeedProps) {
     }
 
     toast.success("Post publie !");
+    // Attribuer XP (non bloquant)
+    fetch("/api/gamification/award", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ activityType: "community.post" }),
+    }).catch(() => {});
     setNewContent("");
     setSubmitting(false);
     await fetchPosts();
@@ -349,6 +355,13 @@ export function PostFeed({ className }: PostFeedProps) {
       ...prev,
       [postId]: [...(prev[postId] || []), newComment],
     }));
+
+    // Attribuer XP pour le commentaire (non bloquant)
+    fetch("/api/gamification/award", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ activityType: "community.comment" }),
+    }).catch(() => {});
 
     // Mettre a jour le compteur
     setPosts((prev) =>

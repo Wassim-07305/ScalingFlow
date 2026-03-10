@@ -434,6 +434,13 @@ export function OnboardingFlow() {
       })
       .eq("id", user.id);
 
+    // Attribuer XP pour l'onboarding (non bloquant)
+    fetch("/api/gamification/award", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ activityType: "onboarding.completed" }),
+    }).catch(() => {});
+
     confetti({
       particleCount: 150,
       spread: 70,
