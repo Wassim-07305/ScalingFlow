@@ -6,6 +6,7 @@ import { resend } from "@/lib/resend/client";
 import {
   subscriptionActivatedEmail,
   subscriptionCanceledEmail,
+  paymentFailedEmail,
 } from "@/lib/resend/templates";
 import type Stripe from "stripe";
 
@@ -164,6 +165,39 @@ export async function POST(req: NextRequest) {
                 html: emailContent.html,
               }).catch(() => {});
             }
+          }
+        }
+        break;
+      }
+
+      case "invoice.payment_failed": {
+        const invoice = event.data.object as Stripe.Invoice;
+        const customerId = invoice.customer as string;
+
+        const { data: profiles } = await supabase
+          .from("profiles")
+          .select("id, full_name, email")
+          .eq("stripe_customer_id", customerId)
+          .limit(1);
+
+        if (profiles && profiles.length > 0) {
+          // Mettre a jour le statut
+          await supabase
+            .from("profiles")
+            .update({ subscription_status: "past_due" })
+            .eq("id", profiles[0].id);
+
+          // Envoyer email d'alerte de paiement echoue
+          if (resend && profiles[0].email) {
+            const firstName = profiles[0].full_name?.split(" ")[0] || "Utilisateur";
+            const emailContent = paymentFailedEmail(firstName);
+
+            await resend.emails.send({
+              from: FROM,
+              to: profiles[0].email,
+              subject: emailContent.subject,
+              html: emailContent.html,
+            }).catch(() => {});
           }
         }
         break;

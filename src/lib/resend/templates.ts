@@ -201,7 +201,35 @@ export function subscriptionCanceledEmail(firstName: string) {
 }
 
 // ---------------------------------------------------------------------------
-// 6. Rappel de streak
+// 6. Echec de paiement
+// ---------------------------------------------------------------------------
+export function paymentFailedEmail(firstName: string) {
+  const html = layout(`
+    <h1 style="margin:0 0 16px;font-size:22px;font-weight:700;color:#FFFFFF;">
+      Probl&egrave;me de paiement
+    </h1>
+    <p style="margin:0 0 12px;font-size:15px;line-height:1.6;color:#D1D5DB;">
+      ${firstName}, le paiement de ton abonnement ScalingFlow a &eacute;chou&eacute;.
+      Ton acc&egrave;s aux fonctionnalit&eacute;s premium pourrait &ecirc;tre interrompu.
+    </p>
+    <p style="margin:0 0 12px;font-size:15px;line-height:1.6;color:#D1D5DB;">
+      V&eacute;rifie tes informations de paiement pour &eacute;viter toute interruption
+      de service.
+    </p>
+    ${ctaButton("Mettre \u00e0 jour mon paiement", `${APP_URL}/settings`)}
+    <p style="margin:0;font-size:13px;color:#6B7280;">
+      Si tu penses qu&rsquo;il s&rsquo;agit d&rsquo;une erreur, contacte-nous en r&eacute;pondant &agrave; cet email.
+    </p>
+  `);
+
+  return {
+    subject: "Action requise : probl\u00e8me de paiement ScalingFlow",
+    html,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// 7. Rappel de streak
 // ---------------------------------------------------------------------------
 export function streakReminderEmail(firstName: string, streakDays: number) {
   const html = layout(`
