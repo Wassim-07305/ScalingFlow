@@ -5,6 +5,7 @@ import { PageHeader } from "@/components/layout/page-header";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { AnimatedCounter } from "@/components/shared/animated-counter";
 import { EmptyState } from "@/components/shared/empty-state";
+import { PerformanceChart } from "@/components/ads/performance-chart";
 import { useUser } from "@/hooks/use-user";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -183,6 +184,9 @@ export default function AnalyticsPage() {
           </Card>
         ))}
       </div>
+
+      {/* Performance Chart */}
+      <PerformanceChart className="mb-6" />
 
       {/* Totaux */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">

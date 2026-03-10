@@ -6,6 +6,7 @@ import { Header } from "./header";
 import { MobileNav } from "./mobile-nav";
 import { NotificationsPanel } from "./notifications-panel";
 import { GlobalSearch } from "./global-search";
+import { AchievementProvider } from "@/components/gamification/achievement-provider";
 import { ThemeProvider } from "./theme-provider";
 import { NavigationProgress } from "./navigation-progress";
 import type { UserRole, NavItem, NavSection } from "@/lib/types/appshell";
@@ -103,6 +104,7 @@ export function AppShell({
           onUnreadCountChange={handleUnreadCountChange}
         />
         <GlobalSearch quickLinks={quickLinks} />
+        <AchievementProvider />
       </div>
     </ThemeProvider>
   );

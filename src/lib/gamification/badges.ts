@@ -8,6 +8,9 @@ import {
   Trophy,
   Star,
   Award,
+  TrendingUp,
+  MessageCircle,
+  Calendar,
   type LucideIcon,
 } from "lucide-react";
 
@@ -86,6 +89,51 @@ export const BADGE_DEFINITIONS: BadgeDefinition[] = [
     description: "Accumule 5 000 points XP",
     icon: Flame,
     color: "text-danger",
+  },
+  // Badges Streak
+  {
+    id: "streak_7",
+    name: "Regularite",
+    description: "Maintiens un streak de 7 jours",
+    icon: Calendar,
+    color: "text-danger",
+  },
+  {
+    id: "streak_30",
+    name: "Discipline",
+    description: "Maintiens un streak de 30 jours",
+    icon: Flame,
+    color: "text-warning",
+  },
+  // Badges Communaute
+  {
+    id: "community_first",
+    name: "Social",
+    description: "Publie ton premier post dans la communaute",
+    icon: MessageCircle,
+    color: "text-info",
+  },
+  {
+    id: "community_10",
+    name: "Influenceur",
+    description: "Publie 10 posts dans la communaute",
+    icon: MessageCircle,
+    color: "text-[#A78BFA]",
+  },
+  // Badges Performance Ads
+  {
+    id: "roas_2x",
+    name: "Rentable",
+    description: "Atteins un ROAS de 2x sur une campagne",
+    icon: TrendingUp,
+    color: "text-accent",
+  },
+  {
+    id: "roas_5x",
+    name: "Profitable",
+    description: "Atteins un ROAS de 5x sur une campagne",
+    icon: TrendingUp,
+    color: "text-warning",
   },
 ];
 
