@@ -30,6 +30,8 @@ import {
   ChevronUp,
   Camera,
   Trash2,
+  Link2,
+  Download,
 } from "lucide-react";
 
 const EXPERIENCE_LABELS: Record<string, string> = {
@@ -410,6 +412,12 @@ export default function SettingsPage() {
         {/* Abonnement */}
         <SubscriptionCard />
 
+        {/* Integrations */}
+        <IntegrationsCard />
+
+        {/* Export */}
+        <ExportDataCard />
+
         {/* Notifications */}
         <Card>
           <CardHeader>
@@ -571,5 +579,166 @@ export default function SettingsPage() {
         </Card>
       </div>
     </div>
+  );
+}
+
+// ─── Integrations Card ────────────────────────────────────────
+
+function IntegrationsCard() {
+  const { user, profile } = useUser();
+  const supabase = createClient();
+  const [metaToken, setMetaToken] = useState("");
+  const [metaAdAccountId, setMetaAdAccountId] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (profile) {
+      setMetaToken(profile.meta_access_token || "");
+      setMetaAdAccountId(profile.meta_ad_account_id || "");
+    }
+  }, [profile]);
+
+  const handleSave = async () => {
+    if (!user) return;
+    setSaving(true);
+    try {
+      const { error } = await supabase
+        .from("profiles")
+        .update({
+          meta_access_token: metaToken.trim() || null,
+          meta_ad_account_id: metaAdAccountId.trim() || null,
+        })
+        .eq("id", user.id);
+
+      if (error) throw error;
+      toast.success("Integrations sauvegardees.");
+    } catch {
+      toast.error("Erreur lors de la sauvegarde.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const hasChanged =
+    metaToken !== (profile?.meta_access_token || "") ||
+    metaAdAccountId !== (profile?.meta_ad_account_id || "");
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Link2 className="h-5 w-5 text-info" />
+          Integrations
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div>
+          <Label>Token Meta Ads</Label>
+          <Input
+            type="password"
+            value={metaToken}
+            onChange={(e) => setMetaToken(e.target.value)}
+            placeholder="EAAxxxxxxx..."
+          />
+          <p className="text-xs text-text-muted mt-1">
+            Connecte ton compte Meta pour synchroniser tes campagnes.
+          </p>
+        </div>
+        <div>
+          <Label>ID compte publicitaire Meta</Label>
+          <Input
+            value={metaAdAccountId}
+            onChange={(e) => setMetaAdAccountId(e.target.value)}
+            placeholder="act_123456789"
+          />
+        </div>
+        <Button
+          size="sm"
+          onClick={handleSave}
+          disabled={saving || !hasChanged}
+        >
+          {saving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+          Sauvegarder
+        </Button>
+      </CardContent>
+    </Card>
+  );
+}
+
+// ─── Export Data Card ─────────────────────────────────────────
+
+function ExportDataCard() {
+  const { user } = useUser();
+  const [exporting, setExporting] = useState(false);
+
+  const handleExportData = async () => {
+    if (!user) return;
+    setExporting(true);
+    try {
+      const supabase = createClient();
+
+      const [offers, funnels, assets, ads, content] = await Promise.all([
+        supabase.from("offers").select("*").eq("user_id", user.id),
+        supabase.from("funnels").select("*").eq("user_id", user.id),
+        supabase.from("sales_assets").select("*").eq("user_id", user.id),
+        supabase.from("ad_creatives").select("*").eq("user_id", user.id),
+        supabase.from("content_pieces").select("*").eq("user_id", user.id),
+      ]);
+
+      const exportData = {
+        exported_at: new Date().toISOString(),
+        offers: offers.data ?? [],
+        funnels: funnels.data ?? [],
+        sales_assets: assets.data ?? [],
+        ad_creatives: ads.data ?? [],
+        content_pieces: content.data ?? [],
+      };
+
+      const blob = new Blob([JSON.stringify(exportData, null, 2)], {
+        type: "application/json",
+      });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `scalingflow-export-${new Date().toISOString().slice(0, 10)}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+
+      toast.success("Donnees exportees avec succes !");
+    } catch {
+      toast.error("Erreur lors de l'export.");
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Download className="h-5 w-5 text-accent" />
+          Exporter mes donnees
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <p className="text-sm text-text-secondary mb-4">
+          Telecharge toutes tes offres, funnels, assets, publicites et contenus
+          au format JSON.
+        </p>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleExportData}
+          disabled={exporting}
+        >
+          {exporting ? (
+            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+          ) : (
+            <Download className="h-4 w-4 mr-2" />
+          )}
+          Exporter toutes mes donnees
+        </Button>
+      </CardContent>
+    </Card>
   );
 }
