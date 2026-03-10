@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { getBadgeDefinition } from "@/lib/gamification/badges";
 
 const XP_REWARDS: Record<string, number> = {
   "generation.market_analysis": 50,
@@ -135,11 +136,13 @@ export async function awardXP(
   }
 
   for (const badge of newBadges) {
+    const badgeDef = getBadgeDefinition(badge);
+    const badgeName = badgeDef?.name || badge;
     await supabase.from("notifications").insert({
       user_id: userId,
       type: "badge" as const,
-      title: "Nouveau badge !",
-      message: `Tu as débloqué le badge "${badge}".`,
+      title: `Badge "${badgeName}" debloque !`,
+      message: badgeDef?.description || `Tu as debloque un nouveau badge.`,
     });
   }
 
