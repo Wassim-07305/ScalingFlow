@@ -7,6 +7,7 @@ import {
   QUICK_LINKS,
   BREADCRUMB_LABELS,
 } from "@/lib/constants/navigation";
+import { useDailyStreak } from "@/hooks/use-daily-streak";
 
 interface DashboardShellProps {
   role: string;
@@ -25,6 +26,8 @@ export function DashboardShell({
   userId,
   children,
 }: DashboardShellProps) {
+  useDailyStreak();
+
   return (
     <AppShell
       role={role}
