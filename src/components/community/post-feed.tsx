@@ -625,7 +625,7 @@ export function PostFeed({ className }: PostFeedProps) {
                     {user && user.id === post.user_id && (
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <button className="p-1 rounded-lg text-text-muted hover:bg-bg-tertiary hover:text-text-primary transition-colors">
+                          <button aria-label="Options du post" className="p-1 rounded-lg text-text-muted hover:bg-bg-tertiary hover:text-text-primary transition-colors">
                             <MoreHorizontal className="h-4 w-4" />
                           </button>
                         </DropdownMenuTrigger>
@@ -696,6 +696,7 @@ export function PostFeed({ className }: PostFeedProps) {
                     <button
                       onClick={() => toggleLike(post.id)}
                       disabled={!user || likingPosts.has(post.id)}
+                      aria-label={post.liked_by_me ? "Retirer le like" : "Aimer ce post"}
                       className={cn(
                         "flex items-center gap-1.5 text-sm transition-colors",
                         post.liked_by_me
@@ -713,6 +714,8 @@ export function PostFeed({ className }: PostFeedProps) {
                     </button>
                     <button
                       onClick={() => toggleComments(post.id)}
+                      aria-label={isCommentsExpanded ? "Masquer les commentaires" : "Afficher les commentaires"}
+                      aria-expanded={isCommentsExpanded}
                       className="flex items-center gap-1.5 text-sm text-text-muted hover:text-info transition-colors"
                     >
                       <MessageCircle className="h-4 w-4" />
@@ -723,7 +726,7 @@ export function PostFeed({ className }: PostFeedProps) {
                         <ChevronDown className="h-3 w-3" />
                       )}
                     </button>
-                    <button className="flex items-center gap-1.5 text-sm text-text-muted hover:text-accent transition-colors">
+                    <button aria-label="Partager ce post" className="flex items-center gap-1.5 text-sm text-text-muted hover:text-accent transition-colors">
                       <Share2 className="h-4 w-4" />
                     </button>
                   </div>
@@ -776,7 +779,7 @@ export function PostFeed({ className }: PostFeedProps) {
                                     {user && user.id === comment.user_id && (
                                       <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
-                                          <button className="p-0.5 rounded text-text-muted opacity-0 group-hover:opacity-100 hover:text-text-primary transition-all">
+                                          <button aria-label="Options du commentaire" className="p-0.5 rounded text-text-muted opacity-0 group-hover:opacity-100 hover:text-text-primary transition-all">
                                             <MoreHorizontal className="h-3 w-3" />
                                           </button>
                                         </DropdownMenuTrigger>
@@ -825,12 +828,14 @@ export function PostFeed({ className }: PostFeedProps) {
                                         onClick={() =>
                                           handleEditComment(comment.id, post.id)
                                         }
+                                        aria-label="Confirmer la modification"
                                         className="text-accent hover:text-accent/80"
                                       >
                                         <Check className="h-3.5 w-3.5" />
                                       </button>
                                       <button
                                         onClick={() => setEditingCommentId(null)}
+                                        aria-label="Annuler la modification"
                                         className="text-text-muted hover:text-text-primary"
                                       >
                                         <X className="h-3.5 w-3.5" />

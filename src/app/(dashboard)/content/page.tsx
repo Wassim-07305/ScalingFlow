@@ -88,10 +88,14 @@ export default function ContentPage() {
         description="Genere et planifie du contenu pour tes reseaux sociaux."
       />
 
-      <div className="flex gap-2 mb-6 overflow-x-auto pb-1">
+      <div className="flex gap-2 mb-6 overflow-x-auto pb-1" role="tablist" aria-label="Types de contenu">
         {TABS.map((tab) => (
           <button
             key={tab.key}
+            role="tab"
+            aria-selected={activeTab === tab.key}
+            aria-controls={`tabpanel-${tab.key}`}
+            id={`tab-${tab.key}`}
             onClick={() => setActiveTab(tab.key)}
             className={cn(
               "flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all whitespace-nowrap",
@@ -106,14 +110,14 @@ export default function ContentPage() {
         ))}
       </div>
 
-      {activeTab === "strategy" && <StrategyOverview initialData={loadedData.strategy} />}
-      {activeTab === "reels" && <ReelsGenerator initialData={loadedData.reels} />}
-      {activeTab === "youtube" && <YouTubeGenerator initialData={loadedData.youtube} />}
-      {activeTab === "stories" && <StoriesGenerator initialData={loadedData.stories} />}
-      {activeTab === "carousels" && <CarouselGenerator initialData={loadedData.carousels} />}
-      {activeTab === "instagram" && <InstagramOptimizer initialData={loadedData.instagram} />}
-      {activeTab === "editorial" && <EditorialCalendar initialData={loadedData.editorial} />}
-      {activeTab === "history" && (
+      {activeTab === "strategy" && <div role="tabpanel" id="tabpanel-strategy" aria-labelledby="tab-strategy"><StrategyOverview initialData={loadedData.strategy} /></div>}
+      {activeTab === "reels" && <div role="tabpanel" id="tabpanel-reels" aria-labelledby="tab-reels"><ReelsGenerator initialData={loadedData.reels} /></div>}
+      {activeTab === "youtube" && <div role="tabpanel" id="tabpanel-youtube" aria-labelledby="tab-youtube"><YouTubeGenerator initialData={loadedData.youtube} /></div>}
+      {activeTab === "stories" && <div role="tabpanel" id="tabpanel-stories" aria-labelledby="tab-stories"><StoriesGenerator initialData={loadedData.stories} /></div>}
+      {activeTab === "carousels" && <div role="tabpanel" id="tabpanel-carousels" aria-labelledby="tab-carousels"><CarouselGenerator initialData={loadedData.carousels} /></div>}
+      {activeTab === "instagram" && <div role="tabpanel" id="tabpanel-instagram" aria-labelledby="tab-instagram"><InstagramOptimizer initialData={loadedData.instagram} /></div>}
+      {activeTab === "editorial" && <div role="tabpanel" id="tabpanel-editorial" aria-labelledby="tab-editorial"><EditorialCalendar initialData={loadedData.editorial} /></div>}
+      {activeTab === "history" && (<div role="tabpanel" id="tabpanel-history" aria-labelledby="tab-history">
         <GenerationHistory
           table="content_pieces"
           titleField="title"
@@ -121,7 +125,7 @@ export default function ContentPage() {
           emptyMessage="Aucun contenu genere pour le moment."
           onSelect={handleHistorySelect}
         />
-      )}
+      </div>)}
     </div>
   );
 }

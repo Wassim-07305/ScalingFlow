@@ -304,6 +304,7 @@ export default function SettingsPage() {
                 <button
                   onClick={() => fileInputRef.current?.click()}
                   disabled={uploadingAvatar}
+                  aria-label="Changer la photo de profil"
                   className="absolute inset-0 rounded-full bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
                 >
                   {uploadingAvatar ? (
@@ -350,6 +351,7 @@ export default function SettingsPage() {
                 type="file"
                 accept="image/*"
                 onChange={handleAvatarUpload}
+                aria-label="Selectionner une photo de profil"
                 className="hidden"
               />
             </div>
@@ -436,6 +438,9 @@ export default function SettingsPage() {
                   <span className="text-sm text-text-primary">{label}</span>
                   <button
                     onClick={() => handleToggleNotif(key)}
+                    role="switch"
+                    aria-checked={notifPrefs[key]}
+                    aria-label={label}
                     className={cn(
                       "relative inline-flex h-6 w-11 items-center rounded-full transition-colors",
                       notifPrefs[key] ? "bg-accent" : "bg-bg-tertiary border border-border-default"
@@ -508,6 +513,7 @@ export default function SettingsPage() {
                       <button
                         type="button"
                         onClick={() => setShowNewPassword((prev) => !prev)}
+                        aria-label={showNewPassword ? "Masquer le mot de passe" : "Afficher le mot de passe"}
                         className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-primary transition-colors"
                       >
                         {showNewPassword ? (
@@ -532,6 +538,7 @@ export default function SettingsPage() {
                         onClick={() =>
                           setShowConfirmPassword((prev) => !prev)
                         }
+                        aria-label={showConfirmPassword ? "Masquer la confirmation" : "Afficher la confirmation"}
                         className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-primary transition-colors"
                       >
                         {showConfirmPassword ? (
@@ -572,6 +579,7 @@ export default function SettingsPage() {
               variant="destructive"
               size="sm"
               onClick={handleDeleteAccount}
+              aria-label="Supprimer mon compte"
             >
               Supprimer mon compte
             </Button>

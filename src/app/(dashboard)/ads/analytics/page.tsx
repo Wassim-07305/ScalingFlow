@@ -157,6 +157,7 @@ export default function AnalyticsPage() {
             variant="ghost"
             onClick={handleSyncMeta}
             disabled={syncing}
+            aria-label="Synchroniser les donnees Meta Ads"
             className="gap-2"
           >
             <RefreshCw className={`h-4 w-4 ${syncing ? "animate-spin" : ""}`} />
@@ -262,6 +263,7 @@ export default function AnalyticsPage() {
                 size="sm"
                 onClick={handleSyncMeta}
                 disabled={syncing}
+                aria-label="Synchroniser les donnees Meta Ads"
                 className="gap-2 shrink-0 ml-4"
               >
                 <RefreshCw className={`h-4 w-4 ${syncing ? "animate-spin" : ""}`} />

@@ -524,7 +524,7 @@ export function OnboardingFlow() {
               className="group flex items-center gap-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 px-8 py-4 text-lg font-semibold text-white shadow-xl shadow-emerald-500/25 transition-all duration-200 hover:scale-105 hover:shadow-2xl hover:shadow-emerald-500/40"
             >
               C&apos;est parti
-              <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+              <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" aria-hidden="true" />
             </motion.button>
           </div>
         );
@@ -837,6 +837,7 @@ export function OnboardingFlow() {
                   <button
                     onClick={handleButtonClick}
                     disabled={!canProceed()}
+                    aria-label={isSummary ? "Lancer l'analyse IA" : "Etape suivante"}
                     className={cn(
                       "flex items-center gap-2 rounded-xl text-base font-semibold text-white transition-all",
                       isSummary
