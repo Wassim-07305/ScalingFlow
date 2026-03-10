@@ -236,8 +236,8 @@ export function OnboardingFlow() {
           setFormData(r);
           if (resumeStep > 0) setStep(resumeStep);
         }
-      } catch (err) {
-        console.error("Failed to load profile:", err);
+      } catch {
+        // Profile load failed silently — user will start fresh
       } finally {
         setLoaded(true);
       }
@@ -388,7 +388,6 @@ export function OnboardingFlow() {
       setAnalysisResult(data);
     } catch (err) {
       const message = err instanceof Error ? err.message : "Erreur inconnue";
-      console.error("Market analysis failed:", message);
       setError(`Erreur lors de l'analyse : ${message}`);
     } finally {
       setIsAnalyzing(false);
