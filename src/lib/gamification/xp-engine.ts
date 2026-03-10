@@ -60,11 +60,12 @@ const BADGE_CONDITIONS: {
 export async function awardXP(
   userId: string,
   activityType: string,
-  activityData?: Record<string, unknown>
+  activityData?: Record<string, unknown>,
+  xpOverride?: number
 ): Promise<{ xp_awarded: number; new_level: number; new_badges: string[] }> {
   const supabase = await createClient();
 
-  const xpAmount = XP_REWARDS[activityType] || 10;
+  const xpAmount = xpOverride ?? XP_REWARDS[activityType] ?? 10;
 
   // Fetch current profile
   const { data: profile } = await supabase

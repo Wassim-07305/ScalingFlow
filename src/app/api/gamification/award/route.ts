@@ -9,6 +9,7 @@ const ALLOWED_ACTIVITIES = [
   "community.comment",
   "onboarding.completed",
   "streak.daily",
+  "challenge.completed",
 ] as const;
 
 type AllowedActivity = (typeof ALLOWED_ACTIVITIES)[number];
@@ -43,7 +44,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const result = await awardXP(user.id, activityType, body.data);
+    const result = await awardXP(user.id, activityType, body.data, body.xpOverride);
 
     return NextResponse.json(result);
   } catch {

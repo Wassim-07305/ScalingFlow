@@ -11,6 +11,7 @@ import { NextTasks } from "@/components/dashboard/next-tasks";
 import { ActivityFeed } from "@/components/dashboard/activity-feed";
 import { QuickActions } from "@/components/dashboard/quick-actions";
 import { SmartRecommendations } from "@/components/dashboard/smart-recommendations";
+import { WeeklyChallenges } from "@/components/dashboard/weekly-challenges";
 
 export default function DashboardPage() {
   return (
@@ -35,6 +36,9 @@ export default function DashboardPage() {
           <BusinessPipeline />
           <NextTasks />
         </div>
+
+        {/* Weekly Challenges */}
+        <WeeklyChallenges />
 
         {/* Smart Recommendations */}
         <SmartRecommendations />
