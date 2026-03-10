@@ -54,10 +54,11 @@ export function EditorialCalendar({ className, initialData }: EditorialCalendarP
     setError(null);
 
     try {
-      const response = await fetch("/api/ai/generate-content", {
+      const tomorrow = new Date(Date.now() + 86400000).toISOString().split("T")[0];
+      const response = await fetch("/api/ai/generate-editorial-calendar", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ contentType: "strategy" }),
+        body: JSON.stringify({ startDate: tomorrow }),
       });
 
       if (!response.ok) {

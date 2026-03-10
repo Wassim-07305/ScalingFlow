@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createStreamingResponse, streamText } from "@/lib/ai/generate";
 import { getAgent, type AgentType, type AgentDefinition } from "@/lib/ai/agents/index";
 import { buildFullVaultContext } from "@/lib/ai/vault-context";
+import { buildRAGContext } from "@/lib/ai/rag";
 import { SupabaseClient } from "@supabase/supabase-js";
 
 // ─── Domain-specific context fetchers ────────────────────────
@@ -132,8 +133,8 @@ export async function POST(req: NextRequest) {
 
     const agent = getAgent(agentType || "general");
 
-    // Fetch full vault context (profile + resources), latest offer, and agent-specific context
-    const [vaultContext, { data: latestOffer }, agentContext] = await Promise.all([
+    // Fetch full vault context (profile + resources), latest offer, agent-specific context, and RAG context
+    const [vaultContext, { data: latestOffer }, agentContext, ragContext] = await Promise.all([
       buildFullVaultContext(user.id),
       supabase
         .from("offers")
@@ -143,13 +144,14 @@ export async function POST(req: NextRequest) {
         .limit(1)
         .single(),
       fetchAgentContext(supabase, user.id, agent),
+      buildRAGContext(user.id, message).catch(() => ""),
     ]);
 
     const offerBlock = latestOffer
       ? `\n## Dernière offre\n- Nom : ${latestOffer.offer_name}\n- Positionnement : ${latestOffer.positioning || "Non défini"}\n- Mécanisme unique : ${latestOffer.unique_mechanism || "Non défini"}\n`
       : "";
 
-    const fullSystemPrompt = `${agent.systemPrompt}\n\n${vaultContext}${offerBlock}${agentContext}`;
+    const fullSystemPrompt = `${agent.systemPrompt}\n\n${vaultContext}${offerBlock}${agentContext}${ragContext}`;
 
     // Load previous messages if conversation exists
     let previousMessages: { role: string; content: string }[] = [];
