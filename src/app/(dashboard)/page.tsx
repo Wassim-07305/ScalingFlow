@@ -10,6 +10,7 @@ import { LeadsChart } from "@/components/dashboard/leads-chart";
 import { NextTasks } from "@/components/dashboard/next-tasks";
 import { ActivityFeed } from "@/components/dashboard/activity-feed";
 import { QuickActions } from "@/components/dashboard/quick-actions";
+import { SmartRecommendations } from "@/components/dashboard/smart-recommendations";
 
 export default function DashboardPage() {
   return (
@@ -34,6 +35,9 @@ export default function DashboardPage() {
           <BusinessPipeline />
           <NextTasks />
         </div>
+
+        {/* Smart Recommendations */}
+        <SmartRecommendations />
 
         {/* Activity Feed */}
         <ActivityFeed />
