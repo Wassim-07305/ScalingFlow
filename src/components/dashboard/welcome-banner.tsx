@@ -6,6 +6,7 @@ import { useUsage } from "@/hooks/use-usage";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Sparkles, Crown, Zap, ArrowRight } from "lucide-react";
+import { cn } from "@/lib/utils/cn";
 
 export function WelcomeBanner() {
   const { profile, loading: userLoading } = useUser();
@@ -55,12 +56,31 @@ export function WelcomeBanner() {
               )}
             </div>
             {!isLoading && !isPro && usage && (
-              <p className="text-sm text-text-muted">
-                {usage.currentUsage}/{usage.limit ?? 5} generations IA utilisees ce mois
-                {usage.limit != null && usage.currentUsage >= usage.limit && (
-                  <span className="text-warning ml-1">— Limite atteinte</span>
-                )}
-              </p>
+              <div className="space-y-1.5 mt-1">
+                <div className="flex items-center justify-between">
+                  <p className="text-sm text-text-muted">
+                    {usage.currentUsage}/{usage.limit ?? 5} generations IA
+                  </p>
+                  {usage.limit != null && usage.currentUsage >= usage.limit && (
+                    <span className="text-xs text-warning font-medium">Limite atteinte</span>
+                  )}
+                </div>
+                <div className="w-full max-w-xs h-2 rounded-full bg-bg-tertiary overflow-hidden">
+                  <div
+                    className={cn(
+                      "h-full rounded-full transition-all duration-500",
+                      usage.limit != null && usage.currentUsage >= usage.limit
+                        ? "bg-warning"
+                        : usage.limit != null && usage.currentUsage >= (usage.limit * 0.8)
+                          ? "bg-yellow-500"
+                          : "bg-accent"
+                    )}
+                    style={{
+                      width: `${Math.min(100, ((usage.currentUsage) / (usage.limit ?? 5)) * 100)}%`,
+                    }}
+                  />
+                </div>
+              </div>
             )}
             {!isLoading && isPro && (
               <p className="text-sm text-text-muted">
