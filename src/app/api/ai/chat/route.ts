@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createStreamingResponse, streamText } from "@/lib/ai/generate";
 import { getAgent, type AgentType } from "@/lib/ai/agents/index";
 import { buildFullVaultContext } from "@/lib/ai/vault-context";
+import { rateLimit } from "@/lib/utils/rate-limit";
 
 export async function POST(req: NextRequest) {
   try {
@@ -17,6 +18,16 @@ export async function POST(req: NextRequest) {
         status: 401,
       });
     }
+
+    // Rate limiting
+    const rl = rateLimit(user.id, "chat", { limit: 10, windowSeconds: 60 });
+    if (!rl.allowed) {
+      return NextResponse.json(
+        { error: "Trop de requetes. Reessaie dans quelques secondes." },
+        { status: 429 }
+      );
+    }
+
     // Check AI usage limits
     const usage = await checkAIUsage(user.id);
     if (!usage.allowed) {
