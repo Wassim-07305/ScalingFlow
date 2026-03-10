@@ -2,7 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe/client";
 import { getPlanByPriceId } from "@/lib/stripe/plans";
 import { createClient } from "@supabase/supabase-js";
+import { resend } from "@/lib/resend/client";
+import {
+  subscriptionActivatedEmail,
+  subscriptionCanceledEmail,
+} from "@/lib/resend/templates";
 import type Stripe from "stripe";
+
+const FROM = "ScalingFlow <noreply@scalingflow.com>";
 
 // Client admin Supabase (service role) pour les webhooks
 function getAdminClient() {
@@ -84,6 +91,25 @@ export async function POST(req: NextRequest) {
           console.log(
             `Abonnement active pour user ${userId}, plan: ${plan?.name || "inconnu"}`
           );
+
+          // Envoyer email de confirmation d'abonnement
+          if (resend && session.customer_email) {
+            const { data: profile } = await supabase
+              .from("profiles")
+              .select("full_name")
+              .eq("id", userId)
+              .single();
+
+            const firstName = profile?.full_name?.split(" ")[0] || "Utilisateur";
+            const emailContent = subscriptionActivatedEmail(firstName, plan?.name || "Pro");
+
+            await resend.emails.send({
+              from: FROM,
+              to: session.customer_email,
+              subject: emailContent.subject,
+              html: emailContent.html,
+            }).catch((err) => console.error("Erreur envoi email activation:", err));
+          }
         }
         break;
       }
@@ -132,6 +158,27 @@ export async function POST(req: NextRequest) {
           console.log(
             `Abonnement annule pour user ${profiles[0].id}`
           );
+
+          // Envoyer email d'annulation
+          if (resend) {
+            const { data: profile } = await supabase
+              .from("profiles")
+              .select("full_name, email")
+              .eq("id", profiles[0].id)
+              .single();
+
+            if (profile?.email) {
+              const firstName = profile.full_name?.split(" ")[0] || "Utilisateur";
+              const emailContent = subscriptionCanceledEmail(firstName);
+
+              await resend.emails.send({
+                from: FROM,
+                to: profile.email,
+                subject: emailContent.subject,
+                html: emailContent.html,
+              }).catch((err) => console.error("Erreur envoi email annulation:", err));
+            }
+          }
         }
         break;
       }

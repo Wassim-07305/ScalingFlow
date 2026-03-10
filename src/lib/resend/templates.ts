@@ -143,7 +143,65 @@ export function milestoneEmail(
 }
 
 // ---------------------------------------------------------------------------
-// 4. Rappel de streak
+// 4. Confirmation d'abonnement
+// ---------------------------------------------------------------------------
+export function subscriptionActivatedEmail(firstName: string, planName: string) {
+  const html = layout(`
+    <h1 style="margin:0 0 16px;font-size:22px;font-weight:700;color:#FFFFFF;">
+      Abonnement ${planName} activ&eacute; !
+    </h1>
+    <p style="margin:0 0 12px;font-size:15px;line-height:1.6;color:#D1D5DB;">
+      ${firstName}, ton abonnement <strong style="color:#34D399;">${planName}</strong>
+      est maintenant actif. Tu as d&eacute;sormais acc&egrave;s &agrave; toutes les fonctionnalit&eacute;s
+      de ton plan.
+    </p>
+    <div style="background-color:#1C1F23;border-radius:8px;padding:20px;margin:16px 0;">
+      <p style="margin:0 0 8px;font-size:14px;color:#9CA3AF;">Ton plan :</p>
+      <p style="margin:0;font-size:20px;font-weight:700;color:#34D399;">${planName}</p>
+    </div>
+    <p style="margin:0 0 12px;font-size:15px;line-height:1.6;color:#D1D5DB;">
+      G&eacute;n&eacute;rations illimit&eacute;es, acc&egrave;s &agrave; tous les agents IA,
+      et bien plus. Fonce !
+    </p>
+    ${ctaButton("Acc\u00e9der au dashboard", `${APP_URL}`)}
+    <p style="margin:0;font-size:13px;color:#6B7280;">
+      Tu peux g&eacute;rer ton abonnement depuis les param&egrave;tres.
+    </p>
+  `);
+
+  return {
+    subject: `Abonnement ${planName} activ\u00e9 \u2705`,
+    html,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// 5. Annulation d'abonnement
+// ---------------------------------------------------------------------------
+export function subscriptionCanceledEmail(firstName: string) {
+  const html = layout(`
+    <h1 style="margin:0 0 16px;font-size:22px;font-weight:700;color:#FFFFFF;">
+      Abonnement annul&eacute;
+    </h1>
+    <p style="margin:0 0 12px;font-size:15px;line-height:1.6;color:#D1D5DB;">
+      ${firstName}, ton abonnement a &eacute;t&eacute; annul&eacute;. Tu passes
+      automatiquement au plan Gratuit (5 g&eacute;n&eacute;rations/mois).
+    </p>
+    <p style="margin:0 0 12px;font-size:15px;line-height:1.6;color:#D1D5DB;">
+      Tes contenus g&eacute;n&eacute;r&eacute;s restent accessibles. Tu peux te r&eacute;abonner
+      &agrave; tout moment.
+    </p>
+    ${ctaButton("Se r\u00e9abonner", `${APP_URL}/pricing`)}
+  `);
+
+  return {
+    subject: "Ton abonnement ScalingFlow a \u00e9t\u00e9 annul\u00e9",
+    html,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// 6. Rappel de streak
 // ---------------------------------------------------------------------------
 export function streakReminderEmail(firstName: string, streakDays: number) {
   const html = layout(`
