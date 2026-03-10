@@ -103,7 +103,6 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(result);
   } catch (error) {
-    console.error("Competitor analysis error:", error);
     return NextResponse.json(
       { error: "Erreur lors de l'analyse concurrentielle" },
       { status: 500 }

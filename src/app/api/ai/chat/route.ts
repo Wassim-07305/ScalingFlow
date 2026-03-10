@@ -108,7 +108,6 @@ export async function POST(req: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("Error in chat:", error);
     return new Response(
       JSON.stringify({ error: "Erreur lors de la génération" }),
       { status: 500 }

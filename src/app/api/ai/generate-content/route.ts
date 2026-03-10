@@ -291,7 +291,6 @@ export async function POST(req: NextRequest) {
     });
   } catch (error) {
     const errMsg = error instanceof Error ? error.message : String(error);
-    console.error("Error generating content:", errMsg, error);
     return NextResponse.json(
       { error: `Erreur lors de la generation du contenu: ${errMsg}` },
       { status: 500 }

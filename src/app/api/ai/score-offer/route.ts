@@ -80,7 +80,6 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(score);
   } catch (error) {
-    console.error("Error scoring offer:", error);
     return NextResponse.json(
       { error: "Erreur lors de l'evaluation de l'offre" },
       { status: 500 }

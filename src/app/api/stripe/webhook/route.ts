@@ -40,7 +40,6 @@ export async function POST(req: NextRequest) {
 
     const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
     if (!webhookSecret) {
-      console.error("STRIPE_WEBHOOK_SECRET non defini");
       return NextResponse.json(
         { error: "Configuration webhook manquante" },
         { status: 500 }
@@ -50,8 +49,7 @@ export async function POST(req: NextRequest) {
     let event: Stripe.Event;
     try {
       event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
-    } catch (err) {
-      console.error("Erreur verification signature webhook:", err);
+    } catch {
       return NextResponse.json(
         { error: "Signature invalide" },
         { status: 400 }
@@ -60,7 +58,6 @@ export async function POST(req: NextRequest) {
 
     const supabase = getAdminClient();
     if (!supabase) {
-      console.error("Supabase admin client non disponible");
       return NextResponse.json(
         { error: "Erreur serveur" },
         { status: 500 }
@@ -88,10 +85,6 @@ export async function POST(req: NextRequest) {
             })
             .eq("id", userId);
 
-          console.log(
-            `Abonnement active pour user ${userId}, plan: ${plan?.name || "inconnu"}`
-          );
-
           // Envoyer email de confirmation d'abonnement
           if (resend && session.customer_email) {
             const { data: profile } = await supabase
@@ -108,7 +101,7 @@ export async function POST(req: NextRequest) {
               to: session.customer_email,
               subject: emailContent.subject,
               html: emailContent.html,
-            }).catch((err) => console.error("Erreur envoi email activation:", err));
+            }).catch(() => {});
           }
         }
         break;
@@ -132,9 +125,6 @@ export async function POST(req: NextRequest) {
             .update({ subscription_status: status })
             .eq("id", profiles[0].id);
 
-          console.log(
-            `Abonnement mis a jour pour user ${profiles[0].id}, statut: ${status}`
-          );
         }
         break;
       }
@@ -155,10 +145,6 @@ export async function POST(req: NextRequest) {
             .update({ subscription_status: "canceled", subscription_plan: "free" })
             .eq("id", profiles[0].id);
 
-          console.log(
-            `Abonnement annule pour user ${profiles[0].id}`
-          );
-
           // Envoyer email d'annulation
           if (resend) {
             const { data: profile } = await supabase
@@ -176,7 +162,7 @@ export async function POST(req: NextRequest) {
                 to: profile.email,
                 subject: emailContent.subject,
                 html: emailContent.html,
-              }).catch((err) => console.error("Erreur envoi email annulation:", err));
+              }).catch(() => {});
             }
           }
         }
@@ -184,12 +170,11 @@ export async function POST(req: NextRequest) {
       }
 
       default:
-        console.log(`Evenement Stripe non gere: ${event.type}`);
+        break;
     }
 
     return NextResponse.json({ received: true });
   } catch (error) {
-    console.error("Erreur webhook Stripe:", error);
     return NextResponse.json(
       { error: "Erreur interne webhook" },
       { status: 500 }

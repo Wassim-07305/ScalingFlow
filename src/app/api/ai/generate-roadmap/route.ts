@@ -94,7 +94,6 @@ export async function POST(req: NextRequest) {
       .insert(tasksToInsert);
 
     if (insertError) {
-      console.error("Error inserting tasks:", insertError);
       return NextResponse.json(
         { error: "Erreur lors de la sauvegarde des tâches" },
         { status: 500 }
@@ -111,7 +110,6 @@ export async function POST(req: NextRequest) {
       recommended_pace: result.recommended_pace,
     });
   } catch (error) {
-    console.error("Error generating roadmap:", error);
     return NextResponse.json(
       { error: "Erreur lors de la génération de la roadmap" },
       { status: 500 }

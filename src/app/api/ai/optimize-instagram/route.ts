@@ -89,7 +89,6 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ result });
   } catch (error) {
-    console.error("Error optimizing Instagram profile:", error);
     return NextResponse.json(
       { error: "Erreur lors de l'optimisation du profil Instagram" },
       { status: 500 }

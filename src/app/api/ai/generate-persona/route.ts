@@ -108,7 +108,6 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(result);
   } catch (error) {
-    console.error("Persona generation error:", error);
     return NextResponse.json(
       { error: "Erreur lors de la generation du persona" },
       { status: 500 }

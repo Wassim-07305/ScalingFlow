@@ -104,7 +104,6 @@ export async function POST(req: NextRequest) {
       .eq("id", offerId);
 
     if (updateError) {
-      console.error("Error saving category OS:", updateError);
       return NextResponse.json(
         { error: "Erreur lors de la sauvegarde du Category OS" },
         { status: 500 }
@@ -117,7 +116,6 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(categoryOS);
   } catch (error) {
-    console.error("Error generating category OS:", error);
     return NextResponse.json(
       { error: "Erreur lors de la generation du Category OS" },
       { status: 500 }

@@ -192,7 +192,6 @@ export async function POST(req: NextRequest) {
         .single();
 
       if (saveError) {
-        console.error("Error saving ad creative:", saveError);
         continue;
       }
 
@@ -208,7 +207,6 @@ export async function POST(req: NextRequest) {
       hooks: generatedHooks.hooks || [],
     });
   } catch (error) {
-    console.error("Error generating ads:", error);
     return NextResponse.json(
       { error: "Erreur lors de la generation des publicites" },
       { status: 500 }

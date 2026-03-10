@@ -100,7 +100,6 @@ export async function POST(request: Request) {
   });
 
   if (error) {
-    console.error("[email/send] Erreur Resend :", error);
     return NextResponse.json(
       { error: "Échec de l'envoi de l'email" },
       { status: 500 }

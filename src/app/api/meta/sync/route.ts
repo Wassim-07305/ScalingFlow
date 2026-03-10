@@ -54,7 +54,6 @@ export async function POST() {
     if (!campaignsResponse.ok) {
       const errorData = await campaignsResponse.json().catch(() => null);
       const errorMsg = errorData?.error?.message || "Erreur API Meta Ads";
-      console.error("Meta Ads API error:", errorMsg);
       return NextResponse.json(
         { error: `Erreur Meta Ads : ${errorMsg}` },
         { status: 502 }
@@ -123,7 +122,6 @@ export async function POST() {
       count: synced,
     });
   } catch (error) {
-    console.error("Erreur sync Meta:", error);
     return NextResponse.json(
       { error: "Erreur interne lors de la synchronisation." },
       { status: 500 }

@@ -66,7 +66,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(result);
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    console.error("Market analysis error:", message, error);
     return NextResponse.json(
       { error: `Erreur analyse : ${message}` },
       { status: 500 }

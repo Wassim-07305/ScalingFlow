@@ -50,7 +50,6 @@ export async function POST(req: NextRequest) {
       });
 
     if (uploadError) {
-      console.error("Storage upload error:", uploadError);
       return NextResponse.json(
         { error: "Erreur lors de l'upload: " + uploadError.message },
         { status: 500 }
@@ -91,7 +90,6 @@ export async function POST(req: NextRequest) {
       .single();
 
     if (dbError) {
-      console.error("DB insert error:", dbError);
       return NextResponse.json(
         { error: "Erreur lors de la sauvegarde" },
         { status: 500 }
@@ -103,7 +101,6 @@ export async function POST(req: NextRequest) {
       has_extracted_text: !!extractedText,
     });
   } catch (error) {
-    console.error("Vault upload error:", error);
     return NextResponse.json(
       { error: "Erreur interne lors de l'upload" },
       { status: 500 }
@@ -121,8 +118,7 @@ async function extractPdfText(file: File): Promise<string | null> {
     const pdfParse = require("pdf-parse");
     const result = await pdfParse(buffer);
     return result.text || null;
-  } catch (err) {
-    console.error("PDF extraction error:", err);
+  } catch {
     return null;
   }
 }

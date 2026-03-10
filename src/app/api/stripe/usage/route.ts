@@ -16,7 +16,6 @@ export async function GET() {
     const usage = await checkAIUsage(user.id);
     return NextResponse.json(usage);
   } catch (error) {
-    console.error("Erreur check usage:", error);
     return NextResponse.json(
       { error: "Erreur lors de la verification" },
       { status: 500 }

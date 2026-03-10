@@ -85,7 +85,6 @@ export async function POST(req: NextRequest) {
       .single();
 
     if (saveError) {
-      console.error("Error saving funnel:", saveError);
       return NextResponse.json(
         { error: "Erreur lors de la sauvegarde du funnel" },
         { status: 500 }
@@ -98,7 +97,6 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(funnel);
   } catch (error) {
-    console.error("Error generating funnel:", error);
     return NextResponse.json(
       { error: "Erreur lors de la génération du funnel" },
       { status: 500 }

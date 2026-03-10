@@ -42,7 +42,6 @@ export async function POST() {
 
     return NextResponse.json({ url: session.url });
   } catch (error) {
-    console.error("Erreur portal Stripe:", error);
     return NextResponse.json(
       { error: "Erreur lors de l'acces au portail de facturation" },
       { status: 500 }

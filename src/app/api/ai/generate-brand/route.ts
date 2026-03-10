@@ -117,7 +117,6 @@ export async function POST(req: NextRequest) {
       .single();
 
     if (saveError) {
-      console.error("Error saving brand identity:", saveError);
       return NextResponse.json(
         { error: "Erreur lors de la sauvegarde de l'identite de marque" },
         { status: 500 }
@@ -130,7 +129,6 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ ...brand, generated: brandIdentity });
   } catch (error) {
-    console.error("Error generating brand identity:", error);
     return NextResponse.json(
       { error: "Erreur lors de la generation de l'identite de marque" },
       { status: 500 }

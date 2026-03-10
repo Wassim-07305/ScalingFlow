@@ -99,7 +99,6 @@ export async function POST(req: NextRequest) {
       .single();
 
     if (saveError) {
-      console.error("Error saving offer:", saveError);
       return NextResponse.json(
         { error: "Erreur lors de la sauvegarde de l'offre" },
         { status: 500 }
@@ -112,7 +111,6 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(offer);
   } catch (error) {
-    console.error("Error generating offer:", error);
     return NextResponse.json(
       { error: "Erreur lors de la génération de l'offre" },
       { status: 500 }
