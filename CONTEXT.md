@@ -5,7 +5,7 @@
 - **Client :** Timothée Fortin
 - **Deadline :** 19 mars 2026
 - **Acompte :** 2 000 €
-- **Statut :** 95% CDC réalisé
+- **Statut :** 99% CDC réalisé
 - **GitHub :** https://github.com/Wassim-07305/ScalingFlow
 - **Vercel (prod) :** https://scalingflow-ahmanewassim6-2668s-projects.vercel.app
 
