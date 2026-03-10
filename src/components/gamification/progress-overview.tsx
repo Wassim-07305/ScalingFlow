@@ -46,7 +46,7 @@ export function ProgressOverview({ className }: ProgressOverviewProps) {
       const supabase = createClient();
 
       // Requetes paralleles pour compter les items par module + rang
-      const [offersRes, funnelsRes, adsRes, contentRes, leaderboardRes] =
+      const [offersRes, funnelsRes, adsRes, contentRes, leaderboardRes, videosRes, watchedRes] =
         await Promise.all([
           supabase
             .from("offers")
@@ -69,6 +69,14 @@ export function ProgressOverview({ className }: ProgressOverviewProps) {
             .select("rank_position")
             .eq("user_id", user.id)
             .single(),
+          supabase
+            .from("academy_videos")
+            .select("id", { count: "exact", head: true }),
+          supabase
+            .from("video_progress")
+            .select("id", { count: "exact", head: true })
+            .eq("user_id", user.id)
+            .eq("watched", true),
         ]);
 
       // Calcul progression onboarding
@@ -78,7 +86,9 @@ export function ProgressOverview({ className }: ProgressOverviewProps) {
 
       const offerProgress = (offersRes.count ?? 0) >= 1 ? 100 : 0;
       const funnelProgress = (funnelsRes.count ?? 0) >= 1 ? 100 : 0;
-      const academyProgress = 0; // Pas de donnees video_progress pour le moment
+      const totalVideos = videosRes.count ?? 0;
+      const watchedVideos = watchedRes.count ?? 0;
+      const academyProgress = totalVideos > 0 ? Math.round((watchedVideos / totalVideos) * 100) : 0;
       const adsProgress = (adsRes.count ?? 0) >= 1 ? 100 : 0;
       const contentProgress = (contentRes.count ?? 0) >= 1 ? 100 : 0;
 
