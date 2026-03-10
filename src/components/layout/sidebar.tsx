@@ -5,7 +5,9 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { LogOut, PanelLeftClose, PanelLeft, Settings, UserCircle } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
+import { Badge } from "@/components/ui/badge";
 import { useUIStore } from "@/stores/ui-store";
+import { useUser } from "@/hooks/use-user";
 import { createClient } from "@/lib/supabase/client";
 import {
   Tooltip,
@@ -54,12 +56,17 @@ export function Sidebar({
 }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
+  const { profile: userProfile } = useUser();
   const {
     sidebarCollapsed: isCollapsed,
     toggleSidebar,
     sidebarMobileOpen,
     setMobileSidebarOpen,
   } = useUIStore();
+
+  const subscriptionPlan = userProfile?.subscription_plan || "free";
+  const planLabel = subscriptionPlan === "premium" ? "Premium" : subscriptionPlan === "pro" ? "Pro" : "Free";
+  const planVariant = subscriptionPlan === "premium" ? "purple" : subscriptionPlan === "pro" ? "cyan" : "muted";
 
   function closeMobile() {
     setMobileSidebarOpen(false);
@@ -208,7 +215,8 @@ export function Sidebar({
           <button
             onClick={toggleSidebar}
             className="flex w-full items-center justify-center rounded-xl px-3 py-2 text-sm text-sidebar-foreground/50 transition-all duration-200 hover:bg-sidebar-accent hover:text-sidebar-foreground"
-            title={isCollapsed ? "Ouvrir le menu" : "Réduire le menu"}
+            aria-label={isCollapsed ? "Ouvrir le menu" : "Reduire le menu"}
+            aria-expanded={!isCollapsed}
           >
             {isCollapsed ? (
               <PanelLeft className="h-5 w-5" />
@@ -252,9 +260,9 @@ export function Sidebar({
               <p className="truncate text-sm font-semibold text-text-primary">
                 {userName}
               </p>
-              <p className="truncate text-xs text-sidebar-foreground/50 capitalize">
-                {role.replace("_", " ")}
-              </p>
+              <Badge variant={planVariant as "cyan" | "purple" | "muted"} className="text-[10px] mt-0.5">
+                {planLabel}
+              </Badge>
             </div>
           </div>
 
@@ -298,6 +306,7 @@ export function Sidebar({
             <TooltipTrigger asChild>
               <button
                 onClick={handleLogout}
+                aria-label="Se deconnecter"
                 className={cn(
                   "mt-1 flex w-full items-center rounded-xl px-3 py-2 text-sm text-sidebar-foreground/50 transition-all duration-200 hover:bg-red-500/10 hover:text-red-400",
                   isCollapsed && "md:justify-center md:px-0"
