@@ -32,7 +32,12 @@ import {
   Trash2,
   Link2,
   Download,
+  Palette,
+  Sun,
+  Moon,
+  Monitor,
 } from "lucide-react";
+import { useUIStore, type Theme } from "@/stores/ui-store";
 
 const EXPERIENCE_LABELS: Record<string, string> = {
   beginner: "Debutant",
@@ -467,6 +472,9 @@ export default function SettingsPage() {
           </CardContent>
         </Card>
 
+        {/* Apparence */}
+        <ThemeCard />
+
         {/* Securite */}
         <Card>
           <CardHeader>
@@ -667,6 +675,48 @@ function IntegrationsCard() {
           {saving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
           Sauvegarder
         </Button>
+      </CardContent>
+    </Card>
+  );
+}
+
+// ─── Theme Card ───────────────────────────────────────────────
+
+const THEME_OPTIONS: { value: Theme; label: string; icon: typeof Sun }[] = [
+  { value: "light", label: "Clair", icon: Sun },
+  { value: "dark", label: "Sombre", icon: Moon },
+  { value: "system", label: "Systeme", icon: Monitor },
+];
+
+function ThemeCard() {
+  const { theme, setTheme } = useUIStore();
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Palette className="h-5 w-5 text-accent" />
+          Apparence
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="grid grid-cols-3 gap-3">
+          {THEME_OPTIONS.map((option) => (
+            <button
+              key={option.value}
+              onClick={() => setTheme(option.value)}
+              className={cn(
+                "flex flex-col items-center gap-2 rounded-xl border p-4 transition-all",
+                theme === option.value
+                  ? "border-accent bg-accent/10 text-accent"
+                  : "border-border-default bg-bg-secondary text-text-secondary hover:border-text-muted"
+              )}
+            >
+              <option.icon className="h-5 w-5" />
+              <span className="text-sm font-medium">{option.label}</span>
+            </button>
+          ))}
+        </div>
       </CardContent>
     </Card>
   );
