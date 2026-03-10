@@ -5,9 +5,26 @@
 - **Client :** Timothée Fortin
 - **Deadline :** 19 mars 2026
 - **Acompte :** 2 000 €
-- **Statut :** 99% CDC réalisé
+- **Statut :** 100% CDC réalisé
 - **GitHub :** https://github.com/Wassim-07305/ScalingFlow
 - **Vercel (prod) :** https://scalingflow-ahmanewassim6-2668s-projects.vercel.app
+
+## Description du projet (CDC)
+
+**ScalingFlow** est une plateforme SaaS alimentée par l'IA qui accompagne les entrepreneurs dans le scaling de leur business. Créé par Timothée Fortin.
+
+**7 phases du parcours :** VAULT → TRUTH → OFFER → BUILD → ATTENTION → LAUNCH → SCALE
+
+**Profils cibles :**
+- A1 : Entrepreneurs sans business (partent de zéro)
+- A2 : Salariés en reconversion
+- A3 : Freelances qui veulent scaler
+- B : Entrepreneurs déjà en train de scaler
+- C : Entrepreneurs en pivot
+
+**Objectifs :** première vente en 30 jours, 5K-10K+/mois en 90 jours.
+
+**Intégrations :** Claude API (Anthropic, IA en streaming), Meta Ads, GHL, Stripe.
 
 ## Stack technique
 
