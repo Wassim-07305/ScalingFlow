@@ -3,7 +3,6 @@
 import React from "react";
 import { PageHeader } from "@/components/layout/page-header";
 import { PostGenerator } from "@/components/content/post-generator";
-import { ContentCalendar } from "@/components/content/content-calendar";
 import { StrategyOverview } from "@/components/content/strategy-overview";
 import { EditorialCalendar } from "@/components/content/editorial-calendar";
 import { ReelsGenerator } from "@/components/content/reels-generator";

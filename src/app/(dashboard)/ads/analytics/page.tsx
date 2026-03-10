@@ -7,6 +7,8 @@ import { AnimatedCounter } from "@/components/shared/animated-counter";
 import { EmptyState } from "@/components/shared/empty-state";
 import { useUser } from "@/hooks/use-user";
 import { createClient } from "@/lib/supabase/client";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 import {
   TrendingUp,
   Eye,
@@ -16,6 +18,7 @@ import {
   Loader2,
   Target,
   Zap,
+  RefreshCw,
 } from "lucide-react";
 
 interface AggregatedMetrics {
@@ -32,9 +35,31 @@ interface AggregatedMetrics {
 }
 
 export default function AnalyticsPage() {
-  const { user, loading: userLoading } = useUser();
+  const { user, profile, loading: userLoading } = useUser();
   const [metrics, setMetrics] = useState<AggregatedMetrics | null>(null);
   const [loading, setLoading] = useState(true);
+  const [syncing, setSyncing] = useState(false);
+
+  const hasMetaConfig = !!(profile?.meta_access_token && profile?.meta_ad_account_id);
+
+  const handleSyncMeta = async () => {
+    setSyncing(true);
+    try {
+      const res = await fetch("/api/meta/sync", { method: "POST" });
+      const data = await res.json();
+      if (!res.ok) {
+        toast.error(data.error || "Erreur de synchronisation");
+      } else {
+        toast.success(data.message || "Synchronisation reussie");
+        // Recharger les metriques
+        window.location.reload();
+      }
+    } catch {
+      toast.error("Erreur lors de la synchronisation Meta Ads");
+    } finally {
+      setSyncing(false);
+    }
+  };
 
   useEffect(() => {
     if (userLoading || !user) return;
@@ -125,7 +150,20 @@ export default function AnalyticsPage() {
 
   return (
     <div>
-      <PageHeader title="Analytics Ads" description="Analyse les performances de tes publicites." />
+      <PageHeader title="Analytics Ads" description="Analyse les performances de tes publicites.">
+        {hasMetaConfig && (
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={handleSyncMeta}
+            disabled={syncing}
+            className="gap-2"
+          >
+            <RefreshCw className={`h-4 w-4 ${syncing ? "animate-spin" : ""}`} />
+            {syncing ? "Sync..." : "Sync Meta Ads"}
+          </Button>
+        )}
+      </PageHeader>
 
       {/* KPI Cards */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
@@ -209,16 +247,34 @@ export default function AnalyticsPage() {
         </Card>
       </div>
 
-      {/* Conseil */}
+      {/* Meta Ads sync status */}
       <Card>
         <CardHeader>
-          <CardTitle>Performances par periode</CardTitle>
+          <CardTitle>Synchronisation Meta Ads</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-text-secondary">
-            Connecte ton compte Meta Ads dans les parametres pour synchroniser
-            tes donnees publicitaires en temps reel et debloquer les graphiques detailles.
-          </p>
+          {hasMetaConfig ? (
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-text-secondary">
+                Ton compte Meta Ads est connecte. Clique sur &ldquo;Sync Meta Ads&rdquo; pour importer tes dernieres donnees.
+              </p>
+              <Button
+                size="sm"
+                onClick={handleSyncMeta}
+                disabled={syncing}
+                className="gap-2 shrink-0 ml-4"
+              >
+                <RefreshCw className={`h-4 w-4 ${syncing ? "animate-spin" : ""}`} />
+                Synchroniser
+              </Button>
+            </div>
+          ) : (
+            <p className="text-sm text-text-secondary">
+              Connecte ton compte Meta Ads dans les{" "}
+              <a href="/settings" className="text-accent hover:underline">parametres</a>{" "}
+              pour synchroniser tes donnees publicitaires et voir tes performances reelles.
+            </p>
+          )}
         </CardContent>
       </Card>
     </div>
