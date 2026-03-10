@@ -9,6 +9,8 @@ import { AnimatedCounter } from "@/components/shared/animated-counter";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useUser } from "@/hooks/use-user";
 import { createClient } from "@/lib/supabase/client";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 import {
   Users,
   TrendingUp,
@@ -20,6 +22,7 @@ import {
   UserCheck,
   Crown,
   Zap,
+  RefreshCw,
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -254,6 +257,25 @@ export default function AdminPage() {
     }
   };
 
+  const [recalculating, setRecalculating] = useState(false);
+
+  const handleRecalculateLeaderboard = async () => {
+    setRecalculating(true);
+    try {
+      const res = await fetch("/api/gamification/recalculate", { method: "POST" });
+      const data = await res.json();
+      if (!res.ok) {
+        toast.error(data.error || "Erreur de recalcul");
+      } else {
+        toast.success(data.message || "Leaderboard recalcule");
+      }
+    } catch {
+      toast.error("Erreur lors du recalcul du leaderboard");
+    } finally {
+      setRecalculating(false);
+    }
+  };
+
   // ─── Guard: loading or not admin ────────────────────────────
   if (userLoading) {
     return (
@@ -280,7 +302,18 @@ export default function AdminPage() {
       <PageHeader
         title="Administration"
         description="Vue d'ensemble de la plateforme ScalingFlow."
-      />
+      >
+        <Button
+          size="sm"
+          variant="ghost"
+          onClick={handleRecalculateLeaderboard}
+          disabled={recalculating}
+          className="gap-2"
+        >
+          <RefreshCw className={`h-4 w-4 ${recalculating ? "animate-spin" : ""}`} />
+          {recalculating ? "Recalcul..." : "Recalculer leaderboard"}
+        </Button>
+      </PageHeader>
 
       {/* ─── KPIs principaux ─────────────────────────────────── */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
