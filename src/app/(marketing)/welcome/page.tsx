@@ -398,6 +398,57 @@ export default function WelcomePage() {
         </div>
       </section>
 
+      {/* ─── FAQ ─── */}
+      <section className="max-w-3xl mx-auto px-4 py-24">
+        <h2 className="text-3xl font-bold text-text-primary text-center mb-4">
+          Questions frequentes
+        </h2>
+        <p className="text-text-secondary text-center mb-12">
+          Tout ce que tu dois savoir avant de commencer.
+        </p>
+        <div className="space-y-3">
+          {[
+            {
+              q: "Combien de temps faut-il pour generer une offre complete ?",
+              a: "Moins de 2 minutes. L'IA analyse ton marche, tes competences et ton positionnement pour generer une offre structuree avec pricing, garantie et arguments de vente.",
+            },
+            {
+              q: "Puis-je modifier les textes generes par l'IA ?",
+              a: "Absolument. Tous les textes generes (offres, funnels, ads, emails) sont entierement editables. L'IA te donne une base solide que tu peux affiner selon tes besoins.",
+            },
+            {
+              q: "Existe-t-il une periode d'essai gratuite ?",
+              a: "Oui, le plan Free te permet de tester la plateforme avec 5 generations IA par mois. Tu peux upgrader a tout moment vers Pro ou Premium pour debloquer toutes les fonctionnalites.",
+            },
+            {
+              q: "Quels types de contenu l'IA peut-elle generer ?",
+              a: "ScalingFlow genere : analyses de marche, offres completes, pages de funnel, creatives publicitaires, scripts de vente, VSL, sequences email/SMS, posts reels, scripts YouTube, et plus encore.",
+            },
+            {
+              q: "Mes donnees sont-elles securisees ?",
+              a: "Oui. Toutes les donnees sont chiffrees et stockees sur Supabase (infrastructure AWS). Les paiements sont securises par Stripe. Nous ne partageons jamais tes donnees avec des tiers.",
+            },
+            {
+              q: "Puis-je annuler mon abonnement a tout moment ?",
+              a: "Oui, sans engagement. Tu peux annuler ton abonnement depuis les parametres de ton compte. Tu conserves l'acces jusqu'a la fin de la periode de facturation en cours.",
+            },
+          ].map((faq) => (
+            <details
+              key={faq.q}
+              className="group rounded-xl border border-border-default/60 bg-bg-secondary/50 transition-all open:bg-bg-secondary"
+            >
+              <summary className="flex cursor-pointer items-center justify-between px-6 py-4 text-sm font-medium text-text-primary list-none [&::-webkit-details-marker]:hidden">
+                {faq.q}
+                <span className="ml-4 shrink-0 text-text-muted transition-transform group-open:rotate-45 text-lg">+</span>
+              </summary>
+              <div className="px-6 pb-4 text-sm text-text-secondary leading-relaxed">
+                {faq.a}
+              </div>
+            </details>
+          ))}
+        </div>
+      </section>
+
       {/* ─── Final CTA ─── */}
       <section className="max-w-4xl mx-auto px-4 py-24 text-center">
         <h2 className="text-3xl font-bold text-text-primary mb-4">
