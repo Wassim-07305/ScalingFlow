@@ -210,8 +210,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Generate asset using AI
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const generatedAsset: any = await generateJSON({ prompt, maxTokens });
+    const generatedAsset = await generateJSON<Record<string, unknown>>({ prompt, maxTokens });
 
     // Save asset to database
     // DB columns: title (text), content (text), ai_raw_response (jsonb)

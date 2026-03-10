@@ -277,8 +277,7 @@ export async function POST(req: NextRequest) {
 
     // Generate content ideas using AI
     const prompt = withVault(contentIdeasPrompt(marketContext, platform));
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const generatedContent: any = await generateJSON({ prompt, maxTokens: 4096 });
+    const generatedContent = await generateJSON<{ ideas?: string[] }>({ prompt, maxTokens: 4096 });
 
     // Award XP (non-blocking)
     try { await awardXP(user.id, "generation.content_strategy"); } catch {}

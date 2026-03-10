@@ -157,16 +157,22 @@ export async function POST(req: NextRequest) {
       },
       avatar
     );
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const generatedAdCopy: any = await generateJSON({
+    interface AdVariation {
+      body?: string;
+      headline?: string;
+      hook?: string;
+      cta?: string;
+      angle?: string;
+      target_audience?: string;
+    }
+    const generatedAdCopy = await generateJSON<{ variations?: AdVariation[] }>({
       prompt: adCopyProm,
       maxTokens: 4096,
     });
 
     // Generate ad hooks
     const hooksProm = adHooksPrompt(market, avatar);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const generatedHooks: any = await generateJSON({
+    const generatedHooks = await generateJSON<{ hooks?: string[] }>({
       prompt: hooksProm,
       maxTokens: 4096,
     });

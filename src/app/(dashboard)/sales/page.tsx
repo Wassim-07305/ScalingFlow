@@ -28,6 +28,9 @@ import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
 import { UpgradeWall } from "@/components/shared/upgrade-wall";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type SalesScript = Record<string, any>;
+
 const TABS = [
   { key: "discovery", label: "Appel Découverte", icon: Phone },
   { key: "closing", label: "Script de Closing", icon: FileText },
@@ -36,8 +39,7 @@ const TABS = [
 
 export default function SalesPage() {
   const [loading, setLoading] = React.useState(false);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [script, setScript] = React.useState<any>(null);
+  const [script, setScript] = React.useState<SalesScript | null>(null);
   const [error, setError] = React.useState<string | null>(null);
   const [activeTab, setActiveTab] = React.useState<string>("discovery");
   const [copied, setCopied] = React.useState(false);
@@ -247,12 +249,11 @@ interface ScriptSection {
   mistakes_to_avoid?: string[];
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function SalesScriptView({ script }: { script: any }) {
+function SalesScriptView({ script }: { script: SalesScript }) {
   const [expandedStep, setExpandedStep] = React.useState<number | null>(0);
 
   // Handle both { sections: [...] } and raw array formats
-  const sections: ScriptSection[] = Array.isArray(script?.sections)
+  const sections: ScriptSection[] | null = Array.isArray(script?.sections)
     ? script.sections
     : Array.isArray(script)
       ? script

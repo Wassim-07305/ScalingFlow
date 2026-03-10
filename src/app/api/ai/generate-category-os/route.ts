@@ -52,8 +52,14 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const marketAnalysis = (offer as any).market_analyses;
+    interface MarketAnalysisData {
+      market_name?: string;
+      problems?: string[];
+      recommended_positioning?: string;
+      competitors?: unknown;
+      target_avatar?: unknown;
+    }
+    const marketAnalysis = (offer as Record<string, unknown>).market_analyses as MarketAnalysisData | undefined;
 
     // Fetch user profile for vault data
     const { data: profile } = await supabase

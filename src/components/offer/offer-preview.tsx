@@ -9,14 +9,24 @@ import { RefreshCw, CheckCircle, Shield, Zap, Gift, FileDown } from "lucide-reac
 import { exportToPDF } from "@/lib/utils/export-pdf";
 
 interface OfferPreviewProps {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  offer: any;
+  offer: Record<string, unknown> & {
+    offer_name?: string;
+    positioning?: string;
+    pricing_strategy?: Record<string, unknown>;
+    guarantees?: { type: string; description: string; duration: string }[];
+    risk_reversal?: string;
+    no_brainer_element?: string;
+    oto_offer?: Record<string, unknown>;
+    delivery_structure?: Record<string, unknown>;
+    ai_raw_response?: Record<string, unknown>;
+  };
   onRegenerate?: () => void;
   className?: string;
 }
 
 export function OfferPreview({ offer, onRegenerate, className }: OfferPreviewProps) {
-  const raw = offer.ai_raw_response || offer;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const raw: Record<string, any> = (offer.ai_raw_response || offer) as Record<string, any>;
   const packaging = raw.packaging || {};
   const delivery = raw.delivery || {};
 

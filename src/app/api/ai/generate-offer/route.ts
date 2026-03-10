@@ -73,8 +73,21 @@ export async function POST(req: NextRequest) {
       profile?.skills || []
     );
     const prompt = vaultContext ? basePrompt + "\n" + vaultContext : basePrompt;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const generatedOffer: any = await generateJSON({ prompt, maxTokens: 8192 });
+    interface GeneratedOffer {
+      packaging?: {
+        offer_name?: string;
+        positioning?: string;
+        unique_mechanism?: { name?: string };
+        pricing?: Record<string, unknown>;
+        guarantees?: Record<string, unknown>[];
+        no_brainer?: string;
+        risk_reversal?: string;
+        oto?: Record<string, unknown>;
+      };
+      delivery?: Record<string, unknown>;
+      full_document_markdown?: string;
+    }
+    const generatedOffer = await generateJSON<GeneratedOffer>({ prompt, maxTokens: 8192 });
 
     // Save offer to database
     const { data: offer, error: saveError } = await supabase

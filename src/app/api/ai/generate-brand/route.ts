@@ -46,10 +46,18 @@ export async function POST(req: NextRequest) {
     }
 
     // Optionally fetch offer if provided
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let offer: any = null;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let categoryOS: any = null;
+    interface OfferData {
+      offer_name: string;
+      positioning?: string | null;
+      unique_mechanism?: string | null;
+      ai_raw_response?: Record<string, unknown> | null;
+    }
+    interface CategoryOSData {
+      new_game?: { category_name?: string };
+      identite?: { tagline?: string; tone_of_voice?: string };
+    }
+    let offer: OfferData | null = null;
+    let categoryOS: CategoryOSData | null = null;
 
     if (offerId) {
       const { data: offerData } = await supabase
@@ -64,7 +72,7 @@ export async function POST(req: NextRequest) {
         // Extract category OS from ai_raw_response if available
         const rawResponse = offerData.ai_raw_response as Record<string, unknown> | null;
         if (rawResponse && typeof rawResponse === "object" && "category_os" in rawResponse) {
-          categoryOS = rawResponse.category_os;
+          categoryOS = rawResponse.category_os as CategoryOSData;
         }
       }
     }

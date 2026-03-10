@@ -70,9 +70,8 @@ export function GenerationHistory({
         .limit(20);
 
       if (!error && data) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         setItems(
-          (data as any[]).map((row) => ({
+          (data as unknown as Record<string, unknown>[]).map((row) => ({
             id: row.id as string,
             title: (row[titleField] as string) || "Sans titre",
             subtitle: subtitleField

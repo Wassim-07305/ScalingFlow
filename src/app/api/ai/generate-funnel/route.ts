@@ -66,8 +66,12 @@ export async function POST(req: NextRequest) {
       avatar
     );
     const prompt = vaultContext ? basePrompt + "\n" + vaultContext : basePrompt;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const generatedFunnel: any = await generateJSON({ prompt, maxTokens: 4096 });
+    interface GeneratedFunnel {
+      optin_page?: Record<string, unknown>;
+      vsl_page?: Record<string, unknown>;
+      thankyou_page?: Record<string, unknown>;
+    }
+    const generatedFunnel = await generateJSON<GeneratedFunnel>({ prompt, maxTokens: 4096 });
 
     // Save funnel to database
     const { data: funnel, error: saveError } = await supabase
