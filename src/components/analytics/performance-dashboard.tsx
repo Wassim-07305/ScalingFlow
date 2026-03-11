@@ -27,6 +27,7 @@ import {
   Eye,
   MousePointerClick,
   Trash2,
+  RefreshCw,
 } from "lucide-react";
 import {
   AreaChart,
@@ -138,8 +139,10 @@ export function PerformanceDashboard() {
     revenue: 0,
   });
 
-  // Load metrics on mount
-  useEffect(() => {
+  const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
+
+  // Load metrics on mount + auto-refresh every 5 min
+  const loadData = useCallback(() => {
     if (!user) return;
     const stored = loadMetrics(user.id);
     if (stored.length > 0) {
@@ -149,7 +152,14 @@ export function PerformanceDashboard() {
       setMetrics(DEMO_DATA);
       setIsDemo(true);
     }
+    setLastRefresh(new Date());
   }, [user]);
+
+  useEffect(() => {
+    loadData();
+    const interval = setInterval(loadData, 5 * 60 * 1000); // auto-refresh 5 min
+    return () => clearInterval(interval);
+  }, [loadData]);
 
   const handleSaveMetric = useCallback(() => {
     if (!user) return;
@@ -301,8 +311,14 @@ export function PerformanceDashboard() {
           {isDemo && (
             <Badge variant="yellow">Donnees de demonstration</Badge>
           )}
+          <span className="text-[10px] text-text-muted">
+            MAJ : {format(lastRefresh, "HH:mm", { locale: fr })}
+          </span>
         </div>
         <div className="flex items-center gap-2">
+          <Button variant="ghost" size="sm" onClick={loadData} title="Rafraichir">
+            <RefreshCw className="h-4 w-4" />
+          </Button>
           {!isDemo && (
             <Button variant="ghost" size="sm" onClick={handleClearData}>
               <Trash2 className="h-4 w-4 mr-1" />

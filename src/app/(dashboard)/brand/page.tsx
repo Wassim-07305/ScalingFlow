@@ -20,11 +20,11 @@ import {
   BookOpen,
   CheckCircle,
   XCircle,
-  Target,
   History,
 } from "lucide-react";
 import { toast } from "sonner";
 import { GenerationHistory } from "@/components/shared/generation-history";
+import { LogoGenerator } from "@/components/brand/logo-generator";
 import type { BrandIdentityResult } from "@/lib/ai/prompts/brand-identity";
 import { UpgradeWall } from "@/components/shared/upgrade-wall";
 
@@ -313,79 +313,16 @@ export default function BrandPage() {
             <StyleGuide direction={generated.direction_artistique} />
           )}
           {activeTab === "logo" && (
-            <LogoConceptView concept={generated.logo_concept} />
+            <LogoGenerator
+              concept={generated.logo_concept}
+              brandName={selectedName || generated.noms?.[0]?.name}
+              palette={generated.direction_artistique?.palette}
+            />
           )}
           {activeTab === "kit" && (
             <BrandKitView kit={generated.brand_kit} />
           )}
         </>
-      )}
-    </div>
-  );
-}
-
-// --- Logo Concept ---
-
-function LogoConceptView({
-  concept,
-}: {
-  concept: BrandIdentityResult["logo_concept"] | null;
-}) {
-  if (!concept) {
-    return (
-      <div className="text-center py-12">
-        <Hexagon className="h-12 w-12 text-text-muted mx-auto mb-3" />
-        <p className="text-text-secondary">Aucun concept de logo genere.</p>
-      </div>
-    );
-  }
-
-  return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Hexagon className="h-5 w-5 text-accent" />
-            Concept de Logo
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div>
-            <p className="text-xs text-text-muted uppercase tracking-wide mb-1">
-              Description
-            </p>
-            <p className="text-sm text-text-secondary">{concept.description}</p>
-          </div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="p-4 rounded-xl bg-bg-tertiary border border-border-default">
-              <p className="text-xs text-text-muted uppercase tracking-wide mb-1">Forme</p>
-              <p className="text-sm text-text-primary">{concept.forme}</p>
-            </div>
-            <div className="p-4 rounded-xl bg-bg-tertiary border border-border-default">
-              <p className="text-xs text-text-muted uppercase tracking-wide mb-1">
-                Symbolisme
-              </p>
-              <p className="text-sm text-text-primary">{concept.symbolisme}</p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {concept.variations.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Variations</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-wrap gap-2">
-              {concept.variations.map((v, i) => (
-                <Badge key={i} variant="muted">
-                  {typeof v === "string" ? v : (v as { type?: string; description?: string }).description || (v as { type?: string }).type || JSON.stringify(v)}
-                </Badge>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
       )}
     </div>
   );

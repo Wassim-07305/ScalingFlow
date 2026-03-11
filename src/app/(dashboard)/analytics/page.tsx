@@ -9,6 +9,7 @@ import { ABTestManager } from "@/components/analytics/ab-test-manager";
 import { AttributionModel } from "@/components/analytics/attribution-model";
 import { LTVCACTracker } from "@/components/analytics/ltv-cac-tracker";
 import { MetricsHistory } from "@/components/analytics/metrics-history";
+import { GrowthTiers } from "@/components/analytics/growth-tiers";
 import {
   BarChart3,
   Sparkles,
@@ -16,11 +17,13 @@ import {
   GitBranch,
   TrendingUp,
   History,
+  Rocket,
 } from "lucide-react";
 
 const TABS = [
   { key: "dashboard", label: "Dashboard", icon: BarChart3 },
   { key: "optimization", label: "Recommandations IA", icon: Sparkles },
+  { key: "growth_tiers", label: "Paliers", icon: Rocket },
   { key: "ab_testing", label: "A/B Testing", icon: FlaskConical },
   { key: "attribution", label: "Attribution", icon: GitBranch },
   { key: "ltv_cac", label: "LTV / CAC", icon: TrendingUp },
@@ -36,6 +39,8 @@ export default function AnalyticsPage() {
         return <PerformanceDashboard />;
       case "optimization":
         return <OptimizationRecommendations />;
+      case "growth_tiers":
+        return <GrowthTiers />;
       case "ab_testing":
         return <ABTestManager />;
       case "attribution":

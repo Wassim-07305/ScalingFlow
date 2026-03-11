@@ -27,6 +27,120 @@ import { buildFullVaultContext } from "@/lib/ai/vault-context";
 import { awardXP } from "@/lib/gamification/xp-engine";
 import { notifyGeneration } from "@/lib/notifications/create";
 import { rateLimit } from "@/lib/utils/rate-limit";
+import { SupabaseClient } from "@supabase/supabase-js";
+
+// ─── #74 + #75 : Fetch ad performance + sales insights for content enrichment ───
+
+async function fetchAdInsights(supabase: SupabaseClient, userId: string): Promise<string> {
+  const sevenDaysAgo = new Date();
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+  // Top performing ad creatives (by CTR)
+  const { data: topAds } = await supabase
+    .from("ad_creatives")
+    .select("headline, hook, angle, ctr, roas, ad_copy")
+    .eq("user_id", userId)
+    .gt("ctr", 0)
+    .order("ctr", { ascending: false })
+    .limit(5);
+
+  // Recent daily metrics for trend
+  const { data: metrics } = await supabase
+    .from("ad_daily_metrics")
+    .select("date, spend, roas, ctr, conversions")
+    .eq("user_id", userId)
+    .gte("date", sevenDaysAgo.toISOString().split("T")[0])
+    .order("date", { ascending: false });
+
+  if ((!topAds || topAds.length === 0) && (!metrics || metrics.length === 0)) return "";
+
+  let insight = "\n## DONNEES PUBLICITAIRES (adaptation intelligente)\n";
+
+  if (topAds && topAds.length > 0) {
+    insight += "### Creatives les plus performantes (par CTR) :\n";
+    for (const ad of topAds) {
+      insight += `- Hook: "${ad.hook || ad.headline}" | Angle: ${ad.angle || "N/A"} | CTR: ${ad.ctr}% | ROAS: ${ad.roas || "N/A"}\n`;
+    }
+    insight += "\n→ Utilise ces angles et hooks performants comme inspiration pour le contenu organique.\n";
+  }
+
+  if (metrics && metrics.length > 0) {
+    const avgRoas = metrics.reduce((s, m) => s + (m.roas || 0), 0) / metrics.length;
+    const avgCtr = metrics.reduce((s, m) => s + (m.ctr || 0), 0) / metrics.length;
+    const totalConversions = metrics.reduce((s, m) => s + (m.conversions || 0), 0);
+    insight += `### Performance des 7 derniers jours :\n`;
+    insight += `- ROAS moyen : ${avgRoas.toFixed(2)} | CTR moyen : ${avgCtr.toFixed(2)}% | Conversions totales : ${totalConversions}\n`;
+    if (avgRoas < 1.5) {
+      insight += "→ Le ROAS est faible — privilegie du contenu organique qui renforce la confiance et l'autorite.\n";
+    }
+    if (avgCtr > 2) {
+      insight += "→ Le CTR est bon — les hooks fonctionnent, decline-les en contenu organique.\n";
+    }
+  }
+
+  return insight;
+}
+
+async function fetchSalesInsights(supabase: SupabaseClient, userId: string): Promise<string> {
+  // Recent call analyses
+  const { data: callAnalyses } = await supabase
+    .from("sales_assets")
+    .select("title, content, metadata, created_at")
+    .eq("user_id", userId)
+    .eq("asset_type", "sales_script")
+    .order("created_at", { ascending: false })
+    .limit(3);
+
+  // Recent sales scripts for objection/pain point data
+  const { data: salesAssets } = await supabase
+    .from("sales_assets")
+    .select("asset_type, ai_raw_response, metadata")
+    .eq("user_id", userId)
+    .in("asset_type", ["sales_script", "sales_letter", "lead_magnet"])
+    .order("created_at", { ascending: false })
+    .limit(5);
+
+  if ((!callAnalyses || callAnalyses.length === 0) && (!salesAssets || salesAssets.length === 0)) return "";
+
+  let insight = "\n## DONNEES DE VENTE (contenu depuis data vente)\n";
+
+  if (callAnalyses && callAnalyses.length > 0) {
+    insight += "### Analyses d'appels recents :\n";
+    for (const call of callAnalyses) {
+      const meta = call.metadata as { original_type?: string; call_type?: string } | null;
+      if (meta?.original_type === "call_analysis") {
+        let parsed = null;
+        try {
+          parsed = typeof call.content === "string" ? JSON.parse(call.content) : call.content;
+        } catch { /* ignore */ }
+
+        if (parsed) {
+          const objections = parsed.objections_detected || [];
+          const signals = parsed.client_signals || {};
+          if (objections.length > 0) {
+            insight += `- Objections detectees : ${objections.map((o: { objection: string }) => o.objection).join(", ")}\n`;
+          }
+          if (signals.buying_signals) {
+            insight += `- Signaux d'achat : ${Array.isArray(signals.buying_signals) ? signals.buying_signals.join(", ") : signals.buying_signals}\n`;
+          }
+          if (signals.emotional_triggers) {
+            insight += `- Declencheurs emotionnels : ${Array.isArray(signals.emotional_triggers) ? signals.emotional_triggers.join(", ") : signals.emotional_triggers}\n`;
+          }
+        }
+      }
+    }
+    insight += "\n→ Cree du contenu qui adresse directement ces objections et active ces declencheurs emotionnels.\n";
+  }
+
+  if (salesAssets && salesAssets.length > 0) {
+    const types = salesAssets.map((a) => a.asset_type);
+    const uniqueTypes = [...new Set(types)];
+    insight += `### Assets de vente disponibles : ${uniqueTypes.join(", ")}\n`;
+    insight += "→ Aligne le contenu organique avec les arguments de vente existants pour une coherence maximale.\n";
+  }
+
+  return insight;
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -61,10 +175,12 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { contentType, market, platform, topic, batchNumber } = body;
 
-    // Recuperer le profil + vault resources pour les prompts avances
-    const [{ data: profile }, vaultContext] = await Promise.all([
+    // Recuperer le profil + vault + ad insights + sales insights en parallele
+    const [{ data: profile }, vaultContext, adInsights, salesInsights] = await Promise.all([
       supabase.from("profiles").select("*").eq("id", user.id).single(),
       buildFullVaultContext(user.id),
+      fetchAdInsights(supabase, user.id),
+      fetchSalesInsights(supabase, user.id),
     ]);
 
     const { data: latestAnalysis } = await supabase
@@ -83,8 +199,14 @@ export async function POST(req: NextRequest) {
       .limit(1)
       .single();
 
-    // Helper to enrich prompts with vault resources
-    const withVault = (prompt: string) => vaultContext ? prompt + "\n" + vaultContext : prompt;
+    // Helper to enrich prompts with vault + ad insights + sales insights
+    const withContext = (prompt: string) => {
+      let enriched = prompt;
+      if (adInsights) enriched += adInsights;
+      if (salesInsights) enriched += salesInsights;
+      if (vaultContext) enriched += "\n" + vaultContext;
+      return enriched;
+    };
 
     const marketContext =
       market || latestAnalysis?.market || profile?.target_market || "Freelances et consultants IA";
@@ -103,7 +225,7 @@ export async function POST(req: NextRequest) {
 
     // --- Strategie de contenu ---
     if (contentType === "strategy") {
-      const prompt = withVault(buildContentStrategyPrompt(
+      const prompt = withContext(buildContentStrategyPrompt(
         marketContext,
         offerContext,
         personaContext,
@@ -141,7 +263,7 @@ export async function POST(req: NextRequest) {
 
     // --- Scripts Reels ---
     if (contentType === "reels") {
-      const prompt = withVault(buildReelsScriptsPrompt(
+      const prompt = withContext(buildReelsScriptsPrompt(
         marketContext,
         offerContext,
         personaContext,
@@ -180,7 +302,7 @@ export async function POST(req: NextRequest) {
           { status: 400 }
         );
       }
-      const prompt = withVault(buildYouTubeScriptPrompt(marketContext, offerContext, topic));
+      const prompt = withContext(buildYouTubeScriptPrompt(marketContext, offerContext, topic));
       const result = await generateJSON<YouTubeScriptResult>({
         prompt,
         maxTokens: 8192,
@@ -205,7 +327,7 @@ export async function POST(req: NextRequest) {
 
     // --- Stories ---
     if (contentType === "stories") {
-      const prompt = withVault(buildStoriesPrompt(marketContext, offerContext));
+      const prompt = withContext(buildStoriesPrompt(marketContext, offerContext));
       const result = await generateJSON<StoriesResult>({
         prompt,
         maxTokens: 4096,
@@ -236,7 +358,7 @@ export async function POST(req: NextRequest) {
           { status: 400 }
         );
       }
-      const prompt = withVault(buildCarouselPrompt(marketContext, offerContext, topic));
+      const prompt = withContext(buildCarouselPrompt(marketContext, offerContext, topic));
       const result = await generateJSON<CarouselResult>({
         prompt,
         maxTokens: 4096,
@@ -287,7 +409,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Generate content ideas using AI
-    const prompt = withVault(contentIdeasPrompt(marketContext, platform));
+    const prompt = withContext(contentIdeasPrompt(marketContext, platform));
     const generatedContent = await generateJSON<{ ideas?: string[] }>({ prompt, maxTokens: 4096 });
 
     // Award XP (non-blocking)

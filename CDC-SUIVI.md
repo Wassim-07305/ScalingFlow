@@ -1,7 +1,7 @@
 # ScalingFlow — Suivi Cahier des Charges (93 fonctionnalités)
 
 > Dernière mise à jour : 2026-03-11
-> Bilan : **51 DONE** / **20 PARTIAL** / **22 MISSING**
+> Bilan : **58 DONE** / **17 PARTIAL** / **18 MISSING**
 
 ---
 
@@ -43,7 +43,7 @@
 |---|---------|--------|-------|
 | 18 | Générateur de nom | DONE | generate-brand + name-generator |
 | 19 | Générateur de DA | DONE | Palette, typos, style visuel, moodboard |
-| 20 | Générateur de logo | PARTIAL | Concept texte uniquement, pas de génération d'image (Replicate non branché) |
+| 20 | Générateur de logo | DONE | Concept texte + génération d'images via Replicate Flux (4 variations) |
 | 21 | Kit de marque | DONE | Mission, vision, valeurs, ton, do/don't |
 
 ## FUNNEL VSL (5/5 DONE)
@@ -115,13 +115,13 @@
 
 | # | Feature | Status | Notes |
 |---|---------|--------|-------|
-| 62 | Dashboard temps réel | PARTIAL | performance-dashboard existe, données pas temps réel |
+| 62 | Dashboard temps réel | DONE | Auto-refresh 5min + bouton rafraîchir + timestamp |
 | 63 | Tracking multi-touch | PARTIAL | attribution-model UI, données manuelles |
 | 64 | Tracking calls | PARTIAL | Analyse IA de transcriptions, pas d'intégration téléphonie |
 | 65 | Tracking revenue | PARTIAL | Charts ok, données manuelles |
 | 66 | Vrai ROAS | PARTIAL | ROAS affiché, calcul basique Meta |
 | 67 | Détection bottlenecks | DONE | optimization-recommendations (413 lignes) |
-| 68 | Alertes intelligentes | MISSING | Pas de système d'alertes sur seuils KPI |
+| 68 | Alertes intelligentes | DONE | 7 règles KPI, cooldown 24h, notifications + email Resend |
 
 ## MANAGING AUTOMATISÉ ADS (0 DONE / 1 PARTIAL / 3 MISSING)
 
@@ -137,8 +137,8 @@
 | # | Feature | Status | Notes |
 |---|---------|--------|-------|
 | 73 | Contenu continu | PARTIAL | Calendrier 30 jours ok, pas de scheduling auto |
-| 74 | Adaptation intelligente | MISSING | Pas de lien analytics → stratégie contenu auto |
-| 75 | Contenu depuis data vente | MISSING | Pas de pipeline calls → contenu |
+| 74 | Adaptation intelligente | DONE | Top creatives + KPIs ads injectés dans prompts contenu |
+| 75 | Contenu depuis data vente | DONE | Objections, signaux d'achat et triggers injectés dans prompts contenu |
 | 76 | Analyse calls de vente | DONE | call-analyzer + analyze-call + scoring |
 | 77 | Métriques vente agrégées | PARTIAL | ltv-cac-tracker + metrics-history, données manuelles |
 
@@ -146,7 +146,7 @@
 
 | # | Feature | Status | Notes |
 |---|---------|--------|-------|
-| 78 | Paliers de croissance | PARTIAL | Dans prompts agents + roadmap, pas de UI dédiée |
+| 78 | Paliers de croissance | DONE | UI dédiée avec 4 paliers, checkpoints, actions recommandées + migration DB |
 | 79 | Whitelabel complet | MISSING | Pas d'architecture multi-tenant |
 | 80 | Générateur OTO | DONE | oto-generator + prompt oto-offer |
 
@@ -176,12 +176,12 @@
 - [x] #42 Social assets — DONE
 - [x] #49 Follower Ads — DONE
 - [x] #50 DM Ads retargeting — DONE
-- [x] #68 Alertes intelligentes (notifications sur seuils KPI) — DONE
-- [ ] #74 Adaptation intelligente (connecter analytics → contenu)
-- [ ] #75 Contenu depuis data vente (connecter calls → contenu)
+- [x] #68 Alertes intelligentes (notifications sur seuils KPI + email) — DONE
+- [x] #74 Adaptation intelligente (connecter analytics → contenu) — DONE
+- [x] #75 Contenu depuis data vente (connecter calls → contenu) — DONE
 
 ### Complexité moyenne
-- [ ] #20 Logo complet (brancher Replicate pour génération d'images)
+- [x] #20 Logo complet (Replicate Flux pour génération d'images) — DONE
 - [ ] #46 Images ads (idem Replicate)
 - [ ] #6 Scraper d'insights (Reddit API, YouTube Data API)
 - [ ] #57 Deploy Funnel (export HTML/PDF)

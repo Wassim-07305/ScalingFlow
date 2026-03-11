@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { ALERT_RULES } from "@/lib/alerts/rules";
 import { createNotification } from "@/lib/notifications/create";
+import { resend } from "@/lib/resend/client";
+import { kpiAlertEmail } from "@/lib/resend/templates";
 
 // Cooldown: don't re-fire the same alert within 24h
 const COOLDOWN_HOURS = 24;
@@ -55,6 +57,38 @@ export async function POST() {
         link: alert.link,
       });
       created++;
+    }
+
+    // Send email digest for danger/warning alerts (non-blocking)
+    if (created > 0 && resend) {
+      const newAlerts = alerts.filter((a) => !recentTitles.has(a.title));
+      if (newAlerts.some((a) => a.severity === "danger" || a.severity === "warning")) {
+        try {
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("full_name, email")
+            .eq("id", user.id)
+            .single();
+
+          const email = profile?.email || user.email;
+          const firstName = profile?.full_name?.split(" ")[0] || "Utilisateur";
+
+          if (email) {
+            const { subject, html } = kpiAlertEmail(
+              firstName,
+              newAlerts.map((a) => ({ title: a.title, message: a.message, severity: a.severity }))
+            );
+            await resend.emails.send({
+              from: "ScalingFlow <alerts@scalingflow.com>",
+              to: email,
+              subject,
+              html,
+            });
+          }
+        } catch {
+          // Email send failed — non-critical
+        }
+      }
     }
 
     return NextResponse.json({

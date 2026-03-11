@@ -1,0 +1,152 @@
+"use client";
+
+import React from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Loader2, Hexagon, Download, RefreshCw } from "lucide-react";
+import { toast } from "sonner";
+import type { BrandIdentityResult } from "@/lib/ai/prompts/brand-identity";
+
+interface LogoGeneratorProps {
+  concept: BrandIdentityResult["logo_concept"] | null;
+  brandName?: string | null;
+  palette?: { hex: string }[];
+}
+
+export function LogoGenerator({ concept, brandName, palette }: LogoGeneratorProps) {
+  const [images, setImages] = React.useState<string[]>([]);
+  const [loading, setLoading] = React.useState(false);
+
+  const generate = async () => {
+    if (!concept) {
+      toast.error("Genere d'abord une identite de marque");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const res = await fetch("/api/ai/generate-logo", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          brandName: brandName || "Brand",
+          concept: `${concept.description}. Forme: ${concept.forme}. Symbolisme: ${concept.symbolisme}`,
+          style: concept.forme,
+          colors: palette?.map((c) => c.hex).slice(0, 3),
+        }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || "Erreur");
+      }
+
+      const data = await res.json();
+      setImages(data.images || []);
+      toast.success("Logos generes !");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Erreur lors de la generation");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Hexagon className="h-5 w-5 text-accent" />
+            Concept de Logo
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {concept ? (
+            <>
+              <div>
+                <p className="text-xs text-text-muted uppercase tracking-wide mb-1">Description</p>
+                <p className="text-sm text-text-secondary">{concept.description}</p>
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="p-4 rounded-xl bg-bg-tertiary border border-border-default">
+                  <p className="text-xs text-text-muted uppercase tracking-wide mb-1">Forme</p>
+                  <p className="text-sm text-text-primary">{concept.forme}</p>
+                </div>
+                <div className="p-4 rounded-xl bg-bg-tertiary border border-border-default">
+                  <p className="text-xs text-text-muted uppercase tracking-wide mb-1">Symbolisme</p>
+                  <p className="text-sm text-text-primary">{concept.symbolisme}</p>
+                </div>
+              </div>
+            </>
+          ) : (
+            <p className="text-sm text-text-secondary text-center py-4">
+              Genere d&apos;abord une identite de marque pour obtenir un concept de logo.
+            </p>
+          )}
+
+          <Button onClick={generate} disabled={loading || !concept} className="w-full">
+            {loading ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                Generation en cours (30-60s)...
+              </>
+            ) : images.length > 0 ? (
+              <>
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Regenerer les logos
+              </>
+            ) : (
+              <>
+                <Hexagon className="h-4 w-4 mr-2" />
+                Generer les logos avec l&apos;IA
+              </>
+            )}
+          </Button>
+        </CardContent>
+      </Card>
+
+      {images.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Propositions de Logo ({images.length} variations)</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-4 sm:grid-cols-2">
+              {images.map((url, i) => (
+                <div
+                  key={i}
+                  className="relative group rounded-xl border border-border-default bg-bg-tertiary overflow-hidden"
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={url}
+                    alt={`Logo variation ${i + 1}`}
+                    className="w-full aspect-square object-contain p-4"
+                  />
+                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <a
+                      href={url}
+                      download={`logo-${brandName || "brand"}-${i + 1}.webp`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 px-4 py-2 rounded-xl bg-accent text-white text-sm font-medium hover:bg-accent/80 transition-colors"
+                    >
+                      <Download className="h-4 w-4" />
+                      Telecharger
+                    </a>
+                  </div>
+                  <div className="p-2 text-center">
+                    <span className="text-xs text-text-muted">Variation {i + 1}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <p className="text-xs text-text-muted text-center mt-4">
+              Les logos sont generes par IA (Flux). Utilise-les comme base pour un designer professionnel.
+            </p>
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  );
+}

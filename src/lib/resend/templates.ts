@@ -231,6 +231,44 @@ export function paymentFailedEmail(firstName: string) {
 // ---------------------------------------------------------------------------
 // 7. Rappel de streak
 // ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// 8. Alerte KPI
+// ---------------------------------------------------------------------------
+export function kpiAlertEmail(
+  firstName: string,
+  alerts: { title: string; message: string; severity: string }[]
+) {
+  const alertRows = alerts
+    .map((a) => {
+      const color = a.severity === "danger" ? "#EF4444" : a.severity === "warning" ? "#F59E0B" : "#3B82F6";
+      return `<div style="background-color:#1C1F23;border-left:3px solid ${color};border-radius:6px;padding:14px 16px;margin:8px 0;">
+        <p style="margin:0 0 4px;font-size:14px;font-weight:600;color:${color};">${a.title}</p>
+        <p style="margin:0;font-size:13px;color:#D1D5DB;">${a.message}</p>
+      </div>`;
+    })
+    .join("");
+
+  const html = layout(`
+    <h1 style="margin:0 0 16px;font-size:22px;font-weight:700;color:#FFFFFF;">
+      Alertes business d&eacute;tect&eacute;es
+    </h1>
+    <p style="margin:0 0 12px;font-size:15px;line-height:1.6;color:#D1D5DB;">
+      ${firstName}, ScalingFlow a d&eacute;tect&eacute; ${alerts.length} alerte${alerts.length > 1 ? "s" : ""}
+      qui n&eacute;cessitent ton attention :
+    </p>
+    ${alertRows}
+    ${ctaButton("Voir le d\u00e9tail", `${APP_URL}`)}
+    <p style="margin:0;font-size:13px;color:#6B7280;">
+      Ces alertes sont bas&eacute;es sur tes KPIs des derniers jours.
+    </p>
+  `);
+
+  return {
+    subject: `${alerts.length} alerte${alerts.length > 1 ? "s" : ""} business d\u00e9tect\u00e9e${alerts.length > 1 ? "s" : ""}`,
+    html,
+  };
+}
+
 export function streakReminderEmail(firstName: string, streakDays: number) {
   const html = layout(`
     <h1 style="margin:0 0 16px;font-size:22px;font-weight:700;color:#FFFFFF;">
