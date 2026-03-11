@@ -6,6 +6,7 @@ import { TabBar } from "@/components/shared/tab-bar";
 import { PersonaDisplay } from "@/components/market/persona-display";
 import { CompetitorGrid } from "@/components/market/competitor-grid";
 import { PainIdentifier } from "@/components/market/pain-identifier";
+import { SchwartzDisplay } from "@/components/market/schwartz-display";
 import { cn } from "@/lib/utils/cn";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -17,6 +18,7 @@ import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import type { PersonaForgeResult } from "@/lib/ai/prompts/persona-forge";
 import type { Database } from "@/types/database";
+import type { SchwartzAnalysisResult } from "@/types/ai";
 import { UpgradeWall } from "@/components/shared/upgrade-wall";
 import {
   BarChart3,
@@ -30,6 +32,7 @@ import {
   TrendingUp,
   Target,
   AlertTriangle,
+  Gauge,
 } from "lucide-react";
 
 type MarketAnalysis = Database["public"]["Tables"]["market_analyses"]["Row"];
@@ -37,6 +40,7 @@ type Competitor = Database["public"]["Tables"]["competitors"]["Row"];
 
 const TABS = [
   { key: "analyse", label: "Analyse", icon: BarChart3 },
+  { key: "schwartz", label: "Schwartz", icon: Gauge },
   { key: "persona", label: "Persona", icon: User },
   { key: "pains", label: "Pains", icon: Flame },
   { key: "concurrence", label: "Concurrence", icon: Swords },
@@ -55,6 +59,7 @@ export default function MarketPage() {
   const [competitors, setCompetitors] = useState<Competitor[]>([]);
   const [loadingPersona, setLoadingPersona] = useState(false);
   const [loadingCompetitors, setLoadingCompetitors] = useState(false);
+  const [loadingSchwartz, setLoadingSchwartz] = useState(false);
   const [loadingData, setLoadingData] = useState(true);
   const [usageLimited, setUsageLimited] = useState<{currentUsage: number; limit: number} | null>(null);
 
@@ -71,7 +76,6 @@ export default function MarketPage() {
 
     if (error) {
       toast.error("Erreur lors du chargement des analyses");
-      console.error(error);
     } else if (data) {
       setAnalyses(data);
       // Selectionner la premiere analyse par defaut (ou celle marquee selected)
@@ -94,9 +98,7 @@ export default function MarketPage() {
       .eq("market_analysis_id", selectedAnalysis.id)
       .order("created_at", { ascending: false });
 
-    if (error) {
-      console.error(error);
-    } else {
+    if (!error) {
       setCompetitors(data || []);
     }
   }, [user, selectedAnalysis, supabase]);
@@ -137,7 +139,6 @@ export default function MarketPage() {
       );
       toast.success("Persona genere avec succes !");
     } catch (error) {
-      console.error(error);
       toast.error(
         error instanceof Error
           ? error.message
@@ -171,7 +172,6 @@ export default function MarketPage() {
       await loadCompetitors();
       toast.success("Analyse concurrentielle terminee !");
     } catch (error) {
-      console.error(error);
       toast.error(
         error instanceof Error
           ? error.message
@@ -183,6 +183,44 @@ export default function MarketPage() {
   };
 
   const persona = selectedAnalysis?.persona as PersonaForgeResult | null;
+
+  // Analyser le niveau Schwartz
+  const handleGenerateSchwartz = async () => {
+    if (!selectedAnalysis) return;
+    setLoadingSchwartz(true);
+
+    try {
+      const res = await fetch("/api/ai/analyze-schwartz", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ market_analysis_id: selectedAnalysis.id }),
+      });
+
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        if (res.status === 403 && errData.usage) { setUsageLimited(errData.usage); return; }
+        throw new Error(errData.error || "Erreur lors de l'analyse");
+      }
+
+      const schwartzAnalysis = await res.json();
+      // Mettre a jour l'analyse locale
+      setSelectedAnalysis({ ...selectedAnalysis, schwartz_analysis: schwartzAnalysis });
+      setAnalyses((prev) =>
+        prev.map((a) =>
+          a.id === selectedAnalysis.id ? { ...a, schwartz_analysis: schwartzAnalysis } : a
+        )
+      );
+      toast.success("Analyse Schwartz terminee !");
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Erreur lors de l'analyse Schwartz"
+      );
+    } finally {
+      setLoadingSchwartz(false);
+    }
+  };
 
   if (usageLimited) {
     return <UpgradeWall currentUsage={usageLimited.currentUsage} limit={usageLimited.limit} />;
@@ -417,6 +455,46 @@ export default function MarketPage() {
           marketAnalysisId={selectedAnalysis.id}
           existingPains={null}
         />
+      )}
+
+      {/* TAB: Schwartz */}
+      {activeTab === "schwartz" && !loadingData && selectedAnalysis && (
+        <div>
+          {selectedAnalysis.schwartz_analysis ? (
+            <SchwartzDisplay
+              analysis={selectedAnalysis.schwartz_analysis as unknown as SchwartzAnalysisResult}
+            />
+          ) : (
+            <Card>
+              <CardContent className="flex flex-col items-center justify-center py-12">
+                <Gauge className="h-12 w-12 text-text-muted mb-4" />
+                <h3 className="text-lg font-medium text-text-primary mb-2">
+                  Aucune analyse Schwartz
+                </h3>
+                <p className="text-sm text-text-secondary text-center max-w-md mb-6">
+                  Determine le niveau de sophistication de ton marche selon les
+                  5 niveaux d&apos;Eugene Schwartz pour adapter ta strategie marketing.
+                </p>
+                <Button
+                  onClick={handleGenerateSchwartz}
+                  disabled={loadingSchwartz}
+                >
+                  {loadingSchwartz ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Analyse en cours...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="h-4 w-4" />
+                      Analyser le niveau Schwartz
+                    </>
+                  )}
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+        </div>
       )}
 
       {/* TAB: Concurrence */}

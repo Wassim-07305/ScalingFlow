@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import { PageHeader } from "@/components/layout/page-header";
 import {
@@ -28,7 +28,16 @@ import {
   EyeOff,
   ChevronDown,
   ChevronUp,
+  Camera,
+  Trash2,
+  Link2,
+  Download,
+  Palette,
+  Sun,
+  Moon,
+  Monitor,
 } from "lucide-react";
+import { useUIStore, type Theme } from "@/stores/ui-store";
 
 const EXPERIENCE_LABELS: Record<string, string> = {
   beginner: "Debutant",
@@ -47,6 +56,83 @@ export default function SettingsPage() {
       toast.success("Abonnement active avec succes ! Bienvenue dans le plan Pro.");
     }
   }, [searchParams]);
+
+  // --- Avatar ---
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (profile?.avatar_url) {
+      setAvatarUrl(profile.avatar_url);
+    }
+  }, [profile?.avatar_url]);
+
+  const handleAvatarUpload = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !user) return;
+
+    if (!file.type.startsWith("image/")) {
+      toast.error("Seules les images sont acceptees.");
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error("L'image ne doit pas depasser 2 Mo.");
+      return;
+    }
+
+    setUploadingAvatar(true);
+    try {
+      const ext = file.name.split(".").pop() || "jpg";
+      const fileName = `${user.id}/avatar.${ext}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from("avatars")
+        .upload(fileName, file, { upsert: true });
+
+      if (uploadError) throw uploadError;
+
+      const { data: urlData } = supabase.storage
+        .from("avatars")
+        .getPublicUrl(fileName);
+
+      const publicUrl = `${urlData.publicUrl}?t=${Date.now()}`;
+
+      const { error: updateError } = await supabase
+        .from("profiles")
+        .update({ avatar_url: publicUrl })
+        .eq("id", user.id);
+
+      if (updateError) throw updateError;
+
+      setAvatarUrl(publicUrl);
+      toast.success("Photo de profil mise a jour !");
+    } catch {
+      toast.error("Erreur lors de l'upload de l'avatar.");
+    } finally {
+      setUploadingAvatar(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  }, [user, supabase]);
+
+  const handleRemoveAvatar = useCallback(async () => {
+    if (!user) return;
+    setUploadingAvatar(true);
+    try {
+      const { error } = await supabase
+        .from("profiles")
+        .update({ avatar_url: null })
+        .eq("id", user.id);
+
+      if (error) throw error;
+      setAvatarUrl(null);
+      toast.success("Photo de profil supprimee.");
+    } catch {
+      toast.error("Erreur lors de la suppression.");
+    } finally {
+      setUploadingAvatar(false);
+    }
+  }, [user, supabase]);
 
   // --- Profil ---
   const [fullName, setFullName] = useState("");
@@ -197,6 +283,85 @@ export default function SettingsPage() {
       />
 
       <div className="space-y-6 max-w-2xl">
+        {/* Avatar */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Camera className="h-5 w-5 text-accent" />
+              Photo de profil
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center gap-6">
+              <div className="relative group">
+                {avatarUrl ? (
+                  <img
+                    src={avatarUrl}
+                    alt="Avatar"
+                    className="h-20 w-20 rounded-full object-cover ring-2 ring-accent/20"
+                  />
+                ) : (
+                  <div className="h-20 w-20 rounded-full bg-accent-muted flex items-center justify-center ring-2 ring-accent/20">
+                    <User className="h-8 w-8 text-accent" />
+                  </div>
+                )}
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploadingAvatar}
+                  aria-label="Changer la photo de profil"
+                  className="absolute inset-0 rounded-full bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
+                >
+                  {uploadingAvatar ? (
+                    <Loader2 className="h-5 w-5 text-white animate-spin" />
+                  ) : (
+                    <Camera className="h-5 w-5 text-white" />
+                  )}
+                </button>
+              </div>
+              <div className="space-y-2">
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={uploadingAvatar}
+                  >
+                    {uploadingAvatar ? (
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    ) : (
+                      <Camera className="h-4 w-4 mr-2" />
+                    )}
+                    Changer
+                  </Button>
+                  {avatarUrl && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleRemoveAvatar}
+                      disabled={uploadingAvatar}
+                      className="text-danger hover:text-danger"
+                    >
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      Supprimer
+                    </Button>
+                  )}
+                </div>
+                <p className="text-xs text-text-muted">
+                  JPG, PNG ou WebP. Max 2 Mo.
+                </p>
+              </div>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleAvatarUpload}
+                aria-label="Selectionner une photo de profil"
+                className="hidden"
+              />
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Profil */}
         <Card>
           <CardHeader>
@@ -253,6 +418,12 @@ export default function SettingsPage() {
         {/* Abonnement */}
         <SubscriptionCard />
 
+        {/* Integrations */}
+        <IntegrationsCard />
+
+        {/* Export */}
+        <ExportDataCard />
+
         {/* Notifications */}
         <Card>
           <CardHeader>
@@ -271,6 +442,9 @@ export default function SettingsPage() {
                   <span className="text-sm text-text-primary">{label}</span>
                   <button
                     onClick={() => handleToggleNotif(key)}
+                    role="switch"
+                    aria-checked={notifPrefs[key]}
+                    aria-label={label}
                     className={cn(
                       "relative inline-flex h-6 w-11 items-center rounded-full transition-colors",
                       notifPrefs[key] ? "bg-accent" : "bg-bg-tertiary border border-border-default"
@@ -297,6 +471,9 @@ export default function SettingsPage() {
             </Button>
           </CardContent>
         </Card>
+
+        {/* Apparence */}
+        <ThemeCard />
 
         {/* Securite */}
         <Card>
@@ -343,6 +520,7 @@ export default function SettingsPage() {
                       <button
                         type="button"
                         onClick={() => setShowNewPassword((prev) => !prev)}
+                        aria-label={showNewPassword ? "Masquer le mot de passe" : "Afficher le mot de passe"}
                         className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-primary transition-colors"
                       >
                         {showNewPassword ? (
@@ -367,6 +545,7 @@ export default function SettingsPage() {
                         onClick={() =>
                           setShowConfirmPassword((prev) => !prev)
                         }
+                        aria-label={showConfirmPassword ? "Masquer la confirmation" : "Afficher la confirmation"}
                         className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-primary transition-colors"
                       >
                         {showConfirmPassword ? (
@@ -407,6 +586,7 @@ export default function SettingsPage() {
               variant="destructive"
               size="sm"
               onClick={handleDeleteAccount}
+              aria-label="Supprimer mon compte"
             >
               Supprimer mon compte
             </Button>
@@ -414,5 +594,208 @@ export default function SettingsPage() {
         </Card>
       </div>
     </div>
+  );
+}
+
+// ─── Integrations Card ────────────────────────────────────────
+
+function IntegrationsCard() {
+  const { user, profile } = useUser();
+  const supabase = createClient();
+  const [metaToken, setMetaToken] = useState("");
+  const [metaAdAccountId, setMetaAdAccountId] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (profile) {
+      setMetaToken(profile.meta_access_token || "");
+      setMetaAdAccountId(profile.meta_ad_account_id || "");
+    }
+  }, [profile]);
+
+  const handleSave = async () => {
+    if (!user) return;
+    setSaving(true);
+    try {
+      const { error } = await supabase
+        .from("profiles")
+        .update({
+          meta_access_token: metaToken.trim() || null,
+          meta_ad_account_id: metaAdAccountId.trim() || null,
+        })
+        .eq("id", user.id);
+
+      if (error) throw error;
+      toast.success("Integrations sauvegardees.");
+    } catch {
+      toast.error("Erreur lors de la sauvegarde.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const hasChanged =
+    metaToken !== (profile?.meta_access_token || "") ||
+    metaAdAccountId !== (profile?.meta_ad_account_id || "");
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Link2 className="h-5 w-5 text-info" />
+          Integrations
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div>
+          <Label>Token Meta Ads</Label>
+          <Input
+            type="password"
+            value={metaToken}
+            onChange={(e) => setMetaToken(e.target.value)}
+            placeholder="EAAxxxxxxx..."
+          />
+          <p className="text-xs text-text-muted mt-1">
+            Connecte ton compte Meta pour synchroniser tes campagnes.
+          </p>
+        </div>
+        <div>
+          <Label>ID compte publicitaire Meta</Label>
+          <Input
+            value={metaAdAccountId}
+            onChange={(e) => setMetaAdAccountId(e.target.value)}
+            placeholder="act_123456789"
+          />
+        </div>
+        <Button
+          size="sm"
+          onClick={handleSave}
+          disabled={saving || !hasChanged}
+        >
+          {saving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+          Sauvegarder
+        </Button>
+      </CardContent>
+    </Card>
+  );
+}
+
+// ─── Theme Card ───────────────────────────────────────────────
+
+const THEME_OPTIONS: { value: Theme; label: string; icon: typeof Sun }[] = [
+  { value: "light", label: "Clair", icon: Sun },
+  { value: "dark", label: "Sombre", icon: Moon },
+  { value: "system", label: "Systeme", icon: Monitor },
+];
+
+function ThemeCard() {
+  const { theme, setTheme } = useUIStore();
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Palette className="h-5 w-5 text-accent" />
+          Apparence
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="grid grid-cols-3 gap-3">
+          {THEME_OPTIONS.map((option) => (
+            <button
+              key={option.value}
+              onClick={() => setTheme(option.value)}
+              className={cn(
+                "flex flex-col items-center gap-2 rounded-xl border p-4 transition-all",
+                theme === option.value
+                  ? "border-accent bg-accent/10 text-accent"
+                  : "border-border-default bg-bg-secondary text-text-secondary hover:border-text-muted"
+              )}
+            >
+              <option.icon className="h-5 w-5" />
+              <span className="text-sm font-medium">{option.label}</span>
+            </button>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+// ─── Export Data Card ─────────────────────────────────────────
+
+function ExportDataCard() {
+  const { user } = useUser();
+  const [exporting, setExporting] = useState(false);
+
+  const handleExportData = async () => {
+    if (!user) return;
+    setExporting(true);
+    try {
+      const supabase = createClient();
+
+      const [offers, funnels, assets, ads, content] = await Promise.all([
+        supabase.from("offers").select("*").eq("user_id", user.id),
+        supabase.from("funnels").select("*").eq("user_id", user.id),
+        supabase.from("sales_assets").select("*").eq("user_id", user.id),
+        supabase.from("ad_creatives").select("*").eq("user_id", user.id),
+        supabase.from("content_pieces").select("*").eq("user_id", user.id),
+      ]);
+
+      const exportData = {
+        exported_at: new Date().toISOString(),
+        offers: offers.data ?? [],
+        funnels: funnels.data ?? [],
+        sales_assets: assets.data ?? [],
+        ad_creatives: ads.data ?? [],
+        content_pieces: content.data ?? [],
+      };
+
+      const blob = new Blob([JSON.stringify(exportData, null, 2)], {
+        type: "application/json",
+      });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `scalingflow-export-${new Date().toISOString().slice(0, 10)}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+
+      toast.success("Donnees exportees avec succes !");
+    } catch {
+      toast.error("Erreur lors de l'export.");
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Download className="h-5 w-5 text-accent" />
+          Exporter mes donnees
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <p className="text-sm text-text-secondary mb-4">
+          Telecharge toutes tes offres, funnels, assets, publicites et contenus
+          au format JSON.
+        </p>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleExportData}
+          disabled={exporting}
+        >
+          {exporting ? (
+            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+          ) : (
+            <Download className="h-4 w-4 mr-2" />
+          )}
+          Exporter toutes mes donnees
+        </Button>
+      </CardContent>
+    </Card>
   );
 }

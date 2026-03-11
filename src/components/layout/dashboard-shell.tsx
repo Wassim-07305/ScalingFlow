@@ -7,6 +7,8 @@ import {
   QUICK_LINKS,
   BREADCRUMB_LABELS,
 } from "@/lib/constants/navigation";
+import { useDailyStreak } from "@/hooks/use-daily-streak";
+import { useAchievementListener } from "@/hooks/use-achievement-listener";
 
 interface DashboardShellProps {
   role: string;
@@ -25,6 +27,9 @@ export function DashboardShell({
   userId,
   children,
 }: DashboardShellProps) {
+  useDailyStreak();
+  useAchievementListener();
+
   return (
     <AppShell
       role={role}

@@ -6,6 +6,7 @@ import { funnelCopyPrompt } from "@/lib/ai/prompts/funnel-copy";
 import { awardXP } from "@/lib/gamification/xp-engine";
 import { notifyGeneration } from "@/lib/notifications/create";
 import { buildFullVaultContext } from "@/lib/ai/vault-context";
+import { rateLimit } from "@/lib/utils/rate-limit";
 
 export async function POST(req: NextRequest) {
   try {
@@ -17,6 +18,16 @@ export async function POST(req: NextRequest) {
     if (!user) {
       return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
     }
+
+    // Rate limiting
+    const rl = rateLimit(user.id, "generate-funnel", { limit: 5, windowSeconds: 60 });
+    if (!rl.allowed) {
+      return NextResponse.json(
+        { error: "Trop de requetes. Reessaie dans quelques secondes." },
+        { status: 429 }
+      );
+    }
+
     // Check AI usage limits
     const usage = await checkAIUsage(user.id);
     if (!usage.allowed) {
@@ -66,8 +77,12 @@ export async function POST(req: NextRequest) {
       avatar
     );
     const prompt = vaultContext ? basePrompt + "\n" + vaultContext : basePrompt;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const generatedFunnel: any = await generateJSON({ prompt, maxTokens: 4096 });
+    interface GeneratedFunnel {
+      optin_page?: Record<string, unknown>;
+      vsl_page?: Record<string, unknown>;
+      thankyou_page?: Record<string, unknown>;
+    }
+    const generatedFunnel = await generateJSON<GeneratedFunnel>({ prompt, maxTokens: 4096 });
 
     // Save funnel to database
     const { data: funnel, error: saveError } = await supabase
@@ -85,7 +100,6 @@ export async function POST(req: NextRequest) {
       .single();
 
     if (saveError) {
-      console.error("Error saving funnel:", saveError);
       return NextResponse.json(
         { error: "Erreur lors de la sauvegarde du funnel" },
         { status: 500 }
@@ -98,7 +112,6 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(funnel);
   } catch (error) {
-    console.error("Error generating funnel:", error);
     return NextResponse.json(
       { error: "Erreur lors de la génération du funnel" },
       { status: 500 }

@@ -9,6 +9,12 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
   Heart,
   MessageCircle,
   Share2,
@@ -17,6 +23,11 @@ import {
   MessageSquare,
   ChevronDown,
   ChevronUp,
+  MoreHorizontal,
+  Pencil,
+  Trash2,
+  X,
+  Check,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useUser } from "@/hooks/use-user";
@@ -97,6 +108,14 @@ export function PostFeed({ className }: PostFeedProps) {
   // Likes en cours
   const [likingPosts, setLikingPosts] = React.useState<Set<string>>(new Set());
 
+  // Edition post
+  const [editingPostId, setEditingPostId] = React.useState<string | null>(null);
+  const [editPostContent, setEditPostContent] = React.useState("");
+
+  // Edition commentaire
+  const [editingCommentId, setEditingCommentId] = React.useState<string | null>(null);
+  const [editCommentContent, setEditCommentContent] = React.useState("");
+
   // ---- Fetch posts ----
   const fetchPosts = React.useCallback(async () => {
     setLoading(true);
@@ -167,6 +186,12 @@ export function PostFeed({ className }: PostFeedProps) {
     }
 
     toast.success("Post publie !");
+    // Attribuer XP (non bloquant)
+    fetch("/api/gamification/award", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ activityType: "community.post" }),
+    }).catch(() => {});
     setNewContent("");
     setSubmitting(false);
     await fetchPosts();
@@ -331,6 +356,13 @@ export function PostFeed({ className }: PostFeedProps) {
       [postId]: [...(prev[postId] || []), newComment],
     }));
 
+    // Attribuer XP pour le commentaire (non bloquant)
+    fetch("/api/gamification/award", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ activityType: "community.comment" }),
+    }).catch(() => {});
+
     // Mettre a jour le compteur
     setPosts((prev) =>
       prev.map((p) =>
@@ -353,6 +385,103 @@ export function PostFeed({ className }: PostFeedProps) {
       next.delete(postId);
       return next;
     });
+  };
+
+  // ---- Editer un post ----
+  const handleEditPost = async (postId: string) => {
+    if (!editPostContent.trim()) return;
+    const { error } = await supabase
+      .from("community_posts")
+      .update({ content: editPostContent.trim() })
+      .eq("id", postId);
+
+    if (error) {
+      toast.error("Impossible de modifier le post");
+      return;
+    }
+
+    setPosts((prev) =>
+      prev.map((p) =>
+        p.id === postId ? { ...p, content: editPostContent.trim() } : p
+      )
+    );
+    setEditingPostId(null);
+    toast.success("Post modifie");
+  };
+
+  // ---- Supprimer un post ----
+  const handleDeletePost = async (postId: string) => {
+    const { error } = await supabase
+      .from("community_posts")
+      .delete()
+      .eq("id", postId);
+
+    if (error) {
+      toast.error("Impossible de supprimer le post");
+      return;
+    }
+
+    setPosts((prev) => prev.filter((p) => p.id !== postId));
+    toast.success("Post supprime");
+  };
+
+  // ---- Editer un commentaire ----
+  const handleEditComment = async (commentId: string, postId: string) => {
+    if (!editCommentContent.trim()) return;
+    const { error } = await supabase
+      .from("community_comments")
+      .update({ content: editCommentContent.trim() })
+      .eq("id", commentId);
+
+    if (error) {
+      toast.error("Impossible de modifier le commentaire");
+      return;
+    }
+
+    setComments((prev) => ({
+      ...prev,
+      [postId]: (prev[postId] || []).map((c) =>
+        c.id === commentId ? { ...c, content: editCommentContent.trim() } : c
+      ),
+    }));
+    setEditingCommentId(null);
+    toast.success("Commentaire modifie");
+  };
+
+  // ---- Supprimer un commentaire ----
+  const handleDeleteComment = async (commentId: string, postId: string) => {
+    const { error } = await supabase
+      .from("community_comments")
+      .delete()
+      .eq("id", commentId);
+
+    if (error) {
+      toast.error("Impossible de supprimer le commentaire");
+      return;
+    }
+
+    setComments((prev) => ({
+      ...prev,
+      [postId]: (prev[postId] || []).filter((c) => c.id !== commentId),
+    }));
+    setPosts((prev) =>
+      prev.map((p) =>
+        p.id === postId
+          ? { ...p, comments_count: Math.max(0, p.comments_count - 1) }
+          : p
+      )
+    );
+
+    // Mettre a jour en DB
+    const post = posts.find((p) => p.id === postId);
+    if (post) {
+      await supabase
+        .from("community_posts")
+        .update({ comments_count: Math.max(0, post.comments_count - 1) })
+        .eq("id", postId);
+    }
+
+    toast.success("Commentaire supprime");
   };
 
   // ---- Helpers d'affichage ----
@@ -506,6 +635,33 @@ export function PostFeed({ className }: PostFeedProps) {
                         {post.category}
                       </Badge>
                     )}
+                    {user && user.id === post.user_id && (
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <button aria-label="Options du post" className="p-1 rounded-lg text-text-muted hover:bg-bg-tertiary hover:text-text-primary transition-colors">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem
+                            onClick={() => {
+                              setEditingPostId(post.id);
+                              setEditPostContent(post.content);
+                            }}
+                          >
+                            <Pencil className="h-3.5 w-3.5 mr-2" />
+                            Modifier
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            className="text-danger focus:text-danger"
+                            onClick={() => handleDeletePost(post.id)}
+                          >
+                            <Trash2 className="h-3.5 w-3.5 mr-2" />
+                            Supprimer
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    )}
                   </div>
 
                   {/* Titre */}
@@ -516,15 +672,44 @@ export function PostFeed({ className }: PostFeedProps) {
                   )}
 
                   {/* Contenu */}
-                  <p className="text-sm text-text-secondary mb-4 whitespace-pre-wrap">
-                    {post.content}
-                  </p>
+                  {editingPostId === post.id ? (
+                    <div className="mb-4">
+                      <Textarea
+                        value={editPostContent}
+                        onChange={(e) => setEditPostContent(e.target.value)}
+                        className="mb-2"
+                      />
+                      <div className="flex items-center gap-2">
+                        <Button
+                          size="sm"
+                          onClick={() => handleEditPost(post.id)}
+                          disabled={!editPostContent.trim()}
+                        >
+                          <Check className="h-3.5 w-3.5 mr-1" />
+                          Enregistrer
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => setEditingPostId(null)}
+                        >
+                          <X className="h-3.5 w-3.5 mr-1" />
+                          Annuler
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="text-sm text-text-secondary mb-4 whitespace-pre-wrap">
+                      {post.content}
+                    </p>
+                  )}
 
                   {/* Actions */}
                   <div className="flex items-center gap-4 pt-3 border-t border-border-default">
                     <button
                       onClick={() => toggleLike(post.id)}
                       disabled={!user || likingPosts.has(post.id)}
+                      aria-label={post.liked_by_me ? "Retirer le like" : "Aimer ce post"}
                       className={cn(
                         "flex items-center gap-1.5 text-sm transition-colors",
                         post.liked_by_me
@@ -542,6 +727,8 @@ export function PostFeed({ className }: PostFeedProps) {
                     </button>
                     <button
                       onClick={() => toggleComments(post.id)}
+                      aria-label={isCommentsExpanded ? "Masquer les commentaires" : "Afficher les commentaires"}
+                      aria-expanded={isCommentsExpanded}
                       className="flex items-center gap-1.5 text-sm text-text-muted hover:text-info transition-colors"
                     >
                       <MessageCircle className="h-4 w-4" />
@@ -552,7 +739,7 @@ export function PostFeed({ className }: PostFeedProps) {
                         <ChevronDown className="h-3 w-3" />
                       )}
                     </button>
-                    <button className="flex items-center gap-1.5 text-sm text-text-muted hover:text-accent transition-colors">
+                    <button aria-label="Partager ce post" className="flex items-center gap-1.5 text-sm text-text-muted hover:text-accent transition-colors">
                       <Share2 className="h-4 w-4" />
                     </button>
                   </div>
@@ -583,7 +770,7 @@ export function PostFeed({ className }: PostFeedProps) {
                             return (
                               <div
                                 key={comment.id}
-                                className="flex gap-2.5 pl-2"
+                                className="flex gap-2.5 pl-2 group"
                               >
                                 <Avatar className="h-7 w-7 flex-shrink-0">
                                   {cAvatar && <AvatarImage src={cAvatar} />}
@@ -602,10 +789,76 @@ export function PostFeed({ className }: PostFeedProps) {
                                         { addSuffix: true, locale: fr }
                                       )}
                                     </span>
+                                    {user && user.id === comment.user_id && (
+                                      <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                          <button aria-label="Options du commentaire" className="p-0.5 rounded text-text-muted opacity-0 group-hover:opacity-100 hover:text-text-primary transition-all">
+                                            <MoreHorizontal className="h-3 w-3" />
+                                          </button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent align="end">
+                                          <DropdownMenuItem
+                                            onClick={() => {
+                                              setEditingCommentId(comment.id);
+                                              setEditCommentContent(comment.content);
+                                            }}
+                                          >
+                                            <Pencil className="h-3 w-3 mr-2" />
+                                            Modifier
+                                          </DropdownMenuItem>
+                                          <DropdownMenuItem
+                                            className="text-danger focus:text-danger"
+                                            onClick={() =>
+                                              handleDeleteComment(comment.id, post.id)
+                                            }
+                                          >
+                                            <Trash2 className="h-3 w-3 mr-2" />
+                                            Supprimer
+                                          </DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                      </DropdownMenu>
+                                    )}
                                   </div>
-                                  <p className="text-xs text-text-secondary">
-                                    {comment.content}
-                                  </p>
+                                  {editingCommentId === comment.id ? (
+                                    <div className="flex items-center gap-1.5 mt-1">
+                                      <Input
+                                        value={editCommentContent}
+                                        onChange={(e) =>
+                                          setEditCommentContent(e.target.value)
+                                        }
+                                        onKeyDown={(e) => {
+                                          if (e.key === "Enter") {
+                                            e.preventDefault();
+                                            handleEditComment(comment.id, post.id);
+                                          }
+                                          if (e.key === "Escape") {
+                                            setEditingCommentId(null);
+                                          }
+                                        }}
+                                        className="h-6 text-xs"
+                                      />
+                                      <button
+                                        onClick={() =>
+                                          handleEditComment(comment.id, post.id)
+                                        }
+                                        aria-label="Confirmer la modification"
+                                        className="text-accent hover:text-accent/80"
+                                      >
+                                        <Check className="h-3.5 w-3.5" />
+                                      </button>
+                                      <button
+                                        onClick={() => setEditingCommentId(null)}
+                                        aria-label="Annuler la modification"
+                                        className="text-text-muted hover:text-text-primary"
+                                      >
+                                        <X className="h-3.5 w-3.5" />
+                                      </button>
+                                    </div>
+                                  ) : (
+                                    <p className="text-xs text-text-secondary">
+                                      {comment.content}
+                                    </p>
+                                  )}
                                 </div>
                               </div>
                             );

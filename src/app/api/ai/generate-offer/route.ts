@@ -6,6 +6,7 @@ import { offerCreationPrompt } from "@/lib/ai/prompts/offer-creation";
 import { buildFullVaultContext } from "@/lib/ai/vault-context";
 import { awardXP } from "@/lib/gamification/xp-engine";
 import { notifyGeneration } from "@/lib/notifications/create";
+import { rateLimit } from "@/lib/utils/rate-limit";
 
 export async function POST(req: NextRequest) {
   try {
@@ -17,6 +18,16 @@ export async function POST(req: NextRequest) {
     if (!user) {
       return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
     }
+
+    // Rate limiting
+    const rl = rateLimit(user.id, "generate-offer", { limit: 5, windowSeconds: 60 });
+    if (!rl.allowed) {
+      return NextResponse.json(
+        { error: "Trop de requetes. Reessaie dans quelques secondes." },
+        { status: 429 }
+      );
+    }
+
     // Check AI usage limits
     const usage = await checkAIUsage(user.id);
     if (!usage.allowed) {
@@ -73,8 +84,21 @@ export async function POST(req: NextRequest) {
       profile?.skills || []
     );
     const prompt = vaultContext ? basePrompt + "\n" + vaultContext : basePrompt;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const generatedOffer: any = await generateJSON({ prompt, maxTokens: 8192 });
+    interface GeneratedOffer {
+      packaging?: {
+        offer_name?: string;
+        positioning?: string;
+        unique_mechanism?: { name?: string };
+        pricing?: Record<string, unknown>;
+        guarantees?: Record<string, unknown>[];
+        no_brainer?: string;
+        risk_reversal?: string;
+        oto?: Record<string, unknown>;
+      };
+      delivery?: Record<string, unknown>;
+      full_document_markdown?: string;
+    }
+    const generatedOffer = await generateJSON<GeneratedOffer>({ prompt, maxTokens: 8192 });
 
     // Save offer to database
     const { data: offer, error: saveError } = await supabase
@@ -99,7 +123,6 @@ export async function POST(req: NextRequest) {
       .single();
 
     if (saveError) {
-      console.error("Error saving offer:", saveError);
       return NextResponse.json(
         { error: "Erreur lors de la sauvegarde de l'offre" },
         { status: 500 }
@@ -112,7 +135,6 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(offer);
   } catch (error) {
-    console.error("Error generating offer:", error);
     return NextResponse.json(
       { error: "Erreur lors de la génération de l'offre" },
       { status: 500 }

@@ -140,9 +140,9 @@ export function GlobalSearch({
             .abortSignal(controller.signal),
           supabase
             .from("sales_assets")
-            .select("id, asset_name")
+            .select("id, title")
             .eq("user_id", user.id)
-            .ilike("asset_name", q)
+            .ilike("title", q)
             .limit(5)
             .abortSignal(controller.signal),
         ]);
@@ -180,7 +180,7 @@ export function GlobalSearch({
           })),
           ...(assets.data ?? []).map((r) => ({
             id: r.id,
-            title: r.asset_name || "Asset sans nom",
+            title: r.title || "Asset sans nom",
             type: "asset" as const,
             href: `/assets`,
             icon: FileText,

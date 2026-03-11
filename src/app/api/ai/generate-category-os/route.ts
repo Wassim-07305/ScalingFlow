@@ -6,6 +6,7 @@ import { buildCategoryOSPrompt, type CategoryOSResult } from "@/lib/ai/prompts/c
 import { awardXP } from "@/lib/gamification/xp-engine";
 import { notifyGeneration } from "@/lib/notifications/create";
 import { buildFullVaultContext } from "@/lib/ai/vault-context";
+import { rateLimit } from "@/lib/utils/rate-limit";
 
 export async function POST(req: NextRequest) {
   try {
@@ -17,6 +18,16 @@ export async function POST(req: NextRequest) {
     if (!user) {
       return NextResponse.json({ error: "Non autorise" }, { status: 401 });
     }
+
+    // Rate limiting
+    const rl = rateLimit(user.id, "generate-category-os", { limit: 5, windowSeconds: 60 });
+    if (!rl.allowed) {
+      return NextResponse.json(
+        { error: "Trop de requetes. Reessaie dans quelques secondes." },
+        { status: 429 }
+      );
+    }
+
     // Check AI usage limits
     const usage = await checkAIUsage(user.id);
     if (!usage.allowed) {
@@ -52,8 +63,14 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const marketAnalysis = (offer as any).market_analyses;
+    interface MarketAnalysisData {
+      market_name?: string;
+      problems?: string[];
+      recommended_positioning?: string;
+      competitors?: unknown;
+      target_avatar?: unknown;
+    }
+    const marketAnalysis = (offer as Record<string, unknown>).market_analyses as MarketAnalysisData | undefined;
 
     // Fetch user profile for vault data
     const { data: profile } = await supabase
@@ -104,7 +121,6 @@ export async function POST(req: NextRequest) {
       .eq("id", offerId);
 
     if (updateError) {
-      console.error("Error saving category OS:", updateError);
       return NextResponse.json(
         { error: "Erreur lors de la sauvegarde du Category OS" },
         { status: 500 }
@@ -117,7 +133,6 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(categoryOS);
   } catch (error) {
-    console.error("Error generating category OS:", error);
     return NextResponse.json(
       { error: "Erreur lors de la generation du Category OS" },
       { status: 500 }

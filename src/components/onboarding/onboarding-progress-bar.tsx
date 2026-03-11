@@ -14,7 +14,14 @@ export function OnboardingProgressBar({
   const progress = total > 0 ? ((step + 1) / total) * 100 : 0;
 
   return (
-    <div className="fixed left-0 right-0 top-0 z-50 h-1 bg-white/10">
+    <div
+      className="fixed left-0 right-0 top-0 z-50 h-1 bg-white/10"
+      role="progressbar"
+      aria-valuenow={step + 1}
+      aria-valuemin={1}
+      aria-valuemax={total}
+      aria-label={`Etape ${step + 1} sur ${total}`}
+    >
       <motion.div
         className="h-full bg-gradient-to-r from-emerald-500 to-teal-500"
         initial={{ width: 0 }}

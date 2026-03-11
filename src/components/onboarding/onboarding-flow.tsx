@@ -236,8 +236,8 @@ export function OnboardingFlow() {
           setFormData(r);
           if (resumeStep > 0) setStep(resumeStep);
         }
-      } catch (err) {
-        console.error("Failed to load profile:", err);
+      } catch {
+        // Profile load failed silently — user will start fresh
       } finally {
         setLoaded(true);
       }
@@ -388,7 +388,6 @@ export function OnboardingFlow() {
       setAnalysisResult(data);
     } catch (err) {
       const message = err instanceof Error ? err.message : "Erreur inconnue";
-      console.error("Market analysis failed:", message);
       setError(`Erreur lors de l'analyse : ${message}`);
     } finally {
       setIsAnalyzing(false);
@@ -434,6 +433,13 @@ export function OnboardingFlow() {
         niche: market.name,
       })
       .eq("id", user.id);
+
+    // Attribuer XP pour l'onboarding (non bloquant)
+    fetch("/api/gamification/award", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ activityType: "onboarding.completed" }),
+    }).catch(() => {});
 
     confetti({
       particleCount: 150,
@@ -524,7 +530,7 @@ export function OnboardingFlow() {
               className="group flex items-center gap-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 px-8 py-4 text-lg font-semibold text-white shadow-xl shadow-emerald-500/25 transition-all duration-200 hover:scale-105 hover:shadow-2xl hover:shadow-emerald-500/40"
             >
               C&apos;est parti
-              <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+              <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" aria-hidden="true" />
             </motion.button>
           </div>
         );
@@ -837,6 +843,7 @@ export function OnboardingFlow() {
                   <button
                     onClick={handleButtonClick}
                     disabled={!canProceed()}
+                    aria-label={isSummary ? "Lancer l'analyse IA" : "Etape suivante"}
                     className={cn(
                       "flex items-center gap-2 rounded-xl text-base font-semibold text-white transition-all",
                       isSummary

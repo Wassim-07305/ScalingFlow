@@ -5,6 +5,7 @@ import { createStreamingResponse, streamText } from "@/lib/ai/generate";
 import { getAgent, type AgentType, type AgentDefinition } from "@/lib/ai/agents/index";
 import { buildFullVaultContext } from "@/lib/ai/vault-context";
 import { buildRAGContext } from "@/lib/ai/rag";
+import { rateLimit } from "@/lib/utils/rate-limit";
 import { SupabaseClient } from "@supabase/supabase-js";
 
 // ─── Domain-specific context fetchers ────────────────────────
@@ -108,6 +109,16 @@ export async function POST(req: NextRequest) {
         status: 401,
       });
     }
+
+    // Rate limiting
+    const rl = rateLimit(user.id, "chat", { limit: 10, windowSeconds: 60 });
+    if (!rl.allowed) {
+      return NextResponse.json(
+        { error: "Trop de requetes. Reessaie dans quelques secondes." },
+        { status: 429 }
+      );
+    }
+
     // Check AI usage limits
     const usage = await checkAIUsage(user.id);
     if (!usage.allowed) {
@@ -201,7 +212,6 @@ export async function POST(req: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("Error in chat:", error);
     return new Response(
       JSON.stringify({ error: "Erreur lors de la génération" }),
       { status: 500 }

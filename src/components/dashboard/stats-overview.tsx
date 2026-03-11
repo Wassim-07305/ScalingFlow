@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Package, FileText, GitBranch, Flame, PenTool, Megaphone, TrendingUp } from "lucide-react";
+import { Package, FileText, GitBranch, Flame, PenTool, Megaphone, Target, TrendingUp, DollarSign } from "lucide-react";
+import { Card } from "@/components/ui/card";
 import { AnimatedCounter } from "@/components/shared/animated-counter";
 import { cn } from "@/lib/utils/cn";
 import { useUser } from "@/hooks/use-user";
@@ -70,6 +71,9 @@ export function StatsOverview() {
     funnels: 0,
     ads: 0,
     content: 0,
+    adSpend: 0,
+    avgRoas: 0,
+    milestones: 0,
   });
   const [countsLoading, setCountsLoading] = useState(true);
 
@@ -80,7 +84,7 @@ export function StatsOverview() {
       setCountsLoading(true);
       const supabase = createClient();
 
-      const [offersRes, assetsRes, funnelsRes, adsRes, contentRes] = await Promise.all([
+      const [offersRes, assetsRes, funnelsRes, adsRes, contentRes, campaignsRes, milestonesRes] = await Promise.all([
         supabase
           .from("offers")
           .select("id", { count: "exact", head: true })
@@ -101,7 +105,22 @@ export function StatsOverview() {
           .from("content_pieces")
           .select("id", { count: "exact", head: true })
           .eq("user_id", user.id),
+        supabase
+          .from("ad_campaigns")
+          .select("total_spend, roas")
+          .eq("user_id", user.id),
+        supabase
+          .from("user_milestones")
+          .select("id", { count: "exact", head: true })
+          .eq("user_id", user.id)
+          .eq("completed", true),
       ]);
+
+      const campaigns = campaignsRes.data ?? [];
+      const adSpend = campaigns.reduce((s, c) => s + (c.total_spend ?? 0), 0);
+      const avgRoas = campaigns.length > 0
+        ? campaigns.reduce((s, c) => s + (c.roas ?? 0), 0) / campaigns.length
+        : 0;
 
       setCounts({
         offers: offersRes.count ?? 0,
@@ -109,6 +128,9 @@ export function StatsOverview() {
         funnels: funnelsRes.count ?? 0,
         ads: adsRes.count ?? 0,
         content: contentRes.count ?? 0,
+        adSpend,
+        avgRoas,
+        milestones: milestonesRes.count ?? 0,
       });
       setCountsLoading(false);
     };
@@ -162,10 +184,33 @@ export function StatsOverview() {
       color: "orange",
       href: "/progress",
     },
+    {
+      label: "Depense Ads",
+      value: counts.adSpend,
+      suffix: " €",
+      icon: DollarSign,
+      color: "blue",
+      href: "/ads/analytics",
+    },
+    {
+      label: "ROAS moyen",
+      value: counts.avgRoas,
+      suffix: "x",
+      icon: TrendingUp,
+      color: "cyan",
+      href: "/ads/analytics",
+    },
+    {
+      label: "Milestones",
+      value: counts.milestones,
+      icon: Target,
+      color: "purple",
+      href: "/roadmap",
+    },
   ];
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-9 gap-3">
       {stats.map((stat) => {
         const colors = colorMap[stat.color];
         return (
@@ -194,7 +239,7 @@ export function StatsOverview() {
                     <AnimatedCounter
                       value={stat.value}
                       suffix={stat.suffix}
-                      decimals={0}
+                      decimals={stat.suffix === "x" || stat.suffix === " €" ? 1 : 0}
                     />
                   )}
                 </div>

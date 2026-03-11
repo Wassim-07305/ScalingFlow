@@ -15,6 +15,7 @@ import {
 import { buildFullVaultContext } from "@/lib/ai/vault-context";
 import { awardXP } from "@/lib/gamification/xp-engine";
 import { notifyGeneration } from "@/lib/notifications/create";
+import { rateLimit } from "@/lib/utils/rate-limit";
 
 export async function POST(req: NextRequest) {
   try {
@@ -26,6 +27,16 @@ export async function POST(req: NextRequest) {
     if (!user) {
       return NextResponse.json({ error: "Non autorise" }, { status: 401 });
     }
+
+    // Rate limiting
+    const rl = rateLimit(user.id, "generate-ads", { limit: 5, windowSeconds: 60 });
+    if (!rl.allowed) {
+      return NextResponse.json(
+        { error: "Trop de requetes. Reessaie dans quelques secondes." },
+        { status: 429 }
+      );
+    }
+
     // Check AI usage limits
     const usage = await checkAIUsage(user.id);
     if (!usage.allowed) {
@@ -157,16 +168,22 @@ export async function POST(req: NextRequest) {
       },
       avatar
     );
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const generatedAdCopy: any = await generateJSON({
+    interface AdVariation {
+      body?: string;
+      headline?: string;
+      hook?: string;
+      cta?: string;
+      angle?: string;
+      target_audience?: string;
+    }
+    const generatedAdCopy = await generateJSON<{ variations?: AdVariation[] }>({
       prompt: adCopyProm,
       maxTokens: 4096,
     });
 
     // Generate ad hooks
     const hooksProm = adHooksPrompt(market, avatar);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const generatedHooks: any = await generateJSON({
+    const generatedHooks = await generateJSON<{ hooks?: string[] }>({
       prompt: hooksProm,
       maxTokens: 4096,
     });
@@ -192,7 +209,6 @@ export async function POST(req: NextRequest) {
         .single();
 
       if (saveError) {
-        console.error("Error saving ad creative:", saveError);
         continue;
       }
 
@@ -208,7 +224,6 @@ export async function POST(req: NextRequest) {
       hooks: generatedHooks.hooks || [],
     });
   } catch (error) {
-    console.error("Error generating ads:", error);
     return NextResponse.json(
       { error: "Erreur lors de la generation des publicites" },
       { status: 500 }

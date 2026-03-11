@@ -9,6 +9,7 @@ import {
 } from "@/lib/ai/prompts/vault-analysis";
 import { awardXP } from "@/lib/gamification/xp-engine";
 import { notifyGeneration } from "@/lib/notifications/create";
+import { rateLimit } from "@/lib/utils/rate-limit";
 
 export async function POST(req: NextRequest) {
   try {
@@ -20,6 +21,16 @@ export async function POST(req: NextRequest) {
     if (!user) {
       return NextResponse.json({ error: "Non autorise" }, { status: 401 });
     }
+
+    // Rate limiting
+    const rl = rateLimit(user.id, "analyze-vault", { limit: 5, windowSeconds: 60 });
+    if (!rl.allowed) {
+      return NextResponse.json(
+        { error: "Trop de requetes. Reessaie dans quelques secondes." },
+        { status: 429 }
+      );
+    }
+
     // Check AI usage limits
     const usage = await checkAIUsage(user.id);
     if (!usage.allowed) {
@@ -53,7 +64,6 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(result);
   } catch (error) {
-    console.error("Vault analysis error:", error);
     return NextResponse.json(
       { error: "Erreur lors de l'analyse du vault" },
       { status: 500 }

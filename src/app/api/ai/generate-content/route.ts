@@ -26,6 +26,7 @@ import {
 import { buildFullVaultContext } from "@/lib/ai/vault-context";
 import { awardXP } from "@/lib/gamification/xp-engine";
 import { notifyGeneration } from "@/lib/notifications/create";
+import { rateLimit } from "@/lib/utils/rate-limit";
 
 export async function POST(req: NextRequest) {
   try {
@@ -37,6 +38,16 @@ export async function POST(req: NextRequest) {
     if (!user) {
       return NextResponse.json({ error: "Non autorise" }, { status: 401 });
     }
+
+    // Rate limiting
+    const rl = rateLimit(user.id, "generate-content", { limit: 5, windowSeconds: 60 });
+    if (!rl.allowed) {
+      return NextResponse.json(
+        { error: "Trop de requetes. Reessaie dans quelques secondes." },
+        { status: 429 }
+      );
+    }
+
     // Check AI usage limits
     const usage = await checkAIUsage(user.id);
     if (!usage.allowed) {
@@ -277,8 +288,7 @@ export async function POST(req: NextRequest) {
 
     // Generate content ideas using AI
     const prompt = withVault(contentIdeasPrompt(marketContext, platform));
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const generatedContent: any = await generateJSON({ prompt, maxTokens: 4096 });
+    const generatedContent = await generateJSON<{ ideas?: string[] }>({ prompt, maxTokens: 4096 });
 
     // Award XP (non-blocking)
     try { await awardXP(user.id, "generation.content_strategy"); } catch {}
@@ -291,7 +301,6 @@ export async function POST(req: NextRequest) {
     });
   } catch (error) {
     const errMsg = error instanceof Error ? error.message : String(error);
-    console.error("Error generating content:", errMsg, error);
     return NextResponse.json(
       { error: `Erreur lors de la generation du contenu: ${errMsg}` },
       { status: 500 }

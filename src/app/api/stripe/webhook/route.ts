@@ -2,7 +2,15 @@ import { NextRequest, NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe/client";
 import { getPlanByPriceId } from "@/lib/stripe/plans";
 import { createClient } from "@supabase/supabase-js";
+import { resend } from "@/lib/resend/client";
+import {
+  subscriptionActivatedEmail,
+  subscriptionCanceledEmail,
+  paymentFailedEmail,
+} from "@/lib/resend/templates";
 import type Stripe from "stripe";
+
+const FROM = "ScalingFlow <noreply@scalingflow.com>";
 
 // Client admin Supabase (service role) pour les webhooks
 function getAdminClient() {
@@ -33,7 +41,6 @@ export async function POST(req: NextRequest) {
 
     const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
     if (!webhookSecret) {
-      console.error("STRIPE_WEBHOOK_SECRET non defini");
       return NextResponse.json(
         { error: "Configuration webhook manquante" },
         { status: 500 }
@@ -43,8 +50,7 @@ export async function POST(req: NextRequest) {
     let event: Stripe.Event;
     try {
       event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
-    } catch (err) {
-      console.error("Erreur verification signature webhook:", err);
+    } catch {
       return NextResponse.json(
         { error: "Signature invalide" },
         { status: 400 }
@@ -53,7 +59,6 @@ export async function POST(req: NextRequest) {
 
     const supabase = getAdminClient();
     if (!supabase) {
-      console.error("Supabase admin client non disponible");
       return NextResponse.json(
         { error: "Erreur serveur" },
         { status: 500 }
@@ -81,9 +86,24 @@ export async function POST(req: NextRequest) {
             })
             .eq("id", userId);
 
-          console.log(
-            `Abonnement active pour user ${userId}, plan: ${plan?.name || "inconnu"}`
-          );
+          // Envoyer email de confirmation d'abonnement
+          if (resend && session.customer_email) {
+            const { data: profile } = await supabase
+              .from("profiles")
+              .select("full_name")
+              .eq("id", userId)
+              .single();
+
+            const firstName = profile?.full_name?.split(" ")[0] || "Utilisateur";
+            const emailContent = subscriptionActivatedEmail(firstName, plan?.name || "Pro");
+
+            await resend.emails.send({
+              from: FROM,
+              to: session.customer_email,
+              subject: emailContent.subject,
+              html: emailContent.html,
+            }).catch(() => {});
+          }
         }
         break;
       }
@@ -106,9 +126,6 @@ export async function POST(req: NextRequest) {
             .update({ subscription_status: status })
             .eq("id", profiles[0].id);
 
-          console.log(
-            `Abonnement mis a jour pour user ${profiles[0].id}, statut: ${status}`
-          );
         }
         break;
       }
@@ -129,20 +146,69 @@ export async function POST(req: NextRequest) {
             .update({ subscription_status: "canceled", subscription_plan: "free" })
             .eq("id", profiles[0].id);
 
-          console.log(
-            `Abonnement annule pour user ${profiles[0].id}`
-          );
+          // Envoyer email d'annulation
+          if (resend) {
+            const { data: profile } = await supabase
+              .from("profiles")
+              .select("full_name, email")
+              .eq("id", profiles[0].id)
+              .single();
+
+            if (profile?.email) {
+              const firstName = profile.full_name?.split(" ")[0] || "Utilisateur";
+              const emailContent = subscriptionCanceledEmail(firstName);
+
+              await resend.emails.send({
+                from: FROM,
+                to: profile.email,
+                subject: emailContent.subject,
+                html: emailContent.html,
+              }).catch(() => {});
+            }
+          }
+        }
+        break;
+      }
+
+      case "invoice.payment_failed": {
+        const invoice = event.data.object as Stripe.Invoice;
+        const customerId = invoice.customer as string;
+
+        const { data: profiles } = await supabase
+          .from("profiles")
+          .select("id, full_name, email")
+          .eq("stripe_customer_id", customerId)
+          .limit(1);
+
+        if (profiles && profiles.length > 0) {
+          // Mettre a jour le statut
+          await supabase
+            .from("profiles")
+            .update({ subscription_status: "past_due" })
+            .eq("id", profiles[0].id);
+
+          // Envoyer email d'alerte de paiement echoue
+          if (resend && profiles[0].email) {
+            const firstName = profiles[0].full_name?.split(" ")[0] || "Utilisateur";
+            const emailContent = paymentFailedEmail(firstName);
+
+            await resend.emails.send({
+              from: FROM,
+              to: profiles[0].email,
+              subject: emailContent.subject,
+              html: emailContent.html,
+            }).catch(() => {});
+          }
         }
         break;
       }
 
       default:
-        console.log(`Evenement Stripe non gere: ${event.type}`);
+        break;
     }
 
     return NextResponse.json({ received: true });
   } catch (error) {
-    console.error("Erreur webhook Stripe:", error);
     return NextResponse.json(
       { error: "Erreur interne webhook" },
       { status: 500 }

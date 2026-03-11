@@ -21,6 +21,7 @@ export function OnboardingTopBar({
       <button
         onClick={onBack}
         disabled={isFirst}
+        aria-label="Etape precedente"
         className={`flex h-10 w-10 items-center justify-center rounded-xl transition-all ${
           isFirst
             ? "cursor-not-allowed opacity-0"

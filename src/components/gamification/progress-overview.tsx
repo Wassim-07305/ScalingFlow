@@ -3,24 +3,13 @@
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils/cn";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { AnimatedCounter } from "@/components/shared/animated-counter";
-import { Flame, Zap, Trophy, Star, Target, BookOpen, Megaphone, PenTool } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Flame, Zap, Trophy, Star, Target, BookOpen, Megaphone, PenTool, Lock } from "lucide-react";
 import { useUser } from "@/hooks/use-user";
 import { createClient } from "@/lib/supabase/client";
-
-/** Liste de tous les badges possibles */
-const ALL_BADGES = [
-  "Explorateur",
-  "Premier pas",
-  "Créateur",
-  "Stratège",
-  "Flamme",
-  "Scaler",
-  "Expert",
-  "Légende",
-];
+import { BADGE_DEFINITIONS, getBadgeDefinition } from "@/lib/gamification/badges";
 
 interface ModuleProgress {
   name: string;
@@ -46,7 +35,7 @@ export function ProgressOverview({ className }: ProgressOverviewProps) {
       const supabase = createClient();
 
       // Requetes paralleles pour compter les items par module + rang
-      const [offersRes, funnelsRes, adsRes, contentRes, leaderboardRes] =
+      const [offersRes, funnelsRes, adsRes, contentRes, leaderboardRes, videosRes, watchedRes] =
         await Promise.all([
           supabase
             .from("offers")
@@ -69,6 +58,14 @@ export function ProgressOverview({ className }: ProgressOverviewProps) {
             .select("rank_position")
             .eq("user_id", user.id)
             .single(),
+          supabase
+            .from("academy_videos")
+            .select("id", { count: "exact", head: true }),
+          supabase
+            .from("video_progress")
+            .select("id", { count: "exact", head: true })
+            .eq("user_id", user.id)
+            .eq("watched", true),
         ]);
 
       // Calcul progression onboarding
@@ -78,7 +75,9 @@ export function ProgressOverview({ className }: ProgressOverviewProps) {
 
       const offerProgress = (offersRes.count ?? 0) >= 1 ? 100 : 0;
       const funnelProgress = (funnelsRes.count ?? 0) >= 1 ? 100 : 0;
-      const academyProgress = 0; // Pas de donnees video_progress pour le moment
+      const totalVideos = videosRes.count ?? 0;
+      const watchedVideos = watchedRes.count ?? 0;
+      const academyProgress = totalVideos > 0 ? Math.round((watchedVideos / totalVideos) * 100) : 0;
       const adsProgress = (adsRes.count ?? 0) >= 1 ? 100 : 0;
       const contentProgress = (contentRes.count ?? 0) >= 1 ? 100 : 0;
 
@@ -229,28 +228,55 @@ export function ProgressOverview({ className }: ProgressOverviewProps) {
       {/* Badges */}
       <Card>
         <CardHeader>
-          <CardTitle>Badges obtenus</CardTitle>
+          <CardTitle>Badges</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-wrap gap-3">
-            {ALL_BADGES.map((badge) => {
-              const unlocked = badges.includes(badge);
-              return (
-                <div key={badge} className="flex flex-col items-center gap-1">
-                  <div className={cn(
-                    "w-14 h-14 rounded-2xl flex items-center justify-center",
-                    unlocked ? "bg-accent/15" : "bg-bg-tertiary opacity-40"
-                  )}>
-                    <Star className={cn(
-                      "h-7 w-7",
-                      unlocked ? "text-accent" : "text-text-muted"
-                    )} />
-                  </div>
-                  <span className="text-[10px] text-text-muted">{badge}</span>
-                </div>
-              );
-            })}
-          </div>
+          <TooltipProvider delayDuration={200}>
+            <div className="grid grid-cols-3 sm:grid-cols-5 gap-4">
+              {BADGE_DEFINITIONS.map((badgeDef) => {
+                const unlocked = badges.includes(badgeDef.id);
+                const Icon = unlocked ? badgeDef.icon : Lock;
+                return (
+                  <Tooltip key={badgeDef.id}>
+                    <TooltipTrigger asChild>
+                      <div className="flex flex-col items-center gap-1.5 cursor-pointer">
+                        <div
+                          className={cn(
+                            "w-14 h-14 rounded-2xl flex items-center justify-center transition-all",
+                            unlocked
+                              ? "bg-gradient-to-br from-bg-secondary to-bg-tertiary ring-2 ring-accent/30"
+                              : "bg-bg-tertiary opacity-50"
+                          )}
+                        >
+                          <Icon
+                            className={cn(
+                              "h-7 w-7 transition-colors",
+                              unlocked ? badgeDef.color : "text-text-muted"
+                            )}
+                          />
+                        </div>
+                        <span
+                          className={cn(
+                            "text-[11px] text-center leading-tight",
+                            unlocked ? "text-text-primary font-medium" : "text-text-muted"
+                          )}
+                        >
+                          {badgeDef.name}
+                        </span>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent side="top" className="max-w-[200px]">
+                      <p className="font-semibold">{badgeDef.name}</p>
+                      <p className="text-xs text-text-secondary">{badgeDef.description}</p>
+                      {!unlocked && (
+                        <p className="text-xs text-text-muted mt-1 italic">Non debloque</p>
+                      )}
+                    </TooltipContent>
+                  </Tooltip>
+                );
+              })}
+            </div>
+          </TooltipProvider>
         </CardContent>
       </Card>
     </div>

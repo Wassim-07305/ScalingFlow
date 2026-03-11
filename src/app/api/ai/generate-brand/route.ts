@@ -6,6 +6,7 @@ import { buildBrandIdentityPrompt, type BrandIdentityResult } from "@/lib/ai/pro
 import { awardXP } from "@/lib/gamification/xp-engine";
 import { notifyGeneration } from "@/lib/notifications/create";
 import { buildFullVaultContext } from "@/lib/ai/vault-context";
+import { rateLimit } from "@/lib/utils/rate-limit";
 
 export async function POST(req: NextRequest) {
   try {
@@ -17,6 +18,16 @@ export async function POST(req: NextRequest) {
     if (!user) {
       return NextResponse.json({ error: "Non autorise" }, { status: 401 });
     }
+
+    // Rate limiting
+    const rl = rateLimit(user.id, "generate-brand", { limit: 5, windowSeconds: 60 });
+    if (!rl.allowed) {
+      return NextResponse.json(
+        { error: "Trop de requetes. Reessaie dans quelques secondes." },
+        { status: 429 }
+      );
+    }
+
     // Check AI usage limits
     const usage = await checkAIUsage(user.id);
     if (!usage.allowed) {
@@ -46,10 +57,18 @@ export async function POST(req: NextRequest) {
     }
 
     // Optionally fetch offer if provided
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let offer: any = null;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let categoryOS: any = null;
+    interface OfferData {
+      offer_name: string;
+      positioning?: string | null;
+      unique_mechanism?: string | null;
+      ai_raw_response?: Record<string, unknown> | null;
+    }
+    interface CategoryOSData {
+      new_game?: { category_name?: string };
+      identite?: { tagline?: string; tone_of_voice?: string };
+    }
+    let offer: OfferData | null = null;
+    let categoryOS: CategoryOSData | null = null;
 
     if (offerId) {
       const { data: offerData } = await supabase
@@ -64,7 +83,7 @@ export async function POST(req: NextRequest) {
         // Extract category OS from ai_raw_response if available
         const rawResponse = offerData.ai_raw_response as Record<string, unknown> | null;
         if (rawResponse && typeof rawResponse === "object" && "category_os" in rawResponse) {
-          categoryOS = rawResponse.category_os;
+          categoryOS = rawResponse.category_os as CategoryOSData;
         }
       }
     }
@@ -117,7 +136,6 @@ export async function POST(req: NextRequest) {
       .single();
 
     if (saveError) {
-      console.error("Error saving brand identity:", saveError);
       return NextResponse.json(
         { error: "Erreur lors de la sauvegarde de l'identite de marque" },
         { status: 500 }
@@ -130,7 +148,6 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ ...brand, generated: brandIdentity });
   } catch (error) {
-    console.error("Error generating brand identity:", error);
     return NextResponse.json(
       { error: "Erreur lors de la generation de l'identite de marque" },
       { status: 500 }

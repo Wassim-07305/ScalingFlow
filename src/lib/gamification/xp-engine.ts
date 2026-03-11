@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { getBadgeDefinition } from "@/lib/gamification/badges";
 
 const XP_REWARDS: Record<string, number> = {
   "generation.market_analysis": 50,
@@ -41,9 +42,18 @@ function calculateLevel(xp: number): number {
   return 1;
 }
 
+interface BadgeStats {
+  xp: number;
+  level: number;
+  generations: number;
+  streak: number;
+  communityPosts: number;
+  maxRoas: number;
+}
+
 const BADGE_CONDITIONS: {
   badge: string;
-  condition: (stats: { xp: number; level: number; generations: number }) => boolean;
+  condition: (stats: BadgeStats) => boolean;
 }[] = [
   { badge: "first_gen", condition: (s) => s.generations >= 1 },
   { badge: "gen_5", condition: (s) => s.generations >= 5 },
@@ -54,16 +64,26 @@ const BADGE_CONDITIONS: {
   { badge: "level_10", condition: (s) => s.level >= 10 },
   { badge: "xp_1000", condition: (s) => s.xp >= 1000 },
   { badge: "xp_5000", condition: (s) => s.xp >= 5000 },
+  // Streak badges
+  { badge: "streak_7", condition: (s) => s.streak >= 7 },
+  { badge: "streak_30", condition: (s) => s.streak >= 30 },
+  // Community badges
+  { badge: "community_first", condition: (s) => s.communityPosts >= 1 },
+  { badge: "community_10", condition: (s) => s.communityPosts >= 10 },
+  // Ads performance badges
+  { badge: "roas_2x", condition: (s) => s.maxRoas >= 2 },
+  { badge: "roas_5x", condition: (s) => s.maxRoas >= 5 },
 ];
 
 export async function awardXP(
   userId: string,
   activityType: string,
-  activityData?: Record<string, unknown>
+  activityData?: Record<string, unknown>,
+  xpOverride?: number
 ): Promise<{ xp_awarded: number; new_level: number; new_badges: string[] }> {
   const supabase = await createClient();
 
-  const xpAmount = XP_REWARDS[activityType] || 10;
+  const xpAmount = xpOverride ?? XP_REWARDS[activityType] ?? 10;
 
   // Fetch current profile
   const { data: profile } = await supabase
@@ -78,25 +98,43 @@ export async function awardXP(
   const newLevel = calculateLevel(newXP);
   const currentBadges: string[] = profile.badges || [];
 
-  // Count total generations for badge conditions
+  // Count total generations and other stats for badge conditions
   const [
     { count: offerCount },
     { count: assetCount },
     { count: adCount },
     { count: funnelCount },
     { count: contentCount },
+    { count: communityPostsCount },
+    campaignsRes,
+    profileStreakRes,
   ] = await Promise.all([
     supabase.from("offers").select("*", { count: "exact", head: true }).eq("user_id", userId),
     supabase.from("sales_assets").select("*", { count: "exact", head: true }).eq("user_id", userId),
     supabase.from("ad_creatives").select("*", { count: "exact", head: true }).eq("user_id", userId),
     supabase.from("funnels").select("*", { count: "exact", head: true }).eq("user_id", userId),
     supabase.from("content_pieces").select("*", { count: "exact", head: true }).eq("user_id", userId),
+    supabase.from("community_posts").select("*", { count: "exact", head: true }).eq("user_id", userId),
+    supabase.from("ad_campaigns").select("roas").eq("user_id", userId),
+    supabase.from("profiles").select("streak_days").eq("id", userId).single(),
   ]);
 
   const totalGenerations =
     (offerCount || 0) + (assetCount || 0) + (adCount || 0) + (funnelCount || 0) + (contentCount || 0);
 
-  const stats = { xp: newXP, level: newLevel, generations: totalGenerations };
+  const maxRoas = (campaignsRes.data ?? []).reduce(
+    (max, c) => Math.max(max, c.roas ?? 0),
+    0
+  );
+
+  const stats: BadgeStats = {
+    xp: newXP,
+    level: newLevel,
+    generations: totalGenerations,
+    streak: profileStreakRes.data?.streak_days ?? 0,
+    communityPosts: communityPostsCount ?? 0,
+    maxRoas,
+  };
   const newBadges: string[] = [];
 
   for (const { badge, condition } of BADGE_CONDITIONS) {
@@ -135,11 +173,13 @@ export async function awardXP(
   }
 
   for (const badge of newBadges) {
+    const badgeDef = getBadgeDefinition(badge);
+    const badgeName = badgeDef?.name || badge;
     await supabase.from("notifications").insert({
       user_id: userId,
       type: "badge" as const,
-      title: "Nouveau badge !",
-      message: `Tu as débloqué le badge "${badge}".`,
+      title: `Badge "${badgeName}" debloque !`,
+      message: badgeDef?.description || `Tu as debloque un nouveau badge.`,
     });
   }
 

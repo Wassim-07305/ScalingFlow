@@ -123,8 +123,8 @@ export default function BrandPage() {
         if (offers && offers.length > 0) {
           setOfferId(offers[0].id);
         }
-      } catch (err) {
-        console.error("Error fetching brand:", err);
+      } catch {
+        // Brand fetch failed silently
       } finally {
         setLoading(false);
       }

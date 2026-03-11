@@ -14,6 +14,7 @@ import { leadMagnetPrompt } from "@/lib/ai/prompts/lead-magnet";
 import { awardXP } from "@/lib/gamification/xp-engine";
 import { notifyGeneration } from "@/lib/notifications/create";
 import { buildFullVaultContext } from "@/lib/ai/vault-context";
+import { rateLimit } from "@/lib/utils/rate-limit";
 
 type AssetType =
   | "vsl_script"
@@ -48,6 +49,16 @@ export async function POST(req: NextRequest) {
     if (!user) {
       return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
     }
+
+    // Rate limiting
+    const rl = rateLimit(user.id, "generate-assets", { limit: 5, windowSeconds: 60 });
+    if (!rl.allowed) {
+      return NextResponse.json(
+        { error: "Trop de requetes. Reessaie dans quelques secondes." },
+        { status: 429 }
+      );
+    }
+
     // Check AI usage limits
     const usage = await checkAIUsage(user.id);
     if (!usage.allowed) {
@@ -210,8 +221,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Generate asset using AI
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const generatedAsset: any = await generateJSON({ prompt, maxTokens });
+    const generatedAsset = await generateJSON<Record<string, unknown>>({ prompt, maxTokens });
 
     // Save asset to database
     // DB columns: title (text), content (text), ai_raw_response (jsonb)
@@ -236,7 +246,6 @@ export async function POST(req: NextRequest) {
       .single();
 
     if (saveError) {
-      console.error("Error saving asset:", saveError.message, saveError.code, saveError.details);
       return NextResponse.json(
         { error: `Erreur lors de la sauvegarde: ${saveError.message}` },
         { status: 500 }
@@ -260,7 +269,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(asset);
   } catch (error) {
     const errMsg = error instanceof Error ? error.message : String(error);
-    console.error("Error generating asset:", errMsg, error);
     return NextResponse.json(
       { error: `Erreur lors de la génération de l'asset: ${errMsg}` },
       { status: 500 }

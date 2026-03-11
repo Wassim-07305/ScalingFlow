@@ -4,6 +4,11 @@ import { createClient } from "@/lib/supabase/server";
 import { DashboardShell } from "@/components/layout/dashboard-shell";
 
 export const metadata: Metadata = {
+  title: {
+    template: "%s | ScalingFlow",
+    default: "Dashboard | ScalingFlow",
+  },
+  description: "Plateforme IA pour structurer et scaler ton business.",
   robots: {
     index: false,
     follow: false,
