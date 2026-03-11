@@ -7,8 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AILoading } from "@/components/shared/ai-loading";
 import { GlowCard } from "@/components/shared/glow-card";
-import { Sparkles, FileText, Video, Gift, ChevronRight, FileDown } from "lucide-react";
+import { Sparkles, FileText, Video, Gift, ChevronRight, FileDown, Code } from "lucide-react";
 import { exportToPDF } from "@/lib/utils/export-pdf";
+import { exportFunnelToHTML, downloadHTML } from "@/lib/utils/export-html";
 import { UpgradeWall } from "@/components/shared/upgrade-wall";
 
 interface FunnelPage {
@@ -294,6 +295,17 @@ export function FunnelBuilder({ className, initialData }: FunnelBuilderProps) {
         >
           <FileDown className="h-4 w-4 mr-1" />
           PDF
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => {
+            const html = exportFunnelToHTML(funnelData);
+            downloadHTML(html, "funnel-scalingflow.html");
+          }}
+        >
+          <Code className="h-4 w-4 mr-1" />
+          HTML
         </Button>
         <Button variant="outline" onClick={() => { setFunnelData(null); handleGenerate(); }}>
           Régénérer

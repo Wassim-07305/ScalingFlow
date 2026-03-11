@@ -7,8 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AILoading } from "@/components/shared/ai-loading";
 import { GlowCard } from "@/components/shared/glow-card";
-import { Sparkles, Image, Video, Target, Copy } from "lucide-react";
+import { Sparkles, Image, Video, Target, Copy, Loader2, ImagePlus } from "lucide-react";
 import { UpgradeWall } from "@/components/shared/upgrade-wall";
+import { toast } from "sonner";
 
 interface CreativeGeneratorProps {
   className?: string;
@@ -23,6 +24,8 @@ export function CreativeGenerator({ className, initialData }: CreativeGeneratorP
   const [error, setError] = React.useState<string | null>(null);
   const [copiedIndex, setCopiedIndex] = React.useState<number | null>(null);
   const [usageLimited, setUsageLimited] = React.useState<{currentUsage: number; limit: number} | null>(null);
+  const [generatingImage, setGeneratingImage] = React.useState<number | null>(null);
+  const [generatedImages, setGeneratedImages] = React.useState<Record<number, string[]>>({});
 
   React.useEffect(() => {
     if (initialData) {
@@ -79,6 +82,34 @@ export function CreativeGenerator({ className, initialData }: CreativeGeneratorP
     navigator.clipboard.writeText(text);
     setCopiedIndex(index);
     setTimeout(() => setCopiedIndex(null), 2000);
+  };
+
+  const generateAdImage = async (index: number) => {
+    const v = variations[index];
+    if (!v) return;
+    setGeneratingImage(index);
+    try {
+      const res = await fetch("/api/ai/generate-logo", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          brandName: v.headline || "Ad",
+          concept: `Social media advertisement visual. "${v.hook}". Style: bold, eye-catching, scroll-stopping social media ad. Modern marketing aesthetic with strong contrast.`,
+          style: "social media advertisement, eye-catching, bold typography overlay, marketing creative",
+        }),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || "Erreur");
+      }
+      const data = await res.json();
+      setGeneratedImages((prev) => ({ ...prev, [index]: data.images || [] }));
+      toast.success("Visuels generes !");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Erreur lors de la generation");
+    } finally {
+      setGeneratingImage(null);
+    }
   };
 
   if (usageLimited) {
@@ -152,6 +183,35 @@ export function CreativeGenerator({ className, initialData }: CreativeGeneratorP
                 <Target className="h-3 w-3 text-text-muted" />
                 <p className="text-xs text-text-muted">{v.angle} &middot; {v.target_audience}</p>
               </div>
+
+              {/* Generated images */}
+              {generatedImages[i] && generatedImages[i].length > 0 && (
+                <div className="grid grid-cols-2 gap-2 pt-2">
+                  {generatedImages[i].map((url, j) => (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img key={j} src={url} alt={`Visual ${j + 1}`} className="rounded-lg w-full aspect-square object-cover" />
+                  ))}
+                </div>
+              )}
+
+              {/* Generate image button */}
+              {v.estimated_format !== "video" && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="w-full mt-2"
+                  disabled={generatingImage === i}
+                  onClick={() => generateAdImage(i)}
+                >
+                  {generatingImage === i ? (
+                    <><Loader2 className="h-3 w-3 animate-spin mr-1" /> Generation...</>
+                  ) : generatedImages[i] ? (
+                    <><ImagePlus className="h-3 w-3 mr-1" /> Regenerer visuels</>
+                  ) : (
+                    <><ImagePlus className="h-3 w-3 mr-1" /> Generer visuels IA</>
+                  )}
+                </Button>
+              )}
             </div>
           </GlowCard>
         ))}

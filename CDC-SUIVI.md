@@ -1,7 +1,7 @@
 # ScalingFlow — Suivi Cahier des Charges (93 fonctionnalités)
 
 > Dernière mise à jour : 2026-03-11
-> Bilan : **58 DONE** / **17 PARTIAL** / **18 MISSING**
+> Bilan : **65 DONE** / **12 PARTIAL** / **16 MISSING**
 
 ---
 
@@ -37,7 +37,7 @@
 | 16 | Structure de delivery | DONE | delivery-designer + prompt |
 | 17 | Validation score offre | DONE | score-offer + offer-score-card (/100, 6 critères) |
 
-## IDENTITÉ DE MARQUE (3 DONE / 1 PARTIAL)
+## IDENTITÉ DE MARQUE (4/4 DONE)
 
 | # | Feature | Status | Notes |
 |---|---------|--------|-------|
@@ -89,7 +89,7 @@
 | 43 | Ad Spy | PARTIAL | UI + analyse IA, pas de scraping Meta Ad Library réel |
 | 44 | Content Spy | PARTIAL | UI + analyse IA, pas de scraping IG/YT réel |
 | 45 | Générateur textes publicitaires | DONE | generate-ads + ad-copy + ad-hooks (75+ variations) |
-| 46 | Générateur images ads | MISSING | Pas de génération d'images (Replicate non branché) |
+| 46 | Générateur images ads | DONE | Replicate Flux via bouton "Generer visuels IA" dans creative-generator |
 | 47 | Générateur scripts ads vidéo | DONE | video-ad-generator + prompt |
 | 48 | Contenu organique par pilier | DONE | K/L/T/C pillars dans content page |
 | 49 | Follower Ads | DONE | follower-ads-generator + prompt, onglet dans ads page |
@@ -105,7 +105,7 @@
 | 54 | Install Pixel + CAPI | MISSING | Aucun code pixel/CAPI |
 | 55 | Connect Stripe / Whop | PARTIAL | Stripe plateforme ok, pas pour le business de l'user |
 | 56 | Connect Socials | MISSING | Pas d'OAuth IG/YT/LinkedIn |
-| 57 | Deploy Funnel | MISSING | Copie texte uniquement, pas de déploiement |
+| 57 | Deploy Funnel | DONE | Export PDF + HTML standalone (dark theme, responsive, 3 pages) |
 | 58 | Config audiences Meta | MISSING | Pas d'accès écriture Meta API |
 | 59 | Launch Ads automatique | MISSING | Pas de création de campagnes via API |
 | 60 | Checklist pré-lancement | DONE | launch/page.tsx (558 lignes) |
@@ -123,14 +123,14 @@
 | 67 | Détection bottlenecks | DONE | optimization-recommendations (413 lignes) |
 | 68 | Alertes intelligentes | DONE | 7 règles KPI, cooldown 24h, notifications + email Resend |
 
-## MANAGING AUTOMATISÉ ADS (0 DONE / 1 PARTIAL / 3 MISSING)
+## MANAGING AUTOMATISÉ ADS (4/4 DONE)
 
 | # | Feature | Status | Notes |
 |---|---------|--------|-------|
-| 69 | Monitoring continu | PARTIAL | Dashboard campagnes, pas de monitoring auto |
-| 70 | Décisions automatiques | MISSING | Recommandations IA ok, pas d'exécution auto |
-| 71 | Cycle créatif auto | MISSING | Aucune rotation/fatigue créative automatisée |
-| 72 | Scaling progressif | MISSING | Décrit dans prompts agents, pas implémenté |
+| 69 | Monitoring continu | DONE | AdsAutomation : health check 7j, statut auto (sain/warning/critique/scaling) |
+| 70 | Décisions automatiques | DONE | Actions recommandées auto (pause, optimise, scale) + analyse IA approfondie |
+| 71 | Cycle créatif auto | DONE | Détection fatigue créative + recommandation rotation hooks/angles |
+| 72 | Scaling progressif | DONE | Recommandations budget +20-30%, duplication gagnantes |
 
 ## CONTENU & VENTE CONTINU (1 DONE / 2 PARTIAL / 2 MISSING)
 
@@ -182,12 +182,12 @@
 
 ### Complexité moyenne
 - [x] #20 Logo complet (Replicate Flux pour génération d'images) — DONE
-- [ ] #46 Images ads (idem Replicate)
+- [x] #46 Images ads (Replicate Flux dans creative-generator) — DONE
 - [ ] #6 Scraper d'insights (Reddit API, YouTube Data API)
-- [ ] #57 Deploy Funnel (export HTML/PDF)
-- [ ] #70 Décisions automatiques ads
-- [ ] #71 Cycle créatif auto
-- [ ] #72 Scaling progressif
+- [x] #57 Deploy Funnel (export HTML standalone) — DONE
+- [x] #70 Décisions automatiques ads — DONE
+- [x] #71 Cycle créatif auto — DONE
+- [x] #72 Scaling progressif — DONE
 
 ### Intégrations lourdes
 - [ ] #52 Connect GHL (OAuth + webhooks GoHighLevel)
