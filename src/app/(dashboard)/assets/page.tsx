@@ -9,6 +9,7 @@ import { SalesLetterGenerator } from "@/components/assets/sales-letter-generator
 import { SettingScriptGenerator } from "@/components/assets/setting-script-generator";
 import { LeadMagnetGenerator } from "@/components/assets/lead-magnet-generator";
 import { SmsSequence } from "@/components/assets/sms-sequence";
+import { SocialAssetsGenerator } from "@/components/assets/social-assets-generator";
 import { GenerationHistory } from "@/components/shared/generation-history";
 import { cn } from "@/lib/utils/cn";
 import { createClient } from "@/lib/supabase/client";
@@ -21,6 +22,7 @@ import {
   FileText,
   Phone,
   Magnet,
+  Share2,
   History,
 } from "lucide-react";
 
@@ -32,6 +34,7 @@ const TABS = [
   { key: "sales_letter", label: "Sales Letter", icon: FileText },
   { key: "setting_script", label: "Script Setting", icon: Phone },
   { key: "lead_magnet", label: "Lead Magnet", icon: Magnet },
+  { key: "social_assets", label: "Social Assets", icon: Share2 },
   { key: "history", label: "Historique", icon: History },
 ] as const;
 
@@ -44,6 +47,7 @@ const ASSET_TYPE_TO_TAB: Record<string, string> = {
   sales_letter: "sales_letter",
   sales_script: "setting_script",
   lead_magnet: "lead_magnet",
+  social_assets: "social_assets",
 };
 
 export default function AssetsPage() {
@@ -131,6 +135,7 @@ export default function AssetsPage() {
       {activeTab === "sales_letter" && <SalesLetterGenerator initialData={loadedData.sales_letter} />}
       {activeTab === "setting_script" && <SettingScriptGenerator initialData={loadedData.setting_script} />}
       {activeTab === "lead_magnet" && <LeadMagnetGenerator initialData={loadedData.lead_magnet} />}
+      {activeTab === "social_assets" && <SocialAssetsGenerator initialData={loadedData.social_assets} />}
       {activeTab === "history" && (
         <GenerationHistory
           table="sales_assets"

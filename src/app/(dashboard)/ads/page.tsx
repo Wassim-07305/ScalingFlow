@@ -6,17 +6,21 @@ import { CreativeGenerator } from "@/components/ads/creative-generator";
 import { CampaignDashboard } from "@/components/ads/campaign-dashboard";
 import { VideoAdGenerator } from "@/components/ads/video-ad-generator";
 import { DMScriptGenerator } from "@/components/ads/dm-script-generator";
+import { FollowerAdsGenerator } from "@/components/ads/follower-ads-generator";
+import { DmRetargetingGenerator } from "@/components/ads/dm-retargeting-generator";
 import { GenerationHistory } from "@/components/shared/generation-history";
 import { cn } from "@/lib/utils/cn";
 import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
-import { Sparkles, BarChart3, Video, MessageSquare, History } from "lucide-react";
+import { Sparkles, BarChart3, Video, MessageSquare, Users, MessageCircle, History } from "lucide-react";
 
 const TABS = [
   { key: "creatives", label: "Creatives IA", icon: Sparkles },
   { key: "campaigns", label: "Campagnes", icon: BarChart3 },
   { key: "video_ads", label: "Video Ads", icon: Video },
   { key: "dm_scripts", label: "Scripts DM", icon: MessageSquare },
+  { key: "follower_ads", label: "Follower Ads", icon: Users },
+  { key: "dm_retargeting", label: "DM Retargeting", icon: MessageCircle },
   { key: "history", label: "Historique", icon: History },
 ] as const;
 
@@ -83,6 +87,8 @@ export default function AdsPage() {
       {activeTab === "campaigns" && <CampaignDashboard />}
       {activeTab === "video_ads" && <VideoAdGenerator initialData={loadedData.video_ads} />}
       {activeTab === "dm_scripts" && <DMScriptGenerator initialData={loadedData.dm_scripts} />}
+      {activeTab === "follower_ads" && <FollowerAdsGenerator initialData={loadedData.follower_ads} />}
+      {activeTab === "dm_retargeting" && <DmRetargetingGenerator initialData={loadedData.dm_retargeting} />}
       {activeTab === "history" && (
         <GenerationHistory
           table="ad_creatives"

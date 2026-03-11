@@ -11,6 +11,9 @@ import { pitchDeckPrompt } from "@/lib/ai/prompts/pitch-deck";
 import { salesLetterPrompt } from "@/lib/ai/prompts/sales-letter";
 import { settingScriptPrompt } from "@/lib/ai/prompts/setting-script";
 import { leadMagnetPrompt } from "@/lib/ai/prompts/lead-magnet";
+import { socialAssetsPrompt } from "@/lib/ai/prompts/social-assets";
+import { followerAdsPrompt } from "@/lib/ai/prompts/follower-ads";
+import { dmRetargetingPrompt } from "@/lib/ai/prompts/dm-retargeting";
 import { awardXP } from "@/lib/gamification/xp-engine";
 import { notifyGeneration } from "@/lib/notifications/create";
 import { buildFullVaultContext } from "@/lib/ai/vault-context";
@@ -25,7 +28,10 @@ type AssetType =
   | "pitch_deck"
   | "sales_letter"
   | "setting_script"
-  | "lead_magnet";
+  | "lead_magnet"
+  | "social_assets"
+  | "follower_ads"
+  | "dm_retargeting";
 
 const VALID_ASSET_TYPES: AssetType[] = [
   "vsl_script",
@@ -37,6 +43,9 @@ const VALID_ASSET_TYPES: AssetType[] = [
   "sales_letter",
   "setting_script",
   "lead_magnet",
+  "social_assets",
+  "follower_ads",
+  "dm_retargeting",
 ];
 
 export async function POST(req: NextRequest) {
@@ -83,6 +92,9 @@ export async function POST(req: NextRequest) {
       sales_letter: "sales_letter",
       setting_script: "setting_script",
       lead_magnet: "lead_magnet",
+      social_assets: "social_assets",
+      follower_ads: "follower_ads",
+      dm_retargeting: "dm_retargeting",
     };
     if (body.type && !assetType) {
       assetType = TYPE_MAP[body.type] || body.type;
@@ -207,6 +219,32 @@ export async function POST(req: NextRequest) {
         maxTokens = 6000;
         break;
 
+      case "social_assets":
+        prompt = socialAssetsPrompt(
+          offer.offer_data || offer,
+          avatar,
+          body.brandKit
+        );
+        maxTokens = 6000;
+        break;
+
+      case "follower_ads":
+        prompt = followerAdsPrompt(
+          offer.offer_data || offer,
+          avatar,
+          body.niche
+        );
+        maxTokens = 6000;
+        break;
+
+      case "dm_retargeting":
+        prompt = dmRetargetingPrompt(
+          offer.offer_data || offer,
+          avatar
+        );
+        maxTokens = 6000;
+        break;
+
       default:
         return NextResponse.json(
           { error: "Type d'asset non supporté" },
@@ -227,7 +265,10 @@ export async function POST(req: NextRequest) {
     // DB columns: title (text), content (text), ai_raw_response (jsonb)
     // Map types not yet in DB check constraint to valid types
     const DB_ASSET_TYPE_MAP: Record<string, string> = {
-      setting_script: "sales_script", // setting_script not in DB constraint yet
+      setting_script: "sales_script",
+      social_assets: "lead_magnet",
+      follower_ads: "lead_magnet",
+      dm_retargeting: "lead_magnet",
     };
     const dbAssetType = DB_ASSET_TYPE_MAP[assetType] || assetType;
     const { data: asset, error: saveError } = await supabase
@@ -263,6 +304,9 @@ export async function POST(req: NextRequest) {
       sales_letter: "generation.sales_letter",
       setting_script: "generation.setting_script",
       lead_magnet: "generation.lead_magnet",
+      social_assets: "generation.ads",
+      follower_ads: "generation.ads",
+      dm_retargeting: "generation.ads",
     };
     try { await awardXP(user.id, assetXPMap[assetType] || "generation.vsl"); } catch {}
 
