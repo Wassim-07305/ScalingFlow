@@ -9,6 +9,7 @@ import {
 } from "@/lib/constants/navigation";
 import { useDailyStreak } from "@/hooks/use-daily-streak";
 import { useAchievementListener } from "@/hooks/use-achievement-listener";
+import { useAlertChecker } from "@/hooks/use-alert-checker";
 
 interface DashboardShellProps {
   role: string;
@@ -29,6 +30,7 @@ export function DashboardShell({
 }: DashboardShellProps) {
   useDailyStreak();
   useAchievementListener();
+  useAlertChecker();
 
   return (
     <AppShell

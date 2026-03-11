@@ -176,7 +176,7 @@
 - [x] #42 Social assets — DONE
 - [x] #49 Follower Ads — DONE
 - [x] #50 DM Ads retargeting — DONE
-- [ ] #68 Alertes intelligentes (notifications sur seuils KPI)
+- [x] #68 Alertes intelligentes (notifications sur seuils KPI) — DONE
 - [ ] #74 Adaptation intelligente (connecter analytics → contenu)
 - [ ] #75 Contenu depuis data vente (connecter calls → contenu)
 
