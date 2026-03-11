@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useCallback } from "react";
 import { cn } from "@/lib/utils/cn";
 import { Button } from "@/components/ui/button";
 import { Send, Bot, User, Loader2 } from "lucide-react";
@@ -11,11 +11,9 @@ interface ChatMessage {
 }
 
 function renderMarkdown(text: string): React.ReactNode {
-  // Split by code blocks first
   const parts = text.split(/(```[\s\S]*?```)/g);
 
   return parts.map((part, i) => {
-    // Code blocks
     if (part.startsWith("```")) {
       const match = part.match(/```(\w+)?\n?([\s\S]*?)```/);
       const code = match?.[2]?.trim() || part.slice(3, -3).trim();
@@ -26,37 +24,30 @@ function renderMarkdown(text: string): React.ReactNode {
       );
     }
 
-    // Process inline markdown line by line
     const lines = part.split("\n");
     return lines.map((line, j) => {
       const key = `${i}-${j}`;
 
-      // Headings
       if (line.startsWith("### ")) return <h4 key={key} className="font-semibold text-text-primary mt-3 mb-1">{line.slice(4)}</h4>;
       if (line.startsWith("## ")) return <h3 key={key} className="font-bold text-text-primary mt-3 mb-1">{line.slice(3)}</h3>;
 
-      // Bullet lists
       if (/^[-*] /.test(line)) {
         return <div key={key} className="flex gap-2 ml-2"><span className="text-accent">&#x2022;</span><span>{formatInline(line.slice(2))}</span></div>;
       }
 
-      // Numbered lists
       const numMatch = line.match(/^(\d+)\. /);
       if (numMatch) {
         return <div key={key} className="flex gap-2 ml-2"><span className="text-accent font-medium">{numMatch[1]}.</span><span>{formatInline(line.slice(numMatch[0].length))}</span></div>;
       }
 
-      // Empty lines
       if (!line.trim()) return <br key={key} />;
 
-      // Regular text
       return <span key={key}>{formatInline(line)}{j < lines.length - 1 ? "\n" : ""}</span>;
     });
   });
 }
 
 function formatInline(text: string): React.ReactNode {
-  // Bold + inline code
   const parts = text.split(/(\*\*[^*]+\*\*|`[^`]+`)/g);
   return parts.map((p, i) => {
     if (p.startsWith("**") && p.endsWith("**"))
@@ -70,26 +61,80 @@ function formatInline(text: string): React.ReactNode {
 interface AIChatProps {
   agentType: string;
   agentName: string;
+  conversationId?: string | null;
+  initialMessages?: ChatMessage[];
+  onConversationSaved?: (id: string, title: string) => void;
   className?: string;
 }
 
-export function AIChat({ agentType, agentName, className }: AIChatProps) {
-  const [messages, setMessages] = React.useState<ChatMessage[]>([]);
+export function AIChat({
+  agentType,
+  agentName,
+  conversationId: initialConversationId,
+  initialMessages,
+  onConversationSaved,
+  className,
+}: AIChatProps) {
+  const [messages, setMessages] = React.useState<ChatMessage[]>(initialMessages || []);
   const [input, setInput] = React.useState("");
   const [isStreaming, setIsStreaming] = React.useState(false);
+  const [conversationId, setConversationId] = React.useState<string | null>(initialConversationId || null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+
+  // Reset when loading a new conversation
+  useEffect(() => {
+    setMessages(initialMessages || []);
+    setConversationId(initialConversationId || null);
+  }, [initialConversationId, initialMessages]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  const saveConversation = useCallback(
+    async (msgs: ChatMessage[]) => {
+      if (msgs.length < 2) return;
+
+      // Auto-title from first user message
+      const firstUserMsg = msgs.find((m) => m.role === "user");
+      const title = firstUserMsg
+        ? firstUserMsg.content.slice(0, 60) + (firstUserMsg.content.length > 60 ? "…" : "")
+        : "Conversation";
+
+      try {
+        const res = await fetch("/api/ai/conversations", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            conversationId,
+            agentType,
+            title,
+            messages: msgs,
+          }),
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          if (!conversationId) {
+            setConversationId(data.id);
+          }
+          onConversationSaved?.(data.id, title);
+        }
+      } catch {
+        // Fail silently — conversation save is non-blocking
+      }
+    },
+    [conversationId, agentType, onConversationSaved]
+  );
 
   const handleSend = async () => {
     if (!input.trim() || isStreaming) return;
 
     const userMessage = input.trim();
     setInput("");
-    setMessages((prev) => [...prev, { role: "user", content: userMessage }]);
+    const newMessages: ChatMessage[] = [...messages, { role: "user", content: userMessage }];
+    setMessages(newMessages);
     setIsStreaming(true);
 
     try {
@@ -99,6 +144,7 @@ export function AIChat({ agentType, agentName, className }: AIChatProps) {
         body: JSON.stringify({
           message: userMessage,
           agentType,
+          conversationId,
         }),
       });
 
@@ -128,6 +174,13 @@ export function AIChat({ agentType, agentName, className }: AIChatProps) {
           return updated;
         });
       }
+
+      // Save after streaming completes
+      const finalMessages: ChatMessage[] = [
+        ...newMessages,
+        { role: "assistant", content: assistantContent },
+      ];
+      saveConversation(finalMessages);
     } catch {
       setMessages((prev) => [
         ...prev,
