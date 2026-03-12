@@ -6,12 +6,14 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils/cn";
 import { useUser } from "@/hooks/use-user";
 import { createClient } from "@/lib/supabase/client";
+import { Button } from "@/components/ui/button";
 import {
   Calendar,
   TrendingUp,
   TrendingDown,
   ArrowUpRight,
   ArrowDownRight,
+  Download,
 } from "lucide-react";
 import { format, parseISO } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -153,12 +155,36 @@ export function MetricsHistory() {
   return (
     <div className="space-y-6">
       {/* Summary */}
-      <div className="flex items-center gap-2 mb-2">
+      <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center gap-2">
         {isDemo && <Badge variant="yellow">Donnees de demonstration</Badge>}
         <Badge variant="muted">
           <Calendar className="h-3 w-3 mr-1" />
           {summary.totalDays} jours de donnees
         </Badge>
+        </div>
+        {!isDemo && metrics.length > 0 && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => {
+              const headers = "Date,Depense,Impressions,Clics,Leads,Appels,Clients,Revenu\n";
+              const rows = metrics.map((m) =>
+                `${m.date},${m.spend},${m.impressions},${m.clicks},${m.leads},${m.calls},${m.clients},${m.revenue}`
+              ).join("\n");
+              const blob = new Blob([headers + rows], { type: "text/csv;charset=utf-8;" });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement("a");
+              a.href = url;
+              a.download = `scalingflow-historique-${format(new Date(), "yyyy-MM-dd")}.csv`;
+              a.click();
+              URL.revokeObjectURL(url);
+            }}
+          >
+            <Download className="h-4 w-4 mr-1" />
+            CSV
+          </Button>
+        )}
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

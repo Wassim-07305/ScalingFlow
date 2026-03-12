@@ -13,7 +13,9 @@ import {
   TrendingUp,
   Target,
   Clock,
+  Code2,
 } from "lucide-react";
+import { PixelCAPIGenerator } from "@/components/launch/pixel-capi-generator";
 
 interface DayTask {
   id: string;
@@ -345,6 +347,7 @@ export default function LaunchGuidePage() {
     new Set()
   );
   const [activeDay, setActiveDay] = React.useState(1);
+  const [activeTab, setActiveTab] = React.useState<"guide" | "pixel">("guide");
   const [loading, setLoading] = React.useState(true);
 
   // Charger les taches completees depuis localStorage
@@ -404,6 +407,38 @@ export default function LaunchGuidePage() {
         description="Tes 10 premiers jours après le lancement de tes ads."
       />
 
+      {/* Tabs */}
+      <div className="flex gap-2 mb-6">
+        <button
+          onClick={() => setActiveTab("guide")}
+          className={cn(
+            "flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all",
+            activeTab === "guide"
+              ? "bg-accent text-white"
+              : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
+          )}
+        >
+          <Rocket className="h-4 w-4" />
+          Guide 10 jours
+        </button>
+        <button
+          onClick={() => setActiveTab("pixel")}
+          className={cn(
+            "flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all",
+            activeTab === "pixel"
+              ? "bg-accent text-white"
+              : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
+          )}
+        >
+          <Code2 className="h-4 w-4" />
+          Pixel & CAPI
+        </button>
+      </div>
+
+      {activeTab === "pixel" && <PixelCAPIGenerator />}
+
+      {activeTab === "guide" && (
+      <>
       {/* Banniere de progression */}
       <Card className="mb-6 border-accent/30">
         <CardContent className="py-4">
@@ -553,6 +588,8 @@ export default function LaunchGuidePage() {
           })}
         </div>
       ))}
+      </>
+      )}
     </div>
   );
 }

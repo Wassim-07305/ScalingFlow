@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils/cn";
 import { useUser } from "@/hooks/use-user";
+import { createClient } from "@/lib/supabase/client";
 import {
   TrendingUp,
   TrendingDown,
@@ -28,6 +29,7 @@ import {
   MousePointerClick,
   Trash2,
   RefreshCw,
+  Download,
 } from "lucide-react";
 import {
   AreaChart,
@@ -84,25 +86,65 @@ const DEMO_DATA: DailyMetric[] = [
   { date: "2026-03-04", spend: 250, impressions: 25000, clicks: 425, leads: 24, calls: 9, clients: 4, revenue: 3988 },
 ];
 
-// ─── localStorage helpers ────────────────────────────────────
-function getStorageKey(userId: string) {
-  return `sf_analytics_metrics_${userId}`;
+// ─── Supabase helpers ────────────────────────────────────────
+async function loadMetricsFromDB(userId: string): Promise<DailyMetric[]> {
+  const supabase = createClient();
+  const { data } = await supabase
+    .from("daily_performance_metrics")
+    .select("date, spend, impressions, clicks, leads, calls, clients, revenue")
+    .eq("user_id", userId)
+    .order("date", { ascending: true });
+  if (!data || data.length === 0) return [];
+  return data.map((row) => ({
+    date: typeof row.date === "string" ? row.date : new Date(row.date).toISOString().split("T")[0],
+    spend: Number(row.spend),
+    impressions: row.impressions,
+    clicks: row.clicks,
+    leads: row.leads,
+    calls: row.calls,
+    clients: row.clients,
+    revenue: Number(row.revenue),
+  }));
 }
 
-function loadMetrics(userId: string): DailyMetric[] {
-  if (typeof window === "undefined") return [];
-  try {
-    const raw = localStorage.getItem(getStorageKey(userId));
-    if (raw) return JSON.parse(raw) as DailyMetric[];
-  } catch {
-    // ignore
-  }
-  return [];
+async function upsertMetricToDB(userId: string, metric: DailyMetric) {
+  const supabase = createClient();
+  await supabase.from("daily_performance_metrics").upsert(
+    {
+      user_id: userId,
+      date: metric.date,
+      spend: metric.spend,
+      impressions: metric.impressions,
+      clicks: metric.clicks,
+      leads: metric.leads,
+      calls: metric.calls,
+      clients: metric.clients,
+      revenue: metric.revenue,
+    },
+    { onConflict: "user_id,date" }
+  );
 }
 
-function saveMetrics(userId: string, metrics: DailyMetric[]) {
-  if (typeof window === "undefined") return;
-  localStorage.setItem(getStorageKey(userId), JSON.stringify(metrics));
+async function clearMetricsFromDB(userId: string) {
+  const supabase = createClient();
+  await supabase.from("daily_performance_metrics").delete().eq("user_id", userId);
+}
+
+function exportMetricsToCSV(metrics: DailyMetric[]) {
+  const headers = "Date,Depense,Impressions,Clics,Leads,Appels,Clients,Revenu,CPL,CPA,ROAS\n";
+  const rows = metrics.map((m) => {
+    const cpl = m.leads > 0 ? (m.spend / m.leads).toFixed(2) : "0";
+    const cpa = m.clients > 0 ? (m.spend / m.clients).toFixed(2) : "0";
+    const roas = m.spend > 0 ? (m.revenue / m.spend).toFixed(2) : "0";
+    return `${m.date},${m.spend},${m.impressions},${m.clicks},${m.leads},${m.calls},${m.clients},${m.revenue},${cpl},${cpa},${roas}`;
+  }).join("\n");
+  const blob = new Blob([headers + rows], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `scalingflow-metrics-${format(new Date(), "yyyy-MM-dd")}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
 }
 
 // ─── Formatting helpers ──────────────────────────────────────
@@ -144,15 +186,16 @@ export function PerformanceDashboard() {
   // Load metrics on mount + auto-refresh every 5 min
   const loadData = useCallback(() => {
     if (!user) return;
-    const stored = loadMetrics(user.id);
-    if (stored.length > 0) {
-      setMetrics(stored);
-      setIsDemo(false);
-    } else {
-      setMetrics(DEMO_DATA);
-      setIsDemo(true);
-    }
-    setLastRefresh(new Date());
+    loadMetricsFromDB(user.id).then((rows) => {
+      if (rows.length > 0) {
+        setMetrics(rows);
+        setIsDemo(false);
+      } else {
+        setMetrics(DEMO_DATA);
+        setIsDemo(true);
+      }
+      setLastRefresh(new Date());
+    });
   }, [user]);
 
   useEffect(() => {
@@ -161,16 +204,15 @@ export function PerformanceDashboard() {
     return () => clearInterval(interval);
   }, [loadData]);
 
-  const handleSaveMetric = useCallback(() => {
+  const handleSaveMetric = useCallback(async () => {
     if (!user) return;
     const updated = [...metrics.filter((m) => m.date !== formData.date), formData].sort(
       (a, b) => a.date.localeCompare(b.date)
     );
-    // If switching from demo, start fresh with only real data
     const finalMetrics = isDemo ? [formData] : updated;
     setMetrics(finalMetrics);
     setIsDemo(false);
-    saveMetrics(user.id, finalMetrics);
+    await upsertMetricToDB(user.id, formData);
     setShowForm(false);
     toast.success("Donnees enregistrees");
     setFormData({
@@ -185,9 +227,9 @@ export function PerformanceDashboard() {
     });
   }, [user, metrics, formData, isDemo]);
 
-  const handleClearData = useCallback(() => {
+  const handleClearData = useCallback(async () => {
     if (!user) return;
-    localStorage.removeItem(getStorageKey(user.id));
+    await clearMetricsFromDB(user.id);
     setMetrics(DEMO_DATA);
     setIsDemo(true);
     toast.success("Donnees reinitialisees");
@@ -320,10 +362,16 @@ export function PerformanceDashboard() {
             <RefreshCw className="h-4 w-4" />
           </Button>
           {!isDemo && (
-            <Button variant="ghost" size="sm" onClick={handleClearData}>
-              <Trash2 className="h-4 w-4 mr-1" />
-              Reinitialiser
-            </Button>
+            <>
+              <Button variant="ghost" size="sm" onClick={() => exportMetricsToCSV(metrics)} title="Exporter CSV">
+                <Download className="h-4 w-4 mr-1" />
+                CSV
+              </Button>
+              <Button variant="ghost" size="sm" onClick={handleClearData}>
+                <Trash2 className="h-4 w-4 mr-1" />
+                Reinitialiser
+              </Button>
+            </>
           )}
           <Button onClick={() => setShowForm(true)}>
             <Plus className="h-4 w-4 mr-1" />

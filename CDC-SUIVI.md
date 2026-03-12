@@ -1,7 +1,7 @@
 # ScalingFlow — Suivi Cahier des Charges (93 fonctionnalités)
 
-> Dernière mise à jour : 2026-03-11
-> Bilan : **71 DONE** / **6 PARTIAL** / **16 MISSING**
+> Dernière mise à jour : 2026-03-12
+> Bilan : **72 DONE** / **6 PARTIAL** / **15 MISSING**
 
 ---
 
@@ -96,13 +96,13 @@
 | 50 | DM Ads retargeting | DONE | dm-retargeting-generator + prompt + automation DM + audiences |
 | 51 | Scripts setting DM | DONE | dm-script-generator + dm-scripts (prospection) |
 
-## INTÉGRATIONS & LANCEMENT (2 DONE / 2 PARTIAL / 6 MISSING)
+## INTÉGRATIONS & LANCEMENT (3 DONE / 2 PARTIAL / 5 MISSING)
 
 | # | Feature | Status | Notes |
 |---|---------|--------|-------|
 | 52 | Connect GHL | MISSING | Aucune intégration GoHighLevel |
 | 53 | Connect Meta Ads | PARTIAL | Sync manuelle via token, pas OAuth |
-| 54 | Install Pixel + CAPI | MISSING | Aucun code pixel/CAPI |
+| 54 | Install Pixel + CAPI | DONE | Generateur de code Pixel + CAPI avec config, events, checklist dans launch/pixel |
 | 55 | Connect Stripe / Whop | PARTIAL | Stripe plateforme ok, pas pour le business de l'user |
 | 56 | Connect Socials | MISSING | Pas d'OAuth IG/YT/LinkedIn |
 | 57 | Deploy Funnel | DONE | Export PDF + HTML standalone (dark theme, responsive, 3 pages) |
@@ -115,7 +115,7 @@
 
 | # | Feature | Status | Notes |
 |---|---------|--------|-------|
-| 62 | Dashboard temps réel | DONE | Auto-refresh 5min + bouton rafraîchir + timestamp |
+| 62 | Dashboard temps réel | DONE | Auto-refresh 5min + Supabase + export CSV + bouton rafraîchir |
 | 63 | Tracking multi-touch | DONE | Attribution model avec revenu réel Supabase, 4 modèles, parcours clients |
 | 64 | Tracking calls | DONE | Analyse IA + import fichier (.txt/.srt/.vtt) + collage transcript |
 | 65 | Tracking revenue | DONE | metrics-history connecté à Supabase daily_performance_metrics |
