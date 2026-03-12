@@ -33,6 +33,28 @@ export default function AdsPage() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [loadedData, setLoadedData] = React.useState<Record<string, any>>({});
 
+  const handleAssetHistorySelect = async (item: { id: string }) => {
+    try {
+      const supabase = createClient();
+      const { data, error } = await supabase
+        .from("sales_assets")
+        .select("asset_type, ai_raw_response, title")
+        .eq("id", item.id)
+        .single();
+      if (error || !data) {
+        toast.error("Impossible de charger cet asset");
+        return;
+      }
+      const parsed = data.ai_raw_response || data;
+      const tabKey = data.asset_type === "dm_retargeting" ? "dm_retargeting" : "follower_ads";
+      setLoadedData((prev) => ({ ...prev, [tabKey]: parsed }));
+      setActiveTab(tabKey);
+      toast.success("Asset chargé depuis l'historique");
+    } catch {
+      toast.error("Erreur lors du chargement");
+    }
+  };
+
   const handleHistorySelect = async (item: { id: string }) => {
     try {
       const supabase = createClient();
@@ -95,14 +117,25 @@ export default function AdsPage() {
       {activeTab === "dm_retargeting" && <DmRetargetingGenerator initialData={loadedData.dm_retargeting} />}
       {activeTab === "ad_spy" && <AdSpy />}
       {activeTab === "history" && (
-        <GenerationHistory
-          table="ad_creatives"
-          titleField="headline"
-          subtitleField="ad_copy"
-          statusField="status"
-          emptyMessage="Aucune créative générée pour le moment."
-          onSelect={handleHistorySelect}
-        />
+        <div className="space-y-6">
+          <GenerationHistory
+            table="ad_creatives"
+            titleField="headline"
+            subtitleField="ad_copy"
+            statusField="status"
+            emptyMessage="Aucune créative générée pour le moment."
+            onSelect={handleHistorySelect}
+          />
+          <GenerationHistory
+            table="sales_assets"
+            titleField="title"
+            subtitleField="asset_type"
+            statusField="status"
+            filters={{ asset_type: ["follower_ads", "dm_retargeting"] }}
+            emptyMessage="Aucune follower ad ou DM retargeting générée."
+            onSelect={handleAssetHistorySelect}
+          />
+        </div>
       )}
     </div>
   );

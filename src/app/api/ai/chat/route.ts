@@ -111,7 +111,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Rate limiting
-    const rl = rateLimit(user.id, "chat", { limit: 10, windowSeconds: 60 });
+    const rl = await rateLimit(user.id, "chat", { limit: 10, windowSeconds: 60 });
     if (!rl.allowed) {
       return NextResponse.json(
         { error: "Trop de requetes. Reessaie dans quelques secondes." },

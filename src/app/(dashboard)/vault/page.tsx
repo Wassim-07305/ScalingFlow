@@ -71,6 +71,22 @@ export default function VaultPage() {
     fetchData();
   }, [user]);
 
+  // Auto-trigger analysis if profile has skills but no vault_analysis
+  const hasAutoTriggered = React.useRef(false);
+  React.useEffect(() => {
+    if (
+      profile &&
+      !regenerating &&
+      !hasAutoTriggered.current &&
+      (profile.skills as string[] | null)?.length &&
+      !(profile.vault_analysis as Record<string, unknown> | null)?.radar
+    ) {
+      hasAutoTriggered.current = true;
+      handleRegenerate();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profile]);
+
   const handleRegenerate = async () => {
     if (!profile) return;
     setRegenerating(true);

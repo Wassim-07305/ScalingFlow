@@ -23,7 +23,7 @@ interface GenerationHistoryProps {
   titleField: string;
   subtitleField?: string;
   statusField?: string;
-  filters?: Record<string, string>;
+  filters?: Record<string, string | string[]>;
   emptyMessage: string;
   onSelect?: (item: HistoryItem) => void;
   className?: string;
@@ -62,7 +62,11 @@ export function GenerationHistory({
       let query = supabase.from(table).select(fields).eq("user_id", user.id);
       if (filters) {
         Object.entries(filters).forEach(([key, value]) => {
-          query = query.eq(key, value);
+          if (Array.isArray(value)) {
+            query = query.in(key, value);
+          } else {
+            query = query.eq(key, value);
+          }
         });
       }
       const { data, error } = await query

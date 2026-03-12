@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Non autorise" }, { status: 401 });
     }
 
-    const rl = rateLimit(user.id, "scrape-insights", {
+    const rl = await rateLimit(user.id, "scrape-insights", {
       limit: 3,
       windowSeconds: 60,
     });

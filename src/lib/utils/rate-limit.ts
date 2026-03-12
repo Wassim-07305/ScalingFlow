@@ -1,26 +1,9 @@
 /**
- * Simple in-memory rate limiter for API routes.
- * Limits requests per user within a sliding time window.
- * Note: resets on server restart and per-instance in serverless.
- * For production at scale, consider @upstash/ratelimit.
+ * Persistent rate limiter using Supabase.
+ * Survives server restarts and works across serverless instances.
  */
 
-interface RateLimitEntry {
-  count: number;
-  resetAt: number;
-}
-
-const store = new Map<string, RateLimitEntry>();
-
-// Clean up expired entries every 5 minutes
-setInterval(() => {
-  const now = Date.now();
-  for (const [key, entry] of store) {
-    if (now > entry.resetAt) {
-      store.delete(key);
-    }
-  }
-}, 5 * 60 * 1000);
+import { createClient } from "@/lib/supabase/server";
 
 interface RateLimitOptions {
   /** Max requests allowed in the window */
@@ -35,25 +18,65 @@ interface RateLimitResult {
   resetAt: number;
 }
 
-export function rateLimit(
+export async function rateLimit(
   userId: string,
   route: string,
   options: RateLimitOptions = {}
-): RateLimitResult {
+): Promise<RateLimitResult> {
   const { limit = 10, windowSeconds = 60 } = options;
   const key = `${userId}:${route}`;
-  const now = Date.now();
-  const entry = store.get(key);
+  const now = new Date();
 
-  if (!entry || now > entry.resetAt) {
-    store.set(key, { count: 1, resetAt: now + windowSeconds * 1000 });
-    return { allowed: true, remaining: limit - 1, resetAt: now + windowSeconds * 1000 };
+  try {
+    const supabase = await createClient();
+
+    // Try to get existing entry
+    const { data: entry } = await supabase
+      .from("rate_limits")
+      .select("id, count, reset_at")
+      .eq("key", key)
+      .single();
+
+    if (!entry || new Date(entry.reset_at) <= now) {
+      // No entry or expired — create/reset
+      const resetAt = new Date(now.getTime() + windowSeconds * 1000);
+
+      if (entry) {
+        await supabase
+          .from("rate_limits")
+          .update({ count: 1, reset_at: resetAt.toISOString() })
+          .eq("id", entry.id);
+      } else {
+        await supabase
+          .from("rate_limits")
+          .insert({ key, count: 1, reset_at: resetAt.toISOString() });
+      }
+
+      return { allowed: true, remaining: limit - 1, resetAt: resetAt.getTime() };
+    }
+
+    // Entry exists and is still valid
+    if (entry.count >= limit) {
+      return {
+        allowed: false,
+        remaining: 0,
+        resetAt: new Date(entry.reset_at).getTime(),
+      };
+    }
+
+    // Increment count
+    await supabase
+      .from("rate_limits")
+      .update({ count: entry.count + 1 })
+      .eq("id", entry.id);
+
+    return {
+      allowed: true,
+      remaining: limit - (entry.count + 1),
+      resetAt: new Date(entry.reset_at).getTime(),
+    };
+  } catch {
+    // If DB fails, allow the request (fail-open) to not block users
+    return { allowed: true, remaining: limit, resetAt: Date.now() + windowSeconds * 1000 };
   }
-
-  if (entry.count >= limit) {
-    return { allowed: false, remaining: 0, resetAt: entry.resetAt };
-  }
-
-  entry.count++;
-  return { allowed: true, remaining: limit - entry.count, resetAt: entry.resetAt };
 }

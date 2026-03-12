@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Non authentifie" }, { status: 401 });
     }
 
-    const rl = rateLimit(user.id, "generate-logo", { limit: 3, windowSeconds: 120 });
+    const rl = await rateLimit(user.id, "generate-logo", { limit: 3, windowSeconds: 120 });
     if (!rl.allowed) {
       return NextResponse.json(
         { error: "Trop de requetes. Reessaie dans 2 minutes." },

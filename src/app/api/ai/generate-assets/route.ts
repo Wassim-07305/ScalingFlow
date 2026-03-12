@@ -60,7 +60,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Rate limiting
-    const rl = rateLimit(user.id, "generate-assets", { limit: 5, windowSeconds: 60 });
+    const rl = await rateLimit(user.id, "generate-assets", { limit: 5, windowSeconds: 60 });
     if (!rl.allowed) {
       return NextResponse.json(
         { error: "Trop de requetes. Reessaie dans quelques secondes." },
@@ -267,8 +267,6 @@ export async function POST(req: NextRequest) {
     const DB_ASSET_TYPE_MAP: Record<string, string> = {
       setting_script: "sales_script",
       social_assets: "lead_magnet",
-      follower_ads: "lead_magnet",
-      dm_retargeting: "lead_magnet",
     };
     const dbAssetType = DB_ASSET_TYPE_MAP[assetType] || assetType;
     const { data: asset, error: saveError } = await supabase
