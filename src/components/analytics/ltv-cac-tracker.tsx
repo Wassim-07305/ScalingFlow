@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils/cn";
 import { useUser } from "@/hooks/use-user";
+import { createClient } from "@/lib/supabase/client";
 import {
   TrendingUp,
   DollarSign,
@@ -71,25 +72,42 @@ const DEMO_ENTRIES: LTVCACEntry[] = [
   { date: "2026-03", avgDealValue: 2497, monthlyChurnRate: 0.04, monthlyAdSpend: 5500, newCustomers: 18 },
 ];
 
-// ─── localStorage helpers ────────────────────────────────────
-function getStorageKey(userId: string) {
-  return `sf_analytics_ltv_cac_${userId}`;
+// ─── Supabase helpers ────────────────────────────────────────
+async function loadEntriesFromDB(userId: string): Promise<LTVCACEntry[]> {
+  const supabase = createClient();
+  const { data } = await supabase
+    .from("ltv_cac_entries")
+    .select("date, avg_deal_value, monthly_churn_rate, monthly_ad_spend, new_customers")
+    .eq("user_id", userId)
+    .order("date", { ascending: true });
+  if (!data || data.length === 0) return [];
+  return data.map((row) => ({
+    date: row.date,
+    avgDealValue: Number(row.avg_deal_value),
+    monthlyChurnRate: Number(row.monthly_churn_rate),
+    monthlyAdSpend: Number(row.monthly_ad_spend),
+    newCustomers: row.new_customers,
+  }));
 }
 
-function loadEntries(userId: string): LTVCACEntry[] {
-  if (typeof window === "undefined") return [];
-  try {
-    const raw = localStorage.getItem(getStorageKey(userId));
-    if (raw) return JSON.parse(raw) as LTVCACEntry[];
-  } catch {
-    // ignore
-  }
-  return [];
+async function upsertEntryToDB(userId: string, entry: LTVCACEntry) {
+  const supabase = createClient();
+  await supabase.from("ltv_cac_entries").upsert(
+    {
+      user_id: userId,
+      date: entry.date,
+      avg_deal_value: entry.avgDealValue,
+      monthly_churn_rate: entry.monthlyChurnRate,
+      monthly_ad_spend: entry.monthlyAdSpend,
+      new_customers: entry.newCustomers,
+    },
+    { onConflict: "user_id,date" }
+  );
 }
 
-function saveEntries(userId: string, entries: LTVCACEntry[]) {
-  if (typeof window === "undefined") return;
-  localStorage.setItem(getStorageKey(userId), JSON.stringify(entries));
+async function clearEntriesFromDB(userId: string) {
+  const supabase = createClient();
+  await supabase.from("ltv_cac_entries").delete().eq("user_id", userId);
 }
 
 // ─── Compute metrics ─────────────────────────────────────────
@@ -204,17 +222,18 @@ export function LTVCACTracker() {
 
   useEffect(() => {
     if (!user) return;
-    const stored = loadEntries(user.id);
-    if (stored.length > 0) {
-      setEntries(stored);
-      setIsDemo(false);
-    } else {
-      setEntries(DEMO_ENTRIES);
-      setIsDemo(true);
-    }
+    loadEntriesFromDB(user.id).then((rows) => {
+      if (rows.length > 0) {
+        setEntries(rows);
+        setIsDemo(false);
+      } else {
+        setEntries(DEMO_ENTRIES);
+        setIsDemo(true);
+      }
+    });
   }, [user]);
 
-  const handleSave = useCallback(() => {
+  const handleSave = useCallback(async () => {
     if (!user) return;
     const updated = isDemo
       ? [formData]
@@ -223,7 +242,7 @@ export function LTVCACTracker() {
         );
     setEntries(updated);
     setIsDemo(false);
-    saveEntries(user.id, updated);
+    await upsertEntryToDB(user.id, formData);
     setShowForm(false);
     toast.success("Donnees LTV/CAC enregistrees");
     setFormData({
@@ -235,9 +254,9 @@ export function LTVCACTracker() {
     });
   }, [user, entries, formData, isDemo]);
 
-  const handleClear = useCallback(() => {
+  const handleClear = useCallback(async () => {
     if (!user) return;
-    localStorage.removeItem(getStorageKey(user.id));
+    await clearEntriesFromDB(user.id);
     setEntries(DEMO_ENTRIES);
     setIsDemo(true);
     toast.success("Donnees reinitialisees");

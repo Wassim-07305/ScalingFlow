@@ -19,6 +19,7 @@ import {
   Target,
   ChevronDown,
   ChevronUp,
+  Upload,
 } from "lucide-react";
 
 interface ScoreSection {
@@ -70,6 +71,29 @@ export function CallAnalyzer() {
   const [transcript, setTranscript] = React.useState("");
   const [callType, setCallType] = React.useState("discovery");
   const [expandedSection, setExpandedSection] = React.useState<string | null>("discovery");
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.name.endsWith(".txt") && !file.name.endsWith(".srt") && !file.name.endsWith(".vtt")) {
+      toast.error("Format accepte : .txt, .srt, .vtt");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Fichier trop volumineux (max 5 Mo)");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      const text = reader.result as string;
+      setTranscript(text);
+      toast.success(`Fichier "${file.name}" charge (${text.length} caracteres)`);
+    };
+    reader.onerror = () => toast.error("Erreur de lecture du fichier");
+    reader.readAsText(file);
+    e.target.value = "";
+  };
 
   const handleAnalyze = async () => {
     if (transcript.trim().length < 50) {
@@ -141,13 +165,30 @@ export function CallAnalyzer() {
             </div>
 
             <div>
-              <label className="text-sm font-medium text-text-primary mb-2 block">
-                Transcript de l&apos;appel
-              </label>
+              <div className="flex items-center justify-between mb-2">
+                <label className="text-sm font-medium text-text-primary">
+                  Transcript de l&apos;appel
+                </label>
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-bg-tertiary text-text-secondary hover:text-text-primary transition-all"
+                >
+                  <Upload className="h-3.5 w-3.5" />
+                  Importer fichier
+                </button>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".txt,.srt,.vtt"
+                  onChange={handleFileUpload}
+                  className="hidden"
+                />
+              </div>
               <textarea
                 value={transcript}
                 onChange={(e) => setTranscript(e.target.value)}
-                placeholder={`Colle ici le transcript complet de ton appel de vente...\n\nVendeur : Bonjour, merci d'avoir pris le temps...\nProspect : Oui, j'ai vu votre publicité et...\n...`}
+                placeholder={`Colle ici le transcript ou importe un fichier (.txt, .srt, .vtt)...\n\nVendeur : Bonjour, merci d'avoir pris le temps...\nProspect : Oui, j'ai vu votre publicité et...\n...`}
                 rows={12}
                 className="w-full px-4 py-3 rounded-xl bg-bg-tertiary border border-border-default text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent resize-none text-sm"
               />

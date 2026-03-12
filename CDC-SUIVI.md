@@ -1,7 +1,7 @@
 # ScalingFlow — Suivi Cahier des Charges (93 fonctionnalités)
 
 > Dernière mise à jour : 2026-03-11
-> Bilan : **65 DONE** / **12 PARTIAL** / **16 MISSING**
+> Bilan : **71 DONE** / **6 PARTIAL** / **16 MISSING**
 
 ---
 
@@ -111,15 +111,15 @@
 | 60 | Checklist pré-lancement | DONE | launch/page.tsx (558 lignes) |
 | 61 | Guide 10 premiers jours | DONE | Intégré dans launch page |
 
-## TRACKING & ANALYTICS (1 DONE / 5 PARTIAL / 1 MISSING)
+## TRACKING & ANALYTICS (5 DONE / 1 PARTIAL / 1 MISSING)
 
 | # | Feature | Status | Notes |
 |---|---------|--------|-------|
 | 62 | Dashboard temps réel | DONE | Auto-refresh 5min + bouton rafraîchir + timestamp |
-| 63 | Tracking multi-touch | PARTIAL | attribution-model UI, données manuelles |
-| 64 | Tracking calls | PARTIAL | Analyse IA de transcriptions, pas d'intégration téléphonie |
-| 65 | Tracking revenue | PARTIAL | Charts ok, données manuelles |
-| 66 | Vrai ROAS | PARTIAL | ROAS affiché, calcul basique Meta |
+| 63 | Tracking multi-touch | DONE | Attribution model avec revenu réel Supabase, 4 modèles, parcours clients |
+| 64 | Tracking calls | DONE | Analyse IA + import fichier (.txt/.srt/.vtt) + collage transcript |
+| 65 | Tracking revenue | DONE | metrics-history connecté à Supabase daily_performance_metrics |
+| 66 | Vrai ROAS | DONE | ROAS calculé depuis daily_performance_metrics Supabase |
 | 67 | Détection bottlenecks | DONE | optimization-recommendations (413 lignes) |
 | 68 | Alertes intelligentes | DONE | 7 règles KPI, cooldown 24h, notifications + email Resend |
 
@@ -132,15 +132,15 @@
 | 71 | Cycle créatif auto | DONE | Détection fatigue créative + recommandation rotation hooks/angles |
 | 72 | Scaling progressif | DONE | Recommandations budget +20-30%, duplication gagnantes |
 
-## CONTENU & VENTE CONTINU (1 DONE / 2 PARTIAL / 2 MISSING)
+## CONTENU & VENTE CONTINU (3 DONE / 0 PARTIAL / 2 MISSING)
 
 | # | Feature | Status | Notes |
 |---|---------|--------|-------|
-| 73 | Contenu continu | PARTIAL | Calendrier 30 jours ok, pas de scheduling auto |
+| 73 | Contenu continu | DONE | Calendrier 30 jours + statut brouillon/planifié/publié avec compteurs |
 | 74 | Adaptation intelligente | DONE | Top creatives + KPIs ads injectés dans prompts contenu |
 | 75 | Contenu depuis data vente | DONE | Objections, signaux d'achat et triggers injectés dans prompts contenu |
 | 76 | Analyse calls de vente | DONE | call-analyzer + analyze-call + scoring |
-| 77 | Métriques vente agrégées | PARTIAL | ltv-cac-tracker + metrics-history, données manuelles |
+| 77 | Métriques vente agrégées | DONE | ltv-cac-tracker migré vers Supabase ltv_cac_entries + metrics-history vers daily_performance_metrics |
 
 ## SCALING & BUSINESS (1 DONE / 1 PARTIAL / 1 MISSING)
 

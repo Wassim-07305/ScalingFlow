@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { AILoading } from "@/components/shared/ai-loading";
-import { Sparkles, LayoutGrid, List, ChevronDown, ChevronUp } from "lucide-react";
+import { Sparkles, LayoutGrid, List, ChevronDown, ChevronUp, CheckCircle2, Clock, Circle } from "lucide-react";
 import { toast } from "sonner";
 import type { ContentStrategyResult } from "@/lib/ai/prompts/content-strategy";
 import { UpgradeWall } from "@/components/shared/upgrade-wall";
@@ -18,6 +18,20 @@ interface EditorialCalendarProps {
 }
 
 type CalendarItem = ContentStrategyResult["calendrier"][number];
+
+type ContentStatus = "draft" | "scheduled" | "published";
+
+const STATUS_CONFIG: Record<ContentStatus, { label: string; icon: typeof Circle; color: string }> = {
+  draft: { label: "Brouillon", icon: Circle, color: "text-text-muted" },
+  scheduled: { label: "Planifie", icon: Clock, color: "text-yellow-400" },
+  published: { label: "Publie", icon: CheckCircle2, color: "text-accent" },
+};
+
+const NEXT_STATUS: Record<ContentStatus, ContentStatus> = {
+  draft: "scheduled",
+  scheduled: "published",
+  published: "draft",
+};
 
 const PILIER_BADGE: Record<string, "default" | "blue" | "cyan" | "purple" | "yellow"> = {
   know: "blue",
@@ -41,6 +55,26 @@ export function EditorialCalendar({ className, initialData }: EditorialCalendarP
   const [expandedDay, setExpandedDay] = React.useState<number | null>(null);
   const [error, setError] = React.useState<string | null>(null);
   const [usageLimited, setUsageLimited] = React.useState<{currentUsage: number; limit: number} | null>(null);
+  const [statuses, setStatuses] = React.useState<Record<number, ContentStatus>>({});
+
+  const toggleStatus = (jour: number, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setStatuses((prev) => {
+      const current = prev[jour] || "draft";
+      return { ...prev, [jour]: NEXT_STATUS[current] };
+    });
+  };
+
+  const getStatus = (jour: number): ContentStatus => statuses[jour] || "draft";
+
+  const statusCounts = React.useMemo(() => {
+    const counts = { draft: 0, scheduled: 0, published: 0 };
+    items.forEach((item) => {
+      const s = statuses[item.jour] || "draft";
+      counts[s]++;
+    });
+    return counts;
+  }, [items, statuses]);
 
   React.useEffect(() => {
     if (initialData) {
@@ -139,21 +173,30 @@ export function EditorialCalendar({ className, initialData }: EditorialCalendarP
             </button>
           ))}
         </div>
-        <div className="flex gap-1">
-          <Button
-            variant={view === "grid" ? "default" : "ghost"}
-            size="icon"
-            onClick={() => setView("grid")}
-          >
-            <LayoutGrid className="h-4 w-4" />
-          </Button>
-          <Button
-            variant={view === "list" ? "default" : "ghost"}
-            size="icon"
-            onClick={() => setView("list")}
-          >
-            <List className="h-4 w-4" />
-          </Button>
+        <div className="flex items-center gap-3">
+          {items.length > 0 && (
+            <div className="flex items-center gap-2 text-xs text-text-muted">
+              <span className="flex items-center gap-1"><CheckCircle2 className="h-3 w-3 text-accent" />{statusCounts.published}</span>
+              <span className="flex items-center gap-1"><Clock className="h-3 w-3 text-yellow-400" />{statusCounts.scheduled}</span>
+              <span className="flex items-center gap-1"><Circle className="h-3 w-3 text-text-muted" />{statusCounts.draft}</span>
+            </div>
+          )}
+          <div className="flex gap-1">
+            <Button
+              variant={view === "grid" ? "default" : "ghost"}
+              size="icon"
+              onClick={() => setView("grid")}
+            >
+              <LayoutGrid className="h-4 w-4" />
+            </Button>
+            <Button
+              variant={view === "list" ? "default" : "ghost"}
+              size="icon"
+              onClick={() => setView("list")}
+            >
+              <List className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -171,7 +214,18 @@ export function EditorialCalendar({ className, initialData }: EditorialCalendarP
             >
               <CardContent className="p-3">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-bold text-text-primary">J{item.jour}</span>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-xs font-bold text-text-primary">J{item.jour}</span>
+                    <button
+                      onClick={(e) => toggleStatus(item.jour, e)}
+                      title={STATUS_CONFIG[getStatus(item.jour)].label}
+                      className="p-0.5 rounded hover:bg-bg-tertiary transition-colors"
+                    >
+                      {React.createElement(STATUS_CONFIG[getStatus(item.jour)].icon, {
+                        className: cn("h-3.5 w-3.5", STATUS_CONFIG[getStatus(item.jour)].color),
+                      })}
+                    </button>
+                  </div>
                   <Badge variant={PILIER_BADGE[item.pilier]} className="text-[10px] px-1.5 py-0">
                     {PILIER_LABEL[item.pilier]}
                   </Badge>
@@ -208,6 +262,15 @@ export function EditorialCalendar({ className, initialData }: EditorialCalendarP
                   <span className="text-sm font-bold text-text-primary w-8 shrink-0">
                     J{item.jour}
                   </span>
+                  <button
+                    onClick={(e) => toggleStatus(item.jour, e)}
+                    title={STATUS_CONFIG[getStatus(item.jour)].label}
+                    className="p-1 rounded hover:bg-bg-tertiary transition-colors shrink-0"
+                  >
+                    {React.createElement(STATUS_CONFIG[getStatus(item.jour)].icon, {
+                      className: cn("h-4 w-4", STATUS_CONFIG[getStatus(item.jour)].color),
+                    })}
+                  </button>
                   <Badge
                     variant={PILIER_BADGE[item.pilier]}
                     className="shrink-0"

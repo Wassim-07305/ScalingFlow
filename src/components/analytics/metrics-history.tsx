@@ -5,6 +5,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils/cn";
 import { useUser } from "@/hooks/use-user";
+import { createClient } from "@/lib/supabase/client";
 import {
   Calendar,
   TrendingUp,
@@ -58,15 +59,24 @@ function fmtNumber(n: number): string {
   return new Intl.NumberFormat("fr-FR").format(Math.round(n));
 }
 
-function loadMetrics(userId: string): DailyMetric[] {
-  if (typeof window === "undefined") return [];
-  try {
-    const raw = localStorage.getItem(`sf_analytics_metrics_${userId}`);
-    if (raw) return JSON.parse(raw) as DailyMetric[];
-  } catch {
-    // ignore
-  }
-  return [];
+async function loadMetricsFromDB(userId: string): Promise<DailyMetric[]> {
+  const supabase = createClient();
+  const { data } = await supabase
+    .from("daily_performance_metrics")
+    .select("date, spend, impressions, clicks, leads, calls, clients, revenue")
+    .eq("user_id", userId)
+    .order("date", { ascending: true });
+  if (!data || data.length === 0) return [];
+  return data.map((row) => ({
+    date: typeof row.date === "string" ? row.date : new Date(row.date).toISOString().split("T")[0],
+    spend: Number(row.spend),
+    impressions: row.impressions,
+    clicks: row.clicks,
+    leads: row.leads,
+    calls: row.calls,
+    clients: row.clients,
+    revenue: Number(row.revenue),
+  }));
 }
 
 // ─── Main component ──────────────────────────────────────────
@@ -77,14 +87,15 @@ export function MetricsHistory() {
 
   useEffect(() => {
     if (!user) return;
-    const stored = loadMetrics(user.id);
-    if (stored.length > 0) {
-      setMetrics(stored);
-      setIsDemo(false);
-    } else {
-      setMetrics(DEMO_DATA);
-      setIsDemo(true);
-    }
+    loadMetricsFromDB(user.id).then((rows) => {
+      if (rows.length > 0) {
+        setMetrics(rows);
+        setIsDemo(false);
+      } else {
+        setMetrics(DEMO_DATA);
+        setIsDemo(true);
+      }
+    });
   }, [user]);
 
   // Calculate derived metrics for each day

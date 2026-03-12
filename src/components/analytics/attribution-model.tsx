@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -11,6 +11,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils/cn";
+import { useUser } from "@/hooks/use-user";
+import { createClient } from "@/lib/supabase/client";
 import {
   BarChart,
   Bar,
@@ -94,17 +96,38 @@ const DEMO_JOURNEYS = [
 
 // ─── Main component ──────────────────────────────────────────
 export function AttributionModel() {
+  const { user } = useUser();
   const [model, setModel] = useState<AttributionModel>("linear");
+  const [totalRevenue, setTotalRevenue] = useState<number>(DEMO_REVENUE);
+  const [isDemo, setIsDemo] = useState(true);
+
+  useEffect(() => {
+    if (!user) return;
+    const supabase = createClient();
+    supabase
+      .from("daily_performance_metrics")
+      .select("revenue")
+      .eq("user_id", user.id)
+      .then(({ data }) => {
+        if (data && data.length > 0) {
+          const total = data.reduce((sum, row) => sum + Number(row.revenue), 0);
+          if (total > 0) {
+            setTotalRevenue(total);
+            setIsDemo(false);
+          }
+        }
+      });
+  }, [user]);
 
   // ─── Computed data ───────────────────────────────────────────
   const chartData = useMemo(() => {
     return DEMO_CHANNELS.map((ch) => ({
       name: ch.name,
       pourcentage: ch[model],
-      revenu: Math.round((ch[model] / 100) * DEMO_REVENUE),
+      revenu: Math.round((ch[model] / 100) * totalRevenue),
       color: ch.color,
     })).sort((a, b) => b.pourcentage - a.pourcentage);
-  }, [model]);
+  }, [model, totalRevenue]);
 
   const totalPct = chartData.reduce((s, d) => s + d.pourcentage, 0);
 
@@ -120,10 +143,14 @@ export function AttributionModel() {
               </h3>
               <p className="text-xs text-text-secondary">
                 Comprenez comment chaque canal contribue a vos conversions selon differents modeles
-                d&apos;attribution. Les donnees affichees sont des donnees de demonstration.
+                d&apos;attribution.{isDemo ? " Les repartitions par canal sont estimees." : " Le revenu total est base sur vos donnees reelles."}
               </p>
             </div>
-            <Badge variant="yellow">Donnees de demo</Badge>
+            {isDemo ? (
+              <Badge variant="yellow">Donnees de demo</Badge>
+            ) : (
+              <Badge variant="default">Revenu reel</Badge>
+            )}
           </div>
         </CardContent>
       </Card>
