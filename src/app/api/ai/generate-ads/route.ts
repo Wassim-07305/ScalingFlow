@@ -133,7 +133,7 @@ export async function POST(req: NextRequest) {
       for (const script of result.scripts || []) {
         const { error: insertErr } = await supabase.from("ad_creatives").insert({
           user_id: user.id,
-          creative_type: "video",
+          creative_type: "video_script",
           ad_copy: script.corps,
           headline: `Video Ad ${script.duree}`,
           hook: script.hook,
@@ -164,7 +164,7 @@ export async function POST(req: NextRequest) {
         const seq = result.prospection[i];
         const { error: insertErr } = await supabase.from("ad_creatives").insert({
           user_id: user.id,
-          creative_type: "dm",
+          creative_type: "dm_script",
           ad_copy: `Opener: ${seq.opener}\n\nFollow-up 1: ${seq.follow_up_1}\n\nFollow-up 2: ${seq.follow_up_2}\n\nClosing: ${seq.closing}`,
           headline: `Sequence DM #${i + 1}`,
           hook: seq.opener,

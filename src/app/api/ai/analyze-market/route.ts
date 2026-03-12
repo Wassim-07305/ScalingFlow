@@ -68,6 +68,8 @@ export async function POST(req: NextRequest) {
           target_avatar: market.avatar,
           ai_raw_response: market,
           selected: i === result.recommended_market_index,
+          country: body.country || null,
+          language: body.language || null,
         });
       } catch (insertErr) {
         console.error(`[analyze-market] Failed to save market ${i} (${market.name}):`, insertErr);

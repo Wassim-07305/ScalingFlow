@@ -49,11 +49,8 @@ export default function AdsPage() {
       const typeMap: Record<string, string> = {
         image: "creatives",
         carousel: "creatives",
-        video: "video_ads",
         video_script: "video_ads",
-        video_ad: "video_ads",
-        dm: "dm_scripts",
-        dm_scripts: "dm_scripts",
+        dm_script: "dm_scripts",
       };
       const tabKey = typeMap[data.creative_type] || "creatives";
       setLoadedData((prev) => ({ ...prev, [tabKey]: parsed }));
