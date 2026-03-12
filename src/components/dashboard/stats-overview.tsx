@@ -218,7 +218,7 @@ export function StatsOverview() {
           <div
             key={stat.label}
             className={cn(
-              "group relative overflow-hidden rounded-xl border border-border-default bg-bg-secondary p-4 cursor-pointer transition-all duration-300",
+              "group relative overflow-hidden rounded-xl border border-border-default bg-bg-secondary p-3 sm:p-4 cursor-pointer transition-all duration-300",
               "hover:border-transparent hover:translate-y-[-2px]",
               colors.glow
             )}
@@ -230,9 +230,9 @@ export function StatsOverview() {
               colors.gradient
             )} />
 
-            <div className="relative flex items-start justify-between">
-              <div>
-                <p className="text-sm text-text-secondary font-medium">{stat.label}</p>
+            <div className="relative flex items-start justify-between gap-2">
+              <div className="min-w-0">
+                <p className="text-xs sm:text-sm text-text-secondary font-medium truncate">{stat.label}</p>
                 <div className="mt-1.5 text-lg sm:text-2xl font-bold text-text-primary">
                   {isLoading ? (
                     <span className="inline-block h-7 w-14 animate-pulse rounded bg-white/10" />
@@ -247,12 +247,12 @@ export function StatsOverview() {
               </div>
               <div
                 className={cn(
-                  "flex h-10 w-10 items-center justify-center rounded-xl transition-all duration-300",
+                  "flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-lg sm:rounded-xl transition-all duration-300 shrink-0",
                   colors.bg,
                   "group-hover:scale-110"
                 )}
               >
-                <stat.icon className={cn("h-5 w-5", colors.icon)} />
+                <stat.icon className={cn("h-4 w-4 sm:h-5 sm:w-5", colors.icon)} />
               </div>
             </div>
 

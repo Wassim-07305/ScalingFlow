@@ -90,7 +90,7 @@ export function AppShell({
           />
 
           {/* Content */}
-          <main className="flex-1 overflow-y-auto p-5 pb-20 md:p-8 md:pb-8">
+          <main className="flex-1 overflow-y-auto p-3 pb-20 sm:p-5 sm:pb-20 md:p-8 md:pb-8">
             <div className="mx-auto max-w-[1400px]">{children}</div>
           </main>
         </div>

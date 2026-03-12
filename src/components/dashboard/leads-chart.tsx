@@ -98,7 +98,7 @@ export function LeadsChart() {
         <CardTitle>Créations par semaine</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="h-[300px]">
+        <div className="h-[220px] sm:h-[300px]">
           {isLoading ? (
             <div className="flex h-full items-center justify-center">
               <div className="h-8 w-8 animate-spin rounded-full border-2 border-accent border-t-transparent" />

@@ -71,10 +71,10 @@ export function WelcomeBanner() {
       <div className="absolute top-0 right-0 w-[300px] h-[200px] bg-accent/8 rounded-full blur-[100px] pointer-events-none" />
       <div className="absolute bottom-0 left-0 w-[200px] h-[150px] bg-teal-500/5 rounded-full blur-[80px] pointer-events-none" />
 
-      <div className="relative px-6 py-5">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="relative px-4 py-4 sm:px-6 sm:py-5">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
           <div className="space-y-2">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
               {isLoading ? (
                 <span className="inline-block h-7 w-48 animate-pulse rounded-lg bg-white/10" />
               ) : (
@@ -119,7 +119,7 @@ export function WelcomeBanner() {
                   )}
                 </div>
                 {/* Usage progress bar */}
-                <div className="w-48 h-1.5 bg-bg-tertiary rounded-full overflow-hidden">
+                <div className="w-32 sm:w-48 h-1.5 bg-bg-tertiary rounded-full overflow-hidden">
                   <motion.div
                     className={cn(
                       "h-full rounded-full",

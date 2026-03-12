@@ -11,10 +11,10 @@ interface PageHeaderProps {
 export function PageHeader({ title, description, children, actions, badge }: PageHeaderProps) {
   const rightContent = children || actions;
   return (
-    <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between mb-8">
+    <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between mb-6 sm:mb-8">
       <div className="space-y-1">
-        <div className="flex items-center gap-3">
-          <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-text-primary to-text-primary/70 bg-clip-text">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight bg-gradient-to-r from-text-primary to-text-primary/70 bg-clip-text">
             {title}
           </h1>
           {badge && (

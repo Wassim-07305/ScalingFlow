@@ -21,7 +21,7 @@ export default function DashboardPage() {
         description="Vue d'ensemble de ton business."
       />
 
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6">
         {/* Welcome Banner (name, plan, usage) */}
         <WelcomeBanner />
 
@@ -32,7 +32,7 @@ export default function DashboardPage() {
         <ProgressBar />
 
         {/* Pipeline + Tasks */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
           <BusinessPipeline />
           <NextTasks />
         </div>
@@ -47,7 +47,7 @@ export default function DashboardPage() {
         <ActivityFeed />
 
         {/* Charts Row */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
           <RevenueChart />
           <LeadsChart />
         </div>

@@ -132,7 +132,7 @@ export function QuickActions() {
                     </span>
                     <ArrowRight className="h-3.5 w-3.5 text-text-muted opacity-0 -translate-x-1 transition-all duration-200 group-hover:opacity-100 group-hover:translate-x-0" />
                   </div>
-                  <p className="text-xs text-text-muted mt-0.5 line-clamp-1">
+                  <p className="text-xs text-text-muted mt-0.5 line-clamp-2 sm:line-clamp-1">
                     {action.description}
                   </p>
                 </div>
