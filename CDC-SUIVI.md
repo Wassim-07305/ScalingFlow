@@ -1,7 +1,7 @@
 # ScalingFlow — Suivi Cahier des Charges (93 fonctionnalités)
 
 > Dernière mise à jour : 2026-03-12
-> Bilan : **75 DONE** / **4 PARTIAL** / **14 MISSING**
+> Bilan : **85 DONE** / **4 PARTIAL** / **4 MISSING**
 
 ---
 
@@ -68,7 +68,7 @@
 | 32 | Générateur de carousels | DONE | carousel-generator + prompt |
 | 33 | Plan éditorial automatisé | DONE | editorial-calendar + content-calendar + API |
 
-## SALES ASSETS (8 DONE / 1 MISSING)
+## SALES ASSETS (9/9 DONE)
 
 | # | Feature | Status | Notes |
 |---|---------|--------|-------|
@@ -82,7 +82,7 @@
 | 41 | Générateur lead magnets | DONE | generate-assets type lead_magnet |
 | 42 | Générateur social assets | DONE | social-assets-generator + prompt, onglet dans assets page |
 
-## CRÉATIVES & ADS (5 DONE / 0 PARTIAL / 4 MISSING)
+## CRÉATIVES & ADS (9/9 DONE)
 
 | # | Feature | Status | Notes |
 |---|---------|--------|-------|
@@ -96,7 +96,7 @@
 | 50 | DM Ads retargeting | DONE | dm-retargeting-generator + prompt + automation DM + audiences |
 | 51 | Scripts setting DM | DONE | dm-script-generator + dm-scripts (prospection) |
 
-## INTÉGRATIONS & LANCEMENT (3 DONE / 3 PARTIAL / 4 MISSING)
+## INTÉGRATIONS & LANCEMENT (4 DONE / 3 PARTIAL / 3 MISSING)
 
 | # | Feature | Status | Notes |
 |---|---------|--------|-------|
@@ -111,7 +111,7 @@
 | 60 | Checklist pré-lancement | DONE | launch/page.tsx (558 lignes) |
 | 61 | Guide 10 premiers jours | DONE | Intégré dans launch page |
 
-## TRACKING & ANALYTICS (5 DONE / 1 PARTIAL / 1 MISSING)
+## TRACKING & ANALYTICS (7/7 DONE)
 
 | # | Feature | Status | Notes |
 |---|---------|--------|-------|
@@ -132,7 +132,7 @@
 | 71 | Cycle créatif auto | DONE | Détection fatigue créative + recommandation rotation hooks/angles |
 | 72 | Scaling progressif | DONE | Recommandations budget +20-30%, duplication gagnantes |
 
-## CONTENU & VENTE CONTINU (3 DONE / 0 PARTIAL / 2 MISSING)
+## CONTENU & VENTE CONTINU (5/5 DONE)
 
 | # | Feature | Status | Notes |
 |---|---------|--------|-------|
@@ -142,7 +142,7 @@
 | 76 | Analyse calls de vente | DONE | call-analyzer + analyze-call + scoring |
 | 77 | Métriques vente agrégées | DONE | ltv-cac-tracker migré vers Supabase ltv_cac_entries + metrics-history vers daily_performance_metrics |
 
-## SCALING & BUSINESS (1 DONE / 1 PARTIAL / 1 MISSING)
+## SCALING & BUSINESS (2 DONE / 0 PARTIAL / 1 MISSING)
 
 | # | Feature | Status | Notes |
 |---|---------|--------|-------|
@@ -170,30 +170,15 @@
 
 ---
 
-## Résumé par priorité
+## Résumé des 8 features restantes
 
-### Quick wins
-- [x] #42 Social assets — DONE
-- [x] #49 Follower Ads — DONE
-- [x] #50 DM Ads retargeting — DONE
-- [x] #68 Alertes intelligentes (notifications sur seuils KPI + email) — DONE
-- [x] #74 Adaptation intelligente (connecter analytics → contenu) — DONE
-- [x] #75 Contenu depuis data vente (connecter calls → contenu) — DONE
+### PARTIAL (4) — Fonctionnent partiellement
+- [~] #9 Analyse concurrentielle — Analyse IA ok, pas de scraping Meta Ad Library/IG/YT
+- [~] #52 Connect GHL — Webhook inbound leads ok, pas d'OAuth GHL complet
+- [~] #53 Connect Meta Ads — Sync manuelle via token, pas OAuth
+- [~] #55 Connect Stripe/Whop — Stripe plateforme ok, pas pour le business de l'user
 
-### Complexité moyenne
-- [x] #20 Logo complet (Replicate Flux pour génération d'images) — DONE
-- [x] #46 Images ads (Replicate Flux dans creative-generator) — DONE
-- [x] #6 Scraper d'insights (IA-powered, insights-scraper) — DONE
-- [x] #57 Deploy Funnel (export HTML standalone) — DONE
-- [x] #70 Décisions automatiques ads — DONE
-- [x] #71 Cycle créatif auto — DONE
-- [x] #72 Scaling progressif — DONE
-
-### Intégrations lourdes
-- [~] #52 Connect GHL (webhook inbound leads ok, pas OAuth complet)
-- [ ] #53 Connect Meta Ads complet (OAuth flow)
-- [ ] #54 Install Pixel + CAPI
-- [ ] #55 Connect Stripe pour business user
+### MISSING (4) — Intégrations lourdes nécessitant APIs tierces
 - [ ] #56 Connect Socials (OAuth IG/YT/LinkedIn)
 - [ ] #58 Config audiences Meta (API write)
 - [ ] #59 Launch Ads automatique (API write)
