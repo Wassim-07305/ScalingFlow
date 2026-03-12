@@ -7,6 +7,7 @@ import { PersonaDisplay } from "@/components/market/persona-display";
 import { CompetitorGrid } from "@/components/market/competitor-grid";
 import { PainIdentifier } from "@/components/market/pain-identifier";
 import { SchwartzDisplay } from "@/components/market/schwartz-display";
+import { InsightsScraper } from "@/components/market/insights-scraper";
 import { cn } from "@/lib/utils/cn";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -33,6 +34,7 @@ import {
   Target,
   AlertTriangle,
   Gauge,
+  Search,
 } from "lucide-react";
 
 type MarketAnalysis = Database["public"]["Tables"]["market_analyses"]["Row"];
@@ -40,6 +42,7 @@ type Competitor = Database["public"]["Tables"]["competitors"]["Row"];
 
 const TABS = [
   { key: "analyse", label: "Analyse", icon: BarChart3 },
+  { key: "insights", label: "Insights", icon: Search },
   { key: "schwartz", label: "Schwartz", icon: Gauge },
   { key: "persona", label: "Persona", icon: User },
   { key: "pains", label: "Pains", icon: Flame },
@@ -447,6 +450,15 @@ export default function MarketPage() {
             </Card>
           )}
         </div>
+      )}
+
+      {/* TAB: Insights Scraper */}
+      {activeTab === "insights" && (
+        <InsightsScraper
+          marketName={selectedAnalysis?.market_name || ""}
+          targetAvatar={selectedAnalysis?.target_avatar as string || undefined}
+          existingPains={(selectedAnalysis?.problems as string[]) || undefined}
+        />
       )}
 
       {/* TAB: Pains */}

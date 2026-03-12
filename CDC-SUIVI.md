@@ -1,7 +1,7 @@
 # ScalingFlow — Suivi Cahier des Charges (93 fonctionnalités)
 
 > Dernière mise à jour : 2026-03-12
-> Bilan : **72 DONE** / **6 PARTIAL** / **15 MISSING**
+> Bilan : **73 DONE** / **6 PARTIAL** / **14 MISSING**
 
 ---
 
@@ -14,12 +14,12 @@
 | 3 | Sélection de parcours | DONE | Parcours selector intégré à l'onboarding |
 | 4 | Upload de ressources | DONE | PDF/text/csv, extraction texte, Supabase Storage |
 
-## RECHERCHE MARCHÉ & AVATAR (4 DONE / 1 PARTIAL / 1 MISSING)
+## RECHERCHE MARCHÉ & AVATAR (5 DONE / 1 PARTIAL / 0 MISSING)
 
 | # | Feature | Status | Notes |
 |---|---------|--------|-------|
 | 5 | Exploration de marché | DONE | Page market 5 onglets, API analyze-market |
-| 6 | Scraper d'insights | MISSING | Aucun scraping réel (Reddit, forums, YouTube, reviews) |
+| 6 | Scraper d'insights | DONE | insights-scraper IA (Reddit, forums, YouTube, reviews simulés) + API scrape-insights |
 | 7 | ICP Pro Max (avatar) | DONE | generate-persona + prompt persona-forge |
 | 8 | Analyse sophistication Schwartz | DONE | analyze-schwartz + schwartz-display |
 | 9 | Analyse concurrentielle | PARTIAL | Analyse IA ok, pas de scraping Meta Ad Library/IG/YT |
@@ -96,11 +96,11 @@
 | 50 | DM Ads retargeting | DONE | dm-retargeting-generator + prompt + automation DM + audiences |
 | 51 | Scripts setting DM | DONE | dm-script-generator + dm-scripts (prospection) |
 
-## INTÉGRATIONS & LANCEMENT (3 DONE / 2 PARTIAL / 5 MISSING)
+## INTÉGRATIONS & LANCEMENT (3 DONE / 3 PARTIAL / 4 MISSING)
 
 | # | Feature | Status | Notes |
 |---|---------|--------|-------|
-| 52 | Connect GHL | MISSING | Aucune intégration GoHighLevel |
+| 52 | Connect GHL | PARTIAL | Webhook inbound leads (x-api-key auth), pas d'OAuth GHL complet |
 | 53 | Connect Meta Ads | PARTIAL | Sync manuelle via token, pas OAuth |
 | 54 | Install Pixel + CAPI | DONE | Generateur de code Pixel + CAPI avec config, events, checklist dans launch/pixel |
 | 55 | Connect Stripe / Whop | PARTIAL | Stripe plateforme ok, pas pour le business de l'user |
@@ -183,14 +183,14 @@
 ### Complexité moyenne
 - [x] #20 Logo complet (Replicate Flux pour génération d'images) — DONE
 - [x] #46 Images ads (Replicate Flux dans creative-generator) — DONE
-- [ ] #6 Scraper d'insights (Reddit API, YouTube Data API)
+- [x] #6 Scraper d'insights (IA-powered, insights-scraper) — DONE
 - [x] #57 Deploy Funnel (export HTML standalone) — DONE
 - [x] #70 Décisions automatiques ads — DONE
 - [x] #71 Cycle créatif auto — DONE
 - [x] #72 Scaling progressif — DONE
 
 ### Intégrations lourdes
-- [ ] #52 Connect GHL (OAuth + webhooks GoHighLevel)
+- [~] #52 Connect GHL (webhook inbound leads ok, pas OAuth complet)
 - [ ] #53 Connect Meta Ads complet (OAuth flow)
 - [ ] #54 Install Pixel + CAPI
 - [ ] #55 Connect Stripe pour business user
