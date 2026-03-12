@@ -604,12 +604,16 @@ function IntegrationsCard() {
   const supabase = createClient();
   const [metaToken, setMetaToken] = useState("");
   const [metaAdAccountId, setMetaAdAccountId] = useState("");
+  const [ghlWebhookUrl, setGhlWebhookUrl] = useState("");
+  const [stripeAccountId, setStripeAccountId] = useState("");
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (profile) {
       setMetaToken(profile.meta_access_token || "");
       setMetaAdAccountId(profile.meta_ad_account_id || "");
+      setGhlWebhookUrl(profile.ghl_webhook_url || "");
+      setStripeAccountId(profile.stripe_connect_account_id || "");
     }
   }, [profile]);
 
@@ -622,6 +626,8 @@ function IntegrationsCard() {
         .update({
           meta_access_token: metaToken.trim() || null,
           meta_ad_account_id: metaAdAccountId.trim() || null,
+          ghl_webhook_url: ghlWebhookUrl.trim() || null,
+          stripe_connect_account_id: stripeAccountId.trim() || null,
         })
         .eq("id", user.id);
 
@@ -634,9 +640,15 @@ function IntegrationsCard() {
     }
   };
 
+  // Compute webhook URL for GHL inbound leads
+  const appUrl = typeof window !== "undefined" ? window.location.origin : "";
+  const ghlInboundUrl = `${appUrl}/api/webhooks/leads`;
+
   const hasChanged =
     metaToken !== (profile?.meta_access_token || "") ||
-    metaAdAccountId !== (profile?.meta_ad_account_id || "");
+    metaAdAccountId !== (profile?.meta_ad_account_id || "") ||
+    ghlWebhookUrl !== (profile?.ghl_webhook_url || "") ||
+    stripeAccountId !== (profile?.stripe_connect_account_id || "");
 
   return (
     <Card>
@@ -646,34 +658,106 @@ function IntegrationsCard() {
           Integrations
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div>
-          <Label>Token Meta Ads</Label>
-          <Input
-            type="password"
-            value={metaToken}
-            onChange={(e) => setMetaToken(e.target.value)}
-            placeholder="EAAxxxxxxx..."
-          />
-          <p className="text-xs text-text-muted mt-1">
-            Connecte ton compte Meta pour synchroniser tes campagnes.
-          </p>
+      <CardContent className="space-y-6">
+        {/* Meta Ads */}
+        <div className="space-y-3">
+          <h4 className="text-sm font-semibold text-text-primary flex items-center gap-2">
+            <Badge variant="blue" className="text-xs">Meta Ads</Badge>
+          </h4>
+          <div>
+            <Label>Token Meta Ads</Label>
+            <Input
+              type="password"
+              value={metaToken}
+              onChange={(e) => setMetaToken(e.target.value)}
+              placeholder="EAAxxxxxxx..."
+            />
+            <p className="text-xs text-text-muted mt-1">
+              Connecte ton compte Meta pour synchroniser tes campagnes. Genere un token depuis le Meta Business Manager.
+            </p>
+          </div>
+          <div>
+            <Label>ID compte publicitaire Meta</Label>
+            <Input
+              value={metaAdAccountId}
+              onChange={(e) => setMetaAdAccountId(e.target.value)}
+              placeholder="act_123456789"
+            />
+          </div>
         </div>
-        <div>
-          <Label>ID compte publicitaire Meta</Label>
-          <Input
-            value={metaAdAccountId}
-            onChange={(e) => setMetaAdAccountId(e.target.value)}
-            placeholder="act_123456789"
-          />
+
+        <Separator />
+
+        {/* GoHighLevel */}
+        <div className="space-y-3">
+          <h4 className="text-sm font-semibold text-text-primary flex items-center gap-2">
+            <Badge variant="cyan" className="text-xs">GoHighLevel</Badge>
+          </h4>
+          <div>
+            <Label>URL Webhook sortant GHL</Label>
+            <Input
+              value={ghlWebhookUrl}
+              onChange={(e) => setGhlWebhookUrl(e.target.value)}
+              placeholder="https://rest.gohighlevel.com/v1/..."
+            />
+            <p className="text-xs text-text-muted mt-1">
+              URL du webhook GHL pour envoyer tes leads et contacts automatiquement.
+            </p>
+          </div>
+          <div>
+            <Label>URL Webhook entrant (pour GHL)</Label>
+            <div className="flex gap-2">
+              <Input
+                value={ghlInboundUrl}
+                readOnly
+                className="text-xs font-mono bg-bg-tertiary"
+              />
+              <Button
+                variant="outline"
+                size="sm"
+                className="shrink-0"
+                onClick={() => {
+                  navigator.clipboard.writeText(ghlInboundUrl);
+                  toast.success("URL copiee !");
+                }}
+              >
+                Copier
+              </Button>
+            </div>
+            <p className="text-xs text-text-muted mt-1">
+              Configure cette URL dans GHL (Workflows &gt; Webhook) pour recevoir les leads entrants dans ScalingFlow.
+            </p>
+          </div>
         </div>
+
+        <Separator />
+
+        {/* Stripe Connect */}
+        <div className="space-y-3">
+          <h4 className="text-sm font-semibold text-text-primary flex items-center gap-2">
+            <Badge variant="default" className="text-xs">Stripe</Badge>
+          </h4>
+          <div>
+            <Label>ID compte Stripe Connect</Label>
+            <Input
+              value={stripeAccountId}
+              onChange={(e) => setStripeAccountId(e.target.value)}
+              placeholder="acct_1xxxxxx"
+            />
+            <p className="text-xs text-text-muted mt-1">
+              Connecte ton compte Stripe pour suivre ton revenu reel et tes transactions.
+              Trouve ton ID dans Stripe Dashboard &gt; Parametres &gt; Informations du compte.
+            </p>
+          </div>
+        </div>
+
         <Button
           size="sm"
           onClick={handleSave}
           disabled={saving || !hasChanged}
         >
           {saving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-          Sauvegarder
+          Sauvegarder les integrations
         </Button>
       </CardContent>
     </Card>

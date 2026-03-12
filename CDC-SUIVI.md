@@ -1,7 +1,7 @@
 # ScalingFlow — Suivi Cahier des Charges (93 fonctionnalités)
 
 > Dernière mise à jour : 2026-03-12
-> Bilan : **85 DONE** / **4 PARTIAL** / **4 MISSING**
+> Bilan : **86 DONE** / **3 PARTIAL** / **4 MISSING** (+ 7 features enrichies conformité CDC)
 
 ---
 
@@ -10,19 +10,19 @@
 | # | Feature | Status | Notes |
 |---|---------|--------|-------|
 | 1 | Onboarding guidé | DONE | Wizard multi-étapes, 50+ champs, store Zustand |
-| 2 | Vault de compétences | DONE | Skill map, extraction, avantage concurrentiel, documents |
+| 2 | Vault de compétences | DONE | Skill map radar + **mindmap SVG interactive** (survol = détail skills), extraction, avantage concurrentiel, documents |
 | 3 | Sélection de parcours | DONE | Parcours selector intégré à l'onboarding |
 | 4 | Upload de ressources | DONE | PDF/text/csv, extraction texte, Supabase Storage |
 
-## RECHERCHE MARCHÉ & AVATAR (5 DONE / 1 PARTIAL / 0 MISSING)
+## RECHERCHE MARCHÉ & AVATAR (6/6 DONE)
 
 | # | Feature | Status | Notes |
 |---|---------|--------|-------|
-| 5 | Exploration de marché | DONE | Page market 5 onglets, API analyze-market |
+| 5 | Exploration de marché | DONE | Page market 5 onglets, API analyze-market, **scoring composite 3 dimensions** (attractivité/concurrence/potentiel) + **estimation budget client** |
 | 6 | Scraper d'insights | DONE | insights-scraper IA (Reddit, forums, YouTube, reviews simulés) + API scrape-insights |
-| 7 | ICP Pro Max (avatar) | DONE | generate-persona + prompt persona-forge |
+| 7 | ICP Pro Max (avatar) | DONE | generate-persona + prompt persona-forge, **bio fictive ultra-détaillée + journée type + canaux médias consommés + export PDF persona card** |
 | 8 | Analyse sophistication Schwartz | DONE | analyze-schwartz + schwartz-display |
-| 9 | Analyse concurrentielle | PARTIAL | Analyse IA ok, pas de scraping Meta Ad Library/IG/YT |
+| 9 | Analyse concurrentielle | DONE | Analyse IA enrichie : insights pub (Meta/IG/YT/TikTok), contenu organique, benchmarks sectoriels, funnels, CA estimé |
 | 10 | Audit business existant | DONE | Vault extraction + competitive advantage |
 
 ## CRÉATION D'OFFRE (7/7 DONE)
@@ -43,7 +43,7 @@
 |---|---------|--------|-------|
 | 18 | Générateur de nom | DONE | generate-brand + name-generator |
 | 19 | Générateur de DA | DONE | Palette, typos, style visuel, moodboard |
-| 20 | Générateur de logo | DONE | Concept texte + génération d'images via Replicate Flux (4 variations) |
+| 20 | Générateur de logo | DONE | Concept texte + **3 variations typées (principal, icône, monochrome) en PNG** via Replicate Flux |
 | 21 | Kit de marque | DONE | Mission, vision, valeurs, ton, do/don't |
 
 ## FUNNEL VSL (5/5 DONE)
@@ -54,7 +54,7 @@
 | 23 | Générateur page VSL | DONE | funnel-builder, type VSL |
 | 24 | Générateur script VSL | DONE | generate-assets type vsl_script |
 | 25 | Page remerciements + OTO | DONE | Funnel thankyou + oto-generator |
-| 26 | A/B Testing setup | DONE | ab-test-manager (702 lignes) |
+| 26 | A/B Testing setup | DONE | ab-test-manager, **auto-déclaration gagnant quand 100+ visites/variante + confiance ≥90%** |
 
 ## FUNNEL SOCIAL (7/7 DONE)
 
@@ -96,14 +96,14 @@
 | 50 | DM Ads retargeting | DONE | dm-retargeting-generator + prompt + automation DM + audiences |
 | 51 | Scripts setting DM | DONE | dm-script-generator + dm-scripts (prospection) |
 
-## INTÉGRATIONS & LANCEMENT (4 DONE / 3 PARTIAL / 3 MISSING)
+## INTÉGRATIONS & LANCEMENT (4 DONE / 3 PARTIAL / 3 MISSING — Settings UI ajoutée pour GHL/Meta/Stripe)
 
 | # | Feature | Status | Notes |
 |---|---------|--------|-------|
-| 52 | Connect GHL | PARTIAL | Webhook inbound leads (x-api-key auth), pas d'OAuth GHL complet |
-| 53 | Connect Meta Ads | PARTIAL | Sync manuelle via token, pas OAuth |
+| 52 | Connect GHL | PARTIAL | Webhook inbound leads + Settings UI (webhook sortant + URL entrant copiable). Pas d'OAuth complet |
+| 53 | Connect Meta Ads | PARTIAL | Token + Ad Account ID configurables dans Settings. Pas OAuth |
 | 54 | Install Pixel + CAPI | DONE | Generateur de code Pixel + CAPI avec config, events, checklist dans launch/pixel |
-| 55 | Connect Stripe / Whop | PARTIAL | Stripe plateforme ok, pas pour le business de l'user |
+| 55 | Connect Stripe / Whop | PARTIAL | Stripe plateforme ok + Settings UI pour Stripe Connect account ID. Pas d'OAuth Stripe Connect complet |
 | 56 | Connect Socials | MISSING | Pas d'OAuth IG/YT/LinkedIn |
 | 57 | Deploy Funnel | DONE | Export PDF + HTML standalone (dark theme, responsive, 3 pages) |
 | 58 | Config audiences Meta | MISSING | Pas d'accès écriture Meta API |
@@ -116,7 +116,7 @@
 | # | Feature | Status | Notes |
 |---|---------|--------|-------|
 | 62 | Dashboard temps réel | DONE | Auto-refresh 5min + Supabase + export CSV + bouton rafraîchir |
-| 63 | Tracking multi-touch | DONE | Attribution model avec revenu réel Supabase, 4 modèles, parcours clients |
+| 63 | Tracking multi-touch | DONE | Attribution model avec revenu réel Supabase, 4 modèles, parcours clients, **export JSON complet** |
 | 64 | Tracking calls | DONE | Analyse IA + import fichier (.txt/.srt/.vtt) + collage transcript |
 | 65 | Tracking revenue | DONE | metrics-history connecté à Supabase daily_performance_metrics |
 | 66 | Vrai ROAS | DONE | ROAS calculé depuis daily_performance_metrics Supabase |
@@ -146,7 +146,7 @@
 
 | # | Feature | Status | Notes |
 |---|---------|--------|-------|
-| 78 | Paliers de croissance | DONE | UI dédiée avec 4 paliers, checkpoints, actions recommandées + migration DB |
+| 78 | Paliers de croissance | DONE | UI dédiée avec **5 paliers CDC** (0-5K, 5-10K, 10-30K, 30-50K, 50K+), checkpoints, actions recommandées + migration DB |
 | 79 | Whitelabel complet | MISSING | Pas d'architecture multi-tenant |
 | 80 | Générateur OTO | DONE | oto-generator + prompt oto-offer |
 
@@ -170,13 +170,12 @@
 
 ---
 
-## Résumé des 8 features restantes
+## Résumé des 7 features restantes
 
-### PARTIAL (4) — Fonctionnent partiellement
-- [~] #9 Analyse concurrentielle — Analyse IA ok, pas de scraping Meta Ad Library/IG/YT
-- [~] #52 Connect GHL — Webhook inbound leads ok, pas d'OAuth GHL complet
-- [~] #53 Connect Meta Ads — Sync manuelle via token, pas OAuth
-- [~] #55 Connect Stripe/Whop — Stripe plateforme ok, pas pour le business de l'user
+### PARTIAL (3) — Fonctionnent partiellement
+- [~] #52 Connect GHL — Webhook + Settings UI, pas d'OAuth GHL complet
+- [~] #53 Connect Meta Ads — Token + Account ID dans Settings, pas OAuth
+- [~] #55 Connect Stripe/Whop — Stripe Connect account ID dans Settings, pas d'OAuth complet
 
 ### MISSING (4) — Intégrations lourdes nécessitant APIs tierces
 - [ ] #56 Connect Socials (OAuth IG/YT/LinkedIn)

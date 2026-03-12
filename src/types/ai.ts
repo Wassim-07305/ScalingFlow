@@ -9,6 +9,12 @@ export interface MarketOpportunity {
   description: string;
   problems: string[];
   viability_score: number;
+  scoring_composite?: {
+    attractivite: number;
+    concurrence: number;
+    potentiel: number;
+  };
+  estimated_client_budget?: string;
   positioning: string;
   avatar: {
     name: string;

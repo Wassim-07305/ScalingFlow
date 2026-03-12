@@ -56,6 +56,8 @@ export interface Database {
           subscription_plan: string;
           meta_access_token: string | null;
           meta_ad_account_id: string | null;
+          ghl_webhook_url: string | null;
+          stripe_connect_account_id: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -105,6 +107,8 @@ export interface Database {
           subscription_plan?: string;
           meta_access_token?: string | null;
           meta_ad_account_id?: string | null;
+          ghl_webhook_url?: string | null;
+          stripe_connect_account_id?: string | null;
         };
         Update: {
           id?: string;
@@ -152,6 +156,8 @@ export interface Database {
           subscription_plan?: string;
           meta_access_token?: string | null;
           meta_ad_account_id?: string | null;
+          ghl_webhook_url?: string | null;
+          stripe_connect_account_id?: string | null;
         };
       };
       market_analyses: {
@@ -173,6 +179,7 @@ export interface Database {
           country: string | null;
           language: string | null;
           ai_raw_response: Json | null;
+          competitor_analysis: Json | null;
           selected: boolean;
           created_at: string;
         };
@@ -194,6 +201,7 @@ export interface Database {
           country?: string | null;
           language?: string | null;
           ai_raw_response?: Json | null;
+          competitor_analysis?: Json | null;
           selected?: boolean;
         };
         Update: {
@@ -211,6 +219,7 @@ export interface Database {
           schwartz_analysis?: Json | null;
           country?: string | null;
           language?: string | null;
+          competitor_analysis?: Json | null;
           ai_raw_response?: Json | null;
           selected?: boolean;
         };

@@ -514,16 +514,44 @@ export default function MarketPage() {
       {activeTab === "concurrence" && !loadingData && selectedAnalysis && (
         <div>
           {competitors.length > 0 ? (
-            <CompetitorGrid
-              competitors={competitors.map((c) => ({
-                name: c.competitor_name,
-                positioning: c.positioning || "",
-                pricing_estimate: c.pricing || "",
-                strengths: c.strengths || [],
-                weaknesses: c.weaknesses || [],
-                differentiation: c.gap_opportunity || "",
-              }))}
-            />
+            (() => {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              const fullAnalysis = (selectedAnalysis as any)?.competitor_analysis as any;
+              const enriched = fullAnalysis?.competitors;
+              const benchmarks = fullAnalysis?.industry_benchmarks;
+
+              return (
+                <CompetitorGrid
+                  competitors={enriched
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    ? enriched.map((c: any) => ({
+                        name: c.name,
+                        positioning: c.positioning || "",
+                        pricing_estimate: c.pricing_estimate || "",
+                        strengths: c.strengths || [],
+                        weaknesses: c.weaknesses || [],
+                        differentiation: c.differentiation || "",
+                        ad_insights: c.ad_insights,
+                        content_insights: c.content_insights,
+                        funnel_type: c.funnel_type,
+                        estimated_revenue_range: c.estimated_revenue_range,
+                      }))
+                    : competitors.map((c) => ({
+                        name: c.competitor_name,
+                        positioning: c.positioning || "",
+                        pricing_estimate: c.pricing || "",
+                        strengths: c.strengths || [],
+                        weaknesses: c.weaknesses || [],
+                        differentiation: c.gap_opportunity || "",
+                      }))
+                  }
+                  marketGaps={fullAnalysis?.market_gaps}
+                  positioningOpportunities={fullAnalysis?.positioning_opportunities}
+                  recommendedDifferentiation={fullAnalysis?.recommended_differentiation}
+                  industryBenchmarks={benchmarks}
+                />
+              );
+            })()
           ) : (
             <Card>
               <CardContent className="flex flex-col items-center justify-center py-12">

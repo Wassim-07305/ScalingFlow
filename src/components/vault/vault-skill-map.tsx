@@ -1,13 +1,14 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { AILoading } from "@/components/shared/ai-loading";
 import { EmptyState } from "@/components/shared/empty-state";
 import { createClient } from "@/lib/supabase/client";
 import { useUser } from "@/hooks/use-user";
-import { Map } from "lucide-react";
+import { cn } from "@/lib/utils/cn";
+import { Map, Network } from "lucide-react";
 import {
   RadarChart,
   PolarGrid,
@@ -42,6 +43,174 @@ const SKILL_CATEGORIES: Record<string, string[]> = {
     "No-code", "CRM", "IA", "Montage video", "Design", "Developpement web",
   ],
 };
+
+// ─── Mindmap component ───────────────────────────────────────
+const CATEGORY_COLORS = [
+  "#3B82F6", // blue
+  "#34D399", // emerald
+  "#F59E0B", // amber
+  "#A78BFA", // purple
+  "#F87171", // red
+  "#06B6D4", // cyan
+];
+
+function SkillMindmap({
+  skills,
+  categories,
+  radarData,
+}: {
+  skills: string[];
+  categories: Record<string, string[]>;
+  radarData: { fullName: string; score: number; count: number }[];
+}) {
+  const [hoveredCategory, setHoveredCategory] = useState<string | null>(null);
+  const entries = Object.entries(categories);
+  const cx = 400;
+  const cy = 300;
+  const catRadius = 180;
+  const skillRadius = 60;
+
+  return (
+    <div className="overflow-x-auto">
+      <svg viewBox="0 0 800 600" className="w-full min-w-[600px]" style={{ maxHeight: 500 }}>
+        {/* Lines from center to categories */}
+        {entries.map(([catName], catIdx) => {
+          const angle = (catIdx / entries.length) * 2 * Math.PI - Math.PI / 2;
+          const catX = cx + Math.cos(angle) * catRadius;
+          const catY = cy + Math.sin(angle) * catRadius;
+          const color = CATEGORY_COLORS[catIdx % CATEGORY_COLORS.length];
+
+          return (
+            <line
+              key={`line-${catName}`}
+              x1={cx}
+              y1={cy}
+              x2={catX}
+              y2={catY}
+              stroke={color}
+              strokeWidth={hoveredCategory === catName ? 3 : 1.5}
+              strokeOpacity={hoveredCategory && hoveredCategory !== catName ? 0.2 : 0.6}
+            />
+          );
+        })}
+
+        {/* Category nodes + skill branches */}
+        {entries.map(([catName, catSkills], catIdx) => {
+          const angle = (catIdx / entries.length) * 2 * Math.PI - Math.PI / 2;
+          const catX = cx + Math.cos(angle) * catRadius;
+          const catY = cy + Math.sin(angle) * catRadius;
+          const color = CATEGORY_COLORS[catIdx % CATEGORY_COLORS.length];
+          const rd = radarData.find((r) => r.fullName === catName);
+          const isHovered = hoveredCategory === catName;
+          const isOtherHovered = hoveredCategory && hoveredCategory !== catName;
+
+          // Matched skills in this category
+          const matchedSkills = catSkills.filter((s) =>
+            skills.some((us) => us.toLowerCase().includes(s.toLowerCase()) || s.toLowerCase().includes(us.toLowerCase()))
+          );
+
+          // Position skill nodes around the category
+          const spreadAngle = Math.PI * 0.6;
+          const startAngle = angle - spreadAngle / 2;
+
+          return (
+            <g
+              key={catName}
+              onMouseEnter={() => setHoveredCategory(catName)}
+              onMouseLeave={() => setHoveredCategory(null)}
+              style={{ cursor: "pointer" }}
+              opacity={isOtherHovered ? 0.25 : 1}
+            >
+              {/* Skill branch lines + nodes */}
+              {catSkills.map((skill, sIdx) => {
+                const sAngle = startAngle + (sIdx / Math.max(catSkills.length - 1, 1)) * spreadAngle;
+                const sX = catX + Math.cos(sAngle) * skillRadius;
+                const sY = catY + Math.sin(sAngle) * skillRadius;
+                const isActive = matchedSkills.includes(skill);
+
+                return (
+                  <g key={skill}>
+                    <line
+                      x1={catX}
+                      y1={catY}
+                      x2={sX}
+                      y2={sY}
+                      stroke={isActive ? color : "#374151"}
+                      strokeWidth={1}
+                      strokeOpacity={isHovered ? 0.8 : 0.3}
+                    />
+                    <circle
+                      cx={sX}
+                      cy={sY}
+                      r={isActive ? 5 : 3}
+                      fill={isActive ? color : "#374151"}
+                      opacity={isHovered ? 1 : 0.5}
+                    />
+                    {isHovered && (
+                      <text
+                        x={sX}
+                        y={sY - 8}
+                        textAnchor="middle"
+                        fontSize={8}
+                        fill={isActive ? "#F9FAFB" : "#6B7280"}
+                        fontWeight={isActive ? "bold" : "normal"}
+                      >
+                        {skill}
+                      </text>
+                    )}
+                  </g>
+                );
+              })}
+
+              {/* Category node */}
+              <circle
+                cx={catX}
+                cy={catY}
+                r={isHovered ? 24 : 20}
+                fill={`${color}20`}
+                stroke={color}
+                strokeWidth={2}
+              />
+              <text
+                x={catX}
+                y={catY + 1}
+                textAnchor="middle"
+                dominantBaseline="middle"
+                fontSize={9}
+                fill="#F9FAFB"
+                fontWeight="bold"
+              >
+                {rd?.score ?? 0}%
+              </text>
+              <text
+                x={catX}
+                y={catY + (isHovered ? 36 : 32)}
+                textAnchor="middle"
+                fontSize={10}
+                fill={color}
+                fontWeight="600"
+              >
+                {catName.split(" ")[0]}
+              </text>
+            </g>
+          );
+        })}
+
+        {/* Center node */}
+        <circle cx={cx} cy={cy} r={30} fill="#34D39920" stroke="#34D399" strokeWidth={2} />
+        <text x={cx} y={cy - 4} textAnchor="middle" fontSize={10} fill="#34D399" fontWeight="bold">
+          Mes
+        </text>
+        <text x={cx} y={cy + 8} textAnchor="middle" fontSize={10} fill="#34D399" fontWeight="bold">
+          Skills
+        </text>
+      </svg>
+      <p className="text-xs text-text-muted text-center mt-2">
+        Survole une categorie pour voir les competences individuelles
+      </p>
+    </div>
+  );
+}
 
 export function VaultSkillMap() {
   const { user } = useUser();
@@ -147,6 +316,19 @@ export function VaultSkillMap() {
               />
             </RadarChart>
           </ResponsiveContainer>
+        </CardContent>
+      </Card>
+
+      {/* Mindmap visualisation */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Network className="h-5 w-5 text-accent" />
+            Mindmap des competences
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <SkillMindmap skills={skills} categories={SKILL_CATEGORIES} radarData={radarData} />
         </CardContent>
       </Card>
 

@@ -208,6 +208,21 @@ export function ABTestManager() {
           conversions: t.variantB.conversions + updateData.variantBConversions,
           traffic: t.variantB.traffic + updateData.variantBTraffic,
         };
+
+        // Auto-declare winner when both variants reach 100+ visits and confidence >= 90%
+        if (t.status === "active" && newA.traffic >= 100 && newB.traffic >= 100) {
+          const conf = calcConfidence(newA.conversions, newA.traffic, newB.conversions, newB.traffic);
+          if (conf >= 90) {
+            const rateA = calcConversionRate(newA.conversions, newA.traffic);
+            const rateB = calcConversionRate(newB.conversions, newB.traffic);
+            const winner = rateA > rateB ? "A" as const : rateB > rateA ? "B" as const : null;
+            if (winner) {
+              toast.success(`Auto-complete : Variante ${winner} gagnante (${(newA.traffic + newB.traffic)} visites, confiance ${conf.toFixed(0)}%)`);
+              return { ...t, variantA: newA, variantB: newB, status: "completed" as const, winner };
+            }
+          }
+        }
+
         return { ...t, variantA: newA, variantB: newB };
       });
       setTests(updated);
@@ -433,10 +448,17 @@ export function ABTestManager() {
                     </Button>
                   </div>
 
+                  {/* Auto-complete info */}
+                  {test.variantA.traffic >= 100 && test.variantB.traffic >= 100 && confidence >= 90 && (
+                    <div className="mt-2 p-2 rounded-lg bg-accent/10 border border-accent/20 text-xs text-accent">
+                      Ce test sera automatiquement complete a la prochaine mise a jour (100+ visites par variante atteint, confiance {">"}90%)
+                    </div>
+                  )}
+
                   {/* Progress bar */}
                   <div className="mt-3">
                     <div className="flex justify-between text-xs text-text-muted mb-1">
-                      <span>Progression</span>
+                      <span>Progression {test.variantA.traffic + test.variantB.traffic >= 200 ? "(seuil 100+/variante atteint)" : `(seuil: 100 visites/variante)`}</span>
                       <span>{progress.toFixed(0)}%</span>
                     </div>
                     <div className="h-1.5 bg-bg-tertiary rounded-full overflow-hidden">

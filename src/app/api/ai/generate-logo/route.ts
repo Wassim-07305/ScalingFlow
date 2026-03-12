@@ -58,75 +58,70 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Build a detailed prompt for logo generation
-    const prompt = buildLogoPrompt(brandName, concept, style, colors);
+    // 3 typed logo variations per CDC spec
+    const LOGO_TYPES = [
+      { type: "principal", label: "Logo principal", suffix: "full logo with brand name, typography-based or illustration, detailed design" },
+      { type: "icone", label: "Logo icone", suffix: "square icon version, minimal, works as favicon or app icon, no text, pure symbol" },
+      { type: "monochrome", label: "Logo monochrome", suffix: "black and white version, no colors, suitable for print, clean silhouette" },
+    ] as const;
 
-    // Use Flux Schnell (fast, high-quality) via Replicate
-    const createRes = await fetch(REPLICATE_API_URL, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "black-forest-labs/flux-schnell",
-        input: {
-          prompt,
-          num_outputs: 4,
-          aspect_ratio: "1:1",
-          output_format: "webp",
-          output_quality: 90,
+    const results: { type: string; label: string; url: string }[] = [];
+
+    for (const logoType of LOGO_TYPES) {
+      const prompt = buildLogoPrompt(brandName, concept, style, colors, logoType.suffix);
+
+      const createRes = await fetch(REPLICATE_API_URL, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
         },
-      }),
-    });
-
-    if (!createRes.ok) {
-      const err = await createRes.json().catch(() => ({}));
-      console.error("[generate-logo] Replicate create error:", err);
-      return NextResponse.json(
-        { error: "Erreur lors de la creation du job Replicate" },
-        { status: 500 }
-      );
-    }
-
-    const prediction: ReplicateResponse = await createRes.json();
-
-    // Poll for completion (max 60s)
-    let result = prediction;
-    const pollUrl = prediction.urls?.get || `${REPLICATE_API_URL}/${prediction.id}`;
-    const maxAttempts = 30;
-
-    for (let i = 0; i < maxAttempts; i++) {
-      if (result.status === "succeeded" || result.status === "failed") break;
-
-      await new Promise((r) => setTimeout(r, 2000));
-
-      const pollRes = await fetch(pollUrl, {
-        headers: { Authorization: `Bearer ${token}` },
+        body: JSON.stringify({
+          model: "black-forest-labs/flux-schnell",
+          input: {
+            prompt,
+            num_outputs: 1,
+            aspect_ratio: "1:1",
+            output_format: "png",
+            output_quality: 95,
+          },
+        }),
       });
-      result = await pollRes.json();
+
+      if (!createRes.ok) {
+        console.error(`[generate-logo] Replicate error for ${logoType.type}`);
+        continue;
+      }
+
+      const prediction: ReplicateResponse = await createRes.json();
+      let result = prediction;
+      const pollUrl = prediction.urls?.get || `${REPLICATE_API_URL}/${prediction.id}`;
+
+      for (let i = 0; i < 30; i++) {
+        if (result.status === "succeeded" || result.status === "failed") break;
+        await new Promise((r) => setTimeout(r, 2000));
+        const pollRes = await fetch(pollUrl, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        result = await pollRes.json();
+      }
+
+      if (result.status === "succeeded" && result.output) {
+        const url = Array.isArray(result.output) ? result.output[0] : result.output;
+        results.push({ type: logoType.type, label: logoType.label, url });
+      }
     }
 
-    if (result.status === "failed") {
+    if (results.length === 0) {
       return NextResponse.json(
-        { error: result.error || "La generation du logo a echoue" },
+        { error: "La generation des logos a echoue" },
         { status: 500 }
       );
     }
-
-    if (result.status !== "succeeded" || !result.output) {
-      return NextResponse.json(
-        { error: "Timeout — la generation prend trop de temps" },
-        { status: 504 }
-      );
-    }
-
-    // output is an array of image URLs
-    const images = Array.isArray(result.output) ? result.output : [result.output];
 
     return NextResponse.json({
-      images,
-      prompt,
+      images: results.map((r) => r.url),
+      logos: results,
       brandName,
     });
   } catch (error) {
@@ -142,10 +137,15 @@ function buildLogoPrompt(
   brandName: string,
   concept: string,
   style?: string,
-  colors?: string[]
+  colors?: string[],
+  typeVariation?: string
 ): string {
   let prompt = `Professional minimalist logo design for a brand called "${brandName}". `;
   prompt += `Concept: ${concept}. `;
+
+  if (typeVariation) {
+    prompt += `Variation: ${typeVariation}. `;
+  }
 
   if (style) {
     prompt += `Style: ${style}. `;
@@ -153,11 +153,11 @@ function buildLogoPrompt(
     prompt += `Style: modern, clean, professional, tech-forward. `;
   }
 
-  if (colors && colors.length > 0) {
+  if (colors && colors.length > 0 && !typeVariation?.includes("monochrome")) {
     prompt += `Color palette: ${colors.join(", ")}. `;
   }
 
-  prompt += `The logo should be centered on a clean background, vector-style, suitable for a SaaS/business brand. High contrast, scalable design. No text unless it's the brand name stylized. Professional branding quality.`;
+  prompt += `The logo should be centered on a clean background, vector-style, suitable for a SaaS/business brand. High contrast, scalable design. Professional branding quality. PNG format, 1000x1000px.`;
 
   return prompt;
 }

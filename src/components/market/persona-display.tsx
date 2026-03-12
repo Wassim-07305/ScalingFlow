@@ -4,15 +4,21 @@ import { useState } from "react";
 import { cn } from "@/lib/utils/cn";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import type { PersonaForgeResult } from "@/lib/ai/prompts/persona-forge";
 import {
   User,
   Brain,
   MessageCircle,
   Route,
+  BookOpen,
+  Download,
+  Tv,
 } from "lucide-react";
+import { exportToPDF } from "@/lib/utils/export-pdf";
 
 const PERSONA_TABS = [
+  { key: "bio", label: "Bio & Journee", icon: BookOpen },
   { key: "demo", label: "Demographique", icon: User },
   { key: "psycho", label: "Psychographique", icon: Brain },
   { key: "langage", label: "Langage", icon: MessageCircle },
@@ -20,6 +26,43 @@ const PERSONA_TABS = [
 ] as const;
 
 type PersonaTabKey = (typeof PERSONA_TABS)[number]["key"];
+
+function buildPersonaPDFContent(persona: PersonaForgeResult): string {
+  let text = `AVATAR CLIENT — ${persona.avatar_name}\n`;
+  text += `Role : ${persona.avatar_role}\n\n`;
+
+  if (persona.bio_fictive) {
+    text += `=== BIO FICTIVE ===\n${persona.bio_fictive}\n\n`;
+  }
+  if (persona.journee_type) {
+    text += `=== JOURNEE TYPE ===\n${persona.journee_type}\n\n`;
+  }
+  if (persona.canaux_medias?.length) {
+    text += `=== CANAUX MEDIAS ===\n${persona.canaux_medias.join("\n")}\n\n`;
+  }
+
+  const d = persona.niveau_1_demo;
+  if (d) {
+    text += `=== DEMOGRAPHIQUE ===\nAge : ${d.age_range}\nGenre : ${d.genre}\nSituation familiale : ${d.situation_familiale}\nRevenu annuel : ${d.revenu_annuel}\nLocalisation : ${d.localisation}\nEducation : ${d.niveau_education}\n\n`;
+  }
+
+  const p = persona.niveau_2_psycho;
+  if (p) {
+    text += `=== PSYCHOGRAPHIQUE ===\nDesirs profonds : ${p.desirs_profonds?.join(", ")}\nPeurs : ${p.peurs?.join(", ")}\nFrustrations : ${p.frustrations?.join(", ")}\nObjections : ${p.objections_achat?.join(", ")}\nCroyances limitantes : ${p.croyances_limitantes?.join(", ")}\n\n`;
+  }
+
+  const l = persona.niveau_3_langage;
+  if (l) {
+    text += `=== LANGAGE ===\nExpressions : ${l.expressions_courantes?.join(" | ")}\nMots-cles : ${l.mots_cles_recherche?.join(", ")}\nPhrases douleur : ${l.phrases_douleur?.join(" | ")}\nPhrases desir : ${l.phrases_desir?.join(" | ")}\nTon : ${l.ton_communication}\n\n`;
+  }
+
+  const pa = persona.niveau_4_parcours;
+  if (pa) {
+    text += `=== PARCOURS D'ACHAT ===\nDeclencheurs : ${pa.declencheurs_achat?.join(", ")}\nSources info : ${pa.sources_info?.join(", ")}\nCriteres : ${pa.criteres_decision?.join(", ")}\nObstacles : ${pa.obstacles_achat?.join(", ")}\nTimeline : ${pa.timeline_decision}\nInfluenceurs : ${pa.influenceurs?.join(", ")}`;
+  }
+
+  return text;
+}
 
 interface PersonaDisplayProps {
   persona: PersonaForgeResult;
@@ -56,7 +99,16 @@ function SectionBlock({ title, children }: { title: string; children: React.Reac
 }
 
 export function PersonaDisplay({ persona }: PersonaDisplayProps) {
-  const [activeTab, setActiveTab] = useState<PersonaTabKey>("demo");
+  const [activeTab, setActiveTab] = useState<PersonaTabKey>("bio");
+
+  const handleExportPDF = () => {
+    exportToPDF({
+      title: `Persona — ${persona.avatar_name}`,
+      subtitle: persona.avatar_role,
+      content: buildPersonaPDFContent(persona),
+      filename: `persona-${persona.avatar_name.toLowerCase().replace(/[^a-z0-9]+/g, "-")}.pdf`,
+    });
+  };
 
   return (
     <div className="space-y-4">
@@ -66,12 +118,16 @@ export function PersonaDisplay({ persona }: PersonaDisplayProps) {
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-accent-muted">
             <User className="h-6 w-6 text-accent" />
           </div>
-          <div>
+          <div className="flex-1">
             <h3 className="text-lg font-semibold text-text-primary">
               {persona.avatar_name}
             </h3>
             <p className="text-sm text-text-secondary">{persona.avatar_role}</p>
           </div>
+          <Button variant="ghost" size="sm" onClick={handleExportPDF}>
+            <Download className="h-4 w-4 mr-1" />
+            Export PDF
+          </Button>
         </CardContent>
       </Card>
 
@@ -93,6 +149,59 @@ export function PersonaDisplay({ persona }: PersonaDisplayProps) {
           </button>
         ))}
       </div>
+
+      {/* Bio, Journee type & Canaux medias */}
+      {activeTab === "bio" && (
+        <div className="space-y-4">
+          {persona.bio_fictive && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <BookOpen className="h-4 w-4 text-accent" />
+                  Bio fictive
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-text-primary leading-relaxed">{persona.bio_fictive}</p>
+              </CardContent>
+            </Card>
+          )}
+
+          {persona.journee_type && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Route className="h-4 w-4 text-accent" />
+                  Journee type
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-text-primary leading-relaxed">{persona.journee_type}</p>
+              </CardContent>
+            </Card>
+          )}
+
+          {persona.canaux_medias && persona.canaux_medias.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Tv className="h-4 w-4 text-accent" />
+                  Canaux medias consommes
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-wrap gap-2">
+                  {persona.canaux_medias.map((canal, i) => (
+                    <Badge key={i} variant="blue" className="text-xs">
+                      {canal}
+                    </Badge>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+      )}
 
       {/* Niveau 1 : Demographique */}
       {activeTab === "demo" && persona.niveau_1_demo && (

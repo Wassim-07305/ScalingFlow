@@ -87,10 +87,15 @@ Analyse le marche et identifie les 3 meilleures opportunites de positionnement p
 1. **Marche cible** : industrie/niche specifique qui a besoin d'infrastructure IA
 2. **Problemes specifiques** : 3-5 problemes concrets que cette niche rencontre
 3. **Score de viabilite** (0-100) base sur : taille du marche, urgence du besoin, capacite a payer, niveau de concurrence, adequation avec les competences de l'utilisateur${data.vaultSkills ? " et son coffre de competences" : ""}
-4. **Positionnement recommande** : angle unique d'attaque${data.parcours ? " adapte au parcours " + data.parcours : ""}
-5. **Avatar client** : persona detaille (nom, role, CA, problemes quotidiens, desirs, objections)
-6. **Concurrents principaux** : 3-5 concurrents avec forces/faiblesses
-7. **Signaux de demande** : indices concrets que ce marche est pret
+4. **Scoring composite** : 3 sous-scores individuels (0-100 chacun) :
+   - **attractivite** : taille du marche, urgence du besoin, tendance de croissance
+   - **concurrence** : niveau de saturation (100 = peu de concurrence, 0 = tres sature)
+   - **potentiel** : capacite a payer, adequation competences, facilite d'entree
+5. **Estimation budget client** : fourchette de budget mensuel que le client cible est pret a investir pour resoudre son probleme
+6. **Positionnement recommande** : angle unique d'attaque${data.parcours ? " adapte au parcours " + data.parcours : ""}
+7. **Avatar client** : persona detaille (nom, role, CA, problemes quotidiens, desirs, objections)
+8. **Concurrents principaux** : 3-5 concurrents avec forces/faiblesses
+9. **Signaux de demande** : indices concrets que ce marche est pret
 
 ## FORMAT DE REPONSE
 Reponds en JSON structure :
@@ -101,6 +106,8 @@ Reponds en JSON structure :
       "description": "...",
       "problems": ["...", "..."],
       "viability_score": 85,
+      "scoring_composite": { "attractivite": 80, "concurrence": 70, "potentiel": 90 },
+      "estimated_client_budget": "500-2000 EUR/mois",
       "positioning": "...",
       "avatar": { "name": "...", "role": "...", "revenue": "...", "pain_points": ["..."], "desires": ["..."], "objections": ["..."] },
       "competitors": [{ "name": "...", "strengths": ["..."], "weaknesses": ["..."] }],

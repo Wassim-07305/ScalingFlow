@@ -13,8 +13,14 @@ interface LogoGeneratorProps {
   palette?: { hex: string }[];
 }
 
+interface LogoResult {
+  type: string;
+  label: string;
+  url: string;
+}
+
 export function LogoGenerator({ concept, brandName, palette }: LogoGeneratorProps) {
-  const [images, setImages] = React.useState<string[]>([]);
+  const [logos, setLogos] = React.useState<LogoResult[]>([]);
   const [loading, setLoading] = React.useState(false);
 
   const generate = async () => {
@@ -42,7 +48,16 @@ export function LogoGenerator({ concept, brandName, palette }: LogoGeneratorProp
       }
 
       const data = await res.json();
-      setImages(data.images || []);
+      if (data.logos) {
+        setLogos(data.logos);
+      } else if (data.images) {
+        // Fallback for old format
+        setLogos(data.images.map((url: string, i: number) => ({
+          type: ["principal", "icone", "monochrome"][i] || `variation-${i}`,
+          label: ["Logo principal", "Logo icone", "Logo monochrome"][i] || `Variation ${i + 1}`,
+          url,
+        })));
+      }
       toast.success("Logos generes !");
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Erreur lors de la generation");
@@ -88,9 +103,9 @@ export function LogoGenerator({ concept, brandName, palette }: LogoGeneratorProp
             {loading ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                Generation en cours (30-60s)...
+                Generation en cours (60-90s)...
               </>
-            ) : images.length > 0 ? (
+            ) : logos.length > 0 ? (
               <>
                 <RefreshCw className="h-4 w-4 mr-2" />
                 Regenerer les logos
@@ -98,51 +113,51 @@ export function LogoGenerator({ concept, brandName, palette }: LogoGeneratorProp
             ) : (
               <>
                 <Hexagon className="h-4 w-4 mr-2" />
-                Generer les logos avec l&apos;IA
+                Generer 3 variations (principal, icone, monochrome)
               </>
             )}
           </Button>
         </CardContent>
       </Card>
 
-      {images.length > 0 && (
+      {logos.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle>Propositions de Logo ({images.length} variations)</CardTitle>
+            <CardTitle>3 variations de logo (PNG)</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid gap-4 sm:grid-cols-2">
-              {images.map((url, i) => (
+            <div className="grid gap-4 sm:grid-cols-3">
+              {logos.map((logo, i) => (
                 <div
                   key={i}
                   className="relative group rounded-xl border border-border-default bg-bg-tertiary overflow-hidden"
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src={url}
-                    alt={`Logo variation ${i + 1}`}
+                    src={logo.url}
+                    alt={logo.label}
                     className="w-full aspect-square object-contain p-4"
                   />
                   <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                     <a
-                      href={url}
-                      download={`logo-${brandName || "brand"}-${i + 1}.webp`}
+                      href={logo.url}
+                      download={`logo-${brandName || "brand"}-${logo.type}.png`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center gap-2 px-4 py-2 rounded-xl bg-accent text-white text-sm font-medium hover:bg-accent/80 transition-colors"
                     >
                       <Download className="h-4 w-4" />
-                      Telecharger
+                      PNG
                     </a>
                   </div>
                   <div className="p-2 text-center">
-                    <span className="text-xs text-text-muted">Variation {i + 1}</span>
+                    <span className="text-xs text-text-muted">{logo.label}</span>
                   </div>
                 </div>
               ))}
             </div>
             <p className="text-xs text-text-muted text-center mt-4">
-              Les logos sont generes par IA (Flux). Utilise-les comme base pour un designer professionnel.
+              Les logos sont generes par IA (Flux) en PNG 1000x1000. Utilise-les comme base pour un designer professionnel.
             </p>
           </CardContent>
         </Card>

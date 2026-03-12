@@ -13,6 +13,9 @@ import {
 import { cn } from "@/lib/utils/cn";
 import { useUser } from "@/hooks/use-user";
 import { createClient } from "@/lib/supabase/client";
+import { Button } from "@/components/ui/button";
+import { Download } from "lucide-react";
+import { toast } from "sonner";
 import {
   BarChart,
   Bar,
@@ -120,6 +123,9 @@ export function AttributionModel() {
       });
   }, [user]);
 
+  // Real revenue only affects the total — channel percentages are always estimated
+  const revenueIsReal = !isDemo;
+
   // ─── Computed data ───────────────────────────────────────────
   const chartData = useMemo(() => {
     return DEMO_CHANNELS.map((ch) => ({
@@ -131,6 +137,41 @@ export function AttributionModel() {
   }, [model, totalRevenue]);
 
   const totalPct = chartData.reduce((s, d) => s + d.pourcentage, 0);
+
+  const handleExportJSON = () => {
+    const exportData = {
+      exported_at: new Date().toISOString(),
+      model: model,
+      model_label: MODEL_LABELS[model],
+      total_revenue: totalRevenue,
+      is_real_revenue: revenueIsReal,
+      channels: chartData.map((ch) => ({
+        name: ch.name,
+        percentage: ch.pourcentage,
+        attributed_revenue: ch.revenu,
+      })),
+      all_models: DEMO_CHANNELS.map((ch) => ({
+        name: ch.name,
+        firstTouch: ch.firstTouch,
+        lastTouch: ch.lastTouch,
+        linear: ch.linear,
+        timeDecay: ch.timeDecay,
+      })),
+      customer_journeys: DEMO_JOURNEYS.map((j) => ({
+        client: j.client,
+        revenue: j.revenue,
+        touchpoints: j.touchpoints,
+      })),
+    };
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `attribution-${model}-${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success("Export JSON telecharge");
+  };
 
   return (
     <div className="space-y-6">
@@ -144,14 +185,15 @@ export function AttributionModel() {
               </h3>
               <p className="text-xs text-text-secondary">
                 Comprenez comment chaque canal contribue a vos conversions selon differents modeles
-                d&apos;attribution.{isDemo ? " Les repartitions par canal sont estimees." : " Le revenu total est base sur vos donnees reelles."}
+                d&apos;attribution. Les repartitions par canal sont des estimations basees sur les modeles standards du secteur.
+                {revenueIsReal && " Le revenu total affiche est base sur vos donnees reelles."}
               </p>
             </div>
-            {isDemo ? (
-              <Badge variant="yellow">Donnees de demo</Badge>
-            ) : (
-              <Badge variant="default">Revenu reel</Badge>
-            )}
+            <div className="flex flex-col gap-1 items-end">
+              <Badge variant="yellow">Repartitions estimees</Badge>
+              {revenueIsReal && <Badge variant="default">Revenu reel : {new Intl.NumberFormat("fr-FR", { style: "currency", currency: "EUR", maximumFractionDigits: 0 }).format(totalRevenue)}</Badge>}
+              {isDemo && <Badge variant="muted">Revenu de demo</Badge>}
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -172,6 +214,10 @@ export function AttributionModel() {
           </Select>
         </div>
         <p className="text-xs text-text-secondary flex-1">{MODEL_DESCRIPTIONS[model]}</p>
+        <Button variant="ghost" size="sm" onClick={handleExportJSON}>
+          <Download className="h-4 w-4 mr-1" />
+          Export JSON
+        </Button>
       </div>
 
       {/* Attribution chart */}

@@ -95,22 +95,36 @@ export async function POST(req: NextRequest) {
 
     // Sauvegarder chaque concurrent dans la table competitors
     for (const competitor of result.competitors) {
-      await supabase.from("competitors").insert({
-        user_id: user.id,
-        market_analysis_id,
-        competitor_name: competitor.name,
-        positioning: competitor.positioning,
-        pricing: competitor.pricing_estimate,
-        strengths: competitor.strengths,
-        weaknesses: competitor.weaknesses,
-        gap_opportunity: competitor.differentiation,
-        source: "ai_analysis",
-      });
+      try {
+        await supabase.from("competitors").insert({
+          user_id: user.id,
+          market_analysis_id,
+          competitor_name: competitor.name,
+          positioning: competitor.positioning,
+          pricing: competitor.pricing_estimate,
+          strengths: competitor.strengths,
+          weaknesses: competitor.weaknesses,
+          gap_opportunity: competitor.differentiation,
+          source: "ai_analysis",
+        });
+      } catch (e) {
+        console.warn("analyze-competitors: failed to insert competitor", e);
+      }
+    }
+
+    // Save full analysis result (with ad/content insights & benchmarks) on market_analyses
+    try {
+      await supabase
+        .from("market_analyses")
+        .update({ competitor_analysis: result })
+        .eq("id", market_analysis_id);
+    } catch (e) {
+      console.warn("analyze-competitors: failed to save full analysis", e);
     }
 
     // Award XP (non-blocking)
-    try { await awardXP(user.id, "generation.competitors"); } catch {}
-    try { await notifyGeneration(user.id, "generation.competitors"); } catch {}
+    try { await awardXP(user.id, "generation.competitors"); } catch (e) { console.warn("XP award failed", e); }
+    try { await notifyGeneration(user.id, "generation.competitors"); } catch (e) { console.warn("Notification failed", e); }
 
     return NextResponse.json(result);
   } catch (error) {
