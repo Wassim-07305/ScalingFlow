@@ -149,36 +149,37 @@ export function GlobalSearch({
 
         if (controller.signal.aborted) return;
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const all: SearchResult[] = [
-          ...(offers.data ?? []).map((r) => ({
+          ...((offers.data ?? []) as any[]).map((r: any) => ({
             id: r.id,
             title: r.offer_name || "Offre sans nom",
             type: "offer" as const,
             href: `/offer`,
             icon: Package,
           })),
-          ...(funnels.data ?? []).map((r) => ({
+          ...((funnels.data ?? []) as any[]).map((r: any) => ({
             id: r.id,
             title: r.funnel_name || "Funnel sans nom",
             type: "funnel" as const,
             href: `/funnel`,
             icon: Filter,
           })),
-          ...(ads.data ?? []).map((r) => ({
+          ...((ads.data ?? []) as any[]).map((r: any) => ({
             id: r.id,
             title: r.headline || "Pub sans titre",
             type: "ad" as const,
             href: `/ads`,
             icon: Megaphone,
           })),
-          ...(content.data ?? []).map((r) => ({
+          ...((content.data ?? []) as any[]).map((r: any) => ({
             id: r.id,
             title: r.title || "Contenu sans titre",
             type: "content" as const,
             href: `/content`,
             icon: PenTool,
           })),
-          ...(assets.data ?? []).map((r) => ({
+          ...((assets.data ?? []) as any[]).map((r: any) => ({
             id: r.id,
             title: r.title || "Asset sans nom",
             type: "asset" as const,

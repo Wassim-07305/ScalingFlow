@@ -69,7 +69,8 @@ async function loadMetricsFromDB(userId: string): Promise<DailyMetric[]> {
     .eq("user_id", userId)
     .order("date", { ascending: true });
   if (!data || data.length === 0) return [];
-  return data.map((row) => ({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (data as any[]).map((row: any) => ({
     date: typeof row.date === "string" ? row.date : new Date(row.date).toISOString().split("T")[0],
     spend: Number(row.spend),
     impressions: row.impressions,

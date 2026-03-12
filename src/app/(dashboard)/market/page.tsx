@@ -82,7 +82,8 @@ export default function MarketPage() {
     } else if (data) {
       setAnalyses(data);
       // Selectionner la premiere analyse par defaut (ou celle marquee selected)
-      const selected = data.find((a) => a.selected) || data[0];
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const selected = (data as any[]).find((a) => a.selected) || data[0];
       if (selected) {
         setSelectedAnalysis(selected);
       }

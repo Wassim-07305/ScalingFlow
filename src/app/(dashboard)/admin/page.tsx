@@ -102,13 +102,15 @@ export default function AdminPage() {
         .from("profiles")
         .select("id, subscription_plan, subscription_status, xp_points, onboarding_completed, created_at");
 
-      const totalUsers = allProfiles?.length || 0;
-      const proUsers = allProfiles?.filter((p) => p.subscription_plan === "pro" && p.subscription_status === "active").length || 0;
-      const premiumUsers = allProfiles?.filter((p) => p.subscription_plan === "premium" && p.subscription_status === "active").length || 0;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const profiles = allProfiles as any[] | null;
+      const totalUsers = profiles?.length || 0;
+      const proUsers = profiles?.filter((p) => p.subscription_plan === "pro" && p.subscription_status === "active").length || 0;
+      const premiumUsers = profiles?.filter((p) => p.subscription_plan === "premium" && p.subscription_status === "active").length || 0;
       const freeUsers = totalUsers - proUsers - premiumUsers;
-      const onboardingCompleted = allProfiles?.filter((p) => p.onboarding_completed).length || 0;
-      const totalXP = allProfiles?.reduce((sum, p) => sum + (p.xp_points || 0), 0) || 0;
-      const newUsersThisMonth = allProfiles?.filter((p) => new Date(p.created_at) >= startOfMonth).length || 0;
+      const onboardingCompleted = profiles?.filter((p) => p.onboarding_completed).length || 0;
+      const totalXP = profiles?.reduce((sum: number, p) => sum + (p.xp_points || 0), 0) || 0;
+      const newUsersThisMonth = profiles?.filter((p) => new Date(p.created_at) >= startOfMonth).length || 0;
 
       // ─── Utilisateurs actifs (7 derniers jours) ─────────────
       const { data: activeData } = await supabase
@@ -117,7 +119,7 @@ export default function AdminPage() {
         .gte("created_at", sevenDaysAgo.toISOString());
 
       const uniqueActiveUsers = activeData
-        ? new Set(activeData.map((row) => row.user_id)).size
+        ? new Set((activeData as { user_id: string }[]).map((row) => row.user_id)).size
         : 0;
 
       // ─── Total generations (toutes tables) ──────────────────
@@ -179,16 +181,19 @@ export default function AdminPage() {
         .limit(15);
 
       if (activityData) {
-        const userIds = [...new Set(activityData.map((a) => a.user_id))];
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const activities = activityData as any[];
+        const userIds = [...new Set(activities.map((a) => a.user_id))];
         const { data: profilesData } = await supabase
           .from("profiles")
           .select("id, full_name")
           .in("id", userIds);
 
-        const nameMap = new Map(profilesData?.map((p) => [p.id, p.full_name]) || []);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const nameMap = new Map((profilesData as any[] || []).map((p) => [p.id, p.full_name]));
 
         setRecentActivity(
-          activityData.map((a) => ({
+          activities.map((a) => ({
             ...a,
             user_name: nameMap.get(a.user_id) || null,
           }))

@@ -33,7 +33,8 @@ export function useNotifications() {
 
     if (data) {
       setNotifications(data as Notification[]);
-      setUnreadCount(data.filter((n) => !n.read).length);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      setUnreadCount((data as any[]).filter((n: any) => !n.read).length);
     }
     setLoading(false);
   }, [user, supabase]);

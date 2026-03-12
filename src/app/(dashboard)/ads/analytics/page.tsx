@@ -79,7 +79,8 @@ export default function AnalyticsPage() {
           .eq("user_id", user.id),
       ]);
 
-      const campaigns = campaignsRes.data ?? [];
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const campaigns: any[] = campaignsRes.data ?? [];
       const creativeCount = creativesRes.count ?? 0;
 
       if (campaigns.length === 0) {

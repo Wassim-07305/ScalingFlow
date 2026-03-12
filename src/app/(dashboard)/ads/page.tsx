@@ -9,11 +9,12 @@ import { DMScriptGenerator } from "@/components/ads/dm-script-generator";
 import { FollowerAdsGenerator } from "@/components/ads/follower-ads-generator";
 import { DmRetargetingGenerator } from "@/components/ads/dm-retargeting-generator";
 import { AdsAutomation } from "@/components/ads/ads-automation";
+import { AdSpy } from "@/components/ads/ad-spy";
 import { GenerationHistory } from "@/components/shared/generation-history";
 import { cn } from "@/lib/utils/cn";
 import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
-import { Sparkles, BarChart3, Video, MessageSquare, Users, MessageCircle, History, Zap } from "lucide-react";
+import { Sparkles, BarChart3, Video, MessageSquare, Users, MessageCircle, History, Zap, Eye } from "lucide-react";
 
 const TABS = [
   { key: "creatives", label: "Creatives IA", icon: Sparkles },
@@ -23,6 +24,7 @@ const TABS = [
   { key: "dm_scripts", label: "Scripts DM", icon: MessageSquare },
   { key: "follower_ads", label: "Follower Ads", icon: Users },
   { key: "dm_retargeting", label: "DM Retargeting", icon: MessageCircle },
+  { key: "ad_spy", label: "Ad Spy", icon: Eye },
   { key: "history", label: "Historique", icon: History },
 ] as const;
 
@@ -92,6 +94,7 @@ export default function AdsPage() {
       {activeTab === "dm_scripts" && <DMScriptGenerator initialData={loadedData.dm_scripts} />}
       {activeTab === "follower_ads" && <FollowerAdsGenerator initialData={loadedData.follower_ads} />}
       {activeTab === "dm_retargeting" && <DmRetargetingGenerator initialData={loadedData.dm_retargeting} />}
+      {activeTab === "ad_spy" && <AdSpy />}
       {activeTab === "history" && (
         <GenerationHistory
           table="ad_creatives"

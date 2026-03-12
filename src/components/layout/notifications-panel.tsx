@@ -88,7 +88,8 @@ export function NotificationsPanel({
           table: "notifications",
           filter: `user_id=eq.${userId}`,
         },
-        (payload) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (payload: any) => {
           const newNotif = payload.new as Notification;
           setNotifications((prev) => [newNotif, ...prev].slice(0, 30));
           setUnreadCount((prev) => {

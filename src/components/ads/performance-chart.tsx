@@ -68,7 +68,8 @@ export function PerformanceChart({ className }: PerformanceChartProps) {
 
       // Creer un map des donnees existantes
       const dataMap = new Map(
-        (dailyData ?? []).map((d) => [d.date, d])
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        ((dailyData ?? []) as any[]).map((d) => [d.date, d])
       );
 
       // Generer tous les jours des 30 derniers jours

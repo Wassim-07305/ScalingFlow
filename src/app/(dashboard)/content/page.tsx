@@ -11,6 +11,7 @@ import { YouTubeGenerator } from "@/components/content/youtube-generator";
 import { StoriesGenerator } from "@/components/content/stories-generator";
 import { CarouselGenerator } from "@/components/content/carousel-generator";
 import { InstagramOptimizer } from "@/components/content/instagram-optimizer";
+import { ContentSpy } from "@/components/ads/content-spy";
 import { GenerationHistory } from "@/components/shared/generation-history";
 import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
@@ -23,6 +24,7 @@ import {
   Instagram,
   CalendarDays,
   History,
+  Search,
 } from "lucide-react";
 
 const CONTENT_TYPE_TO_TAB: Record<string, string> = {
@@ -51,6 +53,7 @@ const TABS = [
   { key: "carousels", label: "Carousels", icon: Layers },
   { key: "instagram", label: "Instagram", icon: Instagram },
   { key: "editorial", label: "Plan Editorial", icon: CalendarDays },
+  { key: "content_spy", label: "Content Spy", icon: Search },
   { key: "history", label: "Historique", icon: History },
 ] as const;
 
@@ -97,6 +100,7 @@ export default function ContentPage() {
       {activeTab === "carousels" && <div role="tabpanel" id="tabpanel-carousels" aria-labelledby="tab-carousels"><CarouselGenerator initialData={loadedData.carousels} /></div>}
       {activeTab === "instagram" && <div role="tabpanel" id="tabpanel-instagram" aria-labelledby="tab-instagram"><InstagramOptimizer initialData={loadedData.instagram} /></div>}
       {activeTab === "editorial" && <div role="tabpanel" id="tabpanel-editorial" aria-labelledby="tab-editorial"><EditorialCalendar initialData={loadedData.editorial} /></div>}
+      {activeTab === "content_spy" && <div role="tabpanel" id="tabpanel-content_spy" aria-labelledby="tab-content_spy"><ContentSpy /></div>}
       {activeTab === "history" && (<div role="tabpanel" id="tabpanel-history" aria-labelledby="tab-history">
         <GenerationHistory
           table="content_pieces"

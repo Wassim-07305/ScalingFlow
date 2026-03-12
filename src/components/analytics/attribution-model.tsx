@@ -108,9 +108,10 @@ export function AttributionModel() {
       .from("daily_performance_metrics")
       .select("revenue")
       .eq("user_id", user.id)
-      .then(({ data }) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .then(({ data }: { data: any }) => {
         if (data && data.length > 0) {
-          const total = data.reduce((sum, row) => sum + Number(row.revenue), 0);
+          const total = data.reduce((sum: number, row: { revenue: number }) => sum + Number(row.revenue), 0);
           if (total > 0) {
             setTotalRevenue(total);
             setIsDemo(false);

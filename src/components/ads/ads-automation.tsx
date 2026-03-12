@@ -79,18 +79,20 @@ export function AdsAutomation() {
         return;
       }
 
-      const totalSpend = metrics.reduce((s, m) => s + (m.spend || 0), 0);
-      const avgRoas = metrics.reduce((s, m) => s + (m.roas || 0), 0) / metrics.length;
-      const avgCtr = metrics.reduce((s, m) => s + (m.ctr || 0), 0) / metrics.length;
-      const avgCpa = metrics.filter((m) => m.cpa > 0).reduce((s, m) => s + (m.cpa || 0), 0) / (metrics.filter((m) => m.cpa > 0).length || 1);
-      const totalConversions = metrics.reduce((s, m) => s + (m.conversions || 0), 0);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const m = metrics as any[];
+      const totalSpend = m.reduce((s: number, x) => s + (x.spend || 0), 0);
+      const avgRoas = m.reduce((s: number, x) => s + (x.roas || 0), 0) / m.length;
+      const avgCtr = m.reduce((s: number, x) => s + (x.ctr || 0), 0) / m.length;
+      const avgCpa = m.filter((x) => x.cpa > 0).reduce((s: number, x) => s + (x.cpa || 0), 0) / (m.filter((x) => x.cpa > 0).length || 1);
+      const totalConversions = m.reduce((s: number, x) => s + (x.conversions || 0), 0);
 
       // Determine trend (compare first half vs second half)
-      const mid = Math.floor(metrics.length / 2);
-      const firstHalf = metrics.slice(mid);
-      const secondHalf = metrics.slice(0, mid);
-      const firstRoas = firstHalf.reduce((s, m) => s + (m.roas || 0), 0) / (firstHalf.length || 1);
-      const secondRoas = secondHalf.reduce((s, m) => s + (m.roas || 0), 0) / (secondHalf.length || 1);
+      const mid = Math.floor(m.length / 2);
+      const firstHalf = m.slice(mid);
+      const secondHalf = m.slice(0, mid);
+      const firstRoas = firstHalf.reduce((s: number, x) => s + (x.roas || 0), 0) / (firstHalf.length || 1);
+      const secondRoas = secondHalf.reduce((s: number, x) => s + (x.roas || 0), 0) / (secondHalf.length || 1);
       const trend = secondRoas > firstRoas * 1.1 ? "up" : secondRoas < firstRoas * 0.9 ? "down" : "stable";
 
       // Determine status

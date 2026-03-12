@@ -23,6 +23,7 @@ import {
   buildCarouselPrompt,
   type CarouselResult,
 } from "@/lib/ai/prompts/carousel-content";
+import { contentSpyPrompt } from "@/lib/ai/prompts/content-spy";
 import { buildFullVaultContext } from "@/lib/ai/vault-context";
 import { awardXP } from "@/lib/gamification/xp-engine";
 import { notifyGeneration } from "@/lib/notifications/create";
@@ -173,7 +174,7 @@ export async function POST(req: NextRequest) {
 
 
     const body = await req.json();
-    const { contentType, market, platform, topic, batchNumber } = body;
+    const { contentType, market, platform, topic, batchNumber, competitor, handle } = body;
 
     // Recuperer le profil + vault + ad insights + sales insights en parallele
     const [{ data: profile }, vaultContext, adInsights, salesInsights] = await Promise.all([
@@ -223,6 +224,32 @@ export async function POST(req: NextRequest) {
         ? `Analyse de marche disponible : ${latestAnalysis.market}`
         : "Parcours client standard";
 
+    // --- Content Spy (#44) ---
+    if (contentType === "content_spy") {
+      if (!competitor || !platform) {
+        return NextResponse.json(
+          { error: "competitor et platform sont requis" },
+          { status: 400 }
+        );
+      }
+      const prompt = withContext(contentSpyPrompt({
+        name: competitor,
+        handle,
+        platform,
+      }));
+
+      const result = await generateJSON<Record<string, unknown>>({
+        prompt,
+        maxTokens: 4096,
+        temperature: 0.8,
+      });
+
+      try { await awardXP(user.id, "generation.content_strategy"); } catch (e) { console.warn("Non-blocking op failed:", e); }
+      try { await notifyGeneration(user.id, "generation.content_strategy"); } catch (e) { console.warn("Non-blocking op failed:", e); }
+
+      return NextResponse.json({ contentType: "content_spy", result });
+    }
+
     // --- Strategie de contenu ---
     if (contentType === "strategy") {
       const prompt = withContext(buildContentStrategyPrompt(
@@ -238,7 +265,7 @@ export async function POST(req: NextRequest) {
 
       // Sauvegarder chaque element du calendrier comme content_piece
       for (const item of result.calendrier || []) {
-        await supabase.from("content_pieces").insert({
+        const { error: insertErr } = await supabase.from("content_pieces").insert({
           user_id: user.id,
           content_type: mapFormatToContentType(item.format),
           title: item.titre,
@@ -252,11 +279,12 @@ export async function POST(req: NextRequest) {
           scheduled_date: getScheduledDate(item.jour),
           published: false,
         });
+        if (insertErr) console.error("generate-content: failed to save calendar item", insertErr);
       }
 
       // Award XP (non-blocking)
-      try { await awardXP(user.id, "generation.content_strategy"); } catch {}
-    try { await notifyGeneration(user.id, "generation.content_strategy"); } catch {}
+      try { await awardXP(user.id, "generation.content_strategy"); } catch (e) { console.warn("Non-blocking op failed:", e); }
+    try { await notifyGeneration(user.id, "generation.content_strategy"); } catch (e) { console.warn("Non-blocking op failed:", e); }
 
       return NextResponse.json({ contentType: "strategy", result });
     }
@@ -276,7 +304,7 @@ export async function POST(req: NextRequest) {
 
       // Sauvegarder chaque script
       for (const script of result.scripts || []) {
-        await supabase.from("content_pieces").insert({
+        const { error: insertErr } = await supabase.from("content_pieces").insert({
           user_id: user.id,
           content_type: "instagram_reel",
           title: `Reel #${script.numero} - ${script.angle}`,
@@ -285,11 +313,12 @@ export async function POST(req: NextRequest) {
           hashtags: script.hashtags,
           published: false,
         });
+        if (insertErr) console.error("generate-content: failed to save reel script", insertErr);
       }
 
       // Award XP (non-blocking)
-      try { await awardXP(user.id, "generation.reels"); } catch {}
-    try { await notifyGeneration(user.id, "generation.reels"); } catch {}
+      try { await awardXP(user.id, "generation.reels"); } catch (e) { console.warn("Non-blocking op failed:", e); }
+    try { await notifyGeneration(user.id, "generation.reels"); } catch (e) { console.warn("Non-blocking op failed:", e); }
 
       return NextResponse.json({ contentType: "reels", result });
     }
@@ -308,7 +337,7 @@ export async function POST(req: NextRequest) {
         maxTokens: 8192,
       });
 
-      await supabase.from("content_pieces").insert({
+      const { error: ytErr } = await supabase.from("content_pieces").insert({
         user_id: user.id,
         content_type: "youtube_video",
         title: result.titre,
@@ -317,10 +346,11 @@ export async function POST(req: NextRequest) {
         hashtags: result.tags,
         published: false,
       });
+      if (ytErr) console.error("generate-content: failed to save youtube script", ytErr);
 
       // Award XP (non-blocking)
-      try { await awardXP(user.id, "generation.youtube"); } catch {}
-    try { await notifyGeneration(user.id, "generation.youtube"); } catch {}
+      try { await awardXP(user.id, "generation.youtube"); } catch (e) { console.warn("Non-blocking op failed:", e); }
+    try { await notifyGeneration(user.id, "generation.youtube"); } catch (e) { console.warn("Non-blocking op failed:", e); }
 
       return NextResponse.json({ contentType: "youtube", result });
     }
@@ -334,18 +364,19 @@ export async function POST(req: NextRequest) {
       });
 
       for (const story of result.stories || []) {
-        await supabase.from("content_pieces").insert({
+        const { error: insertErr } = await supabase.from("content_pieces").insert({
           user_id: user.id,
           content_type: "instagram_story",
           title: `Story - ${story.type}`,
           content: JSON.stringify(story.slides),
           published: false,
         });
+        if (insertErr) console.error("generate-content: failed to save story", insertErr);
       }
 
       // Award XP (non-blocking)
-      try { await awardXP(user.id, "generation.stories"); } catch {}
-    try { await notifyGeneration(user.id, "generation.stories"); } catch {}
+      try { await awardXP(user.id, "generation.stories"); } catch (e) { console.warn("Non-blocking op failed:", e); }
+    try { await notifyGeneration(user.id, "generation.stories"); } catch (e) { console.warn("Non-blocking op failed:", e); }
 
       return NextResponse.json({ contentType: "stories", result });
     }
@@ -364,7 +395,7 @@ export async function POST(req: NextRequest) {
         maxTokens: 4096,
       });
 
-      await supabase.from("content_pieces").insert({
+      const { error: carouselErr } = await supabase.from("content_pieces").insert({
         user_id: user.id,
         content_type: "instagram_carousel",
         title: result.titre,
@@ -373,10 +404,11 @@ export async function POST(req: NextRequest) {
         hashtags: result.hashtags,
         published: false,
       });
+      if (carouselErr) console.error("generate-content: failed to save carousel", carouselErr);
 
       // Award XP (non-blocking)
-      try { await awardXP(user.id, "generation.carousel"); } catch {}
-    try { await notifyGeneration(user.id, "generation.carousel"); } catch {}
+      try { await awardXP(user.id, "generation.carousel"); } catch (e) { console.warn("Non-blocking op failed:", e); }
+    try { await notifyGeneration(user.id, "generation.carousel"); } catch (e) { console.warn("Non-blocking op failed:", e); }
 
       return NextResponse.json({ contentType: "carousel", result });
     }
@@ -413,8 +445,8 @@ export async function POST(req: NextRequest) {
     const generatedContent = await generateJSON<{ ideas?: string[] }>({ prompt, maxTokens: 4096 });
 
     // Award XP (non-blocking)
-    try { await awardXP(user.id, "generation.content_strategy"); } catch {}
-    try { await notifyGeneration(user.id, "generation.content_strategy"); } catch {}
+    try { await awardXP(user.id, "generation.content_strategy"); } catch (e) { console.warn("Non-blocking op failed:", e); }
+    try { await notifyGeneration(user.id, "generation.content_strategy"); } catch (e) { console.warn("Non-blocking op failed:", e); }
 
     return NextResponse.json({
       market: marketContext,

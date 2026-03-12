@@ -116,10 +116,11 @@ export function StatsOverview() {
           .eq("completed", true),
       ]);
 
-      const campaigns = campaignsRes.data ?? [];
-      const adSpend = campaigns.reduce((s, c) => s + (c.total_spend ?? 0), 0);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const campaigns = (campaignsRes.data ?? []) as any[];
+      const adSpend = campaigns.reduce((s: number, c: any) => s + (c.total_spend ?? 0), 0);
       const avgRoas = campaigns.length > 0
-        ? campaigns.reduce((s, c) => s + (c.roas ?? 0), 0) / campaigns.length
+        ? campaigns.reduce((s: number, c: any) => s + (c.roas ?? 0), 0) / campaigns.length
         : 0;
 
       setCounts({

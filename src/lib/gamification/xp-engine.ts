@@ -146,7 +146,7 @@ export async function awardXP(
   const allBadges = [...currentBadges, ...newBadges];
 
   // Update profile
-  await supabase
+  const { error: updateError } = await supabase
     .from("profiles")
     .update({
       xp_points: newXP,
@@ -155,32 +155,42 @@ export async function awardXP(
     })
     .eq("id", userId);
 
+  if (updateError) {
+    console.error("awardXP: failed to update profile", updateError);
+  }
+
   // Log activity
-  await supabase.from("activity_log").insert({
+  const { error: logError } = await supabase.from("activity_log").insert({
     user_id: userId,
     activity_type: activityType,
     activity_data: { xp_awarded: xpAmount, ...activityData },
   });
 
+  if (logError) {
+    console.error("awardXP: failed to log activity", logError);
+  }
+
   // Create notifications for new badges and level ups
   if (newLevel > (profile.level || 1)) {
-    await supabase.from("notifications").insert({
+    const { error: levelNotifError } = await supabase.from("notifications").insert({
       user_id: userId,
       type: "badge" as const,
       title: `Niveau ${newLevel} atteint !`,
       message: `Bravo ! Tu es passé au niveau ${newLevel}.`,
     });
+    if (levelNotifError) console.error("awardXP: failed to create level notification", levelNotifError);
   }
 
   for (const badge of newBadges) {
     const badgeDef = getBadgeDefinition(badge);
     const badgeName = badgeDef?.name || badge;
-    await supabase.from("notifications").insert({
+    const { error: badgeNotifError } = await supabase.from("notifications").insert({
       user_id: userId,
       type: "badge" as const,
       title: `Badge "${badgeName}" debloque !`,
       message: badgeDef?.description || `Tu as debloque un nouveau badge.`,
     });
+    if (badgeNotifError) console.error("awardXP: failed to create badge notification", badgeNotifError);
   }
 
   return { xp_awarded: xpAmount, new_level: newLevel, new_badges: newBadges };

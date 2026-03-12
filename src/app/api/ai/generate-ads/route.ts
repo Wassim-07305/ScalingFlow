@@ -12,6 +12,7 @@ import {
   buildDMScriptsPrompt,
   type DMScriptsResult,
 } from "@/lib/ai/prompts/dm-scripts";
+import { adSpyPrompt } from "@/lib/ai/prompts/ad-spy";
 import { buildFullVaultContext } from "@/lib/ai/vault-context";
 import { awardXP } from "@/lib/gamification/xp-engine";
 import { notifyGeneration } from "@/lib/notifications/create";
@@ -92,6 +93,34 @@ export async function POST(req: NextRequest) {
     const avatarContext =
       typeof avatar === "object" ? JSON.stringify(avatar, null, 2) : String(avatar);
 
+    // --- Ad Spy (#43) ---
+    if (adType === "ad_spy") {
+      const { competitor, url: competitorUrl, industry, platform: adPlatform } = body;
+      if (!competitor || !industry || !adPlatform) {
+        return NextResponse.json(
+          { error: "competitor, industry et platform sont requis" },
+          { status: 400 }
+        );
+      }
+      const prompt = adSpyPrompt({
+        name: competitor,
+        url: competitorUrl,
+        industry,
+        platform: adPlatform,
+      }) + (vaultContext ? "\n" + vaultContext : "");
+
+      const result = await generateJSON<Record<string, unknown>>({
+        prompt,
+        maxTokens: 4096,
+        temperature: 0.8,
+      });
+
+      try { await awardXP(user.id, "generation.ads"); } catch (e) { console.warn("XP award failed:", e); }
+      try { await notifyGeneration(user.id, "generation.ads"); } catch (e) { console.warn("Notification failed:", e); }
+
+      return NextResponse.json({ adType: "ad_spy", result });
+    }
+
     // --- Video Ad Scripts ---
     if (adType === "video_ad") {
       const prompt = buildVideoAdScriptPrompt(offerContext, avatarContext) + (vaultContext ? "\n" + vaultContext : "");
@@ -102,7 +131,7 @@ export async function POST(req: NextRequest) {
 
       // Sauvegarder chaque script video
       for (const script of result.scripts || []) {
-        await supabase.from("ad_creatives").insert({
+        const { error: insertErr } = await supabase.from("ad_creatives").insert({
           user_id: user.id,
           creative_type: "video",
           ad_copy: script.corps,
@@ -112,11 +141,12 @@ export async function POST(req: NextRequest) {
           angle: script.angle,
           status: "draft",
         });
+        if (insertErr) console.error("generate-ads: failed to save video script", insertErr);
       }
 
       // Award XP (non-blocking)
-      try { await awardXP(user.id, "generation.ads"); } catch {}
-    try { await notifyGeneration(user.id, "generation.ads"); } catch {}
+      try { await awardXP(user.id, "generation.ads"); } catch (e) { console.warn("XP award failed:", e); }
+      try { await notifyGeneration(user.id, "generation.ads"); } catch (e) { console.warn("Notification failed:", e); }
 
       return NextResponse.json({ adType: "video_ad", result });
     }
@@ -132,7 +162,7 @@ export async function POST(req: NextRequest) {
       // Sauvegarder les sequences de prospection
       for (let i = 0; i < (result.prospection || []).length; i++) {
         const seq = result.prospection[i];
-        await supabase.from("ad_creatives").insert({
+        const { error: insertErr } = await supabase.from("ad_creatives").insert({
           user_id: user.id,
           creative_type: "dm",
           ad_copy: `Opener: ${seq.opener}\n\nFollow-up 1: ${seq.follow_up_1}\n\nFollow-up 2: ${seq.follow_up_2}\n\nClosing: ${seq.closing}`,
@@ -141,11 +171,12 @@ export async function POST(req: NextRequest) {
           cta: seq.closing,
           status: "draft",
         });
+        if (insertErr) console.error("generate-ads: failed to save DM script", insertErr);
       }
 
       // Award XP (non-blocking)
-      try { await awardXP(user.id, "generation.ads"); } catch {}
-    try { await notifyGeneration(user.id, "generation.ads"); } catch {}
+      try { await awardXP(user.id, "generation.ads"); } catch (e) { console.warn("XP award failed:", e); }
+      try { await notifyGeneration(user.id, "generation.ads"); } catch (e) { console.warn("Notification failed:", e); }
 
       return NextResponse.json({ adType: "dm_scripts", result });
     }
@@ -216,8 +247,8 @@ export async function POST(req: NextRequest) {
     }
 
     // Award XP (non-blocking)
-    try { await awardXP(user.id, "generation.ads"); } catch {}
-    try { await notifyGeneration(user.id, "generation.ads"); } catch {}
+    try { await awardXP(user.id, "generation.ads"); } catch (e) { console.warn("XP award failed:", e); }
+    try { await notifyGeneration(user.id, "generation.ads"); } catch (e) { console.warn("Notification failed:", e); }
 
     return NextResponse.json({
       ad_creatives: adCreatives,

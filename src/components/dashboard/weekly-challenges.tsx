@@ -189,8 +189,9 @@ export function WeeklyChallenges() {
         .eq("user_id", user.id)
         .eq("week_key", weekKey);
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const completedKeys = new Set(
-        (completedData ?? []).map((c) => c.challenge_key)
+        ((completedData ?? []) as any[]).map((c: any) => c.challenge_key)
       );
 
       // Selectionner 4 defis pour cette semaine (rotation basee sur l'ID utilisateur)

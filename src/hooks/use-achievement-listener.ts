@@ -38,7 +38,8 @@ export function useAchievementListener() {
           table: "notifications",
           filter: `user_id=eq.${user.id}`,
         },
-        (payload) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (payload: any) => {
           const notification = payload.new as Notification;
 
           // Transformer la notification en achievement si c'est un type supporte

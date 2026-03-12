@@ -81,7 +81,8 @@ async function loadEntriesFromDB(userId: string): Promise<LTVCACEntry[]> {
     .eq("user_id", userId)
     .order("date", { ascending: true });
   if (!data || data.length === 0) return [];
-  return data.map((row) => ({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (data as any[]).map((row: any) => ({
     date: row.date,
     avgDealValue: Number(row.avg_deal_value),
     monthlyChurnRate: Number(row.monthly_churn_rate),

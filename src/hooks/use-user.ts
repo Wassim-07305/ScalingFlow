@@ -61,7 +61,8 @@ export function useUser() {
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (_event, session) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } = supabase.auth.onAuthStateChange(async (_event: any, session: any) => {
       if (!mounted) return;
       setUser(session?.user ?? null);
       // If auth event fires before getUser resolves, mark as done

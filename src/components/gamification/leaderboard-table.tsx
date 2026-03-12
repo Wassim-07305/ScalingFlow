@@ -48,7 +48,8 @@ export function LeaderboardTable({ className }: LeaderboardTableProps) {
     if (count !== null) setTotalCount(count);
     setHasMore((data?.length ?? 0) >= PAGE_SIZE);
 
-    return data.map((row, index) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return (data as any[]).map((row: any, index: number) => {
       const profile = row.profiles as {
         id: string;
         full_name: string | null;
@@ -90,7 +91,8 @@ export function LeaderboardTable({ className }: LeaderboardTableProps) {
         if (count !== null) setTotalCount(count);
         setHasMore(data.length >= PAGE_SIZE);
 
-        const mapped: LeaderboardEntry[] = data.map((row, index) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const mapped: LeaderboardEntry[] = (data as any[]).map((row: any, index: number) => {
           const profile = row.profiles as {
             id: string;
             full_name: string | null;
@@ -120,7 +122,8 @@ export function LeaderboardTable({ className }: LeaderboardTableProps) {
 
         // Update rank_position for next comparison (non-blocking)
         Promise.all(
-          data.map((row, index) =>
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (data as any[]).map((row: any, index: number) =>
             supabase
               .from("leaderboard_scores")
               .update({ rank_position: index + 1 })

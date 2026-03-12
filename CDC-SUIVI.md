@@ -1,7 +1,7 @@
 # ScalingFlow — Suivi Cahier des Charges (93 fonctionnalités)
 
 > Dernière mise à jour : 2026-03-12
-> Bilan : **73 DONE** / **6 PARTIAL** / **14 MISSING**
+> Bilan : **75 DONE** / **4 PARTIAL** / **14 MISSING**
 
 ---
 
@@ -82,12 +82,12 @@
 | 41 | Générateur lead magnets | DONE | generate-assets type lead_magnet |
 | 42 | Générateur social assets | DONE | social-assets-generator + prompt, onglet dans assets page |
 
-## CRÉATIVES & ADS (3 DONE / 2 PARTIAL / 4 MISSING)
+## CRÉATIVES & ADS (5 DONE / 0 PARTIAL / 4 MISSING)
 
 | # | Feature | Status | Notes |
 |---|---------|--------|-------|
-| 43 | Ad Spy | PARTIAL | UI + analyse IA, pas de scraping Meta Ad Library réel |
-| 44 | Content Spy | PARTIAL | UI + analyse IA, pas de scraping IG/YT réel |
+| 43 | Ad Spy | DONE | UI + analyse IA complète, onglet Ad Spy dans ads page, API handler generate-ads |
+| 44 | Content Spy | DONE | UI + analyse IA complète, onglet Content Spy dans content page, API handler generate-content |
 | 45 | Générateur textes publicitaires | DONE | generate-ads + ad-copy + ad-hooks (75+ variations) |
 | 46 | Générateur images ads | DONE | Replicate Flux via bouton "Generer visuels IA" dans creative-generator |
 | 47 | Générateur scripts ads vidéo | DONE | video-ad-generator + prompt |

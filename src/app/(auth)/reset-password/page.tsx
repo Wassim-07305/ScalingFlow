@@ -25,7 +25,7 @@ export default function ResetPasswordPage() {
   // library picks it up automatically when onAuthStateChange fires.
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event) => {
+      (event: string) => {
         if (event === "PASSWORD_RECOVERY") {
           setHasSession(true);
           setChecking(false);
@@ -34,7 +34,8 @@ export default function ResetPasswordPage() {
     );
 
     // Fallback: if user already has a session (e.g. page refresh)
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    supabase.auth.getSession().then(({ data: { session } }: { data: { session: any } }) => {
       if (session) {
         setHasSession(true);
       }
