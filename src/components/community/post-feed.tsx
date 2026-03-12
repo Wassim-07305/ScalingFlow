@@ -187,7 +187,7 @@ export function PostFeed({ className }: PostFeedProps) {
       return;
     }
 
-    toast.success("Post publie !");
+    toast.success("Post publié !");
     // Attribuer XP (non bloquant)
     fetch("/api/gamification/award", {
       method: "POST",
@@ -409,7 +409,7 @@ export function PostFeed({ className }: PostFeedProps) {
       )
     );
     setEditingPostId(null);
-    toast.success("Post modifie");
+    toast.success("Post modifié");
   };
 
   // ---- Supprimer un post ----
@@ -425,7 +425,7 @@ export function PostFeed({ className }: PostFeedProps) {
     }
 
     setPosts((prev) => prev.filter((p) => p.id !== postId));
-    toast.success("Post supprime");
+    toast.success("Post supprimé");
   };
 
   // ---- Editer un commentaire ----
@@ -448,7 +448,7 @@ export function PostFeed({ className }: PostFeedProps) {
       ),
     }));
     setEditingCommentId(null);
-    toast.success("Commentaire modifie");
+    toast.success("Commentaire modifié");
   };
 
   // ---- Supprimer un commentaire ----
@@ -484,7 +484,7 @@ export function PostFeed({ className }: PostFeedProps) {
         .eq("id", postId);
     }
 
-    toast.success("Commentaire supprime");
+    toast.success("Commentaire supprimé");
   };
 
   // ---- Helpers d'affichage ----

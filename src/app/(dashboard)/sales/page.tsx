@@ -63,7 +63,7 @@ export default function SalesPage() {
           const errData = await response.json();
           if (errData.usage) { setUsageLimited(errData.usage); return; }
         }
-        throw new Error("Erreur lors de la generation");
+        throw new Error("Erreur lors de la génération");
       }
       const data = await response.json();
       setScript(data.ai_raw_response || data);
@@ -95,7 +95,7 @@ export default function SalesPage() {
         return;
       }
 
-      // Parse le contenu — ai_raw_response est deja JSON, content peut etre stringify
+      // Parse le contenu — ai_raw_response est déjà JSON, content peut être stringify
       let parsed = data.ai_raw_response;
       if (!parsed && data.content) {
         try {
@@ -110,7 +110,7 @@ export default function SalesPage() {
         return;
       }
 
-      // Determiner l'onglet cible depuis les metadata
+      // Déterminer l'onglet cible depuis les metadata
       const metadata = data.metadata as { scriptType?: string } | null;
       const scriptType = metadata?.scriptType;
       if (scriptType === "discovery" || scriptType === "closing") {
@@ -145,8 +145,8 @@ export default function SalesPage() {
                 variant="outline"
                 size="sm"
                 onClick={() => exportToPDF({
-                  title: activeType === "discovery" ? "Script Appel Decouverte" : "Script de Closing",
-                  subtitle: "Genere par ScalingFlow",
+                  title: activeType === "discovery" ? "Script Appel Découverte" : "Script de Closing",
+                  subtitle: "Généré par ScalingFlow",
                   content: script,
                   filename: `script-${activeType}-scalingflow.pdf`,
                 })}
@@ -319,7 +319,7 @@ function SalesScriptView({ script }: { script: SalesScript }) {
                   <div>
                     <p className="flex items-center gap-2 text-xs text-text-muted uppercase tracking-wide mb-2">
                       <MessageCircle className="h-3.5 w-3.5" />
-                      Questions cles
+                      Questions clés
                     </p>
                     <div className="space-y-2">
                       {section.key_questions.map((q, j) => (
@@ -353,7 +353,7 @@ function SalesScriptView({ script }: { script: SalesScript }) {
                   <div>
                     <p className="flex items-center gap-2 text-xs text-text-muted uppercase tracking-wide mb-2">
                       <AlertTriangle className="h-3.5 w-3.5 text-warning" />
-                      Erreurs a eviter
+                      Erreurs à éviter
                     </p>
                     <div className="space-y-1">
                       {section.mistakes_to_avoid.map((m, j) => (

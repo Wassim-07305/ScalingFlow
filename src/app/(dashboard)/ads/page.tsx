@@ -55,7 +55,7 @@ export default function AdsPage() {
       const tabKey = typeMap[data.creative_type] || "creatives";
       setLoadedData((prev) => ({ ...prev, [tabKey]: parsed }));
       setActiveTab(tabKey);
-      toast.success("Creative chargee depuis l'historique");
+      toast.success("Creative chargée depuis l'historique");
     } catch {
       toast.error("Erreur lors du chargement");
     }
@@ -100,7 +100,7 @@ export default function AdsPage() {
           titleField="headline"
           subtitleField="ad_copy"
           statusField="status"
-          emptyMessage="Aucune creative generee pour le moment."
+          emptyMessage="Aucune créative générée pour le moment."
           onSelect={handleHistorySelect}
         />
       )}

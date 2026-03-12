@@ -17,7 +17,7 @@ import { DeliveryDesigner } from "@/components/offer/delivery-designer";
 import { OtoGenerator } from "@/components/offer/oto-generator";
 
 const TABS = [
-  { key: "generate", label: "Generer", icon: Sparkles },
+  { key: "generate", label: "Générer", icon: Sparkles },
   { key: "positioning", label: "Positionnement", icon: Crosshair },
   { key: "pricing", label: "Pricing", icon: DollarSign },
   { key: "delivery", label: "Delivery", icon: Settings },
@@ -107,7 +107,7 @@ export default function OfferPage() {
 
   const handleSavePricing = async () => {
     if (!latestOfferId) {
-      toast.error("Aucune offre a modifier. Genere d'abord une offre.");
+      toast.error("Aucune offre a modifier. Génère d'abord une offre.");
       return;
     }
     setSavingPricing(true);

@@ -65,7 +65,7 @@ export function InstagramOptimizer({ className, initialData }: InstagramOptimize
     navigator.clipboard.writeText(text);
     setCopiedField(field);
     setTimeout(() => setCopiedField(null), 2000);
-    toast.success("Copie !");
+    toast.success("Copié !");
   };
 
   if (usageLimited) {
@@ -118,7 +118,7 @@ export function InstagramOptimizer({ className, initialData }: InstagramOptimize
               onClick={() => copyToClipboard(result.nom_affiche, "nom")}
             >
               <Copy className="h-3 w-3 mr-1" />
-              {copiedField === "nom" ? "Copie !" : "Copier"}
+              {copiedField === "nom" ? "Copié !" : "Copier"}
             </Button>
           </div>
           <p className="text-base font-semibold text-accent">{result.nom_affiche}</p>
@@ -135,7 +135,7 @@ export function InstagramOptimizer({ className, initialData }: InstagramOptimize
             onClick={() => copyToClipboard(result.bio, "bio")}
           >
             <Copy className="h-3 w-3 mr-1" />
-            {copiedField === "bio" ? "Copie !" : "Copier"}
+            {copiedField === "bio" ? "Copié !" : "Copier"}
           </Button>
         </div>
         <p className="text-sm text-text-secondary whitespace-pre-wrap">{result.bio}</p>
@@ -217,7 +217,7 @@ export function InstagramOptimizer({ className, initialData }: InstagramOptimize
                     onClick={() => copyToClipboard(alt, `alt-${i}`)}
                   >
                     <Copy className="h-3 w-3 mr-1" />
-                    {copiedField === `alt-${i}` ? "Copie !" : "Copier"}
+                    {copiedField === `alt-${i}` ? "Copié !" : "Copier"}
                   </Button>
                 </div>
                 <p className="text-sm text-text-secondary whitespace-pre-wrap">{alt}</p>

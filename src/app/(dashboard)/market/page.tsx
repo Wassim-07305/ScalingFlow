@@ -141,7 +141,7 @@ export default function MarketPage() {
           a.id === selectedAnalysis.id ? { ...a, persona } : a
         )
       );
-      toast.success("Persona genere avec succes !");
+      toast.success("Persona généré avec succès !");
     } catch (error) {
       toast.error(
         error instanceof Error
@@ -174,7 +174,7 @@ export default function MarketPage() {
       await res.json();
       // Recharger les concurrents depuis la DB
       await loadCompetitors();
-      toast.success("Analyse concurrentielle terminee !");
+      toast.success("Analyse concurrentielle terminée !");
     } catch (error) {
       toast.error(
         error instanceof Error
@@ -214,7 +214,7 @@ export default function MarketPage() {
           a.id === selectedAnalysis.id ? { ...a, schwartz_analysis: schwartzAnalysis } : a
         )
       );
-      toast.success("Analyse Schwartz terminee !");
+      toast.success("Analyse Schwartz terminée !");
     } catch (error) {
       toast.error(
         error instanceof Error
@@ -244,7 +244,7 @@ export default function MarketPage() {
       {analyses.length > 1 && (
         <div className="mb-6">
           <label className="text-sm text-text-muted mb-2 block">
-            Marche selectionne
+            Marché sélectionné
           </label>
           <div className="flex flex-wrap gap-2">
             {analyses.map((a) => (
@@ -281,7 +281,7 @@ export default function MarketPage() {
           <CardContent className="flex flex-col items-center justify-center py-12">
             <BarChart3 className="h-12 w-12 text-text-muted mb-4" />
             <h3 className="text-lg font-medium text-text-primary mb-2">
-              Aucune analyse de marche
+              Aucune analyse de marché
             </h3>
             <p className="text-sm text-text-secondary text-center max-w-md">
               Lance une analyse de marche depuis l&apos;onboarding pour voir tes
@@ -354,7 +354,7 @@ export default function MarketPage() {
                       <div>
                         <h4 className="text-sm font-medium text-text-muted mb-1 flex items-center gap-1.5">
                           <Target className="h-3.5 w-3.5" />
-                          Positionnement recommande
+                          Positionnement recommandé
                         </h4>
                         <p className="text-sm text-text-primary">
                           {analysis.recommended_positioning}
@@ -367,7 +367,7 @@ export default function MarketPage() {
                       <div>
                         <h4 className="text-sm font-medium text-text-muted mb-2 flex items-center gap-1.5">
                           <AlertTriangle className="h-3.5 w-3.5" />
-                          Problemes identifies
+                          Problèmes identifiés
                         </h4>
                         <div className="flex flex-wrap gap-1.5">
                           {analysis.problems.map((p, i) => (

@@ -306,7 +306,7 @@ export function Sidebar({
             <TooltipTrigger asChild>
               <button
                 onClick={handleLogout}
-                aria-label="Se deconnecter"
+                aria-label="Se déconnecter"
                 className={cn(
                   "mt-1 flex w-full items-center rounded-xl px-3 py-2 text-sm text-sidebar-foreground/50 transition-all duration-200 hover:bg-red-500/10 hover:text-red-400",
                   isCollapsed && "md:justify-center md:px-0"

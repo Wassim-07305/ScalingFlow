@@ -35,7 +35,7 @@ export default function FunnelPage() {
 
       setLoadedData(data.ai_raw_response || data);
       setActiveTab("generate");
-      toast.success("Funnel charge depuis l'historique");
+      toast.success("Funnel chargé depuis l'historique");
     } catch {
       toast.error("Erreur lors du chargement");
     }

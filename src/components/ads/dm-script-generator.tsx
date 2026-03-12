@@ -66,7 +66,7 @@ export function DMScriptGenerator({ className, initialData }: DMScriptGeneratorP
     navigator.clipboard.writeText(text);
     setCopiedField(field);
     setTimeout(() => setCopiedField(null), 2000);
-    toast.success("Copie !");
+    toast.success("Copié !");
   };
 
   if (usageLimited) {
@@ -152,7 +152,7 @@ export function DMScriptGenerator({ className, initialData }: DMScriptGeneratorP
                           onClick={() => copyToClipboard(seq.opener, `${seqKey}-opener`)}
                         >
                           <Copy className="h-3 w-3 mr-1" />
-                          {copiedField === `${seqKey}-opener` ? "Copie !" : "Copier"}
+                          {copiedField === `${seqKey}-opener` ? "Copié !" : "Copier"}
                         </Button>
                       </div>
                       <p className="text-sm text-text-secondary whitespace-pre-wrap">{seq.opener}</p>
@@ -168,7 +168,7 @@ export function DMScriptGenerator({ className, initialData }: DMScriptGeneratorP
                           onClick={() => copyToClipboard(seq.follow_up_1, `${seqKey}-fu1`)}
                         >
                           <Copy className="h-3 w-3 mr-1" />
-                          {copiedField === `${seqKey}-fu1` ? "Copie !" : "Copier"}
+                          {copiedField === `${seqKey}-fu1` ? "Copié !" : "Copier"}
                         </Button>
                       </div>
                       <p className="text-sm text-text-secondary whitespace-pre-wrap">
@@ -186,7 +186,7 @@ export function DMScriptGenerator({ className, initialData }: DMScriptGeneratorP
                           onClick={() => copyToClipboard(seq.follow_up_2, `${seqKey}-fu2`)}
                         >
                           <Copy className="h-3 w-3 mr-1" />
-                          {copiedField === `${seqKey}-fu2` ? "Copie !" : "Copier"}
+                          {copiedField === `${seqKey}-fu2` ? "Copié !" : "Copier"}
                         </Button>
                       </div>
                       <p className="text-sm text-text-secondary whitespace-pre-wrap">
@@ -204,7 +204,7 @@ export function DMScriptGenerator({ className, initialData }: DMScriptGeneratorP
                           onClick={() => copyToClipboard(seq.closing, `${seqKey}-closing`)}
                         >
                           <Copy className="h-3 w-3 mr-1" />
-                          {copiedField === `${seqKey}-closing` ? "Copie !" : "Copier"}
+                          {copiedField === `${seqKey}-closing` ? "Copié !" : "Copier"}
                         </Button>
                       </div>
                       <p className="text-sm text-accent whitespace-pre-wrap">{seq.closing}</p>
@@ -230,7 +230,7 @@ export function DMScriptGenerator({ className, initialData }: DMScriptGeneratorP
                   onClick={() => copyToClipboard(item.message, `retarget-${i}`)}
                 >
                   <Copy className="h-3 w-3 mr-1" />
-                  {copiedField === `retarget-${i}` ? "Copie !" : "Copier"}
+                  {copiedField === `retarget-${i}` ? "Copié !" : "Copier"}
                 </Button>
               </div>
               <p className="text-sm font-medium text-text-primary mb-2">{item.scenario}</p>

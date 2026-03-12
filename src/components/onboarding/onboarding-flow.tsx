@@ -74,7 +74,7 @@ const SITUATION_FIELDS: Record<
     {
       key: "secteur",
       label: "Ton secteur",
-      placeholder: "Ex: Tech, Finance, Sante...",
+      placeholder: "Ex: Tech, Finance, Santé...",
     },
     {
       key: "biggest_challenge",
@@ -86,7 +86,7 @@ const SITUATION_FIELDS: Record<
     {
       key: "missions",
       label: "Tes missions principales",
-      placeholder: "Ex: Developpement web, consulting...",
+      placeholder: "Ex: Développement web, consulting...",
     },
     {
       key: "ca_actuel",
@@ -103,7 +103,7 @@ const SITUATION_FIELDS: Record<
     {
       key: "biggest_challenge",
       label: "Ton plus gros challenge",
-      placeholder: "Ce qui t'empeche de scaler...",
+      placeholder: "Ce qui t'empêche de scaler...",
     },
   ],
   entrepreneur: [
@@ -129,7 +129,7 @@ const SITUATION_FIELDS: Record<
     {
       key: "biggest_challenge",
       label: "Qu'est-ce qui te bloque ?",
-      placeholder: "Decris ce qui t'empeche de demarrer...",
+      placeholder: "Décris ce qui t'empêche de démarrer...",
     },
   ],
 };
@@ -842,7 +842,7 @@ export function OnboardingFlow() {
       <div className={cn("relative min-h-dvh text-white", onboardingBg)}>
         <AnimatedBackground />
         <div className="relative z-10 flex min-h-dvh flex-col items-center justify-center">
-          <AILoading text="Analyse de ton marche en cours" />
+          <AILoading text="Analyse de ton marché en cours" />
         </div>
       </div>
     );
@@ -915,7 +915,7 @@ export function OnboardingFlow() {
                     onClick={handleButtonClick}
                     disabled={!canProceed()}
                     aria-label={
-                      isSummary ? "Lancer l'analyse IA" : "Etape suivante"
+                      isSummary ? "Lancer l'analyse IA" : "Étape suivante"
                     }
                     className={cn(
                       "flex items-center gap-2 rounded-xl text-base font-semibold text-white transition-all",
@@ -948,7 +948,7 @@ export function OnboardingFlow() {
                     <span className="text-sm text-white/25">
                       Appuie sur{" "}
                       <kbd className="rounded bg-white/10 px-1.5 py-0.5 font-mono text-xs">
-                        Entree
+                        Entrée
                       </kbd>
                     </span>
                   )}

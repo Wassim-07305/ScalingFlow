@@ -107,7 +107,7 @@ export default function VaultPage() {
       }
       const data = await response.json();
       setProfile((prev) => prev ? { ...prev, vault_analysis: data } : prev);
-      toast.success("Analyse du vault regeneree !");
+      toast.success("Analyse du vault régénérée !");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Erreur");
     } finally {
@@ -131,7 +131,7 @@ export default function VaultPage() {
         throw new Error("Erreur lors de la generation");
       }
       setResources((prev) => prev.filter((r) => r.id !== id));
-      toast.success("Ressource supprimee");
+      toast.success("Ressource supprimée");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Erreur");
     } finally {
@@ -196,7 +196,7 @@ export default function VaultPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Brain className="h-5 w-5 text-accent" />
-              Competences
+              Compétences
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -207,7 +207,7 @@ export default function VaultPage() {
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-text-muted">Aucune competence renseignee</p>
+              <p className="text-sm text-text-muted">Aucune compétence renseignée</p>
             )}
           </CardContent>
         </Card>
@@ -223,15 +223,15 @@ export default function VaultPage() {
           <CardContent className="space-y-2">
             <div className="flex items-center gap-2">
               <span className="text-xs text-text-muted uppercase">Profil :</span>
-              <Badge variant="muted">{situation || "Non renseigne"}</Badge>
+              <Badge variant="muted">{situation || "Non renseigné"}</Badge>
             </div>
             <div className="flex items-center gap-2">
               <span className="text-xs text-text-muted uppercase">Niveau :</span>
-              <Badge variant="muted">{experienceLevel || "Non renseigne"}</Badge>
+              <Badge variant="muted">{experienceLevel || "Non renseigné"}</Badge>
             </div>
             <div className="flex items-center gap-2">
               <span className="text-xs text-text-muted uppercase">Parcours :</span>
-              <Badge variant="muted">{parcoursLabel || parcours || "Non defini"}</Badge>
+              <Badge variant="muted">{parcoursLabel || parcours || "Non défini"}</Badge>
             </div>
           </CardContent>
         </Card>
@@ -252,7 +252,7 @@ export default function VaultPage() {
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-text-muted">Aucune formation renseignee</p>
+              <p className="text-sm text-text-muted">Aucune formation renseignée</p>
             )}
           </CardContent>
         </Card>
