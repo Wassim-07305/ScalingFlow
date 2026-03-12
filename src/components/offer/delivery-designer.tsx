@@ -92,10 +92,10 @@ export function DeliveryDesigner({ offerId, className, initialData }: DeliveryDe
 
     setLoading(true);
     try {
-      const response = await fetch("/api/ai/generate-offer", {
+      const response = await fetch("/api/ai/generate-delivery", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type: "delivery", offerId }),
+        body: JSON.stringify({ offerId }),
       });
 
       if (!response.ok) throw new Error("Erreur lors de la generation");

@@ -228,7 +228,7 @@ export function AdsAutomation() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          agentType: "ads",
+          agentType: "ad_expert",
           messages: [
             {
               role: "user",

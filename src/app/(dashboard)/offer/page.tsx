@@ -10,14 +10,18 @@ import { GenerationHistory } from "@/components/shared/generation-history";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
 import { useUser } from "@/hooks/use-user";
-import { Sparkles, Crosshair, BarChart3, History, DollarSign } from "lucide-react";
+import { Sparkles, Crosshair, BarChart3, History, DollarSign, Settings, Gift } from "lucide-react";
 import { toast } from "sonner";
 import { PricingBuilder } from "@/components/offer/pricing-builder";
+import { DeliveryDesigner } from "@/components/offer/delivery-designer";
+import { OtoGenerator } from "@/components/offer/oto-generator";
 
 const TABS = [
   { key: "generate", label: "Generer", icon: Sparkles },
   { key: "positioning", label: "Positionnement", icon: Crosshair },
   { key: "pricing", label: "Pricing", icon: DollarSign },
+  { key: "delivery", label: "Delivery", icon: Settings },
+  { key: "oto", label: "OTO", icon: Gift },
   { key: "score", label: "Score", icon: BarChart3 },
   { key: "history", label: "Historique", icon: History },
 ] as const;
@@ -158,6 +162,12 @@ export default function OfferPage() {
             {savingPricing ? "Sauvegarde..." : "Sauvegarder le pricing"}
           </Button>
         </div>
+      )}
+      {activeTab === "delivery" && (
+        <DeliveryDesigner offerId={latestOfferId || undefined} />
+      )}
+      {activeTab === "oto" && (
+        <OtoGenerator offerId={latestOfferId || undefined} />
       )}
       {activeTab === "score" && (
         <OfferScoreCard offerId={latestOfferId || undefined} />

@@ -53,10 +53,10 @@ export function OtoGenerator({ offerId, className, initialData }: OtoGeneratorPr
     setOtoData(null);
 
     try {
-      const response = await fetch("/api/ai/generate-offer", {
+      const response = await fetch("/api/ai/generate-oto", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type: "oto", offerId }),
+        body: JSON.stringify({ offerId }),
       });
 
       if (!response.ok) {
