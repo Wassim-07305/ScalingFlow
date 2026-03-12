@@ -137,7 +137,7 @@ const SITUATION_FIELDS: Record<
 /* ─── Helper: build expertise answers object ─── */
 
 function buildExpertiseAnswers(
-  formData: Record<string, unknown>
+  formData: Record<string, unknown>,
 ): Record<string, string> {
   const ea: Record<string, string> = {};
   for (let i = 1; i <= 6; i++) {
@@ -170,7 +170,7 @@ export function OnboardingFlow() {
 
   const visibleQuestions = useMemo(
     () => QUESTIONS.filter((q) => !q.showWhen || q.showWhen(formData)),
-    [formData]
+    [formData],
   );
 
   const currentQuestion = visibleQuestions[step];
@@ -226,11 +226,11 @@ export function OnboardingFlow() {
 
           // Compute visible questions from restored data for correct step
           const restoredVisible = QUESTIONS.filter(
-            (q) => !q.showWhen || q.showWhen(r)
+            (q) => !q.showWhen || q.showWhen(r),
           );
           const resumeStep = Math.min(
             Math.max(profile.onboarding_step || 0, 0),
-            restoredVisible.length - 1
+            restoredVisible.length - 1,
           );
 
           setFormData(r);
@@ -252,7 +252,7 @@ export function OnboardingFlow() {
   useEffect(() => {
     const timer = setTimeout(() => {
       const el = document.querySelector<HTMLInputElement | HTMLTextAreaElement>(
-        "[data-autofocus]"
+        "[data-autofocus]",
       );
       el?.focus();
     }, 350);
@@ -293,7 +293,7 @@ export function OnboardingFlow() {
         .eq("id", user.id);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [user, formData]
+    [user, formData],
   );
 
   /* ── Navigation ── */
@@ -343,6 +343,56 @@ export function OnboardingFlow() {
         return false;
     }
   }, [currentQuestion, formData]);
+
+  /* ── Skip analysis + complete onboarding ── */
+
+  const handleSkipAnalysis = async () => {
+    if (!user) return;
+    await saveProgress(totalSteps);
+
+    await supabase
+      .from("profiles")
+      .update({
+        onboarding_completed: true,
+        onboarding_step: totalSteps,
+        first_name: (formData.firstName as string) || null,
+        last_name: (formData.lastName as string) || null,
+        country: (formData.country as string) || null,
+        language: (formData.language as string) || null,
+        situation: (formData.situation as string) || null,
+        situation_details: formData.situationDetails || {},
+        vault_skills: formData.vaultSkills || [],
+        expertise_answers: buildExpertiseAnswers(formData),
+        parcours: (formData.parcours as string) || null,
+        experience_level: formData.experienceLevel as string as
+          | "beginner"
+          | "intermediate"
+          | "advanced",
+        current_revenue: Number(formData.currentRevenue) || 0,
+        target_revenue: Number(formData.targetRevenue) || 0,
+        industries: (formData.industries as string[]) || [],
+        objectives: (formData.objectives as string[]) || [],
+        budget_monthly: Number(formData.budgetMonthly) || 0,
+        hours_per_week: 0,
+        deadline: "",
+        team_size: 1,
+        formations: [],
+        vault_completed: true,
+      })
+      .eq("id", user.id);
+
+    confetti({
+      particleCount: 150,
+      spread: 70,
+      origin: { y: 0.6 },
+      colors: ["#34d399", "#2dd4bf", "#06b6d4"],
+    });
+
+    setTimeout(() => {
+      router.push("/");
+      router.refresh();
+    }, 1500);
+  };
 
   /* ── Market analysis ── */
 
@@ -414,7 +464,7 @@ export function OnboardingFlow() {
         vault_skills: formData.vaultSkills || [],
         expertise_answers: buildExpertiseAnswers(formData),
         parcours: (formData.parcours as string) || null,
-        experience_level: (formData.experienceLevel as string) as
+        experience_level: formData.experienceLevel as string as
           | "beginner"
           | "intermediate"
           | "advanced",
@@ -530,7 +580,10 @@ export function OnboardingFlow() {
               className="group flex items-center gap-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 px-8 py-4 text-lg font-semibold text-white shadow-xl shadow-emerald-500/25 transition-all duration-200 hover:scale-105 hover:shadow-2xl hover:shadow-emerald-500/40"
             >
               C&apos;est parti
-              <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" aria-hidden="true" />
+              <ArrowRight
+                className="h-5 w-5 transition-transform group-hover:translate-x-1"
+                aria-hidden="true"
+              />
             </motion.button>
           </div>
         );
@@ -540,7 +593,9 @@ export function OnboardingFlow() {
         return (
           <div className="w-full max-w-lg">
             <div className="mb-8">
-              <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">{q.title}</h2>
+              <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
+                {q.title}
+              </h2>
               {q.subtitle && (
                 <p className="mt-2 text-base text-white/40">{q.subtitle}</p>
               )}
@@ -561,7 +616,9 @@ export function OnboardingFlow() {
         return (
           <div className="w-full max-w-lg">
             <div className="mb-8">
-              <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">{q.title}</h2>
+              <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
+                {q.title}
+              </h2>
             </div>
             <div className="relative">
               <input
@@ -584,7 +641,9 @@ export function OnboardingFlow() {
         return (
           <div className="w-full max-w-lg">
             <div className="mb-8">
-              <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">{q.title}</h2>
+              <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
+                {q.title}
+              </h2>
               {q.subtitle && (
                 <p className="mt-2 text-base text-white/40">{q.subtitle}</p>
               )}
@@ -605,7 +664,9 @@ export function OnboardingFlow() {
         return (
           <div className="w-full max-w-lg">
             <div className="mb-8">
-              <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">{q.title}</h2>
+              <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
+                {q.title}
+              </h2>
               {q.subtitle && (
                 <p className="mt-2 text-base text-white/40">{q.subtitle}</p>
               )}
@@ -626,7 +687,9 @@ export function OnboardingFlow() {
         return (
           <div className="w-full max-w-lg">
             <div className="mb-8">
-              <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">{q.title}</h2>
+              <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
+                {q.title}
+              </h2>
               {q.subtitle && (
                 <p className="mt-2 text-base text-white/40">{q.subtitle}</p>
               )}
@@ -648,7 +711,9 @@ export function OnboardingFlow() {
         return (
           <div className="w-full max-w-lg">
             <div className="mb-8">
-              <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">{q.title}</h2>
+              <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
+                {q.title}
+              </h2>
               {q.subtitle && (
                 <p className="mt-2 text-base text-white/40">{q.subtitle}</p>
               )}
@@ -663,7 +728,7 @@ export function OnboardingFlow() {
                     {...(idx === 0 ? { "data-autofocus": true } : {})}
                     type={f.type || "text"}
                     value={String(
-                      details[f.key as keyof SituationDetails] || ""
+                      details[f.key as keyof SituationDetails] || "",
                     )}
                     onChange={(e) => {
                       const updated = {
@@ -690,7 +755,9 @@ export function OnboardingFlow() {
         return (
           <div className="w-full max-w-lg">
             <div className="mb-8">
-              <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">{q.title}</h2>
+              <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
+                {q.title}
+              </h2>
               {q.subtitle && (
                 <p className="mt-2 text-base text-white/40">{q.subtitle}</p>
               )}
@@ -707,7 +774,9 @@ export function OnboardingFlow() {
         return (
           <div className="w-full max-w-lg">
             <div className="mb-8">
-              <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">{q.title}</h2>
+              <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
+                {q.title}
+              </h2>
               {q.subtitle && (
                 <p className="mt-2 text-base text-white/40">{q.subtitle}</p>
               )}
@@ -725,7 +794,9 @@ export function OnboardingFlow() {
         return (
           <div className="w-full max-w-2xl">
             <div className="mb-8">
-              <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">{q.title}</h2>
+              <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
+                {q.title}
+              </h2>
               {q.subtitle && (
                 <p className="mt-2 text-base text-white/40">{q.subtitle}</p>
               )}
@@ -843,12 +914,14 @@ export function OnboardingFlow() {
                   <button
                     onClick={handleButtonClick}
                     disabled={!canProceed()}
-                    aria-label={isSummary ? "Lancer l'analyse IA" : "Etape suivante"}
+                    aria-label={
+                      isSummary ? "Lancer l'analyse IA" : "Etape suivante"
+                    }
                     className={cn(
                       "flex items-center gap-2 rounded-xl text-base font-semibold text-white transition-all",
                       isSummary
                         ? "bg-gradient-to-r from-emerald-500 to-teal-500 px-7 py-3.5 shadow-lg shadow-emerald-500/25 hover:scale-105 hover:shadow-xl hover:shadow-emerald-500/40 disabled:opacity-50"
-                        : "bg-emerald-500 px-6 py-3 hover:bg-emerald-400 disabled:opacity-50"
+                        : "bg-emerald-500 px-6 py-3 hover:bg-emerald-400 disabled:opacity-50",
                     )}
                   >
                     {isSummary ? (
@@ -863,12 +936,22 @@ export function OnboardingFlow() {
                       </>
                     )}
                   </button>
-                  <span className="text-sm text-white/25">
-                    Appuie sur{" "}
-                    <kbd className="rounded bg-white/10 px-1.5 py-0.5 font-mono text-xs">
-                      Entree
-                    </kbd>
-                  </span>
+                  {isSummary && (
+                    <button
+                      onClick={handleSkipAnalysis}
+                      className="rounded-xl border border-white/20 px-6 py-3 text-base font-medium text-white/60 transition-all hover:border-white/40 hover:text-white/80"
+                    >
+                      Passer l&apos;analyse
+                    </button>
+                  )}
+                  {!isSummary && (
+                    <span className="text-sm text-white/25">
+                      Appuie sur{" "}
+                      <kbd className="rounded bg-white/10 px-1.5 py-0.5 font-mono text-xs">
+                        Entree
+                      </kbd>
+                    </span>
+                  )}
                 </div>
               )}
             </motion.div>
