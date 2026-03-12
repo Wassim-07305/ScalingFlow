@@ -211,7 +211,7 @@ export function StatsOverview() {
   ];
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-9 gap-3">
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
       {stats.map((stat) => {
         const colors = colorMap[stat.color];
         return (
@@ -233,14 +233,14 @@ export function StatsOverview() {
             <div className="relative flex items-start justify-between">
               <div>
                 <p className="text-sm text-text-secondary font-medium">{stat.label}</p>
-                <div className="mt-1.5 text-2xl font-bold text-text-primary">
+                <div className="mt-1.5 text-lg sm:text-2xl font-bold text-text-primary">
                   {isLoading ? (
                     <span className="inline-block h-7 w-14 animate-pulse rounded bg-white/10" />
                   ) : (
                     <AnimatedCounter
                       value={stat.value}
                       suffix={stat.suffix}
-                      decimals={stat.suffix === "x" || stat.suffix === " €" ? 1 : 0}
+                      decimals={stat.suffix === "x" ? 1 : 0}
                     />
                   )}
                 </div>
