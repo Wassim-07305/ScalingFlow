@@ -210,7 +210,7 @@ export function GrowthTiers({
       </Card>
 
       {/* All Tiers */}
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {GROWTH_TIERS.map((tier) => {
           const isActive = tier.id === currentTier.id;
           const isPast = GROWTH_TIERS.indexOf(tier) < GROWTH_TIERS.indexOf(currentTier);

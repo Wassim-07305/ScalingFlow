@@ -25,6 +25,7 @@ import {
 } from "lucide-react";
 import { PARCOURS, type ParcoursId } from "@/lib/parcours";
 import { UpgradeWall } from "@/components/shared/upgrade-wall";
+import { VaultSkillMap } from "@/components/vault/vault-skill-map";
 
 interface VaultResource {
   id: string;
@@ -335,6 +336,13 @@ export default function VaultPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* Skill Map — Radar + Mindmap */}
+      {skills && skills.length > 0 && (
+        <div className="mt-6">
+          <VaultSkillMap />
+        </div>
+      )}
 
       {/* AI Analysis — Radar, score, forces, faiblesses, etc. */}
       {vaultAnalysis && vaultAnalysis.radar && (

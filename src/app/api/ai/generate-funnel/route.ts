@@ -94,6 +94,7 @@ export async function POST(req: NextRequest) {
         optin_page: generatedFunnel.optin_page,
         vsl_page: generatedFunnel.vsl_page,
         thankyou_page: generatedFunnel.thankyou_page,
+        ai_raw_response: generatedFunnel,
         status: "draft",
       })
       .select()

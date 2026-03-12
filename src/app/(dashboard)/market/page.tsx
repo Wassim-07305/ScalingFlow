@@ -539,7 +539,8 @@ export default function MarketPage() {
                     : competitors.map((c) => ({
                         name: c.competitor_name,
                         positioning: c.positioning || "",
-                        pricing_estimate: c.pricing || "",
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        pricing_estimate: (c as any).pricing_estimate || (c as any).pricing || "",
                         strengths: c.strengths || [],
                         weaknesses: c.weaknesses || [],
                         differentiation: c.gap_opportunity || "",

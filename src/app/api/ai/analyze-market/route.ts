@@ -55,19 +55,23 @@ export async function POST(req: NextRequest) {
     // Save each market analysis to the database
     for (let i = 0; i < result.markets.length; i++) {
       const market = result.markets[i];
-      await supabase.from("market_analyses").insert({
-        user_id: user.id,
-        market_name: market.name,
-        market_description: market.description,
-        problems: market.problems,
-        competitors: market.competitors,
-        demand_signals: market.demand_signals,
-        viability_score: market.viability_score,
-        recommended_positioning: market.positioning,
-        target_avatar: market.avatar,
-        ai_raw_response: market,
-        selected: i === result.recommended_market_index,
-      });
+      try {
+        await supabase.from("market_analyses").insert({
+          user_id: user.id,
+          market_name: market.name,
+          market_description: market.description,
+          problems: market.problems,
+          competitors: market.competitors,
+          demand_signals: market.demand_signals,
+          viability_score: market.viability_score,
+          recommended_positioning: market.positioning,
+          target_avatar: market.avatar,
+          ai_raw_response: market,
+          selected: i === result.recommended_market_index,
+        });
+      } catch (insertErr) {
+        console.error(`[analyze-market] Failed to save market ${i} (${market.name}):`, insertErr);
+      }
     }
 
     // Award XP (non-blocking)

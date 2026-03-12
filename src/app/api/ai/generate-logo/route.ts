@@ -3,6 +3,8 @@ import { createClient } from "@/lib/supabase/server";
 import { checkAIUsage } from "@/lib/stripe/check-usage";
 import { rateLimit } from "@/lib/utils/rate-limit";
 
+export const maxDuration = 300;
+
 const REPLICATE_API_URL = "https://api.replicate.com/v1/predictions";
 
 interface ReplicateResponse {
