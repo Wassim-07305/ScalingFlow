@@ -66,7 +66,7 @@ const potentielLabel: Record<string, string> = {
 
 export function VaultResults({ analysis, onContinue }: VaultResultsProps) {
   // Formater les donnees pour le RadarChart
-  const radarData = Object.entries(analysis.radar).map(([key, value]) => ({
+  const radarData = Object.entries(analysis.radar ?? {}).map(([key, value]) => ({
     dimension: radarLabels[key] ?? key,
     value,
     fullMark: 100,
@@ -155,7 +155,7 @@ export function VaultResults({ analysis, onContinue }: VaultResultsProps) {
           </CardHeader>
           <CardContent className="flex flex-col items-center gap-4">
             <ViabilityScore
-              score={analysis.score_avantage_competitif}
+              score={analysis.score_avantage_competitif ?? 0}
               size="lg"
             />
             <p className="text-center text-sm text-text-secondary">
@@ -183,7 +183,7 @@ export function VaultResults({ analysis, onContinue }: VaultResultsProps) {
           </CardHeader>
           <CardContent>
             <ul className="space-y-3">
-              {analysis.forces_principales.map((force, i) => (
+              {(analysis.forces_principales ?? []).map((force, i) => (
                 <li key={i} className="flex items-start gap-3">
                   <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-accent-muted text-xs font-bold text-accent">
                     {i + 1}
@@ -205,7 +205,7 @@ export function VaultResults({ analysis, onContinue }: VaultResultsProps) {
           </CardHeader>
           <CardContent>
             <ul className="space-y-3">
-              {analysis.faiblesses.map((faiblesse, i) => (
+              {(analysis.faiblesses ?? []).map((faiblesse, i) => (
                 <li key={i} className="flex items-start gap-3">
                   <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-warning/12 text-xs font-bold text-warning">
                     {i + 1}
@@ -228,7 +228,7 @@ export function VaultResults({ analysis, onContinue }: VaultResultsProps) {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {analysis.suggestions_productisation.map((suggestion, i) => (
+            {(analysis.suggestions_productisation ?? []).map((suggestion, i) => (
               <div
                 key={i}
                 className="rounded-[8px] border border-border-default bg-bg-tertiary p-4 transition-colors hover:border-border-hover"
@@ -263,7 +263,7 @@ export function VaultResults({ analysis, onContinue }: VaultResultsProps) {
           <CardContent className="space-y-3">
             <div className="flex items-center gap-3">
               <Badge variant="default" className="text-sm">
-                {funnelLabels[analysis.recommandation_funnel]}
+                {funnelLabels[analysis.recommandation_funnel] ?? analysis.recommandation_funnel ?? "Non défini"}
               </Badge>
             </div>
             <p className="text-sm leading-relaxed text-text-secondary">
@@ -306,7 +306,7 @@ export function VaultResults({ analysis, onContinue }: VaultResultsProps) {
         </CardHeader>
         <CardContent>
           <ol className="space-y-3">
-            {analysis.prochaines_etapes.map((etape, i) => (
+            {(analysis.prochaines_etapes ?? []).map((etape, i) => (
               <li key={i} className="flex items-start gap-3">
                 <span
                   className={cn(
