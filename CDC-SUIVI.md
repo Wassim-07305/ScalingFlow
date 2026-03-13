@@ -1,7 +1,7 @@
 # ScalingFlow — Suivi Cahier des Charges (93 fonctionnalités)
 
-> Dernière mise à jour : 2026-03-12
-> Bilan : **86 DONE** / **3 PARTIAL** / **4 MISSING** (+ 7 features enrichies conformité CDC)
+> Dernière mise à jour : 2026-03-13
+> Bilan : **93 DONE** / **0 PARTIAL** / **0 MISSING** — 100% CDC complet
 
 ---
 
@@ -96,18 +96,18 @@
 | 50 | DM Ads retargeting | DONE | dm-retargeting-generator + prompt + automation DM + audiences |
 | 51 | Scripts setting DM | DONE | dm-script-generator + dm-scripts (prospection) |
 
-## INTÉGRATIONS & LANCEMENT (4 DONE / 3 PARTIAL / 3 MISSING — Settings UI ajoutée pour GHL/Meta/Stripe)
+## INTÉGRATIONS & LANCEMENT (10/10 DONE)
 
 | # | Feature | Status | Notes |
 |---|---------|--------|-------|
-| 52 | Connect GHL | PARTIAL | Webhook inbound leads + Settings UI (webhook sortant + URL entrant copiable). Pas d'OAuth complet |
-| 53 | Connect Meta Ads | PARTIAL | Token + Ad Account ID configurables dans Settings. Pas OAuth |
+| 52 | Connect GHL | DONE | OAuth2 complet (connect/callback/disconnect) + push contacts API + webhook inbound + token refresh auto |
+| 53 | Connect Meta Ads | DONE | OAuth Facebook Login (long-lived token 60j) + auto-detect ad accounts + Settings UI connect/disconnect |
 | 54 | Install Pixel + CAPI | DONE | Generateur de code Pixel + CAPI avec config, events, checklist dans launch/pixel |
-| 55 | Connect Stripe / Whop | PARTIAL | Stripe plateforme ok + Settings UI pour Stripe Connect account ID. Pas d'OAuth Stripe Connect complet |
-| 56 | Connect Socials | MISSING | Pas d'OAuth IG/YT/LinkedIn |
+| 55 | Connect Stripe / Whop | DONE | Stripe Connect Express OAuth (onboarding link + account status check + disconnect) |
+| 56 | Connect Socials | DONE | OAuth complet pour Instagram, YouTube (Google), LinkedIn, TikTok — connect/callback/disconnect par provider |
 | 57 | Deploy Funnel | DONE | Export PDF + HTML standalone (dark theme, responsive, 3 pages) |
-| 58 | Config audiences Meta | MISSING | Pas d'accès écriture Meta API |
-| 59 | Launch Ads automatique | MISSING | Pas de création de campagnes via API |
+| 58 | Config audiences Meta | DONE | API write Meta : create custom audiences + lookalike audiences + local DB tracking |
+| 59 | Launch Ads automatique | DONE | API write Meta : create campaigns + ad sets + ad creatives + ads, activate/pause via PATCH |
 | 60 | Checklist pré-lancement | DONE | launch/page.tsx (558 lignes) |
 | 61 | Guide 10 premiers jours | DONE | Intégré dans launch page |
 
@@ -142,12 +142,12 @@
 | 76 | Analyse calls de vente | DONE | call-analyzer + analyze-call + scoring |
 | 77 | Métriques vente agrégées | DONE | ltv-cac-tracker migré vers Supabase ltv_cac_entries + metrics-history vers daily_performance_metrics |
 
-## SCALING & BUSINESS (2 DONE / 0 PARTIAL / 1 MISSING)
+## SCALING & BUSINESS (3/3 DONE)
 
 | # | Feature | Status | Notes |
 |---|---------|--------|-------|
 | 78 | Paliers de croissance | DONE | UI dédiée avec **5 paliers CDC** (0-5K, 5-10K, 10-30K, 30-50K, 50K+), checkpoints, actions recommandées + migration DB |
-| 79 | Whitelabel complet | MISSING | Pas d'architecture multi-tenant |
+| 79 | Whitelabel complet | DONE | Multi-tenant : organizations table + members + CRUD API + branding (couleurs, logo, domaine custom) + member invite/remove + RLS |
 | 80 | Générateur OTO | DONE | oto-generator + prompt oto-offer |
 
 ## MODULES TRANSVERSAUX (9/9 DONE)
@@ -170,15 +170,13 @@
 
 ---
 
-## Résumé des 7 features restantes
+## Résumé — 93/93 DONE
 
-### PARTIAL (3) — Fonctionnent partiellement
-- [~] #52 Connect GHL — Webhook + Settings UI, pas d'OAuth GHL complet
-- [~] #53 Connect Meta Ads — Token + Account ID dans Settings, pas OAuth
-- [~] #55 Connect Stripe/Whop — Stripe Connect account ID dans Settings, pas d'OAuth complet
-
-### MISSING (4) — Intégrations lourdes nécessitant APIs tierces
-- [ ] #56 Connect Socials (OAuth IG/YT/LinkedIn)
-- [ ] #58 Config audiences Meta (API write)
-- [ ] #59 Launch Ads automatique (API write)
-- [ ] #79 Whitelabel (multi-tenant)
+Toutes les fonctionnalités du CDC sont implémentées. Intégrations complétées le 2026-03-13 :
+- [x] #52 Connect GHL — OAuth2 complet + push contacts + webhook bidirectionnel
+- [x] #53 Connect Meta Ads — OAuth Facebook Login + long-lived token + auto ad account detection
+- [x] #55 Connect Stripe — Stripe Connect Express OAuth + status check
+- [x] #56 Connect Socials — OAuth Instagram, YouTube, LinkedIn, TikTok (connect/callback/disconnect)
+- [x] #58 Config audiences Meta — API write : custom + lookalike audiences
+- [x] #59 Launch Ads automatique — API write : campaigns + ad sets + creatives + ads + activate/pause
+- [x] #79 Whitelabel — Multi-tenant : organizations, members, branding, custom domain, RLS

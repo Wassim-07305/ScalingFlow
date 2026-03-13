@@ -599,56 +599,129 @@ export default function SettingsPage() {
 
 // ─── Integrations Card ────────────────────────────────────────
 
+type ConnectionStatus = {
+  connected: boolean;
+  username?: string;
+  accountId?: string;
+  expiresAt?: string;
+  connectedAt?: string;
+};
+
 function IntegrationsCard() {
-  const { user, profile } = useUser();
-  const supabase = createClient();
-  const [metaToken, setMetaToken] = useState("");
-  const [metaAdAccountId, setMetaAdAccountId] = useState("");
-  const [ghlWebhookUrl, setGhlWebhookUrl] = useState("");
-  const [stripeAccountId, setStripeAccountId] = useState("");
-  const [saving, setSaving] = useState(false);
+  const { user } = useUser();
+  const [connections, setConnections] = useState<Record<string, ConnectionStatus>>({});
+  const [loading, setLoading] = useState(true);
+  const [disconnecting, setDisconnecting] = useState<string | null>(null);
+  const searchParams = useSearchParams();
 
+  // Show toast for OAuth redirects
   useEffect(() => {
-    if (profile) {
-      setMetaToken(profile.meta_access_token || "");
-      setMetaAdAccountId(profile.meta_ad_account_id || "");
-      setGhlWebhookUrl(profile.ghl_webhook_url || "");
-      setStripeAccountId(profile.stripe_connect_account_id || "");
+    const success = searchParams.get("success");
+    const error = searchParams.get("error");
+    if (success?.includes("connected")) {
+      const provider = success.replace("_connected", "");
+      toast.success(`${provider.charAt(0).toUpperCase() + provider.slice(1)} connecte avec succes !`);
     }
-  }, [profile]);
+    if (error) {
+      toast.error(`Erreur de connexion : ${error}`);
+    }
+  }, [searchParams]);
 
-  const handleSave = async () => {
+  // Fetch connection status
+  useEffect(() => {
     if (!user) return;
-    setSaving(true);
-    try {
-      const { error } = await supabase
-        .from("profiles")
-        .update({
-          meta_access_token: metaToken.trim() || null,
-          meta_ad_account_id: metaAdAccountId.trim() || null,
-          ghl_webhook_url: ghlWebhookUrl.trim() || null,
-          stripe_connect_account_id: stripeAccountId.trim() || null,
-        })
-        .eq("id", user.id);
+    const fetchStatus = async () => {
+      try {
+        const res = await fetch("/api/integrations/status");
+        const data = await res.json();
+        if (data.status) setConnections(data.status);
+      } catch {
+        // silently fail
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchStatus();
+  }, [user]);
 
-      if (error) throw error;
-      toast.success("Integrations sauvegardees.");
+  const handleDisconnect = async (provider: string, endpoint: string) => {
+    setDisconnecting(provider);
+    try {
+      const res = await fetch(endpoint, { method: "POST" });
+      if (res.ok) {
+        setConnections((prev) => ({ ...prev, [provider]: { connected: false } }));
+        toast.success("Deconnecte.");
+      } else {
+        toast.error("Erreur lors de la deconnexion.");
+      }
     } catch {
-      toast.error("Erreur lors de la sauvegarde.");
+      toast.error("Erreur reseau.");
     } finally {
-      setSaving(false);
+      setDisconnecting(null);
     }
   };
 
-  // Compute webhook URL for GHL inbound leads
   const appUrl = typeof window !== "undefined" ? window.location.origin : "";
   const ghlInboundUrl = `${appUrl}/api/webhooks/leads`;
 
-  const hasChanged =
-    metaToken !== (profile?.meta_access_token || "") ||
-    metaAdAccountId !== (profile?.meta_ad_account_id || "") ||
-    ghlWebhookUrl !== (profile?.ghl_webhook_url || "") ||
-    stripeAccountId !== (profile?.stripe_connect_account_id || "");
+  const ConnectButton = ({
+    provider,
+    label,
+    connectUrl,
+    disconnectUrl,
+    badgeVariant = "blue",
+  }: {
+    provider: string;
+    label: string;
+    connectUrl: string;
+    disconnectUrl: string;
+    badgeVariant?: "blue" | "cyan" | "default";
+  }) => {
+    const conn = connections[provider];
+    const isDisconnecting = disconnecting === provider;
+
+    return (
+      <div className="flex items-center justify-between py-3">
+        <div className="flex items-center gap-3">
+          <Badge variant={badgeVariant} className="text-xs">{label}</Badge>
+          {conn?.connected ? (
+            <div className="flex items-center gap-2">
+              <span className="h-2 w-2 rounded-full bg-green-400" />
+              <span className="text-sm text-text-secondary">
+                {conn.username || conn.accountId || "Connecte"}
+              </span>
+            </div>
+          ) : (
+            <span className="text-sm text-text-muted">Non connecte</span>
+          )}
+        </div>
+        {conn?.connected ? (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handleDisconnect(provider, disconnectUrl)}
+            disabled={isDisconnecting}
+            className="text-danger hover:text-danger"
+          >
+            {isDisconnecting ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              "Deconnecter"
+            )}
+          </Button>
+        ) : (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => { window.location.href = connectUrl; }}
+            disabled={loading}
+          >
+            Connecter
+          </Button>
+        )}
+      </div>
+    );
+  };
 
   return (
     <Card>
@@ -658,55 +731,83 @@ function IntegrationsCard() {
           Integrations
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-6">
-        {/* Meta Ads */}
-        <div className="space-y-3">
-          <h4 className="text-sm font-semibold text-text-primary flex items-center gap-2">
-            <Badge variant="blue" className="text-xs">Meta Ads</Badge>
-          </h4>
-          <div>
-            <Label>Token Meta Ads</Label>
-            <Input
-              type="password"
-              value={metaToken}
-              onChange={(e) => setMetaToken(e.target.value)}
-              placeholder="EAAxxxxxxx..."
-            />
-            <p className="text-xs text-text-muted mt-1">
-              Connecte ton compte Meta pour synchroniser tes campagnes. Genere un token depuis le Meta Business Manager.
+      <CardContent className="space-y-2">
+        {loading ? (
+          <div className="flex items-center justify-center py-8">
+            <Loader2 className="h-5 w-5 animate-spin text-text-muted" />
+          </div>
+        ) : (
+          <>
+            {/* Publicite & CRM */}
+            <p className="text-xs font-semibold text-text-muted uppercase tracking-wider pt-2">
+              Publicite & CRM
             </p>
-          </div>
-          <div>
-            <Label>ID compte publicitaire Meta</Label>
-            <Input
-              value={metaAdAccountId}
-              onChange={(e) => setMetaAdAccountId(e.target.value)}
-              placeholder="act_123456789"
-            />
-          </div>
-        </div>
 
-        <Separator />
-
-        {/* GoHighLevel */}
-        <div className="space-y-3">
-          <h4 className="text-sm font-semibold text-text-primary flex items-center gap-2">
-            <Badge variant="cyan" className="text-xs">GoHighLevel</Badge>
-          </h4>
-          <div>
-            <Label>URL Webhook sortant GHL</Label>
-            <Input
-              value={ghlWebhookUrl}
-              onChange={(e) => setGhlWebhookUrl(e.target.value)}
-              placeholder="https://rest.gohighlevel.com/v1/..."
+            <ConnectButton
+              provider="meta"
+              label="Meta Ads"
+              connectUrl="/api/integrations/meta/connect"
+              disconnectUrl="/api/integrations/meta/disconnect"
+              badgeVariant="blue"
             />
-            <p className="text-xs text-text-muted mt-1">
-              URL du webhook GHL pour envoyer tes leads et contacts automatiquement.
+            <ConnectButton
+              provider="ghl"
+              label="GoHighLevel"
+              connectUrl="/api/integrations/ghl/connect"
+              disconnectUrl="/api/integrations/ghl/disconnect"
+              badgeVariant="cyan"
+            />
+            <ConnectButton
+              provider="stripe_connect"
+              label="Stripe Connect"
+              connectUrl="/api/integrations/stripe-connect/connect"
+              disconnectUrl="/api/integrations/stripe-connect/disconnect"
+              badgeVariant="default"
+            />
+
+            <Separator className="my-3" />
+
+            {/* Reseaux sociaux */}
+            <p className="text-xs font-semibold text-text-muted uppercase tracking-wider">
+              Reseaux sociaux
             </p>
-          </div>
-          <div>
-            <Label>URL Webhook entrant (pour GHL)</Label>
-            <div className="flex gap-2">
+
+            <ConnectButton
+              provider="instagram"
+              label="Instagram"
+              connectUrl="/api/integrations/social/instagram/connect"
+              disconnectUrl="/api/integrations/social/instagram/disconnect"
+              badgeVariant="default"
+            />
+            <ConnectButton
+              provider="google"
+              label="YouTube"
+              connectUrl="/api/integrations/social/google/connect"
+              disconnectUrl="/api/integrations/social/google/disconnect"
+              badgeVariant="default"
+            />
+            <ConnectButton
+              provider="linkedin"
+              label="LinkedIn"
+              connectUrl="/api/integrations/social/linkedin/connect"
+              disconnectUrl="/api/integrations/social/linkedin/disconnect"
+              badgeVariant="blue"
+            />
+            <ConnectButton
+              provider="tiktok"
+              label="TikTok"
+              connectUrl="/api/integrations/social/tiktok/connect"
+              disconnectUrl="/api/integrations/social/tiktok/disconnect"
+              badgeVariant="default"
+            />
+
+            <Separator className="my-3" />
+
+            {/* Webhook entrant */}
+            <p className="text-xs font-semibold text-text-muted uppercase tracking-wider">
+              Webhook entrant (GHL / Zapier / Make)
+            </p>
+            <div className="flex gap-2 mt-2">
               <Input
                 value={ghlInboundUrl}
                 readOnly
@@ -725,40 +826,10 @@ function IntegrationsCard() {
               </Button>
             </div>
             <p className="text-xs text-text-muted mt-1">
-              Configure cette URL dans GHL (Workflows &gt; Webhook) pour recevoir les leads entrants dans ScalingFlow.
+              Configure cette URL dans ton CRM (GHL, Zapier, Make) pour recevoir les leads entrants.
             </p>
-          </div>
-        </div>
-
-        <Separator />
-
-        {/* Stripe Connect */}
-        <div className="space-y-3">
-          <h4 className="text-sm font-semibold text-text-primary flex items-center gap-2">
-            <Badge variant="default" className="text-xs">Stripe</Badge>
-          </h4>
-          <div>
-            <Label>ID compte Stripe Connect</Label>
-            <Input
-              value={stripeAccountId}
-              onChange={(e) => setStripeAccountId(e.target.value)}
-              placeholder="acct_1xxxxxx"
-            />
-            <p className="text-xs text-text-muted mt-1">
-              Connecte ton compte Stripe pour suivre ton revenu reel et tes transactions.
-              Trouve ton ID dans Stripe Dashboard &gt; Parametres &gt; Informations du compte.
-            </p>
-          </div>
-        </div>
-
-        <Button
-          size="sm"
-          onClick={handleSave}
-          disabled={saving || !hasChanged}
-        >
-          {saving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-          Sauvegarder les integrations
-        </Button>
+          </>
+        )}
       </CardContent>
     </Card>
   );
