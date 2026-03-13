@@ -268,6 +268,153 @@ export const QUESTIONS: Question[] = [
     field: "parcours",
   },
 
+  // ─── Phase 1 — Questions specifiques par parcours ───
+
+  // A1 — Partir de Zero
+  {
+    id: "phase1_a1_motivation",
+    type: "textarea",
+    title: "Qu'est-ce qui te motive a te lancer maintenant ?",
+    subtitle: "Comprendre ta motivation aide l'IA a trouver un marche qui te correspond vraiment.",
+    field: "phase1_a1_motivation",
+    placeholder: "Ex: Je veux quitter le salariat, avoir plus de liberte, generer des revenus en ligne...",
+    showWhen: (data) => data.parcours === "A1",
+  },
+  {
+    id: "phase1_a1_quickwin",
+    type: "textarea",
+    title: "Si tu pouvais obtenir un premier resultat rapide, ce serait quoi ?",
+    subtitle: "Ton premier quick-win ideal — l'IA va orienter l'analyse vers des marches a cycle court.",
+    field: "phase1_a1_quickwin",
+    placeholder: "Ex: Signer mon premier client a 500EUR, faire ma premiere vente en ligne...",
+    showWhen: (data) => data.parcours === "A1",
+  },
+  {
+    id: "phase1_a1_learning",
+    type: "textarea",
+    title: "Comment tu apprends le mieux ?",
+    subtitle: "Cela influence le type de marche et de modele recommande.",
+    field: "phase1_a1_learning",
+    placeholder: "Ex: En faisant (learning by doing), en regardant des videos, avec un mentor...",
+    showWhen: (data) => data.parcours === "A1",
+  },
+
+  // A2 — Salarie en Reconversion
+  {
+    id: "phase1_a2_transferable",
+    type: "textarea",
+    title: "Quelle expertise de ton job actuel pourrait se monetiser ?",
+    subtitle: "Ton savoir-faire metier est ton avantage — l'IA va identifier les marches qui le valorisent.",
+    field: "phase1_a2_transferable",
+    placeholder: "Ex: Gestion de projet, expertise comptable, connaissance du secteur pharma...",
+    showWhen: (data) => data.parcours === "A2",
+  },
+  {
+    id: "phase1_a2_transition",
+    type: "textarea",
+    title: "Quel est ton plan de transition ?",
+    subtitle: "L'IA adapte les recommandations a ton rythme de transition.",
+    field: "phase1_a2_transition",
+    placeholder: "Ex: En parallele de mon job, demission dans 6 mois, rupture conventionnelle...",
+    showWhen: (data) => data.parcours === "A2",
+  },
+  {
+    id: "phase1_a2_trigger",
+    type: "textarea",
+    title: "Qu'est-ce qui te ferait franchir le pas ?",
+    subtitle: "Ton declencheur — l'IA oriente vers des marches ou ce seuil est atteignable.",
+    field: "phase1_a2_trigger",
+    placeholder: "Ex: Atteindre 3K/mois en side, avoir 5 clients reguliers, remplacer mon salaire...",
+    showWhen: (data) => data.parcours === "A2",
+  },
+
+  // A3 — Freelance
+  {
+    id: "phase1_a3_ideal_offer",
+    type: "textarea",
+    title: "A quoi ressemblerait ton offre ideale scalable ?",
+    subtitle: "Passe de la mission ponctuelle au package scalable — l'IA t'aide a trouver le bon angle.",
+    field: "phase1_a3_ideal_offer",
+    placeholder: "Ex: Un forfait mensuel de gestion Meta Ads, un programme de formation en ligne...",
+    showWhen: (data) => data.parcours === "A3",
+  },
+  {
+    id: "phase1_a3_pricing_blocker",
+    type: "textarea",
+    title: "Qu'est-ce qui t'empeche de facturer plus cher ?",
+    subtitle: "L'IA identifie les marches ou tu peux augmenter tes tarifs naturellement.",
+    field: "phase1_a3_pricing_blocker",
+    placeholder: "Ex: Trop de concurrence, clients PME avec petit budget, pas de specialisation...",
+    showWhen: (data) => data.parcours === "A3",
+  },
+  {
+    id: "phase1_a3_acquisition",
+    type: "textarea",
+    title: "Quel serait ton systeme d'acquisition ideal ?",
+    subtitle: "L'IA va recommander des marches compatibles avec ton canal prefere.",
+    field: "phase1_a3_acquisition",
+    placeholder: "Ex: Publicite Meta, LinkedIn outbound, referral, contenu organique...",
+    showWhen: (data) => data.parcours === "A3",
+  },
+
+  // B — Scaler mon Business
+  {
+    id: "phase1_b_channel",
+    type: "textarea",
+    title: "Quel est ton canal d'acquisition principal aujourd'hui ?",
+    subtitle: "L'IA analyse ton canal actuel pour recommander des leviers de croissance.",
+    field: "phase1_b_channel",
+    placeholder: "Ex: Meta Ads, bouche-a-oreille, SEO, LinkedIn, partenariats...",
+    showWhen: (data) => data.parcours === "B",
+  },
+  {
+    id: "phase1_b_bottleneck",
+    type: "textarea",
+    title: "Quel est ton plus gros bottleneck pour croitre ?",
+    subtitle: "L'IA priorise les marches et strategies qui resolvent ce blocage specifique.",
+    field: "phase1_b_bottleneck",
+    placeholder: "Ex: Pas assez de leads qualifies, taux de closing trop bas, delivery qui ne scale pas...",
+    showWhen: (data) => data.parcours === "B",
+  },
+  {
+    id: "phase1_b_metrics",
+    type: "textarea",
+    title: "Quelles metriques tu suis deja ?",
+    subtitle: "L'IA utilise tes KPIs pour affiner ses recommandations de scaling.",
+    field: "phase1_b_metrics",
+    placeholder: "Ex: CAC 50EUR, LTV 2000EUR, taux de closing 20%, ROAS 3x...",
+    showWhen: (data) => data.parcours === "B",
+  },
+
+  // C — Pivoter
+  {
+    id: "phase1_c_reason",
+    type: "textarea",
+    title: "Pourquoi tu veux pivoter ?",
+    subtitle: "Comprendre ce qui ne marche plus aide l'IA a eviter les memes erreurs sur le nouveau marche.",
+    field: "phase1_c_reason",
+    placeholder: "Ex: Marche sature, marges trop faibles, pas de passion, clients toxiques...",
+    showWhen: (data) => data.parcours === "C",
+  },
+  {
+    id: "phase1_c_assets",
+    type: "textarea",
+    title: "Quels assets peux-tu reutiliser ?",
+    subtitle: "L'IA cherche des marches ou tes assets existants te donnent un avantage.",
+    field: "phase1_c_assets",
+    placeholder: "Ex: Liste email de 5000 contacts, audience YouTube, expertise en Meta Ads, reseau pro...",
+    showWhen: (data) => data.parcours === "C",
+  },
+  {
+    id: "phase1_c_positioning",
+    type: "textarea",
+    title: "Quel serait ton positionnement ideal sur le nouveau marche ?",
+    subtitle: "L'IA va valider cette vision et proposer des angles differenciants.",
+    field: "phase1_c_positioning",
+    placeholder: "Ex: Expert automatisation IA pour agences, consultant growth pour SaaS B2B...",
+    showWhen: (data) => data.parcours === "C",
+  },
+
   // ─── Etape 0.5 — Objectifs et contraintes ───
 
   // 17 — Objectif revenus mensuels [Q-0.5.1]

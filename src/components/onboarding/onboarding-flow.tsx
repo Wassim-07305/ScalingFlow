@@ -44,6 +44,22 @@ const INITIAL_FORM_DATA: Record<string, unknown> = {
   hasPayingClients: "",
   payingClientsDetails: {},
   parcours: "",
+  // Phase 1 per-parcours
+  phase1_a1_motivation: "",
+  phase1_a1_quickwin: "",
+  phase1_a1_learning: "",
+  phase1_a2_transferable: "",
+  phase1_a2_transition: "",
+  phase1_a2_trigger: "",
+  phase1_a3_ideal_offer: "",
+  phase1_a3_pricing_blocker: "",
+  phase1_a3_acquisition: "",
+  phase1_b_channel: "",
+  phase1_b_bottleneck: "",
+  phase1_b_metrics: "",
+  phase1_c_reason: "",
+  phase1_c_assets: "",
+  phase1_c_positioning: "",
   experienceLevel: "",
   currentRevenue: "",
   targetRevenue: "",
@@ -225,6 +241,11 @@ function buildExpertiseAnswers(
     const val = formData[`expertise_q${i}`];
     if (val) ea[`q${i}`] = String(val);
   }
+  // Include phase1 per-parcours answers
+  const phase1 = buildPhase1Answers(formData);
+  for (const [label, answer] of Object.entries(phase1)) {
+    ea[`phase1_${label}`] = answer;
+  }
   return ea;
 }
 
@@ -238,6 +259,50 @@ function buildPayingClientsDetails(
     ...details,
     has_paying_clients: formData.hasPayingClients === "oui",
   };
+}
+
+/* ─── Helper: build phase1 per-parcours answers ─── */
+
+const PHASE1_FIELDS: Record<string, { field: string; label: string }[]> = {
+  A1: [
+    { field: "phase1_a1_motivation", label: "Motivation" },
+    { field: "phase1_a1_quickwin", label: "Quick-win ideal" },
+    { field: "phase1_a1_learning", label: "Style d'apprentissage" },
+  ],
+  A2: [
+    { field: "phase1_a2_transferable", label: "Expertise transferable" },
+    { field: "phase1_a2_transition", label: "Plan de transition" },
+    { field: "phase1_a2_trigger", label: "Declencheur" },
+  ],
+  A3: [
+    { field: "phase1_a3_ideal_offer", label: "Offre ideale scalable" },
+    { field: "phase1_a3_pricing_blocker", label: "Blocage pricing" },
+    { field: "phase1_a3_acquisition", label: "Acquisition ideale" },
+  ],
+  B: [
+    { field: "phase1_b_channel", label: "Canal d'acquisition actuel" },
+    { field: "phase1_b_bottleneck", label: "Bottleneck croissance" },
+    { field: "phase1_b_metrics", label: "Metriques suivies" },
+  ],
+  C: [
+    { field: "phase1_c_reason", label: "Raison du pivot" },
+    { field: "phase1_c_assets", label: "Assets reutilisables" },
+    { field: "phase1_c_positioning", label: "Positionnement ideal" },
+  ],
+};
+
+function buildPhase1Answers(
+  formData: Record<string, unknown>,
+): Record<string, string> {
+  const parcours = String(formData.parcours || "");
+  const fields = PHASE1_FIELDS[parcours];
+  if (!fields) return {};
+  const answers: Record<string, string> = {};
+  for (const { field, label } of fields) {
+    const val = formData[field];
+    if (val) answers[label] = String(val);
+  }
+  return answers;
 }
 
 /* ═══════════════════════════════════════════════════
@@ -300,7 +365,15 @@ export function OnboardingFlow() {
           if (profile.expertise_answers) {
             const ea = profile.expertise_answers as Record<string, string>;
             Object.entries(ea).forEach(([k, v]) => {
-              r[`expertise_${k}`] = v;
+              if (k.startsWith("phase1_")) {
+                // Reverse-map phase1 labels back to form fields
+                const parcours = String(profile.parcours || "");
+                const fields = PHASE1_FIELDS[parcours] || [];
+                const match = fields.find((f) => `phase1_${f.label}` === k);
+                if (match) r[match.field] = v;
+              } else {
+                r[`expertise_${k}`] = v;
+              }
             });
           }
           if (profile.parcours) r.parcours = profile.parcours;
@@ -554,6 +627,7 @@ export function OnboardingFlow() {
           deadline: (formData.deadline as string) || "",
           teamSize: formData.teamPreference === "equipe" ? 2 : 1,
           formations: formData.formations_text ? [String(formData.formations_text)] : [],
+          phase1Answers: buildPhase1Answers(formData),
         }),
       });
 

@@ -39,6 +39,7 @@ export interface MarketAnalysisContext {
   formations?: string[];
   firstName?: string;
   lastName?: string;
+  phase1Answers?: Record<string, string>;
 }
 
 import { PARCOURS } from "@/lib/parcours";
@@ -96,6 +97,12 @@ export function marketAnalysisPrompt(data: MarketAnalysisContext): string {
       })()
     : "";
 
+  const phase1Context = data.phase1Answers && Object.keys(data.phase1Answers).length > 0
+    ? "\n## REPONSES PHASE 1 (RECHERCHE DE MARCHE)\n" +
+      Object.entries(data.phase1Answers).map(([label, answer]) => `- **${label}** : ${answer}`).join("\n") +
+      "\n\nCes reponses revelent les motivations profondes, contraintes et vision de l'utilisateur. Utilise-les pour affiner la selection de marche et le positionnement.\n"
+    : "";
+
   return `Tu es un expert en strategie marketing et business development specialise dans l'IA et l'automatisation pour les freelances et agences.
 
 ## CONTEXTE UTILISATEUR
@@ -106,7 +113,7 @@ export function marketAnalysisPrompt(data: MarketAnalysisContext): string {
 - Objectif : ${data.targetRevenue}EUR/mois
 - Budget ads : ${data.budgetMonthly}EUR/mois${countryContext}${languageContext}${situationContext}${hoursContext}${deadlineContext}${teamContext}${formationsContext}${situationDetailsContext}${payingClientsContext}
 
-${parcoursContext ? `## PARCOURS UTILISATEUR\n${parcoursContext}\n` : ""}${vaultContext}
+${parcoursContext ? `## PARCOURS UTILISATEUR\n${parcoursContext}\n` : ""}${phase1Context}${vaultContext}
 
 ## TA MISSION
 Analyse le marche et identifie les 3 meilleures opportunites de positionnement pour cet utilisateur.${data.country ? ` Concentre-toi sur le marche ${data.country}.` : ""}${data.language ? ` Redige ton analyse en ${data.language}.` : ""} Pour chaque opportunite :
