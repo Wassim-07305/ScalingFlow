@@ -35,13 +35,14 @@ const INITIAL_FORM_DATA: Record<string, unknown> = {
   language: "",
   situation: "",
   situationDetails: {},
+  formations_text: "",
   vaultSkills: [],
   expertise_q1: "",
   expertise_q2: "",
   expertise_q3: "",
   expertise_q4: "",
-  expertise_q5: "",
-  expertise_q6: "",
+  hasPayingClients: "",
+  payingClientsDetails: {},
   parcours: "",
   experienceLevel: "",
   currentRevenue: "",
@@ -49,6 +50,9 @@ const INITIAL_FORM_DATA: Record<string, unknown> = {
   industries: [],
   objectives: [],
   budgetMonthly: "",
+  hoursPerWeek: "",
+  deadline: "",
+  teamPreference: "",
 };
 
 /* ─── Animation variants ─── */
@@ -61,6 +65,29 @@ const slideVariants = {
 
 /* ─── Situation-specific fields ─── */
 
+/* ─── Paying clients detail fields ─── */
+
+const PAYING_CLIENTS_FIELDS = [
+  {
+    key: "clients_count",
+    label: "Combien de clients payants ?",
+    placeholder: "Ex: 12",
+    type: "number",
+  },
+  {
+    key: "client_type",
+    label: "Quel type de clients ?",
+    placeholder: "Ex: Coachs fitness, e-commercants...",
+  },
+  {
+    key: "best_result",
+    label: "Quel resultat tu leur as apporte ?",
+    placeholder: "Ex: +200% de leads en 3 mois...",
+  },
+];
+
+/* ─── Situation-specific fields (aligned with CDC) ─── */
+
 const SITUATION_FIELDS: Record<
   string,
   { key: string; label: string; placeholder: string; type?: string }[]
@@ -68,68 +95,122 @@ const SITUATION_FIELDS: Record<
   salarie: [
     {
       key: "poste",
-      label: "Ton poste actuel",
+      label: "Quel est ton poste actuel ?",
       placeholder: "Ex: Chef de projet digital",
     },
     {
       key: "secteur",
-      label: "Ton secteur",
-      placeholder: "Ex: Tech, Finance, Santé...",
+      label: "Quel secteur ?",
+      placeholder: "Ex: Tech, Finance, Sante...",
+    },
+    {
+      key: "duree_poste",
+      label: "Depuis combien de temps ?",
+      placeholder: "Ex: 5 ans",
     },
     {
       key: "biggest_challenge",
-      label: "Ton plus gros challenge",
-      placeholder: "Ce qui te bloque pour te lancer...",
+      label: "Ton plus gros challenge pour te lancer",
+      placeholder: "Ce qui te bloque...",
     },
   ],
   freelance: [
     {
       key: "missions",
-      label: "Tes missions principales",
-      placeholder: "Ex: Développement web, consulting...",
+      label: "Quel type de missions tu fais ?",
+      placeholder: "Ex: Developpement web, consulting...",
+    },
+    {
+      key: "client_type",
+      label: "Pour quel type de clients ?",
+      placeholder: "Ex: PME, startups, agences...",
     },
     {
       key: "ca_actuel",
-      label: "CA annuel actuel (EUR)",
-      placeholder: "Ex: 50000",
+      label: "CA mensuel moyen (EUR)",
+      placeholder: "Ex: 5000",
+      type: "number",
+    },
+    {
+      key: "clients_count",
+      label: "Combien de clients en simultane ?",
+      placeholder: "Ex: 5",
+      type: "number",
+    },
+    {
+      key: "tarif_actuel",
+      label: "Ton tarif actuel",
+      placeholder: "Ex: TJM 400EUR, forfait 2000EUR...",
+    },
+    {
+      key: "biggest_challenge",
+      label: "Qu'est-ce qui te frustre le plus dans ton modele actuel ?",
+      placeholder: "Ex: Je trade mon temps contre de l'argent...",
+    },
+  ],
+  entrepreneur: [
+    {
+      key: "business",
+      label: "Quel est ton business ?",
+      placeholder: "Ex: Agence de marketing, coaching fitness...",
+    },
+    {
+      key: "ca_actuel",
+      label: "CA mensuel actuel (EUR)",
+      placeholder: "Ex: 15000",
       type: "number",
     },
     {
       key: "clients_count",
       label: "Nombre de clients actifs",
-      placeholder: "Ex: 5",
+      placeholder: "Ex: 20",
       type: "number",
     },
     {
       key: "biggest_challenge",
-      label: "Ton plus gros challenge",
-      placeholder: "Ce qui t'empêche de scaler...",
+      label: "Ton plus gros bottleneck actuel",
+      placeholder: "Ex: Pas assez de leads, taux de closing trop bas...",
     },
   ],
-  entrepreneur: [
+  etudiant: [
     {
-      key: "ca_actuel",
-      label: "CA annuel actuel (EUR)",
-      placeholder: "Ex: 200000",
-      type: "number",
-    },
-    {
-      key: "clients_count",
-      label: "Nombre de clients",
-      placeholder: "Ex: 50",
-      type: "number",
+      key: "etudes",
+      label: "Qu'est-ce que tu etudies ?",
+      placeholder: "Ex: Marketing digital, commerce, informatique...",
     },
     {
       key: "biggest_challenge",
-      label: "Ton plus gros challenge",
-      placeholder: "L'obstacle principal pour passer au next level...",
+      label: "Qu'est-ce qui te bloque pour te lancer ?",
+      placeholder: "Ex: Pas d'experience, pas de budget...",
     },
   ],
-  zero: [
+  reconversion: [
+    {
+      key: "ancien_poste",
+      label: "Ton ancien metier / poste",
+      placeholder: "Ex: Commercial B2B, RH, comptable...",
+    },
+    {
+      key: "duree_experience",
+      label: "Combien d'annees d'experience ?",
+      placeholder: "Ex: 8 ans",
+    },
     {
       key: "biggest_challenge",
-      label: "Qu'est-ce qui te bloque ?",
-      placeholder: "Décris ce qui t'empêche de démarrer...",
+      label: "Pourquoi tu veux changer ?",
+      placeholder: "Ex: Je veux plus de liberte, meilleure remuneration...",
+    },
+  ],
+  sans_emploi: [
+    {
+      key: "ancien_poste",
+      label: "Ton dernier poste / experience",
+      placeholder: "Ex: Responsable marketing, commercial...",
+    },
+    {
+      key: "biggest_challenge",
+      label: "Qu'est-ce qui te bloque pour demarrer ?",
+      placeholder: "Ex: Je ne sais pas par ou commencer...",
     },
   ],
 };
@@ -140,11 +221,23 @@ function buildExpertiseAnswers(
   formData: Record<string, unknown>,
 ): Record<string, string> {
   const ea: Record<string, string> = {};
-  for (let i = 1; i <= 6; i++) {
+  for (let i = 1; i <= 4; i++) {
     const val = formData[`expertise_q${i}`];
     if (val) ea[`q${i}`] = String(val);
   }
   return ea;
+}
+
+/* ─── Helper: build paying clients details ─── */
+
+function buildPayingClientsDetails(
+  formData: Record<string, unknown>,
+): Record<string, unknown> {
+  const details = (formData.payingClientsDetails as Record<string, unknown>) || {};
+  return {
+    ...details,
+    has_paying_clients: formData.hasPayingClients === "oui",
+  };
 }
 
 /* ═══════════════════════════════════════════════════
@@ -223,6 +316,29 @@ export function OnboardingFlow() {
             r.objectives = profile.objectives;
           if (profile.budget_monthly != null)
             r.budgetMonthly = String(profile.budget_monthly);
+          if (profile.hours_per_week)
+            r.hoursPerWeek = String(profile.hours_per_week);
+          if (profile.deadline) r.deadline = profile.deadline;
+          if (profile.team_size != null) {
+            r.teamPreference =
+              profile.team_size === 0
+                ? "recruter"
+                : profile.team_size >= 2
+                  ? "equipe"
+                  : "seul";
+          }
+          if (
+            Array.isArray(profile.formations) &&
+            profile.formations.length > 0
+          )
+            r.formations_text = profile.formations[0];
+          // Restore paying clients
+          const sd = profile.situation_details as Record<string, unknown> | null;
+          if (sd?.paying_clients) {
+            const pc = sd.paying_clients as Record<string, unknown>;
+            r.hasPayingClients = pc.has_paying_clients ? "oui" : "non";
+            r.payingClientsDetails = pc;
+          }
 
           // Compute visible questions from restored data for correct step
           const restoredVisible = QUESTIONS.filter(
@@ -279,7 +395,10 @@ export function OnboardingFlow() {
           country: (formData.country as string) || null,
           language: (formData.language as string) || null,
           situation: (formData.situation as string) || null,
-          situation_details: formData.situationDetails || {},
+          situation_details: {
+            ...(formData.situationDetails || {}),
+            paying_clients: buildPayingClientsDetails(formData),
+          },
           vault_skills: formData.vaultSkills || [],
           expertise_answers: buildExpertiseAnswers(formData),
           parcours: (formData.parcours as string) || null,
@@ -289,6 +408,10 @@ export function OnboardingFlow() {
           industries: (formData.industries as string[]) || [],
           objectives: (formData.objectives as string[]) || [],
           budget_monthly: Number(formData.budgetMonthly) || 0,
+          hours_per_week: Number(formData.hoursPerWeek) || 0,
+          deadline: (formData.deadline as string) || "",
+          team_size: formData.teamPreference === "equipe" ? 2 : formData.teamPreference === "recruter" ? 0 : 1,
+          formations: formData.formations_text ? [String(formData.formations_text)] : [],
         })
         .eq("id", user.id);
     },
@@ -350,35 +473,37 @@ export function OnboardingFlow() {
     if (!user) return;
     await saveProgress(totalSteps);
 
+    const completionData = {
+      onboarding_completed: true,
+      onboarding_step: totalSteps,
+      first_name: (formData.firstName as string) || null,
+      last_name: (formData.lastName as string) || null,
+      country: (formData.country as string) || null,
+      language: (formData.language as string) || null,
+      situation: (formData.situation as string) || null,
+      situation_details: {
+        ...(formData.situationDetails || {}),
+        paying_clients: buildPayingClientsDetails(formData),
+      },
+      vault_skills: formData.vaultSkills || [],
+      expertise_answers: buildExpertiseAnswers(formData),
+      parcours: (formData.parcours as string) || null,
+      experience_level: (formData.experienceLevel as string) || null,
+      current_revenue: Number(formData.currentRevenue) || 0,
+      target_revenue: Number(formData.targetRevenue) || 0,
+      industries: (formData.industries as string[]) || [],
+      objectives: (formData.objectives as string[]) || [],
+      budget_monthly: Number(formData.budgetMonthly) || 0,
+      hours_per_week: Number(formData.hoursPerWeek) || 0,
+      deadline: (formData.deadline as string) || "",
+      team_size: formData.teamPreference === "equipe" ? 2 : formData.teamPreference === "recruter" ? 0 : 1,
+      formations: formData.formations_text ? [String(formData.formations_text)] : [],
+      vault_completed: true,
+    };
+
     await supabase
       .from("profiles")
-      .update({
-        onboarding_completed: true,
-        onboarding_step: totalSteps,
-        first_name: (formData.firstName as string) || null,
-        last_name: (formData.lastName as string) || null,
-        country: (formData.country as string) || null,
-        language: (formData.language as string) || null,
-        situation: (formData.situation as string) || null,
-        situation_details: formData.situationDetails || {},
-        vault_skills: formData.vaultSkills || [],
-        expertise_answers: buildExpertiseAnswers(formData),
-        parcours: (formData.parcours as string) || null,
-        experience_level: formData.experienceLevel as string as
-          | "beginner"
-          | "intermediate"
-          | "advanced",
-        current_revenue: Number(formData.currentRevenue) || 0,
-        target_revenue: Number(formData.targetRevenue) || 0,
-        industries: (formData.industries as string[]) || [],
-        objectives: (formData.objectives as string[]) || [],
-        budget_monthly: Number(formData.budgetMonthly) || 0,
-        hours_per_week: 0,
-        deadline: "",
-        team_size: 1,
-        formations: [],
-        vault_completed: true,
-      })
+      .update(completionData)
       .eq("id", user.id);
 
     confetti({
@@ -411,7 +536,10 @@ export function OnboardingFlow() {
           country: formData.country,
           language: formData.language,
           situation: formData.situation,
-          situationDetails: formData.situationDetails,
+          situationDetails: {
+            ...(formData.situationDetails || {}),
+            paying_clients: buildPayingClientsDetails(formData),
+          },
           skills: [],
           vaultSkills: formData.vaultSkills,
           expertiseAnswers: buildExpertiseAnswers(formData),
@@ -422,10 +550,10 @@ export function OnboardingFlow() {
           industries: formData.industries,
           objectives: formData.objectives,
           budgetMonthly: Number(formData.budgetMonthly) || 0,
-          hoursPerWeek: 0,
-          deadline: "",
-          teamSize: 1,
-          formations: [],
+          hoursPerWeek: Number(formData.hoursPerWeek) || 0,
+          deadline: (formData.deadline as string) || "",
+          teamSize: formData.teamPreference === "equipe" ? 2 : 1,
+          formations: formData.formations_text ? [String(formData.formations_text)] : [],
         }),
       });
 
@@ -460,23 +588,23 @@ export function OnboardingFlow() {
         country: (formData.country as string) || null,
         language: (formData.language as string) || null,
         situation: (formData.situation as string) || null,
-        situation_details: formData.situationDetails || {},
+        situation_details: {
+          ...(formData.situationDetails || {}),
+          paying_clients: buildPayingClientsDetails(formData),
+        },
         vault_skills: formData.vaultSkills || [],
         expertise_answers: buildExpertiseAnswers(formData),
         parcours: (formData.parcours as string) || null,
-        experience_level: formData.experienceLevel as string as
-          | "beginner"
-          | "intermediate"
-          | "advanced",
+        experience_level: (formData.experienceLevel as string) || null,
         current_revenue: Number(formData.currentRevenue) || 0,
         target_revenue: Number(formData.targetRevenue) || 0,
         industries: (formData.industries as string[]) || [],
         objectives: (formData.objectives as string[]) || [],
         budget_monthly: Number(formData.budgetMonthly) || 0,
-        hours_per_week: 0,
-        deadline: "",
-        team_size: 1,
-        formations: [],
+        hours_per_week: Number(formData.hoursPerWeek) || 0,
+        deadline: (formData.deadline as string) || "",
+        team_size: formData.teamPreference === "equipe" ? 2 : formData.teamPreference === "recruter" ? 0 : 1,
+        formations: formData.formations_text ? [String(formData.formations_text)] : [],
         vault_completed: true,
         selected_market: market.name,
         market_viability_score: market.viability_score,
@@ -702,11 +830,15 @@ export function OnboardingFlow() {
           </div>
         );
 
-      /* ── Multi-field (situation details) ── */
+      /* ── Multi-field (situation details OR paying clients details) ── */
       case "multi-field": {
-        const situation = String(formData.situation || "zero");
-        const fields = SITUATION_FIELDS[situation] || SITUATION_FIELDS.zero;
-        const details = (formData.situationDetails as SituationDetails) || {};
+        const isPayingClients = q.field === "payingClientsDetails";
+        const situation = String(formData.situation || "etudiant");
+        const fields = isPayingClients
+          ? PAYING_CLIENTS_FIELDS
+          : (SITUATION_FIELDS[situation] || SITUATION_FIELDS.etudiant);
+        const detailsKey = isPayingClients ? "payingClientsDetails" : "situationDetails";
+        const details = (formData[detailsKey] as SituationDetails) || {};
 
         return (
           <div className="w-full max-w-lg">
@@ -738,7 +870,7 @@ export function OnboardingFlow() {
                             ? Number(e.target.value)
                             : e.target.value,
                       };
-                      setField("situationDetails", updated);
+                      setField(detailsKey, updated);
                     }}
                     placeholder={f.placeholder}
                     className="w-full rounded-xl border-2 border-white/20 bg-white/5 px-5 py-3.5 text-lg text-white outline-none placeholder:text-white/25 transition-colors focus:border-emerald-400"

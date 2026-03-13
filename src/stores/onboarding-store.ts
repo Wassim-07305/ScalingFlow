@@ -3,10 +3,18 @@ import { create } from "zustand";
 export interface SituationDetails {
   poste?: string;
   secteur?: string;
+  duree_poste?: string;
   missions?: string;
+  client_type?: string;
   ca_actuel?: number;
   clients_count?: number;
+  tarif_actuel?: string;
+  business?: string;
+  etudes?: string;
+  ancien_poste?: string;
+  duree_experience?: string;
   biggest_challenge?: string;
+  best_result?: string;
 }
 
 export interface VaultSkillCategory {
@@ -22,7 +30,7 @@ export interface OnboardingFormData {
   country: string;
   language: string;
   // Step 1: Situation
-  situation: "" | "zero" | "salarie" | "freelance" | "entrepreneur";
+  situation: "" | "zero" | "salarie" | "freelance" | "entrepreneur" | "etudiant" | "reconversion" | "sans_emploi";
   situationDetails: SituationDetails;
   // Step 2: Skills (legacy, kept for backward compat)
   skills: string[];
@@ -43,10 +51,13 @@ export interface OnboardingFormData {
   hoursPerWeek: number;
   deadline: string;
   teamSize: number;
+  teamPreference: "" | "seul" | "equipe" | "recruter";
+  hasPayingClients: "" | "oui" | "non";
   // Step 9: Budget
   budgetMonthly: number;
   // Step 10: Formations & Resources (optional)
   formations: string[];
+  formations_text: string;
 }
 
 export interface OnboardingState extends OnboardingFormData {
@@ -90,10 +101,13 @@ const initialState: OnboardingFormData & { step: number } = {
   hoursPerWeek: 0,
   deadline: "",
   teamSize: 1,
+  teamPreference: "",
+  hasPayingClients: "",
   // Budget
   budgetMonthly: 0,
   // Formations
   formations: [],
+  formations_text: "",
 };
 
 export const useOnboardingStore = create<OnboardingState>((set) => ({

@@ -9,7 +9,8 @@ export interface OnboardingData {
 }
 
 export interface VaultSkill {
-  category: string;
+  name?: string;
+  category?: string;
   level: "debutant" | "intermediaire" | "avance" | "expert";
   details?: string;
 }
@@ -30,6 +31,14 @@ export interface MarketAnalysisContext {
   vaultSkills?: VaultSkill[];
   expertiseAnswers?: Record<string, string>;
   situation?: string;
+  // Champs CDC complementaires
+  situationDetails?: Record<string, unknown>;
+  hoursPerWeek?: number;
+  deadline?: string;
+  teamSize?: number;
+  formations?: string[];
+  firstName?: string;
+  lastName?: string;
 }
 
 import { PARCOURS } from "@/lib/parcours";
@@ -45,7 +54,7 @@ function buildVaultContext(vaultSkills?: VaultSkill[], expertiseAnswers?: Record
     context += "\n## COFFRE DE COMPETENCES (VAULT)\n";
     context += "L'utilisateur a les competences suivantes :\n";
     for (const skill of vaultSkills) {
-      context += `- ${skill.category} (niveau : ${skill.level})${skill.details ? ` — ${skill.details}` : ""}\n`;
+      context += `- ${skill.name || skill.category || "Competence"} (niveau : ${skill.level})${skill.details ? ` — ${skill.details}` : ""}\n`;
     }
     context += "\nUtilise ces competences pour identifier des marches ou il a un avantage competitif naturel.\n";
   }
@@ -68,6 +77,24 @@ export function marketAnalysisPrompt(data: MarketAnalysisContext): string {
   const countryContext = data.country ? `\n- Pays cible : ${data.country}` : "";
   const languageContext = data.language ? `\n- Langue du client : ${data.language}` : "";
   const situationContext = data.situation ? `\n- Situation actuelle : ${data.situation}` : "";
+  const hoursContext = data.hoursPerWeek ? `\n- Heures disponibles : ${data.hoursPerWeek}h/semaine` : "";
+  const deadlineContext = data.deadline ? `\n- Deadline : ${data.deadline}` : "";
+  const teamContext = data.teamSize != null ? `\n- Equipe : ${data.teamSize <= 1 ? "Seul" : data.teamSize + " personnes"}` : "";
+  const formationsContext = data.formations && data.formations.length > 0 ? `\n- Formations : ${data.formations.join(", ")}` : "";
+  const situationDetailsContext = data.situationDetails && Object.keys(data.situationDetails).length > 0
+    ? `\n- Details situation : ${Object.entries(data.situationDetails).filter(([k, v]) => v && k !== "paying_clients").map(([k, v]) => `${k}: ${v}`).join(", ")}`
+    : "";
+  const payingClientsContext = data.situationDetails?.paying_clients
+    ? (() => {
+        const pc = data.situationDetails.paying_clients as Record<string, unknown>;
+        if (!pc.has_paying_clients) return "\n- Clients payants : Non (premier business)";
+        const parts = [`a deja eu des clients payants`];
+        if (pc.clients_count) parts.push(`${pc.clients_count} clients`);
+        if (pc.client_type) parts.push(`type: ${pc.client_type}`);
+        if (pc.best_result) parts.push(`meilleur resultat: ${pc.best_result}`);
+        return `\n- Clients payants : ${parts.join(", ")}`;
+      })()
+    : "";
 
   return `Tu es un expert en strategie marketing et business development specialise dans l'IA et l'automatisation pour les freelances et agences.
 
@@ -77,7 +104,7 @@ export function marketAnalysisPrompt(data: MarketAnalysisContext): string {
 - Industries passees : ${data.industries.join(", ")}
 - Revenu actuel : ${data.currentRevenue}EUR/mois
 - Objectif : ${data.targetRevenue}EUR/mois
-- Budget ads : ${data.budgetMonthly}EUR/mois${countryContext}${languageContext}${situationContext}
+- Budget ads : ${data.budgetMonthly}EUR/mois${countryContext}${languageContext}${situationContext}${hoursContext}${deadlineContext}${teamContext}${formationsContext}${situationDetailsContext}${payingClientsContext}
 
 ${parcoursContext ? `## PARCOURS UTILISATEUR\n${parcoursContext}\n` : ""}${vaultContext}
 

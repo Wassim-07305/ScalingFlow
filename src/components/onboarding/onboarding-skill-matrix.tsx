@@ -1,23 +1,23 @@
 "use client";
 
 import {
-  Megaphone,
+  MessageSquare,
   HandCoins,
   PenTool,
+  Megaphone,
+  Users,
   Cpu,
-  Palette,
-  BarChart3,
 } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import type { VaultSkillCategory } from "@/stores/onboarding-store";
 
 const CATEGORIES = [
-  { name: "Marketing Digital", icon: Megaphone },
+  { name: "Acquisition & Prospection", icon: MessageSquare },
   { name: "Vente & Closing", icon: HandCoins },
-  { name: "Copywriting", icon: PenTool },
-  { name: "Tech & Automatisation", icon: Cpu },
-  { name: "Design & Creatif", icon: Palette },
-  { name: "Business & Strategie", icon: BarChart3 },
+  { name: "Creation de contenu", icon: PenTool },
+  { name: "Marketing & Ads", icon: Megaphone },
+  { name: "Delivery & Gestion client", icon: Users },
+  { name: "Automatisation & Outils", icon: Cpu },
 ] as const;
 
 const LEVELS = [

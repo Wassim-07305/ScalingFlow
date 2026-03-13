@@ -95,17 +95,17 @@ export function recommendParcours(data: {
 }): { id: ParcoursId; score: number; reason: string }[] {
   const scores: { id: ParcoursId; score: number; reason: string }[] = [];
 
-  const situation = data.situation || "zero";
+  const situation = data.situation || "etudiant";
   const revenue = data.currentRevenue || 0;
   const level = data.experienceLevel || "beginner";
   const objectives = data.objectives || [];
   const hasClients = (data.situationDetails?.clients_count as number) > 0;
 
-  // A1 — Zero
+  // A1 — Zero (etudiant, sans_emploi, or explicit zero)
   {
     let score = 0;
     let reason = "";
-    if (situation === "zero") {
+    if (situation === "zero" || situation === "etudiant" || situation === "sans_emploi") {
       score += 60;
       reason = "Tu pars de zero — ce parcours est fait pour toi.";
     }
@@ -114,13 +114,13 @@ export function recommendParcours(data: {
     scores.push({ id: "A1", score, reason: reason || "Tu debutes, ce parcours peut t'aider." });
   }
 
-  // A2 — Reconversion
+  // A2 — Reconversion (salarie or reconversion)
   {
     let score = 0;
     let reason = "";
-    if (situation === "salarie") {
+    if (situation === "salarie" || situation === "reconversion") {
       score += 60;
-      reason = "Tu es salarie — ce parcours transforme ton expertise metier en offre.";
+      reason = "Ce parcours transforme ton expertise metier en offre.";
     }
     if (level === "beginner" || level === "intermediate") score += 15;
     if (revenue === 0) score += 15;

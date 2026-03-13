@@ -48,7 +48,7 @@ export interface MarketAnalysisData {
 
 export interface VaultContextData {
   skills?: string[];
-  vaultSkills?: { category: string; level: string; details?: string }[];
+  vaultSkills?: { name?: string; category?: string; level: string; details?: string }[];
   expertiseAnswers?: Record<string, string>;
   situation?: string;
   parcours?: string;
@@ -75,7 +75,7 @@ export function buildPersonaForgePrompt(data: {
   if (vaultData.vaultSkills && vaultData.vaultSkills.length > 0) {
     vaultSkillsContext = "\n\n## COMPETENCES DETAILLEES\n";
     for (const skill of vaultData.vaultSkills) {
-      vaultSkillsContext += `- ${skill.category} (${skill.level})${skill.details ? ` : ${skill.details}` : ""}\n`;
+      vaultSkillsContext += `- ${skill.name || skill.category || "Competence"} (${skill.level})${skill.details ? ` : ${skill.details}` : ""}\n`;
     }
   }
 

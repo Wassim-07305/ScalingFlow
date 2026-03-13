@@ -36,8 +36,31 @@ function Row({ label, value }: { label: string; value: string }) {
 const SITUATION_LABELS: Record<string, string> = {
   zero: "Partir de zero",
   salarie: "Salarie(e)",
-  freelance: "Freelance",
+  freelance: "Freelance / Independant",
   entrepreneur: "Entrepreneur",
+  etudiant: "Etudiant(e)",
+  reconversion: "En reconversion",
+  sans_emploi: "Sans emploi",
+};
+
+const LANGUAGE_LABELS: Record<string, string> = {
+  fr: "Francais",
+  en: "Anglais",
+  both: "Francais + Anglais",
+  ar: "Arabe",
+};
+
+const DEADLINE_LABELS: Record<string, string> = {
+  "1_semaine": "1 semaine",
+  "1_mois": "1 mois",
+  "3_mois": "3 mois",
+  pas_de_rush: "Pas de rush",
+};
+
+const TEAM_LABELS: Record<string, string> = {
+  seul: "Seul",
+  equipe: "J'ai une equipe",
+  recruter: "Je veux recruter",
 };
 
 import { PARCOURS } from "@/lib/parcours";
@@ -45,12 +68,6 @@ import { PARCOURS } from "@/lib/parcours";
 const PARCOURS_LABELS: Record<string, string> = Object.fromEntries(
   Object.entries(PARCOURS).map(([key, def]) => [key, def.label])
 );
-
-const EXPERIENCE_LABELS: Record<string, string> = {
-  beginner: "Debutant",
-  intermediate: "Intermediaire",
-  advanced: "Avance",
-};
 
 export function OnboardingSummary({ data }: OnboardingSummaryProps) {
   const vaultSkills = (data.vaultSkills as VaultSkillCategory[]) || [];
@@ -70,7 +87,7 @@ export function OnboardingSummary({ data }: OnboardingSummaryProps) {
         <Row label="Pays" value={String(data.country || "")} />
         <Row
           label="Langue"
-          value={String(data.language || "") === "fr" ? "Francais" : String(data.language || "")}
+          value={LANGUAGE_LABELS[String(data.language || "")] || String(data.language || "")}
         />
       </Section>
 
@@ -82,8 +99,8 @@ export function OnboardingSummary({ data }: OnboardingSummaryProps) {
         />
         <Row label="Parcours" value={PARCOURS_LABELS[String(data.parcours || "")] || ""} />
         <Row
-          label="Experience"
-          value={EXPERIENCE_LABELS[String(data.experienceLevel || "")] || ""}
+          label="Clients payants"
+          value={data.hasPayingClients === "oui" ? "Oui" : data.hasPayingClients === "non" ? "Non" : ""}
         />
       </Section>
 
@@ -108,18 +125,10 @@ export function OnboardingSummary({ data }: OnboardingSummaryProps) {
         )}
       </Section>
 
-      {/* Chiffres */}
-      <Section title="Chiffres">
+      {/* Objectifs & Contraintes */}
+      <Section title="Objectifs & Contraintes">
         <Row
-          label="Revenu actuel"
-          value={
-            data.currentRevenue
-              ? `${Number(data.currentRevenue).toLocaleString("fr-FR")} EUR/mois`
-              : ""
-          }
-        />
-        <Row
-          label="Objectif"
+          label="Objectif revenus"
           value={
             data.targetRevenue
               ? `${Number(data.targetRevenue).toLocaleString("fr-FR")} EUR/mois`
@@ -127,14 +136,26 @@ export function OnboardingSummary({ data }: OnboardingSummaryProps) {
           }
         />
         <Row
-          label="Budget pub"
+          label="Budget disponible"
           value={
-            data.budgetMonthly !== undefined && data.budgetMonthly !== 0
-              ? `${Number(data.budgetMonthly).toLocaleString("fr-FR")} EUR/mois`
-              : data.budgetMonthly === 0
-                ? "Pas de budget"
+            data.budgetMonthly !== undefined && Number(data.budgetMonthly) > 0
+              ? `${Number(data.budgetMonthly).toLocaleString("fr-FR")} EUR`
+              : String(data.budgetMonthly) === "0"
+                ? "0 EUR"
                 : ""
           }
+        />
+        <Row
+          label="Heures/semaine"
+          value={data.hoursPerWeek ? `${data.hoursPerWeek}h` : ""}
+        />
+        <Row
+          label="Deadline"
+          value={DEADLINE_LABELS[String(data.deadline || "")] || ""}
+        />
+        <Row
+          label="Equipe"
+          value={TEAM_LABELS[String(data.teamPreference || "")] || ""}
         />
       </Section>
 
@@ -179,7 +200,7 @@ export function OnboardingSummary({ data }: OnboardingSummaryProps) {
         <Section title="Expertise">
           {expertiseAnswers.q1 && (
             <Row
-              label="Accomplissement"
+              label="Domaine conseil"
               value={
                 expertiseAnswers.q1.length > 60
                   ? expertiseAnswers.q1.slice(0, 60) + "..."
@@ -189,7 +210,7 @@ export function OnboardingSummary({ data }: OnboardingSummaryProps) {
           )}
           {expertiseAnswers.q2 && (
             <Row
-              label="Methode unique"
+              label="Probleme resolu"
               value={
                 expertiseAnswers.q2.length > 60
                   ? expertiseAnswers.q2.slice(0, 60) + "..."
