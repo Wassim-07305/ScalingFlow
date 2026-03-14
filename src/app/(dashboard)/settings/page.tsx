@@ -36,6 +36,7 @@ import {
   Sun,
   Moon,
   Monitor,
+  RotateCcw,
 } from "lucide-react";
 import { useUIStore, type Theme } from "@/stores/ui-store";
 import { usePushNotifications } from "@/hooks/use-push-notifications";
@@ -133,6 +134,24 @@ export default function SettingsPage() {
       toast.error("Erreur lors de la suppression.");
     } finally {
       setUploadingAvatar(false);
+    }
+  }, [user, supabase]);
+
+  // --- Relancer onboarding ---
+  const [resettingOnboarding, setResettingOnboarding] = useState(false);
+  const handleResetOnboarding = useCallback(async () => {
+    if (!user) return;
+    setResettingOnboarding(true);
+    try {
+      const { error } = await supabase
+        .from("profiles")
+        .update({ onboarding_completed: false, onboarding_step: 0 })
+        .eq("id", user.id);
+      if (error) throw error;
+      window.location.href = "/onboarding";
+    } catch {
+      toast.error("Erreur lors de la réinitialisation.");
+      setResettingOnboarding(false);
     }
   }, [user, supabase]);
 
@@ -404,16 +423,32 @@ export default function SettingsPage() {
                 disabled
               />
             </div>
-            <Button
-              size="sm"
-              onClick={handleSaveProfile}
-              disabled={savingProfile || !profileChanged}
-            >
-              {savingProfile && (
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-              )}
-              Sauvegarder
-            </Button>
+            <div className="flex items-center gap-3">
+              <Button
+                size="sm"
+                onClick={handleSaveProfile}
+                disabled={savingProfile || !profileChanged}
+              >
+                {savingProfile && (
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                )}
+                Sauvegarder
+              </Button>
+
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleResetOnboarding}
+                disabled={resettingOnboarding}
+              >
+                {resettingOnboarding ? (
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                ) : (
+                  <RotateCcw className="h-4 w-4 mr-2" />
+                )}
+                Relancer l&apos;onboarding
+              </Button>
+            </div>
           </CardContent>
         </Card>
 
