@@ -31,13 +31,21 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Check AI usage limits
-    const usage = await checkAIUsage(user.id);
-    if (!usage.allowed) {
-      return NextResponse.json(
-        { error: "Limite de générations IA atteinte", usage },
-        { status: 403 }
-      );
+    // Check AI usage limits (skip during onboarding — market analysis is required)
+    const { data: prof } = await supabase
+      .from("profiles")
+      .select("onboarding_completed")
+      .eq("id", user.id)
+      .single();
+
+    if (prof?.onboarding_completed) {
+      const usage = await checkAIUsage(user.id);
+      if (!usage.allowed) {
+        return NextResponse.json(
+          { error: "Limite de générations IA atteinte", usage },
+          { status: 403 }
+        );
+      }
     }
 
 
