@@ -414,7 +414,10 @@ export function OnboardingFlow() {
   /* ── Select market + complete onboarding ── */
 
   const handleSelectMarket = async (marketIndex: number) => {
-    if (!user || !analysisResult) return;
+    if (!user || !analysisResult) {
+      setError("Session expirée. Recharge la page et réessaie.");
+      return;
+    }
     const market = analysisResult.markets[marketIndex];
 
     try {

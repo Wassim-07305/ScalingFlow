@@ -8,11 +8,11 @@ import { Button } from "@/components/ui/button";
 import { ViabilityScore } from "@/components/onboarding/viability-score";
 import { cn } from "@/lib/utils/cn";
 import type { MarketAnalysisResult } from "@/types/ai";
-import { Target, Users, TrendingUp, Check, ChevronDown, ChevronUp, DollarSign, BarChart3 } from "lucide-react";
+import { Target, Users, TrendingUp, Check, ChevronDown, ChevronUp, DollarSign, BarChart3, Loader2 } from "lucide-react";
 
 interface MarketAnalysisProps {
   result: MarketAnalysisResult;
-  onSelect: (marketIndex: number) => void;
+  onSelect: (marketIndex: number) => Promise<void> | void;
 }
 
 export function MarketAnalysis({ result, onSelect }: MarketAnalysisProps) {
@@ -20,6 +20,7 @@ export function MarketAnalysis({ result, onSelect }: MarketAnalysisProps) {
     result.recommended_market_index
   );
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+  const [validating, setValidating] = useState(false);
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
@@ -61,7 +62,7 @@ export function MarketAnalysis({ result, onSelect }: MarketAnalysisProps) {
                         <CardTitle className="flex items-center gap-2">
                           {market.name}
                           {isRecommended && (
-                            <Badge variant="cyan">Recommande</Badge>
+                            <Badge variant="cyan">Recommandé</Badge>
                           )}
                         </CardTitle>
                         <p className="text-sm text-text-secondary mt-1">
@@ -124,7 +125,7 @@ export function MarketAnalysis({ result, onSelect }: MarketAnalysisProps) {
                         </h4>
                         <div className="grid grid-cols-3 gap-2">
                           {[
-                            { label: "Attractivite", value: market.scoring_composite.attractivite, color: "bg-blue-500" },
+                            { label: "Attractivité", value: market.scoring_composite.attractivite, color: "bg-blue-500" },
                             { label: "Concurrence", value: market.scoring_composite.concurrence, color: "bg-amber-500" },
                             { label: "Potentiel", value: market.scoring_composite.potentiel, color: "bg-emerald-500" },
                           ].map((s) => (
@@ -140,7 +141,7 @@ export function MarketAnalysis({ result, onSelect }: MarketAnalysisProps) {
                       </div>
                     )}
 
-                    {/* Budget client estime */}
+                    {/* Budget client estimé */}
                     {market.estimated_client_budget && (
                       <div className="flex items-center gap-2 p-3 rounded-lg bg-accent/5 border border-accent/20">
                         <DollarSign className="h-4 w-4 text-accent shrink-0" />
@@ -186,7 +187,7 @@ export function MarketAnalysis({ result, onSelect }: MarketAnalysisProps) {
                       {isSelected ? (
                         <>
                           <Check className="h-4 w-4 mr-2" />
-                          Sélectionne
+                          Sélectionné
                         </>
                       ) : (
                         "Choisir ce marché"
@@ -209,10 +210,19 @@ export function MarketAnalysis({ result, onSelect }: MarketAnalysisProps) {
         >
           <Button
             size="lg"
-            onClick={() => onSelect(selectedIndex)}
+            disabled={validating}
+            onClick={async () => {
+              setValidating(true);
+              try {
+                await onSelect(selectedIndex);
+              } catch {
+                setValidating(false);
+              }
+            }}
             className="px-10"
           >
-            Valider et passer à la creation d'offre
+            {validating && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+            Valider et passer à la création d&apos;offre
           </Button>
         </motion.div>
       )}
