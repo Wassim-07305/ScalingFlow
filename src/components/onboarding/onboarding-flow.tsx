@@ -415,28 +415,35 @@ export function OnboardingFlow() {
 
   const handleSelectMarket = async (marketIndex: number) => {
     if (!user || !analysisResult) {
-      setError("Session expirée. Recharge la page et réessaie.");
-      throw new Error("Session expirée");
+      const msg = "Session expirée. Recharge la page et réessaie.";
+      setError(msg);
+      throw new Error(msg);
     }
     const market = analysisResult.markets[marketIndex];
+    const payload = {
+      onboarding_completed: true,
+      onboarding_step: totalSteps,
+      ...buildProfilePayload(formData),
+      selected_market: market.name,
+      market_viability_score: market.viability_score,
+      niche: market.name,
+    };
+
+    console.log("[onboarding] Saving profile with payload:", JSON.stringify(payload, null, 2));
 
     const { error: dbError } = await supabase
       .from("profiles")
-      .update({
-        onboarding_completed: true,
-        onboarding_step: totalSteps,
-        ...buildProfilePayload(formData),
-        selected_market: market.name,
-        market_viability_score: market.viability_score,
-        niche: market.name,
-      })
+      .update(payload)
       .eq("id", user.id);
 
     if (dbError) {
-      console.error("Erreur sauvegarde profil:", dbError);
-      setError(`Erreur lors de la sauvegarde : ${dbError.message}`);
-      throw dbError;
+      console.error("[onboarding] DB error:", dbError);
+      const msg = `Erreur lors de la sauvegarde : ${dbError.message}`;
+      setError(msg);
+      throw new Error(msg);
     }
+
+    console.log("[onboarding] Profile saved successfully, redirecting...");
 
     // Attribuer XP pour l'onboarding (non bloquant)
     fetch("/api/gamification/award", {
@@ -445,16 +452,19 @@ export function OnboardingFlow() {
       body: JSON.stringify({ activityType: "onboarding.completed" }),
     }).catch(() => {});
 
-    confetti({
-      particleCount: 150,
-      spread: 70,
-      origin: { y: 0.6 },
-      colors: ["#34d399", "#2dd4bf", "#06b6d4"],
-    });
+    try {
+      confetti({
+        particleCount: 150,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ["#34d399", "#2dd4bf", "#06b6d4"],
+      });
+    } catch {
+      // confetti is non-critical
+    }
 
     setTimeout(() => {
-      router.push("/");
-      router.refresh();
+      window.location.href = "/";
     }, 1500);
   };
 
