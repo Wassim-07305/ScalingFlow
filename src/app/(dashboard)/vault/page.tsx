@@ -123,7 +123,7 @@ export default function VaultPage() {
       }
       const data = await response.json();
       setProfile((prev) => prev ? { ...prev, vault_analysis: data } : prev);
-      toast.success("Analyse du vault régénérée !");
+      toast.success("Analyse du vault regeneree !");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Erreur");
     } finally {
@@ -147,7 +147,7 @@ export default function VaultPage() {
         throw new Error("Erreur lors de la generation");
       }
       setResources((prev) => prev.filter((r) => r.id !== id));
-      toast.success("Ressource supprimée");
+      toast.success("Ressource supprimee");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Erreur");
     } finally {
@@ -162,7 +162,7 @@ export default function VaultPage() {
   if (loading) {
     return (
       <div>
-        <PageHeader title="Vault" description="Ton coffre-fort de competences et ressources." />
+        <PageHeader title="Coffre-Fort" description="Ton coffre-fort de competences et ressources." />
         <AILoading text="Chargement du vault" />
       </div>
     );
@@ -171,7 +171,7 @@ export default function VaultPage() {
   if (!profile) {
     return (
       <div>
-        <PageHeader title="Vault" description="Ton coffre-fort de competences et ressources." />
+        <PageHeader title="Coffre-Fort" description="Ton coffre-fort de competences et ressources." />
         <EmptyState
           icon={Archive}
           title="Vault non disponible"
@@ -196,7 +196,7 @@ export default function VaultPage() {
   return (
     <div>
       <PageHeader
-        title="Vault"
+        title="Coffre-Fort"
         description="Ton coffre-fort de competences et ressources."
         actions={
           <Button onClick={handleRegenerate} disabled={regenerating}>
@@ -212,7 +212,7 @@ export default function VaultPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Brain className="h-5 w-5 text-accent" />
-              Compétences
+              Competences
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -223,7 +223,7 @@ export default function VaultPage() {
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-text-muted">Aucune compétence renseignée</p>
+              <p className="text-sm text-text-muted">Aucune competence renseignee</p>
             )}
           </CardContent>
         </Card>
@@ -239,15 +239,15 @@ export default function VaultPage() {
           <CardContent className="space-y-2">
             <div className="flex items-center gap-2">
               <span className="text-xs text-text-muted uppercase">Profil :</span>
-              <Badge variant="muted">{situation || "Non renseigné"}</Badge>
+              <Badge variant="muted">{situation || "Non renseigne"}</Badge>
             </div>
             <div className="flex items-center gap-2">
               <span className="text-xs text-text-muted uppercase">Niveau :</span>
-              <Badge variant="muted">{experienceLevel || "Non renseigné"}</Badge>
+              <Badge variant="muted">{experienceLevel || "Non renseigne"}</Badge>
             </div>
             <div className="flex items-center gap-2">
               <span className="text-xs text-text-muted uppercase">Parcours :</span>
-              <Badge variant="muted">{parcoursLabel || parcours || "Non défini"}</Badge>
+              <Badge variant="muted">{parcoursLabel || parcours || "Non defini"}</Badge>
             </div>
           </CardContent>
         </Card>
@@ -268,7 +268,7 @@ export default function VaultPage() {
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-text-muted">Aucune formation renseignée</p>
+              <p className="text-sm text-text-muted">Aucune formation renseignee</p>
             )}
           </CardContent>
         </Card>

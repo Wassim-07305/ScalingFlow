@@ -116,11 +116,11 @@ export function GenerationHistory({
       case "active":
         return "Actif";
       case "validated":
-        return "Validé";
+        return "Valide";
       case "draft":
         return "Brouillon";
       case "published":
-        return "Publié";
+        return "Publie";
       case "paused":
         return "En pause";
       default:
@@ -178,7 +178,7 @@ export function GenerationHistory({
                 <div className="flex items-center gap-2 mt-1.5">
                   <Clock className="h-3 w-3 text-text-muted" />
                   <span className="text-xs text-text-muted">
-                    {format(new Date(item.created_at), "d MMM yyyy à HH:mm", {
+                    {format(new Date(item.created_at), "d MMM yyyy a HH:mm", {
                       locale: fr,
                     })}
                   </span>

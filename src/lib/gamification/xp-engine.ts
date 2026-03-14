@@ -176,7 +176,7 @@ export async function awardXP(
       user_id: userId,
       type: "badge" as const,
       title: `Niveau ${newLevel} atteint !`,
-      message: `Bravo ! Tu es passé au niveau ${newLevel}.`,
+      message: `Bravo ! Tu es passe au niveau ${newLevel}.`,
     });
     if (levelNotifError) console.error("awardXP: failed to create level notification", levelNotifError);
   }

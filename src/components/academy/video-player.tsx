@@ -30,7 +30,7 @@ export function VideoPlayer({ videoUrl, title, className }: VideoPlayerProps) {
             />
           ) : (
             <div className="absolute inset-0 flex items-center justify-center">
-              <p className="text-text-muted text-sm">Aucune vidéo disponible</p>
+              <p className="text-text-muted text-sm">Aucune video disponible</p>
             </div>
           )}
         </div>

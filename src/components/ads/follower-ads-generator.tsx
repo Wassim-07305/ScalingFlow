@@ -70,7 +70,7 @@ export function FollowerAdsGenerator({ initialData }: Props) {
 
   const copyText = (text: string) => {
     navigator.clipboard.writeText(text);
-    toast.success("Copié !");
+    toast.success("Copie !");
   };
 
   if (!data) {

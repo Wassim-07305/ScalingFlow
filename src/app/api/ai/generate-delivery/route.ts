@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+      return NextResponse.json({ error: "Non autorise" }, { status: 401 });
     }
 
     const rl = await rateLimit(user.id, "generate-delivery", { limit: 5, windowSeconds: 60 });

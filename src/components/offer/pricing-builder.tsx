@@ -58,12 +58,12 @@ export function PricingBuilder({
   return (
     <Card className={cn(className)}>
       <CardHeader>
-        <CardTitle>Stratégie de prix</CardTitle>
+        <CardTitle>Strategie de prix</CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
-            <Label>Prix ancre (barré)</Label>
+            <Label>Prix ancre (barre)</Label>
             <Input
               type="number"
               value={anchorPrice}
@@ -72,7 +72,7 @@ export function PricingBuilder({
             />
           </div>
           <div>
-            <Label>Prix réel</Label>
+            <Label>Prix reel</Label>
             <Input
               type="number"
               value={realPrice}
@@ -84,7 +84,7 @@ export function PricingBuilder({
 
         <div>
           <div className="flex items-center justify-between mb-3">
-            <Label>Décomposition de valeur</Label>
+            <Label>Decomposition de valeur</Label>
             <Button variant="ghost" size="sm" onClick={addItem}>
               <Plus className="h-4 w-4 mr-1" />
               Ajouter
@@ -96,7 +96,7 @@ export function PricingBuilder({
                 <Input
                   value={item.item}
                   onChange={(e) => updateBreakdown(index, "item", e.target.value)}
-                  placeholder="Élément..."
+                  placeholder="Element..."
                   className="flex-1"
                 />
                 <Input

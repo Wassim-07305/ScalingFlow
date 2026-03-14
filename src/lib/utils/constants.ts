@@ -40,13 +40,13 @@ export const NAV_ITEMS: NavItem[] = [
   { label: "Roadmap", href: "/roadmap", icon: Map },
   { label: "Progression", href: "/progress", icon: TrendingUp },
   { label: "Leaderboard", href: "/leaderboard", icon: Trophy },
-  { label: "Communauté", href: "/community", icon: Users },
+  { label: "Communaute", href: "/community", icon: Users },
   { label: "Vente", href: "/sales", icon: Handshake },
   { label: "Assistant IA", href: "/assistant", icon: Bot },
 ];
 
 export const NAV_BOTTOM: NavItem[] = [
-  { label: "Paramètres", href: "/settings", icon: Settings },
+  { label: "Parametres", href: "/settings", icon: Settings },
 ];
 
 export const MOBILE_NAV_ITEMS: NavItem[] = [
@@ -54,5 +54,5 @@ export const MOBILE_NAV_ITEMS: NavItem[] = [
   { label: "Offre", href: "/offer", icon: Package },
   { label: "Academy", href: "/academy", icon: GraduationCap },
   { label: "Roadmap", href: "/roadmap", icon: Map },
-  { label: "Communauté", href: "/community", icon: Users },
+  { label: "Communaute", href: "/community", icon: Users },
 ];

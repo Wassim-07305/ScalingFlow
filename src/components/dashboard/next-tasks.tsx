@@ -35,8 +35,8 @@ const taskTypeConfig: Record<
   { icon: React.ElementType; color: string; label: string }
 > = {
   action: { icon: Play, color: "text-accent", label: "Action" },
-  video: { icon: BookOpen, color: "text-info", label: "Vidéo" },
-  review: { icon: RotateCcw, color: "text-[#A78BFA]", label: "Révision" },
+  video: { icon: BookOpen, color: "text-info", label: "Video" },
+  review: { icon: RotateCcw, color: "text-[#A78BFA]", label: "Revision" },
   launch: { icon: Rocket, color: "text-accent", label: "Lancement" },
 };
 
@@ -78,7 +78,7 @@ export function NextTasks() {
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2">
             <ListTodo className="h-5 w-5 text-accent" />
-            Prochaines tâches
+            Prochaines taches
           </CardTitle>
           <Link href="/roadmap">
             <Button variant="ghost" size="sm">
@@ -101,11 +101,11 @@ export function NextTasks() {
           <div className="text-center py-6">
             <CheckCircle2 className="h-10 w-10 text-accent mx-auto mb-2" />
             <p className="text-sm text-text-secondary">
-              Toutes les tâches sont complétées !
+              Toutes les taches sont completees !
             </p>
             <Link href="/roadmap">
               <Button variant="outline" size="sm" className="mt-3">
-                Générer une nouvelle roadmap
+                Generer une nouvelle roadmap
               </Button>
             </Link>
           </div>

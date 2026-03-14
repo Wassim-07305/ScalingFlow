@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+      return NextResponse.json({ error: "Non autorise" }, { status: 401 });
     }
 
     // Rate limiting
@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
 
     if (fetchError || !marketAnalysis) {
       return NextResponse.json(
-        { error: "Analyse de marché introuvable" },
+        { error: "Analyse de marche introuvable" },
         { status: 404 }
       );
     }
@@ -136,7 +136,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(offer);
   } catch (error) {
     return NextResponse.json(
-      { error: "Erreur lors de la génération de l'offre" },
+      { error: "Erreur lors de la generation de l'offre" },
       { status: 500 }
     );
   }

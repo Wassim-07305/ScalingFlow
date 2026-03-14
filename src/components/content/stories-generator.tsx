@@ -98,7 +98,7 @@ export function StoriesGenerator({ className, initialData }: StoriesGeneratorPro
     navigator.clipboard.writeText(text);
     setCopiedIndex(index);
     setTimeout(() => setCopiedIndex(null), 2000);
-    toast.success("Copié !");
+    toast.success("Copie !");
   };
 
   if (usageLimited) {
@@ -148,7 +148,7 @@ export function StoriesGenerator({ className, initialData }: StoriesGeneratorPro
                 </div>
                 <Button variant="ghost" size="sm" onClick={() => copyStory(story, i)}>
                   <Copy className="h-3 w-3 mr-1" />
-                  {copiedIndex === i ? "Copié !" : "Copier"}
+                  {copiedIndex === i ? "Copie !" : "Copier"}
                 </Button>
               </div>
 

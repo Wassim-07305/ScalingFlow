@@ -1048,7 +1048,7 @@ export function OnboardingFlow() {
       <div className={cn("relative min-h-dvh text-white", onboardingBg)}>
         <AnimatedBackground />
         <div className="relative z-10 flex min-h-dvh flex-col items-center justify-center">
-          <AILoading text="Analyse de ton marché en cours" />
+          <AILoading text="Analyse de ton marche en cours" />
         </div>
       </div>
     );
@@ -1121,7 +1121,7 @@ export function OnboardingFlow() {
                     onClick={handleButtonClick}
                     disabled={!canProceed()}
                     aria-label={
-                      isSummary ? "Lancer l'analyse IA" : "Étape suivante"
+                      isSummary ? "Lancer l'analyse IA" : "Etape suivante"
                     }
                     className={cn(
                       "flex items-center gap-2 rounded-xl text-base font-semibold text-white transition-all",
@@ -1154,7 +1154,7 @@ export function OnboardingFlow() {
                     <span className="text-sm text-white/25">
                       Appuie sur{" "}
                       <kbd className="rounded bg-white/10 px-1.5 py-0.5 font-mono text-xs">
-                        Entrée
+                        Entree
                       </kbd>
                     </span>
                   )}

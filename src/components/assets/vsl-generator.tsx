@@ -60,7 +60,7 @@ export function VSLGenerator({ className, initialData }: VSLGeneratorProps) {
   }
 
   if (loading) {
-    return <AILoading text="Rédaction de ton script VSL" className={className} />;
+    return <AILoading text="Redaction de ton script VSL" className={className} />;
   }
 
   if (!script) {
@@ -69,9 +69,9 @@ export function VSLGenerator({ className, initialData }: VSLGeneratorProps) {
         {error && <p className="text-sm text-danger mb-4">{error}</p>}
         <Button size="lg" onClick={handleGenerate}>
           <Sparkles className="h-4 w-4 mr-2" />
-          Générer le script VSL
+          Generer le script VSL
         </Button>
-        <p className="text-sm text-text-secondary mt-2">Script en 7 sections optimisées</p>
+        <p className="text-sm text-text-secondary mt-2">Script en 7 sections optimisees</p>
       </div>
     );
   }

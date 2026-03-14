@@ -68,7 +68,7 @@ export function PostGenerator({ className }: PostGeneratorProps) {
   }
 
   if (loading) {
-    return <AILoading text="Création de tes posts" className={className} />;
+    return <AILoading text="Creation de tes posts" className={className} />;
   }
 
   return (
@@ -97,15 +97,15 @@ export function PostGenerator({ className }: PostGeneratorProps) {
           {error && <p className="text-sm text-danger mb-4">{error}</p>}
           <Button size="lg" onClick={handleGenerate}>
             <Sparkles className="h-4 w-4 mr-2" />
-            Générer des posts {platform}
+            Generer des posts {platform}
           </Button>
         </div>
       ) : (
         <>
           <div className="flex items-center justify-between">
-            <Badge variant="blue">{posts.length} posts générés</Badge>
+            <Badge variant="blue">{posts.length} posts generes</Badge>
             <Button variant="outline" size="sm" onClick={handleGenerate}>
-              Régénérer
+              Regenerer
             </Button>
           </div>
 
@@ -120,7 +120,7 @@ export function PostGenerator({ className }: PostGeneratorProps) {
                     onClick={() => copyToClipboard(post.content || post.text || JSON.stringify(post), i)}
                   >
                     <Copy className="h-3 w-3 mr-1" />
-                    {copiedIndex === i ? "Copié !" : "Copier"}
+                    {copiedIndex === i ? "Copie !" : "Copier"}
                   </Button>
                 </div>
                 {post.title && (

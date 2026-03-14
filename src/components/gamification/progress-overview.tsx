@@ -269,7 +269,7 @@ export function ProgressOverview({ className }: ProgressOverviewProps) {
                       <p className="font-semibold">{badgeDef.name}</p>
                       <p className="text-xs text-text-secondary">{badgeDef.description}</p>
                       {!unlocked && (
-                        <p className="text-xs text-text-muted mt-1 italic">Non débloqué</p>
+                        <p className="text-xs text-text-muted mt-1 italic">Non debloque</p>
                       )}
                     </TooltipContent>
                   </Tooltip>

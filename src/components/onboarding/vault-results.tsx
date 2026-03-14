@@ -263,7 +263,7 @@ export function VaultResults({ analysis, onContinue }: VaultResultsProps) {
           <CardContent className="space-y-3">
             <div className="flex items-center gap-3">
               <Badge variant="default" className="text-sm">
-                {funnelLabels[analysis.recommandation_funnel] ?? analysis.recommandation_funnel ?? "Non défini"}
+                {funnelLabels[analysis.recommandation_funnel] ?? analysis.recommandation_funnel ?? "Non defini"}
               </Badge>
             </div>
             <p className="text-sm leading-relaxed text-text-secondary">

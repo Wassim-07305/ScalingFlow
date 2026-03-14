@@ -89,7 +89,7 @@ export default function ProspectionPage() {
   return (
     <div>
       <PageHeader
-        title="Prospection & Setting"
+        title="Prospection & Closing"
         description="Strategie d'acquisition, scripts d'appels, DMs et workflows outbound."
       />
 

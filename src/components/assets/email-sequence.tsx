@@ -60,7 +60,7 @@ export function EmailSequence({ className, initialData }: EmailSequenceProps) {
   }
 
   if (loading) {
-    return <AILoading text="Rédaction de ta séquence email" className={className} />;
+    return <AILoading text="Redaction de ta sequence email" className={className} />;
   }
 
   if (!sequence) {
@@ -69,9 +69,9 @@ export function EmailSequence({ className, initialData }: EmailSequenceProps) {
         {error && <p className="text-sm text-danger mb-4">{error}</p>}
         <Button size="lg" onClick={handleGenerate}>
           <Sparkles className="h-4 w-4 mr-2" />
-          Générer la séquence email
+          Generer la sequence email
         </Button>
-        <p className="text-sm text-text-secondary mt-2">7 emails de nurturing optimisés</p>
+        <p className="text-sm text-text-secondary mt-2">7 emails de nurturing optimises</p>
       </div>
     );
   }
@@ -89,13 +89,13 @@ export function EmailSequence({ className, initialData }: EmailSequenceProps) {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <h3 className="font-semibold text-text-primary">
-            {sequence.sequence_name || "Séquence Email"}
+            {sequence.sequence_name || "Sequence Email"}
           </h3>
           <Badge variant="blue">{emails.length} emails</Badge>
         </div>
         <CopyExportBar
           copyContent={fullEmailText}
-          pdfTitle={sequence.sequence_name || "Séquence Email"}
+          pdfTitle={sequence.sequence_name || "Sequence Email"}
           pdfSubtitle={`${emails.length} emails`}
           pdfContent={fullEmailText}
           pdfFilename="sequence-email.pdf"

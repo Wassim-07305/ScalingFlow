@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+      return NextResponse.json({ error: "Non autorise" }, { status: 401 });
     }
 
     // Rate limiting
@@ -114,7 +114,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(funnel);
   } catch (error) {
     return NextResponse.json(
-      { error: "Erreur lors de la génération du funnel" },
+      { error: "Erreur lors de la generation du funnel" },
       { status: 500 }
     );
   }

@@ -76,7 +76,7 @@ export function NotificationBell() {
                       {n.message}
                     </p>
                     <p className="text-xs text-text-muted mt-0.5">
-                      {format(new Date(n.created_at), "d MMM à HH:mm", {
+                      {format(new Date(n.created_at), "d MMM a HH:mm", {
                         locale: fr,
                       })}
                     </p>

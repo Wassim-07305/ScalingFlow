@@ -25,7 +25,7 @@ export function MarketAnalysis({ result, onSelect }: MarketAnalysisProps) {
     <div className="max-w-3xl mx-auto space-y-6">
       <div className="text-center space-y-2">
         <h2 className="text-2xl font-bold">
-          3 opportunités identifiées
+          3 opportunites identifiees
         </h2>
         <p className="text-text-secondary">
           {result.reasoning}
@@ -61,7 +61,7 @@ export function MarketAnalysis({ result, onSelect }: MarketAnalysisProps) {
                         <CardTitle className="flex items-center gap-2">
                           {market.name}
                           {isRecommended && (
-                            <Badge variant="cyan">Recommandé</Badge>
+                            <Badge variant="cyan">Recommande</Badge>
                           )}
                         </CardTitle>
                         <p className="text-sm text-text-secondary mt-1">
@@ -83,7 +83,7 @@ export function MarketAnalysis({ result, onSelect }: MarketAnalysisProps) {
                     <div>
                       <h4 className="text-sm font-semibold text-text-primary flex items-center gap-2 mb-2">
                         <Target className="h-4 w-4 text-accent" />
-                        Problèmes identifiés
+                        Problemes identifies
                       </h4>
                       <ul className="space-y-1">
                         {market.problems.map((problem) => (
@@ -169,7 +169,7 @@ export function MarketAnalysis({ result, onSelect }: MarketAnalysisProps) {
                     {/* Why good fit */}
                     <div className="rounded-[8px] bg-bg-tertiary p-3">
                       <p className="text-sm text-text-secondary">
-                        <span className="text-accent font-semibold">Pourquoi ce marché : </span>
+                        <span className="text-accent font-semibold">Pourquoi ce marche : </span>
                         {market.why_good_fit}
                       </p>
                     </div>
@@ -186,10 +186,10 @@ export function MarketAnalysis({ result, onSelect }: MarketAnalysisProps) {
                       {isSelected ? (
                         <>
                           <Check className="h-4 w-4 mr-2" />
-                          Sélectionné
+                          Selectionne
                         </>
                       ) : (
-                        "Choisir ce marché"
+                        "Choisir ce marche"
                       )}
                     </Button>
                   </CardContent>
@@ -212,7 +212,7 @@ export function MarketAnalysis({ result, onSelect }: MarketAnalysisProps) {
             onClick={() => onSelect(selectedIndex)}
             className="px-10"
           >
-            Valider et passer à la création d'offre
+            Valider et passer a la creation d'offre
           </Button>
         </motion.div>
       )}

@@ -177,7 +177,7 @@ export function AcquisitionStrategy() {
             </Button>
             <Button variant="outline" size="sm" onClick={copyAll}>
               <Copy className="h-4 w-4 mr-1" />
-              {copied ? "Copié !" : "Copier tout"}
+              {copied ? "Copie !" : "Copier tout"}
             </Button>
           </div>
         </div>

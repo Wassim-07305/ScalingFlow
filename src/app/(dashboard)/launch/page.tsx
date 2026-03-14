@@ -34,14 +34,14 @@ const LAUNCH_GUIDE: {
 }[] = [
   {
     day: 1,
-    title: "Jour 1 — Lancement & Vérification",
+    title: "Jour 1 — Lancement & Verification",
     focus: "S'assurer que tout fonctionne",
     tasks: [
       {
         id: "1-1",
-        task: "Vérifier que les ads sont en diffusion",
+        task: "Verifier que les ads sont en diffusion",
         description:
-          "Vérifier dans Ads Manager que les campagnes sont bien actives et en learning phase.",
+          "Verifier dans Ads Manager que les campagnes sont bien actives et en learning phase.",
         category: "setup",
       },
       {
@@ -55,21 +55,21 @@ const LAUNCH_GUIDE: {
         id: "1-3",
         task: "Tester le funnel end-to-end",
         description:
-          "Faire un test complet : clic ad → landing → opt-in → thank you page.",
+          "Faire un test complet : clic ad > landing > opt-in > thank you page.",
         category: "setup",
       },
       {
         id: "1-4",
-        task: "Vérifier les emails automatiques",
+        task: "Verifier les emails automatiques",
         description:
-          "S'assurer que la séquence email se déclenche après l'opt-in.",
+          "S'assurer que la sequence email se declenche apres l'opt-in.",
         category: "setup",
       },
     ],
   },
   {
     day: 2,
-    title: "Jour 2 — Premières données",
+    title: "Jour 2 — Premieres donnees",
     focus: "Observer sans toucher",
     tasks: [
       {
@@ -78,14 +78,14 @@ const LAUNCH_GUIDE: {
         description:
           "CPM, CTR, CPC — ne pas paniquer, laisser l'algo apprendre.",
         kpi: "CPM",
-        target: "< 20€",
+        target: "< 20\u20AC",
         category: "monitoring",
       },
       {
         id: "2-2",
-        task: "Vérifier les leads entrants",
+        task: "Verifier les leads entrants",
         description:
-          "Y a-t-il des opt-ins ? Vérifier dans le CRM/email.",
+          "Y a-t-il des opt-ins ? Verifier dans le CRM/email.",
         kpi: "Leads",
         target: "1-3 leads",
         category: "monitoring",
@@ -94,7 +94,7 @@ const LAUNCH_GUIDE: {
         id: "2-3",
         task: "Checker les taux d'ouverture email",
         description:
-          "Premiers emails de la séquence : taux d'ouverture correct ?",
+          "Premiers emails de la sequence : taux d'ouverture correct ?",
         kpi: "Open rate",
         target: "> 30%",
         category: "monitoring",
@@ -104,11 +104,11 @@ const LAUNCH_GUIDE: {
   {
     day: 3,
     title: "Jour 3 — Analyse rapide",
-    focus: "Premiers ajustements légers",
+    focus: "Premiers ajustements legers",
     tasks: [
       {
         id: "3-1",
-        task: "Analyser le CTR par créative",
+        task: "Analyser le CTR par creative",
         description:
           "Identifier les creatives qui performent vs celles qui sont faibles.",
         kpi: "CTR",
@@ -117,10 +117,10 @@ const LAUNCH_GUIDE: {
       },
       {
         id: "3-2",
-        task: "Vérifier le CPC",
+        task: "Verifier le CPC",
         description: "Le CPC est-il dans la fourchette attendue ?",
         kpi: "CPC",
-        target: "< 3€",
+        target: "< 3\u20AC",
         category: "monitoring",
       },
       {
@@ -136,29 +136,29 @@ const LAUNCH_GUIDE: {
   },
   {
     day: 4,
-    title: "Jour 4 — Optimisation créatives",
+    title: "Jour 4 — Optimisation creatives",
     focus: "Couper les perdants",
     tasks: [
       {
         id: "4-1",
-        task: "Pauser les créatives < 0.8% CTR",
+        task: "Pauser les creatives < 0.8% CTR",
         description:
-          "Après 1000+ impressions, couper les creatives qui ne performent pas.",
+          "Apres 1000+ impressions, couper les creatives qui ne performent pas.",
         category: "optimization",
       },
       {
         id: "4-2",
-        task: "Dupliquer la meilleure créative",
+        task: "Dupliquer la meilleure creative",
         description:
-          "Prendre la meilleure et la tester avec un angle légèrement différent.",
+          "Prendre la meilleure et la tester avec un angle legerement different.",
         category: "optimization",
       },
       {
         id: "4-3",
-        task: "Vérifier le CPL",
-        description: "Coût par lead. Est-il viable ?",
+        task: "Verifier le CPL",
+        description: "Cout par lead. Est-il viable ?",
         kpi: "CPL",
-        target: "< 10€",
+        target: "< 10\u20AC",
         category: "monitoring",
       },
     ],
@@ -170,24 +170,24 @@ const LAUNCH_GUIDE: {
     tasks: [
       {
         id: "5-1",
-        task: "Calculer le ROAS préliminaire",
-        description: "Combien de revenue vs dépense pub.",
+        task: "Calculer le ROAS preliminaire",
+        description: "Combien de revenue vs depense pub.",
         kpi: "ROAS",
         target: "> 1x",
         category: "analysis",
       },
       {
         id: "5-2",
-        task: "Analyser la qualité des leads",
+        task: "Analyser la qualite des leads",
         description:
-          "Les leads sont-ils qualifiés ? Répondent-ils aux emails ?",
+          "Les leads sont-ils qualifies ? Repondent-ils aux emails ?",
         category: "analysis",
       },
       {
         id: "5-3",
-        task: "Ajuster le budget si nécessaire",
+        task: "Ajuster le budget si necessaire",
         description:
-          "Si les résultats sont bons, augmenter de 20%. Si mauvais, réduire.",
+          "Si les resultats sont bons, augmenter de 20%. Si mauvais, reduire.",
         category: "optimization",
       },
     ],
@@ -201,21 +201,21 @@ const LAUNCH_GUIDE: {
         id: "6-1",
         task: "Relancer les leads non-convertis",
         description:
-          "Envoyer un DM ou email personnalisé aux leads chauds.",
+          "Envoyer un DM ou email personnalise aux leads chauds.",
         category: "optimization",
       },
       {
         id: "6-2",
         task: "Tester une nouvelle audience",
         description:
-          "Dupliquer la campagne avec une audience LAL ou intérêt différent.",
+          "Dupliquer la campagne avec une audience LAL ou interet different.",
         category: "optimization",
       },
       {
         id: "6-3",
-        task: "Vérifier les séquences SMS",
+        task: "Verifier les sequences SMS",
         description:
-          "Les SMS de relance se déclenchent-ils correctement ?",
+          "Les SMS de relance se declenchent-ils correctement ?",
         category: "monitoring",
       },
     ],
@@ -223,7 +223,7 @@ const LAUNCH_GUIDE: {
   {
     day: 7,
     title: "Jour 7 — Bilan semaine 1",
-    focus: "Décision : continuer, ajuster ou pivoter",
+    focus: "Decision : continuer, ajuster ou pivoter",
     tasks: [
       {
         id: "7-1",
@@ -236,14 +236,14 @@ const LAUNCH_GUIDE: {
         id: "7-2",
         task: "Comparer aux benchmarks",
         description:
-          "Est-ce que tes résultats sont au-dessus ou en-dessous des standards ?",
+          "Est-ce que tes resultats sont au-dessus ou en-dessous des standards ?",
         category: "analysis",
       },
       {
         id: "7-3",
-        task: "Décision stratégique",
+        task: "Decision strategique",
         description:
-          "Continuer sans changement, ajuster la stratégie, ou pivoter complètement.",
+          "Continuer sans changement, ajuster la strategie, ou pivoter completement.",
         category: "optimization",
       },
     ],
@@ -251,20 +251,20 @@ const LAUNCH_GUIDE: {
   {
     day: 8,
     title: "Jour 8 — Scale ou Pivot",
-    focus: "Appliquer les décisions du jour 7",
+    focus: "Appliquer les decisions du jour 7",
     tasks: [
       {
         id: "8-1",
-        task: "Implémenter les changements décidés",
+        task: "Implementer les changements decides",
         description:
           "Nouvelles creatives, nouveaux angles, nouvelles audiences.",
         category: "optimization",
       },
       {
         id: "8-2",
-        task: "Lancer les nouvelles créatives",
+        task: "Lancer les nouvelles creatives",
         description:
-          "Au moins 2-3 nouvelles variations basées sur les learnings.",
+          "Au moins 2-3 nouvelles variations basees sur les learnings.",
         category: "optimization",
       },
     ],
@@ -283,7 +283,7 @@ const LAUNCH_GUIDE: {
       },
       {
         id: "9-2",
-        task: "Optimiser la séquence email",
+        task: "Optimiser la sequence email",
         description:
           "Modifier les emails qui ont un faible taux d'ouverture.",
         category: "optimization",
@@ -292,21 +292,21 @@ const LAUNCH_GUIDE: {
         id: "9-3",
         task: "Analyser les heures de diffusion",
         description:
-          "Les ads performent mieux à quelle heure ? Ajuster le scheduling.",
+          "Les ads performent mieux a quelle heure ? Ajuster le scheduling.",
         category: "analysis",
       },
     ],
   },
   {
     day: 10,
-    title: "Jour 10 — Bilan & Next Steps",
-    focus: "Préparer la phase de scale",
+    title: "Jour 10 — Bilan & Prochaines etapes",
+    focus: "Preparer la phase de scale",
     tasks: [
       {
         id: "10-1",
         task: "Rapport complet des 10 jours",
         description:
-          "Tous les KPIs, learnings, et décisions documentés.",
+          "Tous les KPIs, learnings, et decisions documentes.",
         category: "analysis",
       },
       {
@@ -320,14 +320,14 @@ const LAUNCH_GUIDE: {
         id: "10-3",
         task: "Plan de scale semaine 2",
         description:
-          "Budget, nouvelles audiences, nouvelles creatives à tester.",
+          "Budget, nouvelles audiences, nouvelles creatives a tester.",
         category: "optimization",
       },
       {
         id: "10-4",
-        task: "Mettre à jour le dashboard ScalingFlow",
+        task: "Mettre a jour le dashboard ScalingFlow",
         description:
-          "Renseigner tous les résultats dans l'outil pour le suivi long-terme.",
+          "Renseigner tous les resultats dans l'outil pour le suivi long-terme.",
         category: "setup",
       },
     ],
@@ -335,8 +335,8 @@ const LAUNCH_GUIDE: {
 ];
 
 const CATEGORY_STYLES: Record<string, { label: string; color: string }> = {
-  setup: { label: "Setup", color: "text-blue-400" },
-  monitoring: { label: "Monitoring", color: "text-yellow-400" },
+  setup: { label: "Configuration", color: "text-blue-400" },
+  monitoring: { label: "Suivi", color: "text-yellow-400" },
   optimization: { label: "Optimisation", color: "text-accent" },
   analysis: { label: "Analyse", color: "text-purple-400" },
 };
@@ -391,7 +391,7 @@ export default function LaunchGuidePage() {
       <div>
         <PageHeader
           title="Guide de Lancement"
-          description="Tes 10 premiers jours après le lancement."
+          description="Tes 10 premiers jours apres le lancement."
         />
         <div className="flex items-center justify-center py-20">
           <div className="h-6 w-6 animate-spin rounded-full border-2 border-accent border-t-transparent" />
@@ -404,7 +404,7 @@ export default function LaunchGuidePage() {
     <div>
       <PageHeader
         title="Guide de Lancement"
-        description="Tes 10 premiers jours après le lancement de tes ads."
+        description="Tes 10 premiers jours apres le lancement de tes ads."
       />
 
       {/* Tabs */}
@@ -450,7 +450,7 @@ export default function LaunchGuidePage() {
                   Progression du lancement
                 </p>
                 <p className="text-xs text-text-muted">
-                  {completedCount} / {totalTasks} tâches complétées
+                  {completedCount} / {totalTasks} taches completees
                 </p>
               </div>
             </div>

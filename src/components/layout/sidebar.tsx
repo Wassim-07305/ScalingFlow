@@ -223,7 +223,7 @@ export function Sidebar({
             ) : (
               <>
                 <PanelLeftClose className="h-5 w-5" />
-                <span className="ml-3">Réduire</span>
+                <span className="ml-3">Reduire</span>
               </>
             )}
           </button>
@@ -287,7 +287,7 @@ export function Sidebar({
                   )}
                 />
                 <span className={cn(isCollapsed && "md:hidden")}>
-                  Paramètres
+                  Parametres
                 </span>
               </Link>
             </TooltipTrigger>
@@ -296,7 +296,7 @@ export function Sidebar({
                 side="right"
                 className="bg-bg-secondary text-text-primary border-border-default"
               >
-                Paramètres
+                Parametres
               </TooltipContent>
             )}
           </Tooltip>
@@ -306,7 +306,7 @@ export function Sidebar({
             <TooltipTrigger asChild>
               <button
                 onClick={handleLogout}
-                aria-label="Se déconnecter"
+                aria-label="Se deconnecter"
                 className={cn(
                   "mt-1 flex w-full items-center rounded-xl px-3 py-2 text-sm text-sidebar-foreground/50 transition-all duration-200 hover:bg-red-500/10 hover:text-red-400",
                   isCollapsed && "md:justify-center md:px-0"
@@ -319,7 +319,7 @@ export function Sidebar({
                   )}
                 />
                 <span className={cn(isCollapsed && "md:hidden")}>
-                  Déconnexion
+                  Deconnexion
                 </span>
               </button>
             </TooltipTrigger>
@@ -328,7 +328,7 @@ export function Sidebar({
                 side="right"
                 className="bg-bg-secondary text-text-primary border-border-default"
               >
-                Déconnexion
+                Deconnexion
               </TooltipContent>
             )}
           </Tooltip>

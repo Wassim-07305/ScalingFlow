@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+      return NextResponse.json({ error: "Non autorise" }, { status: 401 });
     }
 
     // Rate limiting
@@ -106,7 +106,7 @@ export async function POST(req: NextRequest) {
 
     if (insertError) {
       return NextResponse.json(
-        { error: "Erreur lors de la sauvegarde des tâches" },
+        { error: "Erreur lors de la sauvegarde des taches" },
         { status: 500 }
       );
     }
@@ -122,7 +122,7 @@ export async function POST(req: NextRequest) {
     });
   } catch (error) {
     return NextResponse.json(
-      { error: "Erreur lors de la génération de la roadmap" },
+      { error: "Erreur lors de la generation de la roadmap" },
       { status: 500 }
     );
   }

@@ -31,7 +31,7 @@ export function CopyExportBar({
     try {
       await navigator.clipboard.writeText(copyContent);
       setCopied(true);
-      toast.success("Copié dans le presse-papiers");
+      toast.success("Copie dans le presse-papiers");
       setTimeout(() => setCopied(false), 2000);
     } catch {
       toast.error("Impossible de copier");
@@ -45,7 +45,7 @@ export function CopyExportBar({
       content: pdfContent || copyContent,
       filename: pdfFilename,
     });
-    toast.success("PDF exporté");
+    toast.success("PDF exporte");
   };
 
   return (
@@ -53,7 +53,7 @@ export function CopyExportBar({
       <div className="flex items-center gap-2">
         <Button variant="outline" size="sm" onClick={handleCopy} className="gap-2">
           {copied ? <Check className="h-3.5 w-3.5 text-accent" /> : <Copy className="h-3.5 w-3.5" />}
-          {copied ? "Copié !" : "Copier"}
+          {copied ? "Copie !" : "Copier"}
         </Button>
         <Button variant="outline" size="sm" onClick={handleExport} className="gap-2">
           <FileDown className="h-3.5 w-3.5" />

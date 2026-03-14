@@ -128,13 +128,13 @@ const ACTIVITY_META: Record<
     category: "Offre",
   },
   "generation.vault_analysis": {
-    label: "Vault analyse",
+    label: "Coffre-fort analyse",
     icon: Zap,
     color: "text-accent",
     category: "Vault",
   },
   "milestone.completed": {
-    label: "Milestone atteint",
+    label: "Jalon atteint",
     icon: Award,
     color: "text-accent",
     category: "Progression",

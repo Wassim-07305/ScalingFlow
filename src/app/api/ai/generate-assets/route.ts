@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+      return NextResponse.json({ error: "Non autorise" }, { status: 401 });
     }
 
     // Rate limiting
@@ -110,7 +110,7 @@ export async function POST(req: NextRequest) {
     if (!VALID_ASSET_TYPES.includes(assetType as AssetType)) {
       return NextResponse.json(
         {
-          error: `Type d'asset invalide. Types acceptés : ${VALID_ASSET_TYPES.join(", ")}`,
+          error: `Type d'asset invalide. Types acceptes : ${VALID_ASSET_TYPES.join(", ")}`,
         },
         { status: 400 }
       );
@@ -130,7 +130,7 @@ export async function POST(req: NextRequest) {
 
     if (!offerId) {
       return NextResponse.json(
-        { error: "Aucune offre trouvée. Génère d'abord une offre." },
+        { error: "Aucune offre trouvee. Genere d'abord une offre." },
         { status: 400 }
       );
     }
@@ -247,7 +247,7 @@ export async function POST(req: NextRequest) {
 
       default:
         return NextResponse.json(
-          { error: "Type d'asset non supporté" },
+          { error: "Type d'asset non supporte" },
           { status: 400 }
         );
     }
@@ -312,7 +312,7 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     const errMsg = error instanceof Error ? error.message : String(error);
     return NextResponse.json(
-      { error: `Erreur lors de la génération de l'asset: ${errMsg}` },
+      { error: `Erreur lors de la generation de l'asset: ${errMsg}` },
       { status: 500 }
     );
   }

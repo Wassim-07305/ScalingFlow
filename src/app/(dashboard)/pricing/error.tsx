@@ -25,7 +25,7 @@ export default function PricingError({
       {error.digest && (
         <p className="text-xs text-text-muted">Digest: {error.digest}</p>
       )}
-      <Button onClick={reset}>Réessayer</Button>
+      <Button onClick={reset}>Reessayer</Button>
     </div>
   );
 }

@@ -122,7 +122,7 @@ export default function AnalyticsPage() {
   if (loading || userLoading) {
     return (
       <div>
-        <PageHeader title="Analytics Ads" description="Analyse les performances de tes publicites." />
+        <PageHeader title="Analytiques Publicites" description="Analyse les performances de tes publicites." />
         <div className="flex items-center justify-center py-20">
           <Loader2 className="h-6 w-6 animate-spin text-text-muted" />
         </div>
@@ -133,7 +133,7 @@ export default function AnalyticsPage() {
   if (!metrics) {
     return (
       <div>
-        <PageHeader title="Analytics Ads" description="Analyse les performances de tes publicites." />
+        <PageHeader title="Analytiques Publicites" description="Analyse les performances de tes publicites." />
         <EmptyState
           icon={BarChart3}
           title="Aucune donnee publicitaire"
@@ -152,7 +152,7 @@ export default function AnalyticsPage() {
 
   return (
     <div>
-      <PageHeader title="Analytics Ads" description="Analyse les performances de tes publicites.">
+      <PageHeader title="Analytiques Publicites" description="Analyse les performances de tes publicites.">
         {hasMetaConfig && (
           <Button
             size="sm"

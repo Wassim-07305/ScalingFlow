@@ -1,12 +1,12 @@
 // ---------------------------------------------------------------------------
 // Templates d'emails — ScalingFlow
-// Chaque template retourne { subject, html } pour être envoyé via Resend.
+// Chaque template retourne { subject, html } pour etre envoye via Resend.
 // Design : dark theme inline (bg #0B0E11, accent #34D399, texte blanc).
 // ---------------------------------------------------------------------------
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://scalingflow.com";
 
-/** Wrapper HTML partagé par tous les templates */
+/** Wrapper HTML partage par tous les templates */
 function layout(content: string): string {
   return `<!DOCTYPE html>
 <html lang="fr">
@@ -44,7 +44,7 @@ function layout(content: string): string {
 </html>`;
 }
 
-/** Bouton CTA réutilisable */
+/** Bouton CTA reutilisable */
 function ctaButton(label: string, href: string): string {
   return `<table role="presentation" cellpadding="0" cellspacing="0" style="margin:24px 0;">
   <tr>
@@ -85,7 +85,7 @@ export function welcomeEmail(firstName: string) {
 }
 
 // ---------------------------------------------------------------------------
-// 2. Notification de génération terminée
+// 2. Notification de generation terminee
 // ---------------------------------------------------------------------------
 export function generationCompleteEmail(
   firstName: string,
@@ -102,11 +102,11 @@ export function generationCompleteEmail(
     <p style="margin:0 0 12px;font-size:15px;line-height:1.6;color:#D1D5DB;">
       Connecte-toi pour consulter et exploiter le contenu g&eacute;n&eacute;r&eacute;.
     </p>
-    ${ctaButton("Voir le résultat", `${APP_URL}/assets`)}
+    ${ctaButton("Voir le resultat", `${APP_URL}/assets`)}
   `);
 
   return {
-    subject: `Ta génération "${generationType}" est prête`,
+    subject: `Ta generation "${generationType}" est prete`,
     html,
   };
 }
@@ -163,14 +163,14 @@ export function subscriptionActivatedEmail(firstName: string, planName: string) 
       G&eacute;n&eacute;rations illimit&eacute;es, acc&egrave;s &agrave; tous les agents IA,
       et bien plus. Fonce !
     </p>
-    ${ctaButton("Acc\u00e9der au dashboard", `${APP_URL}`)}
+    ${ctaButton("Acceder au dashboard", `${APP_URL}`)}
     <p style="margin:0;font-size:13px;color:#6B7280;">
       Tu peux g&eacute;rer ton abonnement depuis les param&egrave;tres.
     </p>
   `);
 
   return {
-    subject: `Abonnement ${planName} activ\u00e9 \u2705`,
+    subject: `Abonnement ${planName} active`,
     html,
   };
 }
@@ -191,11 +191,11 @@ export function subscriptionCanceledEmail(firstName: string) {
       Tes contenus g&eacute;n&eacute;r&eacute;s restent accessibles. Tu peux te r&eacute;abonner
       &agrave; tout moment.
     </p>
-    ${ctaButton("Se r\u00e9abonner", `${APP_URL}/pricing`)}
+    ${ctaButton("Se reabonner", `${APP_URL}/pricing`)}
   `);
 
   return {
-    subject: "Ton abonnement ScalingFlow a \u00e9t\u00e9 annul\u00e9",
+    subject: "Ton abonnement ScalingFlow a ete annule",
     html,
   };
 }
@@ -216,14 +216,14 @@ export function paymentFailedEmail(firstName: string) {
       V&eacute;rifie tes informations de paiement pour &eacute;viter toute interruption
       de service.
     </p>
-    ${ctaButton("Mettre \u00e0 jour mon paiement", `${APP_URL}/settings`)}
+    ${ctaButton("Mettre a jour mon paiement", `${APP_URL}/settings`)}
     <p style="margin:0;font-size:13px;color:#6B7280;">
       Si tu penses qu&rsquo;il s&rsquo;agit d&rsquo;une erreur, contacte-nous en r&eacute;pondant &agrave; cet email.
     </p>
   `);
 
   return {
-    subject: "Action requise : probl\u00e8me de paiement ScalingFlow",
+    subject: "Action requise : probleme de paiement ScalingFlow",
     html,
   };
 }
@@ -257,14 +257,14 @@ export function kpiAlertEmail(
       qui n&eacute;cessitent ton attention :
     </p>
     ${alertRows}
-    ${ctaButton("Voir le d\u00e9tail", `${APP_URL}`)}
+    ${ctaButton("Voir le detail", `${APP_URL}`)}
     <p style="margin:0;font-size:13px;color:#6B7280;">
       Ces alertes sont bas&eacute;es sur tes KPIs des derniers jours.
     </p>
   `);
 
   return {
-    subject: `${alerts.length} alerte${alerts.length > 1 ? "s" : ""} business d\u00e9tect\u00e9e${alerts.length > 1 ? "s" : ""}`,
+    subject: `${alerts.length} alerte${alerts.length > 1 ? "s" : ""} business detectee${alerts.length > 1 ? "s" : ""}`,
     html,
   };
 }

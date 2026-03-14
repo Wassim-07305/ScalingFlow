@@ -69,7 +69,7 @@ export function FunnelBuilder({ className, initialData }: FunnelBuilderProps) {
 
   const handleGenerate = async () => {
     if (!selectedOfferId) {
-      setError("Aucune offre disponible. Génère d'abord une offre.");
+      setError("Aucune offre disponible. Genere d'abord une offre.");
       return;
     }
     setLoading(true);
@@ -103,7 +103,7 @@ export function FunnelBuilder({ className, initialData }: FunnelBuilderProps) {
   }
 
   if (loading) {
-    return <AILoading text="Création de ton funnel de conversion" className={className} />;
+    return <AILoading text="Creation de ton funnel de conversion" className={className} />;
   }
 
   if (!funnelData) {
@@ -113,10 +113,10 @@ export function FunnelBuilder({ className, initialData }: FunnelBuilderProps) {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Sparkles className="h-5 w-5 text-accent" />
-              Générer ton funnel
+              Generer ton funnel
             </CardTitle>
             <CardDescription>
-              L&apos;IA va créer le copywriting complet pour tes 3 pages de funnel
+              L&apos;IA va creer le copywriting complet pour tes 3 pages de funnel
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -149,7 +149,7 @@ export function FunnelBuilder({ className, initialData }: FunnelBuilderProps) {
             {error && <p className="text-sm text-danger">{error}</p>}
             <Button size="lg" onClick={handleGenerate} disabled={!selectedOfferId}>
               <Sparkles className="h-4 w-4 mr-2" />
-              Générer le funnel complet
+              Generer le funnel complet
             </Button>
           </CardContent>
         </Card>
@@ -221,7 +221,7 @@ export function FunnelBuilder({ className, initialData }: FunnelBuilderProps) {
           </GlowCard>
           <Card>
             <CardContent className="pt-6">
-              <h4 className="font-medium text-text-primary mb-3">Bénéfices</h4>
+              <h4 className="font-medium text-text-primary mb-3">Benefices</h4>
               <ul className="space-y-2">
                 {pageData.benefit_bullets?.map((b: string, i: number) => (
                   <li key={i} className="flex items-start gap-2 text-sm text-text-secondary">
@@ -259,7 +259,7 @@ export function FunnelBuilder({ className, initialData }: FunnelBuilderProps) {
           </GlowCard>
           <Card>
             <CardContent className="pt-6">
-              <h4 className="font-medium text-text-primary mb-3">Prochaines étapes</h4>
+              <h4 className="font-medium text-text-primary mb-3">Prochaines etapes</h4>
               <ol className="space-y-2">
                 {pageData.next_steps?.map((step: string, i: number) => (
                   <li key={i} className="flex items-start gap-3 text-sm text-text-secondary">
@@ -308,7 +308,7 @@ export function FunnelBuilder({ className, initialData }: FunnelBuilderProps) {
           HTML
         </Button>
         <Button variant="outline" onClick={() => { setFunnelData(null); handleGenerate(); }}>
-          Régénérer
+          Regenerer
         </Button>
       </div>
     </div>

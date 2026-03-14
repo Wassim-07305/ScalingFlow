@@ -206,7 +206,7 @@ function SkillMindmap({
         </text>
       </svg>
       <p className="text-xs text-text-muted text-center mt-2">
-        Survole une catégorie pour voir les compétences individuelles
+        Survole une categorie pour voir les competences individuelles
       </p>
     </div>
   );
@@ -240,8 +240,8 @@ export function VaultSkillMap() {
     return (
       <EmptyState
         icon={Map}
-        title="Aucune compétence"
-        description="Complète l'onboarding pour visualiser ta cartographie."
+        title="Aucune competence"
+        description="Complete l'onboarding pour visualiser ta cartographie."
       />
     );
   }
@@ -281,7 +281,7 @@ export function VaultSkillMap() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Map className="h-5 w-5 text-accent" />
-            Cartographie des compétences
+            Cartographie des competences
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -298,7 +298,7 @@ export function VaultSkillMap() {
                 tick={{ fill: "#6B7280", fontSize: 10 }}
               />
               <Radar
-                name="Maîtrise"
+                name="Maitrise"
                 dataKey="score"
                 stroke="#34D399"
                 fill="#34D399"
@@ -312,7 +312,7 @@ export function VaultSkillMap() {
                   borderRadius: "12px",
                   color: "#E5E7EB",
                 }}
-                formatter={(value: number | undefined) => [`${value ?? 0}%`, "Maîtrise"]}
+                formatter={(value: number | undefined) => [`${value ?? 0}%`, "Maitrise"]}
               />
             </RadarChart>
           </ResponsiveContainer>
@@ -324,7 +324,7 @@ export function VaultSkillMap() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Network className="h-5 w-5 text-accent" />
-            Mindmap des compétences
+            Mindmap des competences
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -350,7 +350,7 @@ export function VaultSkillMap() {
                 />
               </div>
               <p className="text-xs text-text-muted mt-1">
-                {cat.count} / {cat.total} compétences
+                {cat.count} / {cat.total} competences
               </p>
             </CardContent>
           </Card>

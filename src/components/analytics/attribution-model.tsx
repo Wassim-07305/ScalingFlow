@@ -53,19 +53,19 @@ const DEMO_REVENUE = 32813; // Total revenue to distribute
 const MODEL_LABELS: Record<AttributionModel, string> = {
   firstTouch: "Premier contact",
   lastTouch: "Dernier contact",
-  linear: "Linéaire",
-  timeDecay: "Décroissance temporelle",
+  linear: "Lineaire",
+  timeDecay: "Decroissance temporelle",
 };
 
 const MODEL_DESCRIPTIONS: Record<AttributionModel, string> = {
   firstTouch:
-    "100% du crédit au premier point de contact. Idéal pour mesurer l'efficacité de la découverte.",
+    "100% du credit au premier point de contact. Ideal pour mesurer l'efficacite de la decouverte.",
   lastTouch:
-    "100% du crédit au dernier point de contact avant conversion. Idéal pour mesurer le closing.",
+    "100% du credit au dernier point de contact avant conversion. Ideal pour mesurer le closing.",
   linear:
-    "Crédit réparti également entre tous les points de contact. Vue équilibrée du parcours client.",
+    "Credit reparti egalement entre tous les points de contact. Vue equilibree du parcours client.",
   timeDecay:
-    "Plus de crédit aux points de contact récents. Bon compromis entre premier et dernier contact.",
+    "Plus de credit aux points de contact recents. Bon compromis entre premier et dernier contact.",
 };
 
 // ─── Customer journey demo ───────────────────────────────────
@@ -170,7 +170,7 @@ export function AttributionModel() {
     a.download = `attribution-${model}-${new Date().toISOString().slice(0, 10)}.json`;
     a.click();
     URL.revokeObjectURL(url);
-    toast.success("Export JSON téléchargé");
+    toast.success("Export JSON telecharge");
   };
 
   return (
@@ -181,18 +181,18 @@ export function AttributionModel() {
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
             <div className="flex-1">
               <h3 className="text-sm font-semibold text-text-primary mb-1">
-                Modèles d&apos;attribution
+                Modeles d&apos;attribution
               </h3>
               <p className="text-xs text-text-secondary">
-                Comprenez comment chaque canal contribue à vos conversions selon différents modèles
-                d&apos;attribution. Les répartitions par canal sont des estimations basées sur les modèles standards du secteur.
-                {revenueIsReal && " Le revenu total affiché est basé sur vos données réelles."}
+                Comprenez comment chaque canal contribue a vos conversions selon differents modeles
+                d&apos;attribution. Les repartitions par canal sont des estimations basees sur les modeles standards du secteur.
+                {revenueIsReal && " Le revenu total affiche est base sur vos donnees reelles."}
               </p>
             </div>
             <div className="flex flex-col gap-1 items-end">
-              <Badge variant="yellow">Répartitions estimées</Badge>
-              {revenueIsReal && <Badge variant="default">Revenu réel : {new Intl.NumberFormat("fr-FR", { style: "currency", currency: "EUR", maximumFractionDigits: 0 }).format(totalRevenue)}</Badge>}
-              {isDemo && <Badge variant="muted">Revenu de démo</Badge>}
+              <Badge variant="yellow">Repartitions estimees</Badge>
+              {revenueIsReal && <Badge variant="default">Revenu reel : {new Intl.NumberFormat("fr-FR", { style: "currency", currency: "EUR", maximumFractionDigits: 0 }).format(totalRevenue)}</Badge>}
+              {isDemo && <Badge variant="muted">Revenu de demo</Badge>}
             </div>
           </div>
         </CardContent>
@@ -208,8 +208,8 @@ export function AttributionModel() {
             <SelectContent>
               <SelectItem value="firstTouch">Premier contact</SelectItem>
               <SelectItem value="lastTouch">Dernier contact</SelectItem>
-              <SelectItem value="linear">Linéaire</SelectItem>
-              <SelectItem value="timeDecay">Décroissance temporelle</SelectItem>
+              <SelectItem value="linear">Lineaire</SelectItem>
+              <SelectItem value="timeDecay">Decroissance temporelle</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -296,7 +296,7 @@ export function AttributionModel() {
                     maximumFractionDigits: 0,
                   }).format(ch.revenu)}
                 </div>
-                <div className="text-xs text-text-muted">attribué</div>
+                <div className="text-xs text-text-muted">attribue</div>
               </div>
             </div>
             {/* Mini bar */}
@@ -316,7 +316,7 @@ export function AttributionModel() {
       {/* Model comparison */}
       <Card>
         <CardHeader>
-          <CardTitle>Comparaison des modèles</CardTitle>
+          <CardTitle>Comparaison des modeles</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
@@ -331,10 +331,10 @@ export function AttributionModel() {
                     Dernier contact
                   </th>
                   <th className="text-right text-text-secondary font-medium py-3 px-2">
-                    Linéaire
+                    Lineaire
                   </th>
                   <th className="text-right text-text-secondary font-medium py-3 px-2">
-                    Décroissance
+                    Decroissance
                   </th>
                 </tr>
               </thead>

@@ -69,7 +69,7 @@ export function OfferPreview({ offer, onRegenerate, className }: OfferPreviewPro
           {onRegenerate && (
             <Button variant="outline" size="sm" onClick={onRegenerate}>
               <RefreshCw className="h-4 w-4 mr-2" />
-              Régénérer
+              Regenerer
             </Button>
           )}
         </div>
@@ -80,7 +80,7 @@ export function OfferPreview({ offer, onRegenerate, className }: OfferPreviewPro
         <GlowCard glowColor="orange">
           <div className="flex items-center gap-2 mb-4">
             <Zap className="h-5 w-5 text-accent" />
-            <h3 className="text-lg font-semibold text-text-primary">Mécanisme Unique</h3>
+            <h3 className="text-lg font-semibold text-text-primary">Mecanisme Unique</h3>
           </div>
           <p className="text-accent font-medium mb-3">{mechanism.name}</p>
           {mechanism.description && (
@@ -104,7 +104,7 @@ export function OfferPreview({ offer, onRegenerate, className }: OfferPreviewPro
       {/* Pricing Strategy */}
       <Card>
         <CardHeader>
-          <CardTitle>Stratégie de Prix</CardTitle>
+          <CardTitle>Strategie de Prix</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-baseline gap-4 mb-6">
@@ -186,7 +186,7 @@ export function OfferPreview({ offer, onRegenerate, className }: OfferPreviewPro
             <CardHeader>
               <CardTitle className="text-base flex items-center gap-2">
                 <Gift className="h-4 w-4 text-accent" />
-                Élément No-Brainer
+                Element No-Brainer
               </CardTitle>
             </CardHeader>
             <CardContent>

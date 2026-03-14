@@ -171,7 +171,7 @@ export default function BrandPage() {
         .eq("id", item.id)
         .single();
       if (error || !data) {
-        toast.error("Impossible de charger cette identité");
+        toast.error("Impossible de charger cette identite");
         return;
       }
 
@@ -217,7 +217,7 @@ export default function BrandPage() {
         },
       });
       setActiveTab("nom");
-      toast.success("Identité de marque chargée depuis l'historique");
+      toast.success("Identite de marque chargee depuis l'historique");
     } catch {
       toast.error("Erreur lors du chargement");
     }
@@ -289,7 +289,7 @@ export default function BrandPage() {
           table="brand_identities"
           titleField="selected_name"
           statusField="status"
-          emptyMessage="Aucune identité de marque générée pour le moment."
+          emptyMessage="Aucune identite de marque generee pour le moment."
           onSelect={handleHistorySelect}
         />
       ) : !generated ? (

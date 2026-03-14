@@ -97,7 +97,7 @@ export function InsightsScraper({ marketName, targetAvatar, existingPains }: Ins
   const copyText = (key: string, text: string) => {
     navigator.clipboard.writeText(text);
     setCopiedIdx(key);
-    toast.success("Copié !");
+    toast.success("Copie !");
     setTimeout(() => setCopiedIdx(null), 2000);
   };
 

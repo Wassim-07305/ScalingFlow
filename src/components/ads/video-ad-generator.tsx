@@ -74,7 +74,7 @@ export function VideoAdGenerator({ className, initialData }: VideoAdGeneratorPro
     navigator.clipboard.writeText(text);
     setCopiedIndex(index);
     setTimeout(() => setCopiedIndex(null), 2000);
-    toast.success("Copié !");
+    toast.success("Copie !");
   };
 
   if (usageLimited) {
@@ -126,7 +126,7 @@ export function VideoAdGenerator({ className, initialData }: VideoAdGeneratorPro
                   onClick={() => copyToClipboard(script, i)}
                 >
                   <Copy className="h-3 w-3 mr-1" />
-                  {copiedIndex === i ? "Copié !" : "Copier"}
+                  {copiedIndex === i ? "Copie !" : "Copier"}
                 </Button>
               </div>
 

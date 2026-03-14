@@ -126,7 +126,7 @@ export async function generateJSON<T>({
     prompt,
     systemPrompt:
       (systemPrompt || "") +
-      "\n\nIMPORTANT: Réponds UNIQUEMENT en JSON valide, sans markdown, sans ```json, sans texte autour.",
+      "\n\nIMPORTANT: Reponds UNIQUEMENT en JSON valide, sans markdown, sans ```json, sans texte autour.",
     maxTokens,
     temperature,
   });

@@ -117,7 +117,7 @@ export function CreativeGenerator({ className, initialData }: CreativeGeneratorP
   }
 
   if (loading) {
-    return <AILoading text="Création de tes publicités" className={className} />;
+    return <AILoading text="Creation de tes publicites" className={className} />;
   }
 
   if (variations.length === 0) {
@@ -126,7 +126,7 @@ export function CreativeGenerator({ className, initialData }: CreativeGeneratorP
         {error && <p className="text-sm text-danger mb-4">{error}</p>}
         <Button size="lg" onClick={handleGenerate}>
           <Sparkles className="h-4 w-4 mr-2" />
-          Générer 5 variations
+          Generer 5 variations
         </Button>
         <p className="text-sm text-text-secondary mt-2">Copy + hooks pour tes campagnes</p>
       </div>
@@ -138,7 +138,7 @@ export function CreativeGenerator({ className, initialData }: CreativeGeneratorP
       <div className="flex items-center justify-between">
         <Badge variant="default">{variations.length} variations</Badge>
         <Button variant="outline" size="sm" onClick={handleGenerate}>
-          Régénérer
+          Regenerer
         </Button>
       </div>
 
@@ -148,7 +148,7 @@ export function CreativeGenerator({ className, initialData }: CreativeGeneratorP
             <div className="flex items-center justify-between mb-3">
               <Badge variant={v.estimated_format === "video" ? "blue" : "cyan"}>
                 {v.estimated_format === "video" ? (
-                  <><Video className="h-3 w-3 mr-1" /> Vidéo</>
+                  <><Video className="h-3 w-3 mr-1" /> Video</>
                 ) : (
                   <><Image className="h-3 w-3 mr-1" /> Image</>
                 )}
@@ -159,7 +159,7 @@ export function CreativeGenerator({ className, initialData }: CreativeGeneratorP
                 onClick={() => copyToClipboard(`${v.hook}\n\n${v.body}\n\n${v.headline}\n\nCTA: ${v.cta}`, i)}
               >
                 <Copy className="h-3 w-3 mr-1" />
-                {copiedIndex === i ? "Copié !" : "Copier"}
+                {copiedIndex === i ? "Copie !" : "Copier"}
               </Button>
             </div>
 

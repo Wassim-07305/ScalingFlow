@@ -35,7 +35,7 @@ export function OfferGenerator({ className, marketAnalysisId, marketName, initia
 
   const handleGenerate = async () => {
     if (!marketAnalysisId) {
-      setError("Veuillez d'abord compléter votre analyse de marché dans l'onboarding.");
+      setError("Veuillez d'abord completer votre analyse de marche dans l'onboarding.");
       return;
     }
 
@@ -85,7 +85,7 @@ export function OfferGenerator({ className, marketAnalysisId, marketName, initia
   }
 
   if (loading) {
-    return <AILoading text="Génération de ton offre irrésistible" className={className} />;
+    return <AILoading text="Generation de ton offre irresistible" className={className} />;
   }
 
   return (
@@ -95,32 +95,32 @@ export function OfferGenerator({ className, marketAnalysisId, marketName, initia
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Sparkles className="h-5 w-5 text-accent" />
-              Générer une offre
+              Generer une offre
             </CardTitle>
             <CardDescription>
-              L&apos;IA va créer une offre irrésistible basée sur ton analyse de marché
+              L&apos;IA va creer une offre irresistible basee sur ton analyse de marche
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             {marketName && (
               <div className="flex items-center gap-2">
-                <span className="text-sm text-text-secondary">Marché :</span>
+                <span className="text-sm text-text-secondary">Marche :</span>
                 <Badge variant="default">{marketName}</Badge>
               </div>
             )}
             {error && <p className="text-sm text-danger">{error}</p>}
             <Button size="lg" onClick={handleGenerate}>
               <Sparkles className="h-4 w-4 mr-2" />
-              Générer mon offre
+              Generer mon offre
             </Button>
           </CardContent>
         </Card>
       ) : (
         <EmptyState
           icon={Package}
-          title="Aucune analyse de marché"
-          description="Complète d'abord l'onboarding pour analyser ton marché et pouvoir générer une offre."
-          actionLabel="Aller à l'onboarding"
+          title="Aucune analyse de marche"
+          description="Complete d'abord l'onboarding pour analyser ton marche et pouvoir generer une offre."
+          actionLabel="Aller a l'onboarding"
           onAction={() => window.location.href = "/onboarding"}
         />
       )}

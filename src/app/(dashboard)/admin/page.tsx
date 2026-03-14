@@ -97,7 +97,7 @@ export default function AdminPage() {
       const sevenDaysAgo = new Date();
       sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
-      // ─── Tous les profils (pour stats agrégées) ─────────────
+      // ─── Tous les profils (pour stats agregees) ─────────────
       const { data: allProfiles } = await supabase
         .from("profiles")
         .select("id, subscription_plan, subscription_status, xp_points, onboarding_completed, created_at");

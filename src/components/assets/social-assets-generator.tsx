@@ -68,9 +68,9 @@ export function SocialAssetsGenerator({ initialData }: Props) {
       const result = await res.json();
       const parsed = result.ai_raw_response || JSON.parse(result.content);
       setData(parsed);
-      toast.success("Social assets generés !");
+      toast.success("Social assets generes !");
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Erreur lors de la génération");
+      toast.error(e instanceof Error ? e.message : "Erreur lors de la generation");
     } finally {
       setLoading(false);
     }
@@ -79,7 +79,7 @@ export function SocialAssetsGenerator({ initialData }: Props) {
   const copyAll = () => {
     if (!data) return;
     navigator.clipboard.writeText(JSON.stringify(data, null, 2));
-    toast.success("Copié dans le presse-papier");
+    toast.success("Copie dans le presse-papier");
   };
 
   if (!data) {
@@ -87,11 +87,11 @@ export function SocialAssetsGenerator({ initialData }: Props) {
       <div className="flex flex-col items-center justify-center py-16 gap-4">
         <Share2 className="h-12 w-12 text-text-muted" />
         <p className="text-text-secondary text-sm">
-          Génère des assets visuels pour tes réseaux sociaux : cartes témoignage, bannières, highlights, signature email et badges de preuve sociale.
+          Genere des assets visuels pour tes reseaux sociaux : cartes temoignage, bannieres, highlights, signature email et badges de preuve sociale.
         </p>
         <Button onClick={generate} disabled={loading}>
           {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Share2 className="h-4 w-4 mr-2" />}
-          Générer les social assets
+          Generer les social assets
         </Button>
       </div>
     );
@@ -108,15 +108,15 @@ export function SocialAssetsGenerator({ initialData }: Props) {
           </Button>
           <Button size="sm" onClick={generate} disabled={loading}>
             {loading && <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />}
-            Régénérer
+            Regenerer
           </Button>
         </div>
       </div>
 
-      {/* Cartes témoignage */}
+      {/* Cartes temoignage */}
       {data.testimonial_cards && data.testimonial_cards.length > 0 && (
         <section>
-          <h4 className="text-sm font-medium text-accent mb-3">Cartes Témoignage</h4>
+          <h4 className="text-sm font-medium text-accent mb-3">Cartes Temoignage</h4>
           <div className="grid gap-3 md:grid-cols-3">
             {data.testimonial_cards.map((card, i) => (
               <div key={i} className="rounded-xl border border-border-default bg-bg-tertiary p-4 space-y-2">
@@ -132,10 +132,10 @@ export function SocialAssetsGenerator({ initialData }: Props) {
         </section>
       )}
 
-      {/* Bannières */}
+      {/* Bannieres */}
       {data.social_banners && data.social_banners.length > 0 && (
         <section>
-          <h4 className="text-sm font-medium text-accent mb-3">Bannières Sociales</h4>
+          <h4 className="text-sm font-medium text-accent mb-3">Bannieres Sociales</h4>
           <div className="space-y-3">
             {data.social_banners.map((banner, i) => (
               <div key={i} className="rounded-xl border border-border-default bg-bg-tertiary p-4">

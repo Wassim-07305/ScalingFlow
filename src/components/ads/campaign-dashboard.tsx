@@ -32,7 +32,7 @@ function getStatusLabel(status: AdCampaign["status"]): string {
     case "draft":
       return "Brouillon";
     case "completed":
-      return "Terminé";
+      return "Termine";
   }
 }
 
@@ -110,7 +110,7 @@ export function CampaignDashboard({ className }: CampaignDashboardProps) {
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <Megaphone className="h-12 w-12 text-text-muted/40 mb-4" />
               <p className="text-sm text-text-muted">
-                Aucune campagne publicitaire. Crée tes premières publicités pour voir tes campagnes ici.
+                Aucune campagne publicitaire. Cree tes premieres publicites pour voir tes campagnes ici.
               </p>
             </div>
           </CardContent>
@@ -124,7 +124,7 @@ export function CampaignDashboard({ className }: CampaignDashboardProps) {
       {/* KPIs */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {[
-          { label: "Dépensé", value: totalSpent, suffix: " €", icon: DollarSign, color: "text-accent" },
+          { label: "Depense", value: totalSpent, suffix: " €", icon: DollarSign, color: "text-accent" },
           { label: "Impressions", value: totalImpressions, icon: Eye, color: "text-info" },
           { label: "Clics", value: totalClicks, icon: MousePointer, color: "text-accent" },
           { label: "Conversions", value: totalConversions, icon: TrendingUp, color: "text-accent" },
@@ -176,7 +176,7 @@ export function CampaignDashboard({ className }: CampaignDashboardProps) {
                     <div>
                       <p className="text-sm font-medium text-text-primary">{campaign.campaign_name}</p>
                       <p className="text-xs text-text-muted">
-                        Budget: {budget}€ &middot; Dépensé: {campaign.total_spend}€
+                        Budget: {budget}€ &middot; Depense: {campaign.total_spend}€
                       </p>
                     </div>
                   </div>

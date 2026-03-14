@@ -147,7 +147,7 @@ export default function AssistantPage() {
     const diffH = Math.floor(diffMin / 60);
     const diffD = Math.floor(diffH / 24);
 
-    if (diffMin < 1) return "À l'instant";
+    if (diffMin < 1) return "A l'instant";
     if (diffMin < 60) return `Il y a ${diffMin}min`;
     if (diffH < 24) return `Il y a ${diffH}h`;
     if (diffD < 7) return `Il y a ${diffD}j`;
@@ -158,7 +158,7 @@ export default function AssistantPage() {
     <div>
       <PageHeader
         title="Assistant IA"
-        description="Discute avec nos agents IA spécialisés."
+        description="Discute avec tes agents IA specialises."
       />
 
       {/* Agent selector */}

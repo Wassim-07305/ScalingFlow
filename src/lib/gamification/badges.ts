@@ -64,7 +64,7 @@ export const BADGE_DEFINITIONS: BadgeDefinition[] = [
   },
   {
     id: "level_5",
-    name: "Confirmé",
+    name: "Confirme",
     description: "Atteins le niveau 5",
     icon: Award,
     color: "text-info",
@@ -78,14 +78,14 @@ export const BADGE_DEFINITIONS: BadgeDefinition[] = [
   },
   {
     id: "xp_1000",
-    name: "Millénaire",
+    name: "Millenaire",
     description: "Accumule 1 000 points XP",
     icon: Star,
     color: "text-accent",
   },
   {
     id: "xp_5000",
-    name: "Légende",
+    name: "Legende",
     description: "Accumule 5 000 points XP",
     icon: Flame,
     color: "text-danger",

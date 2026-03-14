@@ -44,7 +44,7 @@ export function OtoGenerator({ offerId, className, initialData }: OtoGeneratorPr
 
   const handleGenerate = async () => {
     if (!offerId) {
-      setError("Veuillez d'abord générer une offre principale.");
+      setError("Veuillez d'abord generer une offre principale.");
       return;
     }
 
@@ -60,7 +60,7 @@ export function OtoGenerator({ offerId, className, initialData }: OtoGeneratorPr
       });
 
       if (!response.ok) {
-        throw new Error("Erreur lors de la génération de l'offre OTO");
+        throw new Error("Erreur lors de la generation de l'offre OTO");
       }
 
       const data = await response.json();
@@ -73,7 +73,7 @@ export function OtoGenerator({ offerId, className, initialData }: OtoGeneratorPr
   };
 
   if (loading) {
-    return <AILoading text="Création de ton offre OTO" className={className} />;
+    return <AILoading text="Creation de ton offre OTO" className={className} />;
   }
 
   if (otoData) {
@@ -99,7 +99,7 @@ export function OtoGenerator({ offerId, className, initialData }: OtoGeneratorPr
               onClick={() =>
                 exportToPDF({
                   title: otoData.oto_name || "Offre OTO",
-                  subtitle: "OTO générée par ScalingFlow",
+                  subtitle: "OTO generee par ScalingFlow",
                   content: otoData,
                   filename: `oto-${(otoData.oto_name || "offre").toLowerCase().replace(/[^a-z0-9]+/g, "-")}.pdf`,
                 })
@@ -110,7 +110,7 @@ export function OtoGenerator({ offerId, className, initialData }: OtoGeneratorPr
             </Button>
             <Button variant="outline" size="sm" onClick={() => { setOtoData(null); handleGenerate(); }}>
               <RefreshCw className="h-4 w-4 mr-2" />
-              Régénérer
+              Regenerer
             </Button>
           </div>
         </div>
@@ -148,7 +148,7 @@ export function OtoGenerator({ offerId, className, initialData }: OtoGeneratorPr
         {/* Benefices en grille */}
         {otoData.benefits?.length > 0 && (
           <div>
-            <h3 className="text-lg font-semibold text-text-primary mb-4">Bénéfices</h3>
+            <h3 className="text-lg font-semibold text-text-primary mb-4">Benefices</h3>
             <div className="grid gap-4 sm:grid-cols-2">
               {otoData.benefits.map(
                 (b: { title: string; description: string }, i: number) => (
@@ -204,7 +204,7 @@ export function OtoGenerator({ offerId, className, initialData }: OtoGeneratorPr
               </span>
             )}
             {otoData.discount_percentage && (
-              <Badge variant="red">{otoData.discount_percentage} de réduction</Badge>
+              <Badge variant="red">{otoData.discount_percentage} de reduction</Badge>
             )}
           </div>
         </GlowCard>
@@ -296,13 +296,13 @@ export function OtoGenerator({ offerId, className, initialData }: OtoGeneratorPr
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-text-secondary text-sm">
-              Génère une offre OTO irrésistible qui se présente juste après l&apos;achat
+              Genere une offre OTO irresistible qui se presente juste apres l&apos;achat
               de ton offre principale pour maximiser la valeur client.
             </p>
             {error && <p className="text-sm text-danger">{error}</p>}
             <Button size="lg" onClick={handleGenerate}>
               <Sparkles className="h-4 w-4 mr-2" />
-              Générer l&apos;offre OTO
+              Generer l&apos;offre OTO
             </Button>
           </CardContent>
         </Card>
@@ -310,8 +310,8 @@ export function OtoGenerator({ offerId, className, initialData }: OtoGeneratorPr
         <EmptyState
           icon={Package}
           title="Aucune offre principale"
-          description="Génère d'abord une offre principale dans l'onglet Générer pour pouvoir créer une offre OTO."
-          actionLabel="Aller à Générer"
+          description="Genere d'abord une offre principale dans l'onglet Generer pour pouvoir creer une offre OTO."
+          actionLabel="Aller a Generer"
           onAction={() => window.location.href = "/offer"}
         />
       )}

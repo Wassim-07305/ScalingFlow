@@ -87,7 +87,7 @@ export function SmsSequence({ className, initialData }: SmsSequenceProps) {
         <div className="flex items-center gap-2">
           <CopyExportBar
             copyContent={messages.map((s: { sms_number: number; body: string; delay: string }) => `SMS ${s.sms_number} (${s.delay})\n${s.body}`).join("\n\n---\n\n")}
-            pdfTitle="Séquence SMS"
+            pdfTitle="Sequence SMS"
             pdfSubtitle={`${messages.length} SMS`}
             pdfFilename="sequence-sms.pdf"
           />

@@ -12,14 +12,14 @@ export async function POST(req: NextRequest) {
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+      return NextResponse.json({ error: "Non autorise" }, { status: 401 });
     }
 
     const { transcript, call_type } = await req.json();
 
     if (!transcript || transcript.trim().length < 50) {
       return NextResponse.json(
-        { error: "Le transcript doit contenir au moins 50 caractères" },
+        { error: "Le transcript doit contenir au moins 50 caracteres" },
         { status: 400 }
       );
     }

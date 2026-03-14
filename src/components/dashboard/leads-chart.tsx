@@ -40,7 +40,7 @@ export function LeadsChart() {
         const weekDate = subWeeks(now, i);
         const start = startOfWeek(weekDate, { locale: fr }).toISOString();
         const end = endOfWeek(weekDate, { locale: fr }).toISOString();
-        // Format : "3 Fév" pour le debut de la semaine
+        // Format : "3 Fev" pour le debut de la semaine
         const label = format(startOfWeek(weekDate, { locale: fr }), "d MMM", {
           locale: fr,
         });
@@ -95,7 +95,7 @@ export function LeadsChart() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Créations par semaine</CardTitle>
+        <CardTitle>Creations par semaine</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="h-[220px] sm:h-[300px]">
@@ -108,8 +108,8 @@ export function LeadsChart() {
               <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-accent/10 mb-3">
                 <BarChart3 className="h-6 w-6 text-accent" />
               </div>
-              <p className="text-sm font-medium text-text-primary mb-1">Pas encore de créations</p>
-              <p className="text-xs text-text-muted max-w-[220px]">Génère ta première offre ou funnel pour voir les stats ici.</p>
+              <p className="text-sm font-medium text-text-primary mb-1">Pas encore de creations</p>
+              <p className="text-xs text-text-muted max-w-[220px]">Genere ta premiere offre ou funnel pour voir les stats ici.</p>
             </div>
           ) : (
             <ResponsiveContainer width="100%" height="100%">
@@ -141,7 +141,7 @@ export function LeadsChart() {
                     color: "#FFFFFF",
                     fontSize: "13px",
                   }}
-                  formatter={(value) => [String(value ?? 0), "Créations"]}
+                  formatter={(value) => [String(value ?? 0), "Creations"]}
                 />
                 <Bar
                   dataKey="creations"

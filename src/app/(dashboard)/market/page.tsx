@@ -141,7 +141,7 @@ export default function MarketPage() {
           a.id === selectedAnalysis.id ? { ...a, persona } : a
         )
       );
-      toast.success("Persona généré avec succès !");
+      toast.success("Persona genere avec succes !");
     } catch (error) {
       toast.error(
         error instanceof Error
@@ -174,7 +174,7 @@ export default function MarketPage() {
       await res.json();
       // Recharger les concurrents depuis la DB
       await loadCompetitors();
-      toast.success("Analyse concurrentielle terminée !");
+      toast.success("Analyse concurrentielle terminee !");
     } catch (error) {
       toast.error(
         error instanceof Error
@@ -214,7 +214,7 @@ export default function MarketPage() {
           a.id === selectedAnalysis.id ? { ...a, schwartz_analysis: schwartzAnalysis } : a
         )
       );
-      toast.success("Analyse Schwartz terminée !");
+      toast.success("Analyse Schwartz terminee !");
     } catch (error) {
       toast.error(
         error instanceof Error
@@ -244,7 +244,7 @@ export default function MarketPage() {
       {analyses.length > 1 && (
         <div className="mb-6">
           <label className="text-sm text-text-muted mb-2 block">
-            Marché sélectionné
+            Marche selectionne
           </label>
           <div className="flex flex-wrap gap-2">
             {analyses.map((a) => (
@@ -281,7 +281,7 @@ export default function MarketPage() {
           <CardContent className="flex flex-col items-center justify-center py-12">
             <BarChart3 className="h-12 w-12 text-text-muted mb-4" />
             <h3 className="text-lg font-medium text-text-primary mb-2">
-              Aucune analyse de marché
+              Aucune analyse de marche
             </h3>
             <p className="text-sm text-text-secondary text-center max-w-md">
               Lance une analyse de marche depuis l&apos;onboarding pour voir tes
@@ -354,7 +354,7 @@ export default function MarketPage() {
                       <div>
                         <h4 className="text-sm font-medium text-text-muted mb-1 flex items-center gap-1.5">
                           <Target className="h-3.5 w-3.5" />
-                          Positionnement recommandé
+                          Positionnement recommande
                         </h4>
                         <p className="text-sm text-text-primary">
                           {analysis.recommended_positioning}
@@ -367,7 +367,7 @@ export default function MarketPage() {
                       <div>
                         <h4 className="text-sm font-medium text-text-muted mb-2 flex items-center gap-1.5">
                           <AlertTriangle className="h-3.5 w-3.5" />
-                          Problèmes identifiés
+                          Problemes identifies
                         </h4>
                         <div className="flex flex-wrap gap-1.5">
                           {analysis.problems.map((p, i) => (
@@ -429,7 +429,7 @@ export default function MarketPage() {
                 </h3>
                 <p className="text-sm text-text-secondary text-center max-w-md mb-6">
                   Genere un avatar client ultra-detaille sur 4 niveaux pour le
-                  marche &laquo; {selectedAnalysis.market_name} &raquo;.
+                  marche « {selectedAnalysis.market_name} ».
                 </p>
                 <Button
                   onClick={handleGeneratePersona}
@@ -486,7 +486,7 @@ export default function MarketPage() {
                 </h3>
                 <p className="text-sm text-text-secondary text-center max-w-md mb-6">
                   Determine le niveau de sophistication de ton marche selon les
-                  5 niveaux d&apos;Eugene Schwartz pour adapter ta strategie marketing.
+                  5 niveaux d'Eugene Schwartz pour adapter ta strategie marketing.
                 </p>
                 <Button
                   onClick={handleGenerateSchwartz}
@@ -562,7 +562,7 @@ export default function MarketPage() {
                 </h3>
                 <p className="text-sm text-text-secondary text-center max-w-md mb-6">
                   Lance une analyse IA des concurrents du marche
-                  &laquo; {selectedAnalysis.market_name} &raquo;.
+                  « {selectedAnalysis.market_name} ».
                 </p>
                 <Button
                   onClick={handleAnalyzeCompetitors}

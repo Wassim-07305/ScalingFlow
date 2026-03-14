@@ -52,7 +52,7 @@ const TYPE_META: Record<
 > = {
   offer: { label: "Offres", icon: Package },
   funnel: { label: "Funnels", icon: Filter },
-  ad: { label: "Publicités", icon: Megaphone },
+  ad: { label: "Publicites", icon: Megaphone },
   content: { label: "Contenus", icon: PenTool },
   asset: { label: "Assets", icon: FileText },
   sale: { label: "Vente", icon: Handshake },
@@ -243,7 +243,7 @@ export function GlobalSearch({
 
         {/* Empty state */}
         {!searching && hasQuery && !hasResults && (
-          <CommandEmpty>Aucun résultat pour &ldquo;{query}&rdquo;</CommandEmpty>
+          <CommandEmpty>Aucun resultat pour &ldquo;{query}&rdquo;</CommandEmpty>
         )}
 
         {/* Search results grouped by type */}
