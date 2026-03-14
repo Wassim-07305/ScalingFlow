@@ -133,8 +133,10 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(categoryOS);
   } catch (error) {
+    console.error("Category OS generation error:", error);
+    const message = error instanceof Error ? error.message : "Erreur lors de la génération du Category OS";
     return NextResponse.json(
-      { error: "Erreur lors de la génération du Category OS" },
+      { error: message },
       { status: 500 }
     );
   }
