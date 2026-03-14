@@ -417,36 +417,47 @@ export function OnboardingFlow() {
     if (!user || !analysisResult) return;
     const market = analysisResult.markets[marketIndex];
 
-    await supabase
-      .from("profiles")
-      .update({
-        onboarding_completed: true,
-        onboarding_step: totalSteps,
-        ...buildProfilePayload(formData),
-        selected_market: market.name,
-        market_viability_score: market.viability_score,
-        niche: market.name,
-      })
-      .eq("id", user.id);
+    try {
+      const { error } = await supabase
+        .from("profiles")
+        .update({
+          onboarding_completed: true,
+          onboarding_step: totalSteps,
+          ...buildProfilePayload(formData),
+          selected_market: market.name,
+          market_viability_score: market.viability_score,
+          niche: market.name,
+        })
+        .eq("id", user.id);
 
-    // Attribuer XP pour l'onboarding (non bloquant)
-    fetch("/api/gamification/award", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ activityType: "onboarding.completed" }),
-    }).catch(() => {});
+      if (error) {
+        console.error("Erreur sauvegarde profil:", error);
+        setError(`Erreur lors de la sauvegarde : ${error.message}`);
+        return;
+      }
 
-    confetti({
-      particleCount: 150,
-      spread: 70,
-      origin: { y: 0.6 },
-      colors: ["#34d399", "#2dd4bf", "#06b6d4"],
-    });
+      // Attribuer XP pour l'onboarding (non bloquant)
+      fetch("/api/gamification/award", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ activityType: "onboarding.completed" }),
+      }).catch(() => {});
 
-    setTimeout(() => {
-      router.push("/");
-      router.refresh();
-    }, 1500);
+      confetti({
+        particleCount: 150,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ["#34d399", "#2dd4bf", "#06b6d4"],
+      });
+
+      setTimeout(() => {
+        router.push("/");
+        router.refresh();
+      }, 1500);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Erreur inconnue";
+      setError(`Erreur lors de la validation : ${message}`);
+    }
   };
 
   /* ── Keyboard: Enter to advance ── */
@@ -728,6 +739,11 @@ export function OnboardingFlow() {
             result={analysisResult}
             onSelect={handleSelectMarket}
           />
+          {error && (
+            <div className="mt-4 w-full max-w-3xl rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-300">
+              {error}
+            </div>
+          )}
         </div>
       </div>
     );
