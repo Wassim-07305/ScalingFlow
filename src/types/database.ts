@@ -22,7 +22,7 @@ export interface Database {
           role: "student" | "admin" | "coach";
           onboarding_completed: boolean;
           onboarding_step: number;
-          situation: "zero" | "salarie" | "freelance" | "entrepreneur" | null;
+          situation: "zero" | "salarie" | "freelance" | "entrepreneur" | "etudiant" | "reconversion" | "sans_emploi" | null;
           situation_details: Json | null;
           skills: string[] | null;
           vault_skills: Json | null;
@@ -73,7 +73,7 @@ export interface Database {
           role?: "student" | "admin" | "coach";
           onboarding_completed?: boolean;
           onboarding_step?: number;
-          situation?: "zero" | "salarie" | "freelance" | "entrepreneur" | null;
+          situation?: "zero" | "salarie" | "freelance" | "entrepreneur" | "etudiant" | "reconversion" | "sans_emploi" | null;
           situation_details?: Json | null;
           skills?: string[] | null;
           vault_skills?: Json | null;
@@ -122,7 +122,7 @@ export interface Database {
           role?: "student" | "admin" | "coach";
           onboarding_completed?: boolean;
           onboarding_step?: number;
-          situation?: "zero" | "salarie" | "freelance" | "entrepreneur" | null;
+          situation?: "zero" | "salarie" | "freelance" | "entrepreneur" | "etudiant" | "reconversion" | "sans_emploi" | null;
           situation_details?: Json | null;
           skills?: string[] | null;
           vault_skills?: Json | null;

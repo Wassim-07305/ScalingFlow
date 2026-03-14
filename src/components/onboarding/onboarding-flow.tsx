@@ -416,51 +416,46 @@ export function OnboardingFlow() {
   const handleSelectMarket = async (marketIndex: number) => {
     if (!user || !analysisResult) {
       setError("Session expirée. Recharge la page et réessaie.");
-      return;
+      throw new Error("Session expirée");
     }
     const market = analysisResult.markets[marketIndex];
 
-    try {
-      const { error } = await supabase
-        .from("profiles")
-        .update({
-          onboarding_completed: true,
-          onboarding_step: totalSteps,
-          ...buildProfilePayload(formData),
-          selected_market: market.name,
-          market_viability_score: market.viability_score,
-          niche: market.name,
-        })
-        .eq("id", user.id);
+    const { error: dbError } = await supabase
+      .from("profiles")
+      .update({
+        onboarding_completed: true,
+        onboarding_step: totalSteps,
+        ...buildProfilePayload(formData),
+        selected_market: market.name,
+        market_viability_score: market.viability_score,
+        niche: market.name,
+      })
+      .eq("id", user.id);
 
-      if (error) {
-        console.error("Erreur sauvegarde profil:", error);
-        setError(`Erreur lors de la sauvegarde : ${error.message}`);
-        return;
-      }
-
-      // Attribuer XP pour l'onboarding (non bloquant)
-      fetch("/api/gamification/award", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ activityType: "onboarding.completed" }),
-      }).catch(() => {});
-
-      confetti({
-        particleCount: 150,
-        spread: 70,
-        origin: { y: 0.6 },
-        colors: ["#34d399", "#2dd4bf", "#06b6d4"],
-      });
-
-      setTimeout(() => {
-        router.push("/");
-        router.refresh();
-      }, 1500);
-    } catch (err) {
-      const message = err instanceof Error ? err.message : "Erreur inconnue";
-      setError(`Erreur lors de la validation : ${message}`);
+    if (dbError) {
+      console.error("Erreur sauvegarde profil:", dbError);
+      setError(`Erreur lors de la sauvegarde : ${dbError.message}`);
+      throw dbError;
     }
+
+    // Attribuer XP pour l'onboarding (non bloquant)
+    fetch("/api/gamification/award", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ activityType: "onboarding.completed" }),
+    }).catch(() => {});
+
+    confetti({
+      particleCount: 150,
+      spread: 70,
+      origin: { y: 0.6 },
+      colors: ["#34d399", "#2dd4bf", "#06b6d4"],
+    });
+
+    setTimeout(() => {
+      router.push("/");
+      router.refresh();
+    }, 1500);
   };
 
   /* ── Keyboard: Enter to advance ── */
