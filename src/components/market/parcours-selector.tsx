@@ -12,43 +12,43 @@ import { CheckCircle, Compass } from "lucide-react";
 const PARCOURS = [
   {
     key: "A1",
-    title: "Expert Confirme",
+    title: "Expert Confirmé",
     description:
-      "Tu as deja des resultats prouves (clients, CA). Tu veux structurer et scaler ton offre existante.",
-    ideal: "Freelances/consultants avec deja 3k+/mois",
-    sophistication: "Marche niveau 4-5 (tres conscient)",
+      "Tu as déjà des résultats prouvés (clients, CA). Tu veux structurer et scaler ton offre existante.",
+    ideal: "Freelances/consultants avec déjà 3k+/mois",
+    sophistication: "Marché niveau 4-5 (très conscient)",
   },
   {
     key: "A2",
-    title: "Expert Emergent",
+    title: "Expert Émergent",
     description:
-      "Tu as les competences mais pas encore les resultats. Tu veux creer ta premiere offre premium.",
-    ideal: "Experts avec competences solides mais peu de clients",
-    sophistication: "Marche niveau 3-4 (solution-aware)",
+      "Tu as les compétences mais pas encore les résultats. Tu veux créer ta première offre premium.",
+    ideal: "Experts avec compétences solides mais peu de clients",
+    sophistication: "Marché niveau 3-4 (solution-aware)",
   },
   {
     key: "A3",
-    title: "Generaliste",
+    title: "Généraliste",
     description:
-      "Tu sais faire beaucoup de choses mais tu n'as pas de specialisation claire. Tu veux te nicher.",
-    ideal: "Profils polyvalents cherchant a se specialiser",
-    sophistication: "Marche niveau 2-3 (problem-aware)",
+      "Tu sais faire beaucoup de choses mais tu n'as pas de spécialisation claire. Tu veux te nicher.",
+    ideal: "Profils polyvalents cherchant à se spécialiser",
+    sophistication: "Marché niveau 2-3 (problem-aware)",
   },
   {
     key: "B",
     title: "Freelance Technique",
     description:
-      "Tu vends du temps/des competences techniques. Tu veux passer d'un modele horaire a un modele valeur.",
-    ideal: "Developpeurs, designers, redacteurs freelance",
-    sophistication: "Marche niveau 1-2 (unaware -> problem-aware)",
+      "Tu vends du temps/des compétences techniques. Tu veux passer d'un modèle horaire à un modèle valeur.",
+    ideal: "Développeurs, designers, rédacteurs freelance",
+    sophistication: "Marché niveau 1-2 (unaware -> problem-aware)",
   },
   {
     key: "C",
-    title: "Agence / Equipe",
+    title: "Agence / Équipe",
     description:
-      "Tu as une equipe et tu veux systematiser l'acquisition et la delivery pour scaler.",
+      "Tu as une équipe et tu veux systématiser l'acquisition et la delivery pour scaler.",
     ideal: "Fondateurs d'agences avec 2+ collaborateurs",
-    sophistication: "Marche niveau 4-5 (tres conscient)",
+    sophistication: "Marché niveau 4-5 (très conscient)",
   },
 ] as const;
 
@@ -89,7 +89,7 @@ export function ParcoursSelector() {
       toast.error("Erreur lors de la sauvegarde");
     } else {
       setSelectedParcours(key);
-      toast.success("Parcours selectionne !");
+      toast.success("Parcours sélectionné !");
     }
     setSaving(false);
   };
@@ -110,8 +110,8 @@ export function ParcoursSelector() {
           Choisis ton parcours
         </h3>
         <p className="text-sm text-text-secondary">
-          Ton parcours determine la strategie IA adaptee a ton profil.
-          Selectionne celui qui te correspond le mieux.
+          Ton parcours détermine la stratégie IA adaptée à ton profil.
+          Sélectionne celui qui te correspond le mieux.
         </p>
       </div>
 
@@ -148,7 +148,7 @@ export function ParcoursSelector() {
                     {p.description}
                   </p>
                   <div className="flex flex-wrap gap-3 text-xs text-text-muted">
-                    <span>Ideal : {p.ideal}</span>
+                    <span>Idéal : {p.ideal}</span>
                     <span>&bull;</span>
                     <span>Sophistication : {p.sophistication}</span>
                   </div>
@@ -162,8 +162,8 @@ export function ParcoursSelector() {
       {selectedParcours && (
         <div className="text-center pt-4">
           <p className="text-sm text-accent font-medium">
-            Parcours {selectedParcours} selectionne — Les analyses IA seront
-            adaptees a ton profil.
+            Parcours {selectedParcours} sélectionné — Les analyses IA seront
+            adaptées à ton profil.
           </p>
         </div>
       )}

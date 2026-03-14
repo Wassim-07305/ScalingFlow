@@ -31,14 +31,14 @@ export function UpgradeWall({ currentUsage, limit, className }: UpgradeWallProps
             <Badge variant="muted" className="mx-1">
               {currentUsage}/{limit}
             </Badge>{" "}
-            generations IA ce mois-ci. Passe a Pro pour des generations illimitees.
+            générations IA ce mois-ci. Passe à Pro pour des générations illimitées.
           </p>
         </div>
 
         <Button asChild size="lg" className="gap-2">
           <Link href="/pricing">
             <Sparkles className="h-4 w-4" />
-            Passer a Pro
+            Passer à Pro
             <ArrowRight className="h-4 w-4" />
           </Link>
         </Button>

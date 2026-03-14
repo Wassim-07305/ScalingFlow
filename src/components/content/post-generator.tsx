@@ -45,7 +45,7 @@ export function PostGenerator({ className }: PostGeneratorProps) {
           const errData = await response.json();
           if (errData.usage) { setUsageLimited(errData.usage); return; }
         }
-        throw new Error("Erreur lors de la generation");
+        throw new Error("Erreur lors de la génération");
       }
       const data = await response.json();
       const raw = data.ai_raw_response || data;
@@ -97,7 +97,7 @@ export function PostGenerator({ className }: PostGeneratorProps) {
           {error && <p className="text-sm text-danger mb-4">{error}</p>}
           <Button size="lg" onClick={handleGenerate}>
             <Sparkles className="h-4 w-4 mr-2" />
-            Generer des posts {platform}
+            Générer des posts {platform}
           </Button>
         </div>
       ) : (
@@ -105,7 +105,7 @@ export function PostGenerator({ className }: PostGeneratorProps) {
           <div className="flex items-center justify-between">
             <Badge variant="blue">{posts.length} posts generes</Badge>
             <Button variant="outline" size="sm" onClick={handleGenerate}>
-              Regenerer
+              Régénérer
             </Button>
           </div>
 

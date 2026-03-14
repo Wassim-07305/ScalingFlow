@@ -10,7 +10,7 @@ import { Sparkles, History } from "lucide-react";
 import { toast } from "sonner";
 
 const TABS = [
-  { key: "generate", label: "Generer", icon: Sparkles },
+  { key: "generate", label: "Générer", icon: Sparkles },
   { key: "history", label: "Historique", icon: History },
 ] as const;
 
@@ -35,7 +35,7 @@ export default function FunnelPage() {
 
       setLoadedData(data.ai_raw_response || data);
       setActiveTab("generate");
-      toast.success("Funnel charge depuis l'historique");
+      toast.success("Funnel chargé depuis l'historique");
     } catch {
       toast.error("Erreur lors du chargement");
     }
@@ -56,7 +56,7 @@ export default function FunnelPage() {
           table="funnels"
           titleField="funnel_name"
           statusField="status"
-          emptyMessage="Aucun funnel genere pour le moment."
+          emptyMessage="Aucun funnel généré pour le moment."
           onSelect={handleHistorySelect}
         />
       )}

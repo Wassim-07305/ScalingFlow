@@ -77,7 +77,7 @@ export function DmScripts() {
         }),
       });
 
-      if (!response.ok) throw new Error("Erreur lors de la generation");
+      if (!response.ok) throw new Error("Erreur lors de la génération");
       const data = await response.json();
 
       const parsed = data.ai_raw_response || data;
@@ -106,22 +106,22 @@ export function DmScripts() {
     const text = typeof result === "string" ? result : JSON.stringify(result, null, 2);
     navigator.clipboard.writeText(text);
     setCopied(true);
-    toast.success("Copie dans le presse-papiers");
+    toast.success("Copié dans le presse-papiers");
     setTimeout(() => setCopied(false), 2000);
   };
 
   const copyMessage = (message: string) => {
     navigator.clipboard.writeText(message);
-    toast.success("Message copie");
+    toast.success("Message copié");
   };
 
-  // Sequence active filtree par plateforme
+  // Séquence active filtrée par plateforme
   const activeSequence = result?.sequences?.find(
     (s) => s.platform.toLowerCase() === activePlatform
   ) || result?.sequences?.[0];
 
   if (loading) {
-    return <AILoading text="Creation de tes scripts de DM" />;
+    return <AILoading text="Création de tes scripts de DM" />;
   }
 
   if (result) {
@@ -129,7 +129,7 @@ export function DmScripts() {
       <div className="space-y-6">
         {/* Actions */}
         <div className="flex items-center justify-between">
-          <Badge variant="default">Scripts generes</Badge>
+          <Badge variant="default">Scripts générés</Badge>
           <div className="flex items-center gap-2">
             <Button
               variant="outline"
@@ -137,7 +137,7 @@ export function DmScripts() {
               onClick={() =>
                 exportToPDF({
                   title: "Scripts DM - Prospection",
-                  subtitle: "Genere par ScalingFlow",
+                  subtitle: "Généré par ScalingFlow",
                   content: result as unknown as Record<string, unknown>,
                   filename: "scripts-dm-scalingflow.pdf",
                 })
@@ -148,7 +148,7 @@ export function DmScripts() {
             </Button>
             <Button variant="outline" size="sm" onClick={copyAll}>
               <Copy className="h-4 w-4 mr-1" />
-              {copied ? "Copie !" : "Copier tout"}
+              {copied ? "Copié !" : "Copier tout"}
             </Button>
           </div>
         </div>
@@ -188,7 +188,7 @@ export function DmScripts() {
         {/* Sequence de messages */}
         {activeSequence ? (
           <div className="space-y-4">
-            {/* Contexte de la sequence */}
+            {/* Contexte de la séquence */}
             {activeSequence.context && (
               <div className="p-3 rounded-lg bg-bg-tertiary">
                 <p className="text-xs text-text-muted uppercase mb-1">Contexte</p>
@@ -286,7 +286,7 @@ export function DmScripts() {
                 {activeSequence.dos && activeSequence.dos.length > 0 && (
                   <Card>
                     <CardHeader className="py-3">
-                      <CardTitle className="text-sm text-green-400">A faire</CardTitle>
+                      <CardTitle className="text-sm text-green-400">À faire</CardTitle>
                     </CardHeader>
                     <CardContent className="pt-0">
                       <ul className="space-y-1">
@@ -303,7 +303,7 @@ export function DmScripts() {
                 {activeSequence.donts && activeSequence.donts.length > 0 && (
                   <Card>
                     <CardHeader className="py-3">
-                      <CardTitle className="text-sm text-red-400">A eviter</CardTitle>
+                      <CardTitle className="text-sm text-red-400">À éviter</CardTitle>
                     </CardHeader>
                     <CardContent className="pt-0">
                       <ul className="space-y-1">
@@ -323,7 +323,7 @@ export function DmScripts() {
         ) : (
           <div className="text-center py-8">
             <p className="text-sm text-text-muted">
-              Aucune sequence trouvee pour cette plateforme.
+              Aucune séquence trouvée pour cette plateforme.
             </p>
           </div>
         )}
@@ -334,7 +334,7 @@ export function DmScripts() {
             <CardHeader className="py-3">
               <CardTitle className="text-sm flex items-center gap-2">
                 <Sparkles className="h-4 w-4 text-accent" />
-                Conseils generaux
+                Conseils généraux
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-0">
@@ -351,7 +351,7 @@ export function DmScripts() {
         )}
 
         <Button variant="outline" onClick={() => setResult(null)}>
-          Regenerer les scripts
+          Régénérer les scripts
         </Button>
       </div>
     );
@@ -364,7 +364,7 @@ export function DmScripts() {
         <MessageSquare className="h-10 w-10 text-accent mx-auto mb-3" />
         <h3 className="font-semibold text-text-primary mb-1">Scripts de DM</h3>
         <p className="text-sm text-text-secondary max-w-md mx-auto">
-          L&apos;IA va creer des sequences de messages pour prospecter sur LinkedIn, Instagram et Messenger.
+          L&apos;IA va créer des séquences de messages pour prospecter sur LinkedIn, Instagram et Messenger.
         </p>
       </div>
 
@@ -372,14 +372,14 @@ export function DmScripts() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-accent" />
-            Generateur de scripts DM
+            Générateur de scripts DM
           </CardTitle>
           <CardDescription>
-            Choisis la plateforme puis genere des sequences de messages.
+            Choisis la plateforme puis génère des séquences de messages.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {/* Selecteur de plateforme */}
+          {/* Sélecteur de plateforme */}
           <div>
             <label className="text-sm font-medium text-text-primary mb-2 block">
               Plateforme
@@ -410,7 +410,7 @@ export function DmScripts() {
 
           <Button size="lg" onClick={handleGenerate} className="w-full">
             <Sparkles className="h-4 w-4 mr-2" />
-            Generer les scripts DM
+            Générer les scripts DM
           </Button>
         </CardContent>
       </Card>

@@ -68,9 +68,9 @@ export function SocialAssetsGenerator({ initialData }: Props) {
       const result = await res.json();
       const parsed = result.ai_raw_response || JSON.parse(result.content);
       setData(parsed);
-      toast.success("Social assets generes !");
+      toast.success("Social assets générés !");
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Erreur lors de la generation");
+      toast.error(e instanceof Error ? e.message : "Erreur lors de la génération");
     } finally {
       setLoading(false);
     }
@@ -87,11 +87,11 @@ export function SocialAssetsGenerator({ initialData }: Props) {
       <div className="flex flex-col items-center justify-center py-16 gap-4">
         <Share2 className="h-12 w-12 text-text-muted" />
         <p className="text-text-secondary text-sm">
-          Genere des assets visuels pour tes reseaux sociaux : cartes temoignage, bannieres, highlights, signature email et badges de preuve sociale.
+          Génère des assets visuels pour tes réseaux sociaux : cartes témoignage, bannières, highlights, signature email et badges de preuve sociale.
         </p>
         <Button onClick={generate} disabled={loading}>
           {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Share2 className="h-4 w-4 mr-2" />}
-          Generer les social assets
+          Générer les social assets
         </Button>
       </div>
     );
@@ -108,12 +108,12 @@ export function SocialAssetsGenerator({ initialData }: Props) {
           </Button>
           <Button size="sm" onClick={generate} disabled={loading}>
             {loading && <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />}
-            Regenerer
+            Régénérer
           </Button>
         </div>
       </div>
 
-      {/* Cartes temoignage */}
+      {/* Cartes témoignage */}
       {data.testimonial_cards && data.testimonial_cards.length > 0 && (
         <section>
           <h4 className="text-sm font-medium text-accent mb-3">Cartes Temoignage</h4>

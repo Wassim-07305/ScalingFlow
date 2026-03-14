@@ -53,13 +53,13 @@ export function StrategyOverview({ className, onStrategyGenerated, initialData }
           const errData = await response.json();
           if (errData.usage) { setUsageLimited(errData.usage); return; }
         }
-        throw new Error("Erreur lors de la generation");
+        throw new Error("Erreur lors de la génération");
       }
       const data = await response.json();
       const result = data.result as ContentStrategyResult;
       setStrategy(result);
       onStrategyGenerated?.(result);
-      toast.success("Strategie de contenu generee avec succes !");
+      toast.success("Stratégie de contenu générée avec succès !");
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Erreur";
       setError(msg);
@@ -74,7 +74,7 @@ export function StrategyOverview({ className, onStrategyGenerated, initialData }
   }
 
   if (loading) {
-    return <AILoading text="Creation de ta strategie de contenu" className={className} />;
+    return <AILoading text="Creation de ta stratégie de contenu" className={className} />;
   }
 
   if (!strategy) {
@@ -83,10 +83,10 @@ export function StrategyOverview({ className, onStrategyGenerated, initialData }
         {error && <p className="text-sm text-danger mb-4">{error}</p>}
         <Button size="lg" onClick={handleGenerate}>
           <Sparkles className="h-4 w-4 mr-2" />
-          Generer ma strategie 30 jours
+          Générer ma stratégie 30 jours
         </Button>
         <p className="text-sm text-text-secondary mt-2">
-          Strategie basee sur les 4 piliers KLCT
+          Stratégie basée sur les 4 piliers KLCT
         </p>
       </div>
     );
@@ -100,13 +100,13 @@ export function StrategyOverview({ className, onStrategyGenerated, initialData }
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-base font-semibold text-text-primary">Strategie globale</h3>
+          <h3 className="text-base font-semibold text-text-primary">Stratégie globale</h3>
           <p className="text-sm text-text-secondary mt-0.5">
             {strategie_globale.frequence_recommandee}
           </p>
         </div>
         <Button variant="outline" size="sm" onClick={handleGenerate}>
-          Regenerer
+          Régénérer
         </Button>
       </div>
 

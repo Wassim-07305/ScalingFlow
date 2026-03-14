@@ -26,9 +26,9 @@ const SKILL_CATEGORIES: Record<string, string[]> = {
   ],
   "Vente & Closing": [
     "Call closing", "DM closing", "Redaction de propositions",
-    "Negociation", "Upsell/Cross-sell",
+    "Négociation", "Upsell/Cross-sell",
   ],
-  "Creation de Contenu": [
+  "Création de Contenu": [
     "Reels/Short", "YouTube", "Copywriting",
     "Carousels", "Stories", "Podcasts", "Newsletters",
   ],
@@ -36,11 +36,11 @@ const SKILL_CATEGORIES: Record<string, string[]> = {
     "Meta Ads", "Google Ads", "TikTok Ads", "SEO", "Influence/partenariats",
   ],
   "Delivery & Gestion Client": [
-    "Coaching 1-on-1", "Coaching groupe", "Creation formation",
+    "Coaching 1-on-1", "Coaching groupe", "Création formation",
     "Gestion projet", "Consulting", "Done-for-you",
   ],
   "Automatisation & Outils": [
-    "No-code", "CRM", "IA", "Montage video", "Design", "Developpement web",
+    "No-code", "CRM", "IA", "Montage vidéo", "Design", "Développement web",
   ],
 };
 
@@ -206,7 +206,7 @@ function SkillMindmap({
         </text>
       </svg>
       <p className="text-xs text-text-muted text-center mt-2">
-        Survole une categorie pour voir les competences individuelles
+        Survole une catégorie pour voir les compétences individuelles
       </p>
     </div>
   );
@@ -240,8 +240,8 @@ export function VaultSkillMap() {
     return (
       <EmptyState
         icon={Map}
-        title="Aucune competence"
-        description="Complete l'onboarding pour visualiser ta cartographie."
+        title="Aucune compétence"
+        description="Complète l'onboarding pour visualiser ta cartographie."
       />
     );
   }
@@ -281,7 +281,7 @@ export function VaultSkillMap() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Map className="h-5 w-5 text-accent" />
-            Cartographie des competences
+            Cartographie des compétences
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -298,7 +298,7 @@ export function VaultSkillMap() {
                 tick={{ fill: "#6B7280", fontSize: 10 }}
               />
               <Radar
-                name="Maitrise"
+                name="Maîtrise"
                 dataKey="score"
                 stroke="#34D399"
                 fill="#34D399"
@@ -312,7 +312,7 @@ export function VaultSkillMap() {
                   borderRadius: "12px",
                   color: "#E5E7EB",
                 }}
-                formatter={(value: number | undefined) => [`${value ?? 0}%`, "Maitrise"]}
+                formatter={(value: number | undefined) => [`${value ?? 0}%`, "Maîtrise"]}
               />
             </RadarChart>
           </ResponsiveContainer>
@@ -324,7 +324,7 @@ export function VaultSkillMap() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Network className="h-5 w-5 text-accent" />
-            Mindmap des competences
+            Mindmap des compétences
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -350,7 +350,7 @@ export function VaultSkillMap() {
                 />
               </div>
               <p className="text-xs text-text-muted mt-1">
-                {cat.count} / {cat.total} competences
+                {cat.count} / {cat.total} compétences
               </p>
             </CardContent>
           </Card>

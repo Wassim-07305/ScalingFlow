@@ -19,14 +19,14 @@ export async function POST(req: NextRequest) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Non autorise" }, { status: 401 });
+      return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
     }
 
     // Rate limiting
     const rl = await rateLimit(user.id, "optimize-instagram", { limit: 5, windowSeconds: 60 });
     if (!rl.allowed) {
       return NextResponse.json(
-        { error: "Trop de requetes. Reessaie dans quelques secondes." },
+        { error: "Trop de requêtes. Réessaie dans quelques secondes." },
         { status: 429 }
       );
     }
@@ -35,20 +35,20 @@ export async function POST(req: NextRequest) {
     const usage = await checkAIUsage(user.id);
     if (!usage.allowed) {
       return NextResponse.json(
-        { error: "Limite de generations IA atteinte", usage },
+        { error: "Limite de générations IA atteinte", usage },
         { status: 403 }
       );
     }
 
 
-    // Recuperer le profil
+    // Récupérer le profil
     const { data: profile } = await supabase
       .from("profiles")
       .select("*")
       .eq("id", user.id)
       .single();
 
-    // Recuperer la derniere analyse de marche
+    // Récupérer la dernière analyse de marché
     const { data: latestAnalysis } = await supabase
       .from("market_analyses")
       .select("*")
@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
       .limit(1)
       .single();
 
-    // Recuperer la derniere offre
+    // Récupérer la dernière offre
     const { data: latestOffer } = await supabase
       .from("offers")
       .select("*")

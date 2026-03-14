@@ -25,12 +25,12 @@ const TYPE_CONFIG = {
     badge: "purple" as const,
   },
   temoignage: {
-    label: "Temoignage",
+    label: "Témoignage",
     icon: MessageCircle,
     badge: "default" as const,
   },
   education: {
-    label: "Education",
+    label: "Éducation",
     icon: GraduationCap,
     badge: "blue" as const,
   },
@@ -76,12 +76,12 @@ export function StoriesGenerator({ className, initialData }: StoriesGeneratorPro
           const errData = await response.json();
           if (errData.usage) { setUsageLimited(errData.usage); return; }
         }
-        throw new Error("Erreur lors de la generation");
+        throw new Error("Erreur lors de la génération");
       }
       const data = await response.json();
       const result = data.result as StoriesResult;
       setStories(result.stories || []);
-      toast.success("Stories generees !");
+      toast.success("Stories générées !");
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Erreur";
       setError(msg);
@@ -106,7 +106,7 @@ export function StoriesGenerator({ className, initialData }: StoriesGeneratorPro
   }
 
   if (loading) {
-    return <AILoading text="Generation des stories" className={className} />;
+    return <AILoading text="Génération des stories" className={className} />;
   }
 
   if (stories.length === 0) {
@@ -115,7 +115,7 @@ export function StoriesGenerator({ className, initialData }: StoriesGeneratorPro
         {error && <p className="text-sm text-danger mb-4">{error}</p>}
         <Button size="lg" onClick={handleGenerate}>
           <Sparkles className="h-4 w-4 mr-2" />
-          Generer 5 series de Stories
+          Générer 5 series de Stories
         </Button>
         <p className="text-sm text-text-secondary mt-2">
           5 types : Coulisses, Temoignage, Education, CTA, Engagement
@@ -129,7 +129,7 @@ export function StoriesGenerator({ className, initialData }: StoriesGeneratorPro
       <div className="flex items-center justify-between">
         <Badge variant="default">{stories.length} series de stories</Badge>
         <Button variant="outline" size="sm" onClick={handleGenerate}>
-          Regenerer
+          Régénérer
         </Button>
       </div>
 

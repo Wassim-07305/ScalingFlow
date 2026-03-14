@@ -43,7 +43,7 @@ export function SmsSequence({ className, initialData }: SmsSequenceProps) {
           const errData = await response.json();
           if (errData.usage) { setUsageLimited(errData.usage); return; }
         }
-        throw new Error("Erreur lors de la generation");
+        throw new Error("Erreur lors de la génération");
       }
       const data = await response.json();
       setSequence(data.ai_raw_response || data);
@@ -59,7 +59,7 @@ export function SmsSequence({ className, initialData }: SmsSequenceProps) {
   }
 
   if (loading) {
-    return <AILoading text="Redaction de ta sequence SMS" className={className} />;
+    return <AILoading text="Redaction de ta séquence SMS" className={className} />;
   }
 
   if (!sequence) {
@@ -68,7 +68,7 @@ export function SmsSequence({ className, initialData }: SmsSequenceProps) {
         {error && <p className="text-sm text-danger mb-4">{error}</p>}
         <Button size="lg" onClick={handleGenerate}>
           <Sparkles className="h-4 w-4 mr-2" />
-          Generer la sequence SMS
+          Générer la séquence SMS
         </Button>
         <p className="text-sm text-text-secondary mt-2">5 SMS de suivi post-inscription</p>
       </div>
@@ -93,7 +93,7 @@ export function SmsSequence({ className, initialData }: SmsSequenceProps) {
           />
           <Button variant="outline" size="sm" onClick={() => { setSequence(null); handleGenerate(); }}>
             <Sparkles className="h-4 w-4 mr-1" />
-            Regenerer
+            Régénérer
           </Button>
         </div>
       </div>

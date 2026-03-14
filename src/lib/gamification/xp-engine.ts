@@ -176,7 +176,7 @@ export async function awardXP(
       user_id: userId,
       type: "badge" as const,
       title: `Niveau ${newLevel} atteint !`,
-      message: `Bravo ! Tu es passe au niveau ${newLevel}.`,
+      message: `Bravo ! Tu es passé au niveau ${newLevel}.`,
     });
     if (levelNotifError) console.error("awardXP: failed to create level notification", levelNotifError);
   }
@@ -187,8 +187,8 @@ export async function awardXP(
     const { error: badgeNotifError } = await supabase.from("notifications").insert({
       user_id: userId,
       type: "badge" as const,
-      title: `Badge "${badgeName}" debloque !`,
-      message: badgeDef?.description || `Tu as debloque un nouveau badge.`,
+      title: `Badge "${badgeName}" débloqué !`,
+      message: badgeDef?.description || `Tu as débloqué un nouveau badge.`,
     });
     if (badgeNotifError) console.error("awardXP: failed to create badge notification", badgeNotifError);
   }

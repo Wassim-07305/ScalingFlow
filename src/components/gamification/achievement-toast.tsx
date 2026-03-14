@@ -37,7 +37,7 @@ const TYPE_CONFIG = {
     icon: Zap,
     color: "from-purple-400 to-pink-500",
     bgColor: "bg-purple-500/20",
-    label: "Defi accompli !",
+    label: "Défi accompli !",
   },
   milestone: {
     icon: Trophy,

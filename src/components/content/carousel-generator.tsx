@@ -55,11 +55,11 @@ export function CarouselGenerator({ className, initialData }: CarouselGeneratorP
           const errData = await response.json();
           if (errData.usage) { setUsageLimited(errData.usage); return; }
         }
-        throw new Error("Erreur lors de la generation");
+        throw new Error("Erreur lors de la génération");
       }
       const data = await response.json();
       setResult(data.result as CarouselResult);
-      toast.success("Carousel genere !");
+      toast.success("Carousel généré !");
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Erreur";
       setError(msg);
@@ -81,7 +81,7 @@ export function CarouselGenerator({ className, initialData }: CarouselGeneratorP
   }
 
   if (loading) {
-    return <AILoading text="Generation du carousel" className={className} />;
+    return <AILoading text="Génération du carousel" className={className} />;
   }
 
   if (!result) {
@@ -101,7 +101,7 @@ export function CarouselGenerator({ className, initialData }: CarouselGeneratorP
           {error && <p className="text-sm text-danger">{error}</p>}
           <Button size="lg" className="w-full" onClick={handleGenerate}>
             <Sparkles className="h-4 w-4 mr-2" />
-            Generer le carousel
+            Générer le carousel
           </Button>
           <p className="text-sm text-text-secondary text-center">
             Carousel 8-10 slides avec cover, contenu et CTA
@@ -127,7 +127,7 @@ export function CarouselGenerator({ className, initialData }: CarouselGeneratorP
             className="w-64"
           />
           <Button variant="outline" size="sm" onClick={handleGenerate}>
-            Regenerer
+            Régénérer
           </Button>
         </div>
       </div>

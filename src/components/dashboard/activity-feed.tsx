@@ -32,12 +32,12 @@ const activityMeta: Record<
   { label: string; icon: React.ElementType; color: string }
 > = {
   "generation.market_analysis": {
-    label: "Analyse de marche generee",
+    label: "Analyse de marché générée",
     icon: Globe,
     color: "text-info",
   },
   "generation.persona": {
-    label: "Persona genere",
+    label: "Persona généré",
     icon: Target,
     color: "text-accent",
   },
@@ -47,62 +47,62 @@ const activityMeta: Record<
     color: "text-info",
   },
   "generation.offer": {
-    label: "Offre creee",
+    label: "Offre créée",
     icon: Package,
     color: "text-accent",
   },
   "generation.category_os": {
-    label: "Positionnement genere",
+    label: "Positionnement généré",
     icon: Package,
     color: "text-accent",
   },
   "generation.brand": {
-    label: "Identite de marque creee",
+    label: "Identite de marque créée",
     icon: Award,
     color: "text-[#A78BFA]",
   },
   "generation.funnel": {
-    label: "Funnel genere",
+    label: "Funnel généré",
     icon: Filter,
     color: "text-info",
   },
   "generation.ads": {
-    label: "Publicites generees",
+    label: "Publicités générées",
     icon: Megaphone,
     color: "text-accent",
   },
   "generation.content_strategy": {
-    label: "Strategie contenu creee",
+    label: "Stratégie contenu créée",
     icon: PenTool,
     color: "text-[#A78BFA]",
   },
   "generation.reels": {
-    label: "Scripts Reels generes",
+    label: "Scripts Reels générés",
     icon: PenTool,
     color: "text-[#A78BFA]",
   },
   "generation.youtube": {
-    label: "Script YouTube genere",
+    label: "Script YouTube généré",
     icon: PenTool,
     color: "text-[#A78BFA]",
   },
   "generation.vsl": {
-    label: "VSL genere",
+    label: "VSL généré",
     icon: FileText,
     color: "text-info",
   },
   "generation.pitch_deck": {
-    label: "Pitch deck genere",
+    label: "Pitch deck généré",
     icon: FileText,
     color: "text-info",
   },
   "generation.sales_letter": {
-    label: "Lettre de vente generee",
+    label: "Lettre de vente générée",
     icon: FileText,
     color: "text-info",
   },
   "validation.offer": {
-    label: "Offre validee",
+    label: "Offre validée",
     icon: Award,
     color: "text-accent",
   },
@@ -148,7 +148,7 @@ export function ActivityFeed() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Activity className="h-5 w-5 text-accent" />
-          Activite recente
+          Activité recente
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -170,13 +170,13 @@ export function ActivityFeed() {
               Pas encore d&apos;activite
             </p>
             <p className="text-xs text-text-muted mb-4">
-              Ton historique apparaitra ici des ta premiere generation.
+              Ton historique apparaîtra ici dès ta première génération.
             </p>
             <a
               href="/offer"
               className="text-xs font-medium text-accent hover:underline"
             >
-              Creer ta premiere offre →
+              Créer ta première offre →
             </a>
           </div>
         ) : (

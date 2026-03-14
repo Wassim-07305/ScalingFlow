@@ -16,14 +16,14 @@ export async function POST(req: NextRequest) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Non autorise" }, { status: 401 });
+      return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
     }
 
     // Check AI usage limits
     const usage = await checkAIUsage(user.id);
     if (!usage.allowed) {
       return NextResponse.json(
-        { error: "Limite de generations IA atteinte", usage },
+        { error: "Limite de générations IA atteinte", usage },
         { status: 403 }
       );
     }
@@ -59,14 +59,14 @@ export async function POST(req: NextRequest) {
       ]);
 
     const marketStr = latestMarket
-      ? `${latestMarket.market_name || "Non defini"} — Audience: ${latestMarket.target_audience || "N/A"} — Douleurs: ${latestMarket.pain_points || "N/A"}`
-      : "Marche non encore analyse";
+      ? `${latestMarket.market_name || "Non défini"} — Audience: ${latestMarket.target_audience || "N/A"} — Douleurs: ${latestMarket.pain_points || "N/A"}`
+      : "Marché non encore analysé";
 
     const offerStr = latestOffer
       ? `${latestOffer.offer_name || "Offre"} — Positionnement: ${latestOffer.positioning || "N/A"} — Mecanisme unique: ${latestOffer.unique_mechanism || "N/A"}`
-      : "Offre non encore creee";
+      : "Offre non encore créée";
 
-    const personaStr = latestMarket?.target_audience || latestOffer?.target_audience || "Persona non defini";
+    const personaStr = latestMarket?.target_audience || latestOffer?.target_audience || "Persona non défini";
 
     const prompt = buildEditorialCalendarPrompt(
       marketStr,
@@ -79,7 +79,7 @@ export async function POST(req: NextRequest) {
     const result = await generateJSON<EditorialCalendarResult>({
       prompt,
       systemPrompt:
-        "Tu es un expert en strategie de contenu digital. Genere un plan editorial detaille en JSON.",
+        "Tu es un expert en stratégie de contenu digital. Génère un plan éditorial détaillé en JSON.",
       maxTokens: 8192,
       temperature: 0.8,
     });
@@ -97,7 +97,7 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.error("Error generating editorial calendar:", error);
     return NextResponse.json(
-      { error: "Erreur lors de la generation du plan editorial" },
+      { error: "Erreur lors de la génération du plan editorial" },
       { status: 500 }
     );
   }

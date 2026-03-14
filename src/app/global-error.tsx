@@ -29,7 +29,7 @@ export default function GlobalError({
       >
         <div style={{ maxWidth: 480, padding: 32, textAlign: "center" }}>
           <h1 style={{ fontSize: 24, fontWeight: 700, marginBottom: 12 }}>
-            Quelque chose s&apos;est mal passe
+            Quelque chose s&apos;est mal passé
           </h1>
           <p
             style={{
@@ -60,7 +60,7 @@ export default function GlobalError({
                 fontSize: 14,
               }}
             >
-              Reessayer
+              Réessayer
             </button>
             <button
               onClick={() => {

@@ -46,7 +46,7 @@ export function CaseStudyGenerator({ className, initialData }: CaseStudyGenerato
         body: JSON.stringify({ type: "case_study", metric, value }),
       });
 
-      if (!response.ok) throw new Error("Erreur lors de la generation");
+      if (!response.ok) throw new Error("Erreur lors de la génération");
       const data = await response.json();
       setCaseStudy(data.ai_raw_response || data);
     } catch (err) {
@@ -57,7 +57,7 @@ export function CaseStudyGenerator({ className, initialData }: CaseStudyGenerato
   };
 
   if (loading) {
-    return <AILoading text="Redaction de ton etude de cas" className={className} />;
+    return <AILoading text="Redaction de ton étude de cas" className={className} />;
   }
 
   if (!caseStudy) {
@@ -67,7 +67,7 @@ export function CaseStudyGenerator({ className, initialData }: CaseStudyGenerato
 
         <div className="text-center mb-2">
           <h3 className="text-sm font-medium text-text-primary">
-            Parametres de l&apos;etude de cas
+            Paramètres de l&apos;étude de cas
           </h3>
           <p className="text-xs text-text-secondary mt-1">
             Renseigne la metrique cle et le resultat obtenu
@@ -86,7 +86,7 @@ export function CaseStudyGenerator({ className, initialData }: CaseStudyGenerato
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="value">Resultat obtenu</Label>
+            <Label htmlFor="value">Résultat obtenu</Label>
             <Input
               id="value"
               placeholder="Ex : x3 en 90 jours"
@@ -99,7 +99,7 @@ export function CaseStudyGenerator({ className, initialData }: CaseStudyGenerato
         <div className="text-center">
           <Button size="lg" onClick={handleGenerate}>
             <Sparkles className="h-4 w-4 mr-2" />
-            Generer l&apos;etude de cas
+            Générer l&apos;étude de cas
           </Button>
         </div>
       </div>
@@ -118,9 +118,9 @@ export function CaseStudyGenerator({ className, initialData }: CaseStudyGenerato
       {/* Title */}
       <div className="flex items-center gap-3 flex-wrap">
         <h3 className="font-semibold text-text-primary text-lg">
-          {caseStudy.title || "Etude de cas"}
+          {caseStudy.title || "Étude de cas"}
         </h3>
-        <Badge variant="purple">Etude de cas</Badge>
+        <Badge variant="purple">Étude de cas</Badge>
       </div>
 
       {/* Problem section */}
@@ -128,7 +128,7 @@ export function CaseStudyGenerator({ className, initialData }: CaseStudyGenerato
         <CardHeader>
           <div className="flex items-center gap-2">
             <Users className="h-4 w-4 text-danger" />
-            <CardTitle>Probleme</CardTitle>
+            <CardTitle>Problème</CardTitle>
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -146,7 +146,7 @@ export function CaseStudyGenerator({ className, initialData }: CaseStudyGenerato
           )}
           {problem.challenges && problem.challenges.length > 0 && (
             <div>
-              <p className="text-xs text-text-muted font-medium mb-1">Defis</p>
+              <p className="text-xs text-text-muted font-medium mb-1">Défis</p>
               <ul className="space-y-1">
                 {problem.challenges.map((challenge: string, i: number) => (
                   <li key={i} className="text-sm text-text-secondary flex items-start gap-2">
@@ -159,7 +159,7 @@ export function CaseStudyGenerator({ className, initialData }: CaseStudyGenerato
           )}
           {problem.previous_attempts && (
             <div>
-              <p className="text-xs text-text-muted font-medium mb-1">Tentatives precedentes</p>
+              <p className="text-xs text-text-muted font-medium mb-1">Tentatives précédentes</p>
               <p className="text-sm text-text-secondary">{problem.previous_attempts}</p>
             </div>
           )}

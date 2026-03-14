@@ -35,7 +35,7 @@ export function OtoGenerator({ offerId, className, initialData }: OtoGeneratorPr
   const [otoData, setOtoData] = React.useState<any>(null);
   const [error, setError] = React.useState<string | null>(null);
 
-  // Charger les donnees historiques quand initialData change
+  // Charger les données historiques quand initialData change
   React.useEffect(() => {
     if (initialData?.oto_data) {
       setOtoData(initialData.oto_data);
@@ -44,7 +44,7 @@ export function OtoGenerator({ offerId, className, initialData }: OtoGeneratorPr
 
   const handleGenerate = async () => {
     if (!offerId) {
-      setError("Veuillez d'abord generer une offre principale.");
+      setError("Veuillez d'abord générer une offre principale.");
       return;
     }
 
@@ -60,7 +60,7 @@ export function OtoGenerator({ offerId, className, initialData }: OtoGeneratorPr
       });
 
       if (!response.ok) {
-        throw new Error("Erreur lors de la generation de l'offre OTO");
+        throw new Error("Erreur lors de la génération de l'offre OTO");
       }
 
       const data = await response.json();
@@ -99,7 +99,7 @@ export function OtoGenerator({ offerId, className, initialData }: OtoGeneratorPr
               onClick={() =>
                 exportToPDF({
                   title: otoData.oto_name || "Offre OTO",
-                  subtitle: "OTO generee par ScalingFlow",
+                  subtitle: "OTO générée par ScalingFlow",
                   content: otoData,
                   filename: `oto-${(otoData.oto_name || "offre").toLowerCase().replace(/[^a-z0-9]+/g, "-")}.pdf`,
                 })
@@ -110,12 +110,12 @@ export function OtoGenerator({ offerId, className, initialData }: OtoGeneratorPr
             </Button>
             <Button variant="outline" size="sm" onClick={() => { setOtoData(null); handleGenerate(); }}>
               <RefreshCw className="h-4 w-4 mr-2" />
-              Regenerer
+              Régénérer
             </Button>
           </div>
         </div>
 
-        {/* Probleme sans OTO */}
+        {/* Problème sans OTO */}
         {otoData.problem_without_oto && (
           <Card>
             <CardHeader>
@@ -145,7 +145,7 @@ export function OtoGenerator({ offerId, className, initialData }: OtoGeneratorPr
           </Card>
         )}
 
-        {/* Benefices en grille */}
+        {/* Bénéfices en grille */}
         {otoData.benefits?.length > 0 && (
           <div>
             <h3 className="text-lg font-semibold text-text-primary mb-4">Benefices</h3>
@@ -296,13 +296,13 @@ export function OtoGenerator({ offerId, className, initialData }: OtoGeneratorPr
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-text-secondary text-sm">
-              Genere une offre OTO irresistible qui se presente juste apres l&apos;achat
+              Génère une offre OTO irrésistible qui se présente juste après l&apos;achat
               de ton offre principale pour maximiser la valeur client.
             </p>
             {error && <p className="text-sm text-danger">{error}</p>}
             <Button size="lg" onClick={handleGenerate}>
               <Sparkles className="h-4 w-4 mr-2" />
-              Generer l&apos;offre OTO
+              Générer l&apos;offre OTO
             </Button>
           </CardContent>
         </Card>
@@ -310,8 +310,8 @@ export function OtoGenerator({ offerId, className, initialData }: OtoGeneratorPr
         <EmptyState
           icon={Package}
           title="Aucune offre principale"
-          description="Genere d'abord une offre principale dans l'onglet Generer pour pouvoir creer une offre OTO."
-          actionLabel="Aller a Generer"
+          description="Génère d'abord une offre principale dans l'onglet Générer pour pouvoir créer une offre OTO."
+          actionLabel="Aller à Générer"
           onAction={() => window.location.href = "/offer"}
         />
       )}

@@ -23,13 +23,13 @@ export async function POST(req: NextRequest) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Non authentifie" }, { status: 401 });
+      return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
     }
 
     const rl = await rateLimit(user.id, "generate-logo", { limit: 3, windowSeconds: 120 });
     if (!rl.allowed) {
       return NextResponse.json(
-        { error: "Trop de requetes. Reessaie dans 2 minutes." },
+        { error: "Trop de requêtes. Réessaie dans 2 minutes." },
         { status: 429 }
       );
     }
@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
     const usage = await checkAIUsage(user.id);
     if (!usage.allowed) {
       return NextResponse.json(
-        { error: "Limite de generations IA atteinte", usage },
+        { error: "Limite de générations IA atteinte", usage },
         { status: 403 }
       );
     }
@@ -45,7 +45,7 @@ export async function POST(req: NextRequest) {
     const token = process.env.REPLICATE_API_TOKEN;
     if (!token) {
       return NextResponse.json(
-        { error: "Generation de logo non configuree (REPLICATE_API_TOKEN manquant)" },
+        { error: "Génération de logo non configurée (REPLICATE_API_TOKEN manquant)" },
         { status: 500 }
       );
     }
@@ -116,7 +116,7 @@ export async function POST(req: NextRequest) {
 
     if (results.length === 0) {
       return NextResponse.json(
-        { error: "La generation des logos a echoue" },
+        { error: "La génération des logos a échoué" },
         { status: 500 }
       );
     }
@@ -129,7 +129,7 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.error("[generate-logo] Error:", error);
     return NextResponse.json(
-      { error: "Erreur lors de la generation du logo" },
+      { error: "Erreur lors de la génération du logo" },
       { status: 500 }
     );
   }

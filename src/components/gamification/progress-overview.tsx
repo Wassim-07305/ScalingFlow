@@ -34,7 +34,7 @@ export function ProgressOverview({ className }: ProgressOverviewProps) {
     const fetchModuleProgress = async () => {
       const supabase = createClient();
 
-      // Requetes paralleles pour compter les items par module + rang
+      // Requêtes parallèles pour compter les items par module + rang
       const [offersRes, funnelsRes, adsRes, contentRes, leaderboardRes, videosRes, watchedRes] =
         await Promise.all([
           supabase

@@ -37,7 +37,7 @@ interface Challenge {
   completed: boolean;
 }
 
-// Definitions des defis possibles
+// Definitions des défis possibles
 const CHALLENGE_DEFINITIONS: {
   key: string;
   title: string;
@@ -50,8 +50,8 @@ const CHALLENGE_DEFINITIONS: {
 }[] = [
   {
     key: "offers_week",
-    title: "Createur d'offres",
-    description: "Genere 2 offres cette semaine",
+    title: "Créateur d'offres",
+    description: "Généré 2 offres cette semaine",
     icon: Package,
     color: "text-accent",
     target: 2,
@@ -67,8 +67,8 @@ const CHALLENGE_DEFINITIONS: {
   },
   {
     key: "content_week",
-    title: "Machine a contenu",
-    description: "Genere 5 contenus cette semaine",
+    title: "Machine à contenu",
+    description: "Généré 5 contenus cette semaine",
     icon: PenTool,
     color: "text-[#A78BFA]",
     target: 5,
@@ -85,7 +85,7 @@ const CHALLENGE_DEFINITIONS: {
   {
     key: "ads_week",
     title: "Publiciste",
-    description: "Cree 3 creatives publicitaires",
+    description: "Crée 3 créatives publicitaires",
     icon: Megaphone,
     color: "text-info",
     target: 3,
@@ -102,7 +102,7 @@ const CHALLENGE_DEFINITIONS: {
   {
     key: "community_week",
     title: "Membre actif",
-    description: "Publie 2 posts dans la communaute",
+    description: "Publie 2 posts dans la communauté",
     icon: MessageCircle,
     color: "text-info",
     target: 2,
@@ -135,7 +135,7 @@ const CHALLENGE_DEFINITIONS: {
   },
   {
     key: "academy_week",
-    title: "Etudiant assidu",
+    title: "Étudiant assidu",
     description: "Regarde 3 videos Academy",
     icon: BookOpen,
     color: "text-accent",
@@ -182,7 +182,7 @@ export function WeeklyChallenges() {
       const weekStart = getWeekStart();
       const weekKey = getWeekKey();
 
-      // Charger les defis completes cette semaine
+      // Charger les défis complétés cette semaine
       const { data: completedData } = await supabase
         .from("challenge_completions")
         .select("challenge_key")
@@ -194,7 +194,7 @@ export function WeeklyChallenges() {
         ((completedData ?? []) as any[]).map((c: any) => c.challenge_key)
       );
 
-      // Selectionner 4 defis pour cette semaine (rotation basee sur l'ID utilisateur)
+      // Sélectionner 4 défis pour cette semaine (rotation basée sur l'ID utilisateur)
       const userSeed = user.id.charCodeAt(0) + user.id.charCodeAt(1);
       const weekSeed = weekStart.getTime();
       const combinedSeed = (userSeed + weekSeed) % CHALLENGE_DEFINITIONS.length;
@@ -262,14 +262,14 @@ export function WeeklyChallenges() {
       }),
     });
 
-    // Mettre a jour l'UI
+    // Mettre à jour l'UI
     setChallenges((prev) =>
       prev.map((c) =>
         c.key === challenge.key ? { ...c, completed: true } : c
       )
     );
 
-    toast.success(`+${challenge.xp_reward} XP ! Defi "${challenge.title}" accompli !`);
+    toast.success(`+${challenge.xp_reward} XP ! Défi "${challenge.title}" accompli !`);
     setClaimingChallenge(null);
   };
 
@@ -283,7 +283,7 @@ export function WeeklyChallenges() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Target className="h-5 w-5 text-accent" />
-            Defis de la semaine
+            Défis de la semaine
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -301,7 +301,7 @@ export function WeeklyChallenges() {
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2">
             <Target className="h-5 w-5 text-accent" />
-            Defis de la semaine
+            Défis de la semaine
           </CardTitle>
           <div className="flex items-center gap-2">
             <Badge variant="muted" className="gap-1">

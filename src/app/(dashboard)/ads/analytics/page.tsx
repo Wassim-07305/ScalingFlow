@@ -51,8 +51,8 @@ export default function AnalyticsPage() {
       if (!res.ok) {
         toast.error(data.error || "Erreur de synchronisation");
       } else {
-        toast.success(data.message || "Synchronisation reussie");
-        // Recharger les metriques
+        toast.success(data.message || "Synchronisation réussie");
+        // Recharger les métriques
         window.location.reload();
       }
     } catch {
@@ -122,7 +122,7 @@ export default function AnalyticsPage() {
   if (loading || userLoading) {
     return (
       <div>
-        <PageHeader title="Analytiques Publicites" description="Analyse les performances de tes publicites." />
+        <PageHeader title="Analytiques Publicités" description="Analyse les performances de tes publicités." />
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
           {Array.from({ length: 4 }).map((_, i) => (
             <Card key={i}>
@@ -163,11 +163,11 @@ export default function AnalyticsPage() {
   if (!metrics) {
     return (
       <div>
-        <PageHeader title="Analytiques Publicites" description="Analyse les performances de tes publicites." />
+        <PageHeader title="Analytiques Publicités" description="Analyse les performances de tes publicités." />
         <EmptyState
           icon={BarChart3}
-          title="Aucune donnee publicitaire"
-          description="Cree des campagnes et des creatives pour voir tes analytics ici."
+          title="Aucune donnée publicitaire"
+          description="Crée des campagnes et des créatives pour voir tes analytics ici."
         />
       </div>
     );
@@ -182,14 +182,14 @@ export default function AnalyticsPage() {
 
   return (
     <div>
-      <PageHeader title="Analytiques Publicites" description="Analyse les performances de tes publicites.">
+      <PageHeader title="Analytiques Publicités" description="Analyse les performances de tes publicités.">
         {hasMetaConfig && (
           <Button
             size="sm"
             variant="ghost"
             onClick={handleSyncMeta}
             disabled={syncing}
-            aria-label="Synchroniser les donnees Meta Ads"
+            aria-label="Synchroniser les données Meta Ads"
             className="gap-2"
           >
             <RefreshCw className={`h-4 w-4 ${syncing ? "animate-spin" : ""}`} />
@@ -228,7 +228,7 @@ export default function AnalyticsPage() {
                 <DollarSign className="h-5 w-5 text-accent" />
               </div>
               <div>
-                <p className="text-xs text-text-muted">Total depense</p>
+                <p className="text-xs text-text-muted">Total dépensé</p>
                 <p className="text-lg font-bold text-text-primary">
                   <AnimatedCounter value={metrics.totalSpend} /> €
                 </p>
@@ -292,13 +292,13 @@ export default function AnalyticsPage() {
           {hasMetaConfig ? (
             <div className="flex items-center justify-between">
               <p className="text-sm text-text-secondary">
-                Ton compte Meta Ads est connecte. Clique sur &ldquo;Sync Meta Ads&rdquo; pour importer tes dernieres donnees.
+                Ton compte Meta Ads est connecté. Clique sur &ldquo;Sync Meta Ads&rdquo; pour importer tes dernières données.
               </p>
               <Button
                 size="sm"
                 onClick={handleSyncMeta}
                 disabled={syncing}
-                aria-label="Synchroniser les donnees Meta Ads"
+                aria-label="Synchroniser les données Meta Ads"
                 className="gap-2 shrink-0 ml-4"
               >
                 <RefreshCw className={`h-4 w-4 ${syncing ? "animate-spin" : ""}`} />
@@ -308,8 +308,8 @@ export default function AnalyticsPage() {
           ) : (
             <p className="text-sm text-text-secondary">
               Connecte ton compte Meta Ads dans les{" "}
-              <a href="/settings" className="text-accent hover:underline">parametres</a>{" "}
-              pour synchroniser tes donnees publicitaires et voir tes performances reelles.
+              <a href="/settings" className="text-accent hover:underline">paramètres</a>{" "}
+              pour synchroniser tes données publicitaires et voir tes performances réelles.
             </p>
           )}
         </CardContent>

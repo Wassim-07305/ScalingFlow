@@ -44,7 +44,7 @@ export function EmailSequence({ className, initialData }: EmailSequenceProps) {
           const errData = await response.json();
           if (errData.usage) { setUsageLimited(errData.usage); return; }
         }
-        throw new Error("Erreur lors de la generation");
+        throw new Error("Erreur lors de la génération");
       }
       const data = await response.json();
       setSequence(data.ai_raw_response || data);
@@ -60,7 +60,7 @@ export function EmailSequence({ className, initialData }: EmailSequenceProps) {
   }
 
   if (loading) {
-    return <AILoading text="Redaction de ta sequence email" className={className} />;
+    return <AILoading text="Redaction de ta séquence email" className={className} />;
   }
 
   if (!sequence) {
@@ -69,7 +69,7 @@ export function EmailSequence({ className, initialData }: EmailSequenceProps) {
         {error && <p className="text-sm text-danger mb-4">{error}</p>}
         <Button size="lg" onClick={handleGenerate}>
           <Sparkles className="h-4 w-4 mr-2" />
-          Generer la sequence email
+          Générer la séquence email
         </Button>
         <p className="text-sm text-text-secondary mt-2">7 emails de nurturing optimises</p>
       </div>

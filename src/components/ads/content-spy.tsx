@@ -30,7 +30,7 @@ import {
   Zap,
 } from "lucide-react";
 
-// Types pour les resultats Content Spy
+// Types pour les résultats Content Spy
 interface ContentType {
   type: string;
   frequency: string;
@@ -139,7 +139,7 @@ export function ContentSpy({ className }: ContentSpyProps) {
 
       const data = await response.json();
       setResult(data.result);
-      toast.success("Analyse terminee !");
+      toast.success("Analyse terminée !");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Erreur lors de l'analyse");
     } finally {
@@ -149,7 +149,7 @@ export function ContentSpy({ className }: ContentSpyProps) {
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
-    toast.success("Copie dans le presse-papiers");
+    toast.success("Copié dans le presse-papiers");
   };
 
   if (loading) {
@@ -170,7 +170,7 @@ export function ContentSpy({ className }: ContentSpyProps) {
                 Content Spy — Analyse de contenu
               </h3>
               <p className="text-sm text-text-secondary">
-                Analyse la strategie de contenu organique de tes concurrents
+                Analyse la stratégie de contenu organique de tes concurrents
               </p>
             </div>
           </div>
@@ -464,7 +464,7 @@ export function ContentSpy({ className }: ContentSpyProps) {
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
             <Lightbulb className="h-4 w-4 text-accent" />
-            Lacunes de contenu (opportunites)
+            Lacunes de contenu (opportunités)
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -517,7 +517,7 @@ export function ContentSpy({ className }: ContentSpyProps) {
                     <p className="text-sm text-accent">{insight.action}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-text-muted">Resultat attendu</p>
+                    <p className="text-xs text-text-muted">Résultat attendu</p>
                     <p className="text-sm text-text-secondary">{insight.expected_result}</p>
                   </div>
                 </div>

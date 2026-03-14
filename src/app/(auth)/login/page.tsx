@@ -33,15 +33,15 @@ export default function LoginPage() {
       if (msg.includes("invalid login credentials") || msg.includes("invalid_credentials")) {
         setError("Email ou mot de passe incorrect.");
       } else if (msg.includes("email not confirmed")) {
-        setError("Ton email n'a pas encore ete verifie. Verifie ta boite de reception.");
+        setError("Ton email n'a pas encore ete verifie. Vérifie ta boite de reception.");
       } else if (msg.includes("too many requests") || msg.includes("rate limit")) {
-        setError("Trop de tentatives. Reessaie dans quelques minutes.");
+        setError("Trop de tentatives. Réessaie dans quelques minutes.");
       } else if (msg.includes("user not found")) {
         setError("Aucun compte trouve avec cet email.");
       } else if (msg.includes("disabled") || msg.includes("banned")) {
         setError("Ce compte a ete desactive. Contacte le support.");
       } else {
-        setError("Erreur de connexion. Verifie tes identifiants et reessaie.");
+        setError("Erreur de connexion. Vérifie tes identifiants et réessaie.");
       }
       setLoading(false);
       return;
@@ -118,7 +118,7 @@ export default function LoginPage() {
             href="/register"
             className="text-info hover:underline font-medium"
           >
-            Creer un compte
+            Créer un compte
           </Link>
         </p>
         <p className="text-xs text-text-muted">

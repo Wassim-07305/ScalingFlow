@@ -17,18 +17,18 @@ interface SchwartzDisplayProps {
 }
 
 const NIVEAU_LABELS: Record<1 | 2 | 3 | 4 | 5, { label: string; color: string }> = {
-  1: { label: "Marche vierge", color: "bg-emerald-500" },
-  2: { label: "Probleme connu", color: "bg-blue-500" },
+  1: { label: "Marché vierge", color: "bg-emerald-500" },
+  2: { label: "Problème connu", color: "bg-blue-500" },
   3: { label: "Solutions connues", color: "bg-yellow-500" },
-  4: { label: "Marche sature", color: "bg-orange-500" },
-  5: { label: "Hyper-sature", color: "bg-red-500" },
+  4: { label: "Marché saturé", color: "bg-orange-500" },
+  5: { label: "Hyper-saturé", color: "bg-red-500" },
 };
 
 const STRATEGIE_LABELS: Record<string, { label: string; description: string }> = {
-  vsl: { label: "VSL (Video Sales Letter)", description: "Promesse directe via video longue" },
+  vsl: { label: "VSL (Video Sales Letter)", description: "Promesse directe via vidéo longue" },
   social_funnel: { label: "Entonnoir Social", description: "Nurturing via contenu social" },
-  education_first: { label: "Education d'abord", description: "Creer la conscience du probleme" },
-  direct_response: { label: "Reponse directe", description: "Preuves massives et identification" },
+  education_first: { label: "Éducation d'abord", description: "Créer la conscience du problème" },
+  direct_response: { label: "Réponse directe", description: "Preuves massives et identification" },
 };
 
 const PREUVE_COLORS: Record<string, "default" | "yellow" | "red"> = {
@@ -82,7 +82,7 @@ export function SchwartzDisplay({ analysis }: SchwartzDisplayProps) {
                   Niveau {analysis.niveau} — {niveauInfo.label}
                 </h3>
                 <p className="text-sm text-text-secondary">
-                  Sophistication de marche selon Eugene Schwartz
+                  Sophistication de marché selon Eugene Schwartz
                 </p>
               </div>
             </div>
@@ -103,8 +103,8 @@ export function SchwartzDisplay({ analysis }: SchwartzDisplayProps) {
           </p>
         </InfoCard>
 
-        {/* Strategie recommandee */}
-        <InfoCard icon={Target} title="Strategie recommandee">
+        {/* Stratégie recommandée */}
+        <InfoCard icon={Target} title="Stratégie recommandée">
           <div className="space-y-2">
             <Badge variant="default" className="text-sm">
               {strategieInfo?.label || analysis.strategie_recommandee}
@@ -148,13 +148,13 @@ export function SchwartzDisplay({ analysis }: SchwartzDisplayProps) {
           </div>
           <p className="text-sm text-text-muted mt-2">
             {analysis.niveau_preuve_requis === "faible" &&
-              "Le prospect est receptif, une preuve legere suffit."}
+              "Le prospect est réceptif, une preuve légère suffit."}
             {analysis.niveau_preuve_requis === "moyen" &&
-              "Necessite des temoignages et etudes de cas."}
+              "Necessite des témoignages et etudes de cas."}
             {analysis.niveau_preuve_requis === "eleve" &&
               "Preuve sociale massive, chiffres precis, garanties fortes."}
             {analysis.niveau_preuve_requis === "tres_eleve" &&
-              "Preuves extremes, video temoignages, resultats verificables."}
+              "Preuves extremes, video témoignages, résultats verificables."}
           </p>
         </CardContent>
       </Card>

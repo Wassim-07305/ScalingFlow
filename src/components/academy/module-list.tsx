@@ -86,7 +86,7 @@ export function ModuleList({ className }: ModuleListProps) {
     if (!user) return;
     setLoading(true);
 
-    // Recuperer tous les modules
+    // Récupérer tous les modules
     const { data: modulesData, error: modulesError } = await supabase
       .from("academy_modules")
       .select("*")
@@ -98,12 +98,12 @@ export function ModuleList({ className }: ModuleListProps) {
       return;
     }
 
-    // Recuperer le compte de videos par module
+    // Récupérer le compte de videos par module
     const { data: videosData } = await supabase
       .from("academy_videos")
       .select("id, module_id");
 
-    // Recuperer la progression de l'utilisateur
+    // Récupérer la progression de l'utilisateur
     const { data: progressData } = await supabase
       .from("video_progress")
       .select("video_id, watched")
@@ -206,7 +206,7 @@ export function ModuleList({ className }: ModuleListProps) {
     setVideos(enrichedVideos);
     setLoadingVideos(false);
 
-    // Ouvrir la premiere video non vue ou la premiere
+    // Ouvrir la première video non vue ou la première
     const firstUnwatched = enrichedVideos.find((v) => !v.watched);
     if (firstUnwatched) {
       setActiveVideo(firstUnwatched);
@@ -219,7 +219,7 @@ export function ModuleList({ className }: ModuleListProps) {
   const markVideoWatched = async (videoId: string) => {
     if (!user) return;
 
-    // Mise a jour optimiste
+    // Mise à jour optimiste
     setVideos((prev) =>
       prev.map((v) =>
         v.id === videoId
@@ -253,7 +253,7 @@ export function ModuleList({ className }: ModuleListProps) {
       return;
     }
 
-    // Mettre a jour les compteurs du module
+    // Mettre à jour les compteurs du module
     if (selectedModule) {
       const newCompletedCount = selectedModule.completed_count + 1;
       setModules((prev) =>
@@ -268,14 +268,14 @@ export function ModuleList({ className }: ModuleListProps) {
       if (newCompletedCount >= selectedModule.video_count) {
         toast.success(`Module "${selectedModule.module_name}" termine ! Bravo !`);
       } else {
-        toast.success("Video marquee comme vue !");
+        toast.success("Vidéo marquée comme vue !");
       }
     } else {
-      toast.success("Video marquee comme vue !");
+      toast.success("Vidéo marquée comme vue !");
     }
   };
 
-  // ---- Retour a la liste ----
+  // ---- Retour à la liste ----
   const goBack = () => {
     setSelectedModule(null);
     setVideos([]);
@@ -353,7 +353,7 @@ export function ModuleList({ className }: ModuleListProps) {
               <Card>
                 <CardContent className="flex items-center justify-center py-12">
                   <p className="text-sm text-text-muted">
-                    Selectionne une video dans la liste
+                    Sélectionne une video dans la liste
                   </p>
                 </CardContent>
               </Card>
@@ -438,7 +438,7 @@ export function ModuleList({ className }: ModuleListProps) {
             </div>
             <Progress value={overallProgress} className="h-2" />
             <p className="text-xs text-text-muted mt-2">
-              {totalCompleted}/{totalVideos} videos terminees
+              {totalCompleted}/{totalVideos} videos terminées
             </p>
           </CardContent>
         </Card>

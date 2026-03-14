@@ -62,7 +62,7 @@ export function BusinessPipeline() {
 
       setSteps([
         { label: "Vault", href: "/vault", icon: Archive, completed: vaultDone },
-        { label: "Marche", href: "/market", icon: Globe, completed: (marketsCount ?? 0) > 0, count: marketsCount ?? 0 },
+        { label: "Marché", href: "/market", icon: Globe, completed: (marketsCount ?? 0) > 0, count: marketsCount ?? 0 },
         { label: "Offre", href: "/offer", icon: Package, completed: (offersCount ?? 0) > 0, count: offersCount ?? 0 },
         { label: "Marque", href: "/brand", icon: Palette, completed: (brandsCount ?? 0) > 0, count: brandsCount ?? 0 },
         { label: "Funnel", href: "/funnel", icon: Filter, completed: (funnelsCount ?? 0) > 0, count: funnelsCount ?? 0 },
@@ -92,7 +92,7 @@ export function BusinessPipeline() {
           <CardTitle>Pipeline business</CardTitle>
           {!isLoading && (
             <span className="text-xs text-text-muted font-normal">
-              {completedCount}/{totalSteps} etapes
+              {completedCount}/{totalSteps} étapes
             </span>
           )}
         </div>

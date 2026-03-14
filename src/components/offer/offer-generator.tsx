@@ -26,7 +26,7 @@ export function OfferGenerator({ className, marketAnalysisId, marketName, initia
   const [error, setError] = React.useState<string | null>(null);
   const [usageLimited, setUsageLimited] = React.useState<{currentUsage: number; limit: number} | null>(null);
 
-  // Charger les donnees historiques quand initialData change
+  // Charger les données historiques quand initialData change
   React.useEffect(() => {
     if (initialData) {
       setGeneratedOffer(initialData);
@@ -35,7 +35,7 @@ export function OfferGenerator({ className, marketAnalysisId, marketName, initia
 
   const handleGenerate = async () => {
     if (!marketAnalysisId) {
-      setError("Veuillez d'abord completer votre analyse de marche dans l'onboarding.");
+      setError("Veuillez d'abord compléter votre analyse de marché dans l'onboarding.");
       return;
     }
 
@@ -55,7 +55,7 @@ export function OfferGenerator({ className, marketAnalysisId, marketName, initia
           const errData = await response.json();
           if (errData.usage) { setUsageLimited(errData.usage); return; }
         }
-        throw new Error("Erreur lors de la generation");
+        throw new Error("Erreur lors de la génération");
       }
 
       const data = await response.json();
@@ -85,7 +85,7 @@ export function OfferGenerator({ className, marketAnalysisId, marketName, initia
   }
 
   if (loading) {
-    return <AILoading text="Generation de ton offre irresistible" className={className} />;
+    return <AILoading text="Génération de ton offre irrésistible" className={className} />;
   }
 
   return (
@@ -95,32 +95,32 @@ export function OfferGenerator({ className, marketAnalysisId, marketName, initia
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Sparkles className="h-5 w-5 text-accent" />
-              Generer une offre
+              Générer une offre
             </CardTitle>
             <CardDescription>
-              L&apos;IA va creer une offre irresistible basee sur ton analyse de marche
+              L&apos;IA va créer une offre irrésistible basée sur ton analyse de marché
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             {marketName && (
               <div className="flex items-center gap-2">
-                <span className="text-sm text-text-secondary">Marche :</span>
+                <span className="text-sm text-text-secondary">Marché :</span>
                 <Badge variant="default">{marketName}</Badge>
               </div>
             )}
             {error && <p className="text-sm text-danger">{error}</p>}
             <Button size="lg" onClick={handleGenerate}>
               <Sparkles className="h-4 w-4 mr-2" />
-              Generer mon offre
+              Générer mon offre
             </Button>
           </CardContent>
         </Card>
       ) : (
         <EmptyState
           icon={Package}
-          title="Aucune analyse de marche"
-          description="Complete d'abord l'onboarding pour analyser ton marche et pouvoir generer une offre."
-          actionLabel="Aller a l'onboarding"
+          title="Aucune analyse de marché"
+          description="Complète d'abord l'onboarding pour analyser ton marché et pouvoir générer une offre."
+          actionLabel="Aller à l'onboarding"
           onAction={() => window.location.href = "/onboarding"}
         />
       )}

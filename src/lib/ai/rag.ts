@@ -253,12 +253,12 @@ export async function buildRAGContext(
 
   let context = "\n## CONTEXTE KNOWLEDGE BASE (RAG)\n";
   context +=
-    "Les extraits suivants proviennent des documents uploades par l'utilisateur. Utilise-les pour enrichir et personnaliser ta reponse.\n\n";
+    "Les extraits suivants proviennent des documents uploadés par l'utilisateur. Utilise-les pour enrichir et personnaliser ta réponse.\n\n";
 
   let totalChars = context.length;
 
   for (const result of results) {
-    const block = `> ${result.content}\n(Similarite: ${(result.similarity * 100).toFixed(0)}%)\n\n`;
+    const block = `> ${result.content}\n(Similarité: ${(result.similarity * 100).toFixed(0)}%)\n\n`;
     if (totalChars + block.length > maxChars) break;
     context += block;
     totalChars += block.length;

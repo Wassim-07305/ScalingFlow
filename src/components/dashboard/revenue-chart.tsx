@@ -41,7 +41,7 @@ export function RevenueChart() {
         const start = startOfMonth(monthDate).toISOString();
         const end = endOfMonth(monthDate).toISOString();
         const label = format(monthDate, "MMM", { locale: fr });
-        // Capitaliser la premiere lettre
+        // Capitaliser la première lettre
         const capitalizedLabel = label.charAt(0).toUpperCase() + label.slice(1);
 
         const [offersRes, creativesRes, funnelsRes, assetsRes] =
@@ -94,7 +94,7 @@ export function RevenueChart() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Generations par mois</CardTitle>
+        <CardTitle>Générations par mois</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="h-[220px] sm:h-[300px]">
@@ -107,8 +107,8 @@ export function RevenueChart() {
               <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-accent/10 mb-3">
                 <TrendingUp className="h-6 w-6 text-accent" />
               </div>
-              <p className="text-sm font-medium text-text-primary mb-1">Pas encore de donnees</p>
-              <p className="text-xs text-text-muted max-w-[220px]">Tes statistiques mensuelles apparaitront ici apres tes premieres generations.</p>
+              <p className="text-sm font-medium text-text-primary mb-1">Pas encore de données</p>
+              <p className="text-xs text-text-muted max-w-[220px]">Tes statistiques mensuelles apparaîtront ici après tes premières générations.</p>
             </div>
           ) : (
             <ResponsiveContainer width="100%" height="100%">

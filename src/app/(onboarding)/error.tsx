@@ -27,13 +27,13 @@ export default function OnboardingError({
           onClick={reset}
           className="rounded-lg bg-accent px-6 py-2.5 font-semibold text-bg-primary"
         >
-          Reessayer
+          Réessayer
         </button>
         <a
           href="/"
           className="rounded-lg border border-border-default px-6 py-2.5 font-semibold text-text-primary"
         >
-          Retour a l&apos;accueil
+          Retour à l&apos;accueil
         </a>
       </div>
     </div>

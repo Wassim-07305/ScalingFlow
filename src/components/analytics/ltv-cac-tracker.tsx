@@ -474,8 +474,8 @@ export function LTVCACTracker() {
                     {currentMetrics.ratio >= 3
                       ? "Votre ratio est sain (>3:1). Vous pouvez investir davantage en acquisition."
                       : currentMetrics.ratio >= 2
-                      ? "Votre ratio est correct mais peut etre ameliore. Optimisez votre funnel ou augmentez votre LTV."
-                      : "Ratio critique (<2:1). Reduisez votre CAC ou augmentez votre LTV en priorite."}
+                      ? "Votre ratio est correct mais peut être amélioré. Optimisez votre funnel ou augmentez votre LTV."
+                      : "Ratio critique (<2:1). Réduisez votre CAC ou augmentez votre LTV en priorité."}
                   </p>
                 </div>
               </div>
@@ -492,7 +492,7 @@ export function LTVCACTracker() {
                   <h4 className="text-sm font-medium text-text-primary">Payback Period</h4>
                   <p className="text-xs text-text-secondary mt-1">
                     {currentMetrics.paybackMonths <= 3
-                      ? "Excellent ! Vous recuperez votre investissement en moins de 3 mois."
+                      ? "Excellent ! Vous récupérez votre investissement en moins de 3 mois."
                       : currentMetrics.paybackMonths <= 6
                       ? "Correct. Essayez de raccourcir le payback en augmentant le panier moyen."
                       : "Attention, le retour sur investissement est lent. Revisez votre pricing ou votre CAC."}
@@ -517,7 +517,7 @@ export function LTVCACTracker() {
                     /mois.{" "}
                     {(entries[entries.length - 1]?.monthlyChurnRate || 0) <= 0.05
                       ? "Bon taux de retention."
-                      : "Travaillez l'onboarding et le succes client pour reduire le churn."}
+                      : "Travaillez l'onboarding et le succès client pour réduire le churn."}
                   </p>
                 </div>
               </div>
@@ -530,7 +530,7 @@ export function LTVCACTracker() {
       {chartData.length > 1 && (
         <Card>
           <CardHeader>
-            <CardTitle>Evolution LTV vs CAC</CardTitle>
+            <CardTitle>Évolution LTV vs CAC</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="h-[300px]">
@@ -709,7 +709,7 @@ export function LTVCACTracker() {
               </p>
             </div>
             <div>
-              <Label htmlFor="ltv-spend">Depense publicitaire mensuelle (EUR)</Label>
+              <Label htmlFor="ltv-spend">Dépense publicitaire mensuelle (EUR)</Label>
               <Input
                 id="ltv-spend"
                 type="number"

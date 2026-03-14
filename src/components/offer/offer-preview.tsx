@@ -58,7 +58,7 @@ export function OfferPreview({ offer, onRegenerate, className }: OfferPreviewPro
             size="sm"
             onClick={() => exportToPDF({
               title: name,
-              subtitle: "Offre generee par ScalingFlow",
+              subtitle: "Offre générée par ScalingFlow",
               content: raw,
               filename: `offre-${name.toLowerCase().replace(/[^a-z0-9]+/g, "-")}.pdf`,
             })}
@@ -69,7 +69,7 @@ export function OfferPreview({ offer, onRegenerate, className }: OfferPreviewPro
           {onRegenerate && (
             <Button variant="outline" size="sm" onClick={onRegenerate}>
               <RefreshCw className="h-4 w-4 mr-2" />
-              Regenerer
+              Régénérer
             </Button>
           )}
         </div>
@@ -80,7 +80,7 @@ export function OfferPreview({ offer, onRegenerate, className }: OfferPreviewPro
         <GlowCard glowColor="orange">
           <div className="flex items-center gap-2 mb-4">
             <Zap className="h-5 w-5 text-accent" />
-            <h3 className="text-lg font-semibold text-text-primary">Mecanisme Unique</h3>
+            <h3 className="text-lg font-semibold text-text-primary">Mécanisme Unique</h3>
           </div>
           <p className="text-accent font-medium mb-3">{mechanism.name}</p>
           {mechanism.description && (
@@ -104,7 +104,7 @@ export function OfferPreview({ offer, onRegenerate, className }: OfferPreviewPro
       {/* Pricing Strategy */}
       <Card>
         <CardHeader>
-          <CardTitle>Strategie de Prix</CardTitle>
+          <CardTitle>Stratégie de Prix</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-baseline gap-4 mb-6">

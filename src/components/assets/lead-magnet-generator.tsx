@@ -48,13 +48,13 @@ const LEAD_MAGNET_TYPES: {
   {
     key: "template",
     label: "Template",
-    description: "Modele pret a l'emploi",
+    description: "Modèle prêt à l'emploi",
     icon: FileSpreadsheet,
   },
   {
     key: "quiz",
     label: "Quiz",
-    description: "Auto-evaluation interactive",
+    description: "Auto-évaluation interactive",
     icon: HelpCircle,
   },
   {
@@ -101,7 +101,7 @@ export function LeadMagnetGenerator({ className, initialData }: LeadMagnetGenera
           const errData = await response.json();
           if (errData.usage) { setUsageLimited(errData.usage); return; }
         }
-        throw new Error("Erreur lors de la generation");
+        throw new Error("Erreur lors de la génération");
       }
       const data = await response.json();
       const raw = data.ai_raw_response || data;
@@ -139,7 +139,7 @@ export function LeadMagnetGenerator({ className, initialData }: LeadMagnetGenera
             Choisis le type de lead magnet
           </h3>
           <p className="text-xs text-text-secondary mt-1">
-            Selectionne le format le plus adapte a ton audience
+            Sélectionne le format le plus adapté à ton audience
           </p>
         </div>
 
@@ -190,7 +190,7 @@ export function LeadMagnetGenerator({ className, initialData }: LeadMagnetGenera
             disabled={!selectedType}
           >
             <Sparkles className="h-4 w-4 mr-2" />
-            Generer le lead magnet
+            Générer le lead magnet
           </Button>
         </div>
       </div>

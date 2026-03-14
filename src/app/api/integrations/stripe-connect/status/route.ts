@@ -11,7 +11,7 @@ export async function GET() {
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Non autorise" }, { status: 401 });
+      return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
     }
 
     const { data: connection } = await supabase
@@ -57,7 +57,7 @@ export async function GET() {
     });
   } catch {
     return NextResponse.json(
-      { error: "Erreur lors de la verification" },
+      { error: "Erreur lors de la vérification" },
       { status: 500 }
     );
   }

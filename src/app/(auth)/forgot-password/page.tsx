@@ -60,7 +60,7 @@ export default function ForgotPasswordPage() {
             </p>
           </div>
           <p className="text-xs text-text-muted text-center">
-            Rien recu ? Verifie tes spams ou{" "}
+            Rien reçu ? Vérifie tes spams ou{" "}
             <button
               onClick={() => setSent(false)}
               className="text-info hover:underline font-medium"

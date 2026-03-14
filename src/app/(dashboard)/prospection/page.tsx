@@ -13,8 +13,8 @@ import { toast } from "sonner";
 import { Compass, Phone, MessageSquare, GitBranch, History } from "lucide-react";
 
 const TABS = [
-  { key: "strategy", label: "Strategie d'Acquisition", icon: Compass },
-  { key: "warm_call", label: "Script Appel Tiede", icon: Phone },
+  { key: "strategy", label: "Stratégie d'Acquisition", icon: Compass },
+  { key: "warm_call", label: "Script Appel Tiède", icon: Phone },
   { key: "dm", label: "Scripts DM", icon: MessageSquare },
   { key: "workflow", label: "Workflow Outbound", icon: GitBranch },
   { key: "history", label: "Historique", icon: History },
@@ -33,11 +33,11 @@ export default function ProspectionPage() {
         .single();
 
       if (error || !data) {
-        toast.error("Impossible de charger cet element");
+        toast.error("Impossible de charger cet élément");
         return;
       }
 
-      // Determiner l'onglet cible depuis les metadata
+      // Déterminer l'onglet cible depuis les metadata
       const metadata = data.metadata as { scriptType?: string } | null;
       const scriptType = metadata?.scriptType;
 
@@ -53,7 +53,7 @@ export default function ProspectionPage() {
         setActiveTab("strategy");
       }
 
-      toast.success("Element charge depuis l'historique");
+      toast.success("Élément chargé depuis l'historique");
     } catch {
       toast.error("Erreur lors du chargement");
     }
@@ -77,7 +77,7 @@ export default function ProspectionPage() {
             subtitleField="asset_type"
             statusField="status"
             filters={{ asset_type: "sales_script" }}
-            emptyMessage="Aucun element de prospection genere pour le moment."
+            emptyMessage="Aucun élément de prospection généré pour le moment."
             onSelect={handleHistorySelect}
           />
         );
@@ -90,7 +90,7 @@ export default function ProspectionPage() {
     <div>
       <PageHeader
         title="Prospection & Closing"
-        description="Strategie d'acquisition, scripts d'appels, DMs et workflows outbound."
+        description="Stratégie d'acquisition, scripts d'appels, DMs et workflows outbound."
       />
 
       <TabBar tabs={TABS} activeTab={activeTab} onTabChange={setActiveTab} />

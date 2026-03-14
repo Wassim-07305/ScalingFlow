@@ -34,19 +34,19 @@ function Row({ label, value }: { label: string; value: string }) {
 }
 
 const SITUATION_LABELS: Record<string, string> = {
-  zero: "Partir de zero",
-  salarie: "Salarie(e)",
-  freelance: "Freelance / Independant",
+  zero: "Partir de zéro",
+  salarie: "Salarié(e)",
+  freelance: "Freelance / Indépendant",
   entrepreneur: "Entrepreneur",
-  etudiant: "Etudiant(e)",
+  etudiant: "Étudiant(e)",
   reconversion: "En reconversion",
   sans_emploi: "Sans emploi",
 };
 
 const LANGUAGE_LABELS: Record<string, string> = {
-  fr: "Francais",
+  fr: "Français",
   en: "Anglais",
-  both: "Francais + Anglais",
+  both: "Français + Anglais",
   ar: "Arabe",
 };
 
@@ -59,7 +59,7 @@ const DEADLINE_LABELS: Record<string, string> = {
 
 const TEAM_LABELS: Record<string, string> = {
   seul: "Seul",
-  equipe: "J'ai une equipe",
+  equipe: "J'ai une équipe",
   recruter: "Je veux recruter",
 };
 
@@ -78,8 +78,8 @@ export function OnboardingSummary({ data }: OnboardingSummaryProps) {
 
   return (
     <div className="grid gap-4 sm:grid-cols-2">
-      {/* Identite */}
-      <Section title="Identite">
+      {/* Identité */}
+      <Section title="Identité">
         <Row
           label="Nom"
           value={`${data.firstName || ""} ${data.lastName || ""}`.trim()}
@@ -104,8 +104,8 @@ export function OnboardingSummary({ data }: OnboardingSummaryProps) {
         />
       </Section>
 
-      {/* Competences */}
-      <Section title="Competences">
+      {/* Compétences */}
+      <Section title="Compétences">
         {vaultSkills.length > 0 ? (
           vaultSkills.map((s) => (
             <Row
@@ -113,15 +113,15 @@ export function OnboardingSummary({ data }: OnboardingSummaryProps) {
               label={s.name}
               value={
                 s.level === "debutant"
-                  ? "Debutant"
+                  ? "Débutant"
                   : s.level === "intermediaire"
-                    ? "Intermediaire"
-                    : "Avance"
+                    ? "Intermédiaire"
+                    : "Avancé"
               }
             />
           ))
         ) : (
-          <p className="text-sm text-white/30">Non renseigne</p>
+          <p className="text-sm text-white/30">Non renseigné</p>
         )}
       </Section>
 
@@ -154,7 +154,7 @@ export function OnboardingSummary({ data }: OnboardingSummaryProps) {
           value={DEADLINE_LABELS[String(data.deadline || "")] || ""}
         />
         <Row
-          label="Equipe"
+          label="Équipe"
           value={TEAM_LABELS[String(data.teamPreference || "")] || ""}
         />
       </Section>
@@ -173,7 +173,7 @@ export function OnboardingSummary({ data }: OnboardingSummaryProps) {
             ))}
           </div>
         ) : (
-          <p className="text-sm text-white/30">Non renseigne</p>
+          <p className="text-sm text-white/30">Non renseigné</p>
         )}
       </Section>
 
@@ -191,11 +191,11 @@ export function OnboardingSummary({ data }: OnboardingSummaryProps) {
             ))}
           </div>
         ) : (
-          <p className="text-sm text-white/30">Non renseigne</p>
+          <p className="text-sm text-white/30">Non renseigné</p>
         )}
       </Section>
 
-      {/* Expertise (resumes) */}
+      {/* Expertise (résumés) */}
       {Object.values(expertiseAnswers).some((v) => v) && (
         <Section title="Expertise">
           {expertiseAnswers.q1 && (
@@ -210,7 +210,7 @@ export function OnboardingSummary({ data }: OnboardingSummaryProps) {
           )}
           {expertiseAnswers.q2 && (
             <Row
-              label="Probleme resolu"
+              label="Problème résolu"
               value={
                 expertiseAnswers.q2.length > 60
                   ? expertiseAnswers.q2.slice(0, 60) + "..."

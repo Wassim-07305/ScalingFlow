@@ -42,7 +42,7 @@ export function OfferScoreCard({ offerId, className }: OfferScoreCardProps) {
 
   const handleScore = async () => {
     if (!offerId) {
-      toast.error("Veuillez d'abord generer une offre.");
+      toast.error("Veuillez d'abord générer une offre.");
       return;
     }
 
@@ -59,12 +59,12 @@ export function OfferScoreCard({ offerId, className }: OfferScoreCardProps) {
       if (!response.ok) {
         const errData = await response.json().catch(() => ({}));
         if (response.status === 403 && errData.usage) { setUsageLimited(errData.usage); return; }
-        throw new Error(errData.error || "Erreur lors de la generation");
+        throw new Error(errData.error || "Erreur lors de la génération");
       }
 
       const data: OfferScoreResult = await response.json();
       setScore(data);
-      toast.success("Evaluation terminee !");
+      toast.success("Évaluation terminée !");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Une erreur est survenue");
     } finally {
@@ -77,7 +77,7 @@ export function OfferScoreCard({ offerId, className }: OfferScoreCardProps) {
   }
 
   if (loading) {
-    return <AILoading text="Evaluation de ton offre en cours" className={className} />;
+    return <AILoading text="Évaluation de ton offre en cours" className={className} />;
   }
 
   if (!score) {
@@ -93,11 +93,11 @@ export function OfferScoreCard({ offerId, className }: OfferScoreCardProps) {
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-sm text-text-secondary">
-                L&apos;IA va evaluer ton offre sur 6 criteres et te donner un score sur 100 avec des recommandations d&apos;amelioration.
+                L&apos;IA va évaluer ton offre sur 6 critères et te donner un score sur 100 avec des recommandations d&apos;amélioration.
               </p>
               <Button size="lg" onClick={handleScore}>
                 <Sparkles className="h-4 w-4 mr-2" />
-                Evaluer mon offre
+                Évaluer mon offre
               </Button>
             </CardContent>
           </Card>
@@ -105,7 +105,7 @@ export function OfferScoreCard({ offerId, className }: OfferScoreCardProps) {
           <EmptyState
             icon={Target}
             title="Aucune offre disponible"
-            description="Genere d'abord une offre pour pouvoir l'evaluer."
+            description="Génère d'abord une offre pour pouvoir l'évaluer."
           />
         )}
       </div>
@@ -215,7 +215,7 @@ export function OfferScoreCard({ offerId, className }: OfferScoreCardProps) {
       {/* Criteria Breakdown */}
       <Card>
         <CardHeader>
-          <CardTitle>Detail des criteres</CardTitle>
+          <CardTitle>Détail des critères</CardTitle>
         </CardHeader>
         <CardContent className="space-y-5">
           {Object.entries(score.criteres).map(([key, value]) => {
@@ -284,7 +284,7 @@ export function OfferScoreCard({ offerId, className }: OfferScoreCardProps) {
       <div className="flex justify-center">
         <Button variant="outline" onClick={handleScore}>
           <RefreshCw className="h-4 w-4 mr-2" />
-          Re-evaluer l&apos;offre
+          Ré-évaluer l&apos;offre
         </Button>
       </div>
     </div>

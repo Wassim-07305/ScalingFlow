@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
       data: { user },
     } = await supabase.auth.getUser();
     if (!user)
-      return NextResponse.json({ error: "Non autorise" }, { status: 401 });
+      return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
 
     const { metrics } = await req.json();
 
@@ -46,7 +46,7 @@ Reponds UNIQUEMENT en JSON valide :
       "category": "Creatives | Audiences | Budget | Funnel | Pricing",
       "priority": "Haute | Moyenne | Basse",
       "expected_impact": "+20% ROAS estime",
-      "action_steps": ["Etape 1", "Etape 2"],
+      "action_steps": ["Étape 1", "Étape 2"],
       "metric_to_watch": "ROAS"
     }
   ],
@@ -54,7 +54,7 @@ Reponds UNIQUEMENT en JSON valide :
   "warnings": ["Alerte si applicable"]
 }
 
-Genere entre 4 et 8 recommandations, triees par impact decroissant. Sois concret et actionnable.`;
+Génère entre 4 et 8 recommandations, triées par impact décroissant. Sois concret et actionnable.`;
 
     const result = await generateJSON({
       prompt,

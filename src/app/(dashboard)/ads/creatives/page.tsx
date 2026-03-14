@@ -6,7 +6,7 @@ import { CreativeGenerator } from "@/components/ads/creative-generator";
 export default function CreativesPage() {
   return (
     <div>
-      <PageHeader title="Creatives" description="Genere des creatives publicitaires avec l'IA." />
+      <PageHeader title="Créatives" description="Génère des créatives publicitaires avec l'IA." />
       <CreativeGenerator />
     </div>
   );

@@ -109,7 +109,7 @@ export function LeadsChart() {
                 <BarChart3 className="h-6 w-6 text-accent" />
               </div>
               <p className="text-sm font-medium text-text-primary mb-1">Pas encore de creations</p>
-              <p className="text-xs text-text-muted max-w-[220px]">Genere ta premiere offre ou funnel pour voir les stats ici.</p>
+              <p className="text-xs text-text-muted max-w-[220px]">Génère ta première offre ou funnel pour voir les stats ici.</p>
             </div>
           ) : (
             <ResponsiveContainer width="100%" height="100%">

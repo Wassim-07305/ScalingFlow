@@ -147,14 +147,14 @@ export default function BrandPage() {
       if (!response.ok) {
         const errData = await response.json().catch(() => ({}));
         if (response.status === 403 && errData.usage) { setUsageLimited(errData.usage); return; }
-        throw new Error(errData.error || "Erreur lors de la generation");
+        throw new Error(errData.error || "Erreur lors de la génération");
       }
 
       const data = await response.json();
       setBrandId(data.id);
       setGenerated(data.generated);
       setSelectedName(null);
-      toast.success("Identite de marque generee avec succes !");
+      toast.success("Identité de marque générée avec succès !");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Une erreur est survenue");
     } finally {
@@ -171,7 +171,7 @@ export default function BrandPage() {
         .eq("id", item.id)
         .single();
       if (error || !data) {
-        toast.error("Impossible de charger cette identite");
+        toast.error("Impossible de charger cette identité");
         return;
       }
 
@@ -217,7 +217,7 @@ export default function BrandPage() {
         },
       });
       setActiveTab("nom");
-      toast.success("Identite de marque chargee depuis l'historique");
+      toast.success("Identité de marque chargée depuis l'historique");
     } catch {
       toast.error("Erreur lors du chargement");
     }
@@ -231,8 +231,8 @@ export default function BrandPage() {
     return (
       <div>
         <PageHeader
-          title="Identite de Marque"
-          description="Cree ton identite de marque unique."
+          title="Identité de Marque"
+          description="Crée ton identité de marque unique."
         />
         <AILoading text="Chargement" />
       </div>
@@ -243,10 +243,10 @@ export default function BrandPage() {
     return (
       <div>
         <PageHeader
-          title="Identite de Marque"
-          description="Cree ton identite de marque unique."
+          title="Identité de Marque"
+          description="Crée ton identité de marque unique."
         />
-        <AILoading text="Generation de ton identite de marque" />
+        <AILoading text="Génération de ton identité de marque" />
       </div>
     );
   }
@@ -254,12 +254,12 @@ export default function BrandPage() {
   return (
     <div>
       <PageHeader
-        title="Identite de Marque"
-        description="Cree ton identite de marque unique."
+        title="Identité de Marque"
+        description="Crée ton identité de marque unique."
         actions={
           <Button onClick={handleGenerate} disabled={generating}>
             <Sparkles className="h-4 w-4 mr-2" />
-            {generated ? "Regenerer" : "Generer"}
+            {generated ? "Régénérer" : "Générer"}
           </Button>
         }
       />
@@ -289,15 +289,15 @@ export default function BrandPage() {
           table="brand_identities"
           titleField="selected_name"
           statusField="status"
-          emptyMessage="Aucune identite de marque generee pour le moment."
+          emptyMessage="Aucune identité de marque générée pour le moment."
           onSelect={handleHistorySelect}
         />
       ) : !generated ? (
         <EmptyState
           icon={Palette}
-          title="Aucune identite de marque"
-          description="Genere ton identite de marque pour obtenir des propositions de noms, une direction artistique, un concept de logo et un kit de marque complet."
-          actionLabel="Generer mon identite"
+          title="Aucune identité de marque"
+          description="Génère ton identité de marque pour obtenir des propositions de noms, une direction artistique, un concept de logo et un kit de marque complet."
+          actionLabel="Générer mon identité"
           onAction={handleGenerate}
         />
       ) : (
@@ -339,7 +339,7 @@ function BrandKitView({
     return (
       <div className="text-center py-12">
         <BookOpen className="h-12 w-12 text-text-muted mx-auto mb-3" />
-        <p className="text-text-secondary">Aucun kit de marque genere.</p>
+        <p className="text-text-secondary">Aucun kit de marque généré.</p>
       </div>
     );
   }
@@ -398,7 +398,7 @@ function BrandKitView({
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base">
               <CheckCircle className="h-4 w-4 text-accent" />
-              A faire
+              À faire
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
@@ -414,7 +414,7 @@ function BrandKitView({
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base">
               <XCircle className="h-4 w-4 text-danger" />
-              A ne pas faire
+              À ne pas faire
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">

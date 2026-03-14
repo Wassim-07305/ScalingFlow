@@ -29,7 +29,7 @@ export async function buildVaultResourcesContext(
 
   let context = "\n## RESSOURCES VAULT DE L'UTILISATEUR\n";
   context +=
-    "L'utilisateur a uploade les ressources suivantes. Utilise-les pour personnaliser tes reponses et rendre le contenu genere unique et specifique a son expertise.\n\n";
+    "L'utilisateur a uploadé les ressources suivantes. Utilise-les pour personnaliser tes réponses et rendre le contenu généré unique et spécifique à son expertise.\n\n";
 
   let totalChars = context.length;
 
@@ -43,13 +43,13 @@ export async function buildVaultResourcesContext(
     const needed = header.length + Math.min(text.length, 2000) + 10;
     if (totalChars + needed > maxChars) {
       // Add a note about truncated resources
-      context += "\n[... autres ressources tronquees pour raison de taille]\n";
+      context += "\n[... autres ressources tronquées pour raison de taille]\n";
       break;
     }
 
     // Truncate individual resource text to 2000 chars
     const truncatedText =
-      text.length > 2000 ? text.slice(0, 2000) + "\n[... tronque]" : text;
+      text.length > 2000 ? text.slice(0, 2000) + "\n[... tronqué]" : text;
 
     context += header + truncatedText + "\n\n";
     totalChars += header.length + truncatedText.length + 2;
@@ -79,18 +79,18 @@ export async function buildFullVaultContext(userId: string): Promise<string> {
   if (!profile) return resourcesContext;
 
   let context = "## PROFIL VAULT DE L'UTILISATEUR\n";
-  if (profile.first_name) context += `- Prenom : ${profile.first_name}\n`;
+  if (profile.first_name) context += `- Prénom : ${profile.first_name}\n`;
   if (profile.situation) context += `- Situation : ${profile.situation}\n`;
   if (profile.parcours) context += `- Parcours : ${profile.parcours}\n`;
   if (profile.experience_level) context += `- Niveau : ${profile.experience_level}\n`;
   if (profile.current_revenue) context += `- Revenu actuel : ${profile.current_revenue} EUR/mois\n`;
   if (profile.target_revenue) context += `- Objectif : ${profile.target_revenue} EUR/mois\n`;
-  if (profile.selected_market) context += `- Marche selectionne : ${profile.selected_market}\n`;
+  if (profile.selected_market) context += `- Marché sélectionné : ${profile.selected_market}\n`;
   if (profile.niche) context += `- Niche : ${profile.niche}\n`;
 
   const skills = profile.vault_skills as { name: string; level: string }[] | null;
   if (skills && Array.isArray(skills) && skills.length > 0) {
-    context += "\n### Competences\n";
+    context += "\n### Compétences\n";
     for (const s of skills) {
       context += `- ${s.name} (${s.level})\n`;
     }

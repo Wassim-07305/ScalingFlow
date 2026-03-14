@@ -99,7 +99,7 @@ export const QUESTIONS: Question[] = [
     id: "situation",
     type: "chips",
     title: "Quelle est ta situation actuelle ?",
-    subtitle: "Selectionne la situation qui te correspond le mieux.",
+    subtitle: "Sélectionne la situation qui te correspond le mieux.",
     field: "situation",
     chips: [
       {
@@ -115,7 +115,7 @@ export const QUESTIONS: Question[] = [
       {
         value: "entrepreneur",
         label: "Entrepreneur",
-        desc: "J'ai deja un business en place.",
+        desc: "J'ai déjà un business en place.",
       },
       {
         value: "etudiant",
@@ -156,14 +156,14 @@ export const QUESTIONS: Question[] = [
     placeholder: "Ex: MBA Marketing, formation Iman Gadzhi, certif Google Ads...",
   },
 
-  // ─── Etape 0.2b — Tes competences ───
+  // ─── Étape 0.2b — Tes compétences ───
 
   // 8 — Vault Skills (6 categories)
   {
     id: "vaultSkills",
     type: "skill-matrix",
-    title: "Evalue tes competences",
-    subtitle: "Pour chaque categorie, selectionne ton niveau actuel. Debutant (je connais les bases) / Intermediaire (je l'ai fait pour moi) / Avance (je l'ai fait pour des clients avec des resultats).",
+    title: "Évalue tes compétences",
+    subtitle: "Pour chaque catégorie, sélectionne ton niveau actuel. Débutant (je connais les bases) / Intermédiaire (je l'ai fait pour moi) / Avancé (je l'ai fait pour des clients avec des résultats).",
     field: "vaultSkills",
   },
 
@@ -201,7 +201,7 @@ export const QUESTIONS: Question[] = [
     type: "textarea",
     title: "Si tu devais enseigner une chose en 1h, ce serait quoi ?",
     field: "expertise_q4",
-    placeholder: "Ex: Comment creer une offre irresistible en partant de zero...",
+    placeholder: "Ex: Comment créer une offre irrésistible en partant de zéro...",
   },
 
   // ─── [Q-0.3.5] Industries / Secteurs ───
@@ -211,7 +211,7 @@ export const QUESTIONS: Question[] = [
     id: "industries",
     type: "chips-multi",
     title: "Quels secteurs / industries connais-tu de l'interieur ?",
-    subtitle: "Selectionne tous ceux ou tu as de l'experience ou de l'appetence.",
+    subtitle: "Sélectionne tous ceux où tu as de l'expérience ou de l'appétence.",
     field: "industries",
     chips: [
       { value: "Fitness / Sport", label: "Fitness / Sport" },
@@ -235,11 +235,11 @@ export const QUESTIONS: Question[] = [
 
   // ─── [Q-0.3.6] Clients payants ───
 
-  // 14 — As-tu deja eu des clients payants ?
+  // 14 — As-tu déjà eu des clients payants ?
   {
     id: "hasPayingClients",
     type: "chips",
-    title: "As-tu deja eu des clients payants ?",
+    title: "As-tu déjà eu des clients payants ?",
     field: "hasPayingClients",
     chips: [
       { value: "oui", label: "Oui" },
@@ -275,25 +275,25 @@ export const QUESTIONS: Question[] = [
     id: "phase1_a1_motivation",
     type: "textarea",
     title: "Qu'est-ce qui te motive a te lancer maintenant ?",
-    subtitle: "Comprendre ta motivation aide l'IA a trouver un marche qui te correspond vraiment.",
+    subtitle: "Comprendre ta motivation aide l'IA à trouver un marché qui te correspond vraiment.",
     field: "phase1_a1_motivation",
-    placeholder: "Ex: Je veux quitter le salariat, avoir plus de liberte, generer des revenus en ligne...",
+    placeholder: "Ex: Je veux quitter le salariat, avoir plus de liberté, générer des revenus en ligne...",
     showWhen: (data) => data.parcours === "A1",
   },
   {
     id: "phase1_a1_quickwin",
     type: "textarea",
     title: "Si tu pouvais obtenir un premier resultat rapide, ce serait quoi ?",
-    subtitle: "Ton premier quick-win ideal — l'IA va orienter l'analyse vers des marches a cycle court.",
+    subtitle: "Ton premier quick-win idéal — l'IA va orienter l'analyse vers des marchés à cycle court.",
     field: "phase1_a1_quickwin",
-    placeholder: "Ex: Signer mon premier client a 500EUR, faire ma premiere vente en ligne...",
+    placeholder: "Ex: Signer mon premier client à 500EUR, faire ma première vente en ligne...",
     showWhen: (data) => data.parcours === "A1",
   },
   {
     id: "phase1_a1_learning",
     type: "textarea",
     title: "Comment tu apprends le mieux ?",
-    subtitle: "Cela influence le type de marche et de modele recommande.",
+    subtitle: "Cela influence le type de marché et de modèle recommandé.",
     field: "phase1_a1_learning",
     placeholder: "Ex: En faisant (learning by doing), en regardant des videos, avec un mentor...",
     showWhen: (data) => data.parcours === "A1",
@@ -304,7 +304,7 @@ export const QUESTIONS: Question[] = [
     id: "phase1_a2_transferable",
     type: "textarea",
     title: "Quelle expertise de ton job actuel pourrait se monetiser ?",
-    subtitle: "Ton savoir-faire metier est ton avantage — l'IA va identifier les marches qui le valorisent.",
+    subtitle: "Ton savoir-faire métier est ton avantage — l'IA va identifier les marchés qui le valorisent.",
     field: "phase1_a2_transferable",
     placeholder: "Ex: Gestion de projet, expertise comptable, connaissance du secteur pharma...",
     showWhen: (data) => data.parcours === "A2",
@@ -322,7 +322,7 @@ export const QUESTIONS: Question[] = [
     id: "phase1_a2_trigger",
     type: "textarea",
     title: "Qu'est-ce qui te ferait franchir le pas ?",
-    subtitle: "Ton declencheur — l'IA oriente vers des marches ou ce seuil est atteignable.",
+    subtitle: "Ton déclencheur — l'IA oriente vers des marchés où ce seuil est atteignable.",
     field: "phase1_a2_trigger",
     placeholder: "Ex: Atteindre 3K/mois en side, avoir 5 clients reguliers, remplacer mon salaire...",
     showWhen: (data) => data.parcours === "A2",
@@ -330,11 +330,11 @@ export const QUESTIONS: Question[] = [
 
   // A3 — Freelance
   {
-    id: "phase1_a3_ideal_offer",
+    id: "phase1_a3_idéal_offer",
     type: "textarea",
-    title: "A quoi ressemblerait ton offre ideale scalable ?",
+    title: "A quoi ressemblerait ton offre idéale scalable ?",
     subtitle: "Passe de la mission ponctuelle au package scalable — l'IA t'aide a trouver le bon angle.",
-    field: "phase1_a3_ideal_offer",
+    field: "phase1_a3_idéal_offer",
     placeholder: "Ex: Un forfait mensuel de gestion Meta Ads, un programme de formation en ligne...",
     showWhen: (data) => data.parcours === "A3",
   },
@@ -342,7 +342,7 @@ export const QUESTIONS: Question[] = [
     id: "phase1_a3_pricing_blocker",
     type: "textarea",
     title: "Qu'est-ce qui t'empeche de facturer plus cher ?",
-    subtitle: "L'IA identifie les marches ou tu peux augmenter tes tarifs naturellement.",
+    subtitle: "L'IA identifie les marchés où tu peux augmenter tes tarifs naturellement.",
     field: "phase1_a3_pricing_blocker",
     placeholder: "Ex: Trop de concurrence, clients PME avec petit budget, pas de specialisation...",
     showWhen: (data) => data.parcours === "A3",
@@ -350,8 +350,8 @@ export const QUESTIONS: Question[] = [
   {
     id: "phase1_a3_acquisition",
     type: "textarea",
-    title: "Quel serait ton systeme d'acquisition ideal ?",
-    subtitle: "L'IA va recommander des marches compatibles avec ton canal prefere.",
+    title: "Quel serait ton systeme d'acquisition idéal ?",
+    subtitle: "L'IA va recommander des marchés compatibles avec ton canal préféré.",
     field: "phase1_a3_acquisition",
     placeholder: "Ex: Publicite Meta, LinkedIn outbound, referral, contenu organique...",
     showWhen: (data) => data.parcours === "A3",
@@ -371,7 +371,7 @@ export const QUESTIONS: Question[] = [
     id: "phase1_b_bottleneck",
     type: "textarea",
     title: "Quel est ton plus gros bottleneck pour croitre ?",
-    subtitle: "L'IA priorise les marches et strategies qui resolvent ce blocage specifique.",
+    subtitle: "L'IA priorise les marchés et stratégies qui résolvent ce blocage spécifique.",
     field: "phase1_b_bottleneck",
     placeholder: "Ex: Pas assez de leads qualifies, taux de closing trop bas, delivery qui ne scale pas...",
     showWhen: (data) => data.parcours === "B",
@@ -379,7 +379,7 @@ export const QUESTIONS: Question[] = [
   {
     id: "phase1_b_metrics",
     type: "textarea",
-    title: "Quelles metriques tu suis deja ?",
+    title: "Quelles métriques tu suis déjà ?",
     subtitle: "L'IA utilise tes KPIs pour affiner ses recommandations de scaling.",
     field: "phase1_b_metrics",
     placeholder: "Ex: CAC 50EUR, LTV 2000EUR, taux de closing 20%, ROAS 3x...",
@@ -391,16 +391,16 @@ export const QUESTIONS: Question[] = [
     id: "phase1_c_reason",
     type: "textarea",
     title: "Pourquoi tu veux pivoter ?",
-    subtitle: "Comprendre ce qui ne marche plus aide l'IA a eviter les memes erreurs sur le nouveau marche.",
+    subtitle: "Comprendre ce qui ne marche plus aide l'IA à éviter les mêmes erreurs sur le nouveau marché.",
     field: "phase1_c_reason",
-    placeholder: "Ex: Marche sature, marges trop faibles, pas de passion, clients toxiques...",
+    placeholder: "Ex: Marché saturé, marges trop faibles, pas de passion, clients toxiques...",
     showWhen: (data) => data.parcours === "C",
   },
   {
     id: "phase1_c_assets",
     type: "textarea",
     title: "Quels assets peux-tu reutiliser ?",
-    subtitle: "L'IA cherche des marches ou tes assets existants te donnent un avantage.",
+    subtitle: "L'IA cherche des marchés où tes assets existants te donnent un avantage.",
     field: "phase1_c_assets",
     placeholder: "Ex: Liste email de 5000 contacts, audience YouTube, expertise en Meta Ads, reseau pro...",
     showWhen: (data) => data.parcours === "C",
@@ -408,7 +408,7 @@ export const QUESTIONS: Question[] = [
   {
     id: "phase1_c_positioning",
     type: "textarea",
-    title: "Quel serait ton positionnement ideal sur le nouveau marche ?",
+    title: "Quel serait ton positionnement idéal sur le nouveau marché ?",
     subtitle: "L'IA va valider cette vision et proposer des angles differenciants.",
     field: "phase1_c_positioning",
     placeholder: "Ex: Expert automatisation IA pour agences, consultant growth pour SaaS B2B...",
@@ -466,7 +466,7 @@ export const QUESTIONS: Question[] = [
   {
     id: "deadline",
     type: "chips",
-    title: "Deadline ideale pour ton premier client ?",
+    title: "Deadline idéale pour ton premier client ?",
     field: "deadline",
     chips: [
       { value: "1_semaine", label: "1 semaine" },
@@ -496,7 +496,7 @@ export const QUESTIONS: Question[] = [
     id: "objectives",
     type: "chips-multi",
     title: "Tes objectifs principaux ?",
-    subtitle: "Selectionne tout ce qui te correspond.",
+    subtitle: "Sélectionne tout ce qui te correspond.",
     field: "objectives",
     chips: [
       { value: "Trouver ma niche", label: "Trouver ma niche" },
@@ -504,7 +504,7 @@ export const QUESTIONS: Question[] = [
         value: "Creer une offre irresistible",
         label: "Creer une offre irresistible",
       },
-      { value: "Generer des leads", label: "Generer des leads" },
+      { value: "Générer des leads", label: "Générer des leads" },
       { value: "Lancer des pubs Meta", label: "Lancer des pubs Meta" },
       {
         value: "Creer un funnel de vente",
@@ -526,6 +526,6 @@ export const QUESTIONS: Question[] = [
     id: "summary",
     type: "summary",
     title: "Resume de ton profil",
-    subtitle: "Verifie tes reponses avant de lancer l'analyse de marche.",
+    subtitle: "Vérifie tes réponses avant de lancer l'analyse de marché.",
   },
 ];

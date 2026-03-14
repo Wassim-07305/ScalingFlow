@@ -56,11 +56,11 @@ export function YouTubeGenerator({ className, initialData }: YouTubeGeneratorPro
           const errData = await response.json();
           if (errData.usage) { setUsageLimited(errData.usage); return; }
         }
-        throw new Error("Erreur lors de la generation");
+        throw new Error("Erreur lors de la génération");
       }
       const data = await response.json();
       setResult(data.result as YouTubeScriptResult);
-      toast.success("Script YouTube genere !");
+      toast.success("Script YouTube généré !");
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Erreur";
       setError(msg);
@@ -82,7 +82,7 @@ export function YouTubeGenerator({ className, initialData }: YouTubeGeneratorPro
   }
 
   if (loading) {
-    return <AILoading text="Generation du script YouTube" className={className} />;
+    return <AILoading text="Génération du script YouTube" className={className} />;
   }
 
   if (!result) {
@@ -102,7 +102,7 @@ export function YouTubeGenerator({ className, initialData }: YouTubeGeneratorPro
           {error && <p className="text-sm text-danger">{error}</p>}
           <Button size="lg" className="w-full" onClick={handleGenerate}>
             <Sparkles className="h-4 w-4 mr-2" />
-            Generer le script YouTube
+            Générer le script YouTube
           </Button>
           <p className="text-sm text-text-secondary text-center">
             Script complet avec plan, thumbnail et description
@@ -118,7 +118,7 @@ export function YouTubeGenerator({ className, initialData }: YouTubeGeneratorPro
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Youtube className="h-5 w-5 text-danger" />
-          <span className="text-sm font-medium text-text-primary">Script genere</span>
+          <span className="text-sm font-medium text-text-primary">Script généré</span>
         </div>
         <div className="flex gap-2">
           <Input
@@ -128,7 +128,7 @@ export function YouTubeGenerator({ className, initialData }: YouTubeGeneratorPro
             className="w-64"
           />
           <Button variant="outline" size="sm" onClick={handleGenerate}>
-            Regenerer
+            Régénérer
           </Button>
         </div>
       </div>
@@ -153,7 +153,7 @@ export function YouTubeGenerator({ className, initialData }: YouTubeGeneratorPro
       <Card>
         <CardContent className="pt-5">
           <div className="flex items-center justify-between mb-2">
-            <p className="text-sm font-medium text-text-primary">Hook (30 premieres secondes)</p>
+            <p className="text-sm font-medium text-text-primary">Hook (30 premières secondes)</p>
             <Button
               variant="ghost"
               size="sm"

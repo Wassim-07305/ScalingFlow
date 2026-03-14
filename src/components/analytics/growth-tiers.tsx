@@ -39,15 +39,15 @@ const GROWTH_TIERS: GrowthTier[] = [
     color: "text-blue-400",
     bgColor: "bg-blue-500/10",
     checkpoints: [
-      "Analyse de marche terminee",
-      "Offre creee et validee",
+      "Analyse de marché terminée",
+      "Offre créée et validée",
       "Funnel de vente en place",
-      "Premieres publicites lancees",
+      "Premieres publicités lancees",
       "Premier client signe",
     ],
     nextActions: [
       "Optimise ton offre avec les retours clients",
-      "Teste 3 angles publicitaires differents",
+      "Teste 3 angles publicitaires différents",
       "Mets en place un suivi des KPIs",
     ],
   },
@@ -62,13 +62,13 @@ const GROWTH_TIERS: GrowthTier[] = [
     checkpoints: [
       "ROAS > 2x stable sur 7 jours",
       "Pipeline de vente regulier (5+ leads/semaine)",
-      "Systeme de contenu en place",
+      "Système de contenu en place",
       "Sequences email automatisees",
-      "3+ temoignages clients",
+      "3+ témoignages clients",
     ],
     nextActions: [
       "Scale tes campagnes gagnantes (budget x2)",
-      "Cree un systeme de referral",
+      "Crée un système de referral",
       "Automatise le suivi prospect",
     ],
   },
@@ -84,7 +84,7 @@ const GROWTH_TIERS: GrowthTier[] = [
       "CPA < 50EUR stable",
       "LTV/CAC > 3x",
       "Multi-canal (Meta + contenu organique)",
-      "Equipe ou assistants en place",
+      "Équipe ou assistants en place",
       "Process de vente documente",
     ],
     nextActions: [
@@ -103,9 +103,9 @@ const GROWTH_TIERS: GrowthTier[] = [
     bgColor: "bg-orange-500/10",
     checkpoints: [
       "Revenue previsible et recurrent",
-      "Equipe de closers/setters en place",
+      "Équipe de closers/setters en place",
       "Multiple offres/produits (front-end + back-end)",
-      "Systeme de contenu organique automatise",
+      "Système de contenu organique automatisé",
       "Processus de recrutement en place",
     ],
     nextActions: [
@@ -123,16 +123,16 @@ const GROWTH_TIERS: GrowthTier[] = [
     color: "text-amber-400",
     bgColor: "bg-amber-500/10",
     checkpoints: [
-      "Systeme qui tourne sans toi (automatisation complete)",
-      "Equipe structuree (ops, marketing, vente)",
+      "Système qui tourne sans toi (automatisation complète)",
+      "Équipe structurée (ops, marketing, vente)",
       "Multiple sources de revenus",
-      "Communaute engagee (1000+ membres)",
+      "Communauté engagée (1000+ membres)",
       "Personal branding fort",
     ],
     nextActions: [
-      "Cree une communaute payante premium",
-      "Explore de nouveaux marches / international",
-      "Envisage levee de fonds ou franchise",
+      "Crée une communauté payante premium",
+      "Explore de nouveaux marchés / international",
+      "Envisage levée de fonds ou franchise",
     ],
   },
 ];
@@ -196,7 +196,7 @@ export function GrowthTiers({
 
           {/* Next actions */}
           <div>
-            <p className="text-xs text-text-muted uppercase tracking-wide mb-2">Actions recommandees</p>
+            <p className="text-xs text-text-muted uppercase tracking-wide mb-2">Actions recommandées</p>
             <div className="space-y-2">
               {currentTier.nextActions.map((action, i) => (
                 <div key={i} className="flex items-start gap-2">

@@ -38,97 +38,97 @@ const ACTIVITY_META: Record<
   { label: string; icon: React.ElementType; color: string; category: string }
 > = {
   "generation.market_analysis": {
-    label: "Analyse de marche generee",
+    label: "Analyse de marché générée",
     icon: Globe,
     color: "text-info",
-    category: "Marche",
+    category: "Marché",
   },
   "generation.persona": {
-    label: "Persona genere",
+    label: "Persona généré",
     icon: Target,
     color: "text-accent",
-    category: "Marche",
+    category: "Marché",
   },
   "generation.competitors": {
     label: "Analyse concurrentielle",
     icon: Globe,
     color: "text-info",
-    category: "Marche",
+    category: "Marché",
   },
   "generation.offer": {
-    label: "Offre creee",
+    label: "Offre créée",
     icon: Package,
     color: "text-accent",
     category: "Offre",
   },
   "generation.category_os": {
-    label: "Positionnement genere",
+    label: "Positionnement généré",
     icon: Package,
     color: "text-accent",
     category: "Offre",
   },
   "generation.brand": {
-    label: "Identite de marque creee",
+    label: "Identité de marque créée",
     icon: Award,
     color: "text-[#A78BFA]",
     category: "Marque",
   },
   "generation.funnel": {
-    label: "Funnel genere",
+    label: "Funnel généré",
     icon: Filter,
     color: "text-info",
     category: "Funnel",
   },
   "generation.ads": {
-    label: "Publicites generees",
+    label: "Publicités générées",
     icon: Megaphone,
     color: "text-accent",
     category: "Ads",
   },
   "generation.content_strategy": {
-    label: "Strategie contenu creee",
+    label: "Stratégie contenu créée",
     icon: PenTool,
     color: "text-[#A78BFA]",
     category: "Contenu",
   },
   "generation.reels": {
-    label: "Scripts Reels generes",
+    label: "Scripts Reels générés",
     icon: PenTool,
     color: "text-[#A78BFA]",
     category: "Contenu",
   },
   "generation.youtube": {
-    label: "Script YouTube genere",
+    label: "Script YouTube généré",
     icon: PenTool,
     color: "text-[#A78BFA]",
     category: "Contenu",
   },
   "generation.vsl": {
-    label: "VSL genere",
+    label: "VSL généré",
     icon: FileText,
     color: "text-info",
     category: "Assets",
   },
   "generation.pitch_deck": {
-    label: "Pitch deck genere",
+    label: "Pitch deck généré",
     icon: FileText,
     color: "text-info",
     category: "Assets",
   },
   "generation.sales_letter": {
-    label: "Lettre de vente generee",
+    label: "Lettre de vente générée",
     icon: FileText,
     color: "text-info",
     category: "Assets",
   },
   "validation.offer": {
-    label: "Offre validee",
+    label: "Offre validée",
     icon: Award,
     color: "text-accent",
     category: "Offre",
   },
   "generation.vault_analysis": {
-    label: "Coffre-fort analyse",
+    label: "Coffre-fort analysé",
     icon: Zap,
     color: "text-accent",
     category: "Vault",
@@ -140,13 +140,13 @@ const ACTIVITY_META: Record<
     category: "Progression",
   },
   "generation.roadmap": {
-    label: "Roadmap generee",
+    label: "Roadmap générée",
     icon: Target,
     color: "text-accent",
     category: "Roadmap",
   },
   "generation.sales": {
-    label: "Script de vente genere",
+    label: "Script de vente généré",
     icon: FileText,
     color: "text-info",
     category: "Vente",
@@ -155,7 +155,7 @@ const ACTIVITY_META: Record<
 
 const CATEGORIES = [
   "Tout",
-  "Marche",
+  "Marché",
   "Offre",
   "Marque",
   "Funnel",
@@ -183,14 +183,14 @@ export default function ActivityLogPage() {
     setLoading(true);
     const supabase = createClient();
 
-    // Construire les filtres par categorie
+    // Construire les filtres par catégorie
     const categoryTypes = category === "Tout"
       ? null
       : Object.entries(ACTIVITY_META)
           .filter(([, meta]) => meta.category === category)
           .map(([type]) => type);
 
-    // Requete count
+    // Requête count
     let countQuery = supabase
       .from("activity_log")
       .select("id", { count: "exact", head: true })
@@ -225,7 +225,7 @@ export default function ActivityLogPage() {
     fetchActivities();
   }, [user, userLoading, fetchActivities]);
 
-  // Reset page quand on change de categorie
+  // Reset page quand on change de catégorie
   useEffect(() => {
     setPage(0);
   }, [category]);
@@ -240,8 +240,8 @@ export default function ActivityLogPage() {
     return (
       <div>
         <PageHeader
-          title="Historique d'activite"
-          description="Retrouve toutes tes actions et generations IA."
+          title="Historique d'activité"
+          description="Retrouve toutes tes actions et générations IA."
         />
         <div className="space-y-3 mt-4">
           {Array.from({ length: 6 }).map((_, i) => (
@@ -266,12 +266,12 @@ export default function ActivityLogPage() {
   return (
     <div>
       <PageHeader
-        title="Historique d'activite"
-        description="Retrouve toutes tes actions et generations IA."
+        title="Historique d'activité"
+        description="Retrouve toutes tes actions et générations IA."
       >
         <div className="flex items-center gap-2 text-sm text-text-muted">
           <Activity className="h-4 w-4" />
-          <span>{total} activite{total > 1 ? "s" : ""}</span>
+          <span>{total} activité{total > 1 ? "s" : ""}</span>
           {totalXp > 0 && (
             <Badge variant="muted" className="ml-1">
               +{totalXp} XP sur cette page
@@ -280,7 +280,7 @@ export default function ActivityLogPage() {
         </div>
       </PageHeader>
 
-      {/* Filtres par categorie */}
+      {/* Filtres par catégorie */}
       <div className="flex flex-wrap gap-2 mb-6">
         {CATEGORIES.map((cat) => (
           <button
@@ -298,15 +298,15 @@ export default function ActivityLogPage() {
         ))}
       </div>
 
-      {/* Liste des activites */}
+      {/* Liste des activités */}
       {activities.length === 0 ? (
         <EmptyState
           icon={Activity}
-          title="Aucune activite"
+          title="Aucune activité"
           description={
             category === "Tout"
-              ? "Ton historique apparaitra ici des ta premiere generation."
-              : `Aucune activite dans la categorie "${category}".`
+              ? "Ton historique apparaîtra ici dès ta première génération."
+              : `Aucune activité dans la catégorie « ${category} ».`
           }
         />
       ) : (

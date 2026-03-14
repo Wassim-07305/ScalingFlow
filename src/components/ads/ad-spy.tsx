@@ -30,7 +30,7 @@ import {
   AlertTriangle,
 } from "lucide-react";
 
-// Types pour les resultats Ad Spy
+// Types pour les résultats Ad Spy
 interface AdCopyPattern {
   type: string;
   example: string;
@@ -132,7 +132,7 @@ export function AdSpy({ className }: AdSpyProps) {
 
       const data = await response.json();
       setResult(data.result);
-      toast.success("Analyse terminee !");
+      toast.success("Analyse terminée !");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Erreur lors de l'analyse");
     } finally {
@@ -142,11 +142,11 @@ export function AdSpy({ className }: AdSpyProps) {
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
-    toast.success("Copie dans le presse-papiers");
+    toast.success("Copié dans le presse-papiers");
   };
 
   if (loading) {
-    return <AILoading text="Analyse des publicites concurrentes" className={className} />;
+    return <AILoading text="Analyse des publicités concurrentes" className={className} />;
   }
 
   // Formulaire
@@ -163,7 +163,7 @@ export function AdSpy({ className }: AdSpyProps) {
                 Ad Spy — Veille Concurrentielle
               </h3>
               <p className="text-sm text-text-secondary">
-                Analyse la strategie publicitaire de tes concurrents grace a l&apos;IA
+                Analyse la stratégie publicitaire de tes concurrents grâce à l&apos;IA
               </p>
             </div>
           </div>
@@ -233,7 +233,7 @@ export function AdSpy({ className }: AdSpyProps) {
   // Resultats
   return (
     <div className={cn("space-y-6", className)}>
-      {/* Header + Bouton regenerer */}
+      {/* Header + Bouton régénérer */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Eye className="h-5 w-5 text-accent" />
@@ -314,7 +314,7 @@ export function AdSpy({ className }: AdSpyProps) {
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
             <Lightbulb className="h-4 w-4 text-accent" />
-            Frameworks de hooks detectes
+            Frameworks de hooks détectés
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -473,7 +473,7 @@ export function AdSpy({ className }: AdSpyProps) {
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
             <Lightbulb className="h-4 w-4 text-accent" />
-            Opportunites a saisir
+            Opportunités à saisir
           </CardTitle>
         </CardHeader>
         <CardContent>

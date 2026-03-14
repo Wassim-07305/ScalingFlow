@@ -67,7 +67,7 @@ export function SettingScriptGenerator({
           const errData = await response.json();
           if (errData.usage) { setUsageLimited(errData.usage); return; }
         }
-        throw new Error("Erreur lors de la generation");
+        throw new Error("Erreur lors de la génération");
       }
       const data = await response.json();
       const raw = data.ai_raw_response || data;
@@ -98,7 +98,7 @@ export function SettingScriptGenerator({
         {error && <p className="text-sm text-danger mb-4">{error}</p>}
         <Button size="lg" onClick={handleGenerate}>
           <Sparkles className="h-4 w-4 mr-2" />
-          Generer le script de setting
+          Générer le script de setting
         </Button>
         <p className="text-sm text-text-secondary mt-2">
           Script complet pour qualifier et booker tes prospects

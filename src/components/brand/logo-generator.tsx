@@ -25,7 +25,7 @@ export function LogoGenerator({ concept, brandName, palette }: LogoGeneratorProp
 
   const generate = async () => {
     if (!concept) {
-      toast.error("Genere d'abord une identite de marque");
+      toast.error("Génère d'abord une identité de marque");
       return;
     }
 
@@ -58,9 +58,9 @@ export function LogoGenerator({ concept, brandName, palette }: LogoGeneratorProp
           url,
         })));
       }
-      toast.success("Logos generes !");
+      toast.success("Logos générés !");
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Erreur lors de la generation");
+      toast.error(e instanceof Error ? e.message : "Erreur lors de la génération");
     } finally {
       setLoading(false);
     }
@@ -95,7 +95,7 @@ export function LogoGenerator({ concept, brandName, palette }: LogoGeneratorProp
             </>
           ) : (
             <p className="text-sm text-text-secondary text-center py-4">
-              Genere d&apos;abord une identite de marque pour obtenir un concept de logo.
+              Génère d&apos;abord une identité de marque pour obtenir un concept de logo.
             </p>
           )}
 
@@ -103,17 +103,17 @@ export function LogoGenerator({ concept, brandName, palette }: LogoGeneratorProp
             {loading ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                Generation en cours (60-90s)...
+                Génération en cours (60-90s)...
               </>
             ) : logos.length > 0 ? (
               <>
                 <RefreshCw className="h-4 w-4 mr-2" />
-                Regenerer les logos
+                Régénérer les logos
               </>
             ) : (
               <>
                 <Hexagon className="h-4 w-4 mr-2" />
-                Generer 3 variations (principal, icone, monochrome)
+                Générer 3 variations (principal, icône, monochrome)
               </>
             )}
           </Button>
@@ -157,7 +157,7 @@ export function LogoGenerator({ concept, brandName, palette }: LogoGeneratorProp
               ))}
             </div>
             <p className="text-xs text-text-muted text-center mt-4">
-              Les logos sont generes par IA (Flux) en PNG 1000x1000. Utilise-les comme base pour un designer professionnel.
+              Les logos sont générés par IA (Flux) en PNG 1000x1000. Utilise-les comme base pour un designer professionnel.
             </p>
           </CardContent>
         </Card>

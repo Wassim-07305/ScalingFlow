@@ -31,7 +31,7 @@ export function CopyExportBar({
     try {
       await navigator.clipboard.writeText(copyContent);
       setCopied(true);
-      toast.success("Copie dans le presse-papiers");
+      toast.success("Copié dans le presse-papiers");
       setTimeout(() => setCopied(false), 2000);
     } catch {
       toast.error("Impossible de copier");

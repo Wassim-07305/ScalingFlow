@@ -153,7 +153,7 @@ export function LeaderboardTable({ className }: LeaderboardTableProps) {
     3: "text-amber-600",
   };
 
-  // Etat vide : aucune donnee dans le classement
+  // État vide : aucune donnée dans le classement
   if (!loading && entries.length === 0) {
     return (
       <Card className={className}>

@@ -18,7 +18,7 @@ export function StyleGuide({ direction, className }: StyleGuideProps) {
       <div className={cn("text-center py-12", className)}>
         <Palette className="h-12 w-12 text-text-muted mx-auto mb-3" />
         <p className="text-text-secondary">
-          Aucune direction artistique generee. Lancez la generation pour obtenir un guide de style.
+          Aucune direction artistique générée. Lancez la génération pour obtenir un guide de style.
         </p>
       </div>
     );

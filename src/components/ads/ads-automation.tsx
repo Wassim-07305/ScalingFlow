@@ -131,7 +131,7 @@ export function AdsAutomation() {
         title: "Mettre en pause les campagnes deficitaires",
         description: `ROAS de ${health.roas7d.toFixed(2)}x — tu perds de l'argent. Pause les campagnes et revois tes creatives.`,
         severity: "danger",
-        impact: `Economie estimee : ${(health.spend7d * 0.3).toFixed(0)}EUR/semaine`,
+        impact: `Économie estimée : ${(health.spend7d * 0.3).toFixed(0)}EUR/semaine`,
       });
     }
 
@@ -163,7 +163,7 @@ export function AdsAutomation() {
         id: "improve_ctr",
         type: "refresh",
         title: "CTR faible — hooks peu performants",
-        description: `CTR de ${health.ctr7d.toFixed(2)}% (objectif > 1.5%). Tes hooks n'accrochent pas. Genere de nouvelles variations.`,
+        description: `CTR de ${health.ctr7d.toFixed(2)}% (objectif > 1.5%). Tes hooks n'accrochent pas. Généré de nouvelles variations.`,
         severity: "warning",
         impact: "Objectif : CTR > 1.5%",
       });
@@ -174,10 +174,10 @@ export function AdsAutomation() {
       list.push({
         id: "creative_fatigue",
         type: "refresh",
-        title: "Fatigue creative detectee",
-        description: "Les performances baissent — signe de fatigue creative. Lance un nouveau batch de creatives avec des angles differents.",
+        title: "Fatigue créative détectée",
+        description: "Les performances baissent — signe de fatigue creative. Lance un nouveau batch de créatives avec des angles differents.",
         severity: "warning",
-        impact: "Rotation recommandee toutes les 2-3 semaines",
+        impact: "Rotation recommandée toutes les 2-3 semaines",
       });
     }
 
@@ -186,7 +186,7 @@ export function AdsAutomation() {
       list.push({
         id: "scale_budget",
         type: "scale",
-        title: "Pret a scaler — augmente le budget",
+        title: "Prêt à scaler — augmente le budget",
         description: `ROAS de ${health.roas7d.toFixed(2)}x en hausse. Augmente le budget de 20-30% par palier.`,
         severity: "success",
         impact: `Budget suggere : +${(health.spend7d * 0.2 / 7).toFixed(0)}EUR/jour`,
@@ -209,9 +209,9 @@ export function AdsAutomation() {
         id: "all_good",
         type: "test",
         title: "Tout est stable",
-        description: "Tes campagnes tournent correctement. Continue a monitorer et teste de nouvelles variations regulierement.",
+        description: "Tes campagnes tournent correctement. Continue à monitorer et teste de nouvelles variations régulièrement.",
         severity: "info",
-        impact: "Recommandation : tester 2-3 nouvelles creatives par semaine",
+        impact: "Recommandation : tester 2-3 nouvelles créatives par semaine",
       });
     }
 
@@ -232,7 +232,7 @@ export function AdsAutomation() {
           messages: [
             {
               role: "user",
-              content: `Analyse ces metriques publicitaires des 7 derniers jours et donne-moi 3 actions concretes a faire aujourd'hui :
+              content: `Analyse ces métriques publicitaires des 7 derniers jours et donne-moi 3 actions concrètes à faire aujourd'hui :
 - ROAS : ${health.roas7d.toFixed(2)}x
 - CTR : ${health.ctr7d.toFixed(2)}%
 - CPA : ${health.cpa7d.toFixed(0)}EUR
@@ -274,7 +274,7 @@ Reponds en francais, format bullet points, concis et actionnable.`,
       <div className="text-center py-16">
         <BarChart3 className="h-12 w-12 text-text-muted mx-auto mb-3" />
         <p className="text-text-secondary text-sm">
-          Aucune donnee publicitaire disponible. Synchronise tes campagnes Meta Ads pour activer le monitoring automatique.
+          Aucune donnée publicitaire disponible. Synchronise tes campagnes Meta Ads pour activer le monitoring automatique.
         </p>
       </div>
     );
@@ -347,7 +347,7 @@ Reponds en francais, format bullet points, concis et actionnable.`,
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Zap className="h-5 w-5 text-accent" />
-            Actions recommandees ({actions.length})
+            Actions recommandées ({actions.length})
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
@@ -416,7 +416,7 @@ Reponds en francais, format bullet points, concis et actionnable.`,
                 Obtenir des recommandations IA
               </Button>
               <p className="text-xs text-text-muted mt-2">
-                L&apos;agent IA Ads analysera tes metriques et donnera des actions concretes.
+                L&apos;agent IA Ads analysera tes métriques et donnera des actions concrètes.
               </p>
             </div>
           )}

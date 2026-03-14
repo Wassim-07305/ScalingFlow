@@ -104,11 +104,11 @@ function CompetitorCard({ competitor }: { competitor: Competitor }) {
           </div>
         </div>
 
-        {/* Differenciation */}
+        {/* Différenciation */}
         <div className="space-y-1.5">
           <h4 className="text-xs font-medium text-text-muted uppercase tracking-wider flex items-center gap-1.5">
             <Target className="h-3 w-3 text-info" />
-            Differenciation
+            Différenciation
           </h4>
           <p className="text-sm text-text-secondary">{competitor.differentiation}</p>
         </div>
@@ -248,13 +248,13 @@ export function CompetitorGrid({
       {/* Synthese strategique */}
       {(marketGaps || positioningOpportunities || recommendedDifferentiation) && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Lacunes du marche */}
+          {/* Lacunes du marché */}
           {marketGaps && marketGaps.length > 0 && (
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-base">
                   <Lightbulb className="h-4 w-4 text-warning" />
-                  Lacunes du marche
+                  Lacunes du marché
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -294,13 +294,13 @@ export function CompetitorGrid({
         </div>
       )}
 
-      {/* Differenciation recommandee */}
+      {/* Différenciation recommandée */}
       {recommendedDifferentiation && (
         <Card className="border-accent/30 bg-accent/5">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base">
               <Target className="h-4 w-4 text-accent" />
-              Differenciation recommandee
+              Différenciation recommandée
             </CardTitle>
           </CardHeader>
           <CardContent>

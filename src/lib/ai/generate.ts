@@ -111,7 +111,7 @@ export async function generateText({
 
   const content = data.choices[0]?.message?.content;
   if (!content) {
-    throw new Error("Pas de reponse de l'IA");
+    throw new Error("Pas de réponse de l'IA");
   }
   return content;
 }
@@ -126,7 +126,7 @@ export async function generateJSON<T>({
     prompt,
     systemPrompt:
       (systemPrompt || "") +
-      "\n\nIMPORTANT: Reponds UNIQUEMENT en JSON valide, sans markdown, sans ```json, sans texte autour.",
+      "\n\nIMPORTANT: Réponds UNIQUEMENT en JSON valide, sans markdown, sans ```json, sans texte autour.",
     maxTokens,
     temperature,
   });

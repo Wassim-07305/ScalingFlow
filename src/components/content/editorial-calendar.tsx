@@ -100,12 +100,12 @@ export function EditorialCalendar({ className, initialData }: EditorialCalendarP
           const errData = await response.json();
           if (errData.usage) { setUsageLimited(errData.usage); return; }
         }
-        throw new Error("Erreur lors de la generation");
+        throw new Error("Erreur lors de la génération");
       }
       const data = await response.json();
       const result = data.result as ContentStrategyResult;
       setItems(result.calendrier || []);
-      toast.success("Plan editorial genere !");
+      toast.success("Plan editorial généré !");
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Erreur";
       setError(msg);
@@ -124,7 +124,7 @@ export function EditorialCalendar({ className, initialData }: EditorialCalendarP
   }
 
   if (loading) {
-    return <AILoading text="Generation du plan editorial" className={className} />;
+    return <AILoading text="Génération du plan editorial" className={className} />;
   }
 
   if (items.length === 0) {
@@ -133,7 +133,7 @@ export function EditorialCalendar({ className, initialData }: EditorialCalendarP
         {error && <p className="text-sm text-danger mb-4">{error}</p>}
         <Button size="lg" onClick={handleGenerate}>
           <Sparkles className="h-4 w-4 mr-2" />
-          Generer le plan editorial 30 jours
+          Générer le plan editorial 30 jours
         </Button>
         <p className="text-sm text-text-secondary mt-2">
           Un contenu par jour pendant 30 jours
@@ -309,7 +309,7 @@ export function EditorialCalendar({ className, initialData }: EditorialCalendarP
 
       <div className="text-center pt-4">
         <Button variant="outline" size="sm" onClick={handleGenerate}>
-          Regenerer le plan
+          Régénérer le plan
         </Button>
       </div>
     </div>

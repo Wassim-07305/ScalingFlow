@@ -18,7 +18,7 @@ import {
 import { exportToPDF } from "@/lib/utils/export-pdf";
 
 const PERSONA_TABS = [
-  { key: "bio", label: "Bio & Journee", icon: BookOpen },
+  { key: "bio", label: "Bio & Journée", icon: BookOpen },
   { key: "demo", label: "Demographique", icon: User },
   { key: "psycho", label: "Psychographique", icon: Brain },
   { key: "langage", label: "Langage", icon: MessageCircle },
@@ -53,12 +53,12 @@ function buildPersonaPDFContent(persona: PersonaForgeResult): string {
 
   const l = persona.niveau_3_langage;
   if (l) {
-    text += `=== LANGAGE ===\nExpressions : ${l.expressions_courantes?.join(" | ")}\nMots-cles : ${l.mots_cles_recherche?.join(", ")}\nPhrases douleur : ${l.phrases_douleur?.join(" | ")}\nPhrases desir : ${l.phrases_desir?.join(" | ")}\nTon : ${l.ton_communication}\n\n`;
+    text += `=== LANGAGE ===\nExpressions : ${l.expressions_courantes?.join(" | ")}\nMots-clés : ${l.mots_cles_recherche?.join(", ")}\nPhrases douleur : ${l.phrases_douleur?.join(" | ")}\nPhrases désir : ${l.phrases_desir?.join(" | ")}\nTon : ${l.ton_communication}\n\n`;
   }
 
   const pa = persona.niveau_4_parcours;
   if (pa) {
-    text += `=== PARCOURS D'ACHAT ===\nDeclencheurs : ${pa.declencheurs_achat?.join(", ")}\nSources info : ${pa.sources_info?.join(", ")}\nCriteres : ${pa.criteres_decision?.join(", ")}\nObstacles : ${pa.obstacles_achat?.join(", ")}\nTimeline : ${pa.timeline_decision}\nInfluenceurs : ${pa.influenceurs?.join(", ")}`;
+    text += `=== PARCOURS D'ACHAT ===\nDéclencheurs : ${pa.declencheurs_achat?.join(", ")}\nSources info : ${pa.sources_info?.join(", ")}\nCritères : ${pa.criteres_decision?.join(", ")}\nObstacles : ${pa.obstacles_achat?.join(", ")}\nTimeline : ${pa.timeline_decision}\nInfluenceurs : ${pa.influenceurs?.join(", ")}`;
   }
 
   return text;
@@ -150,7 +150,7 @@ export function PersonaDisplay({ persona }: PersonaDisplayProps) {
         ))}
       </div>
 
-      {/* Bio, Journee type & Canaux medias */}
+      {/* Bio, Journée type & Canaux medias */}
       {activeTab === "bio" && (
         <div className="space-y-4">
           {persona.bio_fictive && (
@@ -172,7 +172,7 @@ export function PersonaDisplay({ persona }: PersonaDisplayProps) {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Route className="h-4 w-4 text-accent" />
-                  Journee type
+                  Journée type
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -242,7 +242,7 @@ export function PersonaDisplay({ persona }: PersonaDisplayProps) {
             <SectionBlock title="Frustrations">
               <TagList items={persona.niveau_2_psycho.frustrations ?? []} variant="yellow" />
             </SectionBlock>
-            <SectionBlock title="Objections a l'achat">
+            <SectionBlock title="Objections à l'achat">
               <TagList items={persona.niveau_2_psycho.objections_achat ?? []} variant="purple" />
             </SectionBlock>
             <SectionBlock title="Croyances limitantes">
@@ -271,7 +271,7 @@ export function PersonaDisplay({ persona }: PersonaDisplayProps) {
                 ))}
               </div>
             </SectionBlock>
-            <SectionBlock title="Mots-cles de recherche">
+            <SectionBlock title="Mots-clés de recherche">
               <TagList items={persona.niveau_3_langage.mots_cles_recherche ?? []} variant="blue" />
             </SectionBlock>
             <SectionBlock title="Phrases de douleur (verbatim)">
@@ -311,16 +311,16 @@ export function PersonaDisplay({ persona }: PersonaDisplayProps) {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-5">
-            <SectionBlock title="Declencheurs d'achat">
+            <SectionBlock title="Déclencheurs d'achat">
               <TagList items={persona.niveau_4_parcours.declencheurs_achat ?? []} variant="default" />
             </SectionBlock>
             <SectionBlock title="Sources d'information">
               <TagList items={persona.niveau_4_parcours.sources_info ?? []} variant="blue" />
             </SectionBlock>
-            <SectionBlock title="Criteres de decision">
+            <SectionBlock title="Critères de decision">
               <TagList items={persona.niveau_4_parcours.criteres_decision ?? []} variant="purple" />
             </SectionBlock>
-            <SectionBlock title="Obstacles a l'achat">
+            <SectionBlock title="Obstacles à l'achat">
               <TagList items={persona.niveau_4_parcours.obstacles_achat ?? []} variant="red" />
             </SectionBlock>
             <SectionBlock title="Timeline de decision">

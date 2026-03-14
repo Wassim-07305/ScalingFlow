@@ -21,14 +21,14 @@ export async function POST(req: NextRequest) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Non autorise" }, { status: 401 });
+      return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
     }
 
     // Rate limiting
     const rl = await rateLimit(user.id, "generate-persona", { limit: 5, windowSeconds: 60 });
     if (!rl.allowed) {
       return NextResponse.json(
-        { error: "Trop de requetes. Reessaie dans quelques secondes." },
+        { error: "Trop de requêtes. Réessaie dans quelques secondes." },
         { status: 429 }
       );
     }
@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
     const usage = await checkAIUsage(user.id);
     if (!usage.allowed) {
       return NextResponse.json(
-        { error: "Limite de generations IA atteinte", usage },
+        { error: "Limite de générations IA atteinte", usage },
         { status: 403 }
       );
     }
@@ -54,7 +54,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Recuperer l'analyse de marche
+    // Récupérer l'analyse de marché
     const { data: marketAnalysis, error: maError } = await supabase
       .from("market_analyses")
       .select("*")
@@ -64,12 +64,12 @@ export async function POST(req: NextRequest) {
 
     if (maError || !marketAnalysis) {
       return NextResponse.json(
-        { error: "Analyse de marche introuvable" },
+        { error: "Analyse de marché introuvable" },
         { status: 404 }
       );
     }
 
-    // Recuperer le profil utilisateur pour le contexte vault
+    // Récupérer le profil utilisateur pour le contexte vault
     const { data: profile } = await supabase
       .from("profiles")
       .select("skills, vault_skills, expertise_answers, situation, parcours")
@@ -120,7 +120,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(result);
   } catch (error) {
     return NextResponse.json(
-      { error: "Erreur lors de la generation du persona" },
+      { error: "Erreur lors de la génération du persona" },
       { status: 500 }
     );
   }

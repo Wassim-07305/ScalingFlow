@@ -49,7 +49,7 @@ export function PitchDeckGenerator({ className, initialData }: PitchDeckGenerato
           const errData = await response.json();
           if (errData.usage) { setUsageLimited(errData.usage); return; }
         }
-        throw new Error("Erreur lors de la generation");
+        throw new Error("Erreur lors de la génération");
       }
       const data = await response.json();
       const raw = data.ai_raw_response || data;
@@ -77,7 +77,7 @@ export function PitchDeckGenerator({ className, initialData }: PitchDeckGenerato
         {error && <p className="text-sm text-danger mb-4">{error}</p>}
         <Button size="lg" onClick={handleGenerate}>
           <Sparkles className="h-4 w-4 mr-2" />
-          Generer le pitch deck
+          Générer le pitch deck
         </Button>
         <p className="text-sm text-text-secondary mt-2">
           11 slides professionnelles avec notes speaker
@@ -181,7 +181,7 @@ export function PitchDeckGenerator({ className, initialData }: PitchDeckGenerato
               onClick={() => setActiveSlide((p) => p - 1)}
             >
               <ChevronLeft className="h-4 w-4 mr-1" />
-              Precedent
+              Précédent
             </Button>
             <Button
               variant="ghost"

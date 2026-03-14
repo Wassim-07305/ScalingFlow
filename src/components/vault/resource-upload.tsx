@@ -87,7 +87,7 @@ export function ResourceUpload({ onUploadComplete }: ResourceUploadProps) {
           }
 
           const data = await res.json();
-          toast.success(`${file.name} uploade avec succes`);
+          toast.success(`${file.name} uploade avec succès`);
           onUploadComplete?.(data.resource);
         } catch (err) {
           toast.error(
@@ -131,7 +131,7 @@ export function ResourceUpload({ onUploadComplete }: ResourceUploadProps) {
       }
 
       const data = await res.json();
-      toast.success("Ressource ajoutee");
+      toast.success("Ressource ajoutée");
       onUploadComplete?.(data.resource);
       setUrlInput("");
       setUrlTitle("");

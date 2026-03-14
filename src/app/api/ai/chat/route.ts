@@ -31,7 +31,7 @@ async function fetchAgentContext(
       .single();
     if (data) {
       blocks.push(
-        `## Analyse de marche\n- Marche : ${data.market_name || "N/A"}\n- Audience cible : ${data.target_audience || "N/A"}\n- Douleurs : ${data.pain_points || "N/A"}\n- Niveau de sophistication : ${data.sophistication_level || "N/A"}\n- Taille du marche : ${data.market_size || "N/A"}`
+        `## Analyse de marché\n- Marche : ${data.market_name || "N/A"}\n- Audience cible : ${data.target_audience || "N/A"}\n- Douleurs : ${data.pain_points || "N/A"}\n- Niveau de sophistication : ${data.sophistication_level || "N/A"}\n- Taille du marché : ${data.market_size || "N/A"}`
       );
     }
   }
@@ -45,7 +45,7 @@ async function fetchAgentContext(
       .limit(1)
       .single();
     if (data?.competitors) {
-      blocks.push(`## Concurrents identifies\n${JSON.stringify(data.competitors, null, 2)}`);
+      blocks.push(`## Concurrents identifiés\n${JSON.stringify(data.competitors, null, 2)}`);
     }
   }
 
@@ -75,7 +75,7 @@ async function fetchAgentContext(
       const adLines = data.map(
         (a, i) => `${i + 1}. [${a.ad_type || "ad"}] Hook: "${a.hook || "N/A"}" — Audience: ${a.target_audience || "N/A"}`
       );
-      blocks.push(`## Dernieres publicites\n${adLines.join("\n")}`);
+      blocks.push(`## Dernières publicités\n${adLines.join("\n")}`);
     }
   }
 
@@ -90,7 +90,7 @@ async function fetchAgentContext(
       const contentLines = data.map(
         (c, i) => `${i + 1}. [${c.platform || ""}] ${c.content_type || ""} — ${c.title || "Sans titre"}`
       );
-      blocks.push(`## Derniers contenus crees\n${contentLines.join("\n")}`);
+      blocks.push(`## Derniers contenus créés\n${contentLines.join("\n")}`);
     }
   }
 
@@ -105,7 +105,7 @@ export async function POST(req: NextRequest) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return new Response(JSON.stringify({ error: "Non autorise" }), {
+      return new Response(JSON.stringify({ error: "Non autorisé" }), {
         status: 401,
       });
     }
@@ -114,7 +114,7 @@ export async function POST(req: NextRequest) {
     const rl = await rateLimit(user.id, "chat", { limit: 10, windowSeconds: 60 });
     if (!rl.allowed) {
       return NextResponse.json(
-        { error: "Trop de requetes. Reessaie dans quelques secondes." },
+        { error: "Trop de requêtes. Réessaie dans quelques secondes." },
         { status: 429 }
       );
     }
@@ -123,7 +123,7 @@ export async function POST(req: NextRequest) {
     const usage = await checkAIUsage(user.id);
     if (!usage.allowed) {
       return NextResponse.json(
-        { error: "Limite de generations IA atteinte", usage },
+        { error: "Limite de générations IA atteinte", usage },
         { status: 403 }
       );
     }
@@ -159,7 +159,7 @@ export async function POST(req: NextRequest) {
     ]);
 
     const offerBlock = latestOffer
-      ? `\n## Derniere offre\n- Nom : ${latestOffer.offer_name}\n- Positionnement : ${latestOffer.positioning || "Non defini"}\n- Mecanisme unique : ${latestOffer.unique_mechanism || "Non defini"}\n`
+      ? `\n## Dernière offre\n- Nom : ${latestOffer.offer_name}\n- Positionnement : ${latestOffer.positioning || "Non défini"}\n- Mecanisme unique : ${latestOffer.unique_mechanism || "Non défini"}\n`
       : "";
 
     const fullSystemPrompt = `${agent.systemPrompt}\n\n${vaultContext}${offerBlock}${agentContext}${ragContext}`;
@@ -213,7 +213,7 @@ export async function POST(req: NextRequest) {
     });
   } catch (error) {
     return new Response(
-      JSON.stringify({ error: "Erreur lors de la generation" }),
+      JSON.stringify({ error: "Erreur lors de la génération" }),
       { status: 500 }
     );
   }

@@ -2,8 +2,8 @@
  * Parcours constants — Single source of truth for all parcours definitions.
  * Aligned with CDC ScalingFlow (March 2026).
  *
- * A1 = Je pars de zero (no business, no expertise)
- * A2 = Salarie en reconversion
+ * A1 = Je pars de zéro (no business, no expertise)
+ * A2 = Salarié en reconversion
  * A3 = Freelance who wants to scale/package
  * B  = Entrepreneur with existing business to scale
  * C  = Entrepreneur pivoting to a new market
@@ -25,58 +25,58 @@ export interface ParcoursDefinition {
 export const PARCOURS: Record<ParcoursId, ParcoursDefinition> = {
   A1: {
     id: "A1",
-    label: "Partir de Zero",
-    shortLabel: "Zero",
+    label: "Partir de Zéro",
+    shortLabel: "Zéro",
     description:
-      "Tu n'as pas encore de business ni d'expertise claire. L'IA te guide de zero jusqu'a ta premiere vente.",
+      "Tu n'as pas encore de business ni d'expertise claire. L'IA te guide de zéro jusqu'à ta première vente.",
     icon: "Rocket",
-    timeline: "0 a 90 jours",
+    timeline: "0 à 90 jours",
     aiContext:
-      "Parcours A1 — Zero : L'utilisateur part de zero sans business ni expertise claire. Il doit identifier un marche viable base sur ses competences latentes, creer une offre simple et obtenir ses premiers clients. Privilegier des marches accessibles avec des cycles de vente courts et un ticket d'entree bas.",
+      "Parcours A1 — Zéro : L'utilisateur part de zéro sans business ni expertise claire. Il doit identifier un marché viable basé sur ses compétences latentes, créer une offre simple et obtenir ses premiers clients. Privilégier des marchés accessibles avec des cycles de vente courts et un ticket d'entrée bas.",
   },
   A2: {
     id: "A2",
-    label: "Salarie en Reconversion",
+    label: "Salarié en Reconversion",
     shortLabel: "Reconversion",
     description:
-      "Tu es en poste et tu veux te lancer. L'IA identifie ton expertise metier et la transforme en offre.",
+      "Tu es en poste et tu veux te lancer. L'IA identifie ton expertise métier et la transforme en offre.",
     icon: "Briefcase",
-    timeline: "30 a 120 jours",
+    timeline: "30 à 120 jours",
     aiContext:
-      "Parcours A2 — Reconversion : L'utilisateur est salarie et veut se lancer comme prestataire. Il a une expertise sectorielle forte mais peu d'experience entrepreneuriale. Privilegier la productisation de son savoir-faire metier, les marches B2B lies a son secteur, et une transition progressive.",
+      "Parcours A2 — Reconversion : L'utilisateur est salarié et veut se lancer comme prestataire. Il a une expertise sectorielle forte mais peu d'expérience entrepreneuriale. Privilégier la productisation de son savoir-faire métier, les marchés B2B liés à son secteur, et une transition progressive.",
   },
   A3: {
     id: "A3",
     label: "Freelance",
     shortLabel: "Freelance",
     description:
-      "Tu es independant et tu veux packager, scaler ou pivoter tes services.",
+      "Tu es indépendant et tu veux packager, scaler ou pivoter tes services.",
     icon: "User",
-    timeline: "15 a 60 jours",
+    timeline: "15 à 60 jours",
     aiContext:
-      "Parcours A3 — Freelance : L'utilisateur est freelance/prestataire avec des clients mission par mission. Il veut packager ses services en offre scalable, systematiser son acquisition et scaler. Privilegier l'extension de son marche actuel, la productisation et un funnel de vente systematise.",
+      "Parcours A3 — Freelance : L'utilisateur est freelance/prestataire avec des clients mission par mission. Il veut packager ses services en offre scalable, systematiser son acquisition et scaler. Privilégier l'extension de son marché actuel, la productisation et un funnel de vente systématisé.",
   },
   B: {
     id: "B",
     label: "Scaler mon Business",
     shortLabel: "Scaling",
     description:
-      "Tu as deja une offre, des clients et du CA. Tu veux optimiser et passer au niveau superieur (5K-50K+/mois).",
+      "Tu as déjà une offre, des clients et du CA. Tu veux optimiser et passer au niveau supérieur (5K-50K+/mois).",
     icon: "TrendingUp",
-    timeline: "30 a 90 jours",
+    timeline: "30 à 90 jours",
     aiContext:
-      "Parcours B — Scaling : L'utilisateur a deja un business avec une offre, des clients et du CA. Il veut optimiser son funnel, ameliorer son ROAS, augmenter son panier moyen et scaler. Privilegier l'analyse de ses performances existantes, l'optimisation des conversions, et le scaling publicitaire progressif.",
+      "Parcours B — Scaling : L'utilisateur a déjà un business avec une offre, des clients et du CA. Il veut optimiser son funnel, améliorer son ROAS, augmenter son panier moyen et scaler. Privilégier l'analyse de ses performances existantes, l'optimisation des conversions, et le scaling publicitaire progressif.",
   },
   C: {
     id: "C",
     label: "Pivoter",
     shortLabel: "Pivot",
     description:
-      "Tu veux changer de marche ou repositionner ton offre tout en gardant ton experience business.",
+      "Tu veux changer de marché ou repositionner ton offre tout en gardant ton expérience business.",
     icon: "RefreshCw",
-    timeline: "30 a 90 jours",
+    timeline: "30 à 90 jours",
     aiContext:
-      "Parcours C — Pivot : L'utilisateur a de l'experience business mais veut changer de marche ou repositionner son offre. Mix entre nouveau marche (exploration) et expertise existante (leverage). Privilegier l'exploration de nouveaux marches, la reutilisation d'assets et d'audience existants, et une transition progressive sans perte de revenus.",
+      "Parcours C — Pivot : L'utilisateur a de l'expérience business mais veut changer de marché ou repositionner son offre. Mix entre nouveau marché (exploration) et expertise existante (leverage). Privilégier l'exploration de nouveaux marchés, la réutilisation d'assets et d'audience existants, et une transition progressive sans perte de revenus.",
   },
 };
 
@@ -101,17 +101,17 @@ export function recommendParcours(data: {
   const objectives = data.objectives || [];
   const hasClients = (data.situationDetails?.clients_count as number) > 0;
 
-  // A1 — Zero (etudiant, sans_emploi, or explicit zero)
+  // A1 — Zéro (étudiant, sans_emploi, or explicit zero)
   {
     let score = 0;
     let reason = "";
     if (situation === "zero" || situation === "etudiant" || situation === "sans_emploi") {
       score += 60;
-      reason = "Tu pars de zero — ce parcours est fait pour toi.";
+      reason = "Tu pars de zéro — ce parcours est fait pour toi.";
     }
     if (level === "beginner") score += 20;
     if (revenue === 0) score += 20;
-    scores.push({ id: "A1", score, reason: reason || "Tu debutes, ce parcours peut t'aider." });
+    scores.push({ id: "A1", score, reason: reason || "Tu débutes, ce parcours peut t'aider." });
   }
 
   // A2 — Reconversion (salarie or reconversion)
@@ -120,7 +120,7 @@ export function recommendParcours(data: {
     let reason = "";
     if (situation === "salarie" || situation === "reconversion") {
       score += 60;
-      reason = "Ce parcours transforme ton expertise metier en offre.";
+      reason = "Ce parcours transforme ton expertise métier en offre.";
     }
     if (level === "beginner" || level === "intermediate") score += 15;
     if (revenue === 0) score += 15;
@@ -134,7 +134,7 @@ export function recommendParcours(data: {
     let reason = "";
     if (situation === "freelance") {
       score += 60;
-      reason = "Tu es freelance — ce parcours t'aide a packager et scaler.";
+      reason = "Tu es freelance — ce parcours t'aide à packager et scaler.";
     }
     if (hasClients) score += 15;
     if (revenue > 0 && revenue <= 5000) score += 15;
@@ -148,7 +148,7 @@ export function recommendParcours(data: {
     let reason = "";
     if (situation === "entrepreneur") {
       score += 40;
-      reason = "Tu as deja un business — ce parcours t'aide a scaler.";
+      reason = "Tu as déjà un business — ce parcours t'aide à scaler.";
     }
     if (revenue >= 3000) score += 30;
     else if (revenue > 0) score += 15;
@@ -167,7 +167,7 @@ export function recommendParcours(data: {
     }
     if (objectives.some((o) => o.toLowerCase().includes("niche") || o.toLowerCase().includes("pivot"))) {
       score += 40;
-      reason = "Tes objectifs suggerent un repositionnement — ce parcours est adapte.";
+      reason = "Tes objectifs suggèrent un repositionnement — ce parcours est adapté.";
     }
     if (level === "intermediate" || level === "advanced") score += 15;
     if (hasClients) score += 10;

@@ -32,7 +32,7 @@ import { UpgradeWall } from "@/components/shared/upgrade-wall";
 type SalesScript = Record<string, any>;
 
 const TABS = [
-  { key: "discovery", label: "Appel Decouverte", icon: Phone },
+  { key: "discovery", label: "Appel Découverte", icon: Phone },
   { key: "closing", label: "Script de Closing", icon: FileText },
   { key: "history", label: "Historique", icon: History },
 ] as const;
@@ -63,7 +63,7 @@ export default function SalesPage() {
           const errData = await response.json();
           if (errData.usage) { setUsageLimited(errData.usage); return; }
         }
-        throw new Error("Erreur lors de la generation");
+        throw new Error("Erreur lors de la génération");
       }
       const data = await response.json();
       setScript(data.ai_raw_response || data);
@@ -95,7 +95,7 @@ export default function SalesPage() {
         return;
       }
 
-      // Parse le contenu — ai_raw_response est deja JSON, content peut etre stringify
+      // Parse le contenu — ai_raw_response est déjà JSON, content peut être stringify
       let parsed = data.ai_raw_response;
       if (!parsed && data.content) {
         try {
@@ -110,7 +110,7 @@ export default function SalesPage() {
         return;
       }
 
-      // Determiner l'onglet cible depuis les metadata
+      // Déterminer l'onglet cible depuis les metadata
       const metadata = data.metadata as { scriptType?: string } | null;
       const scriptType = metadata?.scriptType;
       if (scriptType === "discovery" || scriptType === "closing") {
@@ -120,7 +120,7 @@ export default function SalesPage() {
       }
 
       setScript(parsed);
-      toast.success("Script charge depuis l'historique");
+      toast.success("Script chargé depuis l'historique");
     } catch {
       toast.error("Erreur lors du chargement");
     }
@@ -132,21 +132,21 @@ export default function SalesPage() {
     }
 
     if (loading) {
-      return <AILoading text="Redaction de ton script de vente" />;
+      return <AILoading text="Rédaction de ton script de vente" />;
     }
 
     if (script) {
       return (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <Badge variant="default">Script genere</Badge>
+            <Badge variant="default">Script généré</Badge>
             <div className="flex items-center gap-2">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => exportToPDF({
-                  title: activeType === "discovery" ? "Script Appel Decouverte" : "Script de Closing",
-                  subtitle: "Genere par ScalingFlow",
+                  title: activeType === "discovery" ? "Script Appel Découverte" : "Script de Closing",
+                  subtitle: "Généré par ScalingFlow",
                   content: script,
                   filename: `script-${activeType}-scalingflow.pdf`,
                 })}
@@ -156,13 +156,13 @@ export default function SalesPage() {
               </Button>
               <Button variant="outline" size="sm" onClick={copyAll}>
                 <Copy className="h-4 w-4 mr-1" />
-                {copied ? "Copie !" : "Copier tout"}
+                {copied ? "Copié !" : "Copier tout"}
               </Button>
             </div>
           </div>
           <SalesScriptView script={script} />
           <Button variant="outline" onClick={() => { setScript(null); handleGenerate(); }}>
-            Regenerer
+            Régénérer
           </Button>
         </div>
       );
@@ -173,17 +173,17 @@ export default function SalesPage() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-accent" />
-            Generateur de scripts
+            Générateur de scripts
           </CardTitle>
           <CardDescription>
-            L&apos;IA va creer un script de vente adapte a ton offre et ton avatar
+            L&apos;IA va créer un script de vente adapté à ton offre et ton avatar
           </CardDescription>
         </CardHeader>
         <CardContent>
           {error && <p className="text-sm text-danger mb-4">{error}</p>}
           <Button size="lg" onClick={handleGenerate}>
             <Sparkles className="h-4 w-4 mr-2" />
-            Generer le script
+            Générer le script
           </Button>
         </CardContent>
       </Card>
@@ -227,7 +227,7 @@ export default function SalesPage() {
           subtitleField="asset_type"
           statusField="status"
           filters={{ asset_type: "sales_script" }}
-          emptyMessage="Aucun script de vente genere pour le moment."
+          emptyMessage="Aucun script de vente généré pour le moment."
           onSelect={handleHistorySelect}
         />
       ) : (
@@ -319,7 +319,7 @@ function SalesScriptView({ script }: { script: SalesScript }) {
                   <div>
                     <p className="flex items-center gap-2 text-xs text-text-muted uppercase tracking-wide mb-2">
                       <MessageCircle className="h-3.5 w-3.5" />
-                      Questions cles
+                      Questions clés
                     </p>
                     <div className="space-y-2">
                       {section.key_questions.map((q, j) => (
@@ -353,7 +353,7 @@ function SalesScriptView({ script }: { script: SalesScript }) {
                   <div>
                     <p className="flex items-center gap-2 text-xs text-text-muted uppercase tracking-wide mb-2">
                       <AlertTriangle className="h-3.5 w-3.5 text-warning" />
-                      Erreurs a eviter
+                      Erreurs à éviter
                     </p>
                     <div className="space-y-1">
                       {section.mistakes_to_avoid.map((m, j) => (

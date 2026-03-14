@@ -66,9 +66,9 @@ export function DmRetargetingGenerator({ initialData }: Props) {
       const result = await res.json();
       const parsed = result.ai_raw_response || JSON.parse(result.content);
       setData(parsed);
-      toast.success("DM Retargeting Ads generees !");
+      toast.success("DM Retargeting Ads générées !");
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Erreur lors de la generation");
+      toast.error(e instanceof Error ? e.message : "Erreur lors de la génération");
     } finally {
       setLoading(false);
     }
@@ -84,11 +84,11 @@ export function DmRetargetingGenerator({ initialData }: Props) {
       <div className="flex flex-col items-center justify-center py-16 gap-4">
         <MessageCircle className="h-12 w-12 text-text-muted" />
         <p className="text-text-secondary text-sm text-center max-w-md">
-          Genere des publicites de retargeting pour pousser tes followers chauds a t&apos;envoyer un DM. Inclut les ads, l&apos;automation DM, les audiences et le setup campagne.
+          Génère des publicités de retargeting pour pousser tes followers chauds à t&apos;envoyer un DM. Inclut les ads, l&apos;automation DM, les audiences et le setup campagne.
         </p>
         <Button onClick={generate} disabled={loading}>
           {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <MessageCircle className="h-4 w-4 mr-2" />}
-          Generer les DM Retargeting Ads
+          Générer les DM Retargeting Ads
         </Button>
       </div>
     );
@@ -100,14 +100,14 @@ export function DmRetargetingGenerator({ initialData }: Props) {
         <h3 className="text-lg font-semibold text-text-primary">DM Retargeting Ads</h3>
         <Button size="sm" onClick={generate} disabled={loading}>
           {loading && <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />}
-          Regenerer
+          Régénérer
         </Button>
       </div>
 
       {/* DM Ads */}
       {data.dm_ads && data.dm_ads.length > 0 && (
         <section>
-          <h4 className="text-sm font-medium text-accent mb-3">Publicites DM ({data.dm_ads.length} variations)</h4>
+          <h4 className="text-sm font-medium text-accent mb-3">Publicités DM ({data.dm_ads.length} variations)</h4>
           <div className="space-y-3">
             {data.dm_ads.map((ad, i) => {
               const typeColor: Record<string, string> = {
@@ -201,7 +201,7 @@ export function DmRetargetingGenerator({ initialData }: Props) {
                     </span>
                   </div>
                   <p className="text-xs text-text-secondary">{aud.source}</p>
-                  <p className="text-[10px] text-text-muted mt-1">Taille estimee : {aud.size_estimate}</p>
+                  <p className="text-[10px] text-text-muted mt-1">Taille estimée : {aud.size_estimate}</p>
                 </div>
               );
             })}

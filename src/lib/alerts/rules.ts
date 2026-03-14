@@ -47,7 +47,7 @@ export const ALERT_RULES: AlertRule[] = [
           ruleId: "roas_low",
           severity: "danger" as const,
           title: "ROAS critique",
-          message: `Ton ROAS moyen est de ${avgRoas.toFixed(2)} sur les ${data.length} derniers jours. Seuil recommande : 1.5x minimum.`,
+          message: `Ton ROAS moyen est de ${avgRoas.toFixed(2)} sur les ${data.length} derniers jours. Seuil recommandé : 1.5x minimum.`,
           link: "/ads",
         };
       }
@@ -56,8 +56,8 @@ export const ALERT_RULES: AlertRule[] = [
   },
   {
     id: "cpa_high",
-    name: "CPA eleve",
-    description: "Cout par acquisition trop eleve",
+    name: "CPA élevé",
+    description: "Coût par acquisition trop élevé",
     category: "ads",
     check: async (supabase, userId) => {
       const { data } = await supabase
@@ -77,8 +77,8 @@ export const ALERT_RULES: AlertRule[] = [
         return {
           ruleId: "cpa_high",
           severity: "warning" as const,
-          title: "CPA eleve",
-          message: `Ton cout par acquisition moyen est de ${avgCpa.toFixed(0)}€. Optimise tes creatives ou ton ciblage.`,
+          title: "CPA élevé",
+          message: `Ton coût par acquisition moyen est de ${avgCpa.toFixed(0)}€. Optimise tes créatives ou ton ciblage.`,
           link: "/ads",
         };
       }
@@ -88,7 +88,7 @@ export const ALERT_RULES: AlertRule[] = [
   {
     id: "budget_no_conversions",
     name: "Budget sans conversion",
-    description: "Depense publicitaire sans aucune conversion depuis 3 jours",
+    description: "Dépense publicitaire sans aucune conversion depuis 3 jours",
     category: "ads",
     check: async (supabase, userId) => {
       const threeDaysAgo = new Date();
@@ -109,8 +109,8 @@ export const ALERT_RULES: AlertRule[] = [
         return {
           ruleId: "budget_no_conversions",
           severity: "danger" as const,
-          title: "Budget sans resultat",
-          message: `${totalSpend.toFixed(0)}€ depenses sans aucune conversion depuis ${data.length} jours. Revois tes campagnes.`,
+          title: "Budget sans résultat",
+          message: `${totalSpend.toFixed(0)}€ dépensés sans aucune conversion depuis ${data.length} jours. Revois tes campagnes.`,
           link: "/ads",
         };
       }
@@ -122,7 +122,7 @@ export const ALERT_RULES: AlertRule[] = [
   {
     id: "inactivity_week",
     name: "Semaine blanche",
-    description: "Aucune activite depuis 7 jours",
+    description: "Aucune activité depuis 7 jours",
     category: "activity",
     check: async (supabase, userId) => {
       const sevenDaysAgo = new Date();
@@ -138,8 +138,8 @@ export const ALERT_RULES: AlertRule[] = [
         return {
           ruleId: "inactivity_week",
           severity: "warning" as const,
-          title: "Semaine blanche detectee",
-          message: "Tu n'as eu aucune activite depuis 7 jours. La regularite est la cle du scaling.",
+          title: "Semaine blanche détectée",
+          message: "Tu n'as eu aucune activité depuis 7 jours. La régularité est la clé du scaling.",
           link: "/roadmap",
         };
       }
@@ -149,7 +149,7 @@ export const ALERT_RULES: AlertRule[] = [
   {
     id: "streak_broken",
     name: "Streak perdu",
-    description: "Tu as perdu ton streak de regularite",
+    description: "Tu as perdu ton streak de régularité",
     category: "activity",
     check: async (supabase, userId) => {
       const { data: profile } = await supabase
@@ -183,7 +183,7 @@ export const ALERT_RULES: AlertRule[] = [
   {
     id: "no_content_week",
     name: "Pas de contenu",
-    description: "Aucun contenu genere depuis 7 jours",
+    description: "Aucun contenu généré depuis 7 jours",
     category: "content",
     check: async (supabase, userId) => {
       const sevenDaysAgo = new Date();
@@ -207,7 +207,7 @@ export const ALERT_RULES: AlertRule[] = [
             ruleId: "no_content_week",
             severity: "warning" as const,
             title: "Contenu en pause",
-            message: "Aucun contenu genere cette semaine. La regularite est essentielle pour l'algorithme.",
+            message: "Aucun contenu généré cette semaine. La régularité est essentielle pour l'algorithme.",
             link: "/content",
           };
         }
@@ -219,7 +219,7 @@ export const ALERT_RULES: AlertRule[] = [
   // === SALES ===
   {
     id: "pipeline_stalled",
-    name: "Pipeline bloque",
+    name: "Pipeline bloqué",
     description: "Aucune progression dans le pipeline depuis 14 jours",
     category: "sales",
     check: async (supabase, userId) => {
@@ -253,7 +253,7 @@ export const ALERT_RULES: AlertRule[] = [
           ruleId: "pipeline_stalled",
           severity: "warning" as const,
           title: "Pipeline au point mort",
-          message: "Aucune nouvelle generation depuis 14 jours. Reprends la ou tu en etais.",
+          message: "Aucune nouvelle génération depuis 14 jours. Reprends là où tu en étais.",
           link: "/roadmap",
         };
       }

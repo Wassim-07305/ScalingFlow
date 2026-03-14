@@ -27,10 +27,10 @@ export async function POST() {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Non autorise" }, { status: 401 });
+      return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
     }
 
-    // Recuperer les tokens Meta depuis le profil
+    // Récupérer les tokens Meta depuis le profil
     const { data: profile } = await supabase
       .from("profiles")
       .select("meta_access_token, meta_ad_account_id")
@@ -39,7 +39,7 @@ export async function POST() {
 
     if (!profile?.meta_access_token || !profile?.meta_ad_account_id) {
       return NextResponse.json(
-        { error: "Configure ton compte Meta Ads dans les parametres." },
+        { error: "Configure ton compte Meta Ads dans les paramètres." },
         { status: 400 }
       );
     }
@@ -118,7 +118,7 @@ export async function POST() {
 
     return NextResponse.json({
       success: true,
-      message: `${synced} campagne${synced > 1 ? "s" : ""} synchronisee${synced > 1 ? "s" : ""}.`,
+      message: `${synced} campagne${synced > 1 ? "s" : ""} synchronisée${synced > 1 ? "s" : ""}.`,
       count: synced,
     });
   } catch (error) {

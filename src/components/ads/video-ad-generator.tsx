@@ -54,12 +54,12 @@ export function VideoAdGenerator({ className, initialData }: VideoAdGeneratorPro
           const errData = await response.json();
           if (errData.usage) { setUsageLimited(errData.usage); return; }
         }
-        throw new Error("Erreur lors de la generation");
+        throw new Error("Erreur lors de la génération");
       }
       const data = await response.json();
       const result = data.result as VideoAdScriptResult;
       setScripts(result.scripts || []);
-      toast.success("Scripts video publicitaires generes !");
+      toast.success("Scripts video publicitaires générés !");
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Erreur";
       setError(msg);
@@ -82,7 +82,7 @@ export function VideoAdGenerator({ className, initialData }: VideoAdGeneratorPro
   }
 
   if (loading) {
-    return <AILoading text="Generation des scripts video" className={className} />;
+    return <AILoading text="Génération des scripts video" className={className} />;
   }
 
   if (scripts.length === 0) {
@@ -91,10 +91,10 @@ export function VideoAdGenerator({ className, initialData }: VideoAdGeneratorPro
         {error && <p className="text-sm text-danger mb-4">{error}</p>}
         <Button size="lg" onClick={handleGenerate}>
           <Sparkles className="h-4 w-4 mr-2" />
-          Generer 3 scripts video
+          Générer 3 scripts video
         </Button>
         <p className="text-sm text-text-secondary mt-2">
-          Un script par duree : 15s, 30s et 60s
+          Un script par durée : 15s, 30s et 60s
         </p>
       </div>
     );
@@ -105,7 +105,7 @@ export function VideoAdGenerator({ className, initialData }: VideoAdGeneratorPro
       <div className="flex items-center justify-between">
         <Badge variant="default">{scripts.length} scripts video</Badge>
         <Button variant="outline" size="sm" onClick={handleGenerate}>
-          Regenerer
+          Régénérer
         </Button>
       </div>
 

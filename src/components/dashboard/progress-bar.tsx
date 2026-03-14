@@ -119,7 +119,7 @@ export function ProgressBar() {
             />
           </div>
           <p className="text-xs text-text-muted mt-1.5">
-            {isLoading ? "Chargement..." : `${taskPercent}% complete`}
+            {isLoading ? "Chargement..." : `${taskPercent}% complété`}
           </p>
         </CardContent>
       </Card>

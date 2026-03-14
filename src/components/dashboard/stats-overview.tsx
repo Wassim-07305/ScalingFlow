@@ -157,7 +157,7 @@ export function StatsOverview() {
       href: "/funnel",
     },
     {
-      label: "Publicites",
+      label: "Publicités",
       value: counts.ads,
       icon: Megaphone,
       color: "blue",

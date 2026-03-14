@@ -23,11 +23,11 @@ import {
 
 const SCRIPT_STEPS = [
   { key: "opening", number: 1, title: "Ouverture & Accroche", icon: Phone },
-  { key: "discovery", number: 2, title: "Decouverte des besoins", icon: MessageCircle },
-  { key: "reframing", number: 3, title: "Recadrage du probleme", icon: Volume2 },
-  { key: "solution", number: 4, title: "Presentation de la solution", icon: Sparkles },
+  { key: "discovery", number: 2, title: "Découverte des besoins", icon: MessageCircle },
+  { key: "reframing", number: 3, title: "Recadrage du problème", icon: Volume2 },
+  { key: "solution", number: 4, title: "Présentation de la solution", icon: Sparkles },
   { key: "objections", number: 5, title: "Gestion des objections", icon: ChevronDown },
-  { key: "cta", number: 6, title: "CTA / Prochaine etape", icon: ArrowRight },
+  { key: "cta", number: 6, title: "CTA / Prochaine étape", icon: ArrowRight },
 ] as const;
 
 interface ScriptStep {
@@ -79,7 +79,7 @@ export function WarmCallScript() {
         }),
       });
 
-      if (!response.ok) throw new Error("Erreur lors de la generation");
+      if (!response.ok) throw new Error("Erreur lors de la génération");
       const data = await response.json();
 
       const parsed = data.ai_raw_response || data;
@@ -88,12 +88,12 @@ export function WarmCallScript() {
           setResult(JSON.parse(parsed));
         } catch {
           setResult({
-            title: "Script d'appel tiede",
+            title: "Script d'appel tiède",
             context: parsed,
             duration_estimate: "-",
             steps: {
               opening: { title: "Ouverture", objective: "", script_lines: [parsed], tonality: "", transition: "", tips: [] },
-              discovery: { title: "Decouverte", objective: "", script_lines: [], tonality: "", transition: "", tips: [] },
+              discovery: { title: "Découverte", objective: "", script_lines: [], tonality: "", transition: "", tips: [] },
               reframing: { title: "Recadrage", objective: "", script_lines: [], tonality: "", transition: "", tips: [] },
               solution: { title: "Solution", objective: "", script_lines: [], tonality: "", transition: "", tips: [] },
               objections: { title: "Objections", objective: "", script_lines: [], tonality: "", transition: "", tips: [] },
@@ -117,12 +117,12 @@ export function WarmCallScript() {
     const text = typeof result === "string" ? result : JSON.stringify(result, null, 2);
     navigator.clipboard.writeText(text);
     setCopied(true);
-    toast.success("Copie dans le presse-papiers");
+    toast.success("Copié dans le presse-papiers");
     setTimeout(() => setCopied(false), 2000);
   };
 
   if (loading) {
-    return <AILoading text="Redaction de ton script d'appel tiede" />;
+    return <AILoading text="Rédaction de ton script d'appel tiède" />;
   }
 
   if (result) {
@@ -131,7 +131,7 @@ export function WarmCallScript() {
         {/* Actions */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Badge variant="default">Script genere</Badge>
+            <Badge variant="default">Script généré</Badge>
             {result.duration_estimate && (
               <Badge variant="muted" className="text-xs">
                 {result.duration_estimate}
@@ -144,8 +144,8 @@ export function WarmCallScript() {
               size="sm"
               onClick={() =>
                 exportToPDF({
-                  title: "Script Appel Tiede",
-                  subtitle: "Genere par ScalingFlow",
+                  title: "Script Appel Tiède",
+                  subtitle: "Généré par ScalingFlow",
                   content: result as unknown as Record<string, unknown>,
                   filename: "script-appel-tiede-scalingflow.pdf",
                 })
@@ -156,7 +156,7 @@ export function WarmCallScript() {
             </Button>
             <Button variant="outline" size="sm" onClick={copyAll}>
               <Copy className="h-4 w-4 mr-1" />
-              {copied ? "Copie !" : "Copier tout"}
+              {copied ? "Copié !" : "Copier tout"}
             </Button>
           </div>
         </div>
@@ -168,7 +168,7 @@ export function WarmCallScript() {
           </GlowCard>
         )}
 
-        {/* 6 etapes du script */}
+        {/* 6 étapes du script */}
         {SCRIPT_STEPS.map((step) => {
           const stepData = result.steps?.[step.key as keyof typeof result.steps];
           if (!stepData) return null;
@@ -209,7 +209,7 @@ export function WarmCallScript() {
                   {/* Phrases du script */}
                   {stepData.script_lines && stepData.script_lines.length > 0 && (
                     <div className="space-y-2">
-                      <p className="text-xs text-text-muted uppercase">Phrases cles</p>
+                      <p className="text-xs text-text-muted uppercase">Phrases clés</p>
                       {stepData.script_lines.map((line, i) => (
                         <div key={i} className="p-3 rounded-lg bg-bg-tertiary border-l-2 border-accent">
                           <p className="text-sm text-text-primary italic">&laquo; {line} &raquo;</p>
@@ -223,7 +223,7 @@ export function WarmCallScript() {
                     <div className="flex items-start gap-2 p-3 rounded-lg bg-bg-tertiary">
                       <Volume2 className="h-3.5 w-3.5 text-accent mt-0.5 shrink-0" />
                       <div>
-                        <p className="text-xs text-text-muted uppercase mb-0.5">Tonalite</p>
+                        <p className="text-xs text-text-muted uppercase mb-0.5">Tonalité</p>
                         <p className="text-sm text-text-secondary">{stepData.tonality}</p>
                       </div>
                     </div>
@@ -260,13 +260,13 @@ export function WarmCallScript() {
           );
         })}
 
-        {/* Objections cles */}
+        {/* Objections clés */}
         {result.key_objections && result.key_objections.length > 0 && (
           <Card>
             <CardHeader className="py-3">
               <CardTitle className="text-sm flex items-center gap-2">
                 <MessageCircle className="h-4 w-4 text-accent" />
-                Objections frequentes et reponses
+                Objections fréquentes et réponses
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-0 space-y-3">
@@ -277,7 +277,7 @@ export function WarmCallScript() {
                     <p className="text-sm text-text-secondary italic">&laquo; {obj.objection} &raquo;</p>
                   </div>
                   <div className="flex items-start gap-2">
-                    <Badge variant="default" className="text-xs shrink-0">Reponse</Badge>
+                    <Badge variant="default" className="text-xs shrink-0">Réponse</Badge>
                     <p className="text-sm text-text-primary">&laquo; {obj.response} &raquo;</p>
                   </div>
                 </div>
@@ -292,7 +292,7 @@ export function WarmCallScript() {
             <CardHeader className="py-3">
               <CardTitle className="text-sm flex items-center gap-2">
                 <Sparkles className="h-4 w-4 text-accent" />
-                Conseils pour reussir
+                Conseils pour réussir
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-0">
@@ -309,7 +309,7 @@ export function WarmCallScript() {
         )}
 
         <Button variant="outline" onClick={() => setResult(null)}>
-          Regenerer le script
+          Régénérer le script
         </Button>
       </div>
     );
@@ -322,7 +322,7 @@ export function WarmCallScript() {
         <Phone className="h-10 w-10 text-accent mx-auto mb-3" />
         <h3 className="font-semibold text-text-primary mb-1">Script d&apos;Appel Tiede</h3>
         <p className="text-sm text-text-secondary max-w-md mx-auto">
-          L&apos;IA va creer un script d&apos;appel structure en 6 etapes : ouverture, decouverte, recadrage, solution, objections et CTA.
+          L&apos;IA va créer un script d&apos;appel structuré en 6 étapes : ouverture, découverte, recadrage, solution, objections et CTA.
         </p>
       </div>
 
@@ -330,17 +330,17 @@ export function WarmCallScript() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-accent" />
-            Generateur de script d&apos;appel tiede
+            Générateur de script d&apos;appel tiède
           </CardTitle>
           <CardDescription>
-            Un script adapte a ton offre pour des appels avec des prospects semi-qualifies.
+            Un script adapté à ton offre pour des appels avec des prospects semi-qualifiés.
           </CardDescription>
         </CardHeader>
         <CardContent>
           {error && <p className="text-sm text-danger mb-4">{error}</p>}
           <Button size="lg" onClick={handleGenerate} className="w-full">
             <Sparkles className="h-4 w-4 mr-2" />
-            Generer le script d&apos;appel
+            Générer le script d&apos;appel
           </Button>
         </CardContent>
       </Card>

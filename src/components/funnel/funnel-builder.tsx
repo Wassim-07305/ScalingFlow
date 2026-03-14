@@ -42,7 +42,7 @@ export function FunnelBuilder({ className, initialData }: FunnelBuilderProps) {
   const [selectedOfferId, setSelectedOfferId] = React.useState<string | null>(null);
   const [usageLimited, setUsageLimited] = React.useState<{currentUsage: number; limit: number} | null>(null);
 
-  // Charger les donnees historiques quand initialData change
+  // Charger les données historiques quand initialData change
   React.useEffect(() => {
     if (initialData) {
       setFunnelData(initialData);
@@ -69,7 +69,7 @@ export function FunnelBuilder({ className, initialData }: FunnelBuilderProps) {
 
   const handleGenerate = async () => {
     if (!selectedOfferId) {
-      setError("Aucune offre disponible. Genere d'abord une offre.");
+      setError("Aucune offre disponible. Génère d'abord une offre.");
       return;
     }
     setLoading(true);
@@ -87,7 +87,7 @@ export function FunnelBuilder({ className, initialData }: FunnelBuilderProps) {
           const errData = await response.json();
           if (errData.usage) { setUsageLimited(errData.usage); return; }
         }
-        throw new Error("Erreur lors de la generation");
+        throw new Error("Erreur lors de la génération");
       }
       const data = await response.json();
       setFunnelData(data.funnel_data || data);
@@ -113,10 +113,10 @@ export function FunnelBuilder({ className, initialData }: FunnelBuilderProps) {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Sparkles className="h-5 w-5 text-accent" />
-              Generer ton funnel
+              Générer ton funnel
             </CardTitle>
             <CardDescription>
-              L&apos;IA va creer le copywriting complet pour tes 3 pages de funnel
+              L&apos;IA va créer le copywriting complet pour tes 3 pages de funnel
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -134,7 +134,7 @@ export function FunnelBuilder({ className, initialData }: FunnelBuilderProps) {
             </div>
             {offers.length > 1 && (
               <div>
-                <label className="text-sm text-text-secondary mb-1 block">Offre a utiliser</label>
+                <label className="text-sm text-text-secondary mb-1 block">Offre à utiliser</label>
                 <select
                   value={selectedOfferId || ""}
                   onChange={(e) => setSelectedOfferId(e.target.value)}
@@ -149,7 +149,7 @@ export function FunnelBuilder({ className, initialData }: FunnelBuilderProps) {
             {error && <p className="text-sm text-danger">{error}</p>}
             <Button size="lg" onClick={handleGenerate} disabled={!selectedOfferId}>
               <Sparkles className="h-4 w-4 mr-2" />
-              Generer le funnel complet
+              Générer le funnel complet
             </Button>
           </CardContent>
         </Card>
@@ -221,7 +221,7 @@ export function FunnelBuilder({ className, initialData }: FunnelBuilderProps) {
           </GlowCard>
           <Card>
             <CardContent className="pt-6">
-              <h4 className="font-medium text-text-primary mb-3">Benefices</h4>
+              <h4 className="font-medium text-text-primary mb-3">Bénéfices</h4>
               <ul className="space-y-2">
                 {pageData.benefit_bullets?.map((b: string, i: number) => (
                   <li key={i} className="flex items-start gap-2 text-sm text-text-secondary">
@@ -259,7 +259,7 @@ export function FunnelBuilder({ className, initialData }: FunnelBuilderProps) {
           </GlowCard>
           <Card>
             <CardContent className="pt-6">
-              <h4 className="font-medium text-text-primary mb-3">Prochaines etapes</h4>
+              <h4 className="font-medium text-text-primary mb-3">Prochaines étapes</h4>
               <ol className="space-y-2">
                 {pageData.next_steps?.map((step: string, i: number) => (
                   <li key={i} className="flex items-start gap-3 text-sm text-text-secondary">
@@ -288,7 +288,7 @@ export function FunnelBuilder({ className, initialData }: FunnelBuilderProps) {
           size="sm"
           onClick={() => exportToPDF({
             title: "Funnel de Conversion",
-            subtitle: "Genere par ScalingFlow",
+            subtitle: "Généré par ScalingFlow",
             content: funnelData,
             filename: "funnel-scalingflow.pdf",
           })}
@@ -308,7 +308,7 @@ export function FunnelBuilder({ className, initialData }: FunnelBuilderProps) {
           HTML
         </Button>
         <Button variant="outline" onClick={() => { setFunnelData(null); handleGenerate(); }}>
-          Regenerer
+          Régénérer
         </Button>
       </div>
     </div>

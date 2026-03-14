@@ -47,7 +47,7 @@ export function InstagramOptimizer({ className, initialData }: InstagramOptimize
           const errData = await response.json();
           if (errData.usage) { setUsageLimited(errData.usage); return; }
         }
-        throw new Error("Erreur lors de la generation");
+        throw new Error("Erreur lors de la génération");
       }
       const data = await response.json();
       setResult(data.result as InstagramProfileResult);
@@ -85,7 +85,7 @@ export function InstagramOptimizer({ className, initialData }: InstagramOptimize
           Optimiser mon profil Instagram
         </Button>
         <p className="text-sm text-text-secondary mt-2">
-          Bio, highlights, strategie de grille et CTA
+          Bio, highlights, stratégie de grille et CTA
         </p>
       </div>
     );
@@ -100,7 +100,7 @@ export function InstagramOptimizer({ className, initialData }: InstagramOptimize
           <span className="text-sm font-medium text-text-primary">Profil optimise</span>
         </div>
         <Button variant="outline" size="sm" onClick={handleGenerate}>
-          Regenerer
+          Régénérer
         </Button>
       </div>
 
@@ -146,7 +146,7 @@ export function InstagramOptimizer({ className, initialData }: InstagramOptimize
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Bookmark className="h-4 w-4" />
-            Stories a la une
+            Stories à la une
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -181,12 +181,12 @@ export function InstagramOptimizer({ className, initialData }: InstagramOptimize
         </CardContent>
       </Card>
 
-      {/* Strategie de grille */}
+      {/* Stratégie de grille */}
       <Card>
         <CardContent className="pt-5">
           <div className="flex items-center gap-2 mb-3">
             <LayoutGrid className="h-4 w-4 text-text-muted" />
-            <p className="text-sm font-medium text-text-primary">Strategie de grille</p>
+            <p className="text-sm font-medium text-text-primary">Stratégie de grille</p>
           </div>
           <p className="text-sm text-text-secondary whitespace-pre-wrap">
             {result.grille_strategy}

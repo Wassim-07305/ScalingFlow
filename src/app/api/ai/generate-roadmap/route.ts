@@ -19,14 +19,14 @@ export async function POST(req: NextRequest) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Non autorise" }, { status: 401 });
+      return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
     }
 
     // Rate limiting
     const rl = await rateLimit(user.id, "generate-roadmap", { limit: 5, windowSeconds: 60 });
     if (!rl.allowed) {
       return NextResponse.json(
-        { error: "Trop de requetes. Reessaie dans quelques secondes." },
+        { error: "Trop de requêtes. Réessaie dans quelques secondes." },
         { status: 429 }
       );
     }
@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
     const usage = await checkAIUsage(user.id);
     if (!usage.allowed) {
       return NextResponse.json(
-        { error: "Limite de generations IA atteinte", usage },
+        { error: "Limite de générations IA atteinte", usage },
         { status: 403 }
       );
     }
@@ -106,7 +106,7 @@ export async function POST(req: NextRequest) {
 
     if (insertError) {
       return NextResponse.json(
-        { error: "Erreur lors de la sauvegarde des taches" },
+        { error: "Erreur lors de la sauvegarde des tâches" },
         { status: 500 }
       );
     }
@@ -122,7 +122,7 @@ export async function POST(req: NextRequest) {
     });
   } catch (error) {
     return NextResponse.json(
-      { error: "Erreur lors de la generation de la roadmap" },
+      { error: "Erreur lors de la génération de la roadmap" },
       { status: 500 }
     );
   }

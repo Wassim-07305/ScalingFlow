@@ -55,7 +55,7 @@ const LAYER_CONFIG: Record<
   { icon: React.ElementType; color: string }
 > = {
   Surface: { icon: AlertTriangle, color: "text-yellow-400" },
-  Economique: { icon: DollarSign, color: "text-red-400" },
+  Économique: { icon: DollarSign, color: "text-red-400" },
   Psychologique: { icon: Brain, color: "text-purple-400" },
   Opportunite: { icon: Lightbulb, color: "text-blue-400" },
 };
@@ -72,7 +72,7 @@ export function PainIdentifier({
 
   const handleGenerate = async () => {
     if (!marketAnalysisId) {
-      toast.error("Selectionne d'abord une analyse de marche");
+      toast.error("Sélectionne d'abord une analyse de marché");
       return;
     }
 
@@ -112,8 +112,8 @@ export function PainIdentifier({
             Bleeding-Neck Pains
           </h3>
           <p className="text-sm text-text-secondary text-center max-w-md mb-6">
-            Identifie les douleurs les plus intenses de ton marche sur 4 couches
-            de profondeur : surface, economique, psychologique et opportunite.
+            Identifie les douleurs les plus intenses de ton marché sur 4 couches
+            de profondeur : surface, économique, psychologique et opportunité.
           </p>
           <Button size="lg" onClick={handleGenerate} disabled={!marketAnalysisId}>
             <Sparkles className="h-4 w-4 mr-2" />
@@ -121,7 +121,7 @@ export function PainIdentifier({
           </Button>
           {!marketAnalysisId && (
             <p className="text-xs text-text-muted mt-2">
-              Lance d&apos;abord une analyse de marche
+              Lance d&apos;abord une analyse de marché
             </p>
           )}
         </CardContent>

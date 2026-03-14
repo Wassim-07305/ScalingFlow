@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Connexion",
-  description: "Connecte-toi ou cree ton compte ScalingFlow pour acceder a ta plateforme IA.",
+  description: "Connecte-toi ou crée ton compte ScalingFlow pour accéder à ta plateforme IA.",
   robots: {
     index: false,
     follow: false,

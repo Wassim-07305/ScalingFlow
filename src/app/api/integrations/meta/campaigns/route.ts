@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Non autorise" }, { status: 401 });
+      return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
     }
 
     const { token, adAccountId } = await getMetaCredentials(supabase, user.id);
@@ -238,7 +238,7 @@ export async function POST(req: NextRequest) {
         creative_id: metaAdCreativeId,
         ad_id: metaAdId,
       },
-      message: "Campagne creee en mode PAUSE. Active-la depuis Meta Ads Manager ou depuis l'app.",
+      message: "Campagne créée en mode PAUSE. Active-la depuis Meta Ads Manager ou depuis l'app.",
     });
   } catch {
     return NextResponse.json(
@@ -255,7 +255,7 @@ export async function PATCH(req: NextRequest) {
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Non autorise" }, { status: 401 });
+      return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
     }
 
     const { token } = await getMetaCredentials(supabase, user.id);

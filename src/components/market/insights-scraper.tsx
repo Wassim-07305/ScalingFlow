@@ -56,7 +56,7 @@ export function InsightsScraper({ marketName, targetAvatar, existingPains }: Ins
 
   const handleScrape = async () => {
     if (market.trim().length < 3) {
-      toast.error("Entre un marche (min 3 caracteres)");
+      toast.error("Entre un marché (min 3 caracteres)");
       return;
     }
 
@@ -86,7 +86,7 @@ export function InsightsScraper({ marketName, targetAvatar, existingPains }: Ins
 
       const data = await response.json();
       setResult(data.result);
-      toast.success("Insights generes !");
+      toast.success("Insights générés !");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Erreur");
     } finally {
@@ -117,10 +117,10 @@ export function InsightsScraper({ marketName, targetAvatar, existingPains }: Ins
         <div className="text-center">
           <Search className="h-10 w-10 text-accent mx-auto mb-3" />
           <h3 className="font-semibold text-text-primary mb-1">
-            Scraper d&apos;insights marche
+            Scraper d&apos;insights marché
           </h3>
           <p className="text-sm text-text-secondary max-w-md mx-auto">
-            L&apos;IA analyse les conversations en ligne (Reddit, forums, YouTube, avis clients) pour extraire les douleurs, desirs et objections de ta cible.
+            L&apos;IA analyse les conversations en ligne (Reddit, forums, YouTube, avis clients) pour extraire les douleurs, désirs et objections de ta cible.
           </p>
         </div>
 
@@ -128,7 +128,7 @@ export function InsightsScraper({ marketName, targetAvatar, existingPains }: Ins
           <CardContent className="pt-6 space-y-4">
             <div>
               <label className="text-sm font-medium text-text-primary mb-2 block">
-                Marche / Industrie
+                Marché / Industrie
               </label>
               <Input
                 placeholder="Ex: coaching business en ligne, SaaS B2B, fitness..."
@@ -138,7 +138,7 @@ export function InsightsScraper({ marketName, targetAvatar, existingPains }: Ins
             </div>
             <div>
               <label className="text-sm font-medium text-text-primary mb-2 block">
-                Niche specifique (optionnel)
+                Niche spécifique (optionnel)
               </label>
               <Input
                 placeholder="Ex: coaches qui vendent des formations high-ticket..."
@@ -179,7 +179,7 @@ export function InsightsScraper({ marketName, targetAvatar, existingPains }: Ins
           <div className="flex items-center justify-between">
             <CardTitle className="text-sm flex items-center gap-2">
               <MessageSquare className="h-4 w-4 text-accent" />
-              Conversations analysees ({result.insights.length})
+              Conversations analysées ({result.insights.length})
             </CardTitle>
             {expandedSection === "insights" ? <ChevronUp className="h-4 w-4 text-text-muted" /> : <ChevronDown className="h-4 w-4 text-text-muted" />}
           </div>
@@ -268,7 +268,7 @@ export function InsightsScraper({ marketName, targetAvatar, existingPains }: Ins
           <div className="flex items-center justify-between">
             <CardTitle className="text-sm flex items-center gap-2">
               <Heart className="h-4 w-4 text-accent" />
-              Top desirs ({result.top_desires.length})
+              Top désirs ({result.top_desires.length})
             </CardTitle>
             {expandedSection === "desires" ? <ChevronUp className="h-4 w-4 text-text-muted" /> : <ChevronDown className="h-4 w-4 text-text-muted" />}
           </div>
@@ -351,7 +351,7 @@ export function InsightsScraper({ marketName, targetAvatar, existingPains }: Ins
               </div>
             </div>
             <div>
-              <p className="text-xs text-text-muted uppercase mb-2">Declencheurs emotionnels</p>
+              <p className="text-xs text-text-muted uppercase mb-2">Déclencheurs emotionnels</p>
               <div className="flex flex-wrap gap-1.5">
                 {result.language_vault.emotional_triggers.map((t, i) => (
                   <Badge key={i} variant="yellow" className="text-xs">{t}</Badge>

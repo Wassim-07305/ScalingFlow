@@ -57,7 +57,7 @@ export function PerformanceChart({ className }: PerformanceChartProps) {
       const endDate = new Date();
       const startDate = subDays(endDate, 30);
 
-      // Recuperer les metriques quotidiennes
+      // Récupérer les métriques quotidiennes
       const { data: dailyData } = await supabase
         .from("ad_daily_metrics")
         .select("date, spend, conversions, roas, clicks")
@@ -66,13 +66,13 @@ export function PerformanceChart({ className }: PerformanceChartProps) {
         .lte("date", format(endDate, "yyyy-MM-dd"))
         .order("date", { ascending: true });
 
-      // Creer un map des donnees existantes
+      // Creer un map des données existantes
       const dataMap = new Map(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         ((dailyData ?? []) as any[]).map((d) => [d.date, d])
       );
 
-      // Generer tous les jours des 30 derniers jours
+      // Générer tous les jours des 30 derniers jours
       const allDays = eachDayOfInterval({ start: startDate, end: endDate });
       const chartData: DailyMetric[] = allDays.map((day) => {
         const dateKey = format(day, "yyyy-MM-dd");
@@ -89,7 +89,7 @@ export function PerformanceChart({ className }: PerformanceChartProps) {
 
       setData(chartData);
 
-      // Calculer la tendance (comparer les 7 derniers jours aux 7 precedents)
+      // Calculer la tendance (comparer les 7 derniers jours aux 7 précédents)
       if (chartData.length >= 14) {
         const recent = chartData.slice(-7);
         const previous = chartData.slice(-14, -7);
@@ -145,7 +145,7 @@ export function PerformanceChart({ className }: PerformanceChartProps) {
           <div className="flex flex-col items-center justify-center h-[300px] text-center">
             <TrendingUp className="h-12 w-12 text-text-muted/30 mb-3" />
             <p className="text-sm text-text-muted">
-              Aucune donnee de performance disponible.
+              Aucune donnée de performance disponible.
             </p>
             <p className="text-xs text-text-muted mt-1">
               Synchronise tes campagnes Meta Ads pour voir tes tendances.

@@ -287,7 +287,7 @@ export function Sidebar({
                   )}
                 />
                 <span className={cn(isCollapsed && "md:hidden")}>
-                  Parametres
+                  Paramètres
                 </span>
               </Link>
             </TooltipTrigger>
@@ -296,7 +296,7 @@ export function Sidebar({
                 side="right"
                 className="bg-bg-secondary text-text-primary border-border-default"
               >
-                Parametres
+                Paramètres
               </TooltipContent>
             )}
           </Tooltip>

@@ -25,7 +25,7 @@ export default function RoadmapError({
       {error.digest && (
         <p className="text-xs text-text-muted">Digest: {error.digest}</p>
       )}
-      <Button onClick={reset}>Reessayer</Button>
+      <Button onClick={reset}>Réessayer</Button>
     </div>
   );
 }

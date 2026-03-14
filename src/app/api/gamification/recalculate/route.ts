@@ -25,11 +25,11 @@ export async function POST() {
       return NextResponse.json({ error: "Configuration manquante" }, { status: 500 });
     }
 
-    // Verifier l'authentification (admin ou cron secret)
-    // Pour un cron, on pourrait verifier un header secret
+    // Vérifier l'authentification (admin ou cron secret)
+    // Pour un cron, on pourrait vérifier un header secret
     // Pour l'instant, cette route est protegee par le middleware auth
 
-    // Recuperer tous les profils
+    // Récupérer tous les profils
     const { data: profiles, error: profilesError } = await supabase
       .from("profiles")
       .select("id, xp_points, level, streak_days")
@@ -78,7 +78,7 @@ export async function POST() {
 
     return NextResponse.json({
       success: true,
-      message: `${updated} score${updated > 1 ? "s" : ""} recalcule${updated > 1 ? "s" : ""}.`,
+      message: `${updated} score${updated > 1 ? "s" : ""} recalculé${updated > 1 ? "s" : ""}.`,
       count: updated,
     });
   } catch {

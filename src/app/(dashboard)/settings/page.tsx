@@ -40,9 +40,9 @@ import {
 import { useUIStore, type Theme } from "@/stores/ui-store";
 
 const EXPERIENCE_LABELS: Record<string, string> = {
-  beginner: "Debutant",
-  intermediate: "Intermediaire",
-  advanced: "Avance",
+  beginner: "Débutant",
+  intermediate: "Intermédiaire",
+  advanced: "Avancé",
 };
 
 export default function SettingsPage() {
@@ -53,7 +53,7 @@ export default function SettingsPage() {
   // Handle checkout success redirect
   useEffect(() => {
     if (searchParams.get("checkout") === "success") {
-      toast.success("Abonnement active avec succes ! Bienvenue dans le plan Pro.");
+      toast.success("Abonnement activé avec succès ! Bienvenue dans le plan Pro.");
     }
   }, [searchParams]);
 
@@ -73,11 +73,11 @@ export default function SettingsPage() {
     if (!file || !user) return;
 
     if (!file.type.startsWith("image/")) {
-      toast.error("Seules les images sont acceptees.");
+      toast.error("Seules les images sont acceptées.");
       return;
     }
     if (file.size > 2 * 1024 * 1024) {
-      toast.error("L'image ne doit pas depasser 2 Mo.");
+      toast.error("L'image ne doit pas dépasser 2 Mo.");
       return;
     }
 
@@ -106,7 +106,7 @@ export default function SettingsPage() {
       if (updateError) throw updateError;
 
       setAvatarUrl(publicUrl);
-      toast.success("Photo de profil mise a jour !");
+      toast.success("Photo de profil mise à jour !");
     } catch {
       toast.error("Erreur lors de l'upload de l'avatar.");
     } finally {
@@ -126,7 +126,7 @@ export default function SettingsPage() {
 
       if (error) throw error;
       setAvatarUrl(null);
-      toast.success("Photo de profil supprimee.");
+      toast.success("Photo de profil supprimée.");
     } catch {
       toast.error("Erreur lors de la suppression.");
     } finally {
@@ -146,7 +146,7 @@ export default function SettingsPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [savingPassword, setSavingPassword] = useState(false);
 
-  // Synchroniser le champ full_name avec le profil charge
+  // Synchroniser le champ full_name avec le profil chargé
   useEffect(() => {
     if (profile?.full_name) {
       setFullName(profile.full_name);
@@ -159,7 +159,7 @@ export default function SettingsPage() {
 
     const trimmed = fullName.trim();
     if (!trimmed) {
-      toast.error("Le nom ne peut pas etre vide.");
+      toast.error("Le nom ne peut pas être vide.");
       return;
     }
 
@@ -173,7 +173,7 @@ export default function SettingsPage() {
       if (error) {
         toast.error("Erreur lors de la sauvegarde : " + error.message);
       } else {
-        toast.success("Profil mis a jour avec succes.");
+        toast.success("Profil mis à jour avec succès.");
       }
     } catch {
       toast.error("Une erreur inattendue est survenue.");
@@ -189,7 +189,7 @@ export default function SettingsPage() {
       return;
     }
     if (newPassword.length < 8) {
-      toast.error("Le mot de passe doit contenir au moins 8 caracteres.");
+      toast.error("Le mot de passe doit contenir au moins 8 caractères.");
       return;
     }
     if (newPassword !== confirmPassword) {
@@ -206,7 +206,7 @@ export default function SettingsPage() {
       if (error) {
         toast.error("Erreur : " + error.message);
       } else {
-        toast.success("Mot de passe mis a jour avec succes.");
+        toast.success("Mot de passe mis à jour avec succès.");
         setNewPassword("");
         setConfirmPassword("");
         setShowPasswordSection(false);
@@ -225,10 +225,10 @@ export default function SettingsPage() {
 
   // --- Notifications ---
   const NOTIF_KEYS = [
-    { key: "email_progression", label: "Emails de progression" },
-    { key: "email_tasks", label: "Rappels de taches" },
-    { key: "email_academy", label: "Nouveautes Academy" },
-    { key: "email_community", label: "Activite communaute" },
+    { key: "email_progression", label: "E-mails de progression" },
+    { key: "email_tasks", label: "Rappels de tâches" },
+    { key: "email_academy", label: "Nouveautés Academy" },
+    { key: "email_community", label: "Activité communauté" },
   ] as const;
 
   type NotifPrefs = Record<string, boolean>;
@@ -264,7 +264,7 @@ export default function SettingsPage() {
         data: notifPrefs,
       });
       if (error) throw error;
-      toast.success("Preferences de notifications sauvegardees.");
+      toast.success("Préférences de notifications sauvegardées.");
     } catch {
       toast.error("Erreur lors de la sauvegarde.");
     } finally {
@@ -272,14 +272,14 @@ export default function SettingsPage() {
     }
   }, [user, notifPrefs, supabase]);
 
-  // Verifier si le profil a change
+  // Vérifier si le profil a changé
   const profileChanged = fullName.trim() !== (profile?.full_name || "");
 
   return (
     <div>
       <PageHeader
-        title="Parametres"
-        description="Gere ton compte et tes integrations."
+        title="Paramètres"
+        description="Gère ton compte et tes intégrations."
       />
 
       <div className="space-y-6 max-w-2xl">
@@ -355,7 +355,7 @@ export default function SettingsPage() {
                 type="file"
                 accept="image/*"
                 onChange={handleAvatarUpload}
-                aria-label="Selectionner une photo de profil"
+                aria-label="Sélectionner une photo de profil"
                 className="hidden"
               />
             </div>
@@ -384,9 +384,9 @@ export default function SettingsPage() {
               />
             </div>
             <div>
-              <Label>Marche cible</Label>
+              <Label>Marché cible</Label>
               <Input
-                value={profile?.selected_market || "Non defini"}
+                value={profile?.selected_market || "Non défini"}
                 disabled
               />
             </div>
@@ -397,7 +397,7 @@ export default function SettingsPage() {
                   profile?.experience_level
                     ? EXPERIENCE_LABELS[profile.experience_level] ||
                       profile.experience_level
-                    : "Non defini"
+                    : "Non défini"
                 }
                 disabled
               />
@@ -467,7 +467,7 @@ export default function SettingsPage() {
               disabled={savingNotifs}
             >
               {savingNotifs && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-              Sauvegarder les preferences
+              Sauvegarder les préférences
             </Button>
           </CardContent>
         </Card>
@@ -475,12 +475,12 @@ export default function SettingsPage() {
         {/* Apparence */}
         <ThemeCard />
 
-        {/* Securite */}
+        {/* Sécurité */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Shield className="h-5 w-5 text-danger" />
-              Securite
+              Sécurité
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -515,7 +515,7 @@ export default function SettingsPage() {
                         type={showNewPassword ? "text" : "password"}
                         value={newPassword}
                         onChange={(e) => setNewPassword(e.target.value)}
-                        placeholder="Minimum 8 caracteres"
+                        placeholder="Minimum 8 caractères"
                       />
                       <button
                         type="button"
@@ -573,7 +573,7 @@ export default function SettingsPage() {
                     {savingPassword && (
                       <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                     )}
-                    Mettre a jour le mot de passe
+                    Mettre à jour le mot de passe
                   </Button>
                 </div>
               </div>
@@ -620,7 +620,7 @@ function IntegrationsCard() {
     const error = searchParams.get("error");
     if (success?.includes("connected")) {
       const provider = success.replace("_connected", "");
-      toast.success(`${provider.charAt(0).toUpperCase() + provider.slice(1)} connecte avec succes !`);
+      toast.success(`${provider.charAt(0).toUpperCase() + provider.slice(1)} connecté avec succès !`);
     }
     if (error) {
       toast.error(`Erreur de connexion : ${error}`);
@@ -650,12 +650,12 @@ function IntegrationsCard() {
       const res = await fetch(endpoint, { method: "POST" });
       if (res.ok) {
         setConnections((prev) => ({ ...prev, [provider]: { connected: false } }));
-        toast.success("Deconnecte.");
+        toast.success("Déconnecté.");
       } else {
-        toast.error("Erreur lors de la deconnexion.");
+        toast.error("Erreur lors de la déconnexion.");
       }
     } catch {
-      toast.error("Erreur reseau.");
+      toast.error("Erreur réseau.");
     } finally {
       setDisconnecting(null);
     }
@@ -688,11 +688,11 @@ function IntegrationsCard() {
             <div className="flex items-center gap-2">
               <span className="h-2 w-2 rounded-full bg-green-400" />
               <span className="text-sm text-text-secondary">
-                {conn.username || conn.accountId || "Connecte"}
+                {conn.username || conn.accountId || "Connecté"}
               </span>
             </div>
           ) : (
-            <span className="text-sm text-text-muted">Non connecte</span>
+            <span className="text-sm text-text-muted">Non connecté</span>
           )}
         </div>
         {conn?.connected ? (
@@ -706,7 +706,7 @@ function IntegrationsCard() {
             {isDisconnecting ? (
               <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
-              "Deconnecter"
+              "Déconnecter"
             )}
           </Button>
         ) : (
@@ -728,7 +728,7 @@ function IntegrationsCard() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Link2 className="h-5 w-5 text-info" />
-          Integrations
+          Intégrations
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-2">
@@ -740,7 +740,7 @@ function IntegrationsCard() {
           <>
             {/* Publicite & CRM */}
             <p className="text-xs font-semibold text-text-muted uppercase tracking-wider pt-2">
-              Publicite & CRM
+              Publicité & CRM
             </p>
 
             <ConnectButton
@@ -769,7 +769,7 @@ function IntegrationsCard() {
 
             {/* Reseaux sociaux */}
             <p className="text-xs font-semibold text-text-muted uppercase tracking-wider">
-              Reseaux sociaux
+              Réseaux sociaux
             </p>
 
             <ConnectButton
@@ -819,7 +819,7 @@ function IntegrationsCard() {
                 className="shrink-0"
                 onClick={() => {
                   navigator.clipboard.writeText(ghlInboundUrl);
-                  toast.success("URL copiee !");
+                  toast.success("URL copiée !");
                 }}
               >
                 Copier
@@ -840,7 +840,7 @@ function IntegrationsCard() {
 const THEME_OPTIONS: { value: Theme; label: string; icon: typeof Sun }[] = [
   { value: "light", label: "Clair", icon: Sun },
   { value: "dark", label: "Sombre", icon: Moon },
-  { value: "system", label: "Systeme", icon: Monitor },
+  { value: "system", label: "Système", icon: Monitor },
 ];
 
 function ThemeCard() {
@@ -916,7 +916,7 @@ function ExportDataCard() {
       a.click();
       URL.revokeObjectURL(url);
 
-      toast.success("Donnees exportees avec succes !");
+      toast.success("Données exportées avec succès !");
     } catch {
       toast.error("Erreur lors de l'export.");
     } finally {
@@ -929,12 +929,12 @@ function ExportDataCard() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Download className="h-5 w-5 text-accent" />
-          Exporter mes donnees
+          Exporter mes données
         </CardTitle>
       </CardHeader>
       <CardContent>
         <p className="text-sm text-text-secondary mb-4">
-          Telecharge toutes tes offres, funnels, assets, publicites et contenus
+          Télécharge toutes tes offres, funnels, assets, publicités et contenus
           au format JSON.
         </p>
         <Button
@@ -948,7 +948,7 @@ function ExportDataCard() {
           ) : (
             <Download className="h-4 w-4 mr-2" />
           )}
-          Exporter toutes mes donnees
+          Exporter toutes mes données
         </Button>
       </CardContent>
     </Card>

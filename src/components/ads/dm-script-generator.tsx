@@ -48,11 +48,11 @@ export function DMScriptGenerator({ className, initialData }: DMScriptGeneratorP
           const errData = await response.json();
           if (errData.usage) { setUsageLimited(errData.usage); return; }
         }
-        throw new Error("Erreur lors de la generation");
+        throw new Error("Erreur lors de la génération");
       }
       const data = await response.json();
       setResult(data.result as DMScriptsResult);
-      toast.success("Scripts DM generes !");
+      toast.success("Scripts DM générés !");
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Erreur";
       setError(msg);
@@ -74,7 +74,7 @@ export function DMScriptGenerator({ className, initialData }: DMScriptGeneratorP
   }
 
   if (loading) {
-    return <AILoading text="Generation des scripts DM" className={className} />;
+    return <AILoading text="Génération des scripts DM" className={className} />;
   }
 
   if (!result) {
@@ -83,7 +83,7 @@ export function DMScriptGenerator({ className, initialData }: DMScriptGeneratorP
         {error && <p className="text-sm text-danger mb-4">{error}</p>}
         <Button size="lg" onClick={handleGenerate}>
           <Sparkles className="h-4 w-4 mr-2" />
-          Generer les scripts DM
+          Générer les scripts DM
         </Button>
         <p className="text-sm text-text-secondary mt-2">
           3 sequences de prospection + 5 scenarios de retargeting
@@ -123,7 +123,7 @@ export function DMScriptGenerator({ className, initialData }: DMScriptGeneratorP
           </button>
         </div>
         <Button variant="outline" size="sm" onClick={handleGenerate}>
-          Regenerer
+          Régénérer
         </Button>
       </div>
 

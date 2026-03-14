@@ -44,7 +44,7 @@ export function VSLGenerator({ className, initialData }: VSLGeneratorProps) {
           const errData = await response.json();
           if (errData.usage) { setUsageLimited(errData.usage); return; }
         }
-        throw new Error("Erreur lors de la generation");
+        throw new Error("Erreur lors de la génération");
       }
       const data = await response.json();
       setScript(data.ai_raw_response || data);
@@ -69,9 +69,9 @@ export function VSLGenerator({ className, initialData }: VSLGeneratorProps) {
         {error && <p className="text-sm text-danger mb-4">{error}</p>}
         <Button size="lg" onClick={handleGenerate}>
           <Sparkles className="h-4 w-4 mr-2" />
-          Generer le script VSL
+          Générer le script VSL
         </Button>
-        <p className="text-sm text-text-secondary mt-2">Script en 7 sections optimisees</p>
+        <p className="text-sm text-text-secondary mt-2">Script en 7 sections optimisées</p>
       </div>
     );
   }

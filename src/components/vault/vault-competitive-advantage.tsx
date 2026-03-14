@@ -61,7 +61,7 @@ export function VaultCompetitiveAdvantage() {
       if (!response.ok) throw new Error("Erreur lors de l'analyse");
       const data = await response.json();
       setAdvantage(data);
-      toast.success("Analyse d'avantage competitif terminee !");
+      toast.success("Analyse d'avantage compétitif terminée !");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Erreur");
     } finally {
@@ -72,7 +72,7 @@ export function VaultCompetitiveAdvantage() {
   if (loading) return <AILoading text="Chargement" />;
 
   if (generating) {
-    return <AILoading text="Analyse de ton avantage competitif par niche" />;
+    return <AILoading text="Analyse de ton avantage compétitif par niche" />;
   }
 
   if (!advantage) {
@@ -80,10 +80,10 @@ export function VaultCompetitiveAdvantage() {
       <div className="text-center py-12">
         <Trophy className="h-12 w-12 text-text-muted mx-auto mb-4" />
         <h3 className="font-semibold text-text-primary mb-2">
-          Score d&apos;avantage competitif
+          Score d&apos;avantage compétitif
         </h3>
         <p className="text-sm text-text-secondary mb-6 max-w-md mx-auto">
-          L&apos;IA analyse tes competences et ton profil pour calculer ton avantage competitif dans differentes niches.
+          L&apos;IA analyse tes compétences et ton profil pour calculer ton avantage compétitif dans différentes niches.
         </p>
         <Button size="lg" onClick={handleGenerate}>
           <Sparkles className="h-4 w-4 mr-2" />
@@ -178,7 +178,7 @@ export function VaultCompetitiveAdvantage() {
               <div className="p-2 rounded-lg bg-bg-tertiary">
                 <p className="text-xs text-text-muted uppercase mb-1">
                   <TrendingUp className="h-3 w-3 inline mr-1" />
-                  Opportunite
+                  Opportunité
                 </p>
                 <p className="text-xs text-text-secondary">{niche.opportunity}</p>
               </div>

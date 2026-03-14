@@ -6,7 +6,7 @@ export async function POST(req: NextRequest) {
   try {
     if (!stripe) {
       return NextResponse.json(
-        { error: "Stripe non configure. Contacte le support." },
+        { error: "Stripe non configuré. Contacte le support." },
         { status: 503 }
       );
     }
@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Non autorise" }, { status: 401 });
+      return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
     }
 
     const body = await req.json();
@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Recuperer ou creer le stripe_customer_id
+    // Récupérer ou créer le stripe_customer_id
     const { data: profile } = await supabase
       .from("profiles")
       .select("stripe_customer_id, email, full_name")
@@ -68,7 +68,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ url: session.url });
   } catch (error) {
     return NextResponse.json(
-      { error: "Erreur lors de la creation de la session de paiement" },
+      { error: "Erreur lors de la création de la session de paiement" },
       { status: 500 }
     );
   }

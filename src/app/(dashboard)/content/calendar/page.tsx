@@ -77,14 +77,14 @@ export default function EditorialCalendarPage() {
             return;
           }
         }
-        throw new Error("Erreur lors de la generation");
+        throw new Error("Erreur lors de la génération");
       }
 
       const data = await response.json();
       const result = data.result as EditorialCalendarResult;
       setItems(result.calendrier || []);
       setStrategie(result.strategie || null);
-      toast.success("Plan editorial 30 jours genere !");
+      toast.success("Plan éditorial 30 jours généré !");
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Erreur";
       setError(msg);
@@ -116,13 +116,13 @@ export default function EditorialCalendarPage() {
           </Button>
         </Link>
         <PageHeader
-          title="Plan Editorial 30 Jours"
-          description="Genere un calendrier de contenu structure sur 30 jours avec les piliers K/L/T."
+          title="Plan Éditorial 30 Jours"
+          description="Génère un calendrier de contenu structuré sur 30 jours avec les piliers K/L/T."
         />
       </div>
 
       {loading && (
-        <AILoading text="Generation du plan editorial 30 jours — cela peut prendre quelques secondes" />
+        <AILoading text="Génération du plan éditorial 30 jours — cela peut prendre quelques secondes" />
       )}
 
       {!loading && items.length === 0 && (
@@ -131,16 +131,16 @@ export default function EditorialCalendarPage() {
             <CalendarDays className="h-8 w-8 text-accent" />
           </div>
           <h3 className="text-lg font-semibold text-text-primary mb-2">
-            Plan editorial intelligent
+            Plan éditorial intelligent
           </h3>
           <p className="text-sm text-text-secondary max-w-md mx-auto mb-6">
-            Genere un plan de contenu personnalise sur 30 jours base sur ton
-            offre, ton marche et les piliers Know / Like / Trust.
+            Génère un plan de contenu personnalisé sur 30 jours basé sur ton
+            offre, ton marché et les piliers Know / Like / Trust.
           </p>
           {error && <p className="text-sm text-danger mb-4">{error}</p>}
           <Button size="lg" onClick={handleGenerate}>
             <Sparkles className="h-4 w-4 mr-2" />
-            Generer mon plan editorial
+            Générer mon plan éditorial
           </Button>
         </div>
       )}
@@ -357,7 +357,7 @@ export default function EditorialCalendarPage() {
           <div className="text-center pt-4">
             <Button variant="outline" size="sm" onClick={handleGenerate}>
               <Sparkles className="h-3 w-3 mr-2" />
-              Regenerer le plan
+              Régénérer le plan
             </Button>
           </div>
         </div>

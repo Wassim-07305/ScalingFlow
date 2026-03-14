@@ -44,7 +44,7 @@ export function SmartRecommendations() {
     const analyze = async () => {
       const supabase = createClient();
 
-      // Requetes paralleles pour analyser la progression
+      // Requêtes parallèles pour analyser la progression
       const [
         vaultRes,
         marketRes,
@@ -93,12 +93,12 @@ export function SmartRecommendations() {
       const p = vaultRes.data;
       const recs: Recommendation[] = [];
 
-      // Logique de recommandation basee sur le parcours utilisateur
+      // Logique de recommandation basée sur le parcours utilisateur
       if (!p?.vault_completed) {
         recs.push({
           id: "vault",
-          title: "Complete ton Vault",
-          description: "Definis tes competences et ta situation pour que l'IA personnalise tout ton contenu.",
+          title: "Complète ton Vault",
+          description: "Definis tes compétences et ta situation pour que l'IA personnalise tout ton contenu.",
           href: "/vault",
           icon: Archive,
           priority: "high",
@@ -108,8 +108,8 @@ export function SmartRecommendations() {
       if ((marketRes.count ?? 0) === 0) {
         recs.push({
           id: "market",
-          title: "Analyse ton marche",
-          description: "Identifie ton marche cible, valide la demande et trouve ton positionnement.",
+          title: "Analyse ton marché",
+          description: "Identifie ton marché cible, valide la demande et trouve ton positionnement.",
           href: "/market",
           icon: Globe,
           priority: p?.vault_completed ? "high" : "medium",
@@ -119,8 +119,8 @@ export function SmartRecommendations() {
       if ((offersRes.count ?? 0) === 0) {
         recs.push({
           id: "offer",
-          title: "Cree ton offre",
-          description: "Genere une offre irresistible avec pricing, garantie et positionnement.",
+          title: "Crée ton offre",
+          description: "Génère une offre irrésistible avec pricing, garantie et positionnement.",
           href: "/offer",
           icon: Package,
           priority: (marketRes.count ?? 0) > 0 ? "high" : "medium",
@@ -130,8 +130,8 @@ export function SmartRecommendations() {
       if ((brandsRes.count ?? 0) === 0 && (offersRes.count ?? 0) > 0) {
         recs.push({
           id: "brand",
-          title: "Definis ton identite de marque",
-          description: "Cree un branding coherent : nom, couleurs, ton et message cle.",
+          title: "Définis ton identité de marque",
+          description: "Crée un branding cohérent : nom, couleurs, ton et message clé.",
           href: "/brand",
           icon: Palette,
           priority: "medium",
@@ -142,7 +142,7 @@ export function SmartRecommendations() {
         recs.push({
           id: "funnel",
           title: "Construis ton funnel de vente",
-          description: "Genere les pages de capture, vente et merci pour convertir tes visiteurs.",
+          description: "Génère les pages de capture, vente et merci pour convertir tes visiteurs.",
           href: "/funnel",
           icon: Filter,
           priority: "high",
@@ -153,7 +153,7 @@ export function SmartRecommendations() {
         recs.push({
           id: "ads",
           title: "Lance tes publicites",
-          description: "Cree des creatives publicitaires pour attirer du trafic vers ton funnel.",
+          description: "Crée des créatives publicitaires pour attirer du trafic vers ton funnel.",
           href: "/ads",
           icon: Megaphone,
           priority: "high",
@@ -163,8 +163,8 @@ export function SmartRecommendations() {
       if ((contentRes.count ?? 0) === 0 && (offersRes.count ?? 0) > 0) {
         recs.push({
           id: "content",
-          title: "Genere du contenu organique",
-          description: "Cree des idees de posts, reels et articles pour attirer une audience.",
+          title: "Généré du contenu organique",
+          description: "Crée des idées de posts, reels et articles pour attirer une audience.",
           href: "/content",
           icon: PenTool,
           priority: "medium",
@@ -174,8 +174,8 @@ export function SmartRecommendations() {
       if ((assetsRes.count ?? 0) === 0 && (funnelsRes.count ?? 0) > 0) {
         recs.push({
           id: "assets",
-          title: "Cree tes assets de vente",
-          description: "Genere un VSL, des emails de sequence ou un pitch deck pour closer.",
+          title: "Crée tes assets de vente",
+          description: "Génère un VSL, des emails de séquence ou un pitch deck pour closer.",
           href: "/assets",
           icon: FileText,
           priority: "medium",
@@ -194,7 +194,7 @@ export function SmartRecommendations() {
         });
       }
 
-      // Trier par priorite et limiter a 3
+      // Trier par priorité et limiter à 3
       const priorityOrder = { high: 0, medium: 1, low: 2 };
       recs.sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]);
       setRecommendations(recs.slice(0, 3));
@@ -239,7 +239,7 @@ export function SmartRecommendations() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Sparkles className="h-5 w-5 text-accent" />
-          Prochaines etapes
+          Prochaines étapes
         </CardTitle>
       </CardHeader>
       <CardContent>

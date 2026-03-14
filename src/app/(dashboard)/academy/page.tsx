@@ -11,7 +11,7 @@ function AcademyStats() {
     <div className="grid grid-cols-3 gap-4 mb-6">
       {[
         { icon: GraduationCap, label: "Modules", value: "Disponibles", color: "text-accent" },
-        { icon: Clock, label: "Format", value: "Video + Action", color: "text-info" },
+        { icon: Clock, label: "Format", value: "Vidéo + Action", color: "text-info" },
         { icon: Trophy, label: "Objectif", value: "Scaler ton business", color: "text-warning" },
       ].map((stat) => (
         <div key={stat.label} className="rounded-[12px] border border-border-default bg-bg-secondary p-4 flex items-center gap-3">
@@ -42,8 +42,8 @@ export default function AcademyPage() {
   return (
     <div>
       <PageHeader
-        title="Academie"
-        description="Formation video etape par etape pour scaler ton business."
+        title="Académie"
+        description="Formation vidéo étape par étape pour scaler ton business."
       />
       <AcademyStats />
       <Suspense fallback={<ModuleListFallback />}>

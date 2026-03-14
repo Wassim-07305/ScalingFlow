@@ -161,7 +161,7 @@ export function MetricsHistory() {
         {isDemo && <Badge variant="yellow">Donnees de demonstration</Badge>}
         <Badge variant="muted">
           <Calendar className="h-3 w-3 mr-1" />
-          {summary.totalDays} jours de donnees
+          {summary.totalDays} jours de données
         </Badge>
         </div>
         {!isDemo && metrics.length > 0 && (
@@ -230,7 +230,7 @@ export function MetricsHistory() {
       {/* Detailed history table */}
       <Card>
         <CardHeader>
-          <CardTitle>Historique detaille jour par jour</CardTitle>
+          <CardTitle>Historique détaillé jour par jour</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">

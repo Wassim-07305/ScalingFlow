@@ -39,7 +39,7 @@ const radarLabels: Record<string, string> = {
   copywriting: "Copywriting",
   tech: "Tech",
   design: "Design",
-  strategie: "Strategie",
+  strategie: "Stratégie",
 };
 
 const funnelLabels: Record<string, string> = {
@@ -65,7 +65,7 @@ const potentielLabel: Record<string, string> = {
 };
 
 export function VaultResults({ analysis, onContinue }: VaultResultsProps) {
-  // Formater les donnees pour le RadarChart
+  // Formater les données pour le RadarChart
   const radarData = Object.entries(analysis.radar ?? {}).map(([key, value]) => ({
     dimension: radarLabels[key] ?? key,
     value,
@@ -74,14 +74,14 @@ export function VaultResults({ analysis, onContinue }: VaultResultsProps) {
 
   return (
     <div className="mx-auto max-w-4xl space-y-6">
-      {/* En-tete */}
+      {/* En-tête */}
       <div className="text-center">
         <h2 className="text-2xl font-bold text-text-primary">
           Analyse de ton Vault
         </h2>
         <p className="mt-2 text-sm text-text-secondary">
-          Cartographie complete de tes competences et recommandations
-          personnalisees
+          Cartographie complète de tes compétences et recommandations
+          personnalisées
         </p>
       </div>
 
@@ -92,7 +92,7 @@ export function VaultResults({ analysis, onContinue }: VaultResultsProps) {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Target className="h-4 w-4 text-accent" />
-              Radar de competences
+              Radar de compétences
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -145,12 +145,12 @@ export function VaultResults({ analysis, onContinue }: VaultResultsProps) {
           </CardContent>
         </Card>
 
-        {/* Score avantage competitif */}
+        {/* Score avantage compétitif */}
         <Card className="flex flex-col items-center justify-center">
           <CardHeader className="text-center">
             <CardTitle className="flex items-center justify-center gap-2">
               <TrendingUp className="h-4 w-4 text-accent" />
-              Avantage competitif
+              Avantage compétitif
             </CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col items-center gap-4">
@@ -160,12 +160,12 @@ export function VaultResults({ analysis, onContinue }: VaultResultsProps) {
             />
             <p className="text-center text-sm text-text-secondary">
               {analysis.score_avantage_competitif >= 80
-                ? "Excellent ! Tu as un avantage competitif tres fort."
+                ? "Excellent ! Tu as un avantage compétitif très fort."
                 : analysis.score_avantage_competitif >= 60
-                  ? "Bon potentiel. Quelques axes d'amelioration identifes."
+                  ? "Bon potentiel. Quelques axes d'amélioration identifiés."
                   : analysis.score_avantage_competitif >= 40
-                    ? "Potentiel a developper. Focus sur tes forces."
-                    : "En construction. Suis les etapes recommandees."}
+                    ? "Potentiel à développer. Focus sur tes forces."
+                    : "En construction. Suis les étapes recommandées."}
             </p>
           </CardContent>
         </Card>
@@ -296,12 +296,12 @@ export function VaultResults({ analysis, onContinue }: VaultResultsProps) {
         </Card>
       </div>
 
-      {/* Prochaines etapes */}
+      {/* Prochaines étapes */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Zap className="h-4 w-4 text-accent" />
-            Prochaines etapes
+            Prochaines étapes
           </CardTitle>
         </CardHeader>
         <CardContent>

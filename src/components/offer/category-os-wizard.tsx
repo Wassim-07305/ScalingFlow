@@ -28,7 +28,7 @@ const STEPS = [
   { key: "ennemi", label: "Ennemi", icon: Sword, color: "text-danger" },
   { key: "truth_bombs", label: "Truth Bombs", icon: Bomb, color: "text-warning" },
   { key: "modele_tangible", label: "Framework", icon: Blocks, color: "text-info" },
-  { key: "identite", label: "Identite", icon: Fingerprint, color: "text-[#A78BFA]" },
+  { key: "identite", label: "Identité", icon: Fingerprint, color: "text-[#A78BFA]" },
 ] as const;
 
 interface CategoryOSWizardProps {
@@ -44,7 +44,7 @@ export function CategoryOSWizard({ offerId, className }: CategoryOSWizardProps) 
 
   const handleGenerate = async () => {
     if (!offerId) {
-      toast.error("Veuillez d'abord generer une offre.");
+      toast.error("Veuillez d'abord générer une offre.");
       return;
     }
 
@@ -62,12 +62,12 @@ export function CategoryOSWizard({ offerId, className }: CategoryOSWizardProps) 
       if (!response.ok) {
         const errData = await response.json().catch(() => ({}));
         if (response.status === 403 && errData.usage) { setUsageLimited(errData.usage); return; }
-        throw new Error(errData.error || "Erreur lors de la generation");
+        throw new Error(errData.error || "Erreur lors de la génération");
       }
 
       const data: CategoryOSResult = await response.json();
       setResult(data);
-      toast.success("Category OS genere avec succes !");
+      toast.success("Category OS généré avec succès !");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Une erreur est survenue");
     } finally {
@@ -80,7 +80,7 @@ export function CategoryOSWizard({ offerId, className }: CategoryOSWizardProps) 
   }
 
   if (loading) {
-    return <AILoading text="Generation du Category OS" className={className} />;
+    return <AILoading text="Génération du Category OS" className={className} />;
   }
 
   if (!result) {
@@ -96,11 +96,11 @@ export function CategoryOSWizard({ offerId, className }: CategoryOSWizardProps) 
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-sm text-text-secondary">
-                Le Category OS definit ton positionnement unique en 5 etapes : nouvelle categorie, ennemi commun, verites derangeantes, framework proprietaire et identite de marque.
+                Le Category OS définit ton positionnement unique en 5 étapes : nouvelle catégorie, ennemi commun, vérités dérangeantes, framework propriétaire et identité de marque.
               </p>
               <Button size="lg" onClick={handleGenerate}>
                 <Sparkles className="h-4 w-4 mr-2" />
-                Generer le Category OS
+                Générer le Category OS
               </Button>
             </CardContent>
           </Card>
@@ -108,7 +108,7 @@ export function CategoryOSWizard({ offerId, className }: CategoryOSWizardProps) 
           <EmptyState
             icon={Gamepad2}
             title="Aucune offre disponible"
-            description="Genere d'abord une offre pour pouvoir creer ton positionnement Category OS."
+            description="Génère d'abord une offre pour pouvoir créer ton positionnement Category OS."
           />
         )}
       </div>
@@ -165,7 +165,7 @@ export function CategoryOSWizard({ offerId, className }: CategoryOSWizardProps) 
           disabled={currentStep === 0}
         >
           <ChevronLeft className="h-4 w-4 mr-1" />
-          Precedent
+          Précédent
         </Button>
         <span className="text-xs text-text-muted">
           {currentStep + 1} / {STEPS.length}
@@ -180,7 +180,7 @@ export function CategoryOSWizard({ offerId, className }: CategoryOSWizardProps) 
         ) : (
           <Button variant="outline" onClick={handleGenerate}>
             <Sparkles className="h-4 w-4 mr-1" />
-            Regenerer
+            Régénérer
           </Button>
         )}
       </div>
@@ -195,7 +195,7 @@ function NewGameStep({ data }: { data: CategoryOSResult["new_game"] }) {
     <div className="space-y-6">
       <div className="p-4 rounded-xl bg-accent-muted/30 border border-accent/20">
         <p className="text-xs text-accent font-medium uppercase tracking-wide mb-1">
-          Nouvelle categorie
+          Nouvelle catégorie
         </p>
         <p className="text-xl font-bold text-text-primary">{data.category_name}</p>
       </div>
@@ -208,7 +208,7 @@ function NewGameStep({ data }: { data: CategoryOSResult["new_game"] }) {
         </div>
         <div className="p-4 rounded-xl bg-bg-tertiary border border-border-default">
           <p className="text-xs text-text-muted uppercase tracking-wide mb-2">
-            Declaration de positionnement
+            Déclaration de positionnement
           </p>
           <p className="text-base font-medium text-text-primary italic">
             &ldquo;{data.positioning_statement}&rdquo;
@@ -285,7 +285,7 @@ function ModeleTangibleStep({ data }: { data: CategoryOSResult["modele_tangible"
     <div className="space-y-6">
       <div className="p-4 rounded-xl bg-info/10 border border-info/20">
         <p className="text-xs text-info font-medium uppercase tracking-wide mb-1">
-          Framework proprietaire
+          Framework propriétaire
         </p>
         <p className="text-xl font-bold text-text-primary">{data.framework_name}</p>
       </div>
@@ -307,7 +307,7 @@ function ModeleTangibleStep({ data }: { data: CategoryOSResult["modele_tangible"
       </div>
       <div className="p-4 rounded-xl bg-bg-tertiary border border-border-default">
         <p className="text-xs text-text-muted uppercase tracking-wide mb-2">
-          Representation visuelle
+          Représentation visuelle
         </p>
         <p className="text-sm text-text-secondary">{data.visual_description}</p>
       </div>

@@ -132,7 +132,7 @@ export function PostFeed({ className }: PostFeedProps) {
       return;
     }
 
-    // Verifier les likes de l'utilisateur courant
+    // Vérifier les likes de l'utilisateur courant
     let likedPostIds: Set<string> = new Set();
     if (user) {
       const { data: likes } = await supabase
@@ -161,13 +161,13 @@ export function PostFeed({ className }: PostFeedProps) {
     fetchPosts();
   }, [fetchPosts]);
 
-  // ---- Filtrage par categorie ----
+  // ---- Filtrage par catégorie ----
   const filteredPosts =
     activeCategory === "Tous"
       ? posts
       : posts.filter((p) => p.category === activeCategory);
 
-  // ---- Creer un post ----
+  // ---- Créer un post ----
   const handleSubmitPost = async () => {
     if (!newContent.trim() || !user) return;
     setSubmitting(true);
@@ -187,7 +187,7 @@ export function PostFeed({ className }: PostFeedProps) {
       return;
     }
 
-    toast.success("Post publie !");
+    toast.success("Post publié !");
     // Attribuer XP (non bloquant)
     fetch("/api/gamification/award", {
       method: "POST",
@@ -211,7 +211,7 @@ export function PostFeed({ className }: PostFeedProps) {
 
     const wasLiked = post.liked_by_me;
 
-    // Mise a jour optimiste
+    // Mise à jour optimiste
     setPosts((prev) =>
       prev.map((p) =>
         p.id === postId
@@ -296,7 +296,7 @@ export function PostFeed({ className }: PostFeedProps) {
 
     setExpandedComments((prev) => new Set(prev).add(postId));
 
-    if (comments[postId]) return; // Deja charge
+    if (comments[postId]) return; // Déjà chargé
 
     setLoadingComments((prev) => new Set(prev).add(postId));
 
@@ -366,14 +366,14 @@ export function PostFeed({ className }: PostFeedProps) {
       body: JSON.stringify({ activityType: "community.comment" }),
     }).catch(() => {});
 
-    // Mettre a jour le compteur
+    // Mettre à jour le compteur
     setPosts((prev) =>
       prev.map((p) =>
         p.id === postId ? { ...p, comments_count: p.comments_count + 1 } : p
       )
     );
 
-    // Mettre a jour le compteur en DB
+    // Mettre à jour le compteur en DB
     const post = posts.find((p) => p.id === postId);
     if (post) {
       await supabase
@@ -409,7 +409,7 @@ export function PostFeed({ className }: PostFeedProps) {
       )
     );
     setEditingPostId(null);
-    toast.success("Post modifie");
+    toast.success("Post modifié");
   };
 
   // ---- Supprimer un post ----
@@ -425,7 +425,7 @@ export function PostFeed({ className }: PostFeedProps) {
     }
 
     setPosts((prev) => prev.filter((p) => p.id !== postId));
-    toast.success("Post supprime");
+    toast.success("Post supprimé");
   };
 
   // ---- Editer un commentaire ----
@@ -448,7 +448,7 @@ export function PostFeed({ className }: PostFeedProps) {
       ),
     }));
     setEditingCommentId(null);
-    toast.success("Commentaire modifie");
+    toast.success("Commentaire modifié");
   };
 
   // ---- Supprimer un commentaire ----
@@ -475,7 +475,7 @@ export function PostFeed({ className }: PostFeedProps) {
       )
     );
 
-    // Mettre a jour en DB
+    // Mettre à jour en DB
     const post = posts.find((p) => p.id === postId);
     if (post) {
       await supabase
@@ -484,7 +484,7 @@ export function PostFeed({ className }: PostFeedProps) {
         .eq("id", postId);
     }
 
-    toast.success("Commentaire supprime");
+    toast.success("Commentaire supprimé");
   };
 
   // ---- Helpers d'affichage ----
@@ -565,7 +565,7 @@ export function PostFeed({ className }: PostFeedProps) {
         </Card>
       )}
 
-      {/* Filtres par categorie */}
+      {/* Filtres par catégorie */}
       <div className="flex gap-2 overflow-x-auto pb-1">
         {CATEGORIES.map((cat) => (
           <button
@@ -588,7 +588,7 @@ export function PostFeed({ className }: PostFeedProps) {
         <div className="flex flex-col items-center justify-center py-12 text-center">
           <MessageSquare className="h-10 w-10 text-text-muted/40 mb-3" />
           <p className="text-sm text-text-muted">
-            Aucun post dans cette categorie pour le moment.
+            Aucun post dans cette catégorie pour le moment.
           </p>
         </div>
       ) : (
@@ -620,7 +620,7 @@ export function PostFeed({ className }: PostFeedProps) {
                         </span>
                         {post.pinned && (
                           <Badge variant="default" className="text-[10px]">
-                            Epingle
+                            Épinglé
                           </Badge>
                         )}
                       </div>
@@ -873,7 +873,7 @@ export function PostFeed({ className }: PostFeedProps) {
                       {user && (
                         <div className="flex gap-2 pl-2">
                           <Input
-                            placeholder="Ecrire un commentaire..."
+                            placeholder="Écrire un commentaire..."
                             value={commentInputs[post.id] || ""}
                             onChange={(e) =>
                               setCommentInputs((prev) => ({

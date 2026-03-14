@@ -110,7 +110,7 @@ export function WelcomeBanner() {
                 <div className="flex items-center gap-2 text-sm text-text-muted">
                   <TrendingUp className="h-3.5 w-3.5" />
                   <span>
-                    {usage.currentUsage}/{usage.limit ?? 5} generations IA ce mois
+                    {usage.currentUsage}/{usage.limit ?? 5} générations IA ce mois
                   </span>
                   {usage.limit != null && usage.currentUsage >= usage.limit && (
                     <Badge variant="red" className="text-xs">
@@ -145,7 +145,7 @@ export function WelcomeBanner() {
                 className="text-sm text-emerald-400/80 flex items-center gap-1.5"
               >
                 <Sparkles className="h-3.5 w-3.5" />
-                Generations IA illimitees
+                Générations IA illimitées
               </motion.p>
             )}
           </div>
@@ -161,7 +161,7 @@ export function WelcomeBanner() {
                 className="group inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-sm font-semibold shadow-lg shadow-emerald-500/20 hover:shadow-xl hover:shadow-emerald-500/30 hover:scale-[1.02] transition-all duration-200"
               >
                 <Sparkles className="h-4 w-4" />
-                Passer a Pro
+                Passer à Pro
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
               </Link>
             </motion.div>

@@ -10,16 +10,16 @@ import { toast } from "sonner";
 import { Sparkles, Send, CheckCircle, RotateCcw } from "lucide-react";
 
 const EXTRACTION_QUESTIONS = [
-  "Quel est le probleme principal que tu resous pour tes clients ? Donne un exemple concret.",
-  "Quelle est ta methodologie ou ton process unique pour obtenir des resultats ?",
-  "Quel est le resultat le plus impressionnant que tu as obtenu pour un client ?",
-  "Qu'est-ce qui te differencie de tes concurrents directs ?",
+  "Quel est le problème principal que tu résous pour tes clients ? Donne un exemple concret.",
+  "Quelle est ta méthodologie ou ton process unique pour obtenir des résultats ?",
+  "Quel est le résultat le plus impressionnant que tu as obtenu pour un client ?",
+  "Qu'est-ce qui te différencie de tes concurrents directs ?",
   "Quelle erreur tes clients font-ils souvent avant de travailler avec toi ?",
-  "Si tu devais resumer ton expertise en une phrase, ce serait quoi ?",
-  "Quel est le moment 'declic' que tes clients vivent en travaillant avec toi ?",
+  "Si tu devais résumer ton expertise en une phrase, ce serait quoi ?",
+  "Quel est le moment 'déclic' que tes clients vivent en travaillant avec toi ?",
   "Quels outils ou frameworks utilises-tu que d'autres n'utilisent pas ?",
-  "Quel est ton parcours qui te rend legitime dans ton domaine ?",
-  "Si un prospect hesitait, quel argument le convaincrait a coup sur ?",
+  "Quel est ton parcours qui te rend légitime dans ton domaine ?",
+  "Si un prospect hésitait, quel argument le convaincrait à coup sûr ?",
 ];
 
 interface ExtractionAnswer {
@@ -84,14 +84,14 @@ export function VaultExtraction() {
         body: JSON.stringify({ answers: finalAnswers }),
       });
 
-      if (!response.ok) throw new Error("Erreur lors de la generation");
+      if (!response.ok) throw new Error("Erreur lors de la génération");
       const data = await response.json();
       const result = typeof data.extraction === "string"
         ? data.extraction
         : JSON.stringify(data.extraction, null, 2);
       setExtractionResult(result);
       setExistingExtraction(result);
-      toast.success("Extraction d'expertise terminee !");
+      toast.success("Extraction d'expertise terminée !");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Erreur");
     } finally {
@@ -109,7 +109,7 @@ export function VaultExtraction() {
   if (loading) return <AILoading text="Chargement" />;
 
   if (generating) {
-    return <AILoading text="Analyse de tes reponses et creation du document d'expertise" />;
+    return <AILoading text="Analyse de tes réponses et création du document d'expertise" />;
   }
 
   // Show existing extraction if available and not in questionnaire mode
@@ -119,7 +119,7 @@ export function VaultExtraction() {
         <div className="flex items-center justify-between">
           <h3 className="font-semibold text-text-primary flex items-center gap-2">
             <CheckCircle className="h-5 w-5 text-accent" />
-            Extraction d&apos;expertise completee
+            Extraction d&apos;expertise complétée
           </h3>
           <Button variant="outline" onClick={handleRestart}>
             <RotateCcw className="h-4 w-4 mr-2" />
@@ -144,7 +144,7 @@ export function VaultExtraction() {
         <div className="flex items-center justify-between">
           <h3 className="font-semibold text-text-primary flex items-center gap-2">
             <CheckCircle className="h-5 w-5 text-accent" />
-            Extraction terminee
+            Extraction terminée
           </h3>
           <Button variant="outline" onClick={handleRestart}>
             <RotateCcw className="h-4 w-4 mr-2" />
@@ -206,7 +206,7 @@ export function VaultExtraction() {
           <textarea
             value={currentAnswer}
             onChange={(e) => setCurrentAnswer(e.target.value)}
-            placeholder="Ta reponse..."
+            placeholder="Ta réponse..."
             rows={4}
             className="w-full px-4 py-3 rounded-xl bg-bg-tertiary border border-border-default text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent resize-none text-sm"
             onKeyDown={(e) => {

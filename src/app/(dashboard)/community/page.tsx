@@ -7,7 +7,7 @@ import { SkeletonCard } from "@/components/ui/skeleton";
 import { MessageSquare, Trophy, HelpCircle } from "lucide-react";
 
 const CATEGORIES = [
-  { icon: MessageSquare, label: "General", color: "text-info" },
+  { icon: MessageSquare, label: "Général", color: "text-info" },
   { icon: Trophy, label: "Wins", color: "text-accent" },
   { icon: HelpCircle, label: "Questions", color: "text-warning" },
 ];
@@ -39,8 +39,8 @@ export default function CommunityPage() {
   return (
     <div>
       <PageHeader
-        title="Communaute"
-        description="Echange avec les autres membres ScalingFlow."
+        title="Communauté"
+        description="Échange avec les autres membres ScalingFlow."
       />
       <CommunityHeader />
       <Suspense fallback={<PostFeedFallback />}>

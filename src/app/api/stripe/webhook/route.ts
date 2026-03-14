@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
   try {
     if (!stripe) {
       return NextResponse.json(
-        { error: "Stripe non configure" },
+        { error: "Stripe non configuré" },
         { status: 503 }
       );
     }
@@ -72,7 +72,7 @@ export async function POST(req: NextRequest) {
         const subscriptionId = session.subscription as string;
 
         if (userId && subscriptionId) {
-          // Recuperer les details de l'abonnement
+          // Récupérer les details de l'abonnement
           const subscription = await stripe.subscriptions.retrieve(subscriptionId);
           const priceId = subscription.items.data[0]?.price.id;
           const plan = priceId ? getPlanByPriceId(priceId) : null;

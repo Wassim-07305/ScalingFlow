@@ -20,7 +20,7 @@ import type { Metadata } from "next";
 
 const title = "ScalingFlow — Scale ton business avec l'IA";
 const description =
-  "La plateforme tout-en-un pour structurer, lancer et scaler ton business. Offres, funnels, ads, contenu — tout genere par l'IA en quelques clics.";
+  "La plateforme tout-en-un pour structurer, lancer et scaler ton business. Offres, funnels, ads, contenu — tout généré par l'IA en quelques clics.";
 
 export const metadata: Metadata = {
   title,
@@ -67,13 +67,13 @@ export const metadata: Metadata = {
 const FEATURES = [
   {
     icon: Target,
-    title: "Analyse de marche",
-    description: "Identifie ton marche ideal, cree ton avatar client et analyse tes concurrents avec l'IA.",
+    title: "Analyse de marché",
+    description: "Identifie ton marché idéal, crée ton avatar client et analyse tes concurrents avec l'IA.",
   },
   {
     icon: Sparkles,
     title: "Offre irresistible",
-    description: "Genere une offre complete : positionnement, pricing, garanties, mecanisme unique.",
+    description: "Génère une offre complète : positionnement, pricing, garanties, mécanisme unique.",
   },
   {
     icon: Filter,
@@ -83,7 +83,7 @@ const FEATURES = [
   {
     icon: Megaphone,
     title: "Ads & Creatives",
-    description: "Cree des publicites qui convertissent : hooks, copy, scripts video, DM automatises.",
+    description: "Crée des publicités qui convertissent : hooks, copy, scripts vidéo, DM automatisés.",
   },
   {
     icon: FileText,
@@ -105,13 +105,13 @@ const STEPS = [
   },
   {
     step: "02",
-    title: "L'IA analyse ton marche",
+    title: "L'IA analyse ton marché",
     description: "ScalingFlow identifie tes opportunites, ton avatar client et tes concurrents.",
   },
   {
     step: "03",
-    title: "Genere tes assets",
-    description: "Offre, funnel, ads, contenu — tout est cree automatiquement, pret a deployer.",
+    title: "Génère tes assets",
+    description: "Offre, funnel, ads, contenu — tout est créé automatiquement, prêt à déployer.",
   },
 ];
 
@@ -124,7 +124,7 @@ const TESTIMONIALS = [
   {
     name: "Sarah M.",
     role: "Consultante marketing",
-    text: "La qualite des textes generes est bluffante. Mes clients pensent que j'ai une equipe de copywriters.",
+    text: "La qualité des textes générés est bluffante. Mes clients pensent que j'ai une équipe de copywriters.",
   },
   {
     name: "Kevin L.",
@@ -186,7 +186,7 @@ export default function WelcomePage() {
 
           <p className="text-lg text-text-secondary max-w-2xl mx-auto mb-10 leading-relaxed">
             Offre, funnel, ads, contenu, emails — tout ce dont tu as besoin pour
-            lancer et scaler, genere par l&apos;IA en quelques clics.{" "}
+            lancer et scaler, généré par l&apos;IA en quelques clics.{" "}
             <span className="text-text-primary font-medium">Gratuit pour commencer.</span>
           </p>
 
@@ -237,7 +237,7 @@ export default function WelcomePage() {
             Tout pour scaler, en un seul endroit
           </h2>
           <p className="text-text-secondary max-w-xl mx-auto">
-            De l&apos;analyse de marche au closing, ScalingFlow genere tous les assets
+            De l&apos;analyse de marché au closing, ScalingFlow génère tous les assets
             dont tu as besoin pour lancer et scaler ton business.
           </p>
         </div>
@@ -263,7 +263,7 @@ export default function WelcomePage() {
         <div className="max-w-4xl mx-auto px-4 py-24">
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold text-text-primary mb-4">
-              Comment ca marche
+              Comment ça marche
             </h2>
             <p className="text-text-secondary">
               3 etapes pour passer de zero a un business structure.
@@ -409,20 +409,20 @@ export default function WelcomePage() {
         <div className="space-y-3">
           {[
             {
-              q: "Combien de temps faut-il pour generer une offre complete ?",
-              a: "Moins de 2 minutes. L'IA analyse ton marche, tes competences et ton positionnement pour generer une offre structuree avec pricing, garantie et arguments de vente.",
+              q: "Combien de temps faut-il pour générer une offre complète ?",
+              a: "Moins de 2 minutes. L'IA analyse ton marché, tes compétences et ton positionnement pour générer une offre structurée avec pricing, garantie et arguments de vente.",
             },
             {
-              q: "Puis-je modifier les textes generes par l'IA ?",
-              a: "Absolument. Tous les textes generes (offres, funnels, ads, emails) sont entierement editables. L'IA te donne une base solide que tu peux affiner selon tes besoins.",
+              q: "Puis-je modifier les textes générés par l'IA ?",
+              a: "Absolument. Tous les textes générés (offres, funnels, ads, emails) sont entièrement éditables. L'IA te donne une base solide que tu peux affiner selon tes besoins.",
             },
             {
               q: "Existe-t-il une periode d'essai gratuite ?",
               a: "Oui, le plan Free te permet de tester la plateforme avec 5 generations IA par mois. Tu peux upgrader a tout moment vers Pro ou Premium pour debloquer toutes les fonctionnalites.",
             },
             {
-              q: "Quels types de contenu l'IA peut-elle generer ?",
-              a: "ScalingFlow genere : analyses de marche, offres completes, pages de funnel, creatives publicitaires, scripts de vente, VSL, sequences email/SMS, posts reels, scripts YouTube, et plus encore.",
+              q: "Quels types de contenu l'IA peut-elle générer ?",
+              a: "ScalingFlow génère : analyses de marché, offres complètes, pages de funnel, créatives publicitaires, scripts de vente, VSL, séquences email/SMS, posts reels, scripts YouTube, et plus encore.",
             },
             {
               q: "Mes donnees sont-elles securisees ?",
@@ -461,7 +461,7 @@ export default function WelcomePage() {
           href="/register"
           className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-accent text-white font-semibold text-lg hover:bg-accent/90 transition-all shadow-[0_0_32px_rgba(52,211,153,0.15)]"
         >
-          Creer mon compte gratuitement
+          Créer mon compte gratuitement
           <ArrowRight className="h-5 w-5" />
         </Link>
       </section>

@@ -6,7 +6,7 @@ export async function POST() {
   try {
     if (!stripe) {
       return NextResponse.json(
-        { error: "Stripe non configure. Contacte le support." },
+        { error: "Stripe non configuré. Contacte le support." },
         { status: 503 }
       );
     }
@@ -17,7 +17,7 @@ export async function POST() {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Non autorise" }, { status: 401 });
+      return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
     }
 
     const { data: profile } = await supabase
@@ -28,7 +28,7 @@ export async function POST() {
 
     if (!profile?.stripe_customer_id) {
       return NextResponse.json(
-        { error: "Aucun abonnement Stripe associe a ce compte." },
+        { error: "Aucun abonnement Stripe associé à ce compte." },
         { status: 400 }
       );
     }
@@ -43,7 +43,7 @@ export async function POST() {
     return NextResponse.json({ url: session.url });
   } catch (error) {
     return NextResponse.json(
-      { error: "Erreur lors de l'acces au portail de facturation" },
+      { error: "Erreur lors de l'accès au portail de facturation" },
       { status: 500 }
     );
   }

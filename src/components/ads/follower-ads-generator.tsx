@@ -60,9 +60,9 @@ export function FollowerAdsGenerator({ initialData }: Props) {
       const result = await res.json();
       const parsed = result.ai_raw_response || JSON.parse(result.content);
       setData(parsed);
-      toast.success("Follower Ads generees !");
+      toast.success("Follower Ads générées !");
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Erreur lors de la generation");
+      toast.error(e instanceof Error ? e.message : "Erreur lors de la génération");
     } finally {
       setLoading(false);
     }
@@ -78,11 +78,11 @@ export function FollowerAdsGenerator({ initialData }: Props) {
       <div className="flex flex-col items-center justify-center py-16 gap-4">
         <Users className="h-12 w-12 text-text-muted" />
         <p className="text-text-secondary text-sm text-center max-w-md">
-          Genere des publicites pour attirer des abonnes qualifies vers ton profil (Social Funnel). Reels Ads, Image Ads et Carousel Ads optimises pour le follow.
+          Génère des publicités pour attirer des abonnés qualifiés vers ton profil (Social Funnel). Reels Ads, Image Ads et Carousel Ads optimisés pour le follow.
         </p>
         <Button onClick={generate} disabled={loading}>
           {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Users className="h-4 w-4 mr-2" />}
-          Generer les Follower Ads
+          Générer les Follower Ads
         </Button>
       </div>
     );
@@ -94,7 +94,7 @@ export function FollowerAdsGenerator({ initialData }: Props) {
         <h3 className="text-lg font-semibold text-text-primary">Follower Ads</h3>
         <Button size="sm" onClick={generate} disabled={loading}>
           {loading && <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />}
-          Regenerer
+          Régénérer
         </Button>
       </div>
 
@@ -198,7 +198,7 @@ export function FollowerAdsGenerator({ initialData }: Props) {
               <p className="text-xs text-text-primary">{data.targeting_suggestions.budget_daily}</p>
             </div>
             <div>
-              <p className="text-xs text-text-muted mb-1">Duree test</p>
+              <p className="text-xs text-text-muted mb-1">Durée test</p>
               <p className="text-xs text-text-primary">{data.targeting_suggestions.duration_test}</p>
             </div>
           </div>

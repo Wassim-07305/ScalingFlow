@@ -24,7 +24,7 @@ export default function RootError({
           Une erreur est survenue
         </h2>
         <p className="max-w-md text-sm text-text-secondary">
-          {error.message || "Une erreur inattendue s'est produite. Veuillez reessayer."}
+          {error.message || "Une erreur inattendue s'est produite. Veuillez réessayer."}
         </p>
         {error.digest && (
           <p className="text-xs text-text-muted">Ref: {error.digest}</p>
@@ -36,7 +36,7 @@ export default function RootError({
           className="inline-flex items-center gap-2 rounded-lg bg-accent px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-accent/90"
         >
           <RefreshCw className="h-4 w-4" />
-          Reessayer
+          Réessayer
         </button>
         <a
           href="/"

@@ -412,7 +412,7 @@ export function PerformanceDashboard() {
       {/* Revenue vs Spend Chart */}
       <Card>
         <CardHeader>
-          <CardTitle>Revenu vs Depense publicitaire</CardTitle>
+          <CardTitle>Revenu vs Dépense publicitaire</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="h-[300px]">
@@ -567,9 +567,9 @@ export function PerformanceDashboard() {
       <Dialog open={showForm} onOpenChange={setShowForm}>
         <DialogContent className="max-w-lg">
           <DialogHeader>
-            <DialogTitle>Ajouter des metriques quotidiennes</DialogTitle>
+            <DialogTitle>Ajouter des métriques quotidiennes</DialogTitle>
             <DialogDescription>
-              Saisissez vos donnees publicitaires du jour. Les KPI seront calcules automatiquement.
+              Saisissez vos données publicitaires du jour. Les KPI seront calculés automatiquement.
             </DialogDescription>
           </DialogHeader>
 

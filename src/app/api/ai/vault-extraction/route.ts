@@ -11,13 +11,13 @@ export async function POST(req: NextRequest) {
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Non autorise" }, { status: 401 });
+      return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
     }
 
     const { answers } = await req.json();
 
     if (!answers || !Array.isArray(answers)) {
-      return NextResponse.json({ error: "Reponses requises" }, { status: 400 });
+      return NextResponse.json({ error: "Réponses requises" }, { status: 400 });
     }
 
     // Get user profile for context
@@ -39,11 +39,11 @@ export async function POST(req: NextRequest) {
 ${answers.map((a: { question: string; answer: string }) => `**Q: ${a.question}**\nR: ${a.answer}`).join("\n\n")}
 
 ## Ta mission
-A partir de ces reponses, cree un document d'expertise structure et actionnable qui servira de base pour toutes les generations IA futures (offres, ads, contenu, scripts).
+A partir de ces réponses, crée un document d'expertise structuré et actionnable qui servira de base pour toutes les générations IA futures (offres, ads, contenu, scripts).
 
 Structure ton document avec ces sections :
 1. **Resume de l'expertise** (2-3 phrases percutantes)
-2. **Probleme principal resolu** (avec contexte marche)
+2. **Problème principal résolu** (avec contexte marché)
 3. **Methodologie unique** (process step-by-step)
 4. **Preuves et resultats** (chiffres cles, temoignages)
 5. **Differenciateurs cles** (ce qui rend cette expertise unique)

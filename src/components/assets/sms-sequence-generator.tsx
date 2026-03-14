@@ -36,7 +36,7 @@ export function SmsSequenceGenerator({ className, initialData }: SmsSequenceGene
         body: JSON.stringify({ type: "sms" }),
       });
 
-      if (!response.ok) throw new Error("Erreur lors de la generation");
+      if (!response.ok) throw new Error("Erreur lors de la génération");
       const data = await response.json();
       setSequence(data.ai_raw_response || data);
     } catch (err) {
@@ -47,7 +47,7 @@ export function SmsSequenceGenerator({ className, initialData }: SmsSequenceGene
   };
 
   if (loading) {
-    return <AILoading text="Redaction de ta sequence SMS" className={className} />;
+    return <AILoading text="Redaction de ta séquence SMS" className={className} />;
   }
 
   if (!sequence) {
@@ -56,7 +56,7 @@ export function SmsSequenceGenerator({ className, initialData }: SmsSequenceGene
         {error && <p className="text-sm text-danger mb-4">{error}</p>}
         <Button size="lg" onClick={handleGenerate}>
           <Sparkles className="h-4 w-4 mr-2" />
-          Generer la sequence SMS
+          Générer la séquence SMS
         </Button>
         <p className="text-sm text-text-secondary mt-2">5 SMS de nurturing optimises</p>
       </div>

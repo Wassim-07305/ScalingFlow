@@ -32,7 +32,7 @@ export default function PricingPage() {
   useEffect(() => {
     const checkout = searchParams.get("checkout");
     if (checkout === "cancel") {
-      toast.info("Paiement annule. Tu peux reessayer quand tu veux.");
+      toast.info("Paiement annulé. Tu peux réessayer quand tu veux.");
     }
   }, [searchParams]);
 
@@ -49,7 +49,7 @@ export default function PricingPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        toast.error(data.error || "Erreur lors de la creation du paiement.");
+        toast.error(data.error || "Erreur lors de la création du paiement.");
         return;
       }
 
@@ -67,7 +67,7 @@ export default function PricingPage() {
     <div>
       <PageHeader
         title="Tarifs"
-        description="Choisis le plan adapte a tes ambitions."
+        description="Choisis le plan adapté à tes ambitions."
       />
 
       <div className="grid gap-6 md:grid-cols-3 max-w-5xl">
@@ -191,11 +191,11 @@ export default function PricingPage() {
       <div className="flex items-center gap-6 mt-8 text-xs text-text-muted">
         <div className="flex items-center gap-1.5">
           <Shield className="h-3.5 w-3.5" />
-          Paiement securise via Stripe
+          Paiement sécurisé via Stripe
         </div>
         <div className="flex items-center gap-1.5">
           <Check className="h-3.5 w-3.5" />
-          Annulation a tout moment
+          Annulation à tout moment
         </div>
         <div className="flex items-center gap-1.5">
           <Check className="h-3.5 w-3.5" />

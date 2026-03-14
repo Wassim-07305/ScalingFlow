@@ -31,10 +31,10 @@ type EventType = "PageView" | "Lead" | "Purchase" | "ViewContent" | "InitiateChe
 const EVENTS: { key: EventType; label: string; description: string }[] = [
   { key: "PageView", label: "PageView", description: "Toutes les pages du funnel" },
   { key: "Lead", label: "Lead", description: "Formulaire opt-in soumis" },
-  { key: "Purchase", label: "Purchase", description: "Achat confirme" },
+  { key: "Purchase", label: "Purchase", description: "Achat confirmé" },
   { key: "ViewContent", label: "ViewContent", description: "Page VSL / offre vue" },
   { key: "InitiateCheckout", label: "InitiateCheckout", description: "Page de paiement ouverte" },
-  { key: "CompleteRegistration", label: "CompleteRegistration", description: "Inscription terminee" },
+  { key: "CompleteRegistration", label: "CompleteRegistration", description: "Inscription terminée" },
 ];
 
 // ─── Code generators ────────────────────────────────────────
@@ -120,7 +120,7 @@ export async function POST(request: Request) {
 }
 
 function generateCAPIClientCall(): string {
-  return `// ─── Appel client (ex: apres soumission formulaire) ────────
+  return `// ─── Appel client (ex: après soumission formulaire) ────────
 async function sendCAPIEvent(eventName: string, email?: string, value?: number) {
   await fetch("/api/meta/capi", {
     method: "POST",
@@ -131,7 +131,7 @@ async function sendCAPIEvent(eventName: string, email?: string, value?: number) 
       value,
       currency: "EUR",
       sourceUrl: window.location.href,
-      clientIp: "", // rempli cote serveur si middleware
+      clientIp: "", // rempli côté serveur si middleware
       userAgent: navigator.userAgent,
     }),
   });
@@ -149,7 +149,7 @@ function useCopyToClipboard() {
   const copy = (key: string, text: string) => {
     navigator.clipboard.writeText(text);
     setCopiedKey(key);
-    toast.success("Code copie !");
+    toast.success("Code copié !");
     setTimeout(() => setCopiedKey(null), 2000);
   };
 
@@ -192,7 +192,7 @@ export function PixelCAPIGenerator() {
                 onChange={(e) => setConfig((p) => ({ ...p, pixelId: e.target.value }))}
               />
               <p className="text-xs text-text-muted mt-1">
-                Trouve dans Meta Events Manager
+                Trouvé dans Meta Events Manager
               </p>
             </div>
             <div>
@@ -205,7 +205,7 @@ export function PixelCAPIGenerator() {
                 onChange={(e) => setConfig((p) => ({ ...p, accessToken: e.target.value }))}
               />
               <p className="text-xs text-text-muted mt-1">
-                Token genere dans Events Manager &rarr; Settings
+                Token généré dans Events Manager &rarr; Settings
               </p>
             </div>
             <div>
@@ -222,7 +222,7 @@ export function PixelCAPIGenerator() {
             <div className="flex items-center gap-2 p-3 rounded-xl bg-yellow-500/10 border border-yellow-500/20">
               <AlertTriangle className="h-4 w-4 text-yellow-400 shrink-0" />
               <p className="text-xs text-yellow-300">
-                Entre ton Pixel ID pour generer les snippets de code.
+                Entre ton Pixel ID pour générer les snippets de code.
               </p>
             </div>
           )}
@@ -285,7 +285,7 @@ export function PixelCAPIGenerator() {
               <div className="flex items-center justify-between">
                 <CardTitle className="text-sm flex items-center gap-2">
                   <Code2 className="h-4 w-4 text-accent" />
-                  2. Evenements Pixel
+                  2. Événements Pixel
                 </CardTitle>
                 {expandedSection === "events" ? (
                   <ChevronUp className="h-4 w-4 text-text-muted" />
@@ -297,7 +297,7 @@ export function PixelCAPIGenerator() {
             {expandedSection === "events" && (
               <CardContent className="pt-0 space-y-3">
                 <p className="text-xs text-text-secondary">
-                  Ajoute ces evenements aux actions correspondantes de ton funnel.
+                  Ajoute ces événements aux actions correspondantes de ton funnel.
                 </p>
                 <div className="grid gap-2">
                   {EVENTS.map((evt) => {
@@ -359,10 +359,10 @@ export function PixelCAPIGenerator() {
             {expandedSection === "capi" && (
               <CardContent className="pt-0 space-y-4">
                 <p className="text-xs text-text-secondary">
-                  Le CAPI envoie les evenements cote serveur pour un tracking plus fiable (bypass ad blockers).
+                  Le CAPI envoie les événements côté serveur pour un tracking plus fiable (bypass ad blockers).
                   {!config.accessToken && (
                     <span className="text-yellow-400 ml-1">
-                      Entre ton Access Token pour generer le code CAPI.
+                      Entre ton Access Token pour générer le code CAPI.
                     </span>
                   )}
                 </p>
@@ -424,7 +424,7 @@ export function PixelCAPIGenerator() {
                   <div className="p-6 text-center rounded-xl bg-bg-tertiary">
                     <Server className="h-8 w-8 text-text-muted mx-auto mb-2" />
                     <p className="text-sm text-text-secondary">
-                      Configure ton Access Token ci-dessus pour generer le code CAPI.
+                      Configure ton Access Token ci-dessus pour générer le code CAPI.
                     </p>
                   </div>
                 )}
@@ -440,14 +440,14 @@ export function PixelCAPIGenerator() {
               </h4>
               <div className="space-y-2">
                 {[
-                  "Pixel de base installe dans le <head> de toutes les pages",
-                  "Evenement Lead sur la page de remerciement opt-in",
-                  "Evenement Purchase sur la page de confirmation d'achat",
-                  "Evenement ViewContent sur la page VSL / offre",
-                  "API Route CAPI creee et deployee",
-                  "Appels CAPI integres aux formulaires",
+                  "Pixel de base installé dans le <head> de toutes les pages",
+                  "Événement Lead sur la page de remerciement opt-in",
+                  "Événement Purchase sur la page de confirmation d'achat",
+                  "Événement ViewContent sur la page VSL / offre",
+                  "API Route CAPI créée et déployée",
+                  "Appels CAPI intégrés aux formulaires",
                   "Tester avec Meta Pixel Helper (extension Chrome)",
-                  "Verifier les evenements dans Events Manager > Test Events",
+                  "Vérifier les événements dans Events Manager > Test Events",
                 ].map((item, i) => (
                   <label
                     key={i}

@@ -29,7 +29,7 @@ export interface NavItem {
 export const NAV_ITEMS: NavItem[] = [
   { label: "Dashboard", href: "/", icon: LayoutDashboard },
   { label: "Onboarding", href: "/onboarding", icon: Compass },
-  { label: "Marche", href: "/market", icon: Globe },
+  { label: "Marché", href: "/market", icon: Globe },
   { label: "Offre", href: "/offer", icon: Package },
   { label: "Marque", href: "/brand", icon: Palette },
   { label: "Funnel", href: "/funnel", icon: Filter },
@@ -40,13 +40,13 @@ export const NAV_ITEMS: NavItem[] = [
   { label: "Roadmap", href: "/roadmap", icon: Map },
   { label: "Progression", href: "/progress", icon: TrendingUp },
   { label: "Leaderboard", href: "/leaderboard", icon: Trophy },
-  { label: "Communaute", href: "/community", icon: Users },
+  { label: "Communauté", href: "/community", icon: Users },
   { label: "Vente", href: "/sales", icon: Handshake },
   { label: "Assistant IA", href: "/assistant", icon: Bot },
 ];
 
 export const NAV_BOTTOM: NavItem[] = [
-  { label: "Parametres", href: "/settings", icon: Settings },
+  { label: "Paramètres", href: "/settings", icon: Settings },
 ];
 
 export const MOBILE_NAV_ITEMS: NavItem[] = [
@@ -54,5 +54,5 @@ export const MOBILE_NAV_ITEMS: NavItem[] = [
   { label: "Offre", href: "/offer", icon: Package },
   { label: "Academy", href: "/academy", icon: GraduationCap },
   { label: "Roadmap", href: "/roadmap", icon: Map },
-  { label: "Communaute", href: "/community", icon: Users },
+  { label: "Communauté", href: "/community", icon: Users },
 ];

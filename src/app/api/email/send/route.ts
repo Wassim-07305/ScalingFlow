@@ -10,7 +10,7 @@ import {
 
 const FROM = "ScalingFlow <noreply@scalingflow.com>";
 
-/** Resout le template a partir de son nom + data arbitraire. */
+/** Résout le template a partir de son nom + data arbitraire. */
 function resolveTemplate(
   template: string,
   data: Record<string, unknown>
@@ -46,10 +46,10 @@ function resolveTemplate(
 }
 
 export async function POST(request: Request) {
-  // Verifier que Resend est configure
+  // Vérifier que Resend est configure
   if (!resend) {
     return NextResponse.json(
-      { error: "Service email non configure" },
+      { error: "Service email non configuré" },
       { status: 503 }
     );
   }
@@ -63,7 +63,7 @@ export async function POST(request: Request) {
 
   if (authError || !user) {
     return NextResponse.json(
-      { error: "Non authentifie" },
+      { error: "Non authentifié" },
       { status: 401 }
     );
   }
@@ -81,7 +81,7 @@ export async function POST(request: Request) {
     );
   }
 
-  // Resoudre le template
+  // Résoudre le template
   const emailContent = resolveTemplate(body.template, body.data ?? {});
 
   if (!emailContent) {
@@ -101,7 +101,7 @@ export async function POST(request: Request) {
 
   if (error) {
     return NextResponse.json(
-      { error: "Echec de l'envoi de l'email" },
+      { error: "Échec de l'envoi de l'email" },
       { status: 500 }
     );
   }

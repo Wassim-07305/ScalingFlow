@@ -26,19 +26,19 @@ export default function RoadmapPage() {
       if (!res.ok) {
         const errData = await res.json().catch(() => ({}));
         if (res.status === 403 && errData.usage) { setUsageLimited(errData.usage); return; }
-        throw new Error(errData.error || "Erreur lors de la generation");
+        throw new Error(errData.error || "Erreur lors de la génération");
       }
 
       const data = await res.json();
       toast.success(
-        `Roadmap generee : ${data.tasks_count} taches, ~${data.total_estimated_hours}h au total`
+        `Roadmap générée : ${data.tasks_count} tâches, ~${data.total_estimated_hours}h au total`
       );
       setRefreshKey((k) => k + 1);
     } catch (error) {
       toast.error(
         error instanceof Error
           ? error.message
-          : "Impossible de generer la roadmap"
+          : "Impossible de générer la roadmap"
       );
     } finally {
       setGenerating(false);
@@ -53,7 +53,7 @@ export default function RoadmapPage() {
     <div>
       <PageHeader
         title="Feuille de Route"
-        description="Ta feuille de route personnalisee pour scaler."
+        description="Ta feuille de route personnalisée pour scaler."
         actions={
           <Button onClick={handleGenerate} disabled={generating}>
             {generating ? (
@@ -61,7 +61,7 @@ export default function RoadmapPage() {
             ) : (
               <Sparkles className="h-4 w-4" />
             )}
-            {generating ? "Generation en cours..." : "Generer ma roadmap IA"}
+            {generating ? "Génération en cours..." : "Générer ma roadmap IA"}
           </Button>
         }
       />

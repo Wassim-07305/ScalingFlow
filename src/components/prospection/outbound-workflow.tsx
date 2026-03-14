@@ -89,7 +89,7 @@ export function OutboundWorkflow() {
         }),
       });
 
-      if (!response.ok) throw new Error("Erreur lors de la generation");
+      if (!response.ok) throw new Error("Erreur lors de la génération");
       const data = await response.json();
 
       const parsed = data.ai_raw_response || data;
@@ -129,7 +129,7 @@ export function OutboundWorkflow() {
     const text = typeof result === "string" ? result : JSON.stringify(result, null, 2);
     navigator.clipboard.writeText(text);
     setCopied(true);
-    toast.success("Copie dans le presse-papiers");
+    toast.success("Copié dans le presse-papiers");
     setTimeout(() => setCopied(false), 2000);
   };
 
@@ -139,7 +139,7 @@ export function OutboundWorkflow() {
   };
 
   if (loading) {
-    return <AILoading text="Creation de ton workflow outbound" />;
+    return <AILoading text="Création de ton workflow outbound" />;
   }
 
   if (result) {
@@ -147,7 +147,7 @@ export function OutboundWorkflow() {
       <div className="space-y-6">
         {/* Actions */}
         <div className="flex items-center justify-between">
-          <Badge variant="default">Workflow genere</Badge>
+          <Badge variant="default">Workflow généré</Badge>
           <div className="flex items-center gap-2">
             <Button
               variant="outline"
@@ -155,7 +155,7 @@ export function OutboundWorkflow() {
               onClick={() =>
                 exportToPDF({
                   title: "Workflow Outbound",
-                  subtitle: "Genere par ScalingFlow",
+                  subtitle: "Généré par ScalingFlow",
                   content: result as unknown as Record<string, unknown>,
                   filename: "workflow-outbound-scalingflow.pdf",
                 })
@@ -166,7 +166,7 @@ export function OutboundWorkflow() {
             </Button>
             <Button variant="outline" size="sm" onClick={copyAll}>
               <Copy className="h-4 w-4 mr-1" />
-              {copied ? "Copie !" : "Copier tout"}
+              {copied ? "Copié !" : "Copier tout"}
             </Button>
           </div>
         </div>
@@ -188,7 +188,7 @@ export function OutboundWorkflow() {
           </div>
         )}
 
-        {/* Etapes du workflow */}
+        {/* Étapes du workflow */}
         {result.steps && result.steps.length > 0 && (
           <div className="space-y-1">
             {result.steps.map((step, i) => {
@@ -258,7 +258,7 @@ export function OutboundWorkflow() {
                               onClick={(e) => {
                                 e.stopPropagation();
                                 navigator.clipboard.writeText(step.template);
-                                toast.success("Template copie");
+                                toast.success("Template copié");
                               }}
                               className="absolute top-2 right-2 p-1.5 rounded-md bg-bg-secondary hover:bg-accent/20 transition-colors"
                               title="Copier le template"
@@ -271,7 +271,7 @@ export function OutboundWorkflow() {
                     )}
                   </Card>
 
-                  {/* Fleche entre les etapes */}
+                  {/* Flèche entre les étapes */}
                   {!isLast && (
                     <div className="flex justify-center py-1">
                       <ArrowDown className="h-4 w-4 text-accent/40" />
@@ -283,7 +283,7 @@ export function OutboundWorkflow() {
           </div>
         )}
 
-        {/* Resume / KPIs */}
+        {/* Résumé / KPIs */}
         {result.summary && (
           <div className="grid gap-4 md:grid-cols-3">
             <Card>
@@ -296,7 +296,7 @@ export function OutboundWorkflow() {
             <Card>
               <CardContent className="pt-6 text-center">
                 <DollarSign className="h-5 w-5 text-accent mx-auto mb-2" />
-                <p className="text-xs text-text-muted uppercase">Cout par lead</p>
+                <p className="text-xs text-text-muted uppercase">Coût par lead</p>
                 <p className="text-lg font-bold text-text-primary">{result.summary.cost_per_lead}</p>
               </CardContent>
             </Card>
@@ -347,7 +347,7 @@ export function OutboundWorkflow() {
               <CardHeader className="py-3">
                 <CardTitle className="text-sm flex items-center gap-2">
                   <Target className="h-4 w-4 text-accent" />
-                  Outils recommandes
+                  Outils recommandés
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-0">
@@ -363,13 +363,13 @@ export function OutboundWorkflow() {
           )}
         </div>
 
-        {/* KPIs a suivre */}
+        {/* KPIs à suivre */}
         {result.kpis_to_track && result.kpis_to_track.length > 0 && (
           <Card>
             <CardHeader className="py-3">
               <CardTitle className="text-sm flex items-center gap-2">
                 <TrendingUp className="h-4 w-4 text-accent" />
-                KPIs a suivre
+                KPIs à suivre
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-0">
@@ -386,7 +386,7 @@ export function OutboundWorkflow() {
         )}
 
         <Button variant="outline" onClick={() => setResult(null)}>
-          Regenerer le workflow
+          Régénérer le workflow
         </Button>
       </div>
     );
@@ -399,7 +399,7 @@ export function OutboundWorkflow() {
         <GitBranch className="h-10 w-10 text-accent mx-auto mb-3" />
         <h3 className="font-semibold text-text-primary mb-1">Workflow Outbound</h3>
         <p className="text-sm text-text-secondary max-w-md mx-auto">
-          L&apos;IA va creer un workflow complet de prospection outbound multi-canal avec templates, timings et KPIs.
+          L&apos;IA va créer un workflow complet de prospection outbound multi-canal avec templates, timings et KPIs.
         </p>
       </div>
 
@@ -407,17 +407,17 @@ export function OutboundWorkflow() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-accent" />
-            Generateur de workflow outbound
+            Générateur de workflow outbound
           </CardTitle>
           <CardDescription>
-            Un processus structure pour generer des leads de facon systematique.
+            Un processus structuré pour générer des leads de façon systématique.
           </CardDescription>
         </CardHeader>
         <CardContent>
           {error && <p className="text-sm text-danger mb-4">{error}</p>}
           <Button size="lg" onClick={handleGenerate} className="w-full">
             <Sparkles className="h-4 w-4 mr-2" />
-            Generer le workflow
+            Générer le workflow
           </Button>
         </CardContent>
       </Card>

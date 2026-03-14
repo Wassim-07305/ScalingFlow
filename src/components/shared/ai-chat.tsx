@@ -160,7 +160,7 @@ export function AIChat({
     loadConversations();
   }, [loadConversations]);
 
-  // Charger une conversation specifique
+  // Charger une conversation spécifique
   const loadConversation = useCallback(async (id: string) => {
     if (!user) return;
     const { data } = await supabase
@@ -283,7 +283,7 @@ export function AIChat({
         ...prev,
         {
           role: "assistant",
-          content: "Desole, une erreur est survenue. Reessaie.",
+          content: "Désolé, une erreur est survenue. Réessaie.",
         },
       ]);
     } finally {
@@ -322,7 +322,7 @@ export function AIChat({
           <div className="flex-1 overflow-y-auto">
             {conversations.length === 0 ? (
               <p className="text-xs text-text-muted text-center py-6 px-3">
-                Aucune conversation precedente.
+                Aucune conversation précédente.
               </p>
             ) : (
               conversations.map((conv) => (
@@ -442,7 +442,7 @@ export function AIChat({
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Ecris ton message..."
+              placeholder="Écris ton message..."
               aria-label="Entrez votre message"
               rows={1}
               className="flex-1 resize-none rounded-lg bg-bg-tertiary border border-border-default px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent"

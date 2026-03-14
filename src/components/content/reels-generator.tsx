@@ -58,12 +58,12 @@ export function ReelsGenerator({ className, initialData }: ReelsGeneratorProps) 
           const errData = await response.json();
           if (errData.usage) { setUsageLimited(errData.usage); return; }
         }
-        throw new Error("Erreur lors de la generation");
+        throw new Error("Erreur lors de la génération");
       }
       const data = await response.json();
       const result = data.result as ReelsScriptsResult;
       setScripts(result.scripts || []);
-      toast.success(`${(result.scripts || []).length} scripts Reels generes !`);
+      toast.success(`${(result.scripts || []).length} scripts Reels générés !`);
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Erreur";
       setError(msg);
@@ -91,7 +91,7 @@ export function ReelsGenerator({ className, initialData }: ReelsGeneratorProps) 
   }
 
   if (loading) {
-    return <AILoading text="Generation des scripts Reels" className={className} />;
+    return <AILoading text="Génération des scripts Reels" className={className} />;
   }
 
   if (scripts.length === 0) {
@@ -100,10 +100,10 @@ export function ReelsGenerator({ className, initialData }: ReelsGeneratorProps) 
         {error && <p className="text-sm text-danger mb-4">{error}</p>}
         <Button size="lg" onClick={() => handleGenerate()}>
           <Sparkles className="h-4 w-4 mr-2" />
-          Generer 12 scripts Reels
+          Générer 12 scripts Reels
         </Button>
         <p className="text-sm text-text-secondary mt-2">
-          Scripts optimises pour Instagram Reels, TikTok et YouTube Shorts
+          Scripts optimisés pour Instagram Reels, TikTok et YouTube Shorts
         </p>
       </div>
     );

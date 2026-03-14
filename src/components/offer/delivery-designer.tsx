@@ -86,7 +86,7 @@ export function DeliveryDesigner({ offerId, className, initialData }: DeliveryDe
 
   const handleGenerate = async () => {
     if (!offerId) {
-      toast.error("Genere d'abord une offre");
+      toast.error("Génère d'abord une offre");
       return;
     }
 
@@ -98,10 +98,10 @@ export function DeliveryDesigner({ offerId, className, initialData }: DeliveryDe
         body: JSON.stringify({ offerId }),
       });
 
-      if (!response.ok) throw new Error("Erreur lors de la generation");
+      if (!response.ok) throw new Error("Erreur lors de la génération");
       const data = await response.json();
       setDelivery(data.delivery_data || data);
-      toast.success("Structure de delivery generee !");
+      toast.success("Structure de delivery générée !");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Erreur");
     } finally {
@@ -110,7 +110,7 @@ export function DeliveryDesigner({ offerId, className, initialData }: DeliveryDe
   };
 
   if (loading) {
-    return <AILoading text="Design de ton systeme de delivery" className={className} />;
+    return <AILoading text="Design de ton système de delivery" className={className} />;
   }
 
   if (!delivery) {
@@ -119,14 +119,14 @@ export function DeliveryDesigner({ offerId, className, initialData }: DeliveryDe
         <Settings className="h-12 w-12 text-text-muted mx-auto mb-4" />
         <h3 className="font-semibold text-text-primary mb-2">Structure de Delivery</h3>
         <p className="text-sm text-text-secondary mb-6 max-w-md mx-auto">
-          L&apos;IA concoit ton systeme de livraison complet : phases, agents IA, automatisations, SOPs et KPIs.
+          L&apos;IA concoit ton système de livraison complet : phases, agents IA, automatisations, SOPs et KPIs.
         </p>
         <Button size="lg" onClick={handleGenerate} disabled={!offerId}>
           <Sparkles className="h-4 w-4 mr-2" />
           Designer le delivery
         </Button>
         {!offerId && (
-          <p className="text-xs text-text-muted mt-2">Genere d&apos;abord une offre</p>
+          <p className="text-xs text-text-muted mt-2">Généré d&apos;abord une offre</p>
         )}
       </div>
     );
@@ -142,7 +142,7 @@ export function DeliveryDesigner({ offerId, className, initialData }: DeliveryDe
         </div>
         <Button variant="outline" onClick={handleGenerate}>
           <Sparkles className="h-4 w-4 mr-1" />
-          Regenerer
+          Régénérer
         </Button>
       </div>
 

@@ -97,7 +97,7 @@ export default function AdminPage() {
       const sevenDaysAgo = new Date();
       sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
-      // ─── Tous les profils (pour stats agregees) ─────────────
+      // ─── Tous les profils (pour stats agrégées) ─────────────
       const { data: allProfiles } = await supabase
         .from("profiles")
         .select("id, subscription_plan, subscription_status, xp_points, onboarding_completed, created_at");
@@ -144,7 +144,7 @@ export default function AdminPage() {
         (funnelsCount || 0) +
         (contentCount || 0);
 
-      // ─── Generations ce mois-ci (via activity_log) ──────────
+      // ─── Générations ce mois-ci (via activity_log) ──────────
       const { count: generationsThisMonth } = await supabase
         .from("activity_log")
         .select("*", { count: "exact", head: true })
@@ -164,7 +164,7 @@ export default function AdminPage() {
         newUsersThisMonth,
       });
 
-      // ─── Utilisateurs recents ───────────────────────────────
+      // ─── Utilisateurs récents ───────────────────────────────
       const { data: recent } = await supabase
         .from("profiles")
         .select("id, full_name, avatar_url, created_at, xp_points, level, subscription_plan, onboarding_completed")
@@ -173,7 +173,7 @@ export default function AdminPage() {
 
       if (recent) setRecentUsers(recent);
 
-      // ─── Activite recente ───────────────────────────────────
+      // ─── Activité récente ───────────────────────────────────
       const { data: activityData } = await supabase
         .from("activity_log")
         .select("id, user_id, activity_type, created_at")
@@ -233,22 +233,22 @@ export default function AdminPage() {
 
   const formatActivityType = (type: string) => {
     const labels: Record<string, string> = {
-      "generation.offer": "Generation offre",
-      "generation.market": "Analyse marche",
-      "generation.funnel": "Generation funnel",
-      "generation.ads": "Generation ads",
-      "generation.content": "Generation contenu",
-      "generation.assets": "Generation assets",
-      "generation.brand": "Generation marque",
-      "generation.roadmap": "Generation roadmap",
+      "generation.offer": "Génération offre",
+      "generation.market": "Analyse marché",
+      "generation.funnel": "Génération funnel",
+      "generation.ads": "Génération ads",
+      "generation.content": "Génération contenu",
+      "generation.assets": "Génération assets",
+      "generation.brand": "Génération marque",
+      "generation.roadmap": "Génération roadmap",
       "generation.chat": "Chat IA",
       "generation.vault": "Analyse vault",
-      "generation.persona": "Generation persona",
+      "generation.persona": "Génération persona",
       "generation.instagram": "Optimisation Instagram",
       "generation.competitors": "Analyse concurrents",
       "generation.score": "Score offre",
     };
-    return labels[type] || type.replace("generation.", "Generation ").replace(".", " ");
+    return labels[type] || type.replace("generation.", "Génération ").replace(".", " ");
   };
 
   const getPlanBadge = (plan: string) => {
@@ -272,7 +272,7 @@ export default function AdminPage() {
       if (!res.ok) {
         toast.error(data.error || "Erreur de recalcul");
       } else {
-        toast.success(data.message || "Leaderboard recalcule");
+        toast.success(data.message || "Leaderboard recalculé");
       }
     } catch {
       toast.error("Erreur lors du recalcul du leaderboard");
@@ -353,14 +353,14 @@ export default function AdminPage() {
               : "—",
           },
           {
-            label: "Generations IA",
+            label: "Générations IA",
             value: stats.totalGenerations,
             icon: Sparkles,
             color: "text-accent",
             sub: `${stats.generationsThisMonth} ce mois`,
           },
           {
-            label: "XP total distribue",
+            label: "XP total distribué",
             value: stats.totalXP,
             icon: TrendingUp,
             color: "text-accent",
@@ -398,7 +398,7 @@ export default function AdminPage() {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs text-text-muted">Abonnes Pro</p>
+                <p className="text-xs text-text-muted">Abonnés Pro</p>
                 <p className="text-2xl font-bold text-text-primary">
                   {loading ? <Loader2 className="h-5 w-5 animate-spin text-text-muted" /> : <AnimatedCounter value={stats.proUsers} />}
                 </p>
@@ -412,7 +412,7 @@ export default function AdminPage() {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs text-text-muted">Abonnes Premium</p>
+                <p className="text-xs text-text-muted">Abonnés Premium</p>
                 <p className="text-2xl font-bold text-text-primary">
                   {loading ? <Loader2 className="h-5 w-5 animate-spin text-text-muted" /> : <AnimatedCounter value={stats.premiumUsers} />}
                 </p>
@@ -443,7 +443,7 @@ export default function AdminPage() {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs text-text-muted">Onboarding complete</p>
+                <p className="text-xs text-text-muted">Onboarding complété</p>
                 <p className="text-2xl font-bold text-text-primary">
                   {loading ? <Loader2 className="h-5 w-5 animate-spin text-text-muted" /> : `${onboardingRate}%`}
                 </p>
@@ -457,10 +457,10 @@ export default function AdminPage() {
         </Card>
       </div>
 
-      {/* ─── Repartition abonnements ─────────────────────────── */}
+      {/* ─── Répartition abonnements ─────────────────────────── */}
       <Card className="mb-6">
         <CardHeader>
-          <CardTitle>Repartition des abonnements</CardTitle>
+          <CardTitle>Répartition des abonnements</CardTitle>
         </CardHeader>
         <CardContent>
           {loading ? (
@@ -497,10 +497,10 @@ export default function AdminPage() {
 
       {/* ─── Two columns: Users + Activity ───────────────────── */}
       <div className="grid gap-6 lg:grid-cols-2">
-        {/* Utilisateurs recents */}
+        {/* Utilisateurs récents */}
         <Card>
           <CardHeader>
-            <CardTitle>Utilisateurs recents</CardTitle>
+            <CardTitle>Utilisateurs récents</CardTitle>
           </CardHeader>
           <CardContent>
             {loading ? (
@@ -545,10 +545,10 @@ export default function AdminPage() {
           </CardContent>
         </Card>
 
-        {/* Activite recente */}
+        {/* Activité récente */}
         <Card>
           <CardHeader>
-            <CardTitle>Activite recente</CardTitle>
+            <CardTitle>Activité récente</CardTitle>
           </CardHeader>
           <CardContent>
             {loading ? (
@@ -557,7 +557,7 @@ export default function AdminPage() {
               </div>
             ) : recentActivity.length === 0 ? (
               <p className="text-sm text-text-muted py-4 text-center">
-                Aucune activite pour le moment.
+                Aucune activité pour le moment.
               </p>
             ) : (
               <div className="space-y-3">

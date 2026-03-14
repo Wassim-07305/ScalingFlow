@@ -58,7 +58,7 @@ export function SubscriptionCard() {
           <CreditCard className="h-5 w-5 text-accent" />
           Abonnement
         </CardTitle>
-        <CardDescription>Gere ton abonnement ScalingFlow</CardDescription>
+        <CardDescription>Gère ton abonnement ScalingFlow</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Plan actuel */}
@@ -110,7 +110,7 @@ export function SubscriptionCard() {
           <Button asChild size="sm">
             <Link href="/pricing">
               <Sparkles className="h-4 w-4 mr-2" />
-              Passer a Pro
+              Passer à Pro
             </Link>
           </Button>
         )}

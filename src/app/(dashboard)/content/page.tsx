@@ -46,13 +46,13 @@ const CONTENT_TYPE_TO_TAB: Record<string, string> = {
 };
 
 const TABS = [
-  { key: "strategy", label: "Strategie", icon: Target },
+  { key: "strategy", label: "Stratégie", icon: Target },
   { key: "reels", label: "Reels", icon: Film },
   { key: "youtube", label: "YouTube", icon: Youtube },
   { key: "stories", label: "Stories", icon: BookImage },
   { key: "carousels", label: "Carousels", icon: Layers },
   { key: "instagram", label: "Instagram", icon: Instagram },
-  { key: "editorial", label: "Plan Editorial", icon: CalendarDays },
+  { key: "editorial", label: "Plan Éditorial", icon: CalendarDays },
   { key: "content_spy", label: "Content Spy", icon: Search },
   { key: "history", label: "Historique", icon: History },
 ] as const;
@@ -78,7 +78,7 @@ export default function ContentPage() {
       const tabKey = CONTENT_TYPE_TO_TAB[data.content_type] || "strategy";
       setLoadedData((prev) => ({ ...prev, [tabKey]: parsed }));
       setActiveTab(tabKey);
-      toast.success("Contenu charge depuis l'historique");
+      toast.success("Contenu chargé depuis l'historique");
     } catch {
       toast.error("Erreur lors du chargement");
     }
@@ -88,7 +88,7 @@ export default function ContentPage() {
     <div>
       <PageHeader
         title="Contenu"
-        description="Genere et planifie du contenu pour tes reseaux sociaux."
+        description="Génère et planifie du contenu pour tes réseaux sociaux."
       />
 
       <TabBar tabs={TABS} activeTab={activeTab} onTabChange={setActiveTab} />
@@ -106,7 +106,7 @@ export default function ContentPage() {
           table="content_pieces"
           titleField="title"
           subtitleField="content_type"
-          emptyMessage="Aucun contenu genere pour le moment."
+          emptyMessage="Aucun contenu généré pour le moment."
           onSelect={handleHistorySelect}
         />
       </div>)}

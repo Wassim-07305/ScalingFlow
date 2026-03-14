@@ -55,7 +55,7 @@ const DEMO_TESTS: ABTest[] = [
   {
     id: "demo-1",
     name: "Hook video vs Hook texte",
-    variantA: { description: "Hook video 3 secondes avec temoignage", conversions: 47, traffic: 520 },
+    variantA: { description: "Hook video 3 secondes avec témoignage", conversions: 47, traffic: 520 },
     variantB: { description: "Hook texte avec promesse forte", conversions: 38, traffic: 510 },
     metric: "CTR",
     targetSampleSize: 1000,
@@ -66,8 +66,8 @@ const DEMO_TESTS: ABTest[] = [
   {
     id: "demo-2",
     name: "Page de vente longue vs courte",
-    variantA: { description: "Page longue avec 12 temoignages + VSL", conversions: 23, traffic: 300 },
-    variantB: { description: "Page courte avec 3 temoignages + CTA direct", conversions: 31, traffic: 305 },
+    variantA: { description: "Page longue avec 12 témoignages + VSL", conversions: 23, traffic: 300 },
+    variantB: { description: "Page courte avec 3 témoignages + CTA direct", conversions: 31, traffic: 305 },
     metric: "Taux de conversion",
     targetSampleSize: 600,
     status: "completed",
@@ -76,9 +76,9 @@ const DEMO_TESTS: ABTest[] = [
   },
   {
     id: "demo-3",
-    name: "CTA 'Reserver un appel' vs 'Decouvrir l'offre'",
-    variantA: { description: "CTA : Reserver un appel strategique gratuit", conversions: 15, traffic: 200 },
-    variantB: { description: "CTA : Decouvrir l'offre maintenant", conversions: 12, traffic: 195 },
+    name: "CTA 'Réserver un appel' vs 'Découvrir l'offre'",
+    variantA: { description: "CTA : Réserver un appel strategique gratuit", conversions: 15, traffic: 200 },
+    variantB: { description: "CTA : Découvrir l'offre maintenant", conversions: 12, traffic: 195 },
     metric: "Taux de clic CTA",
     targetSampleSize: 500,
     status: "active",
@@ -190,7 +190,7 @@ export function ABTestManager() {
     saveTests(user.id, updated);
     setShowCreateForm(false);
     setNewTest({ name: "", variantADesc: "", variantBDesc: "", metric: "Taux de conversion", targetSampleSize: 500 });
-    toast.success("Test A/B cree !");
+    toast.success("Test A/B créé !");
   }, [user, newTest, tests, isDemo]);
 
   const handleUpdateStats = useCallback(
@@ -229,7 +229,7 @@ export function ABTestManager() {
       saveTests(user.id, updated);
       setShowUpdateForm(null);
       setUpdateData({ variantAConversions: 0, variantATraffic: 0, variantBConversions: 0, variantBTraffic: 0 });
-      toast.success("Statistiques mises a jour");
+      toast.success("Statistiques mises à jour");
     },
     [user, tests, updateData]
   );
@@ -270,7 +270,7 @@ export function ABTestManager() {
       const updated = tests.filter((t) => t.id !== testId);
       setTests(updated);
       if (!isDemo) saveTests(user.id, updated);
-      toast.success("Test supprime");
+      toast.success("Test supprimé");
     },
     [user, tests, isDemo]
   );
@@ -444,14 +444,14 @@ export function ABTestManager() {
                       }}
                     >
                       <BarChart3 className="h-4 w-4 mr-1" />
-                      Mettre a jour
+                      Mettre à jour
                     </Button>
                   </div>
 
                   {/* Auto-complete info */}
                   {test.variantA.traffic >= 100 && test.variantB.traffic >= 100 && confidence >= 90 && (
                     <div className="mt-2 p-2 rounded-lg bg-accent/10 border border-accent/20 text-xs text-accent">
-                      Ce test sera automatiquement complete a la prochaine mise a jour (100+ visites par variante atteint, confiance {">"}90%)
+                      Ce test sera automatiquement complete à la prochaine mise à jour (100+ visites par variante atteint, confiance {">"}90%)
                     </div>
                   )}
 
@@ -553,7 +553,7 @@ export function ABTestManager() {
           <DialogHeader>
             <DialogTitle>Nouveau test A/B</DialogTitle>
             <DialogDescription>
-              Definissez les deux variantes a comparer et la metrique a suivre.
+              Définissez les deux variantes à comparer et la métrique à suivre.
             </DialogDescription>
           </DialogHeader>
 
@@ -586,7 +586,7 @@ export function ABTestManager() {
               />
             </div>
             <div>
-              <Label>Metrique a suivre</Label>
+              <Label>Métrique à suivre</Label>
               <Select
                 value={newTest.metric}
                 onValueChange={(v) => setNewTest((p) => ({ ...p, metric: v }))}
@@ -605,7 +605,7 @@ export function ABTestManager() {
               </Select>
             </div>
             <div>
-              <Label htmlFor="sample-size">Taille d&apos;echantillon cible (par variante)</Label>
+              <Label htmlFor="sample-size">Taille d&apos;échantillon cible (par variante)</Label>
               <Input
                 id="sample-size"
                 type="number"
@@ -633,9 +633,9 @@ export function ABTestManager() {
       <Dialog open={!!showUpdateForm} onOpenChange={() => setShowUpdateForm(null)}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Mettre a jour les statistiques</DialogTitle>
+            <DialogTitle>Mettre à jour les statistiques</DialogTitle>
             <DialogDescription>
-              Ajoutez les nouvelles donnees depuis votre derniere mise a jour.
+              Ajoutez les nouvelles données depuis votre dernière mise à jour.
             </DialogDescription>
           </DialogHeader>
 

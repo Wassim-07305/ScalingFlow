@@ -20,12 +20,12 @@ function translateRegisterError(message: string): string {
   if (msg.includes("valid email") || msg.includes("invalid email"))
     return "Format d'email invalide.";
   if (msg.includes("rate limit") || msg.includes("too many"))
-    return "Trop de tentatives. Reessaie dans quelques minutes.";
+    return "Trop de tentatives. Réessaie dans quelques minutes.";
   if (msg.includes("weak password"))
     return "Le mot de passe est trop faible. Ajoute des chiffres ou des majuscules.";
   if (msg.includes("signup") && msg.includes("disabled"))
     return "Les inscriptions sont temporairement desactivees.";
-  return "Erreur lors de l'inscription. Verifie tes informations et reessaie.";
+  return "Erreur lors de l'inscription. Vérifie tes informations et réessaie.";
 }
 
 export default function RegisterPage() {
@@ -93,7 +93,7 @@ export default function RegisterPage() {
           <h1 className="text-3xl font-bold text-text-primary">ScalingFlow</h1>
         </div>
         <p className="text-text-secondary">
-          Cree ton compte et commence a scaler.
+          Crée ton compte et commence à scaler.
         </p>
       </div>
 
@@ -183,7 +183,7 @@ export default function RegisterPage() {
         )}
 
         <Button type="submit" className="w-full" disabled={loading}>
-          {loading ? "Creation..." : "Creer mon compte"}
+          {loading ? "Création..." : "Créer mon compte"}
         </Button>
       </form>
 

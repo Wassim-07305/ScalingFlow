@@ -35,7 +35,7 @@ export function NameGenerator({ brandId, names, selectedName: initialSelected, c
         .eq("id", brandId);
 
       if (error) throw error;
-      toast.success(`"${name}" selectionne comme nom de marque !`);
+      toast.success(`"${name}" sélectionné comme nom de marque !`);
     } catch {
       toast.error("Erreur lors de la sauvegarde");
       setSelected(initialSelected);
@@ -49,7 +49,7 @@ export function NameGenerator({ brandId, names, selectedName: initialSelected, c
       <div className={cn("text-center py-12", className)}>
         <Sparkles className="h-12 w-12 text-text-muted mx-auto mb-3" />
         <p className="text-text-secondary">
-          Aucun nom genere. Lancez la generation pour obtenir des propositions.
+          Aucun nom généré. Lancez la génération pour obtenir des propositions.
         </p>
       </div>
     );
@@ -71,7 +71,7 @@ export function NameGenerator({ brandId, names, selectedName: initialSelected, c
   return (
     <div className={cn("space-y-3", className)}>
       <p className="text-sm text-text-secondary mb-4">
-        Selectionnez le nom que vous preferez. Vous pourrez le modifier plus tard.
+        Sélectionnez le nom que vous préférez. Vous pourrez le modifier plus tard.
       </p>
       {names.map((item, i) => (
         <Card

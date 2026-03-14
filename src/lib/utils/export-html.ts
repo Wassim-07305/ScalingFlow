@@ -49,14 +49,14 @@ export function exportFunnelToHTML(data: FunnelData, brandName?: string): string
       <div class="container">
         <h1>${esc(data.vsl_page.headline)}</h1>
         <p class="intro">${esc(data.vsl_page.intro_text)}</p>
-        <div class="video-placeholder">[Insere ta video VSL ici]</div>
+        <div class="video-placeholder">[Insère ta vidéo VSL ici]</div>
         <ul class="bullets">
           ${data.vsl_page.benefit_bullets.map((b) => `<li>${esc(b)}</li>`).join("\n          ")}
         </ul>
         ${
           data.vsl_page.faq && data.vsl_page.faq.length > 0
             ? `<div class="faq">
-          <h2>Questions frequentes</h2>
+          <h2>Questions fréquentes</h2>
           ${data.vsl_page.faq.map((f) => `<div class="faq-item"><h3>${esc(f.question)}</h3><p>${esc(f.answer)}</p></div>`).join("\n          ")}
         </div>`
             : ""
@@ -78,7 +78,7 @@ export function exportFunnelToHTML(data: FunnelData, brandName?: string): string
             ? `<div class="upsell">
           <h2>${esc(data.thankyou_page.upsell_headline)}</h2>
           <p>${esc(data.thankyou_page.upsell_description || "")}</p>
-          <a href="#" class="cta-btn">${esc(data.thankyou_page.upsell_cta || "Decouvrir")}</a>
+          <a href="#" class="cta-btn">${esc(data.thankyou_page.upsell_cta || "Découvrir")}</a>
         </div>`
             : ""
         }
@@ -133,7 +133,7 @@ export function exportFunnelToHTML(data: FunnelData, brandName?: string): string
   ${vslHTML}
   ${thankHTML}
   <footer style="text-align:center;padding:32px;font-size:12px;color:var(--text-secondary);">
-    Genere par ScalingFlow
+    Généré par ScalingFlow
   </footer>
 </body>
 </html>`;

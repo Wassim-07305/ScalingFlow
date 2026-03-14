@@ -26,8 +26,8 @@ interface UserMilestone {
 // Milestones par defaut si la table est vide
 const FALLBACK_MILESTONES: Milestone[] = [
   { id: "1", title: "Profil complete", description: "Onboarding termine", milestone_order: 1, badge_name: "Premier pas", icon: null },
-  { id: "2", title: "Marche valide", description: "Score viabilite > 70", milestone_order: 2, badge_name: "Explorateur", icon: null },
-  { id: "3", title: "Offre creee", description: "Offre generee et validee", milestone_order: 3, badge_name: "Createur", icon: null },
+  { id: "2", title: "Marché validé", description: "Score viabilité > 70", milestone_order: 2, badge_name: "Explorateur", icon: null },
+  { id: "3", title: "Offre créée", description: "Offre générée et validée", milestone_order: 3, badge_name: "Créateur", icon: null },
   { id: "4", title: "Funnel construit", description: "3 pages de funnel pretes", milestone_order: 4, badge_name: "Stratege", icon: null },
   { id: "5", title: "1er Lead", description: "Premier lead capture", milestone_order: 5, badge_name: null, icon: null },
   { id: "6", title: "1ere Vente", description: "Premier client converti", milestone_order: 6, badge_name: "Scaler", icon: null },
@@ -71,16 +71,16 @@ export function MilestoneTracker({ className }: MilestoneTrackerProps) {
     fetchData();
   }, [user]);
 
-  // Detecter automatiquement les milestones completes par les donnees existantes
+  // Détecter automatiquement les milestones complétés par les données existantes
   const completedIds = new Set(
     userMilestones.filter((um) => um.completed).map((um) => um.milestone_id)
   );
 
-  // Auto-detection basee sur le profil (pour les milestones "profil complete", etc.)
+  // Auto-detection basée sur le profil (pour les milestones "profil complete", etc.)
   const autoCompletedTitles = new Set<string>();
   if (profile?.onboarding_completed) autoCompletedTitles.add("Profil complete");
   if (profile?.market_viability_score && profile.market_viability_score > 70)
-    autoCompletedTitles.add("Marche valide");
+    autoCompletedTitles.add("Marché validé");
 
   const getStatus = (milestone: Milestone, index: number) => {
     if (completedIds.has(milestone.id)) return "completed";

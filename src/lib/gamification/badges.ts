@@ -23,35 +23,35 @@ export interface BadgeDefinition {
 }
 
 /**
- * Definitions des badges avec metadonnees completes.
- * Les IDs correspondent a ceux utilises dans xp-engine.ts
+ * Définitions des badges avec métadonnées complètes.
+ * Les IDs correspondent à ceux utilisés dans xp-engine.ts
  */
 export const BADGE_DEFINITIONS: BadgeDefinition[] = [
   {
     id: "first_gen",
     name: "Premier pas",
-    description: "Genere ton premier contenu avec l'IA",
+    description: "Génère ton premier contenu avec l'IA",
     icon: Sparkles,
     color: "text-accent",
   },
   {
     id: "gen_5",
-    name: "Createur",
-    description: "Genere 5 contenus avec l'IA",
+    name: "Créateur",
+    description: "Génère 5 contenus avec l'IA",
     icon: Zap,
     color: "text-info",
   },
   {
     id: "gen_20",
     name: "Producteur",
-    description: "Genere 20 contenus avec l'IA",
+    description: "Génère 20 contenus avec l'IA",
     icon: Rocket,
     color: "text-[#A78BFA]",
   },
   {
     id: "gen_50",
     name: "Machine",
-    description: "Genere 50 contenus avec l'IA",
+    description: "Génère 50 contenus avec l'IA",
     icon: Crown,
     color: "text-warning",
   },
@@ -64,7 +64,7 @@ export const BADGE_DEFINITIONS: BadgeDefinition[] = [
   },
   {
     id: "level_5",
-    name: "Confirme",
+    name: "Confirmé",
     description: "Atteins le niveau 5",
     icon: Award,
     color: "text-info",
@@ -78,14 +78,14 @@ export const BADGE_DEFINITIONS: BadgeDefinition[] = [
   },
   {
     id: "xp_1000",
-    name: "Millenaire",
+    name: "Millénaire",
     description: "Accumule 1 000 points XP",
     icon: Star,
     color: "text-accent",
   },
   {
     id: "xp_5000",
-    name: "Legende",
+    name: "Légende",
     description: "Accumule 5 000 points XP",
     icon: Flame,
     color: "text-danger",
@@ -93,7 +93,7 @@ export const BADGE_DEFINITIONS: BadgeDefinition[] = [
   // Badges Streak
   {
     id: "streak_7",
-    name: "Regularite",
+    name: "Régularité",
     description: "Maintiens un streak de 7 jours",
     icon: Calendar,
     color: "text-danger",
@@ -105,18 +105,18 @@ export const BADGE_DEFINITIONS: BadgeDefinition[] = [
     icon: Flame,
     color: "text-warning",
   },
-  // Badges Communaute
+  // Badges Communauté
   {
     id: "community_first",
     name: "Social",
-    description: "Publie ton premier post dans la communaute",
+    description: "Publie ton premier post dans la communauté",
     icon: MessageCircle,
     color: "text-info",
   },
   {
     id: "community_10",
     name: "Influenceur",
-    description: "Publie 10 posts dans la communaute",
+    description: "Publie 10 posts dans la communauté",
     icon: MessageCircle,
     color: "text-[#A78BFA]",
   },
@@ -142,7 +142,7 @@ export const BADGE_MAP = new Map<string, BadgeDefinition>(
   BADGE_DEFINITIONS.map((b) => [b.id, b])
 );
 
-/** Retourne la definition d'un badge par son ID */
+/** Retourne la définition d'un badge par son ID */
 export function getBadgeDefinition(id: string): BadgeDefinition | undefined {
   return BADGE_MAP.get(id);
 }

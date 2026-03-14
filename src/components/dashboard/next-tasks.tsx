@@ -101,11 +101,11 @@ export function NextTasks() {
           <div className="text-center py-6">
             <CheckCircle2 className="h-10 w-10 text-accent mx-auto mb-2" />
             <p className="text-sm text-text-secondary">
-              Toutes les taches sont completees !
+              Toutes les tâches sont complétées !
             </p>
             <Link href="/roadmap">
               <Button variant="outline" size="sm" className="mt-3">
-                Generer une nouvelle roadmap
+                Générer une nouvelle roadmap
               </Button>
             </Link>
           </div>

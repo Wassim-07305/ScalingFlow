@@ -22,14 +22,14 @@ export async function POST(req: NextRequest) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Non autorise" }, { status: 401 });
+      return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
     }
 
     // Rate limiting
     const rl = await rateLimit(user.id, "gamification-award", { limit: 30, windowSeconds: 60 });
     if (!rl.allowed) {
       return NextResponse.json(
-        { error: "Trop de requetes. Reessaie dans quelques secondes." },
+        { error: "Trop de requêtes. Réessaie dans quelques secondes." },
         { status: 429 }
       );
     }
@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
 
     if (!activityType || !ALLOWED_ACTIVITIES.includes(activityType as AllowedActivity)) {
       return NextResponse.json(
-        { error: "Type d'activite invalide" },
+        { error: "Type d'activité invalide" },
         { status: 400 }
       );
     }

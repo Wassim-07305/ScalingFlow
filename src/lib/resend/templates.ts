@@ -1,12 +1,12 @@
 // ---------------------------------------------------------------------------
 // Templates d'emails — ScalingFlow
-// Chaque template retourne { subject, html } pour etre envoye via Resend.
+// Chaque template retourne { subject, html } pour être envoyé via Resend.
 // Design : dark theme inline (bg #0B0E11, accent #34D399, texte blanc).
 // ---------------------------------------------------------------------------
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://scalingflow.com";
 
-/** Wrapper HTML partage par tous les templates */
+/** Wrapper HTML partagé par tous les templates */
 function layout(content: string): string {
   return `<!DOCTYPE html>
 <html lang="fr">
@@ -44,7 +44,7 @@ function layout(content: string): string {
 </html>`;
 }
 
-/** Bouton CTA reutilisable */
+/** Bouton CTA réutilisable */
 function ctaButton(label: string, href: string): string {
   return `<table role="presentation" cellpadding="0" cellspacing="0" style="margin:24px 0;">
   <tr>
@@ -85,7 +85,7 @@ export function welcomeEmail(firstName: string) {
 }
 
 // ---------------------------------------------------------------------------
-// 2. Notification de generation terminee
+// 2. Notification de génération terminée
 // ---------------------------------------------------------------------------
 export function generationCompleteEmail(
   firstName: string,
@@ -102,11 +102,11 @@ export function generationCompleteEmail(
     <p style="margin:0 0 12px;font-size:15px;line-height:1.6;color:#D1D5DB;">
       Connecte-toi pour consulter et exploiter le contenu g&eacute;n&eacute;r&eacute;.
     </p>
-    ${ctaButton("Voir le resultat", `${APP_URL}/assets`)}
+    ${ctaButton("Voir le résultat", `${APP_URL}/assets`)}
   `);
 
   return {
-    subject: `Ta generation "${generationType}" est prete`,
+    subject: `Ta génération "${generationType}" est prête`,
     html,
   };
 }
@@ -163,14 +163,14 @@ export function subscriptionActivatedEmail(firstName: string, planName: string) 
       G&eacute;n&eacute;rations illimit&eacute;es, acc&egrave;s &agrave; tous les agents IA,
       et bien plus. Fonce !
     </p>
-    ${ctaButton("Acceder au dashboard", `${APP_URL}`)}
+    ${ctaButton("Accéder au dashboard", `${APP_URL}`)}
     <p style="margin:0;font-size:13px;color:#6B7280;">
       Tu peux g&eacute;rer ton abonnement depuis les param&egrave;tres.
     </p>
   `);
 
   return {
-    subject: `Abonnement ${planName} active`,
+    subject: `Abonnement ${planName} activé`,
     html,
   };
 }
@@ -191,17 +191,17 @@ export function subscriptionCanceledEmail(firstName: string) {
       Tes contenus g&eacute;n&eacute;r&eacute;s restent accessibles. Tu peux te r&eacute;abonner
       &agrave; tout moment.
     </p>
-    ${ctaButton("Se reabonner", `${APP_URL}/pricing`)}
+    ${ctaButton("Se réabonner", `${APP_URL}/pricing`)}
   `);
 
   return {
-    subject: "Ton abonnement ScalingFlow a ete annule",
+    subject: "Ton abonnement ScalingFlow a été annulé",
     html,
   };
 }
 
 // ---------------------------------------------------------------------------
-// 6. Echec de paiement
+// 6. Échec de paiement
 // ---------------------------------------------------------------------------
 export function paymentFailedEmail(firstName: string) {
   const html = layout(`
@@ -216,14 +216,14 @@ export function paymentFailedEmail(firstName: string) {
       V&eacute;rifie tes informations de paiement pour &eacute;viter toute interruption
       de service.
     </p>
-    ${ctaButton("Mettre a jour mon paiement", `${APP_URL}/settings`)}
+    ${ctaButton("Mettre à jour mon paiement", `${APP_URL}/settings`)}
     <p style="margin:0;font-size:13px;color:#6B7280;">
       Si tu penses qu&rsquo;il s&rsquo;agit d&rsquo;une erreur, contacte-nous en r&eacute;pondant &agrave; cet email.
     </p>
   `);
 
   return {
-    subject: "Action requise : probleme de paiement ScalingFlow",
+    subject: "Action requise : problème de paiement ScalingFlow",
     html,
   };
 }
@@ -257,14 +257,14 @@ export function kpiAlertEmail(
       qui n&eacute;cessitent ton attention :
     </p>
     ${alertRows}
-    ${ctaButton("Voir le detail", `${APP_URL}`)}
+    ${ctaButton("Voir le détail", `${APP_URL}`)}
     <p style="margin:0;font-size:13px;color:#6B7280;">
       Ces alertes sont bas&eacute;es sur tes KPIs des derniers jours.
     </p>
   `);
 
   return {
-    subject: `${alerts.length} alerte${alerts.length > 1 ? "s" : ""} business detectee${alerts.length > 1 ? "s" : ""}`,
+    subject: `${alerts.length} alerte${alerts.length > 1 ? "s" : ""} business détectée${alerts.length > 1 ? "s" : ""}`,
     html,
   };
 }

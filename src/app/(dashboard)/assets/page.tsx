@@ -30,13 +30,13 @@ import {
 
 const TABS = [
   { key: "vsl", label: "Script VSL", icon: Video },
-  { key: "email", label: "Sequence Email", icon: Mail },
-  { key: "sms", label: "Sequence SMS", icon: MessageSquare },
+  { key: "email", label: "Séquence Email", icon: Mail },
+  { key: "sms", label: "Séquence SMS", icon: MessageSquare },
   { key: "pitch_deck", label: "Pitch Deck", icon: Presentation },
   { key: "sales_letter", label: "Sales Letter", icon: FileText },
   { key: "setting_script", label: "Script Setting", icon: Phone },
   { key: "lead_magnet", label: "Lead Magnet", icon: Magnet },
-  { key: "case_study", label: "Etude de Cas", icon: BookOpen },
+  { key: "case_study", label: "Étude de Cas", icon: BookOpen },
   { key: "social_assets", label: "Social Assets", icon: Share2 },
   { key: "history", label: "Historique", icon: History },
 ] as const;
@@ -104,7 +104,7 @@ export default function AssetsPage() {
       // Store loaded data and switch to the right tab
       setLoadedData((prev) => ({ ...prev, [tabKey]: parsed }));
       setActiveTab(tabKey);
-      toast.success("Asset charge depuis l'historique");
+      toast.success("Asset chargé depuis l'historique");
     } catch {
       toast.error("Erreur lors du chargement");
     }
@@ -114,7 +114,7 @@ export default function AssetsPage() {
     <div>
       <PageHeader
         title="Ressources Commerciales"
-        description="Genere tes scripts VSL, emails, pitch decks et plus avec l'IA."
+        description="Génère tes scripts VSL, emails, pitch decks et plus avec l'IA."
       />
 
       <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
@@ -150,7 +150,7 @@ export default function AssetsPage() {
           titleField="title"
           subtitleField="asset_type"
           statusField="status"
-          emptyMessage="Aucun asset genere pour le moment."
+          emptyMessage="Aucun asset généré pour le moment."
           onSelect={handleHistorySelect}
         />
       )}

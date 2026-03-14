@@ -85,7 +85,7 @@ export function DailyTasks({ className, refreshKey }: DailyTasksProps) {
 
     const newCompleted = !task.completed;
 
-    // Mise a jour optimiste
+    // Mise à jour optimiste
     setTasks((prev) =>
       prev.map((t) =>
         t.id === taskId
@@ -119,7 +119,7 @@ export function DailyTasks({ className, refreshKey }: DailyTasksProps) {
             : t
         )
       );
-      toast.error("Impossible de mettre a jour la tache");
+      toast.error("Impossible de mettre à jour la tâche");
     }
   };
 
@@ -163,7 +163,7 @@ export function DailyTasks({ className, refreshKey }: DailyTasksProps) {
           <div className="flex flex-col items-center justify-center py-8 text-center">
             <ListChecks className="h-10 w-10 text-text-muted/40 mb-3" />
             <p className="text-sm text-text-muted">
-              Aucune tache pour le moment. Tes taches apparaitront ici au fur et a mesure de ta progression.
+              Aucune tâche pour le moment. Tes tâches apparaîtront ici au fur et à mesure de ta progression.
             </p>
           </div>
         </CardContent>

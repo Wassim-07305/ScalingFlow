@@ -66,7 +66,7 @@ export default function MarketPage() {
   const [loadingData, setLoadingData] = useState(true);
   const [usageLimited, setUsageLimited] = useState<{currentUsage: number; limit: number} | null>(null);
 
-  // Charger les analyses de marche
+  // Charger les analyses de marché
   const loadAnalyses = useCallback(async () => {
     if (!user) return;
     setLoadingData(true);
@@ -81,7 +81,7 @@ export default function MarketPage() {
       toast.error("Erreur lors du chargement des analyses");
     } else if (data) {
       setAnalyses(data);
-      // Selectionner la premiere analyse par defaut (ou celle marquee selected)
+      // Sélectionner la première analyse par défaut (ou celle marquée selected)
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const selected = (data as any[]).find((a) => a.selected) || data[0];
       if (selected) {
@@ -91,7 +91,7 @@ export default function MarketPage() {
     setLoadingData(false);
   }, [user, supabase]);
 
-  // Charger les concurrents de l'analyse selectionnee
+  // Charger les concurrents de l'analyse sélectionnée
   const loadCompetitors = useCallback(async () => {
     if (!user || !selectedAnalysis) return;
 
@@ -115,7 +115,7 @@ export default function MarketPage() {
     loadCompetitors();
   }, [loadCompetitors]);
 
-  // Generer le persona
+  // Générer le persona
   const handleGeneratePersona = async () => {
     if (!selectedAnalysis) return;
     setLoadingPersona(true);
@@ -130,23 +130,23 @@ export default function MarketPage() {
       if (!res.ok) {
         const errData = await res.json().catch(() => ({}));
         if (res.status === 403 && errData.usage) { setUsageLimited(errData.usage); return; }
-        throw new Error(errData.error || "Erreur lors de la generation");
+        throw new Error(errData.error || "Erreur lors de la génération");
       }
 
       const persona = await res.json();
-      // Mettre a jour l'analyse locale
+      // Mettre à jour l'analyse locale
       setSelectedAnalysis({ ...selectedAnalysis, persona });
       setAnalyses((prev) =>
         prev.map((a) =>
           a.id === selectedAnalysis.id ? { ...a, persona } : a
         )
       );
-      toast.success("Persona genere avec succes !");
+      toast.success("Persona généré avec succès !");
     } catch (error) {
       toast.error(
         error instanceof Error
           ? error.message
-          : "Erreur lors de la generation du persona"
+          : "Erreur lors de la génération du persona"
       );
     } finally {
       setLoadingPersona(false);
@@ -168,13 +168,13 @@ export default function MarketPage() {
       if (!res.ok) {
         const errData = await res.json().catch(() => ({}));
         if (res.status === 403 && errData.usage) { setUsageLimited(errData.usage); return; }
-        throw new Error(errData.error || "Erreur lors de la generation");
+        throw new Error(errData.error || "Erreur lors de la génération");
       }
 
       await res.json();
       // Recharger les concurrents depuis la DB
       await loadCompetitors();
-      toast.success("Analyse concurrentielle terminee !");
+      toast.success("Analyse concurrentielle terminée !");
     } catch (error) {
       toast.error(
         error instanceof Error
@@ -207,14 +207,14 @@ export default function MarketPage() {
       }
 
       const schwartzAnalysis = await res.json();
-      // Mettre a jour l'analyse locale
+      // Mettre à jour l'analyse locale
       setSelectedAnalysis({ ...selectedAnalysis, schwartz_analysis: schwartzAnalysis });
       setAnalyses((prev) =>
         prev.map((a) =>
           a.id === selectedAnalysis.id ? { ...a, schwartz_analysis: schwartzAnalysis } : a
         )
       );
-      toast.success("Analyse Schwartz terminee !");
+      toast.success("Analyse Schwartz terminée !");
     } catch (error) {
       toast.error(
         error instanceof Error
@@ -233,18 +233,18 @@ export default function MarketPage() {
   return (
     <div>
       <PageHeader
-        title="Etude de marche"
-        description="Analyse ton marche, cree ton avatar client et identifie tes concurrents."
+        title="Étude de marché"
+        description="Analyse ton marché, crée ton avatar client et identifie tes concurrents."
       />
 
       {/* Tabs */}
       <TabBar tabs={TABS} activeTab={activeTab} onTabChange={(key) => setActiveTab(key as TabKey)} />
 
-      {/* Selection de l'analyse */}
+      {/* Sélection de l'analyse */}
       {analyses.length > 1 && (
         <div className="mb-6">
           <label className="text-sm text-text-muted mb-2 block">
-            Marche selectionne
+            Marché sélectionné
           </label>
           <div className="flex flex-wrap gap-2">
             {analyses.map((a) => (
@@ -290,11 +290,11 @@ export default function MarketPage() {
           <CardContent className="flex flex-col items-center justify-center py-12">
             <BarChart3 className="h-12 w-12 text-text-muted mb-4" />
             <h3 className="text-lg font-medium text-text-primary mb-2">
-              Aucune analyse de marche
+              Aucune analyse de marché
             </h3>
             <p className="text-sm text-text-secondary text-center max-w-md">
-              Lance une analyse de marche depuis l&apos;onboarding pour voir tes
-              resultats ici.
+              Lance une analyse de marché depuis l&apos;onboarding pour voir tes
+              résultats ici.
             </p>
           </CardContent>
         </Card>
@@ -319,7 +319,7 @@ export default function MarketPage() {
                     <div className="flex items-center gap-3">
                       <CardTitle>{analysis.market_name}</CardTitle>
                       {analysis.selected && (
-                        <Badge variant="default">Recommande</Badge>
+                        <Badge variant="default">Recommandé</Badge>
                       )}
                       {analysis.viability_score !== null && (
                         <Badge
@@ -363,7 +363,7 @@ export default function MarketPage() {
                       <div>
                         <h4 className="text-sm font-medium text-text-muted mb-1 flex items-center gap-1.5">
                           <Target className="h-3.5 w-3.5" />
-                          Positionnement recommande
+                          Positionnement recommandé
                         </h4>
                         <p className="text-sm text-text-primary">
                           {analysis.recommended_positioning}
@@ -371,12 +371,12 @@ export default function MarketPage() {
                       </div>
                     )}
 
-                    {/* Problemes */}
+                    {/* Problèmes */}
                     {analysis.problems && analysis.problems.length > 0 && (
                       <div>
                         <h4 className="text-sm font-medium text-text-muted mb-2 flex items-center gap-1.5">
                           <AlertTriangle className="h-3.5 w-3.5" />
-                          Problemes identifies
+                          Problèmes identifiés
                         </h4>
                         <div className="flex flex-wrap gap-1.5">
                           {analysis.problems.map((p, i) => (
@@ -409,7 +409,7 @@ export default function MarketPage() {
                     {aiData && typeof aiData === "object" && "why_good_fit" in aiData && (
                       <div>
                         <h4 className="text-sm font-medium text-text-muted mb-1">
-                          Pourquoi ce marche est adapte
+                          Pourquoi ce marché est adapté
                         </h4>
                         <p className="text-sm text-text-secondary">
                           {aiData.why_good_fit as string}
@@ -434,11 +434,11 @@ export default function MarketPage() {
               <CardContent className="flex flex-col items-center justify-center py-12">
                 <User className="h-12 w-12 text-text-muted mb-4" />
                 <h3 className="text-lg font-medium text-text-primary mb-2">
-                  Aucun persona genere
+                  Aucun persona généré
                 </h3>
                 <p className="text-sm text-text-secondary text-center max-w-md mb-6">
-                  Genere un avatar client ultra-detaille sur 4 niveaux pour le
-                  marche « {selectedAnalysis.market_name} ».
+                  Génère un avatar client ultra-détaillé sur 4 niveaux pour le
+                  marché « {selectedAnalysis.market_name} ».
                 </p>
                 <Button
                   onClick={handleGeneratePersona}
@@ -447,12 +447,12 @@ export default function MarketPage() {
                   {loadingPersona ? (
                     <>
                       <Loader2 className="h-4 w-4 animate-spin" />
-                      Generation en cours...
+                      Génération en cours...
                     </>
                   ) : (
                     <>
                       <Sparkles className="h-4 w-4" />
-                      Generer le Persona
+                      Générer le Persona
                     </>
                   )}
                 </Button>
@@ -494,8 +494,8 @@ export default function MarketPage() {
                   Aucune analyse Schwartz
                 </h3>
                 <p className="text-sm text-text-secondary text-center max-w-md mb-6">
-                  Determine le niveau de sophistication de ton marche selon les
-                  5 niveaux d'Eugene Schwartz pour adapter ta strategie marketing.
+                  Détermine le niveau de sophistication de ton marché selon les
+                  5 niveaux d'Eugène Schwartz pour adapter ta stratégie marketing.
                 </p>
                 <Button
                   onClick={handleGenerateSchwartz}
@@ -570,7 +570,7 @@ export default function MarketPage() {
                   Aucune analyse concurrentielle
                 </h3>
                 <p className="text-sm text-text-secondary text-center max-w-md mb-6">
-                  Lance une analyse IA des concurrents du marche
+                  Lance une analyse IA des concurrents du marché
                   « {selectedAnalysis.market_name} ».
                 </p>
                 <Button

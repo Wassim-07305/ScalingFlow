@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Non autorise" }, { status: 401 });
+      return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
     }
 
     const body = await req.json();
@@ -88,7 +88,7 @@ export async function GET() {
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Non autorise" }, { status: 401 });
+      return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
     }
 
     // Get user's organization
@@ -145,7 +145,7 @@ export async function PATCH(req: NextRequest) {
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Non autorise" }, { status: 401 });
+      return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
     }
 
     // Check user is org owner or admin
@@ -156,7 +156,7 @@ export async function PATCH(req: NextRequest) {
       .single();
 
     if (!membership || !["owner", "admin"].includes(membership.role)) {
-      return NextResponse.json({ error: "Non autorise" }, { status: 403 });
+      return NextResponse.json({ error: "Non autorisé" }, { status: 403 });
     }
 
     const body = await req.json();

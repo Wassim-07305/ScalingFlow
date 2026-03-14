@@ -97,7 +97,7 @@ const PAYING_CLIENTS_FIELDS = [
   },
   {
     key: "best_result",
-    label: "Quel resultat tu leur as apporte ?",
+    label: "Quel résultat tu leur as apporté ?",
     placeholder: "Ex: +200% de leads en 3 mois...",
   },
 ];
@@ -134,7 +134,7 @@ const SITUATION_FIELDS: Record<
     {
       key: "missions",
       label: "Quel type de missions tu fais ?",
-      placeholder: "Ex: Developpement web, consulting...",
+      placeholder: "Ex: Développement web, consulting...",
     },
     {
       key: "client_type",
@@ -149,7 +149,7 @@ const SITUATION_FIELDS: Record<
     },
     {
       key: "clients_count",
-      label: "Combien de clients en simultane ?",
+      label: "Combien de clients en simultané ?",
       placeholder: "Ex: 5",
       type: "number",
     },
@@ -160,7 +160,7 @@ const SITUATION_FIELDS: Record<
     },
     {
       key: "biggest_challenge",
-      label: "Qu'est-ce qui te frustre le plus dans ton modele actuel ?",
+      label: "Qu'est-ce qui te frustre le plus dans ton modèle actuel ?",
       placeholder: "Ex: Je trade mon temps contre de l'argent...",
     },
   ],
@@ -191,41 +191,41 @@ const SITUATION_FIELDS: Record<
   etudiant: [
     {
       key: "etudes",
-      label: "Qu'est-ce que tu etudies ?",
+      label: "Qu'est-ce que tu étudies ?",
       placeholder: "Ex: Marketing digital, commerce, informatique...",
     },
     {
       key: "biggest_challenge",
       label: "Qu'est-ce qui te bloque pour te lancer ?",
-      placeholder: "Ex: Pas d'experience, pas de budget...",
+      placeholder: "Ex: Pas d'expérience, pas de budget...",
     },
   ],
   reconversion: [
     {
       key: "ancien_poste",
-      label: "Ton ancien metier / poste",
+      label: "Ton ancien métier / poste",
       placeholder: "Ex: Commercial B2B, RH, comptable...",
     },
     {
       key: "duree_experience",
-      label: "Combien d'annees d'experience ?",
+      label: "Combien d'années d'expérience ?",
       placeholder: "Ex: 8 ans",
     },
     {
       key: "biggest_challenge",
       label: "Pourquoi tu veux changer ?",
-      placeholder: "Ex: Je veux plus de liberte, meilleure remuneration...",
+      placeholder: "Ex: Je veux plus de liberté, meilleure rémunération...",
     },
   ],
   sans_emploi: [
     {
       key: "ancien_poste",
-      label: "Ton dernier poste / experience",
+      label: "Ton dernier poste / expérience",
       placeholder: "Ex: Responsable marketing, commercial...",
     },
     {
       key: "biggest_challenge",
-      label: "Qu'est-ce qui te bloque pour demarrer ?",
+      label: "Qu'est-ce qui te bloque pour démarrer ?",
       placeholder: "Ex: Je ne sais pas par ou commencer...",
     },
   ],
@@ -1048,7 +1048,7 @@ export function OnboardingFlow() {
       <div className={cn("relative min-h-dvh text-white", onboardingBg)}>
         <AnimatedBackground />
         <div className="relative z-10 flex min-h-dvh flex-col items-center justify-center">
-          <AILoading text="Analyse de ton marche en cours" />
+          <AILoading text="Analyse de ton marché en cours" />
         </div>
       </div>
     );
@@ -1121,7 +1121,7 @@ export function OnboardingFlow() {
                     onClick={handleButtonClick}
                     disabled={!canProceed()}
                     aria-label={
-                      isSummary ? "Lancer l'analyse IA" : "Etape suivante"
+                      isSummary ? "Lancer l'analyse IA" : "Étape suivante"
                     }
                     className={cn(
                       "flex items-center gap-2 rounded-xl text-base font-semibold text-white transition-all",

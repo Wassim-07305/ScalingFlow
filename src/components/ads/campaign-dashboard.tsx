@@ -110,7 +110,7 @@ export function CampaignDashboard({ className }: CampaignDashboardProps) {
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <Megaphone className="h-12 w-12 text-text-muted/40 mb-4" />
               <p className="text-sm text-text-muted">
-                Aucune campagne publicitaire. Cree tes premieres publicites pour voir tes campagnes ici.
+                Aucune campagne publicitaire. Crée tes premières publicités pour voir tes campagnes ici.
               </p>
             </div>
           </CardContent>

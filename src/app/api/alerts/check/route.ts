@@ -16,7 +16,7 @@ export async function POST() {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Non authentifie" }, { status: 401 });
+      return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
     }
 
     // Fetch recent notifications to avoid duplicate alerts
@@ -104,7 +104,7 @@ export async function POST() {
   } catch (error) {
     console.error("[alerts/check] Error:", error);
     return NextResponse.json(
-      { error: "Erreur lors de la verification des alertes" },
+      { error: "Erreur lors de la vérification des alertes" },
       { status: 500 }
     );
   }

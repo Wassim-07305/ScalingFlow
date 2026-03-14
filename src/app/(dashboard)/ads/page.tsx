@@ -20,7 +20,7 @@ const TABS = [
   { key: "creatives", label: "Creatives IA", icon: Sparkles },
   { key: "campaigns", label: "Campagnes", icon: BarChart3 },
   { key: "automation", label: "Automation", icon: Zap },
-  { key: "video_ads", label: "Pubs Video", icon: Video },
+  { key: "video_ads", label: "Pubs Vidéo", icon: Video },
   { key: "dm_scripts", label: "Scripts DM", icon: MessageSquare },
   { key: "follower_ads", label: "Follower Ads", icon: Users },
   { key: "dm_retargeting", label: "DM Retargeting", icon: MessageCircle },
@@ -49,7 +49,7 @@ export default function AdsPage() {
       const tabKey = data.asset_type === "dm_retargeting" ? "dm_retargeting" : "follower_ads";
       setLoadedData((prev) => ({ ...prev, [tabKey]: parsed }));
       setActiveTab(tabKey);
-      toast.success("Asset charge depuis l'historique");
+      toast.success("Asset chargé depuis l'historique");
     } catch {
       toast.error("Erreur lors du chargement");
     }
@@ -77,7 +77,7 @@ export default function AdsPage() {
       const tabKey = typeMap[data.creative_type] || "creatives";
       setLoadedData((prev) => ({ ...prev, [tabKey]: parsed }));
       setActiveTab(tabKey);
-      toast.success("Creative chargee depuis l'historique");
+      toast.success("Creative chargée depuis l'historique");
     } catch {
       toast.error("Erreur lors du chargement");
     }
@@ -86,8 +86,8 @@ export default function AdsPage() {
   return (
     <div>
       <PageHeader
-        title="Publicites"
-        description="Cree et gere tes campagnes publicitaires."
+        title="Publicités"
+        description="Crée et gère tes campagnes publicitaires."
       />
 
       <div className="flex gap-2 mb-6 overflow-x-auto pb-1">
@@ -123,7 +123,7 @@ export default function AdsPage() {
             titleField="headline"
             subtitleField="ad_copy"
             statusField="status"
-            emptyMessage="Aucune creative generee pour le moment."
+            emptyMessage="Aucune creative générée pour le moment."
             onSelect={handleHistorySelect}
           />
           <GenerationHistory
@@ -132,7 +132,7 @@ export default function AdsPage() {
             subtitleField="asset_type"
             statusField="status"
             filters={{ asset_type: ["follower_ads", "dm_retargeting"] }}
-            emptyMessage="Aucune follower ad ou DM retargeting generee."
+            emptyMessage="Aucune follower ad ou DM retargeting générée."
             onSelect={handleAssetHistorySelect}
           />
         </div>

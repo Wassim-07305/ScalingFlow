@@ -19,13 +19,13 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 const actions = [
   {
     label: "Creer une offre",
-    description: "Genere ton positionnement, pricing et garanties",
+    description: "Génère ton positionnement, pricing et garanties",
     href: "/offer",
     icon: Package,
     color: "orange" as const,
   },
   {
-    label: "Generer un funnel",
+    label: "Générer un funnel",
     description: "Page opt-in, VSL et remerciement",
     href: "/funnel",
     icon: Filter,
@@ -33,13 +33,13 @@ const actions = [
   },
   {
     label: "Creer des pubs",
-    description: "Hooks, creatives et scripts video",
+    description: "Hooks, créatives et scripts video",
     href: "/ads/creatives",
     icon: Megaphone,
     color: "cyan" as const,
   },
   {
-    label: "Generer du contenu",
+    label: "Générer du contenu",
     description: "Reels, posts, stories et carrousels",
     href: "/content",
     icon: PenTool,

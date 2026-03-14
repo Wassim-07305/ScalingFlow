@@ -161,15 +161,15 @@ export function OptimizationRecommendations() {
       });
 
       if (!res.ok) {
-        throw new Error("Erreur lors de la generation");
+        throw new Error("Erreur lors de la génération");
       }
 
       const data = (await res.json()) as OptimizationResult;
       setResult(data);
-      toast.success("Recommandations generees !");
+      toast.success("Recommandations générées !");
     } catch (err) {
       console.error(err);
-      toast.error("Erreur lors de la generation des recommandations");
+      toast.error("Erreur lors de la génération des recommandations");
     } finally {
       setLoading(false);
     }
@@ -186,8 +186,8 @@ export function OptimizationRecommendations() {
             </h3>
             <p className="text-sm text-text-secondary mt-1">
               {hasMetrics
-                ? "L'IA va analyser vos metriques reelles et generer des recommandations personnalisees."
-                : "Ajoutez vos donnees dans l'onglet Dashboard d'abord, ou generez sur les donnees de demo."}
+                ? "L'IA va analyser vos métriques réelles et générer des recommandations personnalisées."
+                : "Ajoutez vos données dans l'onglet Dashboard d'abord, ou générez sur les données de démo."}
             </p>
           </div>
           <Button onClick={handleGenerate} disabled={loading} className="shrink-0">
@@ -196,7 +196,7 @@ export function OptimizationRecommendations() {
             ) : (
               <Sparkles className="h-4 w-4 mr-2" />
             )}
-            {loading ? "Analyse en cours..." : "Generer les recommandations"}
+            {loading ? "Analyse en cours..." : "Générer les recommandations"}
           </Button>
         </CardContent>
       </Card>
@@ -308,7 +308,7 @@ export function OptimizationRecommendations() {
           {/* Recommendations */}
           <div className="space-y-3">
             <h3 className="text-base font-semibold text-text-primary">
-              Recommandations detaillees ({result.recommendations.length})
+              Recommandations détaillées ({result.recommendations.length})
             </h3>
             {result.recommendations.map((reco, idx) => {
               const isExpanded = expandedReco === idx;
@@ -376,7 +376,7 @@ export function OptimizationRecommendations() {
                           <div className="flex items-center gap-2">
                             <Target className="h-4 w-4 text-text-muted" />
                             <span className="text-xs text-text-muted">
-                              Metrique a surveiller :
+                              Métrique à surveiller :
                             </span>
                             <Badge variant="muted">{reco.metric_to_watch}</Badge>
                           </div>
@@ -402,8 +402,8 @@ export function OptimizationRecommendations() {
               Optimisez vos campagnes avec l&apos;IA
             </h3>
             <p className="text-sm text-text-secondary max-w-md">
-              Cliquez sur &quot;Generer les recommandations&quot; pour obtenir une analyse complete
-              de vos metriques publicitaires et des recommandations actionnables.
+              Cliquez sur &quot;Générer les recommandations&quot; pour obtenir une analyse complète
+              de vos métriques publicitaires et des recommandations actionnables.
             </p>
           </CardContent>
         </Card>

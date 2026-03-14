@@ -119,11 +119,11 @@ export default function VaultPage() {
           const errData = await response.json();
           if (errData.usage) { setUsageLimited(errData.usage); return; }
         }
-        throw new Error("Erreur lors de la generation");
+        throw new Error("Erreur lors de la génération");
       }
       const data = await response.json();
       setProfile((prev) => prev ? { ...prev, vault_analysis: data } : prev);
-      toast.success("Analyse du vault regeneree !");
+      toast.success("Analyse du vault régénérée !");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Erreur");
     } finally {
@@ -144,10 +144,10 @@ export default function VaultPage() {
           const errData = await res.json();
           if (errData.usage) { setUsageLimited(errData.usage); return; }
         }
-        throw new Error("Erreur lors de la generation");
+        throw new Error("Erreur lors de la génération");
       }
       setResources((prev) => prev.filter((r) => r.id !== id));
-      toast.success("Ressource supprimee");
+      toast.success("Ressource supprimée");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Erreur");
     } finally {
@@ -162,7 +162,7 @@ export default function VaultPage() {
   if (loading) {
     return (
       <div>
-        <PageHeader title="Coffre-Fort" description="Ton coffre-fort de competences et ressources." />
+        <PageHeader title="Coffre-Fort" description="Ton coffre-fort de compétences et ressources." />
         <AILoading text="Chargement du vault" />
       </div>
     );
@@ -171,11 +171,11 @@ export default function VaultPage() {
   if (!profile) {
     return (
       <div>
-        <PageHeader title="Coffre-Fort" description="Ton coffre-fort de competences et ressources." />
+        <PageHeader title="Coffre-Fort" description="Ton coffre-fort de compétences et ressources." />
         <EmptyState
           icon={Archive}
           title="Vault non disponible"
-          description="Complete l'onboarding pour initialiser ton vault."
+          description="Complète l'onboarding pour initialiser ton vault."
         />
       </div>
     );
@@ -197,11 +197,11 @@ export default function VaultPage() {
     <div>
       <PageHeader
         title="Coffre-Fort"
-        description="Ton coffre-fort de competences et ressources."
+        description="Ton coffre-fort de compétences et ressources."
         actions={
           <Button onClick={handleRegenerate} disabled={regenerating}>
             <RefreshCw className={cn("h-4 w-4 mr-2", regenerating && "animate-spin")} />
-            Regenerer l&apos;analyse
+            Régénérer l&apos;analyse
           </Button>
         }
       />
@@ -212,7 +212,7 @@ export default function VaultPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Brain className="h-5 w-5 text-accent" />
-              Competences
+              Compétences
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -223,7 +223,7 @@ export default function VaultPage() {
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-text-muted">Aucune competence renseignee</p>
+              <p className="text-sm text-text-muted">Aucune compétence renseignée</p>
             )}
           </CardContent>
         </Card>
@@ -239,15 +239,15 @@ export default function VaultPage() {
           <CardContent className="space-y-2">
             <div className="flex items-center gap-2">
               <span className="text-xs text-text-muted uppercase">Profil :</span>
-              <Badge variant="muted">{situation || "Non renseigne"}</Badge>
+              <Badge variant="muted">{situation || "Non renseigné"}</Badge>
             </div>
             <div className="flex items-center gap-2">
               <span className="text-xs text-text-muted uppercase">Niveau :</span>
-              <Badge variant="muted">{experienceLevel || "Non renseigne"}</Badge>
+              <Badge variant="muted">{experienceLevel || "Non renseigné"}</Badge>
             </div>
             <div className="flex items-center gap-2">
               <span className="text-xs text-text-muted uppercase">Parcours :</span>
-              <Badge variant="muted">{parcoursLabel || parcours || "Non defini"}</Badge>
+              <Badge variant="muted">{parcoursLabel || parcours || "Non défini"}</Badge>
             </div>
           </CardContent>
         </Card>
@@ -268,7 +268,7 @@ export default function VaultPage() {
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-text-muted">Aucune formation renseignee</p>
+              <p className="text-sm text-text-muted">Aucune formation renseignée</p>
             )}
           </CardContent>
         </Card>

@@ -58,7 +58,7 @@ export function PricingBuilder({
   return (
     <Card className={cn(className)}>
       <CardHeader>
-        <CardTitle>Strategie de prix</CardTitle>
+        <CardTitle>Stratégie de prix</CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="grid gap-4 sm:grid-cols-2">

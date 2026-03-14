@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Non autorise" }, { status: 401 });
+      return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
     }
 
     // Check admin/owner role
@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
       .single();
 
     if (!membership || !["owner", "admin"].includes(membership.role)) {
-      return NextResponse.json({ error: "Non autorise" }, { status: 403 });
+      return NextResponse.json({ error: "Non autorisé" }, { status: 403 });
     }
 
     const { email, role = "member" } = await req.json();
@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
 
     if (!targetProfile) {
       return NextResponse.json(
-        { error: "Utilisateur non trouve. Il doit d'abord creer un compte ScalingFlow." },
+        { error: "Utilisateur non trouve. Il doit d'abord créer un compte ScalingFlow." },
         { status: 404 }
       );
     }
@@ -83,7 +83,7 @@ export async function DELETE(req: NextRequest) {
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Non autorise" }, { status: 401 });
+      return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
     }
 
     const { data: membership } = await supabase
@@ -93,7 +93,7 @@ export async function DELETE(req: NextRequest) {
       .single();
 
     if (!membership || !["owner", "admin"].includes(membership.role)) {
-      return NextResponse.json({ error: "Non autorise" }, { status: 403 });
+      return NextResponse.json({ error: "Non autorisé" }, { status: 403 });
     }
 
     const { user_id } = await req.json();

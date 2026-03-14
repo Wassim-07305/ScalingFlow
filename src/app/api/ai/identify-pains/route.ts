@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Non autorise" }, { status: 401 });
+      return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
     }
 
     const { market_analysis_id } = (await req.json()) as {
@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
 
     const result = await generateJSON({ prompt, maxTokens: 4096 });
 
-    // Sauvegarder les pains dans l'analyse de marche
+    // Sauvegarder les pains dans l'analyse de marché
     await supabase
       .from("market_analyses")
       .update({ bleeding_neck_pains: result } as Record<string, unknown>)

@@ -17,7 +17,7 @@ import { DeliveryDesigner } from "@/components/offer/delivery-designer";
 import { OtoGenerator } from "@/components/offer/oto-generator";
 
 const TABS = [
-  { key: "generate", label: "Generer", icon: Sparkles },
+  { key: "generate", label: "Générer", icon: Sparkles },
   { key: "positioning", label: "Positionnement", icon: Crosshair },
   { key: "pricing", label: "Pricing", icon: DollarSign },
   { key: "delivery", label: "Livraison", icon: Settings },
@@ -99,7 +99,7 @@ export default function OfferPage() {
 
       setLoadedData(data.ai_raw_response || data);
       setActiveTab("generate");
-      toast.success("Offre chargee depuis l'historique");
+      toast.success("Offre chargée depuis l'historique");
     } catch {
       toast.error("Erreur lors du chargement");
     }
@@ -107,7 +107,7 @@ export default function OfferPage() {
 
   const handleSavePricing = async () => {
     if (!latestOfferId) {
-      toast.error("Aucune offre a modifier. Genere d'abord une offre.");
+      toast.error("Aucune offre à modifier. Génère d'abord une offre.");
       return;
     }
     setSavingPricing(true);
@@ -123,7 +123,7 @@ export default function OfferPage() {
         })
         .eq("id", latestOfferId);
       if (error) throw error;
-      toast.success("Strategie de prix sauvegardee !");
+      toast.success("Stratégie de prix sauvegardée !");
     } catch {
       toast.error("Erreur lors de la sauvegarde.");
     } finally {
@@ -134,8 +134,8 @@ export default function OfferPage() {
   return (
     <div>
       <PageHeader
-        title="Creation d'Offre"
-        description="Genere ton offre irresistible avec l'IA."
+        title="Création d'Offre"
+        description="Génère ton offre irrésistible avec l'IA."
       />
 
       <TabBar tabs={TABS} activeTab={activeTab} onTabChange={setActiveTab} />
@@ -178,7 +178,7 @@ export default function OfferPage() {
           titleField="offer_name"
           subtitleField="positioning"
           statusField="status"
-          emptyMessage="Aucune offre generee pour le moment."
+          emptyMessage="Aucune offre générée pour le moment."
           onSelect={handleHistorySelect}
         />
       )}

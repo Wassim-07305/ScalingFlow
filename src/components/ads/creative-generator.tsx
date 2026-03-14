@@ -57,7 +57,7 @@ export function CreativeGenerator({ className, initialData }: CreativeGeneratorP
           const errData = await response.json();
           if (errData.usage) { setUsageLimited(errData.usage); return; }
         }
-        throw new Error("Erreur lors de la generation");
+        throw new Error("Erreur lors de la génération");
       }
       const data = await response.json();
       const raw = data.ai_raw_response || data;
@@ -104,9 +104,9 @@ export function CreativeGenerator({ className, initialData }: CreativeGeneratorP
       }
       const data = await res.json();
       setGeneratedImages((prev) => ({ ...prev, [index]: data.images || [] }));
-      toast.success("Visuels generes !");
+      toast.success("Visuels générés !");
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Erreur lors de la generation");
+      toast.error(e instanceof Error ? e.message : "Erreur lors de la génération");
     } finally {
       setGeneratingImage(null);
     }
@@ -126,7 +126,7 @@ export function CreativeGenerator({ className, initialData }: CreativeGeneratorP
         {error && <p className="text-sm text-danger mb-4">{error}</p>}
         <Button size="lg" onClick={handleGenerate}>
           <Sparkles className="h-4 w-4 mr-2" />
-          Generer 5 variations
+          Générer 5 variations
         </Button>
         <p className="text-sm text-text-secondary mt-2">Copy + hooks pour tes campagnes</p>
       </div>
@@ -138,7 +138,7 @@ export function CreativeGenerator({ className, initialData }: CreativeGeneratorP
       <div className="flex items-center justify-between">
         <Badge variant="default">{variations.length} variations</Badge>
         <Button variant="outline" size="sm" onClick={handleGenerate}>
-          Regenerer
+          Régénérer
         </Button>
       </div>
 
@@ -206,9 +206,9 @@ export function CreativeGenerator({ className, initialData }: CreativeGeneratorP
                   {generatingImage === i ? (
                     <><Loader2 className="h-3 w-3 animate-spin mr-1" /> Generation...</>
                   ) : generatedImages[i] ? (
-                    <><ImagePlus className="h-3 w-3 mr-1" /> Regenerer visuels</>
+                    <><ImagePlus className="h-3 w-3 mr-1" /> Régénérer visuels</>
                   ) : (
-                    <><ImagePlus className="h-3 w-3 mr-1" /> Generer visuels IA</>
+                    <><ImagePlus className="h-3 w-3 mr-1" /> Générer visuels IA</>
                   )}
                 </Button>
               )}

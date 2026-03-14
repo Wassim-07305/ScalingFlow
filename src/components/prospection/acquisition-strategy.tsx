@@ -112,10 +112,10 @@ export function AcquisitionStrategy() {
         }),
       });
 
-      if (!response.ok) throw new Error("Erreur lors de la generation");
+      if (!response.ok) throw new Error("Erreur lors de la génération");
       const data = await response.json();
 
-      // Parse la reponse IA
+      // Parse la réponse IA
       const parsed = data.ai_raw_response || data;
       if (typeof parsed === "string") {
         try {
@@ -145,12 +145,12 @@ export function AcquisitionStrategy() {
     const text = typeof result === "string" ? result : JSON.stringify(result, null, 2);
     navigator.clipboard.writeText(text);
     setCopied(true);
-    toast.success("Copie dans le presse-papiers");
+    toast.success("Copié dans le presse-papiers");
     setTimeout(() => setCopied(false), 2000);
   };
 
   if (loading) {
-    return <AILoading text="Elaboration de ta strategie d'acquisition" />;
+    return <AILoading text="Élaboration de ta stratégie d'acquisition" />;
   }
 
   if (result) {
@@ -158,17 +158,17 @@ export function AcquisitionStrategy() {
       <div className="space-y-6">
         {/* Actions */}
         <div className="flex items-center justify-between">
-          <Badge variant="default">Strategie generee</Badge>
+          <Badge variant="default">Stratégie générée</Badge>
           <div className="flex items-center gap-2">
             <Button
               variant="outline"
               size="sm"
               onClick={() =>
                 exportToPDF({
-                  title: "Strategie d'Acquisition",
-                  subtitle: "Genere par ScalingFlow",
+                  title: "Stratégie d'Acquisition",
+                  subtitle: "Généré par ScalingFlow",
                   content: result as unknown as Record<string, unknown>,
-                  filename: "strategie-acquisition-scalingflow.pdf",
+                  filename: "stratégie-acquisition-scalingflow.pdf",
                 })
               }
             >
@@ -182,7 +182,7 @@ export function AcquisitionStrategy() {
           </div>
         </div>
 
-        {/* Resume */}
+        {/* Résumé */}
         {result.summary && (
           <GlowCard glowColor="cyan">
             <p className="text-sm text-text-secondary leading-relaxed">{result.summary}</p>
@@ -271,27 +271,27 @@ export function AcquisitionStrategy() {
             <Card>
               <CardContent className="pt-6 text-center">
                 <Target className="h-5 w-5 text-accent mx-auto mb-2" />
-                <p className="text-xs text-text-muted uppercase">Cout par lead</p>
+                <p className="text-xs text-text-muted uppercase">Coût par lead</p>
                 <p className="text-lg font-bold text-text-primary">{result.cost_breakdown.per_lead_estimate}</p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="pt-6 text-center">
                 <TrendingUp className="h-5 w-5 text-accent mx-auto mb-2" />
-                <p className="text-xs text-text-muted uppercase">ROI estime</p>
+                <p className="text-xs text-text-muted uppercase">ROI estimé</p>
                 <p className="text-lg font-bold text-text-primary">{result.cost_breakdown.roi_estimate}</p>
               </CardContent>
             </Card>
           </div>
         )}
 
-        {/* Resultats attendus */}
+        {/* Résultats attendus */}
         {result.expected_results && (
           <Card>
             <CardHeader className="py-3">
               <CardTitle className="text-sm flex items-center gap-2">
                 <TrendingUp className="h-4 w-4 text-accent" />
-                Resultats attendus
+                Résultats attendus
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-0">
@@ -336,7 +336,7 @@ export function AcquisitionStrategy() {
         )}
 
         <Button variant="outline" onClick={() => setResult(null)}>
-          Regenerer une strategie
+          Régénérer une strategie
         </Button>
       </div>
     );
@@ -348,10 +348,10 @@ export function AcquisitionStrategy() {
       <div className="text-center">
         <Compass className="h-10 w-10 text-accent mx-auto mb-3" />
         <h3 className="font-semibold text-text-primary mb-1">
-          Strategie d&apos;Acquisition
+          Stratégie d&apos;Acquisition
         </h3>
         <p className="text-sm text-text-secondary max-w-md mx-auto">
-          L&apos;IA va creer une strategie d&apos;acquisition personnalisee avec allocation des canaux, plan d&apos;action et estimations.
+          L&apos;IA va créer une stratégie d&apos;acquisition personnalisée avec allocation des canaux, plan d&apos;action et estimations.
         </p>
       </div>
 
@@ -359,10 +359,10 @@ export function AcquisitionStrategy() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-accent" />
-            Parametres de ta strategie
+            Paramètres de ta strategie
           </CardTitle>
           <CardDescription>
-            Renseigne tes contraintes pour une strategie sur mesure.
+            Renseigne tes contraintes pour une stratégie sur mesure.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-5">
@@ -396,7 +396,7 @@ export function AcquisitionStrategy() {
           </div>
 
           <div className="space-y-2">
-            <Label>Canaux deja utilises</Label>
+            <Label>Canaux déjà utilises</Label>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
               {CHANNELS.map((channel) => (
                 <label
@@ -441,7 +441,7 @@ export function AcquisitionStrategy() {
             className="w-full"
           >
             <Sparkles className="h-4 w-4 mr-2" />
-            Generer la strategie
+            Générer la strategie
           </Button>
         </CardContent>
       </Card>

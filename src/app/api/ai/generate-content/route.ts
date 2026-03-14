@@ -130,7 +130,7 @@ async function fetchSalesInsights(supabase: SupabaseClient, userId: string): Pro
         }
       }
     }
-    insight += "\n→ Cree du contenu qui adresse directement ces objections et active ces declencheurs emotionnels.\n";
+    insight += "\n→ Crée du contenu qui adresse directement ces objections et active ces déclencheurs émotionnels.\n";
   }
 
   if (salesAssets && salesAssets.length > 0) {
@@ -151,14 +151,14 @@ export async function POST(req: NextRequest) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Non autorise" }, { status: 401 });
+      return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
     }
 
     // Rate limiting
     const rl = await rateLimit(user.id, "generate-content", { limit: 5, windowSeconds: 60 });
     if (!rl.allowed) {
       return NextResponse.json(
-        { error: "Trop de requetes. Reessaie dans quelques secondes." },
+        { error: "Trop de requêtes. Réessaie dans quelques secondes." },
         { status: 429 }
       );
     }
@@ -167,7 +167,7 @@ export async function POST(req: NextRequest) {
     const usage = await checkAIUsage(user.id);
     if (!usage.allowed) {
       return NextResponse.json(
-        { error: "Limite de generations IA atteinte", usage },
+        { error: "Limite de générations IA atteinte", usage },
         { status: 403 }
       );
     }
@@ -176,7 +176,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { contentType, market, platform, topic, batchNumber, competitor, handle } = body;
 
-    // Recuperer le profil + vault + ad insights + sales insights en parallele
+    // Récupérer le profil + vault + ad insights + sales insights en parallele
     const [{ data: profile }, vaultContext, adInsights, salesInsights] = await Promise.all([
       supabase.from("profiles").select("*").eq("id", user.id).single(),
       buildFullVaultContext(user.id),
@@ -413,7 +413,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ contentType: "carousel", result });
     }
 
-    // --- Mode par defaut : idees de contenu (existant) ---
+    // --- Mode par défaut : idees de contenu (existant) ---
     if (!platform) {
       return NextResponse.json(
         { error: "contentType ou platform est requis" },
@@ -434,7 +434,7 @@ export async function POST(req: NextRequest) {
     if (!validPlatforms.includes(platform.toLowerCase())) {
       return NextResponse.json(
         {
-          error: `Plateforme invalide. Plateformes acceptees : ${validPlatforms.join(", ")}`,
+          error: `Plateforme invalide. Plateformes acceptées : ${validPlatforms.join(", ")}`,
         },
         { status: 400 }
       );
@@ -456,7 +456,7 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     const errMsg = error instanceof Error ? error.message : String(error);
     return NextResponse.json(
-      { error: `Erreur lors de la generation du contenu: ${errMsg}` },
+      { error: `Erreur lors de la génération du contenu: ${errMsg}` },
       { status: 500 }
     );
   }

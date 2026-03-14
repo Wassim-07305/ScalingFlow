@@ -21,10 +21,10 @@ import {
 } from "lucide-react";
 
 const CATEGORIES = [
-  { value: "case_study", label: "Etude de cas" },
+  { value: "case_study", label: "Étude de cas" },
   { value: "sop", label: "SOP / Process" },
   { value: "transcript", label: "Transcript" },
-  { value: "testimonial", label: "Temoignage" },
+  { value: "testimonial", label: "Témoignage" },
   { value: "other", label: "Autre" },
 ] as const;
 
@@ -97,7 +97,7 @@ export function VaultDocuments() {
       });
     }
 
-    toast.success("Document(s) uploade(s) !");
+    toast.success("Document(s) uploadé(s) !");
     await fetchDocuments();
     setUploading(false);
     if (fileInputRef.current) fileInputRef.current.value = "";
@@ -111,7 +111,7 @@ export function VaultDocuments() {
     await supabase.storage.from("vault-documents").remove([filePath]);
     await supabase.from("vault_documents").delete().eq("id", doc.id);
 
-    toast.success("Document supprime");
+    toast.success("Document supprimé");
     setDocuments((prev) => prev.filter((d) => d.id !== doc.id));
   };
 
@@ -183,7 +183,7 @@ export function VaultDocuments() {
         <EmptyState
           icon={FolderOpen}
           title="Aucun document"
-          description="Uploade tes case studies, SOPs, transcripts et temoignages pour enrichir ton vault."
+          description="Uploade tes case studies, SOPs, transcripts et témoignages pour enrichir ton vault."
         />
       ) : (
         <div className="grid gap-3">

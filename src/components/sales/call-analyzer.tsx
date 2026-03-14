@@ -77,7 +77,7 @@ export function CallAnalyzer() {
     const file = e.target.files?.[0];
     if (!file) return;
     if (!file.name.endsWith(".txt") && !file.name.endsWith(".srt") && !file.name.endsWith(".vtt")) {
-      toast.error("Format accepte : .txt, .srt, .vtt");
+      toast.error("Format accepté : .txt, .srt, .vtt");
       return;
     }
     if (file.size > 5 * 1024 * 1024) {
@@ -88,7 +88,7 @@ export function CallAnalyzer() {
     reader.onload = () => {
       const text = reader.result as string;
       setTranscript(text);
-      toast.success(`Fichier "${file.name}" charge (${text.length} caracteres)`);
+      toast.success(`Fichier "${file.name}" chargé (${text.length} caractères)`);
     };
     reader.onerror = () => toast.error("Erreur de lecture du fichier");
     reader.readAsText(file);
@@ -97,7 +97,7 @@ export function CallAnalyzer() {
 
   const handleAnalyze = async () => {
     if (transcript.trim().length < 50) {
-      toast.error("Le transcript doit contenir au moins 50 caracteres");
+      toast.error("Le transcript doit contenir au moins 50 caractères");
       return;
     }
 
@@ -112,7 +112,7 @@ export function CallAnalyzer() {
       if (!response.ok) throw new Error("Erreur lors de l'analyse");
       const data = await response.json();
       setResult(data);
-      toast.success("Analyse du call terminee !");
+      toast.success("Analyse du call terminée !");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Erreur");
     } finally {
@@ -188,12 +188,12 @@ export function CallAnalyzer() {
               <textarea
                 value={transcript}
                 onChange={(e) => setTranscript(e.target.value)}
-                placeholder={`Colle ici le transcript ou importe un fichier (.txt, .srt, .vtt)...\n\nVendeur : Bonjour, merci d'avoir pris le temps...\nProspect : Oui, j'ai vu votre publicite et...\n...`}
+                placeholder={`Colle ici le transcript ou importe un fichier (.txt, .srt, .vtt)...\n\nVendeur : Bonjour, merci d'avoir pris le temps...\nProspect : Oui, j'ai vu votre publicité et...\n...`}
                 rows={12}
                 className="w-full px-4 py-3 rounded-xl bg-bg-tertiary border border-border-default text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent resize-none text-sm"
               />
               <p className="text-xs text-text-muted mt-1">
-                {transcript.length} caracteres — minimum 50
+                {transcript.length} caractères — minimum 50
               </p>
             </div>
 
@@ -282,7 +282,7 @@ export function CallAnalyzer() {
           {expandedSection === key && (
             <CardContent className="pt-0 space-y-3">
               <div className="p-3 rounded-lg bg-bg-tertiary">
-                <p className="text-xs text-text-muted uppercase mb-1">Moment cle</p>
+                <p className="text-xs text-text-muted uppercase mb-1">Moment clé</p>
                 <p className="text-sm text-text-secondary italic">{section.key_moment}</p>
               </div>
               <div className="grid md:grid-cols-2 gap-3">
@@ -300,7 +300,7 @@ export function CallAnalyzer() {
                 </div>
                 <div>
                   <p className="text-xs text-text-muted uppercase mb-1 flex items-center gap-1">
-                    <ThumbsDown className="h-3 w-3 text-red-400" /> Ameliorations
+                    <ThumbsDown className="h-3 w-3 text-red-400" /> Améliorations
                   </p>
                   <ul className="space-y-1">
                     {section.improvements.map((s, i) => (
@@ -322,7 +322,7 @@ export function CallAnalyzer() {
           <CardHeader className="py-3">
             <CardTitle className="text-sm flex items-center gap-2">
               <Star className="h-4 w-4 text-yellow-400" />
-              Phrases a garder
+              Phrases à garder
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-0 space-y-2">
@@ -339,7 +339,7 @@ export function CallAnalyzer() {
           <CardHeader className="py-3">
             <CardTitle className="text-sm flex items-center gap-2">
               <AlertTriangle className="h-4 w-4 text-yellow-400" />
-              Phrases a ameliorer
+              Phrases à améliorer
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-0 space-y-2">
@@ -376,7 +376,7 @@ export function CallAnalyzer() {
               ))}
             </div>
             <div>
-              <p className="text-xs text-text-muted uppercase mb-1">Declencheurs emotionnels</p>
+              <p className="text-xs text-text-muted uppercase mb-1">Déclencheurs émotionnels</p>
               {result.client_signals.emotional_triggers.map((s, i) => (
                 <Badge key={i} variant="blue" className="text-xs mr-1 mb-1">{s}</Badge>
               ))}
@@ -391,7 +391,7 @@ export function CallAnalyzer() {
           <CardHeader className="py-3">
             <CardTitle className="text-sm flex items-center gap-2">
               <TrendingUp className="h-4 w-4 text-accent" />
-              Prochaines etapes
+              Prochaines étapes
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-0">
@@ -408,7 +408,7 @@ export function CallAnalyzer() {
           <CardHeader className="py-3">
             <CardTitle className="text-sm flex items-center gap-2">
               <Target className="h-4 w-4 text-accent" />
-              Focus entrainement
+              Focus entraînement
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-0">
