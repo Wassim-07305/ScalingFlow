@@ -1,11 +1,10 @@
 "use client";
 
-import Link from "next/link";
 import { motion } from "framer-motion";
 import { useUser } from "@/hooks/use-user";
 import { useUsage } from "@/hooks/use-usage";
 import { Badge } from "@/components/ui/badge";
-import { Sparkles, Crown, Zap, ArrowRight, TrendingUp } from "lucide-react";
+import { Sparkles, Crown, Zap, TrendingUp } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 
 export function WelcomeBanner() {
@@ -150,22 +149,6 @@ export function WelcomeBanner() {
             )}
           </div>
 
-          {!isLoading && !isPro && (
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.3 }}
-            >
-              <Link
-                href="/pricing"
-                className="group inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-sm font-semibold shadow-lg shadow-emerald-500/20 hover:shadow-xl hover:shadow-emerald-500/30 hover:scale-[1.02] transition-all duration-200"
-              >
-                <Sparkles className="h-4 w-4" />
-                Passer à Pro
-                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-              </Link>
-            </motion.div>
-          )}
         </div>
       </div>
     </div>

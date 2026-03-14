@@ -39,7 +39,7 @@ export const QUESTIONS: Question[] = [
     type: "welcome",
     title: "Bienvenue sur ScalingFlow",
     subtitle:
-      "On va personnaliser ton experience en quelques minutes. Reponds aux questions pour que l'IA s'adapte a toi.",
+      "On va personnaliser ton expérience en quelques minutes. Réponds aux questions pour que l'IA s'adapte à toi.",
   },
 
   // 1 — Prenom [Q-0.1.1]
@@ -47,9 +47,9 @@ export const QUESTIONS: Question[] = [
     id: "firstName",
     type: "text",
     title: "Comment tu t'appelles ?",
-    subtitle: "Ton prenom",
+    subtitle: "Ton prénom",
     field: "firstName",
-    placeholder: "Prenom",
+    placeholder: "Prénom",
   },
 
   // 2 — Nom [Q-0.1.2]
@@ -65,7 +65,7 @@ export const QUESTIONS: Question[] = [
   {
     id: "country",
     type: "chips",
-    title: "Dans quel pays tu operes / veux operer ?",
+    title: "Dans quel pays tu opères / veux opérer ?",
     field: "country",
     chipColumns: 2,
     chips: [
@@ -86,7 +86,7 @@ export const QUESTIONS: Question[] = [
     title: "Quelle langue pour tes clients ?",
     field: "language",
     chips: [
-      { value: "fr", label: "Francais" },
+      { value: "fr", label: "Français" },
       { value: "en", label: "Anglais" },
       { value: "both", label: "Les deux" },
     ],
@@ -104,12 +104,12 @@ export const QUESTIONS: Question[] = [
     chips: [
       {
         value: "salarie",
-        label: "Salarie(e)",
-        desc: "J'ai un job et je veux me lancer en parallele.",
+        label: "Salarié(e)",
+        desc: "J'ai un job et je veux me lancer en parallèle.",
       },
       {
         value: "freelance",
-        label: "Freelance / Independant",
+        label: "Freelance / Indépendant",
         desc: "Je fais des missions, je veux structurer et scaler.",
       },
       {
@@ -119,8 +119,8 @@ export const QUESTIONS: Question[] = [
       },
       {
         value: "etudiant",
-        label: "Etudiant(e)",
-        desc: "Je suis en etudes et je veux me lancer.",
+        label: "Étudiant(e)",
+        desc: "Je suis en études et je veux me lancer.",
       },
       {
         value: "reconversion",
@@ -130,7 +130,7 @@ export const QUESTIONS: Question[] = [
       {
         value: "sans_emploi",
         label: "Sans emploi",
-        desc: "Je suis disponible a 100% pour mon projet.",
+        desc: "Je suis disponible à 100% pour mon projet.",
       },
     ],
   },
@@ -140,7 +140,7 @@ export const QUESTIONS: Question[] = [
     id: "situationDetails",
     type: "multi-field",
     title: "Dis-nous en plus sur ta situation",
-    subtitle: "Ces infos aident l'IA a personnaliser ton parcours.",
+    subtitle: "Ces infos aident l'IA à personnaliser ton parcours.",
     field: "situationDetails",
     showWhen: (data) =>
       data.situation !== "" && data.situation !== undefined,
@@ -151,7 +151,7 @@ export const QUESTIONS: Question[] = [
     id: "formations",
     type: "textarea",
     title: "Quelles formations as-tu suivies ?",
-    subtitle: "Diplomes, certifications, formations en ligne, livres cles...",
+    subtitle: "Diplômes, certifications, formations en ligne, livres clés...",
     field: "formations_text",
     placeholder: "Ex: MBA Marketing, formation Iman Gadzhi, certif Google Ads...",
   },
@@ -163,7 +163,7 @@ export const QUESTIONS: Question[] = [
     id: "vaultSkills",
     type: "skill-matrix",
     title: "Évalue tes compétences",
-    subtitle: "Pour chaque catégorie, sélectionne ton niveau actuel. Débutant (je connais les bases) / Intermédiaire (je l'ai fait pour moi) / Avancé (je l'ai fait pour des clients avec des résultats).",
+    subtitle: "Pour chaque catégorie, sélectionne ton niveau actuel. Débutant = je connais les bases. Intermédiaire = je l'ai fait pour moi. Avancé = je l'ai fait pour des clients avec des résultats.",
     field: "vaultSkills",
   },
 
@@ -174,7 +174,7 @@ export const QUESTIONS: Question[] = [
     id: "expertise_1",
     type: "textarea",
     title: "Dans quel domaine les gens te demandent le plus souvent conseil ?",
-    subtitle: "Ces reponses font emerger ton unfair advantage. L'IA les utilise pour personnaliser toutes les generations.",
+    subtitle: "Ces réponses font émerger ton unfair advantage. L'IA les utilise pour personnaliser toutes les générations.",
     field: "expertise_q1",
     placeholder: "Ex: Le marketing digital, la gestion d'equipe, la nutrition...",
   },
@@ -182,18 +182,18 @@ export const QUESTIONS: Question[] = [
   {
     id: "expertise_2",
     type: "textarea",
-    title: "Quel probleme tu resous naturellement pour les autres ?",
+    title: "Quel problème tu résous naturellement pour les autres ?",
     field: "expertise_q2",
-    placeholder: "Ex: J'aide les gens a structurer leurs idees en plans d'action...",
+    placeholder: "Ex: J'aide les gens à structurer leurs idées en plans d'action...",
   },
   // 11 — [Q-0.3.3]
   {
     id: "expertise_3",
     type: "textarea",
-    title: "Quel est le meilleur resultat que tu as obtenu pour toi ou pour quelqu'un ?",
-    subtitle: "Tu peux ajouter des preuves (screenshots, temoignages) dans le Vault apres l'onboarding.",
+    title: "Quel est le meilleur résultat que tu as obtenu pour toi ou pour quelqu'un ?",
+    subtitle: "Tu peux ajouter des preuves (screenshots, témoignages) dans le Vault après l'onboarding.",
     field: "expertise_q3",
-    placeholder: "Ex: J'ai aide un client a passer de 2K a 15K/mois en 3 mois...",
+    placeholder: "Ex: J'ai aidé un client à passer de 2K à 15K/mois en 3 mois...",
   },
   // 12 — [Q-0.3.4]
   {
@@ -210,21 +210,21 @@ export const QUESTIONS: Question[] = [
   {
     id: "industries",
     type: "chips-multi",
-    title: "Quels secteurs / industries connais-tu de l'interieur ?",
+    title: "Quels secteurs / industries connais-tu de l'intérieur ?",
     subtitle: "Sélectionne tous ceux où tu as de l'expérience ou de l'appétence.",
     field: "industries",
     chips: [
       { value: "Fitness / Sport", label: "Fitness / Sport" },
-      { value: "Sante / Bien-etre", label: "Sante / Bien-etre" },
+      { value: "Sante / Bien-etre", label: "Santé / Bien-être" },
       { value: "Immobilier", label: "Immobilier" },
       { value: "E-commerce", label: "E-commerce" },
       { value: "SaaS / Tech", label: "SaaS / Tech" },
       { value: "Finance / Investissement", label: "Finance / Investissement" },
       { value: "Education / Formation", label: "Education / Formation" },
-      { value: "Beaute / Esthetique", label: "Beaute / Esthetique" },
+      { value: "Beaute / Esthetique", label: "Beauté / Esthétique" },
       { value: "Restauration / Food", label: "Restauration / Food" },
       { value: "BTP / Artisanat", label: "BTP / Artisanat" },
-      { value: "Medical / Paramedical", label: "Medical / Paramedical" },
+      { value: "Medical / Paramedical", label: "Médical / Paramédical" },
       { value: "Juridique / Comptable", label: "Juridique / Comptable" },
       { value: "RH / Recrutement", label: "RH / Recrutement" },
       { value: "Marketing / Communication", label: "Marketing / Communication" },
@@ -252,7 +252,7 @@ export const QUESTIONS: Question[] = [
     id: "payingClientsDetails",
     type: "multi-field",
     title: "Parle-nous de tes clients",
-    subtitle: "Ces infos enrichissent le profil IA et alimentent les etudes de cas.",
+    subtitle: "Ces infos enrichissent le profil IA et alimentent les études de cas.",
     field: "payingClientsDetails",
     showWhen: (data) => data.hasPayingClients === "oui",
   },
@@ -264,7 +264,7 @@ export const QUESTIONS: Question[] = [
     id: "parcours",
     type: "parcours-selector",
     title: "Quel parcours te correspond ?",
-    subtitle: "D'apres ton profil, l'IA te recommande un parcours. Tu peux changer si ca ne correspond pas.",
+    subtitle: "D'après ton profil, l'IA te recommande un parcours. Tu peux changer si ça ne correspond pas.",
     field: "parcours",
   },
 
@@ -274,7 +274,7 @@ export const QUESTIONS: Question[] = [
   {
     id: "phase1_a1_motivation",
     type: "textarea",
-    title: "Qu'est-ce qui te motive a te lancer maintenant ?",
+    title: "Qu'est-ce qui te motive à te lancer maintenant ?",
     subtitle: "Comprendre ta motivation aide l'IA à trouver un marché qui te correspond vraiment.",
     field: "phase1_a1_motivation",
     placeholder: "Ex: Je veux quitter le salariat, avoir plus de liberté, générer des revenus en ligne...",
@@ -283,10 +283,10 @@ export const QUESTIONS: Question[] = [
   {
     id: "phase1_a1_quickwin",
     type: "textarea",
-    title: "Si tu pouvais obtenir un premier resultat rapide, ce serait quoi ?",
+    title: "Si tu pouvais obtenir un premier résultat rapide, ce serait quoi ?",
     subtitle: "Ton premier quick-win idéal — l'IA va orienter l'analyse vers des marchés à cycle court.",
     field: "phase1_a1_quickwin",
-    placeholder: "Ex: Signer mon premier client à 500EUR, faire ma première vente en ligne...",
+    placeholder: "Ex: Signer mon premier client à 500 EUR, faire ma première vente en ligne...",
     showWhen: (data) => data.parcours === "A1",
   },
   {
@@ -295,7 +295,7 @@ export const QUESTIONS: Question[] = [
     title: "Comment tu apprends le mieux ?",
     subtitle: "Cela influence le type de marché et de modèle recommandé.",
     field: "phase1_a1_learning",
-    placeholder: "Ex: En faisant (learning by doing), en regardant des videos, avec un mentor...",
+    placeholder: "Ex: En faisant (learning by doing), en regardant des vidéos, avec un mentor...",
     showWhen: (data) => data.parcours === "A1",
   },
 
@@ -303,7 +303,7 @@ export const QUESTIONS: Question[] = [
   {
     id: "phase1_a2_transferable",
     type: "textarea",
-    title: "Quelle expertise de ton job actuel pourrait se monetiser ?",
+    title: "Quelle expertise de ton job actuel pourrait se monétiser ?",
     subtitle: "Ton savoir-faire métier est ton avantage — l'IA va identifier les marchés qui le valorisent.",
     field: "phase1_a2_transferable",
     placeholder: "Ex: Gestion de projet, expertise comptable, connaissance du secteur pharma...",
@@ -313,9 +313,9 @@ export const QUESTIONS: Question[] = [
     id: "phase1_a2_transition",
     type: "textarea",
     title: "Quel est ton plan de transition ?",
-    subtitle: "L'IA adapte les recommandations a ton rythme de transition.",
+    subtitle: "L'IA adapte les recommandations à ton rythme de transition.",
     field: "phase1_a2_transition",
-    placeholder: "Ex: En parallele de mon job, demission dans 6 mois, rupture conventionnelle...",
+    placeholder: "Ex: En parallèle de mon job, démission dans 6 mois, rupture conventionnelle...",
     showWhen: (data) => data.parcours === "A2",
   },
   {
@@ -324,36 +324,36 @@ export const QUESTIONS: Question[] = [
     title: "Qu'est-ce qui te ferait franchir le pas ?",
     subtitle: "Ton déclencheur — l'IA oriente vers des marchés où ce seuil est atteignable.",
     field: "phase1_a2_trigger",
-    placeholder: "Ex: Atteindre 3K/mois en side, avoir 5 clients reguliers, remplacer mon salaire...",
+    placeholder: "Ex: Atteindre 3K/mois en side, avoir 5 clients réguliers, remplacer mon salaire...",
     showWhen: (data) => data.parcours === "A2",
   },
 
   // A3 — Freelance
   {
-    id: "phase1_a3_idéal_offer",
+    id: "phase1_a3_ideal_offer",
     type: "textarea",
-    title: "A quoi ressemblerait ton offre idéale scalable ?",
-    subtitle: "Passe de la mission ponctuelle au package scalable — l'IA t'aide a trouver le bon angle.",
-    field: "phase1_a3_idéal_offer",
+    title: "À quoi ressemblerait ton offre idéale scalable ?",
+    subtitle: "Passe de la mission ponctuelle au package scalable — l'IA t'aide à trouver le bon angle.",
+    field: "phase1_a3_ideal_offer",
     placeholder: "Ex: Un forfait mensuel de gestion Meta Ads, un programme de formation en ligne...",
     showWhen: (data) => data.parcours === "A3",
   },
   {
     id: "phase1_a3_pricing_blocker",
     type: "textarea",
-    title: "Qu'est-ce qui t'empeche de facturer plus cher ?",
+    title: "Qu'est-ce qui t'empêche de facturer plus cher ?",
     subtitle: "L'IA identifie les marchés où tu peux augmenter tes tarifs naturellement.",
     field: "phase1_a3_pricing_blocker",
-    placeholder: "Ex: Trop de concurrence, clients PME avec petit budget, pas de specialisation...",
+    placeholder: "Ex: Trop de concurrence, clients PME avec petit budget, pas de spécialisation...",
     showWhen: (data) => data.parcours === "A3",
   },
   {
     id: "phase1_a3_acquisition",
     type: "textarea",
-    title: "Quel serait ton systeme d'acquisition idéal ?",
+    title: "Quel serait ton système d'acquisition idéal ?",
     subtitle: "L'IA va recommander des marchés compatibles avec ton canal préféré.",
     field: "phase1_a3_acquisition",
-    placeholder: "Ex: Publicite Meta, LinkedIn outbound, referral, contenu organique...",
+    placeholder: "Ex: Publicité Meta, LinkedIn outbound, referral, contenu organique...",
     showWhen: (data) => data.parcours === "A3",
   },
 
@@ -364,16 +364,16 @@ export const QUESTIONS: Question[] = [
     title: "Quel est ton canal d'acquisition principal aujourd'hui ?",
     subtitle: "L'IA analyse ton canal actuel pour recommander des leviers de croissance.",
     field: "phase1_b_channel",
-    placeholder: "Ex: Meta Ads, bouche-a-oreille, SEO, LinkedIn, partenariats...",
+    placeholder: "Ex: Meta Ads, bouche-à-oreille, SEO, LinkedIn, partenariats...",
     showWhen: (data) => data.parcours === "B",
   },
   {
     id: "phase1_b_bottleneck",
     type: "textarea",
-    title: "Quel est ton plus gros bottleneck pour croitre ?",
+    title: "Quel est ton plus gros bottleneck pour croître ?",
     subtitle: "L'IA priorise les marchés et stratégies qui résolvent ce blocage spécifique.",
     field: "phase1_b_bottleneck",
-    placeholder: "Ex: Pas assez de leads qualifies, taux de closing trop bas, delivery qui ne scale pas...",
+    placeholder: "Ex: Pas assez de leads qualifiés, taux de closing trop bas, delivery qui ne scale pas...",
     showWhen: (data) => data.parcours === "B",
   },
   {
@@ -399,17 +399,17 @@ export const QUESTIONS: Question[] = [
   {
     id: "phase1_c_assets",
     type: "textarea",
-    title: "Quels assets peux-tu reutiliser ?",
+    title: "Quels assets peux-tu réutiliser ?",
     subtitle: "L'IA cherche des marchés où tes assets existants te donnent un avantage.",
     field: "phase1_c_assets",
-    placeholder: "Ex: Liste email de 5000 contacts, audience YouTube, expertise en Meta Ads, reseau pro...",
+    placeholder: "Ex: Liste email de 5000 contacts, audience YouTube, expertise en Meta Ads, réseau pro...",
     showWhen: (data) => data.parcours === "C",
   },
   {
     id: "phase1_c_positioning",
     type: "textarea",
     title: "Quel serait ton positionnement idéal sur le nouveau marché ?",
-    subtitle: "L'IA va valider cette vision et proposer des angles differenciants.",
+    subtitle: "L'IA va valider cette vision et proposer des angles différenciants.",
     field: "phase1_c_positioning",
     placeholder: "Ex: Expert automatisation IA pour agences, consultant growth pour SaaS B2B...",
     showWhen: (data) => data.parcours === "C",
@@ -421,7 +421,7 @@ export const QUESTIONS: Question[] = [
   {
     id: "targetRevenue",
     type: "chips",
-    title: "Quel est ton objectif de revenus mensuels ?",
+    title: "Ton objectif de revenus mensuels ?",
     field: "targetRevenue",
     chips: [
       { value: "3000", label: "3K EUR" },
@@ -452,7 +452,7 @@ export const QUESTIONS: Question[] = [
   {
     id: "hoursPerWeek",
     type: "chips",
-    title: "Combien d'heures par semaine peux-tu consacrer a ce projet ?",
+    title: "Combien d'heures par semaine peux-tu consacrer à ce projet ?",
     field: "hoursPerWeek",
     chips: [
       { value: "5", label: "5h" },
@@ -480,11 +480,11 @@ export const QUESTIONS: Question[] = [
   {
     id: "teamPreference",
     type: "chips",
-    title: "Tu preferes travailler seul ou avec une equipe ?",
+    title: "Tu préfères travailler seul ou avec une équipe ?",
     field: "teamPreference",
     chips: [
       { value: "seul", label: "Seul" },
-      { value: "equipe", label: "J'ai deja une equipe" },
+      { value: "equipe", label: "J'ai déjà une équipe" },
       { value: "recruter", label: "Je veux recruter" },
     ],
   },
@@ -502,15 +502,15 @@ export const QUESTIONS: Question[] = [
       { value: "Trouver ma niche", label: "Trouver ma niche" },
       {
         value: "Creer une offre irresistible",
-        label: "Creer une offre irresistible",
+        label: "Créer une offre irrésistible",
       },
       { value: "Générer des leads", label: "Générer des leads" },
       { value: "Lancer des pubs Meta", label: "Lancer des pubs Meta" },
       {
         value: "Creer un funnel de vente",
-        label: "Creer un funnel de vente",
+        label: "Créer un funnel de vente",
       },
-      { value: "Scaler mon activite", label: "Scaler mon activite" },
+      { value: "Scaler mon activite", label: "Scaler mon activité" },
       { value: "Structurer mon delivery", label: "Structurer mon delivery" },
       {
         value: "Automatiser mon business",
@@ -525,7 +525,7 @@ export const QUESTIONS: Question[] = [
   {
     id: "summary",
     type: "summary",
-    title: "Resume de ton profil",
+    title: "Résumé de ton profil",
     subtitle: "Vérifie tes réponses avant de lancer l'analyse de marché.",
   },
 ];

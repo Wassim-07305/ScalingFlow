@@ -93,12 +93,12 @@ const PAYING_CLIENTS_FIELDS = [
   {
     key: "client_type",
     label: "Quel type de clients ?",
-    placeholder: "Ex: Coachs fitness, e-commercants...",
+    placeholder: "Ex : Coachs fitness, e-commerçants...",
   },
   {
     key: "best_result",
     label: "Quel résultat tu leur as apporté ?",
-    placeholder: "Ex: +200% de leads en 3 mois...",
+    placeholder: "Ex : +200% de leads en 3 mois...",
   },
 ];
 
@@ -112,12 +112,12 @@ const SITUATION_FIELDS: Record<
     {
       key: "poste",
       label: "Quel est ton poste actuel ?",
-      placeholder: "Ex: Chef de projet digital",
+      placeholder: "Ex : Chef de projet digital",
     },
     {
       key: "secteur",
       label: "Quel secteur ?",
-      placeholder: "Ex: Tech, Finance, Sante...",
+      placeholder: "Ex : Tech, Finance, Santé...",
     },
     {
       key: "duree_poste",
@@ -134,99 +134,99 @@ const SITUATION_FIELDS: Record<
     {
       key: "missions",
       label: "Quel type de missions tu fais ?",
-      placeholder: "Ex: Développement web, consulting...",
+      placeholder: "Ex : Développement web, consulting...",
     },
     {
       key: "client_type",
       label: "Pour quel type de clients ?",
-      placeholder: "Ex: PME, startups, agences...",
+      placeholder: "Ex : PME, startups, agences...",
     },
     {
       key: "ca_actuel",
       label: "CA mensuel moyen (EUR)",
-      placeholder: "Ex: 5000",
+      placeholder: "Ex : 5000",
       type: "number",
     },
     {
       key: "clients_count",
       label: "Combien de clients en simultané ?",
-      placeholder: "Ex: 5",
+      placeholder: "Ex : 5",
       type: "number",
     },
     {
       key: "tarif_actuel",
       label: "Ton tarif actuel",
-      placeholder: "Ex: TJM 400EUR, forfait 2000EUR...",
+      placeholder: "Ex : TJM 400 EUR, forfait 2000 EUR...",
     },
     {
       key: "biggest_challenge",
       label: "Qu'est-ce qui te frustre le plus dans ton modèle actuel ?",
-      placeholder: "Ex: Je trade mon temps contre de l'argent...",
+      placeholder: "Ex : Je trade mon temps contre de l'argent...",
     },
   ],
   entrepreneur: [
     {
       key: "business",
       label: "Quel est ton business ?",
-      placeholder: "Ex: Agence de marketing, coaching fitness...",
+      placeholder: "Ex : Agence de marketing, coaching fitness...",
     },
     {
       key: "ca_actuel",
       label: "CA mensuel actuel (EUR)",
-      placeholder: "Ex: 15000",
+      placeholder: "Ex : 15000",
       type: "number",
     },
     {
       key: "clients_count",
       label: "Nombre de clients actifs",
-      placeholder: "Ex: 20",
+      placeholder: "Ex : 20",
       type: "number",
     },
     {
       key: "biggest_challenge",
       label: "Ton plus gros bottleneck actuel",
-      placeholder: "Ex: Pas assez de leads, taux de closing trop bas...",
+      placeholder: "Ex : Pas assez de leads, taux de closing trop bas...",
     },
   ],
   etudiant: [
     {
       key: "etudes",
       label: "Qu'est-ce que tu étudies ?",
-      placeholder: "Ex: Marketing digital, commerce, informatique...",
+      placeholder: "Ex : Marketing digital, commerce, informatique...",
     },
     {
       key: "biggest_challenge",
       label: "Qu'est-ce qui te bloque pour te lancer ?",
-      placeholder: "Ex: Pas d'expérience, pas de budget...",
+      placeholder: "Ex : Pas d'expérience, pas de budget...",
     },
   ],
   reconversion: [
     {
       key: "ancien_poste",
       label: "Ton ancien métier / poste",
-      placeholder: "Ex: Commercial B2B, RH, comptable...",
+      placeholder: "Ex : Commercial B2B, RH, comptable...",
     },
     {
       key: "duree_experience",
       label: "Combien d'années d'expérience ?",
-      placeholder: "Ex: 8 ans",
+      placeholder: "Ex : 8 ans",
     },
     {
       key: "biggest_challenge",
       label: "Pourquoi tu veux changer ?",
-      placeholder: "Ex: Je veux plus de liberté, meilleure rémunération...",
+      placeholder: "Ex : Je veux plus de liberté, meilleure rémunération...",
     },
   ],
   sans_emploi: [
     {
       key: "ancien_poste",
       label: "Ton dernier poste / expérience",
-      placeholder: "Ex: Responsable marketing, commercial...",
+      placeholder: "Ex : Responsable marketing, commercial...",
     },
     {
       key: "biggest_challenge",
       label: "Qu'est-ce qui te bloque pour démarrer ?",
-      placeholder: "Ex: Je ne sais pas par ou commencer...",
+      placeholder: "Ex : Je ne sais pas par où commencer...",
     },
   ],
 };
@@ -1154,7 +1154,7 @@ export function OnboardingFlow() {
                     <span className="text-sm text-white/25">
                       Appuie sur{" "}
                       <kbd className="rounded bg-white/10 px-1.5 py-0.5 font-mono text-xs">
-                        Entree
+                        Entrée
                       </kbd>
                     </span>
                   )}

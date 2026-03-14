@@ -14,8 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { PLANS, getPlanById } from "@/lib/stripe/plans";
 import { toast } from "sonner";
-import { CreditCard, ExternalLink, Loader2, Sparkles, Check } from "lucide-react";
-import Link from "next/link";
+import { CreditCard, ExternalLink, Loader2, Check } from "lucide-react";
 
 export function SubscriptionCard() {
   const { profile } = useUser();
@@ -23,7 +22,7 @@ export function SubscriptionCard() {
 
   const isActive = profile?.subscription_status === "active";
 
-  // Determiner le plan actuel
+  // Déterminer le plan actuel
   const currentPlanId = isActive
     ? (profile?.subscription_plan || "pro")
     : "free";
@@ -37,7 +36,7 @@ export function SubscriptionCard() {
       const data = await res.json();
 
       if (!res.ok) {
-        toast.error(data.error || "Erreur lors de l'acces au portail.");
+        toast.error(data.error || "Erreur lors de l'accès au portail.");
         return;
       }
 
@@ -45,7 +44,7 @@ export function SubscriptionCard() {
         window.location.href = data.url;
       }
     } catch {
-      toast.error("Impossible d'acceder au portail de facturation.");
+      toast.error("Impossible d'accéder au portail de facturation.");
     } finally {
       setLoadingPortal(false);
     }
@@ -92,7 +91,7 @@ export function SubscriptionCard() {
         <Separator />
 
         {/* Actions */}
-        {isActive ? (
+        {isActive && (
           <Button
             variant="outline"
             size="sm"
@@ -104,14 +103,7 @@ export function SubscriptionCard() {
             ) : (
               <ExternalLink className="h-4 w-4 mr-2" />
             )}
-            Gerer l&apos;abonnement
-          </Button>
-        ) : (
-          <Button asChild size="sm">
-            <Link href="/pricing">
-              <Sparkles className="h-4 w-4 mr-2" />
-              Passer à Pro
-            </Link>
+            Gérer l&apos;abonnement
           </Button>
         )}
       </CardContent>

@@ -1,10 +1,8 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Sparkles, Lock, ArrowRight } from "lucide-react";
-import Link from "next/link";
+import { Lock } from "lucide-react";
 
 interface UpgradeWallProps {
   currentUsage: number;
@@ -27,21 +25,13 @@ export function UpgradeWall({ currentUsage, limit, className }: UpgradeWallProps
             Limite atteinte
           </h3>
           <p className="text-sm text-text-secondary max-w-md mx-auto">
-            Tu as utilise{" "}
+            Tu as utilisé{" "}
             <Badge variant="muted" className="mx-1">
               {currentUsage}/{limit}
             </Badge>{" "}
-            générations IA ce mois-ci. Passe à Pro pour des générations illimitées.
+            générations IA ce mois-ci. Ta limite mensuelle est atteinte, réessaie le mois prochain.
           </p>
         </div>
-
-        <Button asChild size="lg" className="gap-2">
-          <Link href="/pricing">
-            <Sparkles className="h-4 w-4" />
-            Passer à Pro
-            <ArrowRight className="h-4 w-4" />
-          </Link>
-        </Button>
       </CardContent>
     </Card>
   );
