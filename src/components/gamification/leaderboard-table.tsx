@@ -167,7 +167,7 @@ export function LeaderboardTable({ className }: LeaderboardTableProps) {
           <div className="flex flex-col items-center justify-center py-12 text-center">
             <Trophy className="h-12 w-12 text-text-muted/30 mb-4" />
             <p className="text-text-muted text-sm">
-              Le classement sera disponible bientot.
+              Le classement sera disponible bientôt.
             </p>
           </div>
         </CardContent>

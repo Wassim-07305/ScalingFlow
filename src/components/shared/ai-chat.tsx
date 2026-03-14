@@ -443,7 +443,7 @@ export function AIChat({
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Écris ton message..."
-              aria-label="Entrez votre message"
+              aria-label="Entre ton message"
               rows={1}
               className="flex-1 resize-none rounded-lg bg-bg-tertiary border border-border-default px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent"
             />

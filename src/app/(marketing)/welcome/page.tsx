@@ -217,11 +217,11 @@ export default function WelcomePage() {
         <div className="max-w-4xl mx-auto px-4 py-6 flex flex-wrap items-center justify-center gap-8 text-sm text-text-muted">
           <div className="flex items-center gap-2">
             <BarChart3 className="h-4 w-4 text-accent" />
-            <span><span className="text-text-primary font-semibold">11</span> agents IA specialises</span>
+            <span><span className="text-text-primary font-semibold">11</span> agents IA spécialisés</span>
           </div>
           <div className="flex items-center gap-2">
             <FileText className="h-4 w-4 text-accent" />
-            <span><span className="text-text-primary font-semibold">15+</span> types d&apos;assets generes</span>
+            <span><span className="text-text-primary font-semibold">15+</span> types d&apos;assets générés</span>
           </div>
           <div className="flex items-center gap-2">
             <Zap className="h-4 w-4 text-accent" />

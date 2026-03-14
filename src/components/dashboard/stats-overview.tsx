@@ -82,58 +82,63 @@ export function StatsOverview() {
 
     const fetchCounts = async () => {
       setCountsLoading(true);
-      const supabase = createClient();
+      try {
+        const supabase = createClient();
 
-      const [offersRes, assetsRes, funnelsRes, adsRes, contentRes, campaignsRes, milestonesRes] = await Promise.all([
-        supabase
-          .from("offers")
-          .select("id", { count: "exact", head: true })
-          .eq("user_id", user.id),
-        supabase
-          .from("sales_assets")
-          .select("id", { count: "exact", head: true })
-          .eq("user_id", user.id),
-        supabase
-          .from("funnels")
-          .select("id", { count: "exact", head: true })
-          .eq("user_id", user.id),
-        supabase
-          .from("ad_creatives")
-          .select("id", { count: "exact", head: true })
-          .eq("user_id", user.id),
-        supabase
-          .from("content_pieces")
-          .select("id", { count: "exact", head: true })
-          .eq("user_id", user.id),
-        supabase
-          .from("ad_campaigns")
-          .select("total_spend, roas")
-          .eq("user_id", user.id),
-        supabase
-          .from("user_milestones")
-          .select("id", { count: "exact", head: true })
-          .eq("user_id", user.id)
-          .eq("completed", true),
-      ]);
+        const [offersRes, assetsRes, funnelsRes, adsRes, contentRes, campaignsRes, milestonesRes] = await Promise.all([
+          supabase
+            .from("offers")
+            .select("id", { count: "exact", head: true })
+            .eq("user_id", user.id),
+          supabase
+            .from("sales_assets")
+            .select("id", { count: "exact", head: true })
+            .eq("user_id", user.id),
+          supabase
+            .from("funnels")
+            .select("id", { count: "exact", head: true })
+            .eq("user_id", user.id),
+          supabase
+            .from("ad_creatives")
+            .select("id", { count: "exact", head: true })
+            .eq("user_id", user.id),
+          supabase
+            .from("content_pieces")
+            .select("id", { count: "exact", head: true })
+            .eq("user_id", user.id),
+          supabase
+            .from("ad_campaigns")
+            .select("total_spend, roas")
+            .eq("user_id", user.id),
+          supabase
+            .from("user_milestones")
+            .select("id", { count: "exact", head: true })
+            .eq("user_id", user.id)
+            .eq("completed", true),
+        ]);
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const campaigns = (campaignsRes.data ?? []) as any[];
-      const adSpend = campaigns.reduce((s: number, c: any) => s + (c.total_spend ?? 0), 0);
-      const avgRoas = campaigns.length > 0
-        ? campaigns.reduce((s: number, c: any) => s + (c.roas ?? 0), 0) / campaigns.length
-        : 0;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const campaigns = (campaignsRes.data ?? []) as any[];
+        const adSpend = campaigns.reduce((s: number, c: any) => s + (c.total_spend ?? 0), 0);
+        const avgRoas = campaigns.length > 0
+          ? campaigns.reduce((s: number, c: any) => s + (c.roas ?? 0), 0) / campaigns.length
+          : 0;
 
-      setCounts({
-        offers: offersRes.count ?? 0,
-        assets: assetsRes.count ?? 0,
-        funnels: funnelsRes.count ?? 0,
-        ads: adsRes.count ?? 0,
-        content: contentRes.count ?? 0,
-        adSpend,
-        avgRoas,
-        milestones: milestonesRes.count ?? 0,
-      });
-      setCountsLoading(false);
+        setCounts({
+          offers: offersRes.count ?? 0,
+          assets: assetsRes.count ?? 0,
+          funnels: funnelsRes.count ?? 0,
+          ads: adsRes.count ?? 0,
+          content: contentRes.count ?? 0,
+          adSpend,
+          avgRoas,
+          milestones: milestonesRes.count ?? 0,
+        });
+      } catch {
+        // Silently handle errors — show 0 values rather than infinite skeleton
+      } finally {
+        setCountsLoading(false);
+      }
     };
 
     fetchCounts();
@@ -186,7 +191,7 @@ export function StatsOverview() {
       href: "/progress",
     },
     {
-      label: "Depense Ads",
+      label: "Dépense Ads",
       value: counts.adSpend,
       suffix: " €",
       icon: DollarSign,

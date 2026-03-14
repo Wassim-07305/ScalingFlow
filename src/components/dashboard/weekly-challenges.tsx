@@ -37,7 +37,7 @@ interface Challenge {
   completed: boolean;
 }
 
-// Definitions des défis possibles
+// Définitions des défis possibles
 const CHALLENGE_DEFINITIONS: {
   key: string;
   title: string;
@@ -51,7 +51,7 @@ const CHALLENGE_DEFINITIONS: {
   {
     key: "offers_week",
     title: "Créateur d'offres",
-    description: "Généré 2 offres cette semaine",
+    description: "Génère 2 offres cette semaine",
     icon: Package,
     color: "text-accent",
     target: 2,
@@ -68,7 +68,7 @@ const CHALLENGE_DEFINITIONS: {
   {
     key: "content_week",
     title: "Machine à contenu",
-    description: "Généré 5 contenus cette semaine",
+    description: "Génère 5 contenus cette semaine",
     icon: PenTool,
     color: "text-[#A78BFA]",
     target: 5,
@@ -118,7 +118,7 @@ const CHALLENGE_DEFINITIONS: {
   },
   {
     key: "streak_week",
-    title: "Regularite",
+    title: "Régularité",
     description: "Maintiens un streak de 5 jours",
     icon: Flame,
     color: "text-danger",
@@ -136,7 +136,7 @@ const CHALLENGE_DEFINITIONS: {
   {
     key: "academy_week",
     title: "Étudiant assidu",
-    description: "Regarde 3 videos Academy",
+    description: "Regarde 3 vidéos Academy",
     icon: BookOpen,
     color: "text-accent",
     target: 3,
@@ -156,7 +156,7 @@ const CHALLENGE_DEFINITIONS: {
 function getWeekStart(): Date {
   const now = new Date();
   const day = now.getDay();
-  const diff = now.getDate() - day + (day === 0 ? -6 : 1); // Lundi = debut de semaine
+  const diff = now.getDate() - day + (day === 0 ? -6 : 1); // Lundi = début de semaine
   const weekStart = new Date(now.setDate(diff));
   weekStart.setHours(0, 0, 0, 0);
   return weekStart;
@@ -178,52 +178,57 @@ export function WeeklyChallenges() {
 
     const fetchChallenges = async () => {
       setLoading(true);
-      const supabase = createClient();
-      const weekStart = getWeekStart();
-      const weekKey = getWeekKey();
+      try {
+        const supabase = createClient();
+        const weekStart = getWeekStart();
+        const weekKey = getWeekKey();
 
-      // Charger les défis complétés cette semaine
-      const { data: completedData } = await supabase
-        .from("challenge_completions")
-        .select("challenge_key")
-        .eq("user_id", user.id)
-        .eq("week_key", weekKey);
+        // Charger les défis complétés cette semaine
+        const { data: completedData } = await supabase
+          .from("challenge_completions")
+          .select("challenge_key")
+          .eq("user_id", user.id)
+          .eq("week_key", weekKey);
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const completedKeys = new Set(
-        ((completedData ?? []) as any[]).map((c: any) => c.challenge_key)
-      );
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const completedKeys = new Set(
+          ((completedData ?? []) as any[]).map((c: any) => c.challenge_key)
+        );
 
-      // Sélectionner 4 défis pour cette semaine (rotation basée sur l'ID utilisateur)
-      const userSeed = user.id.charCodeAt(0) + user.id.charCodeAt(1);
-      const weekSeed = weekStart.getTime();
-      const combinedSeed = (userSeed + weekSeed) % CHALLENGE_DEFINITIONS.length;
+        // Sélectionner 4 défis pour cette semaine (rotation basée sur l'ID utilisateur)
+        const userSeed = user.id.charCodeAt(0) + user.id.charCodeAt(1);
+        const weekSeed = weekStart.getTime();
+        const combinedSeed = (userSeed + weekSeed) % CHALLENGE_DEFINITIONS.length;
 
-      const selectedDefs = [
-        ...CHALLENGE_DEFINITIONS.slice(combinedSeed),
-        ...CHALLENGE_DEFINITIONS.slice(0, combinedSeed),
-      ].slice(0, 4);
+        const selectedDefs = [
+          ...CHALLENGE_DEFINITIONS.slice(combinedSeed),
+          ...CHALLENGE_DEFINITIONS.slice(0, combinedSeed),
+        ].slice(0, 4);
 
-      // Calculer la progression de chaque defi
-      const challengePromises = selectedDefs.map(async (def) => {
-        const current = await def.countQuery(supabase, user.id, weekStart);
-        return {
-          id: `${weekKey}-${def.key}`,
-          key: def.key,
-          title: def.title,
-          description: def.description,
-          icon: def.icon,
-          color: def.color,
-          target: def.target,
-          current: Math.min(current, def.target),
-          xp_reward: def.xp_reward,
-          completed: completedKeys.has(def.key),
-        };
-      });
+        // Calculer la progression de chaque défi
+        const challengePromises = selectedDefs.map(async (def) => {
+          const current = await def.countQuery(supabase, user.id, weekStart);
+          return {
+            id: `${weekKey}-${def.key}`,
+            key: def.key,
+            title: def.title,
+            description: def.description,
+            icon: def.icon,
+            color: def.color,
+            target: def.target,
+            current: Math.min(current, def.target),
+            xp_reward: def.xp_reward,
+            completed: completedKeys.has(def.key),
+          };
+        });
 
-      const results = await Promise.all(challengePromises);
-      setChallenges(results);
-      setLoading(false);
+        const results = await Promise.all(challengePromises);
+        setChallenges(results);
+      } catch {
+        // Show empty state rather than infinite skeleton
+      } finally {
+        setLoading(false);
+      }
     };
 
     fetchChallenges();
@@ -247,7 +252,7 @@ export function WeeklyChallenges() {
       });
 
     if (insertError) {
-      toast.error("Erreur lors de la reclamation");
+      toast.error("Erreur lors de la réclamation");
       setClaimingChallenge(null);
       return;
     }
@@ -363,13 +368,13 @@ export function WeeklyChallenges() {
                       </h4>
                       {challenge.completed && (
                         <Badge variant="cyan" className="text-[10px]">
-                          Termine
+                          Terminé
                         </Badge>
                       )}
                       {isReady && !isClaiming && (
                         <Badge variant="default" className="text-[10px] gap-0.5 animate-pulse">
                           <Gift className="h-2.5 w-2.5" />
-                          Reclamer
+                          Réclamer
                         </Badge>
                       )}
                     </div>

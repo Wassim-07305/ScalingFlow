@@ -8,10 +8,11 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AILoading } from "@/components/shared/ai-loading";
-import { EmptyState } from "@/components/shared/empty-state";
 import { cn } from "@/lib/utils/cn";
 import { createClient } from "@/lib/supabase/client";
 import { useUser } from "@/hooks/use-user";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Sparkles,
   Type,
@@ -21,12 +22,30 @@ import {
   CheckCircle,
   XCircle,
   History,
+  RefreshCw,
 } from "lucide-react";
 import { toast } from "sonner";
 import { GenerationHistory } from "@/components/shared/generation-history";
 import { LogoGenerator } from "@/components/brand/logo-generator";
 import type { BrandIdentityResult } from "@/lib/ai/prompts/brand-identity";
 import { UpgradeWall } from "@/components/shared/upgrade-wall";
+
+const BRAND_DIRECTIONS = [
+  "Minimaliste",
+  "Luxe",
+  "Playful",
+  "Professionnel",
+  "Créatif",
+] as const;
+
+const COLOR_PREFERENCES = [
+  "Emeraude",
+  "Bleu",
+  "Orange",
+  "Violet",
+  "Neutre",
+  "Personnalisé",
+] as const;
 
 const TABS = [
   { key: "nom", label: "Nom", icon: Type },
@@ -46,6 +65,9 @@ export default function BrandPage() {
   const [generated, setGenerated] = React.useState<BrandIdentityResult | null>(null);
   const [offerId, setOfferId] = React.useState<string | null>(null);
   const [usageLimited, setUsageLimited] = React.useState<{currentUsage: number; limit: number} | null>(null);
+  const [brandDirection, setBrandDirection] = React.useState<string>(BRAND_DIRECTIONS[0]);
+  const [industry, setIndustry] = React.useState("");
+  const [colorPreference, setColorPreference] = React.useState<string>(COLOR_PREFERENCES[0]);
 
   // Fetch existing brand identity
   React.useEffect(() => {
@@ -141,7 +163,12 @@ export default function BrandPage() {
       const response = await fetch("/api/ai/generate-brand", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ offerId }),
+        body: JSON.stringify({
+          offerId,
+          brandDirection,
+          industry: industry || undefined,
+          colorPreference,
+        }),
       });
 
       if (!response.ok) {
@@ -257,10 +284,12 @@ export default function BrandPage() {
         title="Identité de Marque"
         description="Crée ton identité de marque unique."
         actions={
-          <Button onClick={handleGenerate} disabled={generating}>
-            <Sparkles className="h-4 w-4 mr-2" />
-            {generated ? "Régénérer" : "Générer"}
-          </Button>
+          generated ? (
+            <Button variant="outline" onClick={() => setGenerated(null)}>
+              <RefreshCw className="h-4 w-4 mr-2" />
+              Nouveau brief
+            </Button>
+          ) : undefined
         }
       />
 
@@ -293,13 +322,74 @@ export default function BrandPage() {
           onSelect={handleHistorySelect}
         />
       ) : !generated ? (
-        <EmptyState
-          icon={Palette}
-          title="Aucune identité de marque"
-          description="Génère ton identité de marque pour obtenir des propositions de noms, une direction artistique, un concept de logo et un kit de marque complet."
-          actionLabel="Générer mon identité"
-          onAction={handleGenerate}
-        />
+        <Card className="max-w-lg mx-auto">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Palette className="h-5 w-5 text-accent" />
+              Brief de marque
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-5">
+            {/* Brand direction */}
+            <div className="space-y-2">
+              <Label>Direction de marque</Label>
+              <div className="flex flex-wrap gap-2">
+                {BRAND_DIRECTIONS.map((dir) => (
+                  <button
+                    key={dir}
+                    onClick={() => setBrandDirection(dir)}
+                    className={cn(
+                      "px-3 py-1.5 rounded-lg text-sm font-medium border transition-all",
+                      brandDirection === dir
+                        ? "border-accent bg-accent-muted text-accent"
+                        : "border-border-default bg-bg-tertiary text-text-secondary hover:border-border-hover"
+                    )}
+                  >
+                    {dir}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Industry */}
+            <div className="space-y-2">
+              <Label htmlFor="brand-industry">Industrie (optionnel)</Label>
+              <Input
+                id="brand-industry"
+                placeholder="Ex : E-commerce, SaaS, Coaching..."
+                value={industry}
+                onChange={(e) => setIndustry(e.target.value)}
+              />
+            </div>
+
+            {/* Color preference */}
+            <div className="space-y-2">
+              <Label>Préférence de couleur</Label>
+              <div className="flex flex-wrap gap-2">
+                {COLOR_PREFERENCES.map((color) => (
+                  <button
+                    key={color}
+                    onClick={() => setColorPreference(color)}
+                    className={cn(
+                      "px-3 py-1.5 rounded-lg text-sm font-medium border transition-all",
+                      colorPreference === color
+                        ? "border-accent bg-accent-muted text-accent"
+                        : "border-border-default bg-bg-tertiary text-text-secondary hover:border-border-hover"
+                    )}
+                  >
+                    {color}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Generate button */}
+            <Button className="w-full" size="lg" onClick={handleGenerate} disabled={generating}>
+              <Sparkles className="h-4 w-4 mr-2" />
+              Générer mon identité de marque
+            </Button>
+          </CardContent>
+        </Card>
       ) : (
         <>
           {activeTab === "nom" && (

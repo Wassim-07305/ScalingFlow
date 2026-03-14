@@ -47,7 +47,7 @@ export function SmsSequenceGenerator({ className, initialData }: SmsSequenceGene
   };
 
   if (loading) {
-    return <AILoading text="Redaction de ta séquence SMS" className={className} />;
+    return <AILoading text="Rédaction de ta séquence SMS" className={className} />;
   }
 
   if (!sequence) {

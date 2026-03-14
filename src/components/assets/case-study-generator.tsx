@@ -57,7 +57,7 @@ export function CaseStudyGenerator({ className, initialData }: CaseStudyGenerato
   };
 
   if (loading) {
-    return <AILoading text="Redaction de ton étude de cas" className={className} />;
+    return <AILoading text="Rédaction de ton étude de cas" className={className} />;
   }
 
   if (!caseStudy) {
@@ -70,13 +70,13 @@ export function CaseStudyGenerator({ className, initialData }: CaseStudyGenerato
             Paramètres de l&apos;étude de cas
           </h3>
           <p className="text-xs text-text-secondary mt-1">
-            Renseigne la metrique cle et le resultat obtenu
+            Renseigne la métrique clé et le résultat obtenu
           </p>
         </div>
 
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="metric">Metrique cle</Label>
+            <Label htmlFor="metric">Métrique clé</Label>
             <Input
               id="metric"
               placeholder="Ex : Chiffre d'affaires"
@@ -189,7 +189,7 @@ export function CaseStudyGenerator({ className, initialData }: CaseStudyGenerato
           )}
           {solution.implementation_steps && solution.implementation_steps.length > 0 && (
             <div>
-              <p className="text-xs text-text-muted font-medium mb-1">Etapes de mise en oeuvre</p>
+              <p className="text-xs text-text-muted font-medium mb-1">Étapes de mise en oeuvre</p>
               <ol className="space-y-1">
                 {solution.implementation_steps.map((step: string, i: number) => (
                   <li key={i} className="text-sm text-text-secondary flex items-start gap-2">
@@ -220,20 +220,20 @@ export function CaseStudyGenerator({ className, initialData }: CaseStudyGenerato
         <CardHeader>
           <div className="flex items-center gap-2">
             <TrendingUp className="h-4 w-4 text-accent" />
-            <CardTitle>Resultats</CardTitle>
+            <CardTitle>Résultats</CardTitle>
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
           {quantitative.length > 0 && (
             <div>
-              <p className="text-xs text-text-muted font-medium mb-2">Metriques quantitatives</p>
+              <p className="text-xs text-text-muted font-medium mb-2">Métriques quantitatives</p>
               <div className="rounded-lg border border-border-default overflow-hidden">
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="bg-bg-tertiary">
-                      <th className="text-left px-3 py-2 text-text-muted font-medium">Metrique</th>
+                      <th className="text-left px-3 py-2 text-text-muted font-medium">Métrique</th>
                       <th className="text-left px-3 py-2 text-text-muted font-medium">Avant</th>
-                      <th className="text-left px-3 py-2 text-text-muted font-medium">Apres</th>
+                      <th className="text-left px-3 py-2 text-text-muted font-medium">Après</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -251,7 +251,7 @@ export function CaseStudyGenerator({ className, initialData }: CaseStudyGenerato
           )}
           {qualitative.length > 0 && (
             <div>
-              <p className="text-xs text-text-muted font-medium mb-1">Resultats qualitatifs</p>
+              <p className="text-xs text-text-muted font-medium mb-1">Résultats qualitatifs</p>
               <ul className="space-y-1">
                 {qualitative.map((item: string, i: number) => (
                   <li key={i} className="text-sm text-text-secondary flex items-start gap-2">
@@ -270,7 +270,7 @@ export function CaseStudyGenerator({ className, initialData }: CaseStudyGenerato
           )}
           {results.timeline_to_results && (
             <div>
-              <p className="text-xs text-text-muted font-medium mb-1">Delai d&apos;obtention</p>
+              <p className="text-xs text-text-muted font-medium mb-1">Délai d&apos;obtention</p>
               <p className="text-sm text-text-secondary">{results.timeline_to_results}</p>
             </div>
           )}
@@ -283,7 +283,7 @@ export function CaseStudyGenerator({ className, initialData }: CaseStudyGenerato
           <CardHeader>
             <div className="flex items-center gap-2">
               <Quote className="h-4 w-4 text-warning" />
-              <CardTitle>Temoignage</CardTitle>
+              <CardTitle>Témoignage</CardTitle>
             </div>
           </CardHeader>
           <CardContent className="space-y-3">

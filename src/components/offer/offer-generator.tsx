@@ -35,7 +35,7 @@ export function OfferGenerator({ className, marketAnalysisId, marketName, initia
 
   const handleGenerate = async () => {
     if (!marketAnalysisId) {
-      setError("Veuillez d'abord compléter votre analyse de marché dans l'onboarding.");
+      setError("Complète d'abord ton analyse de marché dans l'onboarding.");
       return;
     }
 

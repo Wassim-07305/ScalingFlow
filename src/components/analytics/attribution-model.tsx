@@ -184,9 +184,9 @@ export function AttributionModel() {
                 Modèles d&apos;attribution
               </h3>
               <p className="text-xs text-text-secondary">
-                Comprenez comment chaque canal contribue à vos conversions selon différents modèles
+                Comprends comment chaque canal contribue à tes conversions selon différents modèles
                 d&apos;attribution. Les répartitions par canal sont des estimations basées sur les modèles standards du secteur.
-                {revenueIsReal && " Le revenu total affiché est basé sur vos données réelles."}
+                {revenueIsReal && " Le revenu total affiché est basé sur tes données réelles."}
               </p>
             </div>
             <div className="flex flex-col gap-1 items-end">

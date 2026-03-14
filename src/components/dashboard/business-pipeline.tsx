@@ -38,40 +38,44 @@ export function BusinessPipeline() {
 
     const fetchPipeline = async () => {
       setLoading(true);
-      const supabase = createClient();
+      try {
+        const supabase = createClient();
 
-      const [
-        { count: marketsCount },
-        { count: offersCount },
-        { count: brandsCount },
-        { count: funnelsCount },
-        { count: assetsCount },
-        { count: adsCount },
-        { count: contentCount },
-      ] = await Promise.all([
-        supabase.from("market_analyses").select("*", { count: "exact", head: true }).eq("user_id", user.id),
-        supabase.from("offers").select("*", { count: "exact", head: true }).eq("user_id", user.id),
-        supabase.from("brand_identities").select("*", { count: "exact", head: true }).eq("user_id", user.id),
-        supabase.from("funnels").select("*", { count: "exact", head: true }).eq("user_id", user.id),
-        supabase.from("sales_assets").select("*", { count: "exact", head: true }).eq("user_id", user.id),
-        supabase.from("ad_creatives").select("*", { count: "exact", head: true }).eq("user_id", user.id),
-        supabase.from("content_pieces").select("*", { count: "exact", head: true }).eq("user_id", user.id),
-      ]);
+        const [
+          { count: marketsCount },
+          { count: offersCount },
+          { count: brandsCount },
+          { count: funnelsCount },
+          { count: assetsCount },
+          { count: adsCount },
+          { count: contentCount },
+        ] = await Promise.all([
+          supabase.from("market_analyses").select("*", { count: "exact", head: true }).eq("user_id", user.id),
+          supabase.from("offers").select("*", { count: "exact", head: true }).eq("user_id", user.id),
+          supabase.from("brand_identities").select("*", { count: "exact", head: true }).eq("user_id", user.id),
+          supabase.from("funnels").select("*", { count: "exact", head: true }).eq("user_id", user.id),
+          supabase.from("sales_assets").select("*", { count: "exact", head: true }).eq("user_id", user.id),
+          supabase.from("ad_creatives").select("*", { count: "exact", head: true }).eq("user_id", user.id),
+          supabase.from("content_pieces").select("*", { count: "exact", head: true }).eq("user_id", user.id),
+        ]);
 
-      const vaultDone = profile?.vault_completed ?? false;
+        const vaultDone = profile?.vault_completed ?? false;
 
-      setSteps([
-        { label: "Vault", href: "/vault", icon: Archive, completed: vaultDone },
-        { label: "Marché", href: "/market", icon: Globe, completed: (marketsCount ?? 0) > 0, count: marketsCount ?? 0 },
-        { label: "Offre", href: "/offer", icon: Package, completed: (offersCount ?? 0) > 0, count: offersCount ?? 0 },
-        { label: "Marque", href: "/brand", icon: Palette, completed: (brandsCount ?? 0) > 0, count: brandsCount ?? 0 },
-        { label: "Funnel", href: "/funnel", icon: Filter, completed: (funnelsCount ?? 0) > 0, count: funnelsCount ?? 0 },
-        { label: "Assets", href: "/assets", icon: FileText, completed: (assetsCount ?? 0) > 0, count: assetsCount ?? 0 },
-        { label: "Ads", href: "/ads", icon: Megaphone, completed: (adsCount ?? 0) > 0, count: adsCount ?? 0 },
-        { label: "Contenu", href: "/content", icon: PenTool, completed: (contentCount ?? 0) > 0, count: contentCount ?? 0 },
-      ]);
-
-      setLoading(false);
+        setSteps([
+          { label: "Vault", href: "/vault", icon: Archive, completed: vaultDone },
+          { label: "Marché", href: "/market", icon: Globe, completed: (marketsCount ?? 0) > 0, count: marketsCount ?? 0 },
+          { label: "Offre", href: "/offer", icon: Package, completed: (offersCount ?? 0) > 0, count: offersCount ?? 0 },
+          { label: "Marque", href: "/brand", icon: Palette, completed: (brandsCount ?? 0) > 0, count: brandsCount ?? 0 },
+          { label: "Funnel", href: "/funnel", icon: Filter, completed: (funnelsCount ?? 0) > 0, count: funnelsCount ?? 0 },
+          { label: "Assets", href: "/assets", icon: FileText, completed: (assetsCount ?? 0) > 0, count: assetsCount ?? 0 },
+          { label: "Ads", href: "/ads", icon: Megaphone, completed: (adsCount ?? 0) > 0, count: adsCount ?? 0 },
+          { label: "Contenu", href: "/content", icon: PenTool, completed: (contentCount ?? 0) > 0, count: contentCount ?? 0 },
+        ]);
+      } catch {
+        // Show empty pipeline rather than infinite skeleton
+      } finally {
+        setLoading(false);
+      }
     };
 
     fetchPipeline();

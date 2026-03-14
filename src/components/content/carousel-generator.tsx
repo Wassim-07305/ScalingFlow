@@ -73,7 +73,7 @@ export function CarouselGenerator({ className, initialData }: CarouselGeneratorP
     navigator.clipboard.writeText(text);
     setCopiedField(field);
     setTimeout(() => setCopiedField(null), 2000);
-    toast.success("Copie !");
+    toast.success("Copié !");
   };
 
   if (usageLimited) {
@@ -142,7 +142,7 @@ export function CarouselGenerator({ className, initialData }: CarouselGeneratorP
             onClick={() => copyToClipboard(result.hook_cover, "cover")}
           >
             <Copy className="h-3 w-3 mr-1" />
-            {copiedField === "cover" ? "Copie !" : "Copier"}
+            {copiedField === "cover" ? "Copié !" : "Copier"}
           </Button>
         </div>
         <p className="text-lg font-semibold text-accent">{result.hook_cover}</p>
@@ -185,7 +185,7 @@ export function CarouselGenerator({ className, initialData }: CarouselGeneratorP
               onClick={() => copyToClipboard(result.caption, "caption")}
             >
               <Copy className="h-3 w-3 mr-1" />
-              {copiedField === "caption" ? "Copie !" : "Copier"}
+              {copiedField === "caption" ? "Copié !" : "Copier"}
             </Button>
           </div>
           <p className="text-sm text-text-secondary whitespace-pre-wrap">{result.caption}</p>

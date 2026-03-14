@@ -2,15 +2,23 @@
 
 import React from "react";
 import { cn } from "@/lib/utils/cn";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AILoading } from "@/components/shared/ai-loading";
 import { GlowCard } from "@/components/shared/glow-card";
-import { Sparkles, Copy, Eye, MessageCircle, GraduationCap, Megaphone, Heart } from "lucide-react";
+import { Sparkles, Copy, Eye, MessageCircle, GraduationCap, Megaphone, Heart, BookOpen } from "lucide-react";
 import { toast } from "sonner";
 import type { StoriesResult } from "@/lib/ai/prompts/stories-scripts";
 import { UpgradeWall } from "@/components/shared/upgrade-wall";
+
+const STORY_THEMES = [
+  { key: "educatif", label: "Éducatif" },
+  { key: "coulisses", label: "Coulisses" },
+  { key: "temoignage", label: "Témoignage" },
+  { key: "engagement", label: "Engagement" },
+  { key: "promotionnel", label: "Promotionnel" },
+] as const;
 
 interface StoriesGeneratorProps {
   className?: string;
@@ -53,10 +61,16 @@ export function StoriesGenerator({ className, initialData }: StoriesGeneratorPro
   const [copiedIndex, setCopiedIndex] = React.useState<number | null>(null);
   const [usageLimited, setUsageLimited] = React.useState<{currentUsage: number; limit: number} | null>(null);
 
+  // Form state
+  const [storyTheme, setStoryTheme] = React.useState("educatif");
+  const [topic, setTopic] = React.useState("");
+  const [showForm, setShowForm] = React.useState(true);
+
   React.useEffect(() => {
     if (initialData) {
       const result = initialData as StoriesResult;
       setStories(result.stories || []);
+      setShowForm(false);
     }
   }, [initialData]);
 
@@ -68,7 +82,11 @@ export function StoriesGenerator({ className, initialData }: StoriesGeneratorPro
       const response = await fetch("/api/ai/generate-content", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ contentType: "stories" }),
+        body: JSON.stringify({
+          contentType: "stories",
+          storyTheme,
+          topic: topic || undefined,
+        }),
       });
 
       if (!response.ok) {
@@ -81,6 +99,7 @@ export function StoriesGenerator({ className, initialData }: StoriesGeneratorPro
       const data = await response.json();
       const result = data.result as StoriesResult;
       setStories(result.stories || []);
+      setShowForm(false);
       toast.success("Stories générées !");
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Erreur";
@@ -98,7 +117,7 @@ export function StoriesGenerator({ className, initialData }: StoriesGeneratorPro
     navigator.clipboard.writeText(text);
     setCopiedIndex(index);
     setTimeout(() => setCopiedIndex(null), 2000);
-    toast.success("Copie !");
+    toast.success("Copié !");
   };
 
   if (usageLimited) {
@@ -109,17 +128,66 @@ export function StoriesGenerator({ className, initialData }: StoriesGeneratorPro
     return <AILoading text="Génération des stories" className={className} />;
   }
 
-  if (stories.length === 0) {
+  if (stories.length === 0 || showForm) {
     return (
-      <div className={cn("text-center py-12", className)}>
-        {error && <p className="text-sm text-danger mb-4">{error}</p>}
-        <Button size="lg" onClick={handleGenerate}>
-          <Sparkles className="h-4 w-4 mr-2" />
-          Générer 5 series de Stories
-        </Button>
-        <p className="text-sm text-text-secondary mt-2">
-          5 types : Coulisses, Temoignage, Education, CTA, Engagement
-        </p>
+      <div className={cn("space-y-6", className)}>
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <BookOpen className="h-5 w-5 text-accent" />
+              Paramètres Stories
+            </CardTitle>
+            <CardDescription>
+              Configurez le thème et le sujet pour générer des séries de stories engageantes.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-5">
+            {/* Story theme */}
+            <div>
+              <label className="text-sm font-medium text-text-primary mb-2 block">Thème de la story</label>
+              <div className="flex flex-wrap gap-2">
+                {STORY_THEMES.map((t) => (
+                  <button
+                    key={t.key}
+                    onClick={() => setStoryTheme(t.key)}
+                    className={cn(
+                      "px-3 py-1.5 rounded-lg text-sm font-medium transition-all",
+                      storyTheme === t.key
+                        ? "bg-accent text-white"
+                        : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
+                    )}
+                  >
+                    {t.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Topic */}
+            <div>
+              <label className="text-sm font-medium text-text-primary mb-1 block">
+                Sujet précis <span className="text-text-muted font-normal">(optionnel)</span>
+              </label>
+              <input
+                type="text"
+                value={topic}
+                onChange={(e) => setTopic(e.target.value)}
+                placeholder="Ex: lancement produit, journée type, avant/après client..."
+                className="w-full rounded-lg border border-border-default bg-bg-secondary px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+              />
+            </div>
+
+            {error && <p className="text-sm text-danger">{error}</p>}
+
+            <Button size="lg" onClick={handleGenerate} className="w-full">
+              <Sparkles className="h-4 w-4 mr-2" />
+              Générer 5 séries de Stories
+            </Button>
+            <p className="text-xs text-text-muted text-center">
+              5 types : Coulisses, Témoignage, Éducation, CTA, Engagement
+            </p>
+          </CardContent>
+        </Card>
       </div>
     );
   }
@@ -127,10 +195,15 @@ export function StoriesGenerator({ className, initialData }: StoriesGeneratorPro
   return (
     <div className={cn("space-y-4", className)}>
       <div className="flex items-center justify-between">
-        <Badge variant="default">{stories.length} series de stories</Badge>
-        <Button variant="outline" size="sm" onClick={handleGenerate}>
-          Régénérer
-        </Button>
+        <Badge variant="default">{stories.length} séries de stories</Badge>
+        <div className="flex items-center gap-2">
+          <Button variant="ghost" size="sm" onClick={() => setShowForm(true)}>
+            Nouveau brief
+          </Button>
+          <Button variant="outline" size="sm" onClick={handleGenerate}>
+            Régénérer
+          </Button>
+        </div>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -148,7 +221,7 @@ export function StoriesGenerator({ className, initialData }: StoriesGeneratorPro
                 </div>
                 <Button variant="ghost" size="sm" onClick={() => copyStory(story, i)}>
                   <Copy className="h-3 w-3 mr-1" />
-                  {copiedIndex === i ? "Copie !" : "Copier"}
+                  {copiedIndex === i ? "Copié !" : "Copier"}
                 </Button>
               </div>
 

@@ -38,6 +38,8 @@ import {
   Monitor,
 } from "lucide-react";
 import { useUIStore, type Theme } from "@/stores/ui-store";
+import { usePushNotifications } from "@/hooks/use-push-notifications";
+import { Smartphone } from "lucide-react";
 
 const EXPERIENCE_LABELS: Record<string, string> = {
   beginner: "Débutant",
@@ -433,6 +435,12 @@ export default function SettingsPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
+            {/* Push notifications */}
+            <PushNotificationToggle />
+
+            <Separator className="my-4" />
+
+            <p className="text-xs text-text-muted mb-3 uppercase font-medium">E-mails</p>
             <div className="space-y-3">
               {NOTIF_KEYS.map(({ key, label }) => (
                 <div
@@ -842,6 +850,63 @@ const THEME_OPTIONS: { value: Theme; label: string; icon: typeof Sun }[] = [
   { value: "dark", label: "Sombre", icon: Moon },
   { value: "system", label: "Système", icon: Monitor },
 ];
+
+function PushNotificationToggle() {
+  const { isSupported, isSubscribed, isLoading, permission, subscribe, unsubscribe } = usePushNotifications();
+  const [toggling, setToggling] = useState(false);
+
+  const handleToggle = async () => {
+    setToggling(true);
+    if (isSubscribed) {
+      const ok = await unsubscribe();
+      if (ok) toast.success("Notifications push désactivées");
+    } else {
+      const ok = await subscribe();
+      if (ok) {
+        toast.success("Notifications push activées !");
+      } else if (permission === "denied") {
+        toast.error("Les notifications sont bloquées dans les paramètres de ton navigateur.");
+      }
+    }
+    setToggling(false);
+  };
+
+  return (
+    <div className="flex items-center justify-between py-2">
+      <div className="flex items-center gap-3">
+        <Smartphone className="h-4 w-4 text-text-muted" />
+        <div>
+          <p className="text-sm text-text-primary">Notifications push</p>
+          <p className="text-xs text-text-muted">
+            {!isSupported
+              ? "Non disponible sur ce navigateur"
+              : isSubscribed
+                ? "Activées — tu recevras les alertes même quand l'app est fermée"
+                : "Reçois les alertes sur ton téléphone ou navigateur"}
+          </p>
+        </div>
+      </div>
+      <button
+        onClick={handleToggle}
+        disabled={!isSupported || isLoading || toggling}
+        role="switch"
+        aria-checked={isSubscribed}
+        aria-label="Notifications push"
+        className={cn(
+          "relative inline-flex h-6 w-11 items-center rounded-full transition-colors disabled:opacity-50",
+          isSubscribed ? "bg-accent" : "bg-bg-tertiary border border-border-default"
+        )}
+      >
+        <span
+          className={cn(
+            "inline-block h-4 w-4 rounded-full bg-white transition-transform",
+            isSubscribed ? "translate-x-6" : "translate-x-1"
+          )}
+        />
+      </button>
+    </div>
+  );
+}
 
 function ThemeCard() {
   const { theme, setTheme } = useUIStore();

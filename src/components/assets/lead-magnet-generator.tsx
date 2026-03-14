@@ -36,13 +36,13 @@ const LEAD_MAGNET_TYPES: {
   {
     key: "checklist",
     label: "Checklist",
-    description: "Liste de controle actionnable",
+    description: "Liste de contrôle actionnable",
     icon: CheckSquare,
   },
   {
     key: "mini_cours",
     label: "Mini-cours",
-    description: "3-5 lecons progressives",
+    description: "3-5 leçons progressives",
     icon: GraduationCap,
   },
   {
@@ -120,7 +120,7 @@ export function LeadMagnetGenerator({ className, initialData }: LeadMagnetGenera
   if (loading) {
     return (
       <AILoading
-        text="Creation de ton lead magnet"
+        text="Création de ton lead magnet"
         className={className}
       />
     );

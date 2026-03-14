@@ -256,7 +256,7 @@ export function PainIdentifier({
                       </div>
                       <div>
                         <span className="text-text-muted">
-                          Declencheur :{" "}
+                          Déclencheur :{" "}
                         </span>
                         <span className="text-text-secondary">
                           {pain.trigger}

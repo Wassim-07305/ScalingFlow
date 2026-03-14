@@ -57,7 +57,7 @@ const activityMeta: Record<
     color: "text-accent",
   },
   "generation.brand": {
-    label: "Identite de marque créée",
+    label: "Identité de marque créée",
     icon: Award,
     color: "text-[#A78BFA]",
   },
@@ -128,16 +128,21 @@ export function ActivityFeed() {
 
     const fetch = async () => {
       setLoading(true);
-      const supabase = createClient();
-      const { data } = await supabase
-        .from("activity_log")
-        .select("id, activity_type, activity_data, created_at")
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: false })
-        .limit(10);
+      try {
+        const supabase = createClient();
+        const { data } = await supabase
+          .from("activity_log")
+          .select("id, activity_type, activity_data, created_at")
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: false })
+          .limit(10);
 
-      if (data) setActivities(data as ActivityItem[]);
-      setLoading(false);
+        if (data) setActivities(data as ActivityItem[]);
+      } catch {
+        // Show empty state rather than infinite skeleton
+      } finally {
+        setLoading(false);
+      }
     };
 
     fetch();
@@ -148,7 +153,7 @@ export function ActivityFeed() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Activity className="h-5 w-5 text-accent" />
-          Activité recente
+          Activité récente
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -167,7 +172,7 @@ export function ActivityFeed() {
               <Zap className="h-6 w-6 text-accent" />
             </div>
             <p className="text-sm font-medium text-text-primary mb-1">
-              Pas encore d&apos;activite
+              Pas encore d&apos;activité
             </p>
             <p className="text-xs text-text-muted mb-4">
               Ton historique apparaîtra ici dès ta première génération.

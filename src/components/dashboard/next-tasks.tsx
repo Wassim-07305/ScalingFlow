@@ -50,17 +50,22 @@ export function NextTasks() {
 
     const fetchTasks = async () => {
       setLoading(true);
-      const supabase = createClient();
-      const { data } = await supabase
-        .from("tasks")
-        .select("*")
-        .eq("user_id", user.id)
-        .eq("completed", false)
-        .order("task_order", { ascending: true })
-        .limit(5);
+      try {
+        const supabase = createClient();
+        const { data } = await supabase
+          .from("tasks")
+          .select("*")
+          .eq("user_id", user.id)
+          .eq("completed", false)
+          .order("task_order", { ascending: true })
+          .limit(5);
 
-      if (data) setTasks(data as Task[]);
-      setLoading(false);
+        if (data) setTasks(data as Task[]);
+      } catch {
+        // Show empty tasks rather than infinite skeleton
+      } finally {
+        setLoading(false);
+      }
     };
 
     fetchTasks();
@@ -78,7 +83,7 @@ export function NextTasks() {
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2">
             <ListTodo className="h-5 w-5 text-accent" />
-            Prochaines taches
+            Prochaines tâches
           </CardTitle>
           <Link href="/roadmap">
             <Button variant="ghost" size="sm">

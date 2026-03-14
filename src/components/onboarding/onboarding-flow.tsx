@@ -272,7 +272,7 @@ const PHASE1_FIELDS: Record<string, { field: string; label: string }[]> = {
   A2: [
     { field: "phase1_a2_transferable", label: "Expertise transferable" },
     { field: "phase1_a2_transition", label: "Plan de transition" },
-    { field: "phase1_a2_trigger", label: "Declencheur" },
+    { field: "phase1_a2_trigger", label: "Déclencheur" },
   ],
   A3: [
     { field: "phase1_a3_ideal_offer", label: "Offre ideale scalable" },

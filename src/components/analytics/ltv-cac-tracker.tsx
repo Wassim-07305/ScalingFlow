@@ -472,10 +472,10 @@ export function LTVCACTracker() {
                   <h4 className="text-sm font-medium text-text-primary">Ratio LTV:CAC</h4>
                   <p className="text-xs text-text-secondary mt-1">
                     {currentMetrics.ratio >= 3
-                      ? "Votre ratio est sain (>3:1). Vous pouvez investir davantage en acquisition."
+                      ? "Ton ratio est sain (>3:1). Tu peux investir davantage en acquisition."
                       : currentMetrics.ratio >= 2
-                      ? "Votre ratio est correct mais peut être amélioré. Optimisez votre funnel ou augmentez votre LTV."
-                      : "Ratio critique (<2:1). Réduisez votre CAC ou augmentez votre LTV en priorité."}
+                      ? "Ton ratio est correct mais peut être amélioré. Optimise ton funnel ou augmente ta LTV."
+                      : "Ratio critique (<2:1). Réduis ton CAC ou augmente ta LTV en priorité."}
                   </p>
                 </div>
               </div>
@@ -492,10 +492,10 @@ export function LTVCACTracker() {
                   <h4 className="text-sm font-medium text-text-primary">Payback Period</h4>
                   <p className="text-xs text-text-secondary mt-1">
                     {currentMetrics.paybackMonths <= 3
-                      ? "Excellent ! Vous récupérez votre investissement en moins de 3 mois."
+                      ? "Excellent ! Tu récupères ton investissement en moins de 3 mois."
                       : currentMetrics.paybackMonths <= 6
                       ? "Correct. Essayez de raccourcir le payback en augmentant le panier moyen."
-                      : "Attention, le retour sur investissement est lent. Revisez votre pricing ou votre CAC."}
+                      : "Attention, le retour sur investissement est lent. Revois ton pricing ou ton CAC."}
                   </p>
                 </div>
               </div>
@@ -661,7 +661,7 @@ export function LTVCACTracker() {
           <DialogHeader>
             <DialogTitle>Donnees mensuelles LTV / CAC</DialogTitle>
             <DialogDescription>
-              Saisissez vos indicateurs business du mois pour calculer votre LTV, CAC et ratio.
+              Saisis tes indicateurs business du mois pour calculer ta LTV, CAC et ratio.
             </DialogDescription>
           </DialogHeader>
 

@@ -182,12 +182,12 @@ export function OptimizationRecommendations() {
         <CardContent className="flex flex-col sm:flex-row items-center justify-between gap-4 py-6">
           <div>
             <h3 className="text-base font-semibold text-text-primary">
-              Optimisation IA de vos campagnes
+              Optimisation IA de tes campagnes
             </h3>
             <p className="text-sm text-text-secondary mt-1">
               {hasMetrics
-                ? "L'IA va analyser vos métriques réelles et générer des recommandations personnalisées."
-                : "Ajoutez vos données dans l'onglet Dashboard d'abord, ou générez sur les données de démo."}
+                ? "L'IA va analyser tes métriques réelles et générer des recommandations personnalisées."
+                : "Ajoute tes données dans l'onglet Dashboard d'abord, ou génère sur les données de démo."}
             </p>
           </div>
           <Button onClick={handleGenerate} disabled={loading} className="shrink-0">
@@ -399,11 +399,11 @@ export function OptimizationRecommendations() {
               <Sparkles className="h-8 w-8 text-accent" />
             </div>
             <h3 className="text-lg font-semibold text-text-primary mb-2">
-              Optimisez vos campagnes avec l&apos;IA
+              Optimise tes campagnes avec l&apos;IA
             </h3>
             <p className="text-sm text-text-secondary max-w-md">
-              Cliquez sur &quot;Générer les recommandations&quot; pour obtenir une analyse complète
-              de vos métriques publicitaires et des recommandations actionnables.
+              Clique sur &quot;Générer les recommandations&quot; pour obtenir une analyse complète
+              de tes métriques publicitaires et des recommandations actionnables.
             </p>
           </CardContent>
         </Card>

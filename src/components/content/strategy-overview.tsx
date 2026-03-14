@@ -2,14 +2,28 @@
 
 import React from "react";
 import { cn } from "@/lib/utils/cn";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AILoading } from "@/components/shared/ai-loading";
-import { Sparkles, Target, Heart, Shield, Zap } from "lucide-react";
+import { Sparkles, Target, Heart, Shield, Zap, Compass } from "lucide-react";
 import { toast } from "sonner";
 import type { ContentStrategyResult } from "@/lib/ai/prompts/content-strategy";
 import { UpgradeWall } from "@/components/shared/upgrade-wall";
+
+const STRATEGY_TYPES = [
+  { key: "organique", label: "Organique" },
+  { key: "payant", label: "Payant" },
+  { key: "mixte", label: "Mixte" },
+] as const;
+
+const PRIMARY_PLATFORMS = [
+  { key: "instagram", label: "Instagram" },
+  { key: "linkedin", label: "LinkedIn" },
+  { key: "youtube", label: "YouTube" },
+  { key: "tiktok", label: "TikTok" },
+  { key: "multi", label: "Multi-plateforme" },
+] as const;
 
 interface StrategyOverviewProps {
   className?: string;
@@ -31,9 +45,16 @@ export function StrategyOverview({ className, onStrategyGenerated, initialData }
   const [error, setError] = React.useState<string | null>(null);
   const [usageLimited, setUsageLimited] = React.useState<{currentUsage: number; limit: number} | null>(null);
 
+  // Form state
+  const [strategyType, setStrategyType] = React.useState("organique");
+  const [primaryPlatform, setPrimaryPlatform] = React.useState("instagram");
+  const [objective, setObjective] = React.useState("");
+  const [showForm, setShowForm] = React.useState(true);
+
   React.useEffect(() => {
     if (initialData) {
       setStrategy(initialData as ContentStrategyResult);
+      setShowForm(false);
     }
   }, [initialData]);
 
@@ -45,7 +66,12 @@ export function StrategyOverview({ className, onStrategyGenerated, initialData }
       const response = await fetch("/api/ai/generate-content", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ contentType: "strategy" }),
+        body: JSON.stringify({
+          contentType: "strategy",
+          strategyType,
+          primaryPlatform,
+          objective: objective || undefined,
+        }),
       });
 
       if (!response.ok) {
@@ -58,6 +84,7 @@ export function StrategyOverview({ className, onStrategyGenerated, initialData }
       const data = await response.json();
       const result = data.result as ContentStrategyResult;
       setStrategy(result);
+      setShowForm(false);
       onStrategyGenerated?.(result);
       toast.success("Stratégie de contenu générée avec succès !");
     } catch (err) {
@@ -74,20 +101,90 @@ export function StrategyOverview({ className, onStrategyGenerated, initialData }
   }
 
   if (loading) {
-    return <AILoading text="Creation de ta stratégie de contenu" className={className} />;
+    return <AILoading text="Création de la stratégie de contenu" className={className} />;
   }
 
-  if (!strategy) {
+  if (!strategy || showForm) {
     return (
-      <div className={cn("text-center py-12", className)}>
-        {error && <p className="text-sm text-danger mb-4">{error}</p>}
-        <Button size="lg" onClick={handleGenerate}>
-          <Sparkles className="h-4 w-4 mr-2" />
-          Générer ma stratégie 30 jours
-        </Button>
-        <p className="text-sm text-text-secondary mt-2">
-          Stratégie basée sur les 4 piliers KLCT
-        </p>
+      <div className={cn("space-y-6", className)}>
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Compass className="h-5 w-5 text-accent" />
+              Paramètres de stratégie
+            </CardTitle>
+            <CardDescription>
+              Définis le type de stratégie, la plateforme principale et tes objectifs.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-5">
+            {/* Strategy type */}
+            <div>
+              <label className="text-sm font-medium text-text-primary mb-2 block">Type de stratégie</label>
+              <div className="flex flex-wrap gap-2">
+                {STRATEGY_TYPES.map((t) => (
+                  <button
+                    key={t.key}
+                    onClick={() => setStrategyType(t.key)}
+                    className={cn(
+                      "px-3 py-1.5 rounded-lg text-sm font-medium transition-all",
+                      strategyType === t.key
+                        ? "bg-accent text-white"
+                        : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
+                    )}
+                  >
+                    {t.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Primary platform */}
+            <div>
+              <label className="text-sm font-medium text-text-primary mb-2 block">Plateforme principale</label>
+              <div className="flex flex-wrap gap-2">
+                {PRIMARY_PLATFORMS.map((p) => (
+                  <button
+                    key={p.key}
+                    onClick={() => setPrimaryPlatform(p.key)}
+                    className={cn(
+                      "px-3 py-1.5 rounded-lg text-sm font-medium transition-all",
+                      primaryPlatform === p.key
+                        ? "bg-accent text-white"
+                        : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
+                    )}
+                  >
+                    {p.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Business objective */}
+            <div>
+              <label className="text-sm font-medium text-text-primary mb-1 block">
+                Objectif principal <span className="text-text-muted font-normal">(optionnel)</span>
+              </label>
+              <input
+                type="text"
+                value={objective}
+                onChange={(e) => setObjective(e.target.value)}
+                placeholder="Ex: augmenter les leads, renforcer l'autorité, lancer un produit..."
+                className="w-full rounded-lg border border-border-default bg-bg-secondary px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+              />
+            </div>
+
+            {error && <p className="text-sm text-danger">{error}</p>}
+
+            <Button size="lg" onClick={handleGenerate} className="w-full">
+              <Sparkles className="h-4 w-4 mr-2" />
+              Générer ma stratégie 30 jours
+            </Button>
+            <p className="text-xs text-text-muted text-center">
+              Stratégie basée sur les 4 piliers KLCT
+            </p>
+          </CardContent>
+        </Card>
       </div>
     );
   }
@@ -105,15 +202,20 @@ export function StrategyOverview({ className, onStrategyGenerated, initialData }
             {strategie_globale.frequence_recommandee}
           </p>
         </div>
-        <Button variant="outline" size="sm" onClick={handleGenerate}>
-          Régénérer
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="ghost" size="sm" onClick={() => setShowForm(true)}>
+            Nouveau brief
+          </Button>
+          <Button variant="outline" size="sm" onClick={handleGenerate}>
+            Régénérer
+          </Button>
+        </div>
       </div>
 
       {/* Ratio KLCT */}
       <Card>
         <CardContent className="pt-5">
-          <p className="text-sm font-medium text-text-primary mb-4">Repartition KLCT</p>
+          <p className="text-sm font-medium text-text-primary mb-4">Répartition KLCT</p>
           <div className="space-y-3">
             {(Object.keys(PILIER_CONFIG) as Array<keyof typeof PILIER_CONFIG>).map((key) => {
               const config = PILIER_CONFIG[key];

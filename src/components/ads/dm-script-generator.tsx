@@ -2,12 +2,12 @@
 
 import React from "react";
 import { cn } from "@/lib/utils/cn";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AILoading } from "@/components/shared/ai-loading";
 import { GlowCard } from "@/components/shared/glow-card";
-import { Sparkles, Copy, MessageSquare, Send, RotateCcw } from "lucide-react";
+import { Sparkles, Copy, MessageSquare, Send, RotateCcw, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import type { DMScriptsResult } from "@/lib/ai/prompts/dm-scripts";
 import { UpgradeWall } from "@/components/shared/upgrade-wall";
@@ -18,6 +18,8 @@ interface DMScriptGeneratorProps {
   initialData?: any;
 }
 
+const SCRIPT_STYLES = ["Direct", "Soft", "Storytelling", "Question"] as const;
+
 export function DMScriptGenerator({ className, initialData }: DMScriptGeneratorProps) {
   const [loading, setLoading] = React.useState(false);
   const [result, setResult] = React.useState<DMScriptsResult | null>(null);
@@ -25,6 +27,8 @@ export function DMScriptGenerator({ className, initialData }: DMScriptGeneratorP
   const [activeSubTab, setActiveSubTab] = React.useState<"prospection" | "retargeting">("prospection");
   const [copiedField, setCopiedField] = React.useState<string | null>(null);
   const [usageLimited, setUsageLimited] = React.useState<{currentUsage: number; limit: number} | null>(null);
+  const [scriptStyle, setScriptStyle] = React.useState<string>("Direct");
+  const [context, setContext] = React.useState("");
 
   React.useEffect(() => {
     if (initialData) {
@@ -40,7 +44,7 @@ export function DMScriptGenerator({ className, initialData }: DMScriptGeneratorP
       const response = await fetch("/api/ai/generate-ads", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ adType: "dm_scripts" }),
+        body: JSON.stringify({ adType: "dm_scripts", scriptStyle, context: context || undefined }),
       });
 
       if (!response.ok) {
@@ -66,7 +70,7 @@ export function DMScriptGenerator({ className, initialData }: DMScriptGeneratorP
     navigator.clipboard.writeText(text);
     setCopiedField(field);
     setTimeout(() => setCopiedField(null), 2000);
-    toast.success("Copie !");
+    toast.success("Copié !");
   };
 
   if (usageLimited) {
@@ -79,15 +83,52 @@ export function DMScriptGenerator({ className, initialData }: DMScriptGeneratorP
 
   if (!result) {
     return (
-      <div className={cn("text-center py-12", className)}>
-        {error && <p className="text-sm text-danger mb-4">{error}</p>}
-        <Button size="lg" onClick={handleGenerate}>
-          <Sparkles className="h-4 w-4 mr-2" />
-          Générer les scripts DM
-        </Button>
-        <p className="text-sm text-text-secondary mt-2">
-          3 sequences de prospection + 5 scenarios de retargeting
-        </p>
+      <div className={cn("max-w-xl mx-auto py-8", className)}>
+        {error && <p className="text-sm text-danger mb-4 text-center">{error}</p>}
+        <Card>
+          <CardHeader>
+            <CardTitle>Scripts DM</CardTitle>
+            <CardDescription>3 séquences de prospection + 5 scénarios de retargeting</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {/* Script style */}
+            <div>
+              <label className="text-sm font-medium text-text-primary mb-2 block">Style de script</label>
+              <div className="flex flex-wrap gap-2">
+                {SCRIPT_STYLES.map((style) => (
+                  <button
+                    key={style}
+                    onClick={() => setScriptStyle(style)}
+                    className={cn(
+                      "px-3 py-1.5 rounded-lg text-sm font-medium transition-all",
+                      scriptStyle === style
+                        ? "bg-accent text-white"
+                        : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
+                    )}
+                  >
+                    {style}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Optional context */}
+            <div>
+              <label className="text-sm font-medium text-text-primary mb-2 block">Contexte (optionnel)</label>
+              <textarea
+                value={context}
+                onChange={(e) => setContext(e.target.value)}
+                placeholder="Ex : Je vends du coaching fitness pour entrepreneurs..."
+                className="w-full rounded-lg border border-border-default bg-bg-tertiary px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent/50 min-h-[80px] resize-none"
+              />
+            </div>
+
+            <Button className="w-full" size="lg" onClick={handleGenerate}>
+              <Sparkles className="h-4 w-4 mr-2" />
+              Générer les scripts DM
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     );
   }
@@ -122,9 +163,15 @@ export function DMScriptGenerator({ className, initialData }: DMScriptGeneratorP
             Retargeting
           </button>
         </div>
-        <Button variant="outline" size="sm" onClick={handleGenerate}>
-          Régénérer
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" onClick={handleGenerate}>
+            Régénérer
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => setResult(null)}>
+            <RefreshCw className="h-4 w-4 mr-1" />
+            Nouveau brief
+          </Button>
+        </div>
       </div>
 
       {/* Prospection sequences */}
@@ -137,7 +184,7 @@ export function DMScriptGenerator({ className, initialData }: DMScriptGeneratorP
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <MessageSquare className="h-4 w-4" />
-                    Sequence #{i + 1}
+                    Séquence #{i + 1}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -152,7 +199,7 @@ export function DMScriptGenerator({ className, initialData }: DMScriptGeneratorP
                           onClick={() => copyToClipboard(seq.opener, `${seqKey}-opener`)}
                         >
                           <Copy className="h-3 w-3 mr-1" />
-                          {copiedField === `${seqKey}-opener` ? "Copie !" : "Copier"}
+                          {copiedField === `${seqKey}-opener` ? "Copié !" : "Copier"}
                         </Button>
                       </div>
                       <p className="text-sm text-text-secondary whitespace-pre-wrap">{seq.opener}</p>
@@ -168,7 +215,7 @@ export function DMScriptGenerator({ className, initialData }: DMScriptGeneratorP
                           onClick={() => copyToClipboard(seq.follow_up_1, `${seqKey}-fu1`)}
                         >
                           <Copy className="h-3 w-3 mr-1" />
-                          {copiedField === `${seqKey}-fu1` ? "Copie !" : "Copier"}
+                          {copiedField === `${seqKey}-fu1` ? "Copié !" : "Copier"}
                         </Button>
                       </div>
                       <p className="text-sm text-text-secondary whitespace-pre-wrap">
@@ -186,7 +233,7 @@ export function DMScriptGenerator({ className, initialData }: DMScriptGeneratorP
                           onClick={() => copyToClipboard(seq.follow_up_2, `${seqKey}-fu2`)}
                         >
                           <Copy className="h-3 w-3 mr-1" />
-                          {copiedField === `${seqKey}-fu2` ? "Copie !" : "Copier"}
+                          {copiedField === `${seqKey}-fu2` ? "Copié !" : "Copier"}
                         </Button>
                       </div>
                       <p className="text-sm text-text-secondary whitespace-pre-wrap">
@@ -204,7 +251,7 @@ export function DMScriptGenerator({ className, initialData }: DMScriptGeneratorP
                           onClick={() => copyToClipboard(seq.closing, `${seqKey}-closing`)}
                         >
                           <Copy className="h-3 w-3 mr-1" />
-                          {copiedField === `${seqKey}-closing` ? "Copie !" : "Copier"}
+                          {copiedField === `${seqKey}-closing` ? "Copié !" : "Copier"}
                         </Button>
                       </div>
                       <p className="text-sm text-accent whitespace-pre-wrap">{seq.closing}</p>
@@ -223,14 +270,14 @@ export function DMScriptGenerator({ className, initialData }: DMScriptGeneratorP
           {(result.retargeting || []).map((item, i) => (
             <GlowCard key={i} glowColor={i % 2 === 0 ? "blue" : "cyan"}>
               <div className="flex items-center justify-between mb-3">
-                <Badge variant="muted">Scenario #{i + 1}</Badge>
+                <Badge variant="muted">Scénario #{i + 1}</Badge>
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={() => copyToClipboard(item.message, `retarget-${i}`)}
                 >
                   <Copy className="h-3 w-3 mr-1" />
-                  {copiedField === `retarget-${i}` ? "Copie !" : "Copier"}
+                  {copiedField === `retarget-${i}` ? "Copié !" : "Copier"}
                 </Button>
               </div>
               <p className="text-sm font-medium text-text-primary mb-2">{item.scenario}</p>

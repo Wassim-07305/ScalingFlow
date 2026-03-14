@@ -2,11 +2,11 @@
 
 import React from "react";
 import { cn } from "@/lib/utils/cn";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AILoading } from "@/components/shared/ai-loading";
-import { Sparkles, MessageSquare, Clock, Link2, ExternalLink } from "lucide-react";
+import { Sparkles, MessageSquare, Clock, Link2, ExternalLink, RefreshCw } from "lucide-react";
 import { CopyExportBar } from "@/components/shared/copy-export-bar";
 import { UpgradeWall } from "@/components/shared/upgrade-wall";
 
@@ -16,12 +16,17 @@ interface SmsSequenceProps {
   initialData?: any;
 }
 
+const SEQUENCE_TYPES = ["Nurturing", "Lancement", "Relance", "Événement"] as const;
+const SMS_COUNTS = [3, 5, 7, 10] as const;
+
 export function SmsSequence({ className, initialData }: SmsSequenceProps) {
   const [loading, setLoading] = React.useState(false);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [sequence, setSequence] = React.useState<any>(initialData || null);
   const [error, setError] = React.useState<string | null>(null);
   const [usageLimited, setUsageLimited] = React.useState<{currentUsage: number; limit: number} | null>(null);
+  const [sequenceType, setSequenceType] = React.useState<string>("Nurturing");
+  const [smsCount, setSmsCount] = React.useState<number>(5);
 
   React.useEffect(() => {
     if (initialData) setSequence(initialData);
@@ -35,7 +40,7 @@ export function SmsSequence({ className, initialData }: SmsSequenceProps) {
       const response = await fetch("/api/ai/generate-assets", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type: "sms" }),
+        body: JSON.stringify({ type: "sms", sequenceType, smsCount }),
       });
 
       if (!response.ok) {
@@ -59,18 +64,67 @@ export function SmsSequence({ className, initialData }: SmsSequenceProps) {
   }
 
   if (loading) {
-    return <AILoading text="Redaction de ta séquence SMS" className={className} />;
+    return <AILoading text="Rédaction de ta séquence SMS" className={className} />;
   }
 
   if (!sequence) {
     return (
-      <div className={cn("text-center py-12", className)}>
-        {error && <p className="text-sm text-danger mb-4">{error}</p>}
-        <Button size="lg" onClick={handleGenerate}>
-          <Sparkles className="h-4 w-4 mr-2" />
-          Générer la séquence SMS
-        </Button>
-        <p className="text-sm text-text-secondary mt-2">5 SMS de suivi post-inscription</p>
+      <div className={cn("max-w-xl mx-auto py-8", className)}>
+        {error && <p className="text-sm text-danger mb-4 text-center">{error}</p>}
+        <Card>
+          <CardHeader>
+            <CardTitle>Séquence SMS</CardTitle>
+            <CardDescription>SMS de suivi post-inscription optimisés pour la conversion</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {/* Sequence type */}
+            <div>
+              <label className="text-sm font-medium text-text-primary mb-2 block">Type de séquence</label>
+              <div className="flex flex-wrap gap-2">
+                {SEQUENCE_TYPES.map((type) => (
+                  <button
+                    key={type}
+                    onClick={() => setSequenceType(type)}
+                    className={cn(
+                      "px-3 py-1.5 rounded-lg text-sm font-medium transition-all",
+                      sequenceType === type
+                        ? "bg-accent text-white"
+                        : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
+                    )}
+                  >
+                    {type}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* SMS count */}
+            <div>
+              <label className="text-sm font-medium text-text-primary mb-2 block">Nombre de SMS</label>
+              <div className="flex flex-wrap gap-2">
+                {SMS_COUNTS.map((count) => (
+                  <button
+                    key={count}
+                    onClick={() => setSmsCount(count)}
+                    className={cn(
+                      "px-3 py-1.5 rounded-lg text-sm font-medium transition-all",
+                      smsCount === count
+                        ? "bg-accent text-white"
+                        : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
+                    )}
+                  >
+                    {count}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <Button className="w-full" size="lg" onClick={handleGenerate}>
+              <Sparkles className="h-4 w-4 mr-2" />
+              Générer la séquence SMS
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     );
   }
@@ -81,19 +135,23 @@ export function SmsSequence({ className, initialData }: SmsSequenceProps) {
     <div className={cn("space-y-4", className)}>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <h3 className="font-semibold text-text-primary">Sequence SMS</h3>
+          <h3 className="font-semibold text-text-primary">Séquence SMS</h3>
           <Badge variant="default">{messages.length} SMS</Badge>
         </div>
         <div className="flex items-center gap-2">
           <CopyExportBar
             copyContent={messages.map((s: { sms_number: number; body: string; delay: string }) => `SMS ${s.sms_number} (${s.delay})\n${s.body}`).join("\n\n---\n\n")}
-            pdfTitle="Sequence SMS"
+            pdfTitle="Séquence SMS"
             pdfSubtitle={`${messages.length} SMS`}
             pdfFilename="sequence-sms.pdf"
           />
           <Button variant="outline" size="sm" onClick={() => { setSequence(null); handleGenerate(); }}>
             <Sparkles className="h-4 w-4 mr-1" />
             Régénérer
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => setSequence(null)}>
+            <RefreshCw className="h-4 w-4 mr-1" />
+            Nouveau brief
           </Button>
         </div>
       </div>

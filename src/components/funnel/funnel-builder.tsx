@@ -7,10 +7,11 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AILoading } from "@/components/shared/ai-loading";
 import { GlowCard } from "@/components/shared/glow-card";
-import { Sparkles, FileText, Video, Gift, ChevronRight, FileDown, Code } from "lucide-react";
+import { Sparkles, FileText, Video, Gift, ChevronRight, FileDown, Code, Pencil, Check } from "lucide-react";
 import { exportToPDF } from "@/lib/utils/export-pdf";
 import { exportFunnelToHTML, downloadHTML } from "@/lib/utils/export-html";
 import { UpgradeWall } from "@/components/shared/upgrade-wall";
+import { toast } from "sonner";
 
 interface FunnelPage {
   type: "optin" | "vsl" | "thankyou";
@@ -41,6 +42,7 @@ export function FunnelBuilder({ className, initialData }: FunnelBuilderProps) {
   const [offers, setOffers] = React.useState<any[]>([]);
   const [selectedOfferId, setSelectedOfferId] = React.useState<string | null>(null);
   const [usageLimited, setUsageLimited] = React.useState<{currentUsage: number; limit: number} | null>(null);
+  const [isEditing, setIsEditing] = React.useState(false);
 
   // Charger les données historiques quand initialData change
   React.useEffect(() => {
@@ -102,8 +104,17 @@ export function FunnelBuilder({ className, initialData }: FunnelBuilderProps) {
     return <UpgradeWall currentUsage={usageLimited.currentUsage} limit={usageLimited.limit} className={className} />;
   }
 
+  const updatePageField = (page: "optin" | "vsl" | "thankyou", field: string, value: string) => {
+    if (!funnelData) return;
+    const pageKey = page === "optin" ? "optin_page" : page === "vsl" ? "vsl_page" : "thankyou_page";
+    setFunnelData({
+      ...funnelData,
+      [pageKey]: { ...funnelData[pageKey], [field]: value },
+    });
+  };
+
   if (loading) {
-    return <AILoading text="Creation de ton funnel de conversion" className={className} />;
+    return <AILoading text="Création de ton funnel de conversion" className={className} />;
   }
 
   if (!funnelData) {
@@ -184,12 +195,49 @@ export function FunnelBuilder({ className, initialData }: FunnelBuilderProps) {
         ))}
       </div>
 
+      {/* Edit toggle */}
+      <div className="flex items-center justify-end">
+        <Button
+          variant={isEditing ? "default" : "ghost"}
+          size="sm"
+          onClick={() => {
+            if (isEditing) toast.success("Modifications sauvegardées");
+            setIsEditing(!isEditing);
+          }}
+        >
+          {isEditing ? (
+            <><Check className="h-3 w-3 mr-1" /> Terminer</>
+          ) : (
+            <><Pencil className="h-3 w-3 mr-1" /> Modifier</>
+          )}
+        </Button>
+      </div>
+
       {/* Page Content */}
       {activePage === "optin" && pageData && (
         <div className="space-y-4">
           <GlowCard glowColor="orange">
-            <h3 className="text-xl font-bold text-text-primary mb-2">{pageData.headline}</h3>
-            <p className="text-text-secondary">{pageData.subheadline}</p>
+            {isEditing ? (
+              <div className="space-y-3">
+                <input
+                  type="text"
+                  value={pageData.headline || ""}
+                  onChange={(e) => updatePageField("optin", "headline", e.target.value)}
+                  className="w-full bg-transparent text-xl font-bold text-text-primary border-b border-accent/30 pb-1 focus:outline-none"
+                />
+                <textarea
+                  value={pageData.subheadline || ""}
+                  onChange={(e) => updatePageField("optin", "subheadline", e.target.value)}
+                  className="w-full bg-transparent text-text-secondary resize-none focus:outline-none"
+                  rows={2}
+                />
+              </div>
+            ) : (
+              <>
+                <h3 className="text-xl font-bold text-text-primary mb-2">{pageData.headline}</h3>
+                <p className="text-text-secondary">{pageData.subheadline}</p>
+              </>
+            )}
           </GlowCard>
           <Card>
             <CardContent className="pt-6">
@@ -307,7 +355,10 @@ export function FunnelBuilder({ className, initialData }: FunnelBuilderProps) {
           <Code className="h-4 w-4 mr-1" />
           HTML
         </Button>
-        <Button variant="outline" onClick={() => { setFunnelData(null); handleGenerate(); }}>
+        <Button variant="ghost" size="sm" onClick={() => setFunnelData(null)}>
+          Nouveau brief
+        </Button>
+        <Button variant="outline" size="sm" onClick={() => { setFunnelData(null); handleGenerate(); }}>
           Régénérer
         </Button>
       </div>

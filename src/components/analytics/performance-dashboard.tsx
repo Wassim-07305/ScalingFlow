@@ -569,7 +569,7 @@ export function PerformanceDashboard() {
           <DialogHeader>
             <DialogTitle>Ajouter des métriques quotidiennes</DialogTitle>
             <DialogDescription>
-              Saisissez vos données publicitaires du jour. Les KPI seront calculés automatiquement.
+              Saisis tes données publicitaires du jour. Les KPI seront calculés automatiquement.
             </DialogDescription>
           </DialogHeader>
 

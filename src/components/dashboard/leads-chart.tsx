@@ -32,58 +32,63 @@ export function LeadsChart() {
 
     const fetchCreationsPerWeek = async () => {
       setLoading(true);
-      const supabase = createClient();
-      const now = new Date();
-      const weeks: WeekData[] = [];
+      try {
+        const supabase = createClient();
+        const now = new Date();
+        const weeks: WeekData[] = [];
 
-      for (let i = 5; i >= 0; i--) {
-        const weekDate = subWeeks(now, i);
-        const start = startOfWeek(weekDate, { locale: fr }).toISOString();
-        const end = endOfWeek(weekDate, { locale: fr }).toISOString();
-        // Format : "3 Fev" pour le debut de la semaine
-        const label = format(startOfWeek(weekDate, { locale: fr }), "d MMM", {
-          locale: fr,
-        });
+        for (let i = 5; i >= 0; i--) {
+          const weekDate = subWeeks(now, i);
+          const start = startOfWeek(weekDate, { locale: fr }).toISOString();
+          const end = endOfWeek(weekDate, { locale: fr }).toISOString();
+          // Format : "3 Fév" pour le début de la semaine
+          const label = format(startOfWeek(weekDate, { locale: fr }), "d MMM", {
+            locale: fr,
+          });
 
-        const [offersRes, creativesRes, funnelsRes, assetsRes] =
-          await Promise.all([
-            supabase
-              .from("offers")
-              .select("id", { count: "exact", head: true })
-              .eq("user_id", user.id)
-              .gte("created_at", start)
-              .lte("created_at", end),
-            supabase
-              .from("ad_creatives")
-              .select("id", { count: "exact", head: true })
-              .eq("user_id", user.id)
-              .gte("created_at", start)
-              .lte("created_at", end),
-            supabase
-              .from("funnels")
-              .select("id", { count: "exact", head: true })
-              .eq("user_id", user.id)
-              .gte("created_at", start)
-              .lte("created_at", end),
-            supabase
-              .from("sales_assets")
-              .select("id", { count: "exact", head: true })
-              .eq("user_id", user.id)
-              .gte("created_at", start)
-              .lte("created_at", end),
-          ]);
+          const [offersRes, creativesRes, funnelsRes, assetsRes] =
+            await Promise.all([
+              supabase
+                .from("offers")
+                .select("id", { count: "exact", head: true })
+                .eq("user_id", user.id)
+                .gte("created_at", start)
+                .lte("created_at", end),
+              supabase
+                .from("ad_creatives")
+                .select("id", { count: "exact", head: true })
+                .eq("user_id", user.id)
+                .gte("created_at", start)
+                .lte("created_at", end),
+              supabase
+                .from("funnels")
+                .select("id", { count: "exact", head: true })
+                .eq("user_id", user.id)
+                .gte("created_at", start)
+                .lte("created_at", end),
+              supabase
+                .from("sales_assets")
+                .select("id", { count: "exact", head: true })
+                .eq("user_id", user.id)
+                .gte("created_at", start)
+                .lte("created_at", end),
+            ]);
 
-        const total =
-          (offersRes.count ?? 0) +
-          (creativesRes.count ?? 0) +
-          (funnelsRes.count ?? 0) +
-          (assetsRes.count ?? 0);
+          const total =
+            (offersRes.count ?? 0) +
+            (creativesRes.count ?? 0) +
+            (funnelsRes.count ?? 0) +
+            (assetsRes.count ?? 0);
 
-        weeks.push({ week: label, creations: total });
+          weeks.push({ week: label, creations: total });
+        }
+
+        setData(weeks);
+      } catch {
+        // Show empty state rather than infinite skeleton
+      } finally {
+        setLoading(false);
       }
-
-      setData(weeks);
-      setLoading(false);
     };
 
     fetchCreationsPerWeek();
@@ -95,7 +100,7 @@ export function LeadsChart() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Creations par semaine</CardTitle>
+        <CardTitle>Créations par semaine</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="h-[220px] sm:h-[300px]">
@@ -108,7 +113,7 @@ export function LeadsChart() {
               <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-accent/10 mb-3">
                 <BarChart3 className="h-6 w-6 text-accent" />
               </div>
-              <p className="text-sm font-medium text-text-primary mb-1">Pas encore de creations</p>
+              <p className="text-sm font-medium text-text-primary mb-1">Pas encore de créations</p>
               <p className="text-xs text-text-muted max-w-[220px]">Génère ta première offre ou funnel pour voir les stats ici.</p>
             </div>
           ) : (
@@ -141,7 +146,7 @@ export function LeadsChart() {
                     color: "#FFFFFF",
                     fontSize: "13px",
                   }}
-                  formatter={(value) => [String(value ?? 0), "Creations"]}
+                  formatter={(value) => [String(value ?? 0), "Créations"]}
                 />
                 <Bar
                   dataKey="creations"

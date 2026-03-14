@@ -73,7 +73,7 @@ export function OtoGenerator({ offerId, className, initialData }: OtoGeneratorPr
   };
 
   if (loading) {
-    return <AILoading text="Creation de ton offre OTO" className={className} />;
+    return <AILoading text="Création de ton offre OTO" className={className} />;
   }
 
   if (otoData) {

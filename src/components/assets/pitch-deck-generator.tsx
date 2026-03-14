@@ -4,6 +4,7 @@ import React from "react";
 import { cn } from "@/lib/utils/cn";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { AILoading } from "@/components/shared/ai-loading";
 import { GlowCard } from "@/components/shared/glow-card";
 import {
@@ -13,6 +14,7 @@ import {
   MessageSquareText,
   ChevronLeft,
   ChevronRight,
+  RefreshCw,
 } from "lucide-react";
 import type { PitchDeckResult } from "@/lib/ai/prompts/pitch-deck";
 import { UpgradeWall } from "@/components/shared/upgrade-wall";
@@ -22,12 +24,17 @@ interface PitchDeckGeneratorProps {
   initialData?: PitchDeckResult;
 }
 
+const AUDIENCES = ["Investisseurs", "Clients", "Partenaires"] as const;
+const SLIDE_COUNTS = [5, 8, 10, 15] as const;
+
 export function PitchDeckGenerator({ className, initialData }: PitchDeckGeneratorProps) {
   const [loading, setLoading] = React.useState(false);
   const [deck, setDeck] = React.useState<PitchDeckResult | null>(initialData || null);
   const [error, setError] = React.useState<string | null>(null);
   const [activeSlide, setActiveSlide] = React.useState(0);
   const [usageLimited, setUsageLimited] = React.useState<{currentUsage: number; limit: number} | null>(null);
+  const [audience, setAudience] = React.useState<string>("Investisseurs");
+  const [slideCount, setSlideCount] = React.useState<number>(10);
 
   React.useEffect(() => {
     if (initialData) setDeck(initialData);
@@ -41,7 +48,7 @@ export function PitchDeckGenerator({ className, initialData }: PitchDeckGenerato
       const response = await fetch("/api/ai/generate-assets", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type: "pitch_deck" }),
+        body: JSON.stringify({ type: "pitch_deck", audience, slideCount }),
       });
 
       if (!response.ok) {
@@ -67,21 +74,68 @@ export function PitchDeckGenerator({ className, initialData }: PitchDeckGenerato
 
   if (loading) {
     return (
-      <AILoading text="Creation de ton pitch deck" className={className} />
+      <AILoading text="Création de ton pitch deck" className={className} />
     );
   }
 
   if (!deck) {
     return (
-      <div className={cn("text-center py-12", className)}>
-        {error && <p className="text-sm text-danger mb-4">{error}</p>}
-        <Button size="lg" onClick={handleGenerate}>
-          <Sparkles className="h-4 w-4 mr-2" />
-          Générer le pitch deck
-        </Button>
-        <p className="text-sm text-text-secondary mt-2">
-          11 slides professionnelles avec notes speaker
-        </p>
+      <div className={cn("max-w-xl mx-auto py-8", className)}>
+        {error && <p className="text-sm text-danger mb-4 text-center">{error}</p>}
+        <Card>
+          <CardHeader>
+            <CardTitle>Pitch Deck</CardTitle>
+            <CardDescription>Slides professionnelles avec notes speaker</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {/* Audience */}
+            <div>
+              <label className="text-sm font-medium text-text-primary mb-2 block">Audience</label>
+              <div className="flex flex-wrap gap-2">
+                {AUDIENCES.map((a) => (
+                  <button
+                    key={a}
+                    onClick={() => setAudience(a)}
+                    className={cn(
+                      "px-3 py-1.5 rounded-lg text-sm font-medium transition-all",
+                      audience === a
+                        ? "bg-accent text-white"
+                        : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
+                    )}
+                  >
+                    {a}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Slide count */}
+            <div>
+              <label className="text-sm font-medium text-text-primary mb-2 block">Nombre de slides</label>
+              <div className="flex flex-wrap gap-2">
+                {SLIDE_COUNTS.map((count) => (
+                  <button
+                    key={count}
+                    onClick={() => setSlideCount(count)}
+                    className={cn(
+                      "px-3 py-1.5 rounded-lg text-sm font-medium transition-all",
+                      slideCount === count
+                        ? "bg-accent text-white"
+                        : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
+                    )}
+                  >
+                    {count}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <Button className="w-full" size="lg" onClick={handleGenerate}>
+              <Sparkles className="h-4 w-4 mr-2" />
+              Générer le pitch deck
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     );
   }
@@ -92,14 +146,20 @@ export function PitchDeckGenerator({ className, initialData }: PitchDeckGenerato
   return (
     <div className={cn("space-y-6", className)}>
       {/* Slide counter */}
-      <div className="flex items-center gap-4">
-        <Badge variant="blue">
-          <Presentation className="h-3 w-3 mr-1" />
-          {slides.length} slides
-        </Badge>
-        <span className="text-sm text-text-secondary">
-          Slide {activeSlide + 1} / {slides.length}
-        </span>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <Badge variant="blue">
+            <Presentation className="h-3 w-3 mr-1" />
+            {slides.length} slides
+          </Badge>
+          <span className="text-sm text-text-secondary">
+            Slide {activeSlide + 1} / {slides.length}
+          </span>
+        </div>
+        <Button variant="outline" size="sm" onClick={() => setDeck(null)}>
+          <RefreshCw className="h-4 w-4 mr-1" />
+          Nouveau brief
+        </Button>
       </div>
 
       {/* Slide navigator — numbered tabs */}

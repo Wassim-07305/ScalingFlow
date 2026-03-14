@@ -45,7 +45,7 @@ export function CopyExportBar({
       content: pdfContent || copyContent,
       filename: pdfFilename,
     });
-    toast.success("PDF exporte");
+    toast.success("PDF exporté");
   };
 
   return (
@@ -53,7 +53,7 @@ export function CopyExportBar({
       <div className="flex items-center gap-2">
         <Button variant="outline" size="sm" onClick={handleCopy} className="gap-2">
           {copied ? <Check className="h-3.5 w-3.5 text-accent" /> : <Copy className="h-3.5 w-3.5" />}
-          {copied ? "Copie !" : "Copier"}
+          {copied ? "Copié !" : "Copier"}
         </Button>
         <Button variant="outline" size="sm" onClick={handleExport} className="gap-2">
           <FileDown className="h-3.5 w-3.5" />

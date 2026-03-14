@@ -1,8 +1,10 @@
 "use client";
 
 import React from "react";
+import { cn } from "@/lib/utils/cn";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader2, Users, Copy } from "lucide-react";
+import { Loader2, Users, Copy, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 
 interface FollowerAdsData {
@@ -39,9 +41,14 @@ interface Props {
   initialData?: FollowerAdsData;
 }
 
+const PLATFORMS = ["Instagram", "Facebook", "TikTok"] as const;
+const OBJECTIVES = ["Abonnés", "Notoriété", "Engagement"] as const;
+
 export function FollowerAdsGenerator({ initialData }: Props) {
   const [data, setData] = React.useState<FollowerAdsData | null>(initialData || null);
   const [loading, setLoading] = React.useState(false);
+  const [platform, setPlatform] = React.useState<string>("Instagram");
+  const [objective, setObjective] = React.useState<string>("Abonnés");
 
   const generate = async () => {
     setLoading(true);
@@ -70,20 +77,71 @@ export function FollowerAdsGenerator({ initialData }: Props) {
 
   const copyText = (text: string) => {
     navigator.clipboard.writeText(text);
-    toast.success("Copie !");
+    toast.success("Copié !");
   };
 
   if (!data) {
     return (
-      <div className="flex flex-col items-center justify-center py-16 gap-4">
-        <Users className="h-12 w-12 text-text-muted" />
-        <p className="text-text-secondary text-sm text-center max-w-md">
-          Génère des publicités pour attirer des abonnés qualifiés vers ton profil (Social Funnel). Reels Ads, Image Ads et Carousel Ads optimisés pour le follow.
-        </p>
-        <Button onClick={generate} disabled={loading}>
-          {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Users className="h-4 w-4 mr-2" />}
-          Générer les Follower Ads
-        </Button>
+      <div className="max-w-xl mx-auto py-8">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Users className="h-5 w-5" />
+              Follower Ads
+            </CardTitle>
+            <CardDescription>
+              Génère des publicités pour attirer des abonnés qualifiés vers ton profil. Reels Ads, Image Ads et Carousel Ads optimisés pour le follow.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {/* Platform */}
+            <div>
+              <label className="text-sm font-medium text-text-primary mb-2 block">Plateforme</label>
+              <div className="flex flex-wrap gap-2">
+                {PLATFORMS.map((p) => (
+                  <button
+                    key={p}
+                    onClick={() => setPlatform(p)}
+                    className={cn(
+                      "px-3 py-1.5 rounded-lg text-sm font-medium transition-all",
+                      platform === p
+                        ? "bg-accent text-white"
+                        : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
+                    )}
+                  >
+                    {p}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Objective */}
+            <div>
+              <label className="text-sm font-medium text-text-primary mb-2 block">Objectif</label>
+              <div className="flex flex-wrap gap-2">
+                {OBJECTIVES.map((obj) => (
+                  <button
+                    key={obj}
+                    onClick={() => setObjective(obj)}
+                    className={cn(
+                      "px-3 py-1.5 rounded-lg text-sm font-medium transition-all",
+                      objective === obj
+                        ? "bg-accent text-white"
+                        : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
+                    )}
+                  >
+                    {obj}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <Button className="w-full" onClick={generate} disabled={loading}>
+              {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Users className="h-4 w-4 mr-2" />}
+              Générer les Follower Ads
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     );
   }
@@ -92,10 +150,16 @@ export function FollowerAdsGenerator({ initialData }: Props) {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold text-text-primary">Follower Ads</h3>
-        <Button size="sm" onClick={generate} disabled={loading}>
-          {loading && <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />}
-          Régénérer
-        </Button>
+        <div className="flex gap-2">
+          <Button size="sm" onClick={generate} disabled={loading}>
+            {loading && <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />}
+            Régénérer
+          </Button>
+          <Button size="sm" variant="outline" onClick={() => setData(null)}>
+            <RefreshCw className="h-3.5 w-3.5 mr-1.5" />
+            Nouveau brief
+          </Button>
+        </div>
       </div>
 
       {/* Reels Ads */}
@@ -111,7 +175,7 @@ export function FollowerAdsGenerator({ initialData }: Props) {
                       <span className="text-[10px] px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-400 font-medium">Reel #{i + 1}</span>
                       <span className="text-[10px] px-2 py-0.5 rounded-full bg-bg-primary text-text-muted">{ad.angle}</span>
                     </div>
-                    <p className="text-sm font-semibold text-text-primary mb-1">🎬 {ad.hook}</p>
+                    <p className="text-sm font-semibold text-text-primary mb-1">{ad.hook}</p>
                     <p className="text-xs text-text-secondary whitespace-pre-wrap">{ad.script}</p>
                     <p className="text-xs text-accent mt-2 font-medium">{ad.cta}</p>
                     <p className="text-[10px] text-text-muted mt-1">Audience : {ad.target_audience}</p>
@@ -179,10 +243,10 @@ export function FollowerAdsGenerator({ initialData }: Props) {
       {/* Targeting */}
       {data.targeting_suggestions && (
         <section>
-          <h4 className="text-sm font-medium text-accent mb-3">Ciblage recommande</h4>
+          <h4 className="text-sm font-medium text-accent mb-3">Ciblage recommandé</h4>
           <div className="rounded-xl border border-border-default bg-bg-tertiary p-4 grid gap-3 md:grid-cols-2">
             <div>
-              <p className="text-xs text-text-muted mb-1">Interets</p>
+              <p className="text-xs text-text-muted mb-1">Intérêts</p>
               <div className="flex flex-wrap gap-1">
                 {data.targeting_suggestions.interests.map((i, idx) => (
                   <span key={idx} className="text-[10px] px-2 py-0.5 rounded-full bg-accent/10 text-accent">{i}</span>

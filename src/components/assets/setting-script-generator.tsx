@@ -4,7 +4,7 @@ import React from "react";
 import { cn } from "@/lib/utils/cn";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { AILoading } from "@/components/shared/ai-loading";
 import { GlowCard } from "@/components/shared/glow-card";
 import {
@@ -17,6 +17,7 @@ import {
   Send,
   AlertTriangle,
   CheckCircle2,
+  RefreshCw,
 } from "lucide-react";
 import type { SettingScriptResult } from "@/lib/ai/prompts/setting-script";
 import { UpgradeWall } from "@/components/shared/upgrade-wall";
@@ -29,13 +30,15 @@ interface SettingScriptGeneratorProps {
 const TABS = [
   { key: "opening", label: "Ouverture", icon: Phone },
   { key: "qualification", label: "Qualification", icon: HelpCircle },
-  { key: "presentation", label: "Presentation", icon: Presentation },
+  { key: "presentation", label: "Présentation", icon: Presentation },
   { key: "objections", label: "Objections", icon: ShieldAlert },
   { key: "closing", label: "Closing", icon: PhoneCall },
   { key: "followup", label: "Follow-up", icon: Send },
 ] as const;
 
 type TabKey = (typeof TABS)[number]["key"];
+
+const CALL_TYPES = ["Découverte", "Qualification", "Closing"] as const;
 
 export function SettingScriptGenerator({
   className,
@@ -46,6 +49,8 @@ export function SettingScriptGenerator({
   const [error, setError] = React.useState<string | null>(null);
   const [activeTab, setActiveTab] = React.useState<TabKey>("opening");
   const [usageLimited, setUsageLimited] = React.useState<{currentUsage: number; limit: number} | null>(null);
+  const [callType, setCallType] = React.useState<string>("Découverte");
+  const [context, setContext] = React.useState("");
 
   React.useEffect(() => {
     if (initialData) setScript(initialData);
@@ -59,7 +64,7 @@ export function SettingScriptGenerator({
       const response = await fetch("/api/ai/generate-assets", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type: "setting_script" }),
+        body: JSON.stringify({ type: "setting_script", callType, context: context || undefined }),
       });
 
       if (!response.ok) {
@@ -86,7 +91,7 @@ export function SettingScriptGenerator({
   if (loading) {
     return (
       <AILoading
-        text="Creation de ton script de setting"
+        text="Création de ton script de setting"
         className={className}
       />
     );
@@ -94,15 +99,52 @@ export function SettingScriptGenerator({
 
   if (!script) {
     return (
-      <div className={cn("text-center py-12", className)}>
-        {error && <p className="text-sm text-danger mb-4">{error}</p>}
-        <Button size="lg" onClick={handleGenerate}>
-          <Sparkles className="h-4 w-4 mr-2" />
-          Générer le script de setting
-        </Button>
-        <p className="text-sm text-text-secondary mt-2">
-          Script complet pour qualifier et booker tes prospects
-        </p>
+      <div className={cn("max-w-xl mx-auto py-8", className)}>
+        {error && <p className="text-sm text-danger mb-4 text-center">{error}</p>}
+        <Card>
+          <CardHeader>
+            <CardTitle>Script de Setting</CardTitle>
+            <CardDescription>Script complet pour qualifier et booker tes prospects</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {/* Call type */}
+            <div>
+              <label className="text-sm font-medium text-text-primary mb-2 block">Type d&apos;appel</label>
+              <div className="flex flex-wrap gap-2">
+                {CALL_TYPES.map((type) => (
+                  <button
+                    key={type}
+                    onClick={() => setCallType(type)}
+                    className={cn(
+                      "px-3 py-1.5 rounded-lg text-sm font-medium transition-all",
+                      callType === type
+                        ? "bg-accent text-white"
+                        : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
+                    )}
+                  >
+                    {type}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Optional context */}
+            <div>
+              <label className="text-sm font-medium text-text-primary mb-2 block">Contexte (optionnel)</label>
+              <textarea
+                value={context}
+                onChange={(e) => setContext(e.target.value)}
+                placeholder="Ex : Appel avec un prospect qui a téléchargé notre guide..."
+                className="w-full rounded-lg border border-border-default bg-bg-tertiary px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent/50 min-h-[80px] resize-none"
+              />
+            </div>
+
+            <Button className="w-full" size="lg" onClick={handleGenerate}>
+              <Sparkles className="h-4 w-4 mr-2" />
+              Générer le script de setting
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     );
   }
@@ -110,22 +152,28 @@ export function SettingScriptGenerator({
   return (
     <div className={cn("space-y-6", className)}>
       {/* Tab navigation */}
-      <div className="flex gap-2 overflow-x-auto pb-2">
-        {TABS.map((tab) => (
-          <button
-            key={tab.key}
-            onClick={() => setActiveTab(tab.key)}
-            className={cn(
-              "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all",
-              activeTab === tab.key
-                ? "bg-accent text-white"
-                : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
-            )}
-          >
-            <tab.icon className="h-3 w-3" />
-            {tab.label}
-          </button>
-        ))}
+      <div className="flex items-center justify-between">
+        <div className="flex gap-2 overflow-x-auto pb-2">
+          {TABS.map((tab) => (
+            <button
+              key={tab.key}
+              onClick={() => setActiveTab(tab.key)}
+              className={cn(
+                "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all",
+                activeTab === tab.key
+                  ? "bg-accent text-white"
+                  : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
+              )}
+            >
+              <tab.icon className="h-3 w-3" />
+              {tab.label}
+            </button>
+          ))}
+        </div>
+        <Button variant="outline" size="sm" onClick={() => setScript(null)} className="flex-shrink-0 ml-2">
+          <RefreshCw className="h-4 w-4 mr-1" />
+          Nouveau brief
+        </Button>
       </div>
 
       {/* Tab content */}
@@ -174,7 +222,7 @@ export function SettingScriptGenerator({
                     <CheckCircle2 className="h-3.5 w-3.5 text-accent mt-0.5 flex-shrink-0" />
                     <div>
                       <p className="text-xs text-text-muted font-medium">
-                        Reponse ideale
+                        Réponse idéale
                       </p>
                       <p className="text-xs text-text-secondary">
                         {q.ideal_answer}
@@ -204,7 +252,7 @@ export function SettingScriptGenerator({
           <div className="flex items-center gap-2 mb-4">
             <Presentation className="h-4 w-4 text-accent" />
             <h3 className="font-semibold text-text-primary">
-              Mini-presentation
+              Mini-présentation
             </h3>
           </div>
           <p className="text-sm text-text-secondary whitespace-pre-wrap mb-4">

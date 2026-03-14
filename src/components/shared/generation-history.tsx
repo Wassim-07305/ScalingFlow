@@ -6,9 +6,11 @@ import { fr } from "date-fns/locale";
 import { cn } from "@/lib/utils/cn";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Clock, ChevronRight, Inbox } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Clock, ChevronRight, Inbox, Trash2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useUser } from "@/hooks/use-user";
+import { toast } from "sonner";
 
 interface HistoryItem {
   id: string;
@@ -42,6 +44,8 @@ export function GenerationHistory({
   const { user } = useUser();
   const [items, setItems] = React.useState<HistoryItem[]>([]);
   const [loading, setLoading] = React.useState(true);
+  const [deletingId, setDeletingId] = React.useState<string | null>(null);
+  const [confirmDeleteId, setConfirmDeleteId] = React.useState<string | null>(null);
   const supabase = createClient();
 
   React.useEffect(() => {
@@ -94,6 +98,21 @@ export function GenerationHistory({
     fetchHistory();
   }, [user, table, titleField, subtitleField, statusField, filters, supabase]);
 
+  const handleDelete = async (id: string) => {
+    setDeletingId(id);
+    try {
+      const { error } = await supabase.from(table).delete().eq("id", id);
+      if (error) throw error;
+      setItems((prev) => prev.filter((item) => item.id !== id));
+      toast.success("Élément supprimé");
+    } catch {
+      toast.error("Erreur lors de la suppression");
+    } finally {
+      setDeletingId(null);
+      setConfirmDeleteId(null);
+    }
+  };
+
   const statusVariant = (status?: string) => {
     switch (status) {
       case "active":
@@ -116,11 +135,11 @@ export function GenerationHistory({
       case "active":
         return "Actif";
       case "validated":
-        return "Valide";
+        return "Validé";
       case "draft":
         return "Brouillon";
       case "published":
-        return "Publie";
+        return "Publié";
       case "paused":
         return "En pause";
       default:
@@ -155,14 +174,20 @@ export function GenerationHistory({
 
   return (
     <div className={cn("space-y-3", className)}>
+      <div className="flex items-center justify-between mb-2">
+        <p className="text-sm text-text-muted">{items.length} élément{items.length > 1 ? "s" : ""}</p>
+      </div>
       {items.map((item) => (
         <Card
           key={item.id}
           className={cn(
-            "transition-all",
+            "transition-all group",
             onSelect && "cursor-pointer hover:border-border-hover"
           )}
-          onClick={() => onSelect?.(item)}
+          onClick={() => {
+            if (confirmDeleteId === item.id) return;
+            onSelect?.(item);
+          }}
         >
           <CardContent className="py-4">
             <div className="flex items-center justify-between">
@@ -178,7 +203,7 @@ export function GenerationHistory({
                 <div className="flex items-center gap-2 mt-1.5">
                   <Clock className="h-3 w-3 text-text-muted" />
                   <span className="text-xs text-text-muted">
-                    {format(new Date(item.created_at), "d MMM yyyy a HH:mm", {
+                    {format(new Date(item.created_at), "d MMM yyyy à HH:mm", {
                       locale: fr,
                     })}
                   </span>
@@ -190,7 +215,43 @@ export function GenerationHistory({
                     {statusLabel(item.status)}
                   </Badge>
                 )}
-                {onSelect && (
+
+                {/* Delete button */}
+                {confirmDeleteId === item.id ? (
+                  <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-danger hover:text-danger text-xs h-7 px-2"
+                      disabled={deletingId === item.id}
+                      onClick={() => handleDelete(item.id)}
+                    >
+                      {deletingId === item.id ? "..." : "Supprimer"}
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-text-muted text-xs h-7 px-2"
+                      onClick={() => setConfirmDeleteId(null)}
+                    >
+                      Annuler
+                    </Button>
+                  </div>
+                ) : (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="opacity-0 group-hover:opacity-100 transition-opacity h-7 w-7 p-0 text-text-muted hover:text-danger"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setConfirmDeleteId(item.id);
+                    }}
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </Button>
+                )}
+
+                {onSelect && confirmDeleteId !== item.id && (
                   <ChevronRight className="h-4 w-4 text-text-muted" />
                 )}
               </div>

@@ -74,7 +74,7 @@ export function YouTubeGenerator({ className, initialData }: YouTubeGeneratorPro
     navigator.clipboard.writeText(text);
     setCopiedField(field);
     setTimeout(() => setCopiedField(null), 2000);
-    toast.success("Copie !");
+    toast.success("Copié !");
   };
 
   if (usageLimited) {
@@ -143,7 +143,7 @@ export function YouTubeGenerator({ className, initialData }: YouTubeGeneratorPro
             onClick={() => copyToClipboard(result.titre, "titre")}
           >
             <Copy className="h-3 w-3 mr-1" />
-            {copiedField === "titre" ? "Copie !" : "Copier"}
+            {copiedField === "titre" ? "Copié !" : "Copier"}
           </Button>
         </div>
         <p className="text-lg font-semibold text-text-primary">{result.titre}</p>
@@ -160,7 +160,7 @@ export function YouTubeGenerator({ className, initialData }: YouTubeGeneratorPro
               onClick={() => copyToClipboard(result.hook, "hook")}
             >
               <Copy className="h-3 w-3 mr-1" />
-              {copiedField === "hook" ? "Copie !" : "Copier"}
+              {copiedField === "hook" ? "Copié !" : "Copier"}
             </Button>
           </div>
           <p className="text-sm text-accent whitespace-pre-wrap">{result.hook}</p>
@@ -208,7 +208,7 @@ export function YouTubeGenerator({ className, initialData }: YouTubeGeneratorPro
                 }}
               >
                 <Copy className="h-3 w-3 mr-1" />
-                {copiedField === "script" ? "Copie !" : "Copier"}
+                {copiedField === "script" ? "Copié !" : "Copier"}
               </Button>
               {showFullScript ? (
                 <ChevronUp className="h-4 w-4 text-text-muted" />
@@ -247,7 +247,7 @@ export function YouTubeGenerator({ className, initialData }: YouTubeGeneratorPro
               onClick={() => copyToClipboard(result.description_youtube, "desc")}
             >
               <Copy className="h-3 w-3 mr-1" />
-              {copiedField === "desc" ? "Copie !" : "Copier"}
+              {copiedField === "desc" ? "Copié !" : "Copier"}
             </Button>
           </div>
           <p className="text-sm text-text-secondary whitespace-pre-wrap mb-4">

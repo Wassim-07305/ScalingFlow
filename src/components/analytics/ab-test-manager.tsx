@@ -537,11 +537,11 @@ export function ABTestManager() {
               Aucun test A/B en cours
             </h3>
             <p className="text-sm text-text-secondary max-w-md mb-4">
-              Creez votre premier test A/B pour comparer deux variantes et optimiser vos conversions.
+              Crée ton premier test A/B pour comparer deux variantes et optimiser tes conversions.
             </p>
             <Button onClick={() => setShowCreateForm(true)}>
               <Plus className="h-4 w-4 mr-1" />
-              Creer un test
+              Créer un test
             </Button>
           </CardContent>
         </Card>
@@ -623,7 +623,7 @@ export function ABTestManager() {
               Annuler
             </Button>
             <Button onClick={handleCreate} disabled={!newTest.name.trim()}>
-              Creer le test
+              Créer le test
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -635,7 +635,7 @@ export function ABTestManager() {
           <DialogHeader>
             <DialogTitle>Mettre à jour les statistiques</DialogTitle>
             <DialogDescription>
-              Ajoutez les nouvelles données depuis votre dernière mise à jour.
+              Ajoute les nouvelles données depuis ta dernière mise à jour.
             </DialogDescription>
           </DialogHeader>
 

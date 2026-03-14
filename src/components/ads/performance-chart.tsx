@@ -66,7 +66,7 @@ export function PerformanceChart({ className }: PerformanceChartProps) {
         .lte("date", format(endDate, "yyyy-MM-dd"))
         .order("date", { ascending: true });
 
-      // Creer un map des données existantes
+      // Créer un map des données existantes
       const dataMap = new Map(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         ((dailyData ?? []) as any[]).map((d) => [d.date, d])

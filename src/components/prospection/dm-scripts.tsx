@@ -264,7 +264,7 @@ export function DmScripts() {
                         </div>
                       )}
 
-                      {/* Declencheur du prochain message */}
+                      {/* Déclencheur du prochain message */}
                       {msg.next_step_trigger && (
                         <div className="flex items-start gap-2 p-2 rounded-lg bg-bg-tertiary">
                           <ArrowRight className="h-3.5 w-3.5 text-accent mt-0.5 shrink-0" />

@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { sendPushToUser } from "@/lib/notifications/push";
 
 type NotificationType = "milestone" | "badge" | "community" | "task" | "system" | "win";
 
@@ -26,6 +27,9 @@ export async function createNotification({
     message,
     link: link ?? null,
   });
+
+  // Fire-and-forget push notification
+  sendPushToUser(userId, { title, body: message, link, type }).catch(() => {});
 }
 
 // ─── Pre-built notification helpers ──────────────────────────

@@ -119,14 +119,14 @@ export function DeliveryDesigner({ offerId, className, initialData }: DeliveryDe
         <Settings className="h-12 w-12 text-text-muted mx-auto mb-4" />
         <h3 className="font-semibold text-text-primary mb-2">Structure de Delivery</h3>
         <p className="text-sm text-text-secondary mb-6 max-w-md mx-auto">
-          L&apos;IA concoit ton système de livraison complet : phases, agents IA, automatisations, SOPs et KPIs.
+          L&apos;IA conçoit ton système de livraison complet : phases, agents IA, automatisations, SOPs et KPIs.
         </p>
         <Button size="lg" onClick={handleGenerate} disabled={!offerId}>
           <Sparkles className="h-4 w-4 mr-2" />
           Designer le delivery
         </Button>
         {!offerId && (
-          <p className="text-xs text-text-muted mt-2">Généré d&apos;abord une offre</p>
+          <p className="text-xs text-text-muted mt-2">Génère d&apos;abord une offre</p>
         )}
       </div>
     );
@@ -150,7 +150,7 @@ export function DeliveryDesigner({ offerId, className, initialData }: DeliveryDe
       <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
         <Card>
           <CardContent className="py-3 text-center">
-            <p className="text-xs text-text-muted">Scalabilite</p>
+            <p className="text-xs text-text-muted">Scalabilité</p>
             <p className="text-2xl font-bold text-accent">{delivery.scalability_score}%</p>
           </CardContent>
         </Card>
@@ -252,7 +252,7 @@ export function DeliveryDesigner({ offerId, className, initialData }: DeliveryDe
                   <p className="text-xs text-text-secondary">{agent.role}</p>
                   <div className="flex gap-4 text-xs">
                     <div>
-                      <span className="text-text-muted">Declencheur : </span>
+                      <span className="text-text-muted">Déclencheur : </span>
                       <span className="text-text-secondary">{agent.trigger}</span>
                     </div>
                   </div>
@@ -316,7 +316,7 @@ export function DeliveryDesigner({ offerId, className, initialData }: DeliveryDe
             <CardHeader className="py-3">
               <CardTitle className="text-sm flex items-center gap-2">
                 <AlertTriangle className="h-4 w-4 text-yellow-400" />
-                Goulots d&apos;etranglement
+                Goulots d&apos;étranglement
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-0">

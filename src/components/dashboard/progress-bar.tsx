@@ -21,25 +21,30 @@ export function ProgressBar() {
 
     const fetchProgress = async () => {
       setLoading(true);
-      const supabase = createClient();
+      try {
+        const supabase = createClient();
 
-      const [completedRes, totalRes] = await Promise.all([
-        supabase
-          .from("tasks")
-          .select("id", { count: "exact", head: true })
-          .eq("user_id", user.id)
-          .eq("completed", true),
-        supabase
-          .from("tasks")
-          .select("id", { count: "exact", head: true })
-          .eq("user_id", user.id),
-      ]);
+        const [completedRes, totalRes] = await Promise.all([
+          supabase
+            .from("tasks")
+            .select("id", { count: "exact", head: true })
+            .eq("user_id", user.id)
+            .eq("completed", true),
+          supabase
+            .from("tasks")
+            .select("id", { count: "exact", head: true })
+            .eq("user_id", user.id),
+        ]);
 
-      setTaskProgress({
-        completed: completedRes.count ?? 0,
-        total: totalRes.count ?? 0,
-      });
-      setLoading(false);
+        setTaskProgress({
+          completed: completedRes.count ?? 0,
+          total: totalRes.count ?? 0,
+        });
+      } catch {
+        // Show empty state rather than infinite skeleton
+      } finally {
+        setLoading(false);
+      }
     };
 
     fetchProgress();
@@ -108,7 +113,7 @@ export function ProgressBar() {
               <p className="text-xs text-text-muted">
                 {isLoading
                   ? "..."
-                  : `${taskProgress.completed} / ${taskProgress.total} taches`}
+                  : `${taskProgress.completed} / ${taskProgress.total} tâches`}
               </p>
             </div>
           </div>

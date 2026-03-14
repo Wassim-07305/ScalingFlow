@@ -18,7 +18,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
 const actions = [
   {
-    label: "Creer une offre",
+    label: "Créer une offre",
     description: "Génère ton positionnement, pricing et garanties",
     href: "/offer",
     icon: Package,
@@ -32,7 +32,7 @@ const actions = [
     color: "blue" as const,
   },
   {
-    label: "Creer des pubs",
+    label: "Créer des pubs",
     description: "Hooks, créatives et scripts video",
     href: "/ads/creatives",
     icon: Megaphone,

@@ -49,14 +49,14 @@ export function NameGenerator({ brandId, names, selectedName: initialSelected, c
       <div className={cn("text-center py-12", className)}>
         <Sparkles className="h-12 w-12 text-text-muted mx-auto mb-3" />
         <p className="text-text-secondary">
-          Aucun nom généré. Lancez la génération pour obtenir des propositions.
+          Aucun nom généré. Lance la génération pour obtenir des propositions.
         </p>
       </div>
     );
   }
 
-  const disponibiliteVariant = (d: string) => {
-    switch (d.toLowerCase()) {
+  const disponibiliteVariant = (d?: string) => {
+    switch ((d || "").toLowerCase()) {
       case "haute":
         return "default";
       case "moyenne":
@@ -71,7 +71,7 @@ export function NameGenerator({ brandId, names, selectedName: initialSelected, c
   return (
     <div className={cn("space-y-3", className)}>
       <p className="text-sm text-text-secondary mb-4">
-        Sélectionnez le nom que vous préférez. Vous pourrez le modifier plus tard.
+        Sélectionne le nom que tu préfères. Tu pourras le modifier plus tard.
       </p>
       {names.map((item, i) => (
         <Card
@@ -100,7 +100,7 @@ export function NameGenerator({ brandId, names, selectedName: initialSelected, c
               <div className="flex items-center gap-2 ml-4 shrink-0">
                 <Globe className="h-3.5 w-3.5 text-text-muted" />
                 <Badge variant={disponibiliteVariant(item.disponibilite_probable)}>
-                  {item.disponibilite_probable}
+                  {item.disponibilite_probable || "—"}
                 </Badge>
               </div>
             </div>

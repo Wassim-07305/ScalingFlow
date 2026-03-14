@@ -2,14 +2,20 @@
 
 import React from "react";
 import { cn } from "@/lib/utils/cn";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { AILoading } from "@/components/shared/ai-loading";
-import { Sparkles, LayoutGrid, List, ChevronDown, ChevronUp, CheckCircle2, Clock, Circle } from "lucide-react";
+import { Sparkles, LayoutGrid, List, ChevronDown, ChevronUp, CheckCircle2, Clock, Circle, CalendarDays } from "lucide-react";
 import { toast } from "sonner";
 import type { ContentStrategyResult } from "@/lib/ai/prompts/content-strategy";
 import { UpgradeWall } from "@/components/shared/upgrade-wall";
+
+const CALENDAR_DURATIONS = [
+  { key: "7", label: "7 jours" },
+  { key: "14", label: "14 jours" },
+  { key: "30", label: "30 jours" },
+] as const;
 
 interface EditorialCalendarProps {
   className?: string;
@@ -23,8 +29,8 @@ type ContentStatus = "draft" | "scheduled" | "published";
 
 const STATUS_CONFIG: Record<ContentStatus, { label: string; icon: typeof Circle; color: string }> = {
   draft: { label: "Brouillon", icon: Circle, color: "text-text-muted" },
-  scheduled: { label: "Planifie", icon: Clock, color: "text-yellow-400" },
-  published: { label: "Publie", icon: CheckCircle2, color: "text-accent" },
+  scheduled: { label: "Planifié", icon: Clock, color: "text-yellow-400" },
+  published: { label: "Publié", icon: CheckCircle2, color: "text-accent" },
 };
 
 const NEXT_STATUS: Record<ContentStatus, ContentStatus> = {
@@ -57,6 +63,11 @@ export function EditorialCalendar({ className, initialData }: EditorialCalendarP
   const [usageLimited, setUsageLimited] = React.useState<{currentUsage: number; limit: number} | null>(null);
   const [statuses, setStatuses] = React.useState<Record<number, ContentStatus>>({});
 
+  // Form state
+  const [duration, setDuration] = React.useState("30");
+  const [pillars, setPillars] = React.useState("");
+  const [showForm, setShowForm] = React.useState(true);
+
   const toggleStatus = (jour: number, e: React.MouseEvent) => {
     e.stopPropagation();
     setStatuses((prev) => {
@@ -80,6 +91,7 @@ export function EditorialCalendar({ className, initialData }: EditorialCalendarP
     if (initialData) {
       const result = initialData as ContentStrategyResult;
       setItems(result.calendrier || []);
+      setShowForm(false);
     }
   }, [initialData]);
 
@@ -92,7 +104,11 @@ export function EditorialCalendar({ className, initialData }: EditorialCalendarP
       const response = await fetch("/api/ai/generate-editorial-calendar", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ startDate: tomorrow }),
+        body: JSON.stringify({
+          startDate: tomorrow,
+          duration: parseInt(duration),
+          pillars: pillars || undefined,
+        }),
       });
 
       if (!response.ok) {
@@ -105,7 +121,8 @@ export function EditorialCalendar({ className, initialData }: EditorialCalendarP
       const data = await response.json();
       const result = data.result as ContentStrategyResult;
       setItems(result.calendrier || []);
-      toast.success("Plan editorial généré !");
+      setShowForm(false);
+      toast.success("Plan éditorial généré !");
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Erreur";
       setError(msg);
@@ -124,20 +141,69 @@ export function EditorialCalendar({ className, initialData }: EditorialCalendarP
   }
 
   if (loading) {
-    return <AILoading text="Génération du plan editorial" className={className} />;
+    return <AILoading text="Génération du plan éditorial" className={className} />;
   }
 
-  if (items.length === 0) {
+  if (items.length === 0 || showForm) {
     return (
-      <div className={cn("text-center py-12", className)}>
-        {error && <p className="text-sm text-danger mb-4">{error}</p>}
-        <Button size="lg" onClick={handleGenerate}>
-          <Sparkles className="h-4 w-4 mr-2" />
-          Générer le plan editorial 30 jours
-        </Button>
-        <p className="text-sm text-text-secondary mt-2">
-          Un contenu par jour pendant 30 jours
-        </p>
+      <div className={cn("space-y-6", className)}>
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <CalendarDays className="h-5 w-5 text-accent" />
+              Plan éditorial
+            </CardTitle>
+            <CardDescription>
+              Configurez la durée et les piliers de contenu pour générer un calendrier éditorial complet.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-5">
+            {/* Duration */}
+            <div>
+              <label className="text-sm font-medium text-text-primary mb-2 block">Durée du calendrier</label>
+              <div className="flex flex-wrap gap-2">
+                {CALENDAR_DURATIONS.map((d) => (
+                  <button
+                    key={d.key}
+                    onClick={() => setDuration(d.key)}
+                    className={cn(
+                      "px-3 py-1.5 rounded-lg text-sm font-medium transition-all",
+                      duration === d.key
+                        ? "bg-accent text-white"
+                        : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
+                    )}
+                  >
+                    {d.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Content pillars */}
+            <div>
+              <label className="text-sm font-medium text-text-primary mb-1 block">
+                Piliers de contenu <span className="text-text-muted font-normal">(optionnel)</span>
+              </label>
+              <input
+                type="text"
+                value={pillars}
+                onChange={(e) => setPillars(e.target.value)}
+                placeholder="Ex: expertise, coulisses, témoignages, offres..."
+                className="w-full rounded-lg border border-border-default bg-bg-secondary px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+              />
+            </div>
+
+            {error && <p className="text-sm text-danger">{error}</p>}
+
+            <Button size="lg" onClick={handleGenerate} className="w-full">
+              <Sparkles className="h-4 w-4 mr-2" />
+              Générer le plan éditorial {duration} jours
+            </Button>
+            <p className="text-xs text-text-muted text-center">
+              Un contenu par jour pendant {duration} jours
+            </p>
+          </CardContent>
+        </Card>
       </div>
     );
   }
@@ -307,7 +373,10 @@ export function EditorialCalendar({ className, initialData }: EditorialCalendarP
         </div>
       )}
 
-      <div className="text-center pt-4">
+      <div className="flex items-center justify-center gap-2 pt-4">
+        <Button variant="ghost" size="sm" onClick={() => setShowForm(true)}>
+          Nouveau brief
+        </Button>
         <Button variant="outline" size="sm" onClick={handleGenerate}>
           Régénérer le plan
         </Button>

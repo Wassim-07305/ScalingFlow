@@ -32,57 +32,62 @@ export function RevenueChart() {
 
     const fetchGenerationsPerMonth = async () => {
       setLoading(true);
-      const supabase = createClient();
-      const now = new Date();
-      const months: MonthData[] = [];
+      try {
+        const supabase = createClient();
+        const now = new Date();
+        const months: MonthData[] = [];
 
-      for (let i = 5; i >= 0; i--) {
-        const monthDate = subMonths(now, i);
-        const start = startOfMonth(monthDate).toISOString();
-        const end = endOfMonth(monthDate).toISOString();
-        const label = format(monthDate, "MMM", { locale: fr });
-        // Capitaliser la première lettre
-        const capitalizedLabel = label.charAt(0).toUpperCase() + label.slice(1);
+        for (let i = 5; i >= 0; i--) {
+          const monthDate = subMonths(now, i);
+          const start = startOfMonth(monthDate).toISOString();
+          const end = endOfMonth(monthDate).toISOString();
+          const label = format(monthDate, "MMM", { locale: fr });
+          // Capitaliser la première lettre
+          const capitalizedLabel = label.charAt(0).toUpperCase() + label.slice(1);
 
-        const [offersRes, creativesRes, funnelsRes, assetsRes] =
-          await Promise.all([
-            supabase
-              .from("offers")
-              .select("id", { count: "exact", head: true })
-              .eq("user_id", user.id)
-              .gte("created_at", start)
-              .lte("created_at", end),
-            supabase
-              .from("ad_creatives")
-              .select("id", { count: "exact", head: true })
-              .eq("user_id", user.id)
-              .gte("created_at", start)
-              .lte("created_at", end),
-            supabase
-              .from("funnels")
-              .select("id", { count: "exact", head: true })
-              .eq("user_id", user.id)
-              .gte("created_at", start)
-              .lte("created_at", end),
-            supabase
-              .from("sales_assets")
-              .select("id", { count: "exact", head: true })
-              .eq("user_id", user.id)
-              .gte("created_at", start)
-              .lte("created_at", end),
-          ]);
+          const [offersRes, creativesRes, funnelsRes, assetsRes] =
+            await Promise.all([
+              supabase
+                .from("offers")
+                .select("id", { count: "exact", head: true })
+                .eq("user_id", user.id)
+                .gte("created_at", start)
+                .lte("created_at", end),
+              supabase
+                .from("ad_creatives")
+                .select("id", { count: "exact", head: true })
+                .eq("user_id", user.id)
+                .gte("created_at", start)
+                .lte("created_at", end),
+              supabase
+                .from("funnels")
+                .select("id", { count: "exact", head: true })
+                .eq("user_id", user.id)
+                .gte("created_at", start)
+                .lte("created_at", end),
+              supabase
+                .from("sales_assets")
+                .select("id", { count: "exact", head: true })
+                .eq("user_id", user.id)
+                .gte("created_at", start)
+                .lte("created_at", end),
+            ]);
 
-        const total =
-          (offersRes.count ?? 0) +
-          (creativesRes.count ?? 0) +
-          (funnelsRes.count ?? 0) +
-          (assetsRes.count ?? 0);
+          const total =
+            (offersRes.count ?? 0) +
+            (creativesRes.count ?? 0) +
+            (funnelsRes.count ?? 0) +
+            (assetsRes.count ?? 0);
 
-        months.push({ month: capitalizedLabel, generations: total });
+          months.push({ month: capitalizedLabel, generations: total });
+        }
+
+        setData(months);
+      } catch {
+        // Show empty state rather than infinite skeleton
+      } finally {
+        setLoading(false);
       }
-
-      setData(months);
-      setLoading(false);
     };
 
     fetchGenerationsPerMonth();
@@ -154,7 +159,7 @@ export function RevenueChart() {
                   }}
                   formatter={(value) => [
                     String(value ?? 0),
-                    "Generations",
+                    "Générations",
                   ]}
                 />
                 <Area

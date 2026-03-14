@@ -128,7 +128,7 @@ export function AdsAutomation() {
       list.push({
         id: "pause_bleeding",
         type: "pause",
-        title: "Mettre en pause les campagnes deficitaires",
+        title: "Mettre en pause les campagnes déficitaires",
         description: `ROAS de ${health.roas7d.toFixed(2)}x — tu perds de l'argent. Pause les campagnes et revois tes creatives.`,
         severity: "danger",
         impact: `Économie estimée : ${(health.spend7d * 0.3).toFixed(0)}EUR/semaine`,
@@ -139,7 +139,7 @@ export function AdsAutomation() {
       list.push({
         id: "optimize_creatives",
         type: "refresh",
-        title: "Rafraichir les creatives",
+        title: "Rafraîchir les créatives",
         description: `ROAS de ${health.roas7d.toFixed(2)}x — en dessous du seuil optimal. Teste de nouveaux hooks et angles.`,
         severity: "warning",
         impact: "Potentiel : +30-50% de CTR avec de nouveaux angles",
@@ -151,8 +151,8 @@ export function AdsAutomation() {
       list.push({
         id: "reduce_cpa",
         type: "test",
-        title: "CPA trop eleve — optimise le ciblage",
-        description: `CPA moyen de ${health.cpa7d.toFixed(0)}EUR. Reduis les audiences larges et teste des lookalikes plus precises.`,
+        title: "CPA trop élevé — optimise le ciblage",
+        description: `CPA moyen de ${health.cpa7d.toFixed(0)}EUR. Réduis les audiences larges et teste des lookalikes plus précises.`,
         severity: "warning",
         impact: "Objectif : CPA < 30EUR",
       });
@@ -163,7 +163,7 @@ export function AdsAutomation() {
         id: "improve_ctr",
         type: "refresh",
         title: "CTR faible — hooks peu performants",
-        description: `CTR de ${health.ctr7d.toFixed(2)}% (objectif > 1.5%). Tes hooks n'accrochent pas. Généré de nouvelles variations.`,
+        description: `CTR de ${health.ctr7d.toFixed(2)}% (objectif > 1.5%). Tes hooks n'accrochent pas. Génère de nouvelles variations.`,
         severity: "warning",
         impact: "Objectif : CTR > 1.5%",
       });
@@ -175,7 +175,7 @@ export function AdsAutomation() {
         id: "creative_fatigue",
         type: "refresh",
         title: "Fatigue créative détectée",
-        description: "Les performances baissent — signe de fatigue creative. Lance un nouveau batch de créatives avec des angles differents.",
+        description: "Les performances baissent — signe de fatigue créative. Lance un nouveau batch de créatives avec des angles différents.",
         severity: "warning",
         impact: "Rotation recommandée toutes les 2-3 semaines",
       });
@@ -189,7 +189,7 @@ export function AdsAutomation() {
         title: "Prêt à scaler — augmente le budget",
         description: `ROAS de ${health.roas7d.toFixed(2)}x en hausse. Augmente le budget de 20-30% par palier.`,
         severity: "success",
-        impact: `Budget suggere : +${(health.spend7d * 0.2 / 7).toFixed(0)}EUR/jour`,
+        impact: `Budget suggéré : +${(health.spend7d * 0.2 / 7).toFixed(0)}EUR/jour`,
       });
     }
 
@@ -200,7 +200,7 @@ export function AdsAutomation() {
         title: "Duplique tes meilleures campagnes",
         description: "Tes campagnes sont rentables. Duplique les gagnantes avec de nouvelles audiences.",
         severity: "success",
-        impact: "Potentiel de scaling : x2 sans degrader le ROAS",
+        impact: "Potentiel de scaling : x2 sans dégrader le ROAS",
       });
     }
 
@@ -236,11 +236,11 @@ export function AdsAutomation() {
 - ROAS : ${health.roas7d.toFixed(2)}x
 - CTR : ${health.ctr7d.toFixed(2)}%
 - CPA : ${health.cpa7d.toFixed(0)}EUR
-- Depense totale : ${health.spend7d.toFixed(0)}EUR
+- Dépense totale : ${health.spend7d.toFixed(0)}EUR
 - Conversions : ${health.conversions7d}
 - Tendance : ${health.trend === "up" ? "hausse" : health.trend === "down" ? "baisse" : "stable"}
 
-Reponds en francais, format bullet points, concis et actionnable.`,
+Réponds en français, format bullet points, concis et actionnable.`,
             },
           ],
         }),
@@ -330,7 +330,7 @@ Reponds en francais, format bullet points, concis et actionnable.`,
               { label: "ROAS", value: `${health.roas7d.toFixed(2)}x`, good: health.roas7d >= 2 },
               { label: "CTR", value: `${health.ctr7d.toFixed(2)}%`, good: health.ctr7d >= 1.5 },
               { label: "CPA", value: `${health.cpa7d.toFixed(0)}EUR`, good: health.cpa7d <= 30 },
-              { label: "Depense", value: `${health.spend7d.toFixed(0)}EUR`, good: true },
+              { label: "Dépense", value: `${health.spend7d.toFixed(0)}EUR`, good: true },
               { label: "Conversions", value: `${health.conversions7d}`, good: health.conversions7d > 0 },
             ].map((kpi) => (
               <div key={kpi.label} className="p-3 rounded-xl bg-bg-tertiary border border-border-default">

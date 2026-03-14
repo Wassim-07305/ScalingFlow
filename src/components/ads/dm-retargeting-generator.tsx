@@ -1,8 +1,10 @@
 "use client";
 
 import React from "react";
+import { cn } from "@/lib/utils/cn";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader2, MessageCircle, Copy } from "lucide-react";
+import { Loader2, MessageCircle, Copy, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 
 interface DmRetargetingData {
@@ -45,9 +47,12 @@ interface Props {
   initialData?: DmRetargetingData;
 }
 
+const RETARGETING_TYPES = ["Visiteurs site", "Engagés", "Abandons panier", "Anciens clients"] as const;
+
 export function DmRetargetingGenerator({ initialData }: Props) {
   const [data, setData] = React.useState<DmRetargetingData | null>(initialData || null);
   const [loading, setLoading] = React.useState(false);
+  const [retargetingType, setRetargetingType] = React.useState<string>("Visiteurs site");
 
   const generate = async () => {
     setLoading(true);
@@ -76,20 +81,50 @@ export function DmRetargetingGenerator({ initialData }: Props) {
 
   const copyText = (text: string) => {
     navigator.clipboard.writeText(text);
-    toast.success("Copie !");
+    toast.success("Copié !");
   };
 
   if (!data) {
     return (
-      <div className="flex flex-col items-center justify-center py-16 gap-4">
-        <MessageCircle className="h-12 w-12 text-text-muted" />
-        <p className="text-text-secondary text-sm text-center max-w-md">
-          Génère des publicités de retargeting pour pousser tes followers chauds à t&apos;envoyer un DM. Inclut les ads, l&apos;automation DM, les audiences et le setup campagne.
-        </p>
-        <Button onClick={generate} disabled={loading}>
-          {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <MessageCircle className="h-4 w-4 mr-2" />}
-          Générer les DM Retargeting Ads
-        </Button>
+      <div className="max-w-xl mx-auto py-8">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <MessageCircle className="h-5 w-5" />
+              DM Retargeting Ads
+            </CardTitle>
+            <CardDescription>
+              Génère des publicités de retargeting pour pousser tes followers chauds à t&apos;envoyer un DM. Inclut les ads, l&apos;automation DM, les audiences et le setup campagne.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {/* Retargeting type */}
+            <div>
+              <label className="text-sm font-medium text-text-primary mb-2 block">Type de retargeting</label>
+              <div className="flex flex-wrap gap-2">
+                {RETARGETING_TYPES.map((type) => (
+                  <button
+                    key={type}
+                    onClick={() => setRetargetingType(type)}
+                    className={cn(
+                      "px-3 py-1.5 rounded-lg text-sm font-medium transition-all",
+                      retargetingType === type
+                        ? "bg-accent text-white"
+                        : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
+                    )}
+                  >
+                    {type}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <Button className="w-full" onClick={generate} disabled={loading}>
+              {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <MessageCircle className="h-4 w-4 mr-2" />}
+              Générer les DM Retargeting Ads
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     );
   }
@@ -98,10 +133,16 @@ export function DmRetargetingGenerator({ initialData }: Props) {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold text-text-primary">DM Retargeting Ads</h3>
-        <Button size="sm" onClick={generate} disabled={loading}>
-          {loading && <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />}
-          Régénérer
-        </Button>
+        <div className="flex gap-2">
+          <Button size="sm" onClick={generate} disabled={loading}>
+            {loading && <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />}
+            Régénérer
+          </Button>
+          <Button size="sm" variant="outline" onClick={() => setData(null)}>
+            <RefreshCw className="h-3.5 w-3.5 mr-1.5" />
+            Nouveau brief
+          </Button>
+        </div>
       </div>
 
       {/* DM Ads */}
@@ -136,7 +177,7 @@ export function DmRetargetingGenerator({ initialData }: Props) {
                       </div>
                     </div>
                     <button
-                      onClick={() => copyText(`Hook: ${ad.hook}\n\n${ad.body}\n\nCTA: ${ad.cta}\nMot-cle: ${ad.dm_keyword}`)}
+                      onClick={() => copyText(`Hook: ${ad.hook}\n\n${ad.body}\n\nCTA: ${ad.cta}\nMot-clé: ${ad.dm_keyword}`)}
                       className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg hover:bg-bg-primary transition-all"
                     >
                       <Copy className="h-3.5 w-3.5 text-text-muted" />
@@ -231,7 +272,7 @@ export function DmRetargetingGenerator({ initialData }: Props) {
               </div>
             </div>
             <div>
-              <p className="text-xs text-text-muted">Cout / DM cible</p>
+              <p className="text-xs text-text-muted">Coût / DM cible</p>
               <p className="text-xs text-accent font-medium">{data.campaign_setup.kpi_targets.cost_per_dm}</p>
             </div>
             <div>
