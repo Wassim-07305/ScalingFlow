@@ -123,8 +123,38 @@ export default function AnalyticsPage() {
     return (
       <div>
         <PageHeader title="Analytiques Publicites" description="Analyse les performances de tes publicites." />
-        <div className="flex items-center justify-center py-20">
-          <Loader2 className="h-6 w-6 animate-spin text-text-muted" />
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Card key={i}>
+              <CardContent className="pt-6">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="h-3 w-16 bg-bg-tertiary rounded animate-pulse" />
+                  <div className="h-4 w-4 bg-bg-tertiary rounded animate-pulse" />
+                </div>
+                <div className="h-7 w-24 bg-bg-tertiary rounded animate-pulse mt-2" />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+        <Card className="mb-6">
+          <CardContent className="pt-6">
+            <div className="h-48 bg-bg-tertiary rounded animate-pulse" />
+          </CardContent>
+        </Card>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Card key={i}>
+              <CardContent className="pt-6">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-bg-tertiary animate-pulse" />
+                  <div className="space-y-2">
+                    <div className="h-3 w-20 bg-bg-tertiary rounded animate-pulse" />
+                    <div className="h-5 w-16 bg-bg-tertiary rounded animate-pulse" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
         </div>
       </div>
     );
@@ -163,7 +193,7 @@ export default function AnalyticsPage() {
             className="gap-2"
           >
             <RefreshCw className={`h-4 w-4 ${syncing ? "animate-spin" : ""}`} />
-            {syncing ? "Sync..." : "Sync Meta Ads"}
+            {syncing ? "Sync..." : "Synchroniser Meta Ads"}
           </Button>
         )}
       </PageHeader>

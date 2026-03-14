@@ -284,8 +284,21 @@ export default function AdminPage() {
   // ─── Guard: loading or not admin ────────────────────────────
   if (userLoading) {
     return (
-      <div className="flex items-center justify-center min-h-[50vh]">
-        <Loader2 className="h-8 w-8 animate-spin text-text-muted" />
+      <div>
+        <PageHeader title="Administration" description="Vue d'ensemble de la plateforme ScalingFlow." />
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <Card key={i}>
+              <CardContent className="pt-6">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="h-3 w-20 bg-bg-tertiary rounded animate-pulse" />
+                  <div className="h-4 w-4 bg-bg-tertiary rounded animate-pulse" />
+                </div>
+                <div className="h-7 w-16 bg-bg-tertiary rounded animate-pulse mt-2" />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       </div>
     );
   }

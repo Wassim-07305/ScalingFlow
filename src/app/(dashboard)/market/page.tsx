@@ -267,11 +267,20 @@ export default function MarketPage() {
 
       {/* Loading state */}
       {loadingData && (
-        <div className="flex items-center justify-center py-20">
-          <Loader2 className="h-6 w-6 animate-spin text-accent" />
-          <span className="ml-2 text-sm text-text-secondary">
-            Chargement des analyses...
-          </span>
+        <div className="space-y-4">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <Card key={i}>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div className="space-y-2">
+                    <div className="h-5 w-40 bg-bg-tertiary rounded animate-pulse" />
+                    <div className="h-3 w-24 bg-bg-tertiary rounded animate-pulse" />
+                  </div>
+                  <div className="h-4 w-4 bg-bg-tertiary rounded animate-pulse" />
+                </div>
+              </CardHeader>
+            </Card>
+          ))}
         </div>
       )}
 

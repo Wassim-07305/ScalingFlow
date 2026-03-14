@@ -21,7 +21,7 @@ import {
 } from "lucide-react";
 
 const TABS = [
-  { key: "dashboard", label: "Dashboard", icon: BarChart3 },
+  { key: "dashboard", label: "Tableau de bord", icon: BarChart3 },
   { key: "optimization", label: "Recommandations IA", icon: Sparkles },
   { key: "growth_tiers", label: "Paliers", icon: Rocket },
   { key: "ab_testing", label: "A/B Testing", icon: FlaskConical },

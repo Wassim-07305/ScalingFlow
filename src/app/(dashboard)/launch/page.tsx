@@ -393,8 +393,25 @@ export default function LaunchGuidePage() {
           title="Guide de Lancement"
           description="Tes 10 premiers jours apres le lancement."
         />
-        <div className="flex items-center justify-center py-20">
-          <div className="h-6 w-6 animate-spin rounded-full border-2 border-accent border-t-transparent" />
+        <div className="flex gap-2 mb-6">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="h-10 w-32 bg-bg-tertiary rounded-xl animate-pulse" />
+          ))}
+        </div>
+        <div className="space-y-3">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <Card key={i}>
+              <CardContent className="py-4">
+                <div className="flex items-center gap-4">
+                  <div className="w-8 h-8 rounded-lg bg-bg-tertiary animate-pulse shrink-0" />
+                  <div className="flex-1 space-y-2">
+                    <div className="h-4 w-56 bg-bg-tertiary rounded animate-pulse" />
+                    <div className="h-3 w-36 bg-bg-tertiary rounded animate-pulse" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
         </div>
       </div>
     );

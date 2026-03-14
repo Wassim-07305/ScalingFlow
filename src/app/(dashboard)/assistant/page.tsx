@@ -52,6 +52,7 @@ export default function AssistantPage() {
   const [activeConversationId, setActiveConversationId] = React.useState<string | null>(null);
   const [activeMessages, setActiveMessages] = React.useState<ChatMessage[]>([]);
   const [loadingHistory, setLoadingHistory] = React.useState(false);
+  const [showMobileSidebar, setShowMobileSidebar] = React.useState(false);
 
   const agent = AGENTS.find((a) => a.type === selectedAgent) || AGENTS[0];
 
@@ -185,6 +186,53 @@ export default function AssistantPage() {
           );
         })}
       </div>
+
+      {/* Mobile toggle for conversation history */}
+      <div className="flex lg:hidden mb-4">
+        <button
+          onClick={() => setShowMobileSidebar(!showMobileSidebar)}
+          className="flex items-center gap-2 px-3 py-2 rounded-lg bg-bg-tertiary text-text-secondary text-sm font-medium hover:text-text-primary transition-colors"
+        >
+          <MessageSquare className="h-4 w-4" />
+          Historique ({conversations.length})
+        </button>
+      </div>
+
+      {/* Mobile sidebar overlay */}
+      {showMobileSidebar && (
+        <div className="lg:hidden mb-4 rounded-xl border border-border-default bg-bg-secondary overflow-hidden max-h-[300px] flex flex-col">
+          <div className="p-3 border-b border-border-default">
+            <button
+              onClick={() => { startNewConversation(); setShowMobileSidebar(false); }}
+              className="flex items-center gap-2 w-full px-3 py-2 rounded-lg bg-accent/10 text-accent text-sm font-medium hover:bg-accent/20 transition-colors"
+            >
+              <Plus className="h-4 w-4" />
+              Nouvelle conversation
+            </button>
+          </div>
+          <div className="flex-1 overflow-y-auto p-2 space-y-1">
+            {conversations.length === 0 ? (
+              <p className="text-xs text-text-muted text-center py-4">Aucune conversation.</p>
+            ) : (
+              conversations.map((conv) => (
+                <button
+                  key={conv.id}
+                  onClick={() => { openConversation(conv); setShowMobileSidebar(false); }}
+                  className={cn(
+                    "w-full text-left px-3 py-2 rounded-lg text-sm transition-colors",
+                    activeConversationId === conv.id
+                      ? "bg-accent/15 text-accent"
+                      : "text-text-secondary hover:bg-bg-tertiary"
+                  )}
+                >
+                  <p className="font-medium truncate text-xs">{conv.title || "Sans titre"}</p>
+                  <span className="text-[10px] text-text-muted">{formatDate(conv.updated_at)}</span>
+                </button>
+              ))
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Main layout: sidebar + chat */}
       <div className="flex gap-4">
