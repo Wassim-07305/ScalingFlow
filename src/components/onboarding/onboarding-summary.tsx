@@ -1,7 +1,5 @@
 "use client";
 
-import type { VaultSkillCategory } from "@/stores/onboarding-store";
-
 interface OnboardingSummaryProps {
   data: Record<string, unknown>;
 }
@@ -34,33 +32,12 @@ function Row({ label, value }: { label: string; value: string }) {
 }
 
 const SITUATION_LABELS: Record<string, string> = {
-  zero: "Partir de zéro",
   salarie: "Salarié(e)",
   freelance: "Freelance / Indépendant",
   entrepreneur: "Entrepreneur",
   etudiant: "Étudiant(e)",
   reconversion: "En reconversion",
   sans_emploi: "Sans emploi",
-};
-
-const LANGUAGE_LABELS: Record<string, string> = {
-  fr: "Français",
-  en: "Anglais",
-  both: "Français + Anglais",
-  ar: "Arabe",
-};
-
-const DEADLINE_LABELS: Record<string, string> = {
-  "1_semaine": "1 semaine",
-  "1_mois": "1 mois",
-  "3_mois": "3 mois",
-  pas_de_rush: "Pas de rush",
-};
-
-const TEAM_LABELS: Record<string, string> = {
-  seul: "Seul",
-  equipe: "J'ai une équipe",
-  recruter: "Je veux recruter",
 };
 
 import { PARCOURS } from "@/lib/parcours";
@@ -70,7 +47,6 @@ const PARCOURS_LABELS: Record<string, string> = Object.fromEntries(
 );
 
 export function OnboardingSummary({ data }: OnboardingSummaryProps) {
-  const vaultSkills = (data.vaultSkills as VaultSkillCategory[]) || [];
   const expertiseAnswers =
     (data.expertiseAnswers as Record<string, string>) || {};
   const industries = (data.industries as string[]) || [];
@@ -80,58 +56,21 @@ export function OnboardingSummary({ data }: OnboardingSummaryProps) {
     <div className="grid gap-4 sm:grid-cols-2">
       {/* Identité */}
       <Section title="Identité">
+        <Row label="Prénom" value={String(data.firstName || "")} />
         <Row
-          label="Nom"
-          value={`${data.firstName || ""} ${data.lastName || ""}`.trim()}
-        />
-        <Row label="Pays" value={String(data.country || "")} />
-        <Row
-          label="Langue"
-          value={LANGUAGE_LABELS[String(data.language || "")] || String(data.language || "")}
-        />
-      </Section>
-
-      {/* Situation */}
-      <Section title="Situation">
-        <Row
-          label="Statut"
+          label="Situation"
           value={SITUATION_LABELS[String(data.situation || "")] || ""}
         />
         <Row label="Parcours" value={PARCOURS_LABELS[String(data.parcours || "")] || ""} />
-        <Row
-          label="Clients payants"
-          value={data.hasPayingClients === "oui" ? "Oui" : data.hasPayingClients === "non" ? "Non" : ""}
-        />
       </Section>
 
-      {/* Compétences */}
-      <Section title="Compétences">
-        {vaultSkills.length > 0 ? (
-          vaultSkills.map((s) => (
-            <Row
-              key={s.name}
-              label={s.name}
-              value={
-                s.level === "debutant"
-                  ? "Débutant"
-                  : s.level === "intermediaire"
-                    ? "Intermédiaire"
-                    : "Avancé"
-              }
-            />
-          ))
-        ) : (
-          <p className="text-sm text-white/30">Non renseigné</p>
-        )}
-      </Section>
-
-      {/* Objectifs & Contraintes */}
-      <Section title="Objectifs & Contraintes">
+      {/* Objectifs */}
+      <Section title="Objectifs">
         <Row
           label="Objectif revenus"
           value={
             data.targetRevenue
-              ? `${Number(data.targetRevenue).toLocaleString("fr-FR")} EUR/mois`
+              ? `${Number(data.targetRevenue).toLocaleString("fr-FR")} €/mois`
               : ""
           }
         />
@@ -139,29 +78,17 @@ export function OnboardingSummary({ data }: OnboardingSummaryProps) {
           label="Budget disponible"
           value={
             data.budgetMonthly !== undefined && Number(data.budgetMonthly) > 0
-              ? `${Number(data.budgetMonthly).toLocaleString("fr-FR")} EUR`
+              ? `${Number(data.budgetMonthly).toLocaleString("fr-FR")} €`
               : String(data.budgetMonthly) === "0"
-                ? "0 EUR"
+                ? "0 €"
                 : ""
           }
         />
-        <Row
-          label="Heures/semaine"
-          value={data.hoursPerWeek ? `${data.hoursPerWeek}h` : ""}
-        />
-        <Row
-          label="Deadline"
-          value={DEADLINE_LABELS[String(data.deadline || "")] || ""}
-        />
-        <Row
-          label="Équipe"
-          value={TEAM_LABELS[String(data.teamPreference || "")] || ""}
-        />
       </Section>
 
-      {/* Objectifs */}
-      <Section title="Objectifs">
-        {objectives.length > 0 ? (
+      {/* Objectifs business */}
+      {objectives.length > 0 && (
+        <Section title="Objectifs business">
           <div className="flex flex-wrap gap-2">
             {objectives.map((o) => (
               <span
@@ -172,14 +99,12 @@ export function OnboardingSummary({ data }: OnboardingSummaryProps) {
               </span>
             ))}
           </div>
-        ) : (
-          <p className="text-sm text-white/30">Non renseigné</p>
-        )}
-      </Section>
+        </Section>
+      )}
 
       {/* Industries */}
-      <Section title="Industries">
-        {industries.length > 0 ? (
+      {industries.length > 0 && (
+        <Section title="Industries">
           <div className="flex flex-wrap gap-2">
             {industries.map((i) => (
               <span
@@ -190,34 +115,17 @@ export function OnboardingSummary({ data }: OnboardingSummaryProps) {
               </span>
             ))}
           </div>
-        ) : (
-          <p className="text-sm text-white/30">Non renseigné</p>
-        )}
-      </Section>
+        </Section>
+      )}
 
-      {/* Expertise (résumés) */}
-      {Object.values(expertiseAnswers).some((v) => v) && (
+      {/* Expertise */}
+      {expertiseAnswers.q1 && (
         <Section title="Expertise">
-          {expertiseAnswers.q1 && (
-            <Row
-              label="Domaine conseil"
-              value={
-                expertiseAnswers.q1.length > 60
-                  ? expertiseAnswers.q1.slice(0, 60) + "..."
-                  : expertiseAnswers.q1
-              }
-            />
-          )}
-          {expertiseAnswers.q2 && (
-            <Row
-              label="Problème résolu"
-              value={
-                expertiseAnswers.q2.length > 60
-                  ? expertiseAnswers.q2.slice(0, 60) + "..."
-                  : expertiseAnswers.q2
-              }
-            />
-          )}
+          <p className="text-sm text-white/60">
+            {expertiseAnswers.q1.length > 120
+              ? expertiseAnswers.q1.slice(0, 120) + "..."
+              : expertiseAnswers.q1}
+          </p>
         </Section>
       )}
     </div>

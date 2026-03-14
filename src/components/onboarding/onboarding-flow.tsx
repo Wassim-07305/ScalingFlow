@@ -14,61 +14,26 @@ import { OnboardingProgressBar } from "./onboarding-progress-bar";
 import { OnboardingTopBar } from "./onboarding-top-bar";
 import { ChipSelector } from "./chip-selector";
 import { MultiChipSelector } from "./multi-chip-selector";
-import { OnboardingSkillMatrix } from "./onboarding-skill-matrix";
 import { OnboardingSummary } from "./onboarding-summary";
 import { ParcoursSelector } from "./parcours-selector";
 import { QUESTIONS } from "./questions";
 import { AILoading } from "@/components/shared/ai-loading";
 import { MarketAnalysis } from "@/components/onboarding/market-analysis";
 import type { MarketAnalysisResult } from "@/types/ai";
-import type {
-  VaultSkillCategory,
-  SituationDetails,
-} from "@/stores/onboarding-store";
+import type { SituationDetails } from "@/stores/onboarding-store";
 
 /* ─── Initial state ─── */
 
 const INITIAL_FORM_DATA: Record<string, unknown> = {
   firstName: "",
-  lastName: "",
-  country: "",
-  language: "",
   situation: "",
   situationDetails: {},
-  formations_text: "",
-  vaultSkills: [],
   expertise_q1: "",
-  expertise_q2: "",
-  expertise_q3: "",
-  expertise_q4: "",
-  hasPayingClients: "",
-  payingClientsDetails: {},
   parcours: "",
-  // Phase 1 per-parcours
-  phase1_a1_motivation: "",
-  phase1_a1_quickwin: "",
-  phase1_a1_learning: "",
-  phase1_a2_transferable: "",
-  phase1_a2_transition: "",
-  phase1_a2_trigger: "",
-  phase1_a3_ideal_offer: "",
-  phase1_a3_pricing_blocker: "",
-  phase1_a3_acquisition: "",
-  phase1_b_channel: "",
-  phase1_b_bottleneck: "",
-  phase1_b_metrics: "",
-  phase1_c_reason: "",
-  phase1_c_assets: "",
-  phase1_c_positioning: "",
-  experienceLevel: "",
-  currentRevenue: "",
   targetRevenue: "",
   industries: [],
   objectives: [],
   budgetMonthly: "",
-  hoursPerWeek: "",
-  deadline: "",
-  teamPreference: "",
 };
 
 /* ─── Animation variants ─── */
@@ -80,29 +45,6 @@ const slideVariants = {
 };
 
 /* ─── Situation-specific fields ─── */
-
-/* ─── Paying clients detail fields ─── */
-
-const PAYING_CLIENTS_FIELDS = [
-  {
-    key: "clients_count",
-    label: "Combien de clients payants ?",
-    placeholder: "Ex: 12",
-    type: "number",
-  },
-  {
-    key: "client_type",
-    label: "Quel type de clients ?",
-    placeholder: "Ex : Coachs fitness, e-commerçants...",
-  },
-  {
-    key: "best_result",
-    label: "Quel résultat tu leur as apporté ?",
-    placeholder: "Ex : +200% de leads en 3 mois...",
-  },
-];
-
-/* ─── Situation-specific fields (aligned with CDC) ─── */
 
 const SITUATION_FIELDS: Record<
   string,
@@ -118,11 +60,6 @@ const SITUATION_FIELDS: Record<
       key: "secteur",
       label: "Quel secteur ?",
       placeholder: "Ex : Tech, Finance, Santé...",
-    },
-    {
-      key: "duree_poste",
-      label: "Depuis combien de temps ?",
-      placeholder: "Ex: 5 ans",
     },
     {
       key: "biggest_challenge",
@@ -148,17 +85,6 @@ const SITUATION_FIELDS: Record<
       type: "number",
     },
     {
-      key: "clients_count",
-      label: "Combien de clients en simultané ?",
-      placeholder: "Ex : 5",
-      type: "number",
-    },
-    {
-      key: "tarif_actuel",
-      label: "Ton tarif actuel",
-      placeholder: "Ex : TJM 400 EUR, forfait 2000 EUR...",
-    },
-    {
       key: "biggest_challenge",
       label: "Qu'est-ce qui te frustre le plus dans ton modèle actuel ?",
       placeholder: "Ex : Je trade mon temps contre de l'argent...",
@@ -174,12 +100,6 @@ const SITUATION_FIELDS: Record<
       key: "ca_actuel",
       label: "CA mensuel actuel (EUR)",
       placeholder: "Ex : 15000",
-      type: "number",
-    },
-    {
-      key: "clients_count",
-      label: "Nombre de clients actifs",
-      placeholder: "Ex : 20",
       type: "number",
     },
     {
@@ -207,11 +127,6 @@ const SITUATION_FIELDS: Record<
       placeholder: "Ex : Commercial B2B, RH, comptable...",
     },
     {
-      key: "duree_experience",
-      label: "Combien d'années d'expérience ?",
-      placeholder: "Ex : 8 ans",
-    },
-    {
       key: "biggest_challenge",
       label: "Pourquoi tu veux changer ?",
       placeholder: "Ex : Je veux plus de liberté, meilleure rémunération...",
@@ -237,72 +152,26 @@ function buildExpertiseAnswers(
   formData: Record<string, unknown>,
 ): Record<string, string> {
   const ea: Record<string, string> = {};
-  for (let i = 1; i <= 4; i++) {
-    const val = formData[`expertise_q${i}`];
-    if (val) ea[`q${i}`] = String(val);
-  }
-  // Include phase1 per-parcours answers
-  const phase1 = buildPhase1Answers(formData);
-  for (const [label, answer] of Object.entries(phase1)) {
-    ea[`phase1_${label}`] = answer;
-  }
+  const val = formData.expertise_q1;
+  if (val) ea.q1 = String(val);
   return ea;
 }
 
-/* ─── Helper: build paying clients details ─── */
+/* ─── Helper: build profile save payload ─── */
 
-function buildPayingClientsDetails(
-  formData: Record<string, unknown>,
-): Record<string, unknown> {
-  const details = (formData.payingClientsDetails as Record<string, unknown>) || {};
+function buildProfilePayload(formData: Record<string, unknown>) {
   return {
-    ...details,
-    has_paying_clients: formData.hasPayingClients === "oui",
+    first_name: (formData.firstName as string) || null,
+    situation: (formData.situation as string) || null,
+    situation_details: formData.situationDetails || {},
+    expertise_answers: buildExpertiseAnswers(formData),
+    parcours: (formData.parcours as string) || null,
+    target_revenue: Number(formData.targetRevenue) || 0,
+    industries: (formData.industries as string[]) || [],
+    objectives: (formData.objectives as string[]) || [],
+    budget_monthly: Number(formData.budgetMonthly) || 0,
+    vault_completed: true,
   };
-}
-
-/* ─── Helper: build phase1 per-parcours answers ─── */
-
-const PHASE1_FIELDS: Record<string, { field: string; label: string }[]> = {
-  A1: [
-    { field: "phase1_a1_motivation", label: "Motivation" },
-    { field: "phase1_a1_quickwin", label: "Quick-win ideal" },
-    { field: "phase1_a1_learning", label: "Style d'apprentissage" },
-  ],
-  A2: [
-    { field: "phase1_a2_transferable", label: "Expertise transferable" },
-    { field: "phase1_a2_transition", label: "Plan de transition" },
-    { field: "phase1_a2_trigger", label: "Déclencheur" },
-  ],
-  A3: [
-    { field: "phase1_a3_ideal_offer", label: "Offre ideale scalable" },
-    { field: "phase1_a3_pricing_blocker", label: "Blocage pricing" },
-    { field: "phase1_a3_acquisition", label: "Acquisition ideale" },
-  ],
-  B: [
-    { field: "phase1_b_channel", label: "Canal d'acquisition actuel" },
-    { field: "phase1_b_bottleneck", label: "Bottleneck croissance" },
-    { field: "phase1_b_metrics", label: "Metriques suivies" },
-  ],
-  C: [
-    { field: "phase1_c_reason", label: "Raison du pivot" },
-    { field: "phase1_c_assets", label: "Assets reutilisables" },
-    { field: "phase1_c_positioning", label: "Positionnement ideal" },
-  ],
-};
-
-function buildPhase1Answers(
-  formData: Record<string, unknown>,
-): Record<string, string> {
-  const parcours = String(formData.parcours || "");
-  const fields = PHASE1_FIELDS[parcours];
-  if (!fields) return {};
-  const answers: Record<string, string> = {};
-  for (const { field, label } of fields) {
-    const val = formData[field];
-    if (val) answers[label] = String(val);
-  }
-  return answers;
 }
 
 /* ═══════════════════════════════════════════════════
@@ -354,33 +223,14 @@ export function OnboardingFlow() {
         if (profile) {
           const r: Record<string, unknown> = { ...INITIAL_FORM_DATA };
           if (profile.first_name) r.firstName = profile.first_name;
-          if (profile.last_name) r.lastName = profile.last_name;
-          if (profile.country) r.country = profile.country;
-          if (profile.language) r.language = profile.language;
           if (profile.situation) r.situation = profile.situation;
           if (profile.situation_details)
             r.situationDetails = profile.situation_details;
-          if (Array.isArray(profile.vault_skills))
-            r.vaultSkills = profile.vault_skills;
           if (profile.expertise_answers) {
             const ea = profile.expertise_answers as Record<string, string>;
-            Object.entries(ea).forEach(([k, v]) => {
-              if (k.startsWith("phase1_")) {
-                // Reverse-map phase1 labels back to form fields
-                const parcours = String(profile.parcours || "");
-                const fields = PHASE1_FIELDS[parcours] || [];
-                const match = fields.find((f) => `phase1_${f.label}` === k);
-                if (match) r[match.field] = v;
-              } else {
-                r[`expertise_${k}`] = v;
-              }
-            });
+            if (ea.q1) r.expertise_q1 = ea.q1;
           }
           if (profile.parcours) r.parcours = profile.parcours;
-          if (profile.experience_level)
-            r.experienceLevel = profile.experience_level;
-          if (profile.current_revenue)
-            r.currentRevenue = String(profile.current_revenue);
           if (profile.target_revenue)
             r.targetRevenue = String(profile.target_revenue);
           if (Array.isArray(profile.industries))
@@ -389,29 +239,6 @@ export function OnboardingFlow() {
             r.objectives = profile.objectives;
           if (profile.budget_monthly != null)
             r.budgetMonthly = String(profile.budget_monthly);
-          if (profile.hours_per_week)
-            r.hoursPerWeek = String(profile.hours_per_week);
-          if (profile.deadline) r.deadline = profile.deadline;
-          if (profile.team_size != null) {
-            r.teamPreference =
-              profile.team_size === 0
-                ? "recruter"
-                : profile.team_size >= 2
-                  ? "equipe"
-                  : "seul";
-          }
-          if (
-            Array.isArray(profile.formations) &&
-            profile.formations.length > 0
-          )
-            r.formations_text = profile.formations[0];
-          // Restore paying clients
-          const sd = profile.situation_details as Record<string, unknown> | null;
-          if (sd?.paying_clients) {
-            const pc = sd.paying_clients as Record<string, unknown>;
-            r.hasPayingClients = pc.has_paying_clients ? "oui" : "non";
-            r.payingClientsDetails = pc;
-          }
 
           // Compute visible questions from restored data for correct step
           const restoredVisible = QUESTIONS.filter(
@@ -463,28 +290,7 @@ export function OnboardingFlow() {
         .from("profiles")
         .update({
           onboarding_step: nextStep,
-          first_name: (formData.firstName as string) || null,
-          last_name: (formData.lastName as string) || null,
-          country: (formData.country as string) || null,
-          language: (formData.language as string) || null,
-          situation: (formData.situation as string) || null,
-          situation_details: {
-            ...(formData.situationDetails || {}),
-            paying_clients: buildPayingClientsDetails(formData),
-          },
-          vault_skills: formData.vaultSkills || [],
-          expertise_answers: buildExpertiseAnswers(formData),
-          parcours: (formData.parcours as string) || null,
-          experience_level: (formData.experienceLevel as string) || null,
-          current_revenue: Number(formData.currentRevenue) || 0,
-          target_revenue: Number(formData.targetRevenue) || 0,
-          industries: (formData.industries as string[]) || [],
-          objectives: (formData.objectives as string[]) || [],
-          budget_monthly: Number(formData.budgetMonthly) || 0,
-          hours_per_week: Number(formData.hoursPerWeek) || 0,
-          deadline: (formData.deadline as string) || "",
-          team_size: formData.teamPreference === "equipe" ? 2 : formData.teamPreference === "recruter" ? 0 : 1,
-          formations: formData.formations_text ? [String(formData.formations_text)] : [],
+          ...buildProfilePayload(formData),
         })
         .eq("id", user.id);
     },
@@ -519,10 +325,8 @@ export function OnboardingFlow() {
         return true;
       case "text":
         return String(formData[field!] || "").trim() !== "";
-      case "text-euro":
-        return String(formData[field!] || "").trim() !== "";
       case "textarea":
-        return true; // Expertise questions are optional
+        return true; // optional
       case "chips":
         return String(formData[field!] || "").trim() !== "";
       case "parcours-selector":
@@ -531,8 +335,6 @@ export function OnboardingFlow() {
         return ((formData[field!] as string[]) || []).length > 0;
       case "multi-field":
         return true;
-      case "skill-matrix":
-        return ((formData[field!] as VaultSkillCategory[]) || []).length > 0;
       case "summary":
         return true;
       default:
@@ -546,37 +348,13 @@ export function OnboardingFlow() {
     if (!user) return;
     await saveProgress(totalSteps);
 
-    const completionData = {
-      onboarding_completed: true,
-      onboarding_step: totalSteps,
-      first_name: (formData.firstName as string) || null,
-      last_name: (formData.lastName as string) || null,
-      country: (formData.country as string) || null,
-      language: (formData.language as string) || null,
-      situation: (formData.situation as string) || null,
-      situation_details: {
-        ...(formData.situationDetails || {}),
-        paying_clients: buildPayingClientsDetails(formData),
-      },
-      vault_skills: formData.vaultSkills || [],
-      expertise_answers: buildExpertiseAnswers(formData),
-      parcours: (formData.parcours as string) || null,
-      experience_level: (formData.experienceLevel as string) || null,
-      current_revenue: Number(formData.currentRevenue) || 0,
-      target_revenue: Number(formData.targetRevenue) || 0,
-      industries: (formData.industries as string[]) || [],
-      objectives: (formData.objectives as string[]) || [],
-      budget_monthly: Number(formData.budgetMonthly) || 0,
-      hours_per_week: Number(formData.hoursPerWeek) || 0,
-      deadline: (formData.deadline as string) || "",
-      team_size: formData.teamPreference === "equipe" ? 2 : formData.teamPreference === "recruter" ? 0 : 1,
-      formations: formData.formations_text ? [String(formData.formations_text)] : [],
-      vault_completed: true,
-    };
-
     await supabase
       .from("profiles")
-      .update(completionData)
+      .update({
+        onboarding_completed: true,
+        onboarding_step: totalSteps,
+        ...buildProfilePayload(formData),
+      })
       .eq("id", user.id);
 
     confetti({
@@ -605,29 +383,16 @@ export function OnboardingFlow() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           firstName: formData.firstName,
-          lastName: formData.lastName,
-          country: formData.country,
-          language: formData.language,
           situation: formData.situation,
-          situationDetails: {
-            ...(formData.situationDetails || {}),
-            paying_clients: buildPayingClientsDetails(formData),
-          },
+          situationDetails: formData.situationDetails || {},
           skills: [],
-          vaultSkills: formData.vaultSkills,
+          vaultSkills: [],
           expertiseAnswers: buildExpertiseAnswers(formData),
           parcours: formData.parcours,
-          experienceLevel: formData.experienceLevel,
-          currentRevenue: Number(formData.currentRevenue) || 0,
           targetRevenue: Number(formData.targetRevenue) || 0,
           industries: formData.industries,
           objectives: formData.objectives,
           budgetMonthly: Number(formData.budgetMonthly) || 0,
-          hoursPerWeek: Number(formData.hoursPerWeek) || 0,
-          deadline: (formData.deadline as string) || "",
-          teamSize: formData.teamPreference === "equipe" ? 2 : 1,
-          formations: formData.formations_text ? [String(formData.formations_text)] : [],
-          phase1Answers: buildPhase1Answers(formData),
         }),
       });
 
@@ -657,29 +422,7 @@ export function OnboardingFlow() {
       .update({
         onboarding_completed: true,
         onboarding_step: totalSteps,
-        first_name: (formData.firstName as string) || null,
-        last_name: (formData.lastName as string) || null,
-        country: (formData.country as string) || null,
-        language: (formData.language as string) || null,
-        situation: (formData.situation as string) || null,
-        situation_details: {
-          ...(formData.situationDetails || {}),
-          paying_clients: buildPayingClientsDetails(formData),
-        },
-        vault_skills: formData.vaultSkills || [],
-        expertise_answers: buildExpertiseAnswers(formData),
-        parcours: (formData.parcours as string) || null,
-        experience_level: (formData.experienceLevel as string) || null,
-        current_revenue: Number(formData.currentRevenue) || 0,
-        target_revenue: Number(formData.targetRevenue) || 0,
-        industries: (formData.industries as string[]) || [],
-        objectives: (formData.objectives as string[]) || [],
-        budget_monthly: Number(formData.budgetMonthly) || 0,
-        hours_per_week: Number(formData.hoursPerWeek) || 0,
-        deadline: (formData.deadline as string) || "",
-        team_size: formData.teamPreference === "equipe" ? 2 : formData.teamPreference === "recruter" ? 0 : 1,
-        formations: formData.formations_text ? [String(formData.formations_text)] : [],
-        vault_completed: true,
+        ...buildProfilePayload(formData),
         selected_market: market.name,
         market_viability_score: market.viability_score,
         niche: market.name,
@@ -713,7 +456,6 @@ export function OnboardingFlow() {
       if (e.key !== "Enter") return;
       if (!currentQuestion) return;
       const t = currentQuestion.type;
-      // Don't advance for textarea, multi-field, summary, welcome
       if (
         t === "textarea" ||
         t === "multi-field" ||
@@ -813,31 +555,6 @@ export function OnboardingFlow() {
           </div>
         );
 
-      /* ── Euro input ── */
-      case "text-euro":
-        return (
-          <div className="w-full max-w-lg">
-            <div className="mb-8">
-              <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
-                {q.title}
-              </h2>
-            </div>
-            <div className="relative">
-              <input
-                data-autofocus
-                type="number"
-                value={String(fieldValue || "")}
-                onChange={(e) => setField(q.field!, e.target.value)}
-                placeholder={q.placeholder}
-                className="w-full border-b-2 border-white/20 bg-transparent pb-3 pr-14 text-2xl font-medium text-white outline-none placeholder:text-white/25 transition-colors focus:border-emerald-400 sm:text-3xl"
-              />
-              <span className="absolute bottom-3 right-0 text-lg text-white/30">
-                EUR
-              </span>
-            </div>
-          </div>
-        );
-
       /* ── Textarea ── */
       case "textarea":
         return (
@@ -855,7 +572,7 @@ export function OnboardingFlow() {
               value={String(fieldValue || "")}
               onChange={(e) => setField(q.field!, e.target.value)}
               placeholder={q.placeholder}
-              rows={3}
+              rows={4}
               className="w-full resize-none rounded-xl border-2 border-white/20 bg-white/5 px-5 py-4 text-lg text-white outline-none placeholder:text-white/25 transition-colors focus:border-emerald-400"
             />
           </div>
@@ -904,15 +621,11 @@ export function OnboardingFlow() {
           </div>
         );
 
-      /* ── Multi-field (situation details OR paying clients details) ── */
+      /* ── Multi-field (situation details) ── */
       case "multi-field": {
-        const isPayingClients = q.field === "payingClientsDetails";
         const situation = String(formData.situation || "etudiant");
-        const fields = isPayingClients
-          ? PAYING_CLIENTS_FIELDS
-          : (SITUATION_FIELDS[situation] || SITUATION_FIELDS.etudiant);
-        const detailsKey = isPayingClients ? "payingClientsDetails" : "situationDetails";
-        const details = (formData[detailsKey] as SituationDetails) || {};
+        const fields = SITUATION_FIELDS[situation] || SITUATION_FIELDS.etudiant;
+        const details = (formData.situationDetails as SituationDetails) || {};
 
         return (
           <div className="w-full max-w-lg">
@@ -944,7 +657,7 @@ export function OnboardingFlow() {
                             ? Number(e.target.value)
                             : e.target.value,
                       };
-                      setField(detailsKey, updated);
+                      setField("situationDetails", updated);
                     }}
                     placeholder={f.placeholder}
                     className="w-full rounded-xl border-2 border-white/20 bg-white/5 px-5 py-3.5 text-lg text-white outline-none placeholder:text-white/25 transition-colors focus:border-emerald-400"
@@ -955,25 +668,6 @@ export function OnboardingFlow() {
           </div>
         );
       }
-
-      /* ── Skill matrix ── */
-      case "skill-matrix":
-        return (
-          <div className="w-full max-w-lg">
-            <div className="mb-8">
-              <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
-                {q.title}
-              </h2>
-              {q.subtitle && (
-                <p className="mt-2 text-base text-white/40">{q.subtitle}</p>
-              )}
-            </div>
-            <OnboardingSkillMatrix
-              value={(fieldValue as VaultSkillCategory[]) || []}
-              onChange={(v) => setField(q.field!, v)}
-            />
-          </div>
-        );
 
       /* ── Parcours selector ── */
       case "parcours-selector":
@@ -1092,7 +786,7 @@ export function OnboardingFlow() {
       <OnboardingProgressBar step={step} total={totalSteps} />
 
       <div className="relative z-10 flex min-h-dvh flex-col">
-        {/* Top bar — always visible, back invisible on welcome */}
+        {/* Top bar */}
         <OnboardingTopBar
           onBack={goPrev}
           step={step}
@@ -1114,7 +808,7 @@ export function OnboardingFlow() {
             >
               {renderQuestion()}
 
-              {/* Inline navigation — below question, left-aligned (Rivia style) */}
+              {/* Inline navigation */}
               {showNav && (
                 <div className="mt-8 flex items-center gap-4">
                   <button
