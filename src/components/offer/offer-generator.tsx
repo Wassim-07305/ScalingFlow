@@ -10,6 +10,8 @@ import { AILoading } from "@/components/shared/ai-loading";
 import { EmptyState } from "@/components/shared/empty-state";
 import { OfferPreview } from "./offer-preview";
 import { UpgradeWall } from "@/components/shared/upgrade-wall";
+import { createClient } from "@/lib/supabase/client";
+import { useUser } from "@/hooks/use-user";
 
 interface OfferGeneratorProps {
   className?: string;
@@ -20,6 +22,7 @@ interface OfferGeneratorProps {
 }
 
 export function OfferGenerator({ className, marketAnalysisId, marketName, initialData }: OfferGeneratorProps) {
+  const { user } = useUser();
   const [loading, setLoading] = React.useState(false);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [generatedOffer, setGeneratedOffer] = React.useState<any>(null);
@@ -121,7 +124,13 @@ export function OfferGenerator({ className, marketAnalysisId, marketName, initia
           title="Aucune analyse de marché"
           description="Complète d'abord l'onboarding pour analyser ton marché et pouvoir générer une offre."
           actionLabel="Aller à l'onboarding"
-          onAction={() => window.location.href = "/onboarding"}
+          onAction={async () => {
+            if (user) {
+              const supabase = createClient();
+              await supabase.from("profiles").update({ onboarding_completed: false, onboarding_step: 0 }).eq("id", user.id);
+            }
+            window.location.href = "/onboarding";
+          }}
         />
       )}
     </div>
