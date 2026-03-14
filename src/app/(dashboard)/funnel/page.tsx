@@ -44,7 +44,7 @@ export default function FunnelPage() {
   return (
     <div>
       <PageHeader
-        title="Funnel Builder"
+        title="Constructeur de Funnel"
         description="Construis ton funnel de conversion avec copy IA."
       />
 

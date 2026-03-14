@@ -113,7 +113,7 @@ export default function AssetsPage() {
   return (
     <div>
       <PageHeader
-        title="Sales Assets"
+        title="Ressources Commerciales"
         description="Genere tes scripts VSL, emails, pitch decks et plus avec l'IA."
       />
 

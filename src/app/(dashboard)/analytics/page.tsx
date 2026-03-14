@@ -57,8 +57,8 @@ export default function AnalyticsPage() {
   return (
     <div>
       <PageHeader
-        title="Analytics"
-        description="Tableau de bord de performance, optimisations IA et suivi de vos metriques."
+        title="Analytiques"
+        description="Tableau de bord de performance, optimisations IA et suivi de tes metriques."
       />
 
       <TabBar tabs={TABS} activeTab={activeTab} onTabChange={setActiveTab} />

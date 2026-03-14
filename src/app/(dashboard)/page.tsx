@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import { PageHeader } from "@/components/layout/page-header";
 import { WelcomeBanner } from "@/components/dashboard/welcome-banner";
 import { StatsOverview } from "@/components/dashboard/stats-overview";
@@ -12,49 +13,61 @@ import { ActivityFeed } from "@/components/dashboard/activity-feed";
 import { QuickActions } from "@/components/dashboard/quick-actions";
 import { SmartRecommendations } from "@/components/dashboard/smart-recommendations";
 import { WeeklyChallenges } from "@/components/dashboard/weekly-challenges";
+import { SkeletonCard, SkeletonDashboard } from "@/components/ui/skeleton";
+
+function SectionFallback({ className }: { className?: string }) {
+  return <SkeletonCard className={className} />;
+}
 
 export default function DashboardPage() {
   return (
     <div>
       <PageHeader
-        title="Dashboard"
+        title="Tableau de Bord"
         description="Vue d'ensemble de ton business."
       />
 
-      <div className="space-y-4 sm:space-y-6">
-        {/* Welcome Banner (name, plan, usage) */}
-        <WelcomeBanner />
+      <Suspense fallback={<SkeletonDashboard />}>
+        <div className="space-y-4 sm:space-y-6">
+          <Suspense fallback={<SectionFallback className="h-24" />}>
+            <WelcomeBanner />
+          </Suspense>
 
-        {/* KPI Cards */}
-        <StatsOverview />
+          <Suspense fallback={
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              {[1,2,3,4].map(i => <SectionFallback key={i} />)}
+            </div>
+          }>
+            <StatsOverview />
+          </Suspense>
 
-        {/* Progress Bars (XP + Roadmap) */}
-        <ProgressBar />
+          <ProgressBar />
 
-        {/* Pipeline + Tasks */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-          <BusinessPipeline />
-          <NextTasks />
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+            <Suspense fallback={<SectionFallback className="h-48" />}>
+              <BusinessPipeline />
+            </Suspense>
+            <Suspense fallback={<SectionFallback className="h-48" />}>
+              <NextTasks />
+            </Suspense>
+          </div>
+
+          <WeeklyChallenges />
+          <SmartRecommendations />
+          <ActivityFeed />
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+            <Suspense fallback={<SectionFallback className="h-64" />}>
+              <RevenueChart />
+            </Suspense>
+            <Suspense fallback={<SectionFallback className="h-64" />}>
+              <LeadsChart />
+            </Suspense>
+          </div>
+
+          <QuickActions />
         </div>
-
-        {/* Weekly Challenges */}
-        <WeeklyChallenges />
-
-        {/* Smart Recommendations */}
-        <SmartRecommendations />
-
-        {/* Activity Feed */}
-        <ActivityFeed />
-
-        {/* Charts Row */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-          <RevenueChart />
-          <LeadsChart />
-        </div>
-
-        {/* Quick Actions */}
-        <QuickActions />
-      </div>
+      </Suspense>
     </div>
   );
 }

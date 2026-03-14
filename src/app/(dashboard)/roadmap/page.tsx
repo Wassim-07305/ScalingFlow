@@ -52,7 +52,7 @@ export default function RoadmapPage() {
   return (
     <div>
       <PageHeader
-        title="Roadmap"
+        title="Feuille de Route"
         description="Ta feuille de route personnalisee pour scaler."
         actions={
           <Button onClick={handleGenerate} disabled={generating}>

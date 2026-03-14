@@ -60,7 +60,7 @@ export default function LoginPage() {
           <h1 className="text-3xl font-bold text-text-primary">ScalingFlow</h1>
         </div>
         <p className="text-text-secondary">
-          Connecte-toi pour accéder à ton cockpit.
+          Connecte-toi pour acceder a ton cockpit.
         </p>
       </div>
 
@@ -118,7 +118,7 @@ export default function LoginPage() {
             href="/register"
             className="text-info hover:underline font-medium"
           >
-            Créer un compte
+            Creer un compte
           </Link>
         </p>
         <p className="text-xs text-text-muted">

@@ -88,7 +88,7 @@ export default function ContentPage() {
     <div>
       <PageHeader
         title="Contenu"
-        description="Génère et planifie du contenu pour tes reseaux sociaux."
+        description="Genere et planifie du contenu pour tes reseaux sociaux."
       />
 
       <TabBar tabs={TABS} activeTab={activeTab} onTabChange={setActiveTab} />
