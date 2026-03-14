@@ -140,20 +140,16 @@ export default function SettingsPage() {
   // --- Relancer onboarding ---
   const [resettingOnboarding, setResettingOnboarding] = useState(false);
   const handleResetOnboarding = useCallback(async () => {
-    if (!user) return;
     setResettingOnboarding(true);
     try {
-      const { error } = await supabase
-        .from("profiles")
-        .update({ onboarding_completed: false, onboarding_step: 0 })
-        .eq("id", user.id);
-      if (error) throw error;
+      const res = await fetch("/api/onboarding/reset", { method: "POST" });
+      if (!res.ok) throw new Error();
       window.location.href = "/onboarding";
     } catch {
       toast.error("Erreur lors de la réinitialisation.");
       setResettingOnboarding(false);
     }
-  }, [user, supabase]);
+  }, []);
 
   // --- Profil ---
   const [fullName, setFullName] = useState("");
