@@ -7,9 +7,13 @@ export async function logActivity(
 ): Promise<void> {
   const supabase = await createClient();
 
-  await supabase.from("activity_log").insert({
+  const { error } = await supabase.from("activity_log").insert({
     user_id: userId,
     activity_type: activityType,
     activity_data: activityData || {},
   });
+
+  if (error) {
+    console.error("logActivity: failed to insert", error);
+  }
 }

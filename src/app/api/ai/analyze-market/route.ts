@@ -90,9 +90,9 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(result);
   } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
+    console.error("[analyze-market] Error:", error);
     return NextResponse.json(
-      { error: `Erreur analyse : ${message}` },
+      { error: "Erreur lors de l'analyse de marché" },
       { status: 500 }
     );
   }

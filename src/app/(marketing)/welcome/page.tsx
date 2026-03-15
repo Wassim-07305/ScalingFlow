@@ -225,7 +225,7 @@ export default function WelcomePage() {
           </div>
           <div className="flex items-center gap-2">
             <Zap className="h-4 w-4 text-accent" />
-            <span>Resultats en <span className="text-text-primary font-semibold">30 secondes</span></span>
+            <span>Résultats en <span className="text-text-primary font-semibold">30 secondes</span></span>
           </div>
         </div>
       </section>

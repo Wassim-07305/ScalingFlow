@@ -18,16 +18,26 @@ function getAdminClient() {
   return createClient(url, serviceKey);
 }
 
-export async function POST() {
+export async function POST(req: Request) {
   try {
+    // Verify authentication via cron secret or admin user
+    const cronSecret = req.headers.get("x-cron-secret");
+    const expectedSecret = process.env.CRON_SECRET;
+
+    if (!expectedSecret || cronSecret !== expectedSecret) {
+      // Fall back to checking if user is authenticated (admin check)
+      const { createClient } = await import("@/lib/supabase/server");
+      const userSupabase = await createClient();
+      const { data: { user } } = await userSupabase.auth.getUser();
+      if (!user) {
+        return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+      }
+    }
+
     const supabase = getAdminClient();
     if (!supabase) {
       return NextResponse.json({ error: "Configuration manquante" }, { status: 500 });
     }
-
-    // Vérifier l'authentification (admin ou cron secret)
-    // Pour un cron, on pourrait vérifier un header secret
-    // Pour l'instant, cette route est protegee par le middleware auth
 
     // Récupérer tous les profils
     const { data: profiles, error: profilesError } = await supabase

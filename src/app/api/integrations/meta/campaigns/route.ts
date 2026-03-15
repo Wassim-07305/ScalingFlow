@@ -149,12 +149,20 @@ export async function POST(req: NextRequest) {
     let metaAdCreativeId: string | null = null;
 
     if (image_url && link_url) {
+      if (!body.page_id) {
+        return NextResponse.json(
+          { error: "page_id est requis pour créer une publicité avec image." },
+          { status: 400 }
+        );
+      }
+
       const creativeRes = await metaPost(
         `${META_GRAPH_URL}/act_${adAccountId}/adcreatives`,
         {
           access_token: token,
           name: `${campaign_name} — Creative`,
           object_story_spec: {
+            page_id: body.page_id,
             link_data: {
               message: ad_copy || "",
               link: link_url,
@@ -162,7 +170,6 @@ export async function POST(req: NextRequest) {
               call_to_action: { type: cta },
               picture: image_url,
             },
-            page_id: body.page_id,
           },
         }
       );

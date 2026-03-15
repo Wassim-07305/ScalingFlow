@@ -178,7 +178,7 @@ export async function POST(req: NextRequest) {
 
     // Récupérer le profil + vault + ad insights + sales insights en parallele
     const [{ data: profile }, vaultContext, adInsights, salesInsights] = await Promise.all([
-      supabase.from("profiles").select("*").eq("id", user.id).single(),
+      supabase.from("profiles").select("id, full_name, skills, target_market, niche, situation, parcours, target_revenue, industries, objectives").eq("id", user.id).single(),
       buildFullVaultContext(user.id),
       fetchAdInsights(supabase, user.id),
       fetchSalesInsights(supabase, user.id),
@@ -454,9 +454,9 @@ export async function POST(req: NextRequest) {
       ideas: generatedContent.ideas || [],
     });
   } catch (error) {
-    const errMsg = error instanceof Error ? error.message : String(error);
+    console.error("[generate-content] Error:", error);
     return NextResponse.json(
-      { error: `Erreur lors de la génération du contenu: ${errMsg}` },
+      { error: "Erreur lors de la génération du contenu" },
       { status: 500 }
     );
   }

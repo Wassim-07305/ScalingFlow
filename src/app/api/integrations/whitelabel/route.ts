@@ -56,7 +56,8 @@ export async function POST(req: NextRequest) {
           { status: 409 }
         );
       }
-      return NextResponse.json({ error: orgError.message }, { status: 500 });
+      console.error("[whitelabel] Org creation error:", orgError);
+      return NextResponse.json({ error: "Erreur lors de la création" }, { status: 500 });
     }
 
     // Add owner as member
@@ -184,7 +185,8 @@ export async function PATCH(req: NextRequest) {
       .single();
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      console.error("[whitelabel] Update error:", error);
+      return NextResponse.json({ error: "Erreur lors de la mise à jour" }, { status: 500 });
     }
 
     return NextResponse.json({ success: true, organization: org });

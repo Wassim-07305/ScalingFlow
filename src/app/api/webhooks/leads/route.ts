@@ -64,9 +64,9 @@ export async function POST(req: NextRequest) {
       message: "Lead received and notification created",
     });
   } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
+    console.error("Webhook error:", error);
     return NextResponse.json(
-      { error: `Webhook error: ${message}` },
+      { error: "Erreur interne du webhook" },
       { status: 500 }
     );
   }

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useUser } from "@/hooks/use-user";
 import { toast } from "sonner";
@@ -25,7 +25,7 @@ export const STATUSES: ColumnConfig[] = [
 ];
 
 export function PipelineBoard() {
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
   const { user } = useUser();
   const [leads, setLeads] = useState<PipelineLead[]>([]);
   const [loading, setLoading] = useState(true);

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { verifyOAuthState } from "@/lib/utils/oauth-state";
 
 // ─── GoHighLevel OAuth: Callback Handler ─────────────────────
 // GET /api/integrations/ghl/callback?code=xxx&state=xxx
@@ -15,12 +16,16 @@ export async function GET(req: NextRequest) {
       return NextResponse.redirect(`${appUrl}/settings?error=ghl_missing_params`);
     }
 
-    const stateData = JSON.parse(Buffer.from(state, "base64url").toString());
+    // SECURITY: Verify HMAC-signed state to prevent CSRF
+    const stateUserId = verifyOAuthState(state);
+    if (!stateUserId) {
+      return NextResponse.redirect(`${appUrl}/settings?error=ghl_invalid_state`);
+    }
 
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
-    if (!user || user.id !== stateData.userId) {
+    if (!user || user.id !== stateUserId) {
       return NextResponse.redirect(`${appUrl}/settings?error=ghl_auth_mismatch`);
     }
 

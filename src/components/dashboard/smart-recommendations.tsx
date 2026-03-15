@@ -98,7 +98,7 @@ export function SmartRecommendations() {
         recs.push({
           id: "vault",
           title: "Complète ton Vault",
-          description: "Definis tes compétences et ta situation pour que l'IA personnalise tout ton contenu.",
+          description: "Définis tes compétences et ta situation pour que l'IA personnalise tout ton contenu.",
           href: "/vault",
           icon: Archive,
           priority: "high",

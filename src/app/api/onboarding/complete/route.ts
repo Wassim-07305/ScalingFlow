@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
     if (dbError) {
       console.error("[onboarding/complete] DB error:", dbError);
       return NextResponse.json(
-        { error: `Erreur de sauvegarde : ${dbError.message}` },
+        { error: "Erreur de sauvegarde" },
         { status: 500 }
       );
     }

@@ -49,6 +49,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
     }
 
+    // Parse body once upfront (ReadableStream can only be consumed once)
+    const body = await req.json();
+
     // Get GHL credentials
     const { data: connection } = await supabase
       .from("connected_accounts")
@@ -66,8 +69,19 @@ export async function POST(req: NextRequest) {
         .single();
 
       if (profile?.ghl_webhook_url) {
+        // SECURITY: Validate webhook URL to prevent SSRF
+        try {
+          const webhookUrl = new URL(profile.ghl_webhook_url);
+          const wh = webhookUrl.hostname.toLowerCase();
+          const blocked = [/^localhost$/, /^127\./, /^10\./, /^172\.(1[6-9]|2\d|3[0-1])\./, /^192\.168\./, /^0\./, /^169\.254\./, /\.internal$/, /\.local$/];
+          if (blocked.some((p) => p.test(wh)) || !["http:", "https:"].includes(webhookUrl.protocol)) {
+            return NextResponse.json({ error: "URL webhook non autorisée" }, { status: 400 });
+          }
+        } catch {
+          return NextResponse.json({ error: "URL webhook invalide" }, { status: 400 });
+        }
+
         // Push via webhook
-        const body = await req.json();
         const res = await fetch(profile.ghl_webhook_url, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -104,7 +118,6 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    const body = await req.json();
     const { email, phone, name, firstName, lastName, tags, source, notes } = body;
 
     if (!email && !phone) {

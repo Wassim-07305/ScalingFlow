@@ -366,7 +366,7 @@ export function OptimizationRecommendations() {
                       <div className="pt-4 space-y-4">
                         <div>
                           <h4 className="text-xs font-semibold text-text-muted uppercase tracking-wider mb-2">
-                            Etapes d&apos;action
+                            Étapes d&apos;action
                           </h4>
                           <ol className="space-y-2">
                             {reco.action_steps.map((step, i) => (

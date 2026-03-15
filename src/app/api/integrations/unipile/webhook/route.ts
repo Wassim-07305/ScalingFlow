@@ -7,6 +7,19 @@ import { createServerClient } from "@supabase/ssr";
 
 export async function POST(request: NextRequest) {
   try {
+    // SECURITY: Verify webhook authenticity via shared secret
+    const webhookSecret = process.env.UNIPILE_WEBHOOK_SECRET;
+    if (webhookSecret) {
+      const providedSecret = request.headers.get("x-webhook-secret") ||
+        request.headers.get("authorization")?.replace("Bearer ", "");
+      if (providedSecret !== webhookSecret) {
+        return NextResponse.json(
+          { error: "Webhook non autorisé" },
+          { status: 401 }
+        );
+      }
+    }
+
     const body = await request.json();
 
     const { event, data } = body as {

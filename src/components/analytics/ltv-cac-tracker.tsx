@@ -738,7 +738,7 @@ export function LTVCACTracker() {
             {formData.avgDealValue > 0 && formData.newCustomers > 0 && (
               <div className="p-3 rounded-xl bg-bg-tertiary/50 border border-border-default">
                 <h4 className="text-xs font-semibold text-text-muted uppercase tracking-wider mb-2">
-                  Apercu
+                  Aperçu
                 </h4>
                 <div className="grid grid-cols-2 gap-2 text-sm">
                   <div>

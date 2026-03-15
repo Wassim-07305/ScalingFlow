@@ -59,7 +59,8 @@ export async function POST(req: NextRequest) {
     const { error: updateError } = await supabase
       .from("pipeline_leads")
       .update({ status: newStatus })
-      .eq("id", leadId);
+      .eq("id", leadId)
+      .eq("user_id", user.id);
 
     if (updateError) {
       return NextResponse.json(

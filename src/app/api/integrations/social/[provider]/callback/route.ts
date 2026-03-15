@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { verifyOAuthState } from "@/lib/utils/oauth-state";
 
 // ─── Social OAuth: Callback Handler (#56) ────────────────────
 // GET /api/integrations/social/[provider]/callback
@@ -70,11 +71,16 @@ export async function GET(
       return NextResponse.redirect(`${appUrl}/settings?error=${provider}_missing_params`);
     }
 
-    const stateData = JSON.parse(Buffer.from(state, "base64url").toString());
+    // SECURITY: Verify HMAC-signed state to prevent CSRF
+    const stateUserId = verifyOAuthState(state);
+    if (!stateUserId) {
+      return NextResponse.redirect(`${appUrl}/settings?error=${provider}_invalid_state`);
+    }
+
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
-    if (!user || user.id !== stateData.userId) {
+    if (!user || user.id !== stateUserId) {
       return NextResponse.redirect(`${appUrl}/settings?error=${provider}_auth_mismatch`);
     }
 

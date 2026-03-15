@@ -45,7 +45,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const result = await awardXP(user.id, activityType, body.data, body.xpOverride);
+    // SECURITY: Never accept xpOverride from the client — only server-side can override XP
+    const result = await awardXP(user.id, activityType, body.data);
 
     return NextResponse.json(result);
   } catch {

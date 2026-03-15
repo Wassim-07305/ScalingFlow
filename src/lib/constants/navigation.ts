@@ -135,6 +135,9 @@ export const BREADCRUMB_LABELS: Record<string, string> = {
   settings: "Paramètres",
   admin: "Administration",
   portal: "Portail",
+  campaigns: "Campagnes",
+  creatives: "Créatifs",
+  "unipile-callback": "Unipile",
 };
 
 // ─── Quick links (Cmd+K) ─────────────────────────────────────

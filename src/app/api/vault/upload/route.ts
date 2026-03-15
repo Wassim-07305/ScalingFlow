@@ -38,9 +38,28 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // SECURITY: Validate file type
+    const ALLOWED_VAULT_TYPES = [
+      "application/pdf",
+      "text/plain", "text/csv", "text/markdown",
+      "image/jpeg", "image/png", "image/gif", "image/webp",
+      "application/msword",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    ];
+
+    if (file.type && !ALLOWED_VAULT_TYPES.includes(file.type)) {
+      return NextResponse.json(
+        { error: "Type de fichier non autorisé pour le vault" },
+        { status: 400 }
+      );
+    }
+
+    // SECURITY: Sanitize filename to prevent path traversal
+    const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+
     // Upload to Supabase Storage
-    const ext = file.name.split(".").pop() || "bin";
-    const storagePath = `${user.id}/${Date.now()}_${file.name}`;
+    const ext = safeName.split(".").pop() || "bin";
+    const storagePath = `${user.id}/${Date.now()}_${safeName}`;
 
     const { error: uploadError } = await supabase.storage
       .from("vault-resources")
@@ -51,7 +70,7 @@ export async function POST(req: NextRequest) {
 
     if (uploadError) {
       return NextResponse.json(
-        { error: "Erreur lors de l'upload: " + uploadError.message },
+        { error: "Erreur lors de l'upload" },
         { status: 500 }
       );
     }

@@ -171,7 +171,7 @@ export function OutboundWorkflow() {
           </div>
         </div>
 
-        {/* Apercu */}
+        {/* Aperçu */}
         {result.overview && (
           <GlowCard glowColor="blue">
             <p className="text-sm text-text-secondary leading-relaxed">{result.overview}</p>

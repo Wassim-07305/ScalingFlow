@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
 
     // Récupérer le profil + vault resources pour le contexte
     const [{ data: profile }, vaultContext] = await Promise.all([
-      supabase.from("profiles").select("*").eq("id", user.id).single(),
+      supabase.from("profiles").select("id, full_name, skills, target_market, niche, situation, parcours, target_revenue, industries, objectives").eq("id", user.id).single(),
       buildFullVaultContext(user.id),
     ]);
 

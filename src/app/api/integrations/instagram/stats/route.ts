@@ -3,7 +3,10 @@ import { createClient } from "@/lib/supabase/server";
 
 export const maxDuration = 30;
 
-const INSTAGRAM_GRAPH_URL = "https://graph.instagram.com";
+// Use Facebook Graph API for Instagram Business/Creator accounts.
+// The legacy https://graph.instagram.com endpoint (Basic Display API) is
+// deprecated and does not support business fields like followers_count.
+const INSTAGRAM_GRAPH_URL = "https://graph.facebook.com/v21.0";
 
 export async function GET() {
   try {

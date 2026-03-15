@@ -148,7 +148,28 @@ export async function generateJSON<T>({
     })
   );
 
-  return JSON.parse(jsonStr) as T;
+  try {
+    return JSON.parse(jsonStr) as T;
+  } catch (parseError) {
+    // Last resort: try to find the first { ... } or [ ... ] block
+    const objectMatch = jsonStr.match(/\{[\s\S]*\}/);
+    const arrayMatch = jsonStr.match(/\[[\s\S]*\]/);
+    const fallback = objectMatch?.[0] || arrayMatch?.[0];
+
+    if (fallback) {
+      try {
+        return JSON.parse(fallback) as T;
+      } catch {
+        // Both attempts failed
+      }
+    }
+
+    throw new Error(
+      `L'IA a retourné un JSON invalide. Réessaie.${
+        parseError instanceof Error ? ` (${parseError.message})` : ""
+      }`
+    );
+  }
 }
 
 export function createStreamingResponse(

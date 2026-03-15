@@ -30,7 +30,7 @@ export function FolderCard({
   return (
     <div className="group relative rounded-2xl bg-bg-secondary/50 border border-border-default/50 p-4 transition-all duration-200 hover:border-accent/20 hover:shadow-lg hover:shadow-accent/5 hover:bg-bg-secondary cursor-pointer backdrop-blur-sm">
       <div className="flex items-start justify-between">
-        <button onClick={onClick} className="flex-1 text-left">
+        <button onClick={onClick} className="flex-1 text-left" aria-label={`Ouvrir le dossier ${name}`}>
           <div
             className="flex h-12 w-12 items-center justify-center rounded-xl mb-3 transition-transform duration-200 group-hover:scale-105"
             style={{ backgroundColor: `${color}15` }}
@@ -45,7 +45,7 @@ export function FolderCard({
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="p-1.5 rounded-lg text-text-muted opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-bg-tertiary hover:text-text-primary">
+            <button className="p-1.5 rounded-lg text-text-muted sm:opacity-0 sm:group-hover:opacity-100 transition-all duration-200 hover:bg-bg-tertiary hover:text-text-primary" aria-label={`Actions pour le dossier ${name}`}>
               <MoreVertical className="h-4 w-4" />
             </button>
           </DropdownMenuTrigger>

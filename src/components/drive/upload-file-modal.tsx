@@ -101,6 +101,7 @@ export function UploadFileModal({
     }
 
     setUploading(false);
+    const failedCount = files.length - successCount;
     if (successCount > 0) {
       toast.success(
         successCount === 1
@@ -108,7 +109,12 @@ export function UploadFileModal({
           : `${successCount} fichiers uploadés avec succès`
       );
       onUploadComplete();
-      onOpenChange(false);
+      if (failedCount === 0) {
+        onOpenChange(false);
+      } else {
+        // Keep modal open with only the failed files so user can retry
+        toast.error(`${failedCount} fichier${failedCount > 1 ? "s" : ""} en erreur`);
+      }
     }
   };
 

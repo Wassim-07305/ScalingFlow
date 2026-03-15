@@ -130,6 +130,31 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // SECURITY: Block SSRF — prevent fetching internal/private network addresses
+    const hostname = parsedUrl.hostname.toLowerCase();
+    const blockedPatterns = [
+      /^localhost$/,
+      /^127\./,
+      /^10\./,
+      /^172\.(1[6-9]|2\d|3[0-1])\./,
+      /^192\.168\./,
+      /^0\./,
+      /^169\.254\./, // AWS metadata
+      /^\[::1\]$/,
+      /^\[fd/,
+      /^\[fe80:/,
+      /^metadata\.google\.internal$/,
+      /\.internal$/,
+      /\.local$/,
+    ];
+
+    if (blockedPatterns.some((p) => p.test(hostname))) {
+      return NextResponse.json(
+        { error: "URL non autorisée." },
+        { status: 400 }
+      );
+    }
+
     // Fetch the page HTML
     let html: string;
     try {

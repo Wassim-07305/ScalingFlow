@@ -36,7 +36,7 @@ type MetricKey = "spend" | "roas" | "conversions" | "clicks";
 
 const METRICS: { key: MetricKey; label: string; color: string; suffix: string }[] = [
   { key: "roas", label: "ROAS", color: "#34D399", suffix: "x" },
-  { key: "spend", label: "Depense", color: "#60A5FA", suffix: " €" },
+  { key: "spend", label: "Dépense", color: "#60A5FA", suffix: " €" },
   { key: "conversions", label: "Conversions", color: "#A78BFA", suffix: "" },
   { key: "clicks", label: "Clics", color: "#FBBF24", suffix: "" },
 ];

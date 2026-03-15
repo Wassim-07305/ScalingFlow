@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
@@ -124,7 +124,7 @@ export default function ClientDetailPage() {
   const router = useRouter();
   const clientId = params.id as string;
   const { user } = useUser();
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   const [client, setClient] = React.useState<ClientDetail | null>(null);
   const [deals, setDeals] = React.useState<DealRow[]>([]);
@@ -376,7 +376,36 @@ export default function ClientDetailPage() {
     );
   }
 
-  if (!client) return null;
+  if (!client) {
+    return (
+      <div className="max-w-4xl mx-auto">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="mb-4 text-text-secondary hover:text-text-primary"
+          onClick={() => router.push("/clients")}
+        >
+          <ArrowLeft className="h-4 w-4 mr-1" />
+          Retour aux clients
+        </Button>
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border-default bg-bg-secondary/30 py-16 text-center backdrop-blur-sm">
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-bg-tertiary mb-4">
+            <Activity className="h-7 w-7 text-text-muted" />
+          </div>
+          <h3 className="text-base font-semibold text-text-primary mb-1">
+            Client introuvable
+          </h3>
+          <p className="text-sm text-text-secondary mb-5 max-w-sm">
+            Ce client n&apos;existe pas ou a été supprimé.
+          </p>
+          <Button onClick={() => router.push("/clients")}>
+            <ArrowLeft className="h-4 w-4 mr-1" />
+            Retour aux clients
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   const statusCfg = STATUS_CONFIG[client.status];
 
@@ -452,7 +481,7 @@ export default function ClientDetailPage() {
       </div>
 
       {/* Mini stats row */}
-      <div className="grid grid-cols-3 gap-3 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
         <div className="flex items-center gap-3 rounded-2xl border border-border-default bg-bg-secondary/50 px-4 py-3 backdrop-blur-sm">
           <div className="rounded-xl bg-accent/10 p-2.5">
             <DollarSign className="h-4 w-4 text-accent" />
@@ -728,11 +757,12 @@ export default function ClientDetailPage() {
                         )}
                       </div>
 
-                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="flex items-center gap-1 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
                         <Button
                           variant="ghost"
                           size="icon"
                           className="h-8 w-8"
+                          aria-label={`Modifier le deal ${deal.title}`}
                           onClick={() => {
                             setEditingDeal(deal);
                             setDealFormOpen(true);
@@ -744,6 +774,7 @@ export default function ClientDetailPage() {
                           variant="ghost"
                           size="icon"
                           className="h-8 w-8 text-danger hover:text-danger"
+                          aria-label={`Supprimer le deal ${deal.title}`}
                           onClick={() => handleDeleteDeal(deal)}
                         >
                           <Trash2 className="h-3.5 w-3.5" />

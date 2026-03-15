@@ -75,8 +75,10 @@ export async function rateLimit(
       remaining: limit - (entry.count + 1),
       resetAt: new Date(entry.reset_at).getTime(),
     };
-  } catch {
-    // If DB fails, allow the request (fail-open) to not block users
-    return { allowed: true, remaining: limit, resetAt: Date.now() + windowSeconds * 1000 };
+  } catch (error) {
+    // SECURITY: Fail-closed — if rate limit DB is unavailable, deny the request
+    // This prevents abuse when the rate limit system is down
+    console.error("[rate-limit] DB error, failing closed:", error);
+    return { allowed: false, remaining: 0, resetAt: Date.now() + windowSeconds * 1000 };
   }
 }

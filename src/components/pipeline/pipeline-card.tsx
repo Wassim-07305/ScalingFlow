@@ -43,6 +43,15 @@ function timeAgo(dateStr: string): string {
 export function PipelineCard({ lead, onClick, isDragging }: PipelineCardProps) {
   return (
     <div
+      role="button"
+      aria-label={`Lead ${lead.name}${lead.amount > 0 ? `, ${lead.amount.toLocaleString("fr-FR")} \u20AC` : ""}`}
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onClick(lead);
+        }
+      }}
       draggable
       onDragStart={(e) => {
         e.dataTransfer.setData("text/plain", lead.id);
@@ -73,7 +82,7 @@ export function PipelineCard({ lead, onClick, isDragging }: PipelineCardProps) {
             {lead.name}
           </span>
         </div>
-        <GripVertical className="h-4 w-4 text-text-muted opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+        <GripVertical className="h-4 w-4 text-text-muted opacity-0 group-hover:opacity-100 transition-opacity shrink-0" aria-hidden="true" />
       </div>
 
       {/* Info */}

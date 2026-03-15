@@ -7,6 +7,29 @@ import type { Database } from "@/types/database";
 
 type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 
+// Explicitly list columns to avoid fetching sensitive fields
+// (meta_access_token, claude_api_key, webhook_api_key, stripe_customer_id)
+const PROFILE_COLUMNS = [
+  "id", "email", "full_name", "first_name", "last_name",
+  "country", "language", "avatar_url", "role",
+  "onboarding_completed", "onboarding_step",
+  "situation", "situation_details",
+  "skills", "vault_skills", "expertise_answers",
+  "parcours", "formations",
+  "experience_level", "current_revenue", "target_revenue",
+  "industries", "objectives", "budget_monthly",
+  "hours_per_week", "deadline", "team_size",
+  "vault_completed", "vault_analysis", "vault_extraction", "vault_updated_at",
+  "selected_market", "market_viability_score", "niche",
+  "xp_points", "level", "streak_days", "last_active_date", "badges",
+  "global_progress",
+  "show_on_leaderboard", "show_revenue",
+  "subscription_status", "subscription_plan",
+  "meta_ad_account_id",
+  "ghl_webhook_url", "organization_id", "stripe_connect_account_id",
+  "created_at", "updated_at",
+].join(", ");
+
 const AUTH_TIMEOUT_MS = 5000;
 
 export function useUser() {
@@ -43,11 +66,12 @@ export function useUser() {
         setUser(user);
 
         if (user) {
-          const { data: profile } = await supabase
+          const { data: profile, error } = await supabase
             .from("profiles")
-            .select("*")
+            .select(PROFILE_COLUMNS)
             .eq("id", user.id)
             .single();
+          if (error) console.error("useUser: failed to load profile", error);
           if (mounted) setProfile(profile);
         }
       } catch (err) {
@@ -68,11 +92,12 @@ export function useUser() {
       // If auth event fires before getUser resolves, mark as done
       done();
       if (session?.user) {
-        const { data: profile } = await supabase
+        const { data: profile, error } = await supabase
           .from("profiles")
-          .select("*")
+          .select(PROFILE_COLUMNS)
           .eq("id", session.user.id)
           .single();
+        if (error) console.error("useUser: failed to load profile", error);
         if (mounted) setProfile(profile);
       } else {
         setProfile(null);

@@ -132,7 +132,7 @@ async function clearMetricsFromDB(userId: string) {
 }
 
 function exportMetricsToCSV(metrics: DailyMetric[]) {
-  const headers = "Date,Depense,Impressions,Clics,Leads,Appels,Clients,Revenu,CPL,CPA,ROAS\n";
+  const headers = "Date,Dépense,Impressions,Clics,Leads,Appels,Clients,Revenu,CPL,CPA,ROAS\n";
   const rows = metrics.map((m) => {
     const cpl = m.leads > 0 ? (m.spend / m.leads).toFixed(2) : "0";
     const cpa = m.clients > 0 ? (m.spend / m.clients).toFixed(2) : "0";
@@ -272,7 +272,7 @@ export function PerformanceDashboard() {
     const roas = totals.spend > 0 ? totals.revenue / totals.spend : 0;
 
     return [
-      { label: "Depense totale", value: fmtCurrency(totals.spend), trend: trendPct("spend"), icon: DollarSign },
+      { label: "Dépense totale", value: fmtCurrency(totals.spend), trend: trendPct("spend"), icon: DollarSign },
       { label: "Leads", value: fmtNumber(totals.leads), trend: trendPct("leads"), icon: Users },
       { label: "CPL", value: fmtCurrency(cpl), trend: -trendPct("leads") + trendPct("spend"), icon: Target },
       { label: "Revenu", value: fmtCurrency(totals.revenue), trend: trendPct("revenue"), icon: DollarSign },
@@ -286,7 +286,7 @@ export function PerformanceDashboard() {
     return metrics.map((m) => ({
       date: format(parseISO(m.date), "dd MMM", { locale: fr }),
       Revenu: m.revenue,
-      Depense: m.spend,
+      Dépense: m.spend,
     }));
   }, [metrics]);
 
@@ -423,7 +423,7 @@ export function PerformanceDashboard() {
                     <stop offset="5%" stopColor="#34D399" stopOpacity={0.3} />
                     <stop offset="95%" stopColor="#34D399" stopOpacity={0} />
                   </linearGradient>
-                  <linearGradient id="colorDepense" x1="0" y1="0" x2="0" y2="1">
+                  <linearGradient id="colorDépense" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#F59E0B" stopOpacity={0.3} />
                     <stop offset="95%" stopColor="#F59E0B" stopOpacity={0} />
                   </linearGradient>
@@ -462,10 +462,10 @@ export function PerformanceDashboard() {
                 />
                 <Area
                   type="monotone"
-                  dataKey="Depense"
+                  dataKey="Dépense"
                   stroke="#F59E0B"
                   fillOpacity={1}
-                  fill="url(#colorDepense)"
+                  fill="url(#colorDépense)"
                   strokeWidth={2}
                 />
               </AreaChart>
@@ -534,8 +534,8 @@ export function PerformanceDashboard() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border-default">
-                  <th className="text-left text-text-secondary font-medium py-3 px-2">Periode</th>
-                  <th className="text-right text-text-secondary font-medium py-3 px-2">Depense</th>
+                  <th className="text-left text-text-secondary font-medium py-3 px-2">Période</th>
+                  <th className="text-right text-text-secondary font-medium py-3 px-2">Dépense</th>
                   <th className="text-right text-text-secondary font-medium py-3 px-2">Leads</th>
                   <th className="text-right text-text-secondary font-medium py-3 px-2">CPL</th>
                   <th className="text-right text-text-secondary font-medium py-3 px-2">Revenu</th>
@@ -584,7 +584,7 @@ export function PerformanceDashboard() {
               />
             </div>
             <div>
-              <Label htmlFor="metric-spend">Depense (EUR)</Label>
+              <Label htmlFor="metric-spend">Dépense (EUR)</Label>
               <Input
                 id="metric-spend"
                 type="number"

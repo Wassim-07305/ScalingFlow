@@ -34,8 +34,31 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // SECURITY: Validate file type (not just extension)
+    const ALLOWED_MIME_TYPES = [
+      "application/pdf",
+      "image/jpeg", "image/png", "image/gif", "image/webp", "image/svg+xml",
+      "text/plain", "text/csv", "text/markdown",
+      "application/msword",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+      "video/mp4", "video/quicktime", "video/webm",
+      "audio/mpeg", "audio/wav", "audio/ogg",
+    ];
+
+    if (file.type && !ALLOWED_MIME_TYPES.includes(file.type)) {
+      return NextResponse.json(
+        { error: "Type de fichier non autorisé" },
+        { status: 400 }
+      );
+    }
+
+    // SECURITY: Sanitize filename to prevent path traversal
+    const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+
     // Upload to Supabase Storage
-    const ext = file.name.split(".").pop() || "bin";
+    const ext = safeName.split(".").pop() || "bin";
     const storagePath = `${user.id}/${crypto.randomUUID()}.${ext}`;
 
     const { error: uploadError } = await supabase.storage
@@ -48,15 +71,25 @@ export async function POST(req: NextRequest) {
     if (uploadError) {
       console.error("Storage upload error:", uploadError);
       return NextResponse.json(
-        { error: `Erreur d'upload : ${uploadError.message}` },
+        { error: "Erreur lors de l'upload du fichier" },
         { status: 500 }
       );
     }
 
-    // Get public URL
-    const {
-      data: { publicUrl },
-    } = supabase.storage.from("drive").getPublicUrl(storagePath);
+    // Get signed URL (bucket is private — getPublicUrl won't work)
+    const { data: signedUrlData, error: signedUrlError } = await supabase.storage
+      .from("drive")
+      .createSignedUrl(storagePath, 60 * 60 * 24 * 365); // 1 year
+
+    if (signedUrlError || !signedUrlData?.signedUrl) {
+      console.error("Signed URL error:", signedUrlError);
+      return NextResponse.json(
+        { error: "Erreur lors de la génération de l'URL du fichier" },
+        { status: 500 }
+      );
+    }
+
+    const publicUrl = signedUrlData.signedUrl;
 
     // Save metadata to drive_files
     const { data: driveFile, error: dbError } = await supabase
@@ -75,7 +108,7 @@ export async function POST(req: NextRequest) {
     if (dbError) {
       console.error("DB insert error:", dbError);
       return NextResponse.json(
-        { error: `Erreur de sauvegarde : ${dbError.message}` },
+        { error: "Erreur de sauvegarde" },
         { status: 500 }
       );
     }

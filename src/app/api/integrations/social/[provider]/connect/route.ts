@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createOAuthState } from "@/lib/utils/oauth-state";
 
 // ─── Social OAuth: Start Flow (#56) ──────────────────────────
 // GET /api/integrations/social/[provider]/connect
@@ -70,9 +71,8 @@ export async function GET(
     }
 
     const redirectUri = `${process.env.NEXT_PUBLIC_APP_URL}/api/integrations/social/${provider}/callback`;
-    const state = Buffer.from(
-      JSON.stringify({ userId: user.id, provider })
-    ).toString("base64url");
+    // SECURITY: HMAC-signed state to prevent CSRF
+    const state = createOAuthState(user.id);
 
     const authUrl = new URL(config.authUrl);
 

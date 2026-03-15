@@ -169,7 +169,7 @@ export function MetricsHistory() {
             variant="ghost"
             size="sm"
             onClick={() => {
-              const headers = "Date,Depense,Impressions,Clics,Leads,Appels,Clients,Revenu\n";
+              const headers = "Date,Dépense,Impressions,Clics,Leads,Appels,Clients,Revenu\n";
               const rows = metrics.map((m) =>
                 `${m.date},${m.spend},${m.impressions},${m.clicks},${m.leads},${m.calls},${m.clients},${m.revenue}`
               ).join("\n");
@@ -238,7 +238,7 @@ export function MetricsHistory() {
               <thead>
                 <tr className="border-b border-border-default">
                   <th className="text-left text-text-secondary font-medium py-3 px-2">Date</th>
-                  <th className="text-right text-text-secondary font-medium py-3 px-2">Depense</th>
+                  <th className="text-right text-text-secondary font-medium py-3 px-2">Dépense</th>
                   <th className="text-right text-text-secondary font-medium py-3 px-2">Impressions</th>
                   <th className="text-right text-text-secondary font-medium py-3 px-2">Clics</th>
                   <th className="text-right text-text-secondary font-medium py-3 px-2">CTR</th>

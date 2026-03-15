@@ -20,13 +20,17 @@ export async function createNotification({
 }: CreateNotificationParams) {
   const supabase = await createClient();
 
-  await supabase.from("notifications").insert({
+  const { error } = await supabase.from("notifications").insert({
     user_id: userId,
     type,
     title,
     message,
     link: link ?? null,
   });
+
+  if (error) {
+    console.error("createNotification: failed to insert", error);
+  }
 
   // Fire-and-forget push notification
   sendPushToUser(userId, { title, body: message, link, type }).catch(() => {});

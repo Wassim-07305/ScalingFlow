@@ -286,7 +286,7 @@ export async function POST(req: NextRequest) {
 
     if (saveError) {
       return NextResponse.json(
-        { error: `Erreur lors de la sauvegarde: ${saveError.message}` },
+        { error: "Erreur lors de la sauvegarde" },
         { status: 500 }
       );
     }
@@ -310,9 +310,9 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(asset);
   } catch (error) {
-    const errMsg = error instanceof Error ? error.message : String(error);
+    console.error("[generate-assets] Error:", error);
     return NextResponse.json(
-      { error: `Erreur lors de la génération de l'asset: ${errMsg}` },
+      { error: "Erreur lors de la génération de l'asset" },
       { status: 500 }
     );
   }

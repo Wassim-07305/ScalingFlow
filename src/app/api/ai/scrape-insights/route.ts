@@ -179,9 +179,9 @@ export async function POST(req: NextRequest) {
       scraping_used: useRealScraping && scrapedPages.length > 0,
     });
   } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
+    console.error("[scrape-insights] Error:", error);
     return NextResponse.json(
-      { error: `Erreur lors de la recherche : ${message}` },
+      { error: "Erreur lors de la recherche" },
       { status: 500 }
     );
   }

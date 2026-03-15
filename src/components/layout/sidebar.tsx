@@ -226,7 +226,7 @@ export function Sidebar({
           <button
             onClick={toggleSidebar}
             className="flex w-full items-center justify-center rounded-xl px-3 py-2 text-sm text-sidebar-foreground/50 transition-all duration-200 hover:bg-sidebar-accent hover:text-sidebar-foreground"
-            aria-label={isCollapsed ? "Ouvrir le menu" : "Reduire le menu"}
+            aria-label={isCollapsed ? "Ouvrir le menu" : "Réduire le menu"}
             aria-expanded={!isCollapsed}
           >
             {isCollapsed ? (
@@ -234,7 +234,7 @@ export function Sidebar({
             ) : (
               <>
                 <PanelLeftClose className="h-5 w-5" />
-                <span className="ml-3">Reduire</span>
+                <span className="ml-3">Réduire</span>
               </>
             )}
           </button>
@@ -317,7 +317,7 @@ export function Sidebar({
             <TooltipTrigger asChild>
               <button
                 onClick={handleLogout}
-                aria-label="Se deconnecter"
+                aria-label="Se déconnecter"
                 className={cn(
                   "mt-1 flex w-full items-center rounded-xl px-3 py-2 text-sm text-sidebar-foreground/50 transition-all duration-200 hover:bg-red-500/10 hover:text-red-400",
                   isCollapsed && "md:justify-center md:px-0"
@@ -330,7 +330,7 @@ export function Sidebar({
                   )}
                 />
                 <span className={cn(isCollapsed && "md:hidden")}>
-                  Deconnexion
+                  Déconnexion
                 </span>
               </button>
             </TooltipTrigger>
@@ -339,7 +339,7 @@ export function Sidebar({
                 side="right"
                 className="bg-bg-secondary text-text-primary border-border-default"
               >
-                Deconnexion
+                Déconnexion
               </TooltipContent>
             )}
           </Tooltip>

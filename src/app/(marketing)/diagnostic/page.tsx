@@ -306,6 +306,7 @@ export default function DiagnosticPage() {
   const [result, setResult] = useState<DiagnosticResult | null>(null);
   const [funnelScan, setFunnelScan] = useState<FunnelScanResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [validationError, setValidationError] = useState<string | null>(null);
 
   const [form, setForm] = useState<DiagnosticForm>({
     offer_name: "",
@@ -340,6 +341,10 @@ export default function DiagnosticPage() {
   };
 
   const handleSubmit = async () => {
+    if (form.offer_name.trim() === "" && form.offer_description.trim() === "") {
+      setError("Remplis au moins le nom ou la description de ton offre avant de lancer le diagnostic.");
+      return;
+    }
     setLoading(true);
     setError(null);
     try {
@@ -386,7 +391,22 @@ export default function DiagnosticPage() {
   const canNext =
     step === 0
       ? form.offer_name.trim() !== "" || form.offer_description.trim() !== ""
+      : step === 1
+      ? form.acquisition_channels.length > 0
+      : step === 2
+      ? form.delivery_method.trim() !== ""
       : true;
+
+  const handleNext = () => {
+    if (!canNext) {
+      if (step === 0) setValidationError("Remplis au moins le nom ou la description de ton offre.");
+      else if (step === 1) setValidationError("Sélectionne au moins un canal d'acquisition.");
+      else if (step === 2) setValidationError("Décris ton mode de livraison.");
+      return;
+    }
+    setValidationError(null);
+    setStep((s) => s + 1);
+  };
 
   // ─── Results view ────────────────────────────────
   if (result) {
@@ -939,6 +959,14 @@ export default function DiagnosticPage() {
             </>
           )}
 
+          {/* Validation error */}
+          {validationError && (
+            <div className="p-3 rounded-xl bg-yellow-500/10 border border-yellow-500/20 text-sm text-yellow-400 flex items-center gap-2">
+              <AlertTriangle className="h-4 w-4 shrink-0" />
+              {validationError}
+            </div>
+          )}
+
           {/* Error */}
           {error && (
             <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-sm text-red-400 flex items-center gap-2">
@@ -951,7 +979,10 @@ export default function DiagnosticPage() {
           <div className="flex items-center justify-between pt-2">
             {step > 0 ? (
               <button
-                onClick={() => setStep((s) => s - 1)}
+                onClick={() => {
+                  setValidationError(null);
+                  setStep((s) => s - 1);
+                }}
                 className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm text-text-secondary hover:text-text-primary hover:bg-bg-tertiary transition-all duration-200"
               >
                 <ArrowLeft className="h-4 w-4" />
@@ -963,8 +994,7 @@ export default function DiagnosticPage() {
 
             {step < STEPS.length - 1 ? (
               <button
-                onClick={() => setStep((s) => s + 1)}
-                disabled={!canNext}
+                onClick={handleNext}
                 className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-accent text-white text-sm font-medium hover:bg-accent/90 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed shadow-[0_0_20px_rgba(52,211,153,0.15)]"
               >
                 Suivant

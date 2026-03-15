@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -52,7 +52,7 @@ function formatCurrency(amount: number) {
 export default function ClientsPage() {
   const router = useRouter();
   const { user } = useUser();
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   const [clients, setClients] = React.useState<ClientRow[]>([]);
   const [loading, setLoading] = React.useState(true);

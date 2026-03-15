@@ -209,7 +209,8 @@ export function DirectMessages() {
             supabase
               .from("direct_messages")
               .update({ read: true })
-              .eq("id", newMsg.id);
+              .eq("id", newMsg.id)
+              .then();
           }
 
           // Mettre à jour la liste des conversations
@@ -545,6 +546,7 @@ export function DirectMessages() {
             {/* Mobile back button */}
             <button
               onClick={handleMobileBack}
+              aria-label="Retour aux conversations"
               className="md:hidden flex items-center justify-center h-8 w-8 rounded-lg hover:bg-bg-tertiary transition-colors text-text-muted"
             >
               <ArrowLeft className="h-4 w-4" />
@@ -653,6 +655,7 @@ export function DirectMessages() {
                 onClick={handleSend}
                 disabled={sending || !newMessage.trim()}
                 className="rounded-xl h-10 w-10 shrink-0"
+                aria-label="Envoyer le message"
               >
                 {sending ? (
                   <Loader2 className="h-4 w-4 animate-spin" />

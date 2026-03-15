@@ -469,14 +469,21 @@ export function CallAnalyzer() {
               </div>
               <textarea
                 value={transcript}
-                onChange={(e) => setTranscript(e.target.value)}
+                onChange={(e) => {
+                  if (e.target.value.length <= 500_000) {
+                    setTranscript(e.target.value);
+                  } else {
+                    toast.error("Le transcript ne peut pas dépasser 500 000 caractères");
+                  }
+                }}
                 placeholder={`Colle ici le transcript ou importe un fichier (.txt, .srt, .vtt)...\n\nVendeur : Bonjour, merci d'avoir pris le temps...\nProspect : Oui, j'ai vu votre publicité et...\n...`}
                 rows={10}
+                maxLength={500000}
                 className="w-full px-4 py-3 rounded-xl bg-bg-tertiary border border-border-default/50 text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent/40 resize-none text-sm leading-relaxed transition-colors"
               />
               <div className="flex items-center justify-between mt-1.5">
                 <p className="text-xs text-text-muted">
-                  {transcript.length.toLocaleString("fr-FR")} caractères
+                  {transcript.length.toLocaleString("fr-FR")} / 500 000 caractères
                 </p>
                 <p className="text-xs text-text-muted">Minimum 50 caractères</p>
               </div>
@@ -487,6 +494,7 @@ export function CallAnalyzer() {
               onClick={handleAnalyze}
               disabled={transcript.trim().length < 50}
               className="w-full rounded-xl"
+              aria-label="Analyser le call de vente"
             >
               <Sparkles className="h-4 w-4 mr-2" />
               Analyser le call
@@ -592,7 +600,7 @@ export function CallAnalyzer() {
           </div>
 
           {/* Score breakdown — mini rings */}
-          <div className="grid grid-cols-5 gap-3 mt-6 pt-5 border-t border-border-default/30">
+          <div className="grid grid-cols-3 sm:grid-cols-5 gap-3 mt-6 pt-5 border-t border-border-default/30">
             {Object.entries(result.scores).map(([key, section]) => (
               <button
                 key={key}

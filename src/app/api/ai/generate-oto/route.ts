@@ -84,7 +84,8 @@ export async function POST(req: NextRequest) {
     const { error: updateError } = await supabase
       .from("offers")
       .update({ oto_offer: otoData })
-      .eq("id", offerId);
+      .eq("id", offerId)
+      .eq("user_id", user.id);
 
     if (updateError) {
       console.error("generate-oto: failed to update offer", updateError);
@@ -98,9 +99,9 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(otoData);
   } catch (error) {
-    const errMsg = error instanceof Error ? error.message : String(error);
+    console.error("[generate-oto] Error:", error);
     return NextResponse.json(
-      { error: `Erreur lors de la génération de l'OTO: ${errMsg}` },
+      { error: "Erreur lors de la génération de l'OTO" },
       { status: 500 }
     );
   }

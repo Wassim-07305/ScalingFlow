@@ -78,9 +78,9 @@ export async function GET() {
 
     return NextResponse.redirect(accountLink.url);
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Erreur inconnue";
+    console.error("[stripe-connect] Error:", error);
     return NextResponse.json(
-      { error: `Erreur Stripe Connect: ${message}` },
+      { error: "Erreur lors de la connexion Stripe" },
       { status: 500 }
     );
   }

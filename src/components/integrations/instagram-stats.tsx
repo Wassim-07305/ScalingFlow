@@ -276,6 +276,7 @@ export function InstagramStats() {
                 onClick={() => fetchStats(false)}
                 className="p-1.5 rounded-lg text-text-muted hover:text-text-primary hover:bg-bg-tertiary transition-all"
                 title="Rafraîchir maintenant"
+                aria-label="Rafraîchir les statistiques Instagram"
               >
                 <RefreshCw
                   className={cn("h-3.5 w-3.5", loading && "animate-spin")}

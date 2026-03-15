@@ -280,7 +280,8 @@ export function GoogleCalendarWidget({ className }: { className?: string }) {
                           href={`https://calendar.google.com/calendar/event?eid=${btoa(evt.id)}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="p-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-bg-tertiary"
+                          aria-label={`Ouvrir ${evt.title} dans Google Calendar`}
+                          className="p-1.5 rounded-lg sm:opacity-0 sm:group-hover:opacity-100 transition-all duration-200 hover:bg-bg-tertiary"
                         >
                           <ExternalLink className="h-3.5 w-3.5 text-text-muted hover:text-accent" />
                         </a>

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createOAuthState } from "@/lib/utils/oauth-state";
 
 // ─── GoHighLevel OAuth: Start Flow (#52) ─────────────────────
 // GET /api/integrations/ghl/connect
@@ -30,7 +31,7 @@ export async function GET() {
       "locations.readonly",
     ].join(" ");
 
-    const state = Buffer.from(JSON.stringify({ userId: user.id })).toString("base64url");
+    const state = createOAuthState(user.id);
 
     const authUrl = new URL("https://marketplace.gohighlevel.com/oauth/chooselocation");
     authUrl.searchParams.set("client_id", clientId);

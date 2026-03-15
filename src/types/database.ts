@@ -57,6 +57,7 @@ export interface Database {
           meta_access_token: string | null;
           meta_ad_account_id: string | null;
           ghl_webhook_url: string | null;
+          webhook_api_key: string | null;
           organization_id: string | null;
           stripe_connect_account_id: string | null;
           vault_extraction: Json | null;
@@ -112,6 +113,7 @@ export interface Database {
           meta_access_token?: string | null;
           meta_ad_account_id?: string | null;
           ghl_webhook_url?: string | null;
+          webhook_api_key?: string | null;
           organization_id?: string | null;
           stripe_connect_account_id?: string | null;
           vault_extraction?: Json | null;
@@ -166,6 +168,7 @@ export interface Database {
           meta_ad_account_id?: string | null;
           organization_id?: string | null;
           ghl_webhook_url?: string | null;
+          webhook_api_key?: string | null;
           stripe_connect_account_id?: string | null;
           vault_extraction?: Json | null;
           claude_api_key?: string | null;
@@ -191,6 +194,7 @@ export interface Database {
           country: string | null;
           language: string | null;
           ai_raw_response: Json | null;
+          bleeding_neck_pains: Json | null;
           competitor_analysis: Json | null;
           selected: boolean;
           created_at: string;
@@ -213,6 +217,7 @@ export interface Database {
           country?: string | null;
           language?: string | null;
           ai_raw_response?: Json | null;
+          bleeding_neck_pains?: Json | null;
           competitor_analysis?: Json | null;
           selected?: boolean;
         };
@@ -231,6 +236,7 @@ export interface Database {
           schwartz_analysis?: Json | null;
           country?: string | null;
           language?: string | null;
+          bleeding_neck_pains?: Json | null;
           competitor_analysis?: Json | null;
           ai_raw_response?: Json | null;
           selected?: boolean;
@@ -250,6 +256,9 @@ export interface Database {
           risk_reversal: string | null;
           delivery_structure: Json | null;
           oto_offer: Json | null;
+          oto_data: Json | null;
+          delivery_data: Json | null;
+          unique_mechanism_details: Json | null;
           full_document: string | null;
           status: "draft" | "validated" | "active";
           ai_raw_response: Json | null;
@@ -269,6 +278,9 @@ export interface Database {
           risk_reversal?: string | null;
           delivery_structure?: Json | null;
           oto_offer?: Json | null;
+          oto_data?: Json | null;
+          delivery_data?: Json | null;
+          unique_mechanism_details?: Json | null;
           full_document?: string | null;
           status?: "draft" | "validated" | "active";
           ai_raw_response?: Json | null;
@@ -283,6 +295,9 @@ export interface Database {
           risk_reversal?: string | null;
           delivery_structure?: Json | null;
           oto_offer?: Json | null;
+          oto_data?: Json | null;
+          delivery_data?: Json | null;
+          unique_mechanism_details?: Json | null;
           full_document?: string | null;
           status?: "draft" | "validated" | "active";
           ai_raw_response?: Json | null;
@@ -300,6 +315,9 @@ export interface Database {
           thankyou_page: Json | null;
           ab_variants: Json | null;
           status: "draft" | "published" | "paused";
+          published: boolean;
+          published_slug: string | null;
+          published_at: string | null;
           total_visits: number;
           total_optins: number;
           conversion_rate: number;
@@ -317,6 +335,8 @@ export interface Database {
           thankyou_page?: Json | null;
           ab_variants?: Json | null;
           status?: "draft" | "published" | "paused";
+          published?: boolean;
+          published_slug?: string | null;
         };
         Update: {
           funnel_name?: string;
@@ -326,6 +346,9 @@ export interface Database {
           thankyou_page?: Json | null;
           ab_variants?: Json | null;
           status?: "draft" | "published" | "paused";
+          published?: boolean;
+          published_slug?: string | null;
+          published_at?: string | null;
           total_visits?: number;
           total_optins?: number;
           conversion_rate?: number;
@@ -369,7 +392,7 @@ export interface Database {
         Row: {
           id: string;
           user_id: string;
-          creative_type: "image" | "video_script" | "carousel";
+          creative_type: "image" | "video_script" | "carousel" | "dm_script";
           ad_copy: string;
           headline: string | null;
           hook: string | null;
@@ -392,7 +415,7 @@ export interface Database {
         Insert: {
           id?: string;
           user_id: string;
-          creative_type: "image" | "video_script" | "carousel";
+          creative_type: "image" | "video_script" | "carousel" | "dm_script";
           ad_copy: string;
           headline?: string | null;
           hook?: string | null;
@@ -404,7 +427,7 @@ export interface Database {
           status?: "draft" | "ready" | "active" | "paused" | "stopped";
         };
         Update: {
-          creative_type?: "image" | "video_script" | "carousel";
+          creative_type?: "image" | "video_script" | "carousel" | "dm_script";
           ad_copy?: string;
           headline?: string | null;
           hook?: string | null;
@@ -973,6 +996,9 @@ export interface Database {
           features: Json;
           limits: Json;
           owner_id: string;
+          custom_onboarding_steps: Json | null;
+          custom_welcome_message: string | null;
+          custom_prompts: Json | null;
           created_at: string;
           updated_at: string;
         };
@@ -988,6 +1014,9 @@ export interface Database {
           features?: Json;
           limits?: Json;
           owner_id: string;
+          custom_onboarding_steps?: Json | null;
+          custom_welcome_message?: string | null;
+          custom_prompts?: Json | null;
         };
         Update: {
           name?: string;
@@ -999,6 +1028,9 @@ export interface Database {
           brand_name?: string | null;
           features?: Json;
           limits?: Json;
+          custom_onboarding_steps?: Json | null;
+          custom_welcome_message?: string | null;
+          custom_prompts?: Json | null;
         };
       };
       organization_members: {
@@ -1072,30 +1104,756 @@ export interface Database {
           id: string;
           user_id: string;
           provider: string;
-          provider_username: string | null;
-          access_token: string;
+          access_token: string | null;
           refresh_token: string | null;
           token_expires_at: string | null;
+          provider_account_id: string | null;
+          provider_user_id: string | null;
+          provider_username: string | null;
+          scopes: string[] | null;
           metadata: Json | null;
-          created_at: string;
+          connected_at: string;
           updated_at: string;
         };
         Insert: {
           id?: string;
           user_id: string;
           provider: string;
-          provider_username?: string | null;
-          access_token: string;
+          access_token?: string | null;
           refresh_token?: string | null;
           token_expires_at?: string | null;
+          provider_account_id?: string | null;
+          provider_user_id?: string | null;
+          provider_username?: string | null;
+          scopes?: string[] | null;
           metadata?: Json | null;
         };
         Update: {
-          provider_username?: string | null;
-          access_token?: string;
+          access_token?: string | null;
           refresh_token?: string | null;
           token_expires_at?: string | null;
+          provider_account_id?: string | null;
+          provider_user_id?: string | null;
+          provider_username?: string | null;
+          scopes?: string[] | null;
           metadata?: Json | null;
+        };
+      };
+      challenge_completions: {
+        Row: {
+          id: string;
+          user_id: string;
+          challenge_key: string;
+          week_key: string;
+          xp_awarded: number;
+          completed_at: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          challenge_key: string;
+          week_key: string;
+          xp_awarded?: number;
+        };
+        Update: {
+          xp_awarded?: number;
+        };
+      };
+      ad_daily_metrics: {
+        Row: {
+          id: string;
+          user_id: string;
+          date: string;
+          spend: number;
+          impressions: number;
+          clicks: number;
+          conversions: number;
+          roas: number;
+          ctr: number;
+          cpm: number;
+          cpa: number;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          date: string;
+          spend?: number;
+          impressions?: number;
+          clicks?: number;
+          conversions?: number;
+          roas?: number;
+          ctr?: number;
+          cpm?: number;
+          cpa?: number;
+        };
+        Update: {
+          spend?: number;
+          impressions?: number;
+          clicks?: number;
+          conversions?: number;
+          roas?: number;
+          ctr?: number;
+          cpm?: number;
+          cpa?: number;
+        };
+      };
+      ab_tests: {
+        Row: {
+          id: string;
+          user_id: string;
+          name: string;
+          metric: string;
+          target_sample_size: number;
+          status: "active" | "paused" | "completed";
+          winner: "A" | "B" | null;
+          variant_a_description: string;
+          variant_a_conversions: number;
+          variant_a_traffic: number;
+          variant_b_description: string;
+          variant_b_conversions: number;
+          variant_b_traffic: number;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          name: string;
+          metric: string;
+          target_sample_size?: number;
+          status?: "active" | "paused" | "completed";
+          variant_a_description: string;
+          variant_b_description: string;
+        };
+        Update: {
+          name?: string;
+          metric?: string;
+          target_sample_size?: number;
+          status?: "active" | "paused" | "completed";
+          winner?: "A" | "B" | null;
+          variant_a_description?: string;
+          variant_a_conversions?: number;
+          variant_a_traffic?: number;
+          variant_b_description?: string;
+          variant_b_conversions?: number;
+          variant_b_traffic?: number;
+        };
+      };
+      ltv_cac_entries: {
+        Row: {
+          id: string;
+          user_id: string;
+          date: string;
+          avg_deal_value: number;
+          monthly_churn_rate: number;
+          monthly_ad_spend: number;
+          new_customers: number;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          date: string;
+          avg_deal_value?: number;
+          monthly_churn_rate?: number;
+          monthly_ad_spend?: number;
+          new_customers?: number;
+        };
+        Update: {
+          avg_deal_value?: number;
+          monthly_churn_rate?: number;
+          monthly_ad_spend?: number;
+          new_customers?: number;
+        };
+      };
+      daily_performance_metrics: {
+        Row: {
+          id: string;
+          user_id: string;
+          date: string;
+          spend: number;
+          impressions: number;
+          clicks: number;
+          leads: number;
+          calls: number;
+          clients: number;
+          revenue: number;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          date: string;
+          spend?: number;
+          impressions?: number;
+          clicks?: number;
+          leads?: number;
+          calls?: number;
+          clients?: number;
+          revenue?: number;
+        };
+        Update: {
+          spend?: number;
+          impressions?: number;
+          clicks?: number;
+          leads?: number;
+          calls?: number;
+          clients?: number;
+          revenue?: number;
+        };
+      };
+      growth_checkpoints: {
+        Row: {
+          id: string;
+          user_id: string;
+          tier_id: string;
+          checkpoint: string;
+          completed_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          tier_id: string;
+          checkpoint: string;
+        };
+        Update: never;
+      };
+      meta_audiences: {
+        Row: {
+          id: string;
+          user_id: string;
+          meta_audience_id: string | null;
+          name: string;
+          description: string | null;
+          audience_type: "custom" | "lookalike" | "saved";
+          subtype: string | null;
+          source_data: Json | null;
+          approximate_count: number | null;
+          temperature: string | null;
+          targeting_spec: Json | null;
+          status: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          meta_audience_id?: string | null;
+          name: string;
+          description?: string | null;
+          audience_type?: "custom" | "lookalike" | "saved";
+          subtype?: string | null;
+          source_data?: Json | null;
+          temperature?: string | null;
+          targeting_spec?: Json | null;
+          status?: string;
+        };
+        Update: {
+          meta_audience_id?: string | null;
+          name?: string;
+          description?: string | null;
+          audience_type?: "custom" | "lookalike" | "saved";
+          subtype?: string | null;
+          source_data?: Json | null;
+          temperature?: string | null;
+          targeting_spec?: Json | null;
+          status?: string;
+        };
+      };
+      push_subscriptions: {
+        Row: {
+          id: string;
+          user_id: string;
+          endpoint: string;
+          p256dh: string;
+          auth: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          endpoint: string;
+          p256dh: string;
+          auth: string;
+        };
+        Update: {
+          endpoint?: string;
+          p256dh?: string;
+          auth?: string;
+        };
+      };
+      revenue_entries: {
+        Row: {
+          id: string;
+          user_id: string;
+          amount: number;
+          source: string | null;
+          campaign_name: string | null;
+          creative_name: string | null;
+          audience_name: string | null;
+          channel: string | null;
+          notes: string | null;
+          entry_date: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          amount: number;
+          source?: string | null;
+          campaign_name?: string | null;
+          creative_name?: string | null;
+          audience_name?: string | null;
+          channel?: string | null;
+          notes?: string | null;
+          entry_date?: string;
+        };
+        Update: {
+          amount?: number;
+          source?: string | null;
+          campaign_name?: string | null;
+          creative_name?: string | null;
+          audience_name?: string | null;
+          channel?: string | null;
+          notes?: string | null;
+          entry_date?: string;
+        };
+      };
+      sales_call_logs: {
+        Row: {
+          id: string;
+          user_id: string;
+          call_date: string;
+          duration_minutes: number | null;
+          outcome: string | null;
+          revenue: number;
+          main_objection: string | null;
+          lead_source: string | null;
+          notes: string | null;
+          ai_score: number | null;
+          ai_feedback: Json | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          call_date?: string;
+          duration_minutes?: number | null;
+          outcome?: string | null;
+          revenue?: number;
+          main_objection?: string | null;
+          lead_source?: string | null;
+          notes?: string | null;
+          ai_score?: number | null;
+          ai_feedback?: Json | null;
+        };
+        Update: {
+          call_date?: string;
+          duration_minutes?: number | null;
+          outcome?: string | null;
+          revenue?: number;
+          main_objection?: string | null;
+          lead_source?: string | null;
+          notes?: string | null;
+          ai_score?: number | null;
+          ai_feedback?: Json | null;
+        };
+      };
+      ad_automation_config: {
+        Row: {
+          id: string;
+          user_id: string;
+          cpa_max: number;
+          roas_min: number;
+          ctr_min: number;
+          frequency_max: number;
+          scale_increment: number;
+          scaling_rules: Json;
+          enabled: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          cpa_max?: number;
+          roas_min?: number;
+          ctr_min?: number;
+          frequency_max?: number;
+          scale_increment?: number;
+          scaling_rules?: Json;
+          enabled?: boolean;
+        };
+        Update: {
+          cpa_max?: number;
+          roas_min?: number;
+          ctr_min?: number;
+          frequency_max?: number;
+          scale_increment?: number;
+          scaling_rules?: Json;
+          enabled?: boolean;
+        };
+      };
+      ad_automation_log: {
+        Row: {
+          id: string;
+          user_id: string;
+          action_type: string;
+          creative_name: string | null;
+          campaign_name: string | null;
+          reason: string | null;
+          details: Json | null;
+          status: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          action_type: string;
+          creative_name?: string | null;
+          campaign_name?: string | null;
+          reason?: string | null;
+          details?: Json | null;
+          status?: string;
+        };
+        Update: {
+          action_type?: string;
+          creative_name?: string | null;
+          campaign_name?: string | null;
+          reason?: string | null;
+          details?: Json | null;
+          status?: string;
+        };
+      };
+      launch_checklist: {
+        Row: {
+          id: string;
+          user_id: string;
+          offer_ready: boolean;
+          funnel_ready: boolean;
+          market_validated: boolean;
+          brand_ready: boolean;
+          pixel_installed: boolean;
+          integrations_ready: boolean;
+          content_ready: boolean;
+          audience_ready: boolean;
+          all_passed: boolean;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          offer_ready?: boolean;
+          funnel_ready?: boolean;
+          market_validated?: boolean;
+          brand_ready?: boolean;
+          pixel_installed?: boolean;
+          integrations_ready?: boolean;
+          content_ready?: boolean;
+          audience_ready?: boolean;
+          all_passed?: boolean;
+        };
+        Update: {
+          offer_ready?: boolean;
+          funnel_ready?: boolean;
+          market_validated?: boolean;
+          brand_ready?: boolean;
+          pixel_installed?: boolean;
+          integrations_ready?: boolean;
+          content_ready?: boolean;
+          audience_ready?: boolean;
+          all_passed?: boolean;
+        };
+      };
+      content_batches: {
+        Row: {
+          id: string;
+          user_id: string;
+          week_number: number | null;
+          year: number | null;
+          content_pieces: Json;
+          performance_input: string | null;
+          objections_input: string | null;
+          ai_raw_response: Json | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          week_number?: number | null;
+          year?: number | null;
+          content_pieces?: Json;
+          performance_input?: string | null;
+          objections_input?: string | null;
+          ai_raw_response?: Json | null;
+        };
+        Update: {
+          week_number?: number | null;
+          year?: number | null;
+          content_pieces?: Json;
+          performance_input?: string | null;
+          objections_input?: string | null;
+          ai_raw_response?: Json | null;
+        };
+      };
+      academy_quiz_results: {
+        Row: {
+          id: string;
+          user_id: string;
+          module_id: string;
+          score: number;
+          total_questions: number;
+          passed: boolean;
+          completed_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          module_id: string;
+          score: number;
+          total_questions: number;
+          passed?: boolean;
+        };
+        Update: {
+          score?: number;
+          total_questions?: number;
+          passed?: boolean;
+        };
+      };
+      clients: {
+        Row: {
+          id: string;
+          user_id: string;
+          name: string;
+          email: string | null;
+          phone: string | null;
+          company: string | null;
+          status: string;
+          notes: string | null;
+          avatar_url: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          name: string;
+          email?: string | null;
+          phone?: string | null;
+          company?: string | null;
+          status?: string;
+          notes?: string | null;
+          avatar_url?: string | null;
+        };
+        Update: {
+          name?: string;
+          email?: string | null;
+          phone?: string | null;
+          company?: string | null;
+          status?: string;
+          notes?: string | null;
+          avatar_url?: string | null;
+        };
+      };
+      client_deals: {
+        Row: {
+          id: string;
+          client_id: string;
+          user_id: string;
+          title: string;
+          amount: number;
+          status: string;
+          closed_at: string | null;
+          notes: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          client_id: string;
+          user_id: string;
+          title: string;
+          amount?: number;
+          status?: string;
+          closed_at?: string | null;
+          notes?: string | null;
+        };
+        Update: {
+          title?: string;
+          amount?: number;
+          status?: string;
+          closed_at?: string | null;
+          notes?: string | null;
+        };
+      };
+      client_activities: {
+        Row: {
+          id: string;
+          client_id: string;
+          user_id: string;
+          type: string;
+          description: string;
+          metadata: Json;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          client_id: string;
+          user_id: string;
+          type: string;
+          description: string;
+          metadata?: Json;
+        };
+        Update: {
+          type?: string;
+          description?: string;
+          metadata?: Json;
+        };
+      };
+      pipeline_leads: {
+        Row: {
+          id: string;
+          user_id: string;
+          name: string;
+          email: string | null;
+          phone: string | null;
+          source: string | null;
+          status: string;
+          notes: string | null;
+          amount: number;
+          assigned_to: string | null;
+          metadata: Json;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          name: string;
+          email?: string | null;
+          phone?: string | null;
+          source?: string | null;
+          status?: string;
+          notes?: string | null;
+          amount?: number;
+          assigned_to?: string | null;
+          metadata?: Json;
+        };
+        Update: {
+          name?: string;
+          email?: string | null;
+          phone?: string | null;
+          source?: string | null;
+          status?: string;
+          notes?: string | null;
+          amount?: number;
+          assigned_to?: string | null;
+          metadata?: Json;
+        };
+      };
+      pipeline_activities: {
+        Row: {
+          id: string;
+          lead_id: string;
+          user_id: string;
+          action: string;
+          old_status: string | null;
+          new_status: string | null;
+          notes: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          lead_id: string;
+          user_id: string;
+          action: string;
+          old_status?: string | null;
+          new_status?: string | null;
+          notes?: string | null;
+        };
+        Update: {
+          action?: string;
+          old_status?: string | null;
+          new_status?: string | null;
+          notes?: string | null;
+        };
+      };
+      drive_folders: {
+        Row: {
+          id: string;
+          user_id: string;
+          name: string;
+          parent_id: string | null;
+          color: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          name: string;
+          parent_id?: string | null;
+          color?: string;
+        };
+        Update: {
+          name?: string;
+          parent_id?: string | null;
+          color?: string;
+        };
+      };
+      drive_files: {
+        Row: {
+          id: string;
+          user_id: string;
+          folder_id: string | null;
+          name: string;
+          file_url: string;
+          file_size: number;
+          mime_type: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          folder_id?: string | null;
+          name: string;
+          file_url: string;
+          file_size?: number;
+          mime_type?: string;
+        };
+        Update: {
+          folder_id?: string | null;
+          name?: string;
+          file_url?: string;
+          file_size?: number;
+          mime_type?: string;
+        };
+      };
+      document_chunks: {
+        Row: {
+          id: string;
+          user_id: string;
+          document_id: string;
+          content: string;
+          chunk_index: number;
+          metadata: Json;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          document_id: string;
+          content: string;
+          chunk_index?: number;
+          metadata?: Json;
+        };
+        Update: {
+          content?: string;
+          chunk_index?: number;
+          metadata?: Json;
         };
       };
       roadmap_tasks: {

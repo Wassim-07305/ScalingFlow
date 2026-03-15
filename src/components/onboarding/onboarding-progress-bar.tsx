@@ -20,7 +20,7 @@ export function OnboardingProgressBar({
       aria-valuenow={step + 1}
       aria-valuemin={1}
       aria-valuemax={total}
-      aria-label={`Etape ${step + 1} sur ${total}`}
+      aria-label={`Étape ${step + 1} sur ${total}`}
     >
       <motion.div
         className="h-full bg-gradient-to-r from-emerald-500 to-teal-500"

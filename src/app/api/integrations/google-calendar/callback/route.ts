@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { verifyOAuthState } from "@/lib/utils/oauth-state";
 
 // ─── Google Calendar OAuth: Callback Handler ─────────────────
 // GET /api/integrations/google-calendar/callback
@@ -24,13 +25,20 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    const stateData = JSON.parse(Buffer.from(state, "base64url").toString());
+    // SECURITY: Verify HMAC-signed state to prevent CSRF
+    const stateUserId = verifyOAuthState(state);
+    if (!stateUserId) {
+      return NextResponse.redirect(
+        `${appUrl}/settings?tab=integrations&error=google_calendar_invalid_state`
+      );
+    }
+
     const supabase = await createClient();
     const {
       data: { user },
     } = await supabase.auth.getUser();
 
-    if (!user || user.id !== stateData.userId) {
+    if (!user || user.id !== stateUserId) {
       return NextResponse.redirect(
         `${appUrl}/settings?tab=integrations&error=google_calendar_auth_mismatch`
       );

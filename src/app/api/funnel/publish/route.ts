@@ -65,7 +65,8 @@ export async function POST(req: NextRequest) {
         custom_domain: custom_domain || null,
         status: "published",
       })
-      .eq("id", funnel_id);
+      .eq("id", funnel_id)
+      .eq("user_id", user.id);
 
     if (updateError) {
       console.error("[funnel/publish] Error:", updateError);
