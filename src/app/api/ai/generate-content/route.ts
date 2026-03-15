@@ -36,9 +36,13 @@ import {
   scrapeInstagramProfile,
   scrapeInstagramPosts,
   scrapeTikTok,
+  scrapeYouTubeTranscript,
+  scrapeFacebookPosts,
   type InstagramProfileResult,
   type InstagramPostResult,
   type TikTokResult,
+  type YouTubeTranscriptResult,
+  type FacebookPostResult,
 } from "@/lib/scraping/apify";
 import { awardXP } from "@/lib/gamification/xp-engine";
 import { notifyGeneration } from "@/lib/notifications/create";
@@ -253,9 +257,10 @@ export async function POST(req: NextRequest) {
       // Phase 1 : Scraping réel via Apify (prioritaire) puis Firecrawl (fallback)
       let scrapedContext = "";
       let sourceUrls: string[] = [];
-      let dataSource: "instagram_api" | "tiktok_api" | "web_scraping" | "ai_only" = "ai_only";
-      let scrapedPosts: { caption: string; likes: number; comments: number; ownerUsername?: string }[] = [];
+      let dataSource: "instagram_api" | "tiktok_api" | "youtube_api" | "facebook_api" | "web_scraping" | "ai_only" = "ai_only";
+      let scrapedPosts: { caption: string; likes: number; comments: number; shares?: number; ownerUsername?: string }[] = [];
       let profileData: InstagramProfileResult | null = null;
+      let transcriptData: { title: string; channelName: string; viewCount: number; likeCount: number; duration: string; uploadDate: string; transcript: string; url: string } | null = null;
 
       const apifyReady = isApifyConfigured();
       const firecrawlReady = isFirecrawlConfigured();
@@ -344,6 +349,74 @@ ${tiktokResults.slice(0, 10).map((v, i) => `${i + 1}. @${v.authorName}: "${v.des
         }
       }
 
+      // --- Apify: YouTube ---
+      if (apifyReady && platform === "youtube" && dataSource === "ai_only") {
+        try {
+          const videoUrl = handle && (handle.includes("youtube.com") || handle.includes("youtu.be"))
+            ? handle
+            : `https://www.youtube.com/results?search_query=${encodeURIComponent(competitor)}`;
+
+          const ytResult: YouTubeTranscriptResult | null = await scrapeYouTubeTranscript(videoUrl);
+
+          if (ytResult && (ytResult.title || ytResult.transcript)) {
+            scrapedContext += `## DONNÉES YOUTUBE RÉELLES — ${ytResult.title}
+- Chaîne : ${ytResult.channelName}
+- Vues : ${ytResult.viewCount.toLocaleString("fr-FR")}
+- Likes : ${ytResult.likeCount.toLocaleString("fr-FR")}
+- Durée : ${ytResult.duration}
+- Date de publication : ${ytResult.uploadDate}
+
+### Transcription de la vidéo :
+${ytResult.transcript.slice(0, 5000)}
+`;
+            transcriptData = {
+              title: ytResult.title,
+              channelName: ytResult.channelName,
+              viewCount: ytResult.viewCount,
+              likeCount: ytResult.likeCount,
+              duration: ytResult.duration,
+              uploadDate: ytResult.uploadDate,
+              transcript: ytResult.transcript,
+              url: ytResult.url,
+            };
+            sourceUrls.push(ytResult.url);
+            dataSource = "youtube_api";
+          }
+        } catch (err) {
+          console.warn("Apify YouTube scraping failed for content_spy:", err);
+        }
+      }
+
+      // --- Apify: Facebook ---
+      if (apifyReady && platform === "facebook" && dataSource === "ai_only") {
+        try {
+          const fbUrl = handle && handle.includes("facebook.com")
+            ? handle
+            : `https://www.facebook.com/${competitor.replace(/\s+/g, "")}`;
+
+          const fbResults: FacebookPostResult[] = await scrapeFacebookPosts(fbUrl, 15);
+
+          if (fbResults.length > 0) {
+            scrapedContext += `## DONNÉES FACEBOOK RÉELLES
+### Posts Facebook trouvés (${fbResults.length} résultats) :
+${fbResults.slice(0, 10).map((p, i) => `${i + 1}. "${p.text.slice(0, 200)}" — ${p.likes} likes, ${p.comments} commentaires, ${p.shares} partages | Type: ${p.type}`).join("\n")}
+`;
+            scrapedPosts = fbResults.slice(0, 10).map((p) => ({
+              caption: p.text,
+              likes: p.likes,
+              comments: p.comments,
+              shares: p.shares,
+            }));
+            for (const p of fbResults) {
+              if (p.url && !sourceUrls.includes(p.url)) sourceUrls.push(p.url);
+            }
+            dataSource = "facebook_api";
+          }
+        } catch (err) {
+          console.warn("Apify Facebook scraping failed for content_spy:", err);
+        }
+      }
+
       // --- Fallback Firecrawl ---
       if (firecrawlReady && dataSource === "ai_only") {
         try {
@@ -420,6 +493,7 @@ ${tiktokResults.slice(0, 10).map((v, i) => `${i + 1}. @${v.authorName}: "${v.des
           followers: profileData.followers,
           posts: profileData.posts,
         } : undefined,
+        transcript_data: transcriptData || undefined,
       });
     }
 

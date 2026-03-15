@@ -9,6 +9,7 @@ import { PainIdentifier } from "@/components/market/pain-identifier";
 import { SchwartzDisplay } from "@/components/market/schwartz-display";
 import { InsightsScraper } from "@/components/market/insights-scraper";
 import { BusinessAudit } from "@/components/market/business-audit";
+import { ReviewVerbatims, type ReviewVerbatim, type ReviewSourceData } from "@/components/market/review-verbatims";
 import { cn } from "@/lib/utils/cn";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -37,6 +38,9 @@ import {
   Gauge,
   Search,
   ClipboardCheck,
+  MessageSquareQuote,
+  Plus,
+  Trash2,
 } from "lucide-react";
 
 type MarketAnalysis = Database["public"]["Tables"]["market_analyses"]["Row"];
@@ -46,6 +50,7 @@ const TABS = [
   { key: "analyse", label: "Analyse", icon: BarChart3 },
   { key: "audit", label: "Audit Business", icon: ClipboardCheck },
   { key: "insights", label: "Insights", icon: Search },
+  { key: "avis", label: "Avis clients", icon: MessageSquareQuote },
   { key: "schwartz", label: "Schwartz", icon: Gauge },
   { key: "persona", label: "Persona", icon: User },
   { key: "pains", label: "Pains", icon: Flame },
@@ -68,9 +73,19 @@ export default function MarketPage() {
   const [competitorDataSource, setCompetitorDataSource] = useState<string>("ai_only");
   const [competitorScrapingUsed, setCompetitorScrapingUsed] = useState(false);
   const [competitorTrendsData, setCompetitorTrendsData] = useState<{ term: string; timelineData: { date: string; value: number }[]; relatedQueries: string[] }[] | undefined>(undefined);
+  const [competitorScreenshots, setCompetitorScreenshots] = useState<{ url: string; screenshotUrl: string }[] | undefined>(undefined);
+  const [competitorTechStacks, setCompetitorTechStacks] = useState<{ url: string; technologies: { name: string; category: string }[] }[] | undefined>(undefined);
   const [loadingSchwartz, setLoadingSchwartz] = useState(false);
   const [loadingData, setLoadingData] = useState(true);
   const [usageLimited, setUsageLimited] = useState<{currentUsage: number; limit: number} | null>(null);
+
+  // Review scraping state
+  const [googleMapsUrls, setGoogleMapsUrls] = useState<string[]>([""]);
+  const [trustpilotUrls, setTrustpilotUrls] = useState<string[]>([""]);
+  const [reviewVerbatims, setReviewVerbatims] = useState<ReviewVerbatim[]>([]);
+  const [reviewsData, setReviewsData] = useState<ReviewSourceData[]>([]);
+  const [loadingReviews, setLoadingReviews] = useState(false);
+  const [reviewsSourcesOpen, setReviewsSourcesOpen] = useState(true);
 
   // Charger les analyses de marché
   const loadAnalyses = useCallback(async () => {
@@ -182,6 +197,8 @@ export default function MarketPage() {
       setCompetitorDataSource(resData.data_source || "ai_only");
       setCompetitorScrapingUsed(resData.scraping_used || false);
       setCompetitorTrendsData(resData.trends_data || undefined);
+      setCompetitorScreenshots(resData.screenshots || undefined);
+      setCompetitorTechStacks(resData.tech_stacks || undefined);
       // Recharger les concurrents depuis la DB
       await loadCompetitors();
       const sourceLabel = resData.data_source === "apify_crawl" ? "Apify" : resData.data_source === "google_trends" ? "Google Trends" : resData.scraping_used ? "données réelles" : "IA";
@@ -234,6 +251,63 @@ export default function MarketPage() {
       );
     } finally {
       setLoadingSchwartz(false);
+    }
+  };
+
+  // Scraper les avis clients
+  const handleScrapeReviews = async () => {
+    if (!selectedAnalysis) return;
+
+    const validGoogleUrls = googleMapsUrls.filter((u) => u.trim());
+    const validTrustpilotUrls = trustpilotUrls.filter((u) => u.trim());
+
+    if (validGoogleUrls.length === 0 && validTrustpilotUrls.length === 0) {
+      toast.error("Ajoute au moins une URL Google Maps ou Trustpilot.");
+      return;
+    }
+
+    setLoadingReviews(true);
+
+    try {
+      const res = await fetch("/api/ai/analyze-market", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          skills: [],
+          experienceLevel: "intermediaire",
+          currentRevenue: 0,
+          targetRevenue: 0,
+          industries: [selectedAnalysis.market_name],
+          objectives: [],
+          budgetMonthly: 0,
+          competitor_google_maps_urls: validGoogleUrls,
+          competitor_trustpilot_urls: validTrustpilotUrls,
+        }),
+      });
+
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        if (res.status === 403 && errData.usage) { setUsageLimited(errData.usage); return; }
+        throw new Error(errData.error || "Erreur lors du scraping des avis");
+      }
+
+      const data = await res.json();
+
+      if (data.review_verbatims && data.review_verbatims.length > 0) {
+        setReviewVerbatims(data.review_verbatims);
+        setReviewsData(data.reviews_data || []);
+        toast.success(`${data.review_verbatims.length} avis clients récupérés !`);
+      } else {
+        toast.info("Aucun avis trouvé pour les URLs fournies.");
+      }
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Erreur lors du scraping des avis clients"
+      );
+    } finally {
+      setLoadingReviews(false);
     }
   };
 
@@ -487,6 +561,158 @@ export default function MarketPage() {
         />
       )}
 
+      {/* TAB: Avis clients */}
+      {activeTab === "avis" && !loadingData && selectedAnalysis && (
+        <div className="space-y-6">
+          {/* Sources d'avis clients — collapsible */}
+          <Card>
+            <CardHeader
+              className="cursor-pointer"
+              onClick={() => setReviewsSourcesOpen(!reviewsSourcesOpen)}
+            >
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <MessageSquareQuote className="h-4 w-4 text-accent" />
+                  Sources d&apos;avis clients
+                </CardTitle>
+                {reviewsSourcesOpen ? (
+                  <ChevronUp className="h-4 w-4 text-text-muted" />
+                ) : (
+                  <ChevronDown className="h-4 w-4 text-text-muted" />
+                )}
+              </div>
+              <p className="text-xs text-text-muted mt-1">
+                Ajoute les URLs Google Maps et Trustpilot de tes concurrents pour analyser leurs avis clients.
+              </p>
+            </CardHeader>
+
+            {reviewsSourcesOpen && (
+              <CardContent className="space-y-6 border-t border-border-default pt-4">
+                {/* Google Maps URLs */}
+                <div className="space-y-3">
+                  <label className="text-sm font-medium text-text-primary flex items-center gap-2">
+                    <span className="h-5 w-5 rounded bg-blue-500/10 flex items-center justify-center text-[10px] text-blue-400 font-bold">G</span>
+                    URLs Google Maps concurrents
+                  </label>
+                  {googleMapsUrls.map((url, idx) => (
+                    <div key={idx} className="flex gap-2">
+                      <input
+                        type="url"
+                        value={url}
+                        onChange={(e) => {
+                          const newUrls = [...googleMapsUrls];
+                          newUrls[idx] = e.target.value;
+                          setGoogleMapsUrls(newUrls);
+                        }}
+                        placeholder="https://maps.google.com/maps/place/..."
+                        className="flex-1 rounded-lg bg-bg-tertiary border border-border-default px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-1 focus:ring-accent"
+                      />
+                      {googleMapsUrls.length > 1 && (
+                        <button
+                          onClick={() => setGoogleMapsUrls(googleMapsUrls.filter((_, i) => i !== idx))}
+                          className="p-2 rounded-lg text-text-muted hover:text-red-400 hover:bg-red-400/10 transition-colors"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                  {googleMapsUrls.length < 5 && (
+                    <button
+                      onClick={() => setGoogleMapsUrls([...googleMapsUrls, ""])}
+                      className="flex items-center gap-1.5 text-xs text-accent hover:text-accent/80 transition-colors"
+                    >
+                      <Plus className="h-3.5 w-3.5" />
+                      Ajouter une URL Google Maps
+                    </button>
+                  )}
+                </div>
+
+                {/* Trustpilot URLs */}
+                <div className="space-y-3">
+                  <label className="text-sm font-medium text-text-primary flex items-center gap-2">
+                    <span className="h-5 w-5 rounded bg-green-500/10 flex items-center justify-center text-[10px] text-green-400 font-bold">T</span>
+                    URLs Trustpilot concurrents
+                  </label>
+                  {trustpilotUrls.map((url, idx) => (
+                    <div key={idx} className="flex gap-2">
+                      <input
+                        type="url"
+                        value={url}
+                        onChange={(e) => {
+                          const newUrls = [...trustpilotUrls];
+                          newUrls[idx] = e.target.value;
+                          setTrustpilotUrls(newUrls);
+                        }}
+                        placeholder="https://fr.trustpilot.com/review/..."
+                        className="flex-1 rounded-lg bg-bg-tertiary border border-border-default px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-1 focus:ring-accent"
+                      />
+                      {trustpilotUrls.length > 1 && (
+                        <button
+                          onClick={() => setTrustpilotUrls(trustpilotUrls.filter((_, i) => i !== idx))}
+                          className="p-2 rounded-lg text-text-muted hover:text-red-400 hover:bg-red-400/10 transition-colors"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                  {trustpilotUrls.length < 5 && (
+                    <button
+                      onClick={() => setTrustpilotUrls([...trustpilotUrls, ""])}
+                      className="flex items-center gap-1.5 text-xs text-accent hover:text-accent/80 transition-colors"
+                    >
+                      <Plus className="h-3.5 w-3.5" />
+                      Ajouter une URL Trustpilot
+                    </button>
+                  )}
+                </div>
+
+                {/* Scrape button */}
+                <Button
+                  onClick={handleScrapeReviews}
+                  disabled={loadingReviews}
+                  className="w-full"
+                >
+                  {loadingReviews ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Analyse des avis en cours...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="h-4 w-4" />
+                      Analyser les avis clients
+                    </>
+                  )}
+                </Button>
+              </CardContent>
+            )}
+          </Card>
+
+          {/* Verbatims display */}
+          {reviewVerbatims.length > 0 && (
+            <ReviewVerbatims verbatims={reviewVerbatims} reviewsData={reviewsData} />
+          )}
+
+          {/* Empty state when no reviews yet */}
+          {reviewVerbatims.length === 0 && !loadingReviews && (
+            <Card>
+              <CardContent className="flex flex-col items-center justify-center py-12">
+                <MessageSquareQuote className="h-12 w-12 text-text-muted mb-4" />
+                <h3 className="text-lg font-medium text-text-primary mb-2">
+                  Aucun avis analysé
+                </h3>
+                <p className="text-sm text-text-secondary text-center max-w-md">
+                  Ajoute les URLs Google Maps ou Trustpilot de tes concurrents ci-dessus
+                  pour collecter et analyser les verbatims clients.
+                </p>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+      )}
+
       {/* TAB: Pains */}
       {activeTab === "pains" && !loadingData && selectedAnalysis && (
         <PainIdentifier
@@ -578,6 +804,8 @@ export default function MarketPage() {
                   dataSource={competitorDataSource as "apify_crawl" | "google_trends" | "web_scraping" | "ai_only"}
                   scrapingUsed={competitorScrapingUsed}
                   trendsData={competitorTrendsData}
+                  screenshots={competitorScreenshots}
+                  techStacks={competitorTechStacks}
                 />
               );
             })()

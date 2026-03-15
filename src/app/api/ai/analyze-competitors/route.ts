@@ -20,8 +20,12 @@ import {
   isApifyConfigured,
   crawlWebsite,
   scrapeGoogleTrends,
+  screenshotWebsite,
+  detectTechStack,
   type WebCrawlResult,
   type GoogleTrendsResult,
+  type WebsiteScreenshot,
+  type TechStackResult,
 } from "@/lib/scraping/apify";
 
 export const maxDuration = 60;
@@ -214,6 +218,42 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // Phase 2 : Screenshots & Tech Stack (bonus, non-blocking)
+    let screenshots: { url: string; screenshotUrl: string }[] = [];
+    let techStacks: { url: string; technologies: { name: string; category: string }[] }[] = [];
+
+    if (apifyReady) {
+      const urlsForBonus = (competitor_urls || []).filter((u) => u.startsWith("http")).slice(0, 3);
+      if (urlsForBonus.length > 0) {
+        try {
+          const [screenshotResults, techStackResults] = await Promise.allSettled([
+            Promise.allSettled(urlsForBonus.map((u) => screenshotWebsite(u))),
+            Promise.allSettled(urlsForBonus.map((u) => detectTechStack(u))),
+          ]);
+
+          // Collect screenshot results
+          if (screenshotResults.status === "fulfilled") {
+            for (const r of screenshotResults.value) {
+              if (r.status === "fulfilled" && r.value) {
+                screenshots.push({ url: r.value.url, screenshotUrl: r.value.screenshotUrl });
+              }
+            }
+          }
+
+          // Collect tech stack results
+          if (techStackResults.status === "fulfilled") {
+            for (const r of techStackResults.value) {
+              if (r.status === "fulfilled" && r.value && r.value.technologies.length > 0) {
+                techStacks.push({ url: r.value.url, technologies: r.value.technologies });
+              }
+            }
+          }
+        } catch (err) {
+          console.warn("Screenshot/TechStack bonus phase failed (non-blocking):", err);
+        }
+      }
+    }
+
     const [basePrompt, vaultContext] = await Promise.all([
       Promise.resolve(buildCompetitorAnalysisPrompt(
         {
@@ -275,6 +315,8 @@ export async function POST(req: NextRequest) {
       scraping_used: dataSource !== "ai_only",
       data_source: dataSource,
       trends_data: trendsData.length > 0 ? trendsData : undefined,
+      screenshots: screenshots.length > 0 ? screenshots : undefined,
+      tech_stacks: techStacks.length > 0 ? techStacks : undefined,
     });
   } catch (error) {
     console.error("[analyze-competitors] Error:", error);

@@ -73,6 +73,28 @@ export interface GoogleTrendsResult {
   relatedQueries: string[];
 }
 
+export interface YouTubeTranscriptResult {
+  title: string;
+  description: string;
+  viewCount: number;
+  likeCount: number;
+  channelName: string;
+  duration: string;
+  uploadDate: string;
+  transcript: string;
+  url: string;
+}
+
+export interface FacebookPostResult {
+  text: string;
+  likes: number;
+  comments: number;
+  shares: number;
+  type: string;
+  timestamp: string;
+  url: string;
+}
+
 // ---------------------------------------------------------------------------
 // Configuration check
 // ---------------------------------------------------------------------------
@@ -427,6 +449,317 @@ export async function scrapeGoogleTrends(params: {
         )
       : toStringArray(item.relatedQueries),
   }));
+}
+
+// ---------------------------------------------------------------------------
+// YouTube Transcript
+// ---------------------------------------------------------------------------
+
+/**
+ * Scrape a YouTube video transcript (or channel videos).
+ * Uses actor: starvibe/youtube-video-transcript
+ */
+export async function scrapeYouTubeTranscript(
+  videoUrl: string,
+): Promise<YouTubeTranscriptResult | null> {
+  if (!videoUrl) return null;
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const raw = await runActor<any>("starvibe~youtube-video-transcript", {
+    urls: [videoUrl],
+  });
+
+  const item = raw[0];
+  if (!item) return null;
+
+  return {
+    title: item.title ?? "",
+    description: item.description ?? "",
+    viewCount: item.viewCount ?? item.view_count ?? 0,
+    likeCount: item.likeCount ?? item.like_count ?? 0,
+    channelName: item.channelName ?? item.channel_name ?? item.author ?? "",
+    duration: item.duration ?? "",
+    uploadDate: item.uploadDate ?? item.upload_date ?? item.publishedAt ?? "",
+    transcript: item.transcript ?? item.captions ?? item.subtitles ?? "",
+    url: item.url ?? videoUrl,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Facebook Posts
+// ---------------------------------------------------------------------------
+
+/**
+ * Scrape Facebook page posts.
+ * Uses actor: danek/facebook-pages-posts-ppr
+ */
+export async function scrapeFacebookPosts(
+  pageUrl: string,
+  limit = 15,
+): Promise<FacebookPostResult[]> {
+  if (!pageUrl) return [];
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const raw = await runActor<any>("danek~facebook-pages-posts-ppr", {
+    startUrls: [{ url: pageUrl }],
+    maxPosts: limit,
+  });
+
+  return raw.slice(0, limit).map((item) => ({
+    text: item.text ?? item.message ?? item.postText ?? "",
+    likes: item.likes ?? item.likesCount ?? item.reactions ?? 0,
+    comments: item.comments ?? item.commentsCount ?? 0,
+    shares: item.shares ?? item.sharesCount ?? 0,
+    type: item.type ?? item.postType ?? "post",
+    timestamp: item.time ?? item.timestamp ?? item.date ?? "",
+    url: item.url ?? item.postUrl ?? "",
+  }));
+}
+
+// ---------------------------------------------------------------------------
+// Google Maps Reviews
+// ---------------------------------------------------------------------------
+
+export interface GoogleMapsReview {
+  name: string;
+  text: string;
+  stars: number;
+  publishedAtDate: string;
+  responseFromOwner: string | null;
+  reviewUrl: string;
+}
+
+/**
+ * Scrape Google Maps reviews for a business.
+ * Uses actor: compass/Google-Maps-Reviews-Scraper
+ */
+export async function scrapeGoogleMapsReviews(params: {
+  googleMapsUrl: string;
+  limit?: number;
+}): Promise<GoogleMapsReview[]> {
+  const { googleMapsUrl, limit = 30 } = params;
+
+  if (!googleMapsUrl) {
+    console.warn("[apify] scrapeGoogleMapsReviews: no URL provided");
+    return [];
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const raw = await runActor<any>("compass~Google-Maps-Reviews-Scraper", {
+    startUrls: [{ url: googleMapsUrl }],
+    maxReviews: limit,
+    language: "fr",
+  });
+
+  return raw.slice(0, limit).map((item) => ({
+    name: item.name ?? item.reviewerName ?? item.author ?? "",
+    text: item.text ?? item.reviewText ?? item.body ?? "",
+    stars: item.stars ?? item.rating ?? item.score ?? 0,
+    publishedAtDate: item.publishedAtDate ?? item.publishAt ?? item.date ?? "",
+    responseFromOwner: item.responseFromOwner?.text ?? item.ownerResponse ?? null,
+    reviewUrl: item.reviewUrl ?? item.url ?? "",
+  }));
+}
+
+// ---------------------------------------------------------------------------
+// Trustpilot Reviews
+// ---------------------------------------------------------------------------
+
+export interface TrustpilotReview {
+  title: string;
+  text: string;
+  rating: number;
+  date: string;
+  author: string;
+}
+
+/**
+ * Scrape Trustpilot reviews for a business.
+ * Uses actor: nikita-sviridenko/trustpilot-reviews-scraper
+ */
+export async function scrapeTrustpilotReviews(params: {
+  trustpilotUrl: string;
+  limit?: number;
+}): Promise<TrustpilotReview[]> {
+  const { trustpilotUrl, limit = 30 } = params;
+
+  if (!trustpilotUrl) {
+    console.warn("[apify] scrapeTrustpilotReviews: no URL provided");
+    return [];
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const raw = await runActor<any>("nikita-sviridenko~trustpilot-reviews-scraper", {
+    startUrls: [{ url: trustpilotUrl }],
+    maxItems: limit,
+  });
+
+  return raw.slice(0, limit).map((item) => ({
+    title: item.title ?? item.heading ?? "",
+    text: item.text ?? item.reviewBody ?? item.body ?? "",
+    rating: item.rating ?? item.stars ?? item.score ?? 0,
+    date: item.date ?? item.publishedDate ?? item.createdAt ?? "",
+    author: item.author ?? item.consumer?.displayName ?? item.reviewerName ?? "",
+  }));
+}
+
+// ---------------------------------------------------------------------------
+// Website Screenshot
+// ---------------------------------------------------------------------------
+
+export interface WebsiteScreenshot {
+  url: string;
+  screenshotUrl: string;
+  width: number;
+  height: number;
+}
+
+/**
+ * Take a full-page screenshot of a website.
+ * Uses actor: dz_omar/screenshot
+ */
+export async function screenshotWebsite(url: string): Promise<WebsiteScreenshot | null> {
+  const token = process.env.APIFY_TOKEN;
+  if (!token) {
+    console.warn("[apify] APIFY_TOKEN not configured");
+    return null;
+  }
+
+  try {
+    // Start the actor run with a 30s timeout
+    const startRes = await fetch(
+      `${APIFY_BASE_URL}/acts/dz_omar~screenshot/runs?token=${token}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          urls: [{ url }],
+          screenshotType: "full",
+          format: "png",
+          width: 1280,
+        }),
+        signal: AbortSignal.timeout(30000),
+      },
+    );
+
+    if (!startRes.ok) {
+      console.warn(`[apify] Failed to start screenshot actor: ${startRes.status}`);
+      return null;
+    }
+
+    const startData = await startRes.json();
+    const runId: string = startData?.data?.id;
+    if (!runId) {
+      console.warn("[apify] No run ID returned for screenshot actor");
+      return null;
+    }
+
+    // Poll for completion (max 30s)
+    const deadline = Date.now() + 30000;
+    let datasetId: string | undefined;
+
+    while (Date.now() < deadline) {
+      await sleep(2000);
+
+      const pollRes = await fetch(
+        `${APIFY_BASE_URL}/actor-runs/${runId}?token=${token}`,
+        { signal: AbortSignal.timeout(10000) },
+      );
+
+      if (!pollRes.ok) return null;
+
+      const pollData = await pollRes.json();
+      const status: string = pollData?.data?.status;
+
+      if (status === "SUCCEEDED") {
+        datasetId = pollData?.data?.defaultDatasetId;
+        break;
+      }
+
+      if (status === "FAILED" || status === "ABORTED" || status === "TIMED-OUT") {
+        console.warn(`[apify] Screenshot run ${runId} ended with status: ${status}`);
+        return null;
+      }
+    }
+
+    if (!datasetId) {
+      console.warn(`[apify] Timeout waiting for screenshot actor (run ${runId})`);
+      return null;
+    }
+
+    // Fetch dataset items
+    const itemsRes = await fetch(
+      `${APIFY_BASE_URL}/datasets/${datasetId}/items?token=${token}`,
+      { signal: AbortSignal.timeout(10000) },
+    );
+
+    if (!itemsRes.ok) return null;
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const items: any[] = await itemsRes.json();
+    const item = Array.isArray(items) ? items[0] : null;
+
+    if (!item) return null;
+
+    const screenshotUrl = item.screenshotUrl ?? item.screenshot_url ?? item.url_screenshot ?? item.imageUrl ?? "";
+    if (!screenshotUrl) return null;
+
+    return {
+      url,
+      screenshotUrl,
+      width: item.width ?? 1280,
+      height: item.height ?? 800,
+    };
+  } catch (err) {
+    console.warn("[apify] Error running screenshot actor:", err);
+    return null;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Tech Stack Detection
+// ---------------------------------------------------------------------------
+
+export interface TechStackResult {
+  url: string;
+  technologies: { name: string; category: string }[];
+}
+
+/**
+ * Detect the technology stack of a website.
+ * Uses actor: botflowtech/website-technology-stack-detector
+ */
+export async function detectTechStack(url: string): Promise<TechStackResult | null> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const raw = await runActor<any>("botflowtech~website-technology-stack-detector", {
+    urls: [url],
+  });
+
+  const item = raw[0];
+  if (!item) return null;
+
+  // Normalise technologies array from various response shapes
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let technologies: { name: string; category: string }[] = [];
+
+  if (Array.isArray(item.technologies)) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    technologies = item.technologies.map((t: any) => ({
+      name: typeof t === "string" ? t : (t.name ?? t.technology ?? ""),
+      category: typeof t === "string" ? "Autre" : (t.category ?? t.categories?.[0] ?? "Autre"),
+    })).filter((t: { name: string }) => t.name);
+  } else if (Array.isArray(item.detectedTechnologies)) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    technologies = item.detectedTechnologies.map((t: any) => ({
+      name: t.name ?? t.technology ?? "",
+      category: t.category ?? t.categories?.[0] ?? "Autre",
+    })).filter((t: { name: string }) => t.name);
+  }
+
+  return {
+    url: item.url ?? url,
+    technologies,
+  };
 }
 
 // ---------------------------------------------------------------------------

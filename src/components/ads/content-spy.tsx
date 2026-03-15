@@ -37,6 +37,13 @@ import {
   MessageCircle,
   Bot,
   Radio,
+  Youtube,
+  Facebook,
+  Share2,
+  Play,
+  Eye,
+  ThumbsUp,
+  FileText,
 } from "lucide-react";
 
 // Types pour les résultats Content Spy
@@ -99,18 +106,20 @@ interface ContentSpyResult {
 }
 
 const PLATFORMS = [
-  { value: "youtube", label: "YouTube" },
-  { value: "instagram", label: "Instagram" },
-  { value: "tiktok", label: "TikTok" },
-  { value: "linkedin", label: "LinkedIn" },
+  { value: "youtube", label: "YouTube", icon: Youtube },
+  { value: "instagram", label: "Instagram", icon: Instagram },
+  { value: "tiktok", label: "TikTok", icon: Radio },
+  { value: "facebook", label: "Facebook", icon: Facebook },
+  { value: "linkedin", label: "LinkedIn", icon: Globe },
 ];
 
-type DataSource = "instagram_api" | "tiktok_api" | "web_scraping" | "ai_only";
+type DataSource = "instagram_api" | "tiktok_api" | "youtube_api" | "facebook_api" | "web_scraping" | "ai_only";
 
 interface ScrapedPost {
   caption: string;
   likes: number;
   comments: number;
+  shares?: number;
   ownerUsername?: string;
 }
 
@@ -122,9 +131,22 @@ interface ProfileData {
   posts: number;
 }
 
+interface TranscriptData {
+  title: string;
+  channelName: string;
+  viewCount: number;
+  likeCount: number;
+  duration: string;
+  uploadDate: string;
+  transcript: string;
+  url: string;
+}
+
 const DATA_SOURCE_CONFIG: Record<DataSource, { label: string; icon: React.ElementType; color: string; bgColor: string; borderColor: string }> = {
   instagram_api: { label: "Instagram API", icon: Instagram, color: "text-pink-400", bgColor: "bg-pink-500/10", borderColor: "border-pink-500/20" },
   tiktok_api: { label: "TikTok API", icon: Radio, color: "text-cyan-400", bgColor: "bg-cyan-500/10", borderColor: "border-cyan-500/20" },
+  youtube_api: { label: "YouTube API", icon: Youtube, color: "text-red-400", bgColor: "bg-red-500/10", borderColor: "border-red-500/20" },
+  facebook_api: { label: "Facebook API", icon: Facebook, color: "text-blue-400", bgColor: "bg-blue-500/10", borderColor: "border-blue-500/20" },
   web_scraping: { label: "Web Scraping", icon: Globe, color: "text-blue-400", bgColor: "bg-blue-500/10", borderColor: "border-blue-500/20" },
   ai_only: { label: "Analyse IA", icon: Bot, color: "text-purple-400", bgColor: "bg-purple-500/10", borderColor: "border-purple-500/20" },
 };
@@ -141,6 +163,8 @@ export function ContentSpy({ className }: ContentSpyProps) {
   const [dataSource, setDataSource] = React.useState<DataSource>("ai_only");
   const [scrapedPosts, setScrapedPosts] = React.useState<ScrapedPost[]>([]);
   const [profileData, setProfileData] = React.useState<ProfileData | null>(null);
+  const [transcriptData, setTranscriptData] = React.useState<TranscriptData | null>(null);
+  const [transcriptExpanded, setTranscriptExpanded] = React.useState(false);
   const [postsExpanded, setPostsExpanded] = React.useState(false);
 
   // Champs du formulaire
@@ -183,6 +207,7 @@ export function ContentSpy({ className }: ContentSpyProps) {
       setDataSource(data.data_source || "ai_only");
       setScrapedPosts(data.scraped_posts || []);
       setProfileData(data.profile_data || null);
+      setTranscriptData(data.transcript_data || null);
       const source = data.data_source as DataSource;
       const sourceLabel = DATA_SOURCE_CONFIG[source]?.label || "IA";
       toast.success(data.scraping_used
@@ -241,11 +266,17 @@ export function ContentSpy({ className }: ContentSpyProps) {
                   <SelectValue placeholder="Choisis une plateforme" />
                 </SelectTrigger>
                 <SelectContent>
-                  {PLATFORMS.map((p) => (
-                    <SelectItem key={p.value} value={p.value}>
-                      {p.label}
-                    </SelectItem>
-                  ))}
+                  {PLATFORMS.map((p) => {
+                    const PlatformIcon = p.icon;
+                    return (
+                      <SelectItem key={p.value} value={p.value}>
+                        <span className="flex items-center gap-2">
+                          <PlatformIcon className="h-3.5 w-3.5" />
+                          {p.label}
+                        </span>
+                      </SelectItem>
+                    );
+                  })}
                 </SelectContent>
               </Select>
             </div>
@@ -287,7 +318,7 @@ export function ContentSpy({ className }: ContentSpyProps) {
           </h3>
           <Badge variant="default">{result.platform}</Badge>
         </div>
-        <Button variant="outline" size="sm" onClick={() => { setResult(null); setSources([]); setScrapingUsed(false); setDataSource("ai_only"); setScrapedPosts([]); setProfileData(null); setPostsExpanded(false); }}>
+        <Button variant="outline" size="sm" onClick={() => { setResult(null); setSources([]); setScrapingUsed(false); setDataSource("ai_only"); setScrapedPosts([]); setProfileData(null); setTranscriptData(null); setTranscriptExpanded(false); setPostsExpanded(false); }}>
           Nouvelle analyse
         </Button>
       </div>
@@ -344,6 +375,83 @@ export function ContentSpy({ className }: ContentSpyProps) {
         </Card>
       )}
 
+      {/* Vidéo YouTube scrapée */}
+      {transcriptData && (
+        <Card className="border-red-500/20">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Youtube className="h-4 w-4 text-red-400" />
+              Vidéo YouTube analysée
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="p-3 rounded-lg bg-bg-tertiary border border-border-default">
+              <p className="text-sm font-semibold text-text-primary">{transcriptData.title}</p>
+              <p className="text-xs text-text-muted mt-1">Chaîne : {transcriptData.channelName}</p>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div className="text-center p-2 rounded-lg bg-bg-tertiary">
+                <p className="text-xs text-text-muted flex items-center justify-center gap-1"><Eye className="h-3 w-3" /> Vues</p>
+                <p className="text-sm font-semibold text-text-primary">{transcriptData.viewCount.toLocaleString("fr-FR")}</p>
+              </div>
+              <div className="text-center p-2 rounded-lg bg-bg-tertiary">
+                <p className="text-xs text-text-muted flex items-center justify-center gap-1"><ThumbsUp className="h-3 w-3" /> Likes</p>
+                <p className="text-sm font-semibold text-text-primary">{transcriptData.likeCount.toLocaleString("fr-FR")}</p>
+              </div>
+              <div className="text-center p-2 rounded-lg bg-bg-tertiary">
+                <p className="text-xs text-text-muted flex items-center justify-center gap-1"><Play className="h-3 w-3" /> Durée</p>
+                <p className="text-sm font-semibold text-text-primary">{transcriptData.duration}</p>
+              </div>
+              <div className="text-center p-2 rounded-lg bg-bg-tertiary">
+                <p className="text-xs text-text-muted">Date</p>
+                <p className="text-sm font-semibold text-text-primary">{transcriptData.uploadDate}</p>
+              </div>
+            </div>
+            {transcriptData.transcript && (
+              <div>
+                <button
+                  type="button"
+                  className="flex items-center gap-2 text-sm text-text-secondary hover:text-accent transition-colors cursor-pointer"
+                  onClick={() => setTranscriptExpanded(!transcriptExpanded)}
+                >
+                  <FileText className="h-4 w-4" />
+                  <span>Transcription</span>
+                  {transcriptExpanded ? (
+                    <ChevronUp className="h-3 w-3 text-text-muted" />
+                  ) : (
+                    <ChevronDown className="h-3 w-3 text-text-muted" />
+                  )}
+                </button>
+                {transcriptExpanded ? (
+                  <div className="mt-2 p-3 rounded-lg bg-bg-tertiary border border-border-default max-h-60 overflow-y-auto">
+                    <p className="text-xs text-text-secondary whitespace-pre-wrap leading-relaxed">
+                      {transcriptData.transcript}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="mt-2 p-3 rounded-lg bg-bg-tertiary border border-border-default">
+                    <p className="text-xs text-text-secondary line-clamp-3">
+                      {transcriptData.transcript.slice(0, 500)}...
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
+            {transcriptData.url && (
+              <a
+                href={transcriptData.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 text-sm text-red-400 hover:text-red-300 transition-colors"
+              >
+                <ExternalLink className="h-3 w-3" />
+                Voir la vidéo sur YouTube
+              </a>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
       {/* Posts réels analysés (collapsible) */}
       {scrapedPosts.length > 0 && (
         <Card>
@@ -386,6 +494,12 @@ export function ContentSpy({ className }: ContentSpyProps) {
                         <MessageCircle className="h-3 w-3 text-blue-400" />
                         {post.comments.toLocaleString("fr-FR")}
                       </span>
+                      {post.shares !== undefined && post.shares > 0 && (
+                        <span className="flex items-center gap-1">
+                          <Share2 className="h-3 w-3 text-emerald-400" />
+                          {post.shares.toLocaleString("fr-FR")}
+                        </span>
+                      )}
                     </div>
                   </div>
                 ))}

@@ -39,7 +39,10 @@ export async function POST(req: NextRequest) {
 
 
     const body = await req.json();
-    const { marketAnalysisId } = body;
+    const { marketAnalysisId, competitor_reviews } = body as {
+      marketAnalysisId: string;
+      competitor_reviews?: string;
+    };
 
     if (!marketAnalysisId) {
       return NextResponse.json(
@@ -83,7 +86,18 @@ export async function POST(req: NextRequest) {
       },
       profile?.skills || []
     );
-    const prompt = vaultContext ? basePrompt + "\n" + vaultContext : basePrompt;
+    // Inject competitor review insights if provided
+    let reviewsContext = "";
+    if (competitor_reviews && competitor_reviews.trim()) {
+      const truncatedReviews = competitor_reviews.slice(0, 3000);
+      reviewsContext = `\n\n## DOULEURS ET FRUSTRATIONS DES CLIENTS DES CONCURRENTS
+Voici les douleurs et frustrations exprimées par les clients des concurrents. Utilise ces insights pour créer une offre qui résout ces problèmes spécifiques avec des garanties ciblées.
+
+${truncatedReviews}
+`;
+    }
+
+    const prompt = [basePrompt, reviewsContext, vaultContext].filter(Boolean).join("\n");
     interface GeneratedOffer {
       packaging?: {
         offer_name?: string;

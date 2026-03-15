@@ -14,6 +14,9 @@ import {
   Globe,
   Bot,
   Zap,
+  Camera,
+  Cpu,
+  ExternalLink,
 } from "lucide-react";
 
 interface AdInsight {
@@ -62,6 +65,16 @@ interface TrendsDataItem {
   relatedQueries: string[];
 }
 
+interface ScreenshotItem {
+  url: string;
+  screenshotUrl: string;
+}
+
+interface TechStackItem {
+  url: string;
+  technologies: { name: string; category: string }[];
+}
+
 interface CompetitorGridProps {
   competitors: Competitor[];
   marketGaps?: string[];
@@ -71,6 +84,8 @@ interface CompetitorGridProps {
   dataSource?: DataSource;
   scrapingUsed?: boolean;
   trendsData?: TrendsDataItem[];
+  screenshots?: ScreenshotItem[];
+  techStacks?: TechStackItem[];
 }
 
 function CompetitorCard({ competitor }: { competitor: Competitor }) {
@@ -222,6 +237,8 @@ export function CompetitorGrid({
   dataSource = "ai_only",
   scrapingUsed = false,
   trendsData,
+  screenshots,
+  techStacks,
 }: CompetitorGridProps) {
   const sourceConfig = DATA_SOURCE_LABELS[dataSource];
 
@@ -327,6 +344,107 @@ export function CompetitorGrid({
           <CompetitorCard key={i} competitor={competitor} />
         ))}
       </div>
+
+      {/* Captures des sites concurrents */}
+      {screenshots && screenshots.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Camera className="h-4 w-4 text-accent" />
+              Captures des sites concurrents
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {screenshots.map((s, i) => {
+                let displayUrl = s.url;
+                try {
+                  displayUrl = new URL(s.url).hostname.replace("www.", "");
+                } catch { /* keep original */ }
+
+                return (
+                  <a
+                    key={i}
+                    href={s.screenshotUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group block rounded-2xl border border-border-default overflow-hidden bg-bg-tertiary transition-all hover:border-accent/50 hover:shadow-lg hover:shadow-accent/5"
+                  >
+                    <div className="aspect-video relative overflow-hidden">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={s.screenshotUrl}
+                        alt={`Capture de ${displayUrl}`}
+                        className="w-full h-full object-cover object-top transition-transform group-hover:scale-[1.02]"
+                        loading="lazy"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-end p-3">
+                        <ExternalLink className="h-4 w-4 text-white" />
+                      </div>
+                    </div>
+                    <div className="px-3 py-2.5">
+                      <p className="text-sm text-text-secondary truncate">{displayUrl}</p>
+                    </div>
+                  </a>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Stack technologique */}
+      {techStacks && techStacks.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Cpu className="h-4 w-4 text-accent" />
+              Stack technologique
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-5">
+              {techStacks.map((ts, i) => {
+                let displayUrl = ts.url;
+                try {
+                  displayUrl = new URL(ts.url).hostname.replace("www.", "");
+                } catch { /* keep original */ }
+
+                // Group technologies by category
+                const grouped = ts.technologies.reduce<Record<string, string[]>>((acc, tech) => {
+                  const cat = tech.category || "Autre";
+                  if (!acc[cat]) acc[cat] = [];
+                  acc[cat].push(tech.name);
+                  return acc;
+                }, {});
+
+                return (
+                  <div key={i} className="p-4 rounded-xl bg-bg-tertiary border border-border-default">
+                    <p className="text-sm font-medium text-text-primary mb-3">{displayUrl}</p>
+                    <div className="space-y-3">
+                      {Object.entries(grouped).map(([category, techs]) => (
+                        <div key={category}>
+                          <p className="text-xs text-text-secondary mb-1.5 uppercase tracking-wider">{category}</p>
+                          <div className="flex flex-wrap gap-1.5">
+                            {techs.map((name, j) => (
+                              <span
+                                key={j}
+                                className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-accent/10 text-accent border border-accent/20"
+                              >
+                                {name}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Synthese strategique */}
       {(marketGaps || positioningOpportunities || recommendedDifferentiation) && (
