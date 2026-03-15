@@ -1,19 +1,28 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { checkAIUsage } from "@/lib/stripe/check-usage";
+import { generateText } from "@/lib/ai/generate";
 import { rateLimit } from "@/lib/utils/rate-limit";
 
-export const maxDuration = 300;
+export const maxDuration = 120;
 
-const REPLICATE_API_URL = "https://api.replicate.com/v1/predictions";
-
-interface ReplicateResponse {
-  id: string;
-  status: string;
-  output?: string | string[];
-  error?: string;
-  urls?: { get: string };
-}
+const LOGO_TYPES = [
+  {
+    type: "principal",
+    label: "Logo principal",
+    instruction: "Logo complet avec le nom de la marque intégré. Design typographique ou combiné (symbole + texte). Utilise les couleurs de la palette.",
+  },
+  {
+    type: "icone",
+    label: "Logo icône",
+    instruction: "Version icône carrée, minimaliste, sans texte. Doit fonctionner comme favicon ou icône d'app. Symbole pur, géométrique.",
+  },
+  {
+    type: "monochrome",
+    label: "Logo monochrome",
+    instruction: "Version noir et blanc uniquement (#000 sur fond transparent). Pas de couleurs. Silhouette épurée adaptée à l'impression.",
+  },
+] as const;
 
 export async function POST(req: NextRequest) {
   try {
@@ -42,16 +51,13 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const token = process.env.REPLICATE_API_TOKEN;
-    if (!token) {
-      return NextResponse.json(
-        { error: "Génération de logo non configurée (REPLICATE_API_TOKEN manquant)" },
-        { status: 500 }
-      );
-    }
-
     const body = await req.json();
-    const { brandName, concept, style, colors } = body;
+    const { brandName, concept, style, colors } = body as {
+      brandName?: string;
+      concept?: string;
+      style?: string;
+      colors?: string[];
+    };
 
     if (!brandName || !concept) {
       return NextResponse.json(
@@ -60,57 +66,25 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 3 typed logo variations per CDC spec
-    const LOGO_TYPES = [
-      { type: "principal", label: "Logo principal", suffix: "full logo with brand name, typography-based or illustration, detailed design" },
-      { type: "icone", label: "Logo icone", suffix: "square icon version, minimal, works as favicon or app icon, no text, pure symbol" },
-      { type: "monochrome", label: "Logo monochrome", suffix: "black and white version, no colors, suitable for print, clean silhouette" },
-    ] as const;
-
     const results: { type: string; label: string; url: string }[] = [];
 
     for (const logoType of LOGO_TYPES) {
-      const prompt = buildLogoPrompt(brandName, concept, style, colors, logoType.suffix);
-
-      const createRes = await fetch(REPLICATE_API_URL, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model: "black-forest-labs/flux-schnell",
-          input: {
-            prompt,
-            num_outputs: 1,
-            aspect_ratio: "1:1",
-            output_format: "png",
-            output_quality: 95,
-          },
-        }),
-      });
-
-      if (!createRes.ok) {
-        console.error(`[generate-logo] Replicate error for ${logoType.type}`);
-        continue;
-      }
-
-      const prediction: ReplicateResponse = await createRes.json();
-      let result = prediction;
-      const pollUrl = prediction.urls?.get || `${REPLICATE_API_URL}/${prediction.id}`;
-
-      for (let i = 0; i < 30; i++) {
-        if (result.status === "succeeded" || result.status === "failed") break;
-        await new Promise((r) => setTimeout(r, 2000));
-        const pollRes = await fetch(pollUrl, {
-          headers: { Authorization: `Bearer ${token}` },
+      try {
+        const svgCode = await generateText({
+          prompt: buildSVGPrompt(brandName, concept, style, colors, logoType.instruction),
+          maxTokens: 4096,
+          temperature: 0.8,
         });
-        result = await pollRes.json();
-      }
 
-      if (result.status === "succeeded" && result.output) {
-        const url = Array.isArray(result.output) ? result.output[0] : result.output;
-        results.push({ type: logoType.type, label: logoType.label, url });
+        // Extract SVG from response
+        const svgMatch = svgCode.match(/<svg[\s\S]*?<\/svg>/i);
+        if (!svgMatch) continue;
+
+        const svg = svgMatch[0];
+        const dataUrl = `data:image/svg+xml;base64,${Buffer.from(svg).toString("base64")}`;
+        results.push({ type: logoType.type, label: logoType.label, url: dataUrl });
+      } catch (err) {
+        console.error(`[generate-logo] Erreur pour ${logoType.type}:`, err);
       }
     }
 
@@ -135,31 +109,36 @@ export async function POST(req: NextRequest) {
   }
 }
 
-function buildLogoPrompt(
+function buildSVGPrompt(
   brandName: string,
   concept: string,
   style?: string,
   colors?: string[],
-  typeVariation?: string
+  typeInstruction?: string
 ): string {
-  let prompt = `Professional minimalist logo design for a brand called "${brandName}". `;
-  prompt += `Concept: ${concept}. `;
+  const colorInfo = colors && colors.length > 0
+    ? `Palette de couleurs à utiliser : ${colors.join(", ")}.`
+    : "Utilise des couleurs modernes et professionnelles.";
 
-  if (typeVariation) {
-    prompt += `Variation: ${typeVariation}. `;
-  }
+  return `Tu es un designer de logos expert. Génère un logo SVG professionnel.
 
-  if (style) {
-    prompt += `Style: ${style}. `;
-  } else {
-    prompt += `Style: modern, clean, professional, tech-forward. `;
-  }
+## MARQUE
+- Nom : ${brandName}
+- Concept : ${concept}
+${style ? `- Style : ${style}` : "- Style : moderne, épuré, professionnel"}
+- ${colorInfo}
 
-  if (colors && colors.length > 0 && !typeVariation?.includes("monochrome")) {
-    prompt += `Color palette: ${colors.join(", ")}. `;
-  }
+## TYPE DE VARIATION
+${typeInstruction || "Logo principal avec le nom de la marque."}
 
-  prompt += `The logo should be centered on a clean background, vector-style, suitable for a SaaS/business brand. High contrast, scalable design. Professional branding quality. PNG format, 1000x1000px.`;
+## CONTRAINTES SVG
+- Viewbox : 0 0 200 200
+- Utilise uniquement des éléments SVG natifs (path, circle, rect, text, g, polygon, line, ellipse)
+- Le texte doit utiliser des polices web-safe (Arial, Helvetica, sans-serif)
+- Design centré dans le viewbox
+- Pas de xmlns redondants, pas de commentaires
+- Le logo doit être professionnel, minimaliste et mémorisable
+- Adapté pour une marque SaaS/business
 
-  return prompt;
+Réponds UNIQUEMENT avec le code SVG, rien d'autre. Commence par <svg et termine par </svg>.`;
 }

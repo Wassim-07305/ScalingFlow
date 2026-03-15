@@ -141,13 +141,13 @@ export function LogoGenerator({ concept, brandName, palette }: LogoGeneratorProp
                   <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                     <a
                       href={logo.url}
-                      download={`logo-${brandName || "brand"}-${logo.type}.png`}
+                      download={`logo-${brandName || "brand"}-${logo.type}.svg`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center gap-2 px-4 py-2 rounded-xl bg-accent text-white text-sm font-medium hover:bg-accent/80 transition-colors"
                     >
                       <Download className="h-4 w-4" />
-                      PNG
+                      SVG
                     </a>
                   </div>
                   <div className="p-2 text-center">
@@ -157,7 +157,7 @@ export function LogoGenerator({ concept, brandName, palette }: LogoGeneratorProp
               ))}
             </div>
             <p className="text-xs text-text-muted text-center mt-4">
-              Les logos sont générés par IA (Flux) en PNG 1000x1000. Utilise-les comme base pour un designer professionnel.
+              Les logos sont générés par IA en SVG vectoriel. Utilise-les comme base pour un designer professionnel.
             </p>
           </CardContent>
         </Card>
