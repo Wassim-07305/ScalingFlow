@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { sendCAPIIfConfigured } from "@/lib/tracking/meta-capi";
 
 // ─── Inbound Webhook for CRM/GHL Lead Sync (#52) ────────────
 // Accepts leads from GoHighLevel, Zapier, Make, or any CRM
@@ -58,6 +59,15 @@ export async function POST(req: NextRequest) {
         .filter(Boolean)
         .join(" | "),
     });
+
+    // Envoyer événement Lead à Meta CAPI (non-bloquant)
+    sendCAPIIfConfigured(
+      supabase,
+      profile.id,
+      "Lead",
+      { email: body.email, phone: body.phone },
+      body.value ? { value: Number(body.value), currency: "EUR" } : undefined
+    ).catch(() => {});
 
     return NextResponse.json({
       success: true,

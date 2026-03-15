@@ -26,6 +26,7 @@ import {
 } from "lucide-react";
 import { SalesMetrics } from "@/components/sales/sales-metrics";
 import { CallAnalyzer } from "@/components/sales/call-analyzer";
+import { ClosingScriptGenerator } from "@/components/sales/closing-script-generator";
 import { exportToPDF } from "@/lib/utils/export-pdf";
 import { cn } from "@/lib/utils/cn";
 import { createClient } from "@/lib/supabase/client";
@@ -226,7 +227,9 @@ export default function SalesPage() {
         ))}
       </div>
 
-      {activeTab === "analyzer" ? (
+      {activeTab === "closing" ? (
+        <ClosingScriptGenerator />
+      ) : activeTab === "analyzer" ? (
         <CallAnalyzer />
       ) : activeTab === "metrics" ? (
         <SalesMetrics />

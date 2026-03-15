@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { sendCAPIIfConfigured } from "@/lib/tracking/meta-capi";
 
 const VALID_STATUSES = [
   "nouveau",
@@ -77,6 +78,16 @@ export async function POST(req: NextRequest) {
       old_status: oldStatus || null,
       new_status: newStatus,
     });
+
+    // Envoyer événement CAPI selon le changement de statut (non-bloquant)
+    if (newStatus === "call_booke" && oldStatus !== "call_booke") {
+      // Appel schedulé → événement Schedule
+      sendCAPIIfConfigured(supabase, user.id, "Schedule", {}).catch(() => {});
+    }
+    if (newStatus === "nouveau" && !oldStatus) {
+      // Nouveau lead → événement Lead
+      sendCAPIIfConfigured(supabase, user.id, "Lead", {}).catch(() => {});
+    }
 
     // Award XP when deal is closed
     if (newStatus === "close" && oldStatus !== "close") {

@@ -81,12 +81,14 @@ export async function POST(req: NextRequest) {
       brand_name,
       format,
       style,
+      num_variations,
     }: {
       ad_text: { headline: string; body: string };
       brand_colors: string[];
       brand_name: string;
       format: AdFormat;
       style: AdStyle;
+      num_variations?: number;
     } = body;
 
     if (!ad_text?.headline || !format) {
@@ -106,8 +108,8 @@ export async function POST(req: NextRequest) {
 
     const styleDesc = STYLE_DESCRIPTIONS[style] || STYLE_DESCRIPTIONS.minimal;
 
-    // Generate 3 variations with different visual approaches
-    const VARIATIONS = [
+    // Generate 3-5 variations with different visual approaches
+    const ALL_VARIATIONS = [
       {
         suffix:
           "Product showcase composition with text headline area at top, clean background gradient, professional marketing layout",
@@ -120,7 +122,18 @@ export async function POST(req: NextRequest) {
         suffix:
           "Lifestyle scene with blurred background, prominent headline text space, modern digital marketing aesthetic",
       },
+      {
+        suffix:
+          "Split composition with contrasting halves, dynamic diagonal divider, attention-grabbing visual balance",
+      },
+      {
+        suffix:
+          "Flat lay overhead perspective, organized objects arrangement, testimonial-style layout with space for text",
+      },
     ];
+
+    const variationCount = Math.min(Math.max(num_variations || 3, 1), 5);
+    const VARIATIONS = ALL_VARIATIONS.slice(0, variationCount);
 
     const results: { url: string; variation: number }[] = [];
 

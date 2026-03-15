@@ -83,6 +83,7 @@ export function AdImageGenerator({ className }: AdImageGeneratorProps) {
   const [format, setFormat] = React.useState<AdFormat>("feed");
   const [style, setStyle] = React.useState<AdStyle>("minimal");
   const [brandName, setBrandName] = React.useState("");
+  const [numVariations, setNumVariations] = React.useState(3);
   const [brandColors, setBrandColors] = React.useState<string[]>([
     "#34D399",
     "#0B0E11",
@@ -125,6 +126,7 @@ export function AdImageGenerator({ className }: AdImageGeneratorProps) {
           brand_name: brandName,
           format,
           style,
+          num_variations: numVariations,
         }),
       });
 
@@ -381,6 +383,29 @@ export function AdImageGenerator({ className }: AdImageGeneratorProps) {
                     +
                   </button>
                 )}
+              </div>
+            </div>
+
+            {/* Number of variations */}
+            <div>
+              <label className="text-sm font-medium text-text-primary mb-2 block">
+                Nombre de variations
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {[3, 4, 5].map((n) => (
+                  <button
+                    key={n}
+                    onClick={() => setNumVariations(n)}
+                    className={cn(
+                      "px-4 py-2 rounded-lg text-sm font-medium transition-all",
+                      numVariations === n
+                        ? "bg-accent text-white"
+                        : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
+                    )}
+                  >
+                    {n} images
+                  </button>
+                ))}
               </div>
             </div>
 

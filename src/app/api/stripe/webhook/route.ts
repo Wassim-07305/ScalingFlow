@@ -9,6 +9,7 @@ import {
   paymentFailedEmail,
 } from "@/lib/resend/templates";
 import type Stripe from "stripe";
+import { sendCAPIIfConfigured } from "@/lib/tracking/meta-capi";
 
 const FROM = "ScalingFlow <noreply@scalingflow.com>";
 
@@ -85,6 +86,18 @@ export async function POST(req: NextRequest) {
               stripe_customer_id: session.customer as string,
             })
             .eq("id", userId);
+
+          // Envoyer événement Purchase à Meta CAPI (non-bloquant)
+          sendCAPIIfConfigured(
+            supabase,
+            userId,
+            "Purchase",
+            { email: session.customer_email || undefined },
+            {
+              value: (session.amount_total || 0) / 100,
+              currency: (session.currency || "eur").toUpperCase(),
+            }
+          ).catch(() => {});
 
           // Envoyer email de confirmation d'abonnement
           if (resend && session.customer_email) {

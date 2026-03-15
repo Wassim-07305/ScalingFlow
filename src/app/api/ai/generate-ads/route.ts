@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { checkAIUsage } from "@/lib/stripe/check-usage";
 import { createClient } from "@/lib/supabase/server";
 import { generateJSON } from "@/lib/ai/generate";
-import { adCopyPrompt } from "@/lib/ai/prompts/ad-copy";
+import { adCopyPrompt, adCopyMassivePrompt, type MassiveAdBatch } from "@/lib/ai/prompts/ad-copy";
 import { adHooksPrompt } from "@/lib/ai/prompts/ad-hooks";
 import {
   buildVideoAdScriptPrompt,
@@ -179,6 +179,83 @@ export async function POST(req: NextRequest) {
       try { await notifyGeneration(user.id, "generation.ads"); } catch (e) { console.warn("Notification failed:", e); }
 
       return NextResponse.json({ adType: "dm_scripts", result });
+    }
+
+    // --- Génération massive : un batch de 15 variations (#45) ---
+    if (adType === "massive_batch") {
+      const { massiveBatch } = body;
+      if (!massiveBatch) {
+        return NextResponse.json(
+          { error: "massiveBatch est requis (cold_audience, warm_audience, hot_audience, hooks_controverses, storytelling)" },
+          { status: 400 }
+        );
+      }
+      if (!offer) {
+        return NextResponse.json(
+          { error: "Aucune offre trouvée. Crée d'abord une offre." },
+          { status: 400 }
+        );
+      }
+
+      const prompt = adCopyMassivePrompt(
+        {
+          offer_name: offer.offer_name,
+          positioning: offer.positioning,
+          unique_mechanism: offer.unique_mechanism,
+          pricing: offer.pricing || { real_price: 0 },
+        },
+        avatar,
+        massiveBatch as MassiveAdBatch
+      ) + (vaultContext ? "\n" + vaultContext : "");
+
+      interface AdVariation {
+        body?: string;
+        headline?: string;
+        hook?: string;
+        cta?: string;
+        angle?: string;
+        target_audience?: string;
+      }
+
+      const result = await generateJSON<{ variations?: AdVariation[] }>({
+        prompt,
+        maxTokens: 8192,
+        temperature: 0.85,
+      });
+
+      // Sauvegarder les variations
+      const savedCreatives = [];
+      for (const variation of result.variations || []) {
+        const { data: adCreative, error: saveError } = await supabase
+          .from("ad_creatives")
+          .insert({
+            user_id: user.id,
+            creative_type: "image",
+            ad_copy: variation.body,
+            headline: variation.headline,
+            hook: variation.hook,
+            cta: variation.cta,
+            angle: variation.angle,
+            target_audience: variation.target_audience,
+            status: "draft",
+          })
+          .select()
+          .single();
+
+        if (!saveError && adCreative) {
+          savedCreatives.push(adCreative);
+        }
+      }
+
+      try { await awardXP(user.id, "generation.ads"); } catch (e) { console.warn("XP award failed:", e); }
+      try { await notifyGeneration(user.id, "generation.ads"); } catch (e) { console.warn("Notification failed:", e); }
+
+      return NextResponse.json({
+        adType: "massive_batch",
+        batch: massiveBatch,
+        ad_creatives: savedCreatives,
+        ai_raw_response: result,
+      });
     }
 
     // --- Mode par défaut : Ad copy + hooks (existant) ---
