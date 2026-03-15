@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { resolveOrganization } from "@/lib/whitelabel/resolve-org";
 
 export async function updateSession(request: NextRequest) {
   const publicRoutes = ["/login", "/register", "/welcome", "/forgot-password", "/reset-password", "/diagnostic"];
@@ -13,6 +14,35 @@ export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
     request,
   });
+
+  /* ── Custom domain / subdomain detection ── */
+  let resolvedOrgId: string | null = null;
+  let resolvedOrgSlug: string | null = null;
+
+  try {
+    const hostname = request.headers.get("host") || "";
+    const appHost = process.env.NEXT_PUBLIC_APP_URL
+      ? new URL(process.env.NEXT_PUBLIC_APP_URL).hostname
+      : "localhost";
+
+    // Ne pas résoudre pour le domaine principal ou localhost
+    const isMainDomain =
+      hostname.split(":")[0] === appHost ||
+      hostname.startsWith("localhost") ||
+      hostname.startsWith("127.0.0.1");
+
+    if (!isMainDomain) {
+      const org = await resolveOrganization(hostname);
+      if (org) {
+        resolvedOrgId = org.id;
+        resolvedOrgSlug = org.slug;
+        supabaseResponse.headers.set("x-org-id", org.id);
+        supabaseResponse.headers.set("x-org-slug", org.slug);
+      }
+    }
+  } catch {
+    // La résolution d'org ne doit pas bloquer la navigation
+  }
 
   try {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -42,6 +72,11 @@ export async function updateSession(request: NextRequest) {
           cookiesToSet.forEach(({ name, value, options }) =>
             supabaseResponse.cookies.set(name, value, options)
           );
+          // Re-appliquer les headers org après recréation de la réponse
+          if (resolvedOrgId) {
+            supabaseResponse.headers.set("x-org-id", resolvedOrgId);
+            supabaseResponse.headers.set("x-org-slug", resolvedOrgSlug!);
+          }
         },
       },
     });

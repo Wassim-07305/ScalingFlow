@@ -221,9 +221,10 @@ export function OnboardingFlow() {
     useState<MarketAnalysisResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loaded, setLoaded] = useState(false);
+  const [customWelcomeMessage, setCustomWelcomeMessage] = useState<string | null>(null);
 
   const router = useRouter();
-  const { user, loading: userLoading } = useUser();
+  const { user, profile, loading: userLoading } = useUser();
   const supabase = createClient();
 
   /* ── Visible questions (filter showWhen) ── */
@@ -295,6 +296,27 @@ export function OnboardingFlow() {
     load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, userLoading]);
+
+  /* ── Fetch custom onboarding from organization ── */
+
+  useEffect(() => {
+    if (userLoading || !profile?.organization_id) return;
+
+    const fetchOrgOnboarding = async () => {
+      const { data: org } = await supabase
+        .from("organizations")
+        .select("custom_welcome_message")
+        .eq("id", profile.organization_id as string)
+        .maybeSingle();
+
+      if (org?.custom_welcome_message) {
+        setCustomWelcomeMessage(org.custom_welcome_message);
+      }
+    };
+
+    fetchOrgOnboarding();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profile?.organization_id, userLoading]);
 
   /* ── Auto-focus inputs on step change ── */
 
@@ -548,14 +570,14 @@ export function OnboardingFlow() {
             >
               {q.title}
             </motion.h1>
-            {q.subtitle && (
+            {(customWelcomeMessage || q.subtitle) && (
               <motion.p
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.6 }}
                 className="mb-10 max-w-md text-lg text-white/50"
               >
-                {q.subtitle}
+                {customWelcomeMessage || q.subtitle}
               </motion.p>
             )}
             <motion.button

@@ -60,16 +60,31 @@ function formatDate(dateStr: string): string {
   });
 }
 
+const POLL_INTERVAL_MS = 5 * 60 * 1000; // 5 minutes
+
+function formatRelativeTime(date: Date): string {
+  const diffMs = Date.now() - date.getTime();
+  const diffMin = Math.floor(diffMs / 60_000);
+  if (diffMin < 1) return "à l'instant";
+  if (diffMin === 1) return "il y a 1 min";
+  return `il y a ${diffMin} min`;
+}
+
 export function InstagramStats() {
   const [data, setData] = React.useState<InstagramStatsData | null>(null);
   const [loading, setLoading] = React.useState(true);
+  const [lastUpdated, setLastUpdated] = React.useState<Date | null>(null);
+  const [isPolling, setIsPolling] = React.useState(true);
+  const [, forceUpdate] = React.useState(0);
+  const intervalRef = React.useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const fetchStats = React.useCallback(async () => {
-    setLoading(true);
+  const fetchStats = React.useCallback(async (showLoader = true) => {
+    if (showLoader) setLoading(true);
     try {
       const res = await fetch("/api/integrations/instagram/stats");
       const json = await res.json();
       setData(json);
+      setLastUpdated(new Date());
     } catch {
       setData({ connected: false, error: "Erreur de connexion" });
     } finally {
@@ -77,9 +92,53 @@ export function InstagramStats() {
     }
   }, []);
 
+  // Démarrer / arrêter le polling selon la visibilité de l'onglet
   React.useEffect(() => {
     fetchStats();
+
+    const startPolling = () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+      intervalRef.current = setInterval(() => {
+        fetchStats(false);
+      }, POLL_INTERVAL_MS);
+      setIsPolling(true);
+    };
+
+    const stopPolling = () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+      setIsPolling(false);
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        stopPolling();
+      } else {
+        // Rafraîchir immédiatement au retour puis relancer le polling
+        fetchStats(false);
+        startPolling();
+      }
+    };
+
+    // Démarrer le polling initial
+    startPolling();
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      stopPolling();
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
   }, [fetchStats]);
+
+  // Mettre à jour le texte "il y a X min" toutes les 30 secondes
+  React.useEffect(() => {
+    const timer = setInterval(() => {
+      forceUpdate((n) => n + 1);
+    }, 30_000);
+    return () => clearInterval(timer);
+  }, []);
 
   // Loading skeleton
   if (loading) {
@@ -149,13 +208,30 @@ export function InstagramStats() {
             <CardTitle className="flex items-center gap-2 text-sm">
               <Instagram className="h-4 w-4 text-pink-400" />
               Instagram — @{profile.username}
+              {isPolling && (
+                <span
+                  className="relative flex h-2 w-2"
+                  title="Rafraîchissement automatique actif"
+                >
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+                </span>
+              )}
             </CardTitle>
-            <button
-              onClick={fetchStats}
-              className="p-1.5 rounded-lg text-text-muted hover:text-text-primary hover:bg-bg-tertiary transition-colors"
-            >
-              <RefreshCw className="h-3.5 w-3.5" />
-            </button>
+            <div className="flex items-center gap-2">
+              {lastUpdated && (
+                <span className="text-[11px] text-text-muted">
+                  {formatRelativeTime(lastUpdated)}
+                </span>
+              )}
+              <button
+                onClick={() => fetchStats(false)}
+                className="p-1.5 rounded-lg text-text-muted hover:text-text-primary hover:bg-bg-tertiary transition-colors"
+                title="Rafraîchir maintenant"
+              >
+                <RefreshCw className={cn("h-3.5 w-3.5", loading && "animate-spin")} />
+              </button>
+            </div>
           </div>
         </CardHeader>
         <CardContent className="pt-0">

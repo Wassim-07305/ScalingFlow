@@ -22,6 +22,9 @@ import {
   ChevronUp,
   Copy,
   Check,
+  Globe,
+  ExternalLink,
+  Loader2,
 } from "lucide-react";
 
 const SOURCE_COLORS: Record<string, string> = {
@@ -45,23 +48,35 @@ interface InsightsScraperProps {
   existingPains?: string[];
 }
 
+type LoadingPhase = "scraping" | "analyzing" | null;
+
 export function InsightsScraper({ marketName, targetAvatar, existingPains }: InsightsScraperProps) {
   const [market, setMarket] = useState(marketName || "");
   const [niche, setNiche] = useState("");
   const [loading, setLoading] = useState(false);
+  const [loadingPhase, setLoadingPhase] = useState<LoadingPhase>(null);
   const [result, setResult] = useState<MarketInsightsResult | null>(null);
+  const [sources, setSources] = useState<string[]>([]);
+  const [scrapingUsed, setScrapingUsed] = useState(false);
   const [expandedSection, setExpandedSection] = useState<string | null>("insights");
   const [copiedIdx, setCopiedIdx] = useState<string | null>(null);
   const [usageLimited, setUsageLimited] = useState<{ currentUsage: number; limit: number } | null>(null);
 
   const handleScrape = async () => {
     if (market.trim().length < 3) {
-      toast.error("Entre un marché (min 3 caracteres)");
+      toast.error("Entre un marché (min 3 caractères)");
       return;
     }
 
     setLoading(true);
+    setLoadingPhase("scraping");
+    setSources([]);
+    setScrapingUsed(false);
+
     try {
+      // Show "scraping" phase briefly, then switch to "analyzing"
+      const phaseTimer = setTimeout(() => setLoadingPhase("analyzing"), 5000);
+
       const response = await fetch("/api/ai/scrape-insights", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -72,6 +87,8 @@ export function InsightsScraper({ marketName, targetAvatar, existingPains }: Ins
           existingPains: existingPains || undefined,
         }),
       });
+
+      clearTimeout(phaseTimer);
 
       if (!response.ok) {
         if (response.status === 403) {
@@ -86,11 +103,19 @@ export function InsightsScraper({ marketName, targetAvatar, existingPains }: Ins
 
       const data = await response.json();
       setResult(data.result);
-      toast.success("Insights générés !");
+      setSources(data.sources || []);
+      setScrapingUsed(data.scraping_used || false);
+
+      if (data.scraping_used) {
+        toast.success(`Insights générés à partir de ${data.sources?.length || 0} sources web réelles !`);
+      } else {
+        toast.success("Insights générés !");
+      }
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Erreur");
     } finally {
       setLoading(false);
+      setLoadingPhase(null);
     }
   };
 
@@ -108,7 +133,30 @@ export function InsightsScraper({ marketName, targetAvatar, existingPains }: Ins
   }
 
   if (loading) {
-    return <AILoading text="Analyse des conversations en ligne (Reddit, forums, YouTube, avis...)" />;
+    return (
+      <div className="space-y-4">
+        <AILoading
+          text={
+            loadingPhase === "scraping"
+              ? "Recherche web en cours... Scraping des sources (Reddit, forums, avis...)"
+              : "Analyse des données collectées par l'IA..."
+          }
+        />
+        <div className="flex items-center justify-center gap-2 text-xs text-text-muted">
+          {loadingPhase === "scraping" ? (
+            <>
+              <Globe className="h-3.5 w-3.5 animate-pulse text-accent" />
+              <span>Collecte des données depuis le web...</span>
+            </>
+          ) : (
+            <>
+              <Loader2 className="h-3.5 w-3.5 animate-spin text-accent" />
+              <span>Extraction des insights, douleurs et objections...</span>
+            </>
+          )}
+        </div>
+      </div>
+    );
   }
 
   if (!result) {
@@ -162,10 +210,16 @@ export function InsightsScraper({ marketName, targetAvatar, existingPains }: Ins
       <Card className="border-accent/20">
         <CardContent className="py-4">
           <p className="text-sm text-text-secondary">{result.summary}</p>
-          <div className="flex items-center gap-2 mt-3">
+          <div className="flex items-center gap-2 mt-3 flex-wrap">
             <Badge variant="default">{result.insights.length} insights</Badge>
             <Badge variant="blue">{result.top_pain_points.length} douleurs</Badge>
             <Badge variant="yellow">{result.common_objections.length} objections</Badge>
+            {scrapingUsed && (
+              <Badge variant="default" className="bg-emerald-500/20 text-emerald-400">
+                <Globe className="h-3 w-3 mr-1" />
+                Données web réelles
+              </Badge>
+            )}
             <Button variant="outline" size="sm" className="ml-auto" onClick={() => setResult(null)}>
               Nouvelle recherche
             </Button>
@@ -212,7 +266,7 @@ export function InsightsScraper({ marketName, targetAvatar, existingPains }: Ins
                   )}
                   {insight.desire_expressed && (
                     <span className="text-[10px] px-2 py-0.5 rounded bg-green-500/10 text-green-400">
-                      Desir: {insight.desire_expressed}
+                      Désir: {insight.desire_expressed}
                     </span>
                   )}
                   {insight.objection && (
@@ -248,7 +302,7 @@ export function InsightsScraper({ marketName, targetAvatar, existingPains }: Ins
                     <Badge variant={pain.intensity === "critique" ? "red" : pain.intensity === "forte" ? "yellow" : "muted"} className="text-[10px]">
                       {pain.intensity}
                     </Badge>
-                    <span className="text-xs text-text-muted">freq. {pain.frequency}%</span>
+                    <span className="text-xs text-text-muted">fréq. {pain.frequency}%</span>
                   </div>
                 </div>
                 <div className="space-y-1">
@@ -279,7 +333,7 @@ export function InsightsScraper({ marketName, targetAvatar, existingPains }: Ins
               <div key={i} className="p-3 rounded-xl bg-bg-tertiary/50">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-sm font-medium text-text-primary">{desire.desire}</span>
-                  <span className="text-xs text-text-muted">freq. {desire.frequency}%</span>
+                  <span className="text-xs text-text-muted">fréq. {desire.frequency}%</span>
                 </div>
                 <div className="space-y-1">
                   {desire.exact_quotes.map((q, j) => (
@@ -338,7 +392,7 @@ export function InsightsScraper({ marketName, targetAvatar, existingPains }: Ins
               </div>
             </div>
             <div>
-              <p className="text-xs text-text-muted uppercase mb-2">Phrases a reutiliser</p>
+              <p className="text-xs text-text-muted uppercase mb-2">Phrases à réutiliser</p>
               <div className="space-y-1.5">
                 {result.language_vault.phrases_to_reuse.map((p, i) => (
                   <div key={i} className="flex items-center justify-between p-2 rounded-lg bg-bg-tertiary/50">
@@ -351,7 +405,7 @@ export function InsightsScraper({ marketName, targetAvatar, existingPains }: Ins
               </div>
             </div>
             <div>
-              <p className="text-xs text-text-muted uppercase mb-2">Déclencheurs emotionnels</p>
+              <p className="text-xs text-text-muted uppercase mb-2">Déclencheurs émotionnels</p>
               <div className="flex flex-wrap gap-1.5">
                 {result.language_vault.emotional_triggers.map((t, i) => (
                   <Badge key={i} variant="yellow" className="text-xs">{t}</Badge>
@@ -359,7 +413,7 @@ export function InsightsScraper({ marketName, targetAvatar, existingPains }: Ins
               </div>
             </div>
             <div>
-              <p className="text-xs text-text-muted uppercase mb-2">Avant / Apres</p>
+              <p className="text-xs text-text-muted uppercase mb-2">Avant / Après</p>
               <div className="grid gap-2">
                 {result.language_vault.before_after_descriptions.map((ba, i) => (
                   <div key={i} className="grid grid-cols-2 gap-2">
@@ -368,7 +422,7 @@ export function InsightsScraper({ marketName, targetAvatar, existingPains }: Ins
                       <p className="text-xs text-text-secondary">{ba.before}</p>
                     </div>
                     <div className="p-2 rounded-lg bg-green-500/5 border border-green-500/10">
-                      <p className="text-[10px] text-accent uppercase mb-1">Apres</p>
+                      <p className="text-[10px] text-accent uppercase mb-1">Après</p>
                       <p className="text-xs text-text-secondary">{ba.after}</p>
                     </div>
                   </div>
@@ -395,13 +449,57 @@ export function InsightsScraper({ marketName, targetAvatar, existingPains }: Ins
             {result.content_angles.map((angle, i) => (
               <div key={i} className="p-3 rounded-xl bg-bg-tertiary/50">
                 <p className="text-sm font-medium text-text-primary mb-1">{angle.angle}</p>
-                <p className="text-xs text-text-muted mb-1">Inspire de : {angle.source_inspiration}</p>
+                <p className="text-xs text-text-muted mb-1">Inspiré de : {angle.source_inspiration}</p>
                 <p className="text-xs text-accent">Hook : &ldquo;{angle.hook_idea}&rdquo;</p>
               </div>
             ))}
           </CardContent>
         )}
       </Card>
+
+      {/* Sources section */}
+      {sources.length > 0 && (
+        <Card>
+          <CardHeader className="cursor-pointer py-3" onClick={() => toggle("sources")}>
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-sm flex items-center gap-2">
+                <Globe className="h-4 w-4 text-accent" />
+                Sources web ({sources.length})
+              </CardTitle>
+              {expandedSection === "sources" ? <ChevronUp className="h-4 w-4 text-text-muted" /> : <ChevronDown className="h-4 w-4 text-text-muted" />}
+            </div>
+          </CardHeader>
+          {expandedSection === "sources" && (
+            <CardContent className="pt-0 space-y-2">
+              <p className="text-xs text-text-muted mb-3">
+                Pages web scrapées et analysées pour générer ces insights :
+              </p>
+              {sources.map((url, i) => {
+                let displayUrl = url;
+                try {
+                  const parsed = new URL(url);
+                  displayUrl = `${parsed.hostname}${parsed.pathname}`.replace(/\/$/, "");
+                } catch {}
+
+                return (
+                  <a
+                    key={i}
+                    href={url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 p-2 rounded-lg bg-bg-tertiary/50 hover:bg-bg-tertiary transition-colors group"
+                  >
+                    <ExternalLink className="h-3 w-3 text-text-muted group-hover:text-accent shrink-0" />
+                    <span className="text-xs text-text-secondary group-hover:text-accent truncate">
+                      {displayUrl}
+                    </span>
+                  </a>
+                );
+              })}
+            </CardContent>
+          )}
+        </Card>
+      )}
     </div>
   );
 }

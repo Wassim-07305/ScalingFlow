@@ -67,6 +67,7 @@ interface FileCardProps {
   createdAt: string;
   onRename: () => void;
   onDelete: () => void;
+  onPreview?: () => void;
 }
 
 export function FileCard({
@@ -77,6 +78,7 @@ export function FileCard({
   createdAt,
   onRename,
   onDelete,
+  onPreview,
 }: FileCardProps) {
   const Icon = getFileIcon(mimeType);
   const iconColor = getFileIconColor(mimeType);
@@ -85,10 +87,18 @@ export function FileCard({
     window.open(fileUrl, "_blank", "noopener,noreferrer");
   };
 
+  const handleClick = () => {
+    if (onPreview) {
+      onPreview();
+    } else {
+      handleOpen();
+    }
+  };
+
   return (
     <div className="group relative rounded-2xl bg-bg-secondary border border-border-default p-4 transition-all duration-150 hover:border-border-hover hover:shadow-lg hover:shadow-accent/5">
       <div className="flex items-start justify-between">
-        <button onClick={handleOpen} className="flex-1 text-left">
+        <button onClick={handleClick} className="flex-1 text-left">
           <div
             className="flex h-12 w-12 items-center justify-center rounded-xl mb-3"
             style={{ backgroundColor: `${iconColor}20` }}

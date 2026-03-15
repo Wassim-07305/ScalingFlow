@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { BreadcrumbNav, type BreadcrumbFolder } from "@/components/drive/breadcrumb-nav";
 import { FolderCard } from "@/components/drive/folder-card";
 import { FileCard } from "@/components/drive/file-card";
+import { FilePreviewModal } from "@/components/drive/file-preview-modal";
 import { CreateFolderModal } from "@/components/drive/create-folder-modal";
 import { UploadFileModal } from "@/components/drive/upload-file-modal";
 import { createClient } from "@/lib/supabase/client";
@@ -46,6 +47,11 @@ export default function DrivePage() {
   const [createFolderOpen, setCreateFolderOpen] = React.useState(false);
   const [uploadOpen, setUploadOpen] = React.useState(false);
   const [renameFolderId, setRenameFolderId] = React.useState<string | null>(null);
+  const [previewFile, setPreviewFile] = React.useState<{
+    name: string;
+    fileUrl: string;
+    mimeType: string;
+  } | null>(null);
 
   const supabase = React.useMemo(() => createClient(), []);
 
@@ -344,6 +350,13 @@ export default function DrivePage() {
                     createdAt={file.created_at}
                     onRename={() => handleRenameFile(file.id)}
                     onDelete={() => handleDeleteFile(file.id)}
+                    onPreview={() =>
+                      setPreviewFile({
+                        name: file.name,
+                        fileUrl: file.file_url,
+                        mimeType: file.mime_type,
+                      })
+                    }
                   />
                 ))}
               </div>
@@ -378,6 +391,14 @@ export default function DrivePage() {
         onOpenChange={setUploadOpen}
         folderId={currentFolderId}
         onUploadComplete={loadContents}
+      />
+
+      <FilePreviewModal
+        open={previewFile !== null}
+        onOpenChange={(open) => {
+          if (!open) setPreviewFile(null);
+        }}
+        file={previewFile}
       />
     </div>
   );
