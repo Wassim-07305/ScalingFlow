@@ -28,6 +28,14 @@ import {
   Zap,
   Shield,
   AlertTriangle,
+  Globe,
+  ExternalLink,
+  ChevronDown,
+  ChevronUp,
+  Image as ImageIcon,
+  Calendar,
+  MousePointerClick,
+  Monitor,
 } from "lucide-react";
 
 // Types pour les résultats Ad Spy
@@ -80,6 +88,27 @@ interface AdSpyResult {
   recommendations: Recommendation[];
 }
 
+// Type pour les pubs réelles scrapées via Apify
+interface MetaAdResult {
+  brand: string;
+  body: string;
+  headline: string;
+  ctaText: string;
+  ctaUrl: string;
+  startDate: string;
+  format: string;
+  imageUrls: string[];
+  platforms: string[];
+}
+
+type ScrapingSource = "apify" | "firecrawl" | "ai_only";
+
+const SCRAPING_SOURCE_CONFIG: Record<ScrapingSource, { label: string; variant: "default" | "blue" | "muted" }> = {
+  apify: { label: "Meta Ad Library", variant: "default" },
+  firecrawl: { label: "Web Scraping", variant: "blue" },
+  ai_only: { label: "Analyse IA", variant: "muted" },
+};
+
 const PLATFORMS = [
   { value: "meta", label: "Meta (Facebook/Instagram)" },
   { value: "tiktok", label: "TikTok Ads" },
@@ -94,6 +123,11 @@ interface AdSpyProps {
 export function AdSpy({ className }: AdSpyProps) {
   const [loading, setLoading] = React.useState(false);
   const [result, setResult] = React.useState<AdSpyResult | null>(null);
+  const [sources, setSources] = React.useState<string[]>([]);
+  const [scrapingUsed, setScrapingUsed] = React.useState(false);
+  const [scrapingSource, setScrapingSource] = React.useState<ScrapingSource>("ai_only");
+  const [realAds, setRealAds] = React.useState<MetaAdResult[]>([]);
+  const [realAdsExpanded, setRealAdsExpanded] = React.useState(true);
 
   // Champs du formulaire
   const [competitor, setCompetitor] = React.useState("");
@@ -132,7 +166,17 @@ export function AdSpy({ className }: AdSpyProps) {
 
       const data = await response.json();
       setResult(data.result);
-      toast.success("Analyse terminée !");
+      setSources(data.sources || []);
+      setScrapingUsed(data.scraping_used || false);
+      setScrapingSource(data.scraping_source || "ai_only");
+      setRealAds(data.real_ads || []);
+      setRealAdsExpanded(true);
+
+      toast.success(data.scraping_source === "apify"
+        ? `Analyse terminée avec ${(data.real_ads || []).length} publicités réelles !`
+        : data.scraping_used
+          ? "Analyse terminée avec données web scrapées !"
+          : "Analyse terminée !");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Erreur lors de l'analyse");
     } finally {
@@ -242,10 +286,189 @@ export function AdSpy({ className }: AdSpyProps) {
           </h3>
           <Badge variant="default">{result.platform}</Badge>
         </div>
-        <Button variant="outline" size="sm" onClick={() => setResult(null)}>
+        <Button variant="outline" size="sm" onClick={() => { setResult(null); setSources([]); setScrapingUsed(false); setScrapingSource("ai_only"); setRealAds([]); }}>
           Nouvelle analyse
         </Button>
       </div>
+
+      {/* Badge source de données */}
+      <div className="flex items-center gap-3">
+        <Badge variant={SCRAPING_SOURCE_CONFIG[scrapingSource].variant}>
+          {scrapingSource === "apify" && <Globe className="h-3 w-3 mr-1" />}
+          {scrapingSource === "firecrawl" && <Monitor className="h-3 w-3 mr-1" />}
+          {SCRAPING_SOURCE_CONFIG[scrapingSource].label}
+        </Badge>
+        {scrapingUsed && (
+          <p className="text-xs text-text-muted">
+            {scrapingSource === "apify"
+              ? `${realAds.length} publicité${realAds.length > 1 ? "s" : ""} réelle${realAds.length > 1 ? "s" : ""} trouvée${realAds.length > 1 ? "s" : ""}`
+              : "Analyse enrichie avec des données web scrapées"}
+          </p>
+        )}
+      </div>
+
+      {/* Publicités réelles trouvées (Apify) */}
+      {realAds.length > 0 && (
+        <Card>
+          <CardHeader
+            className="cursor-pointer select-none"
+            onClick={() => setRealAdsExpanded(!realAdsExpanded)}
+          >
+            <CardTitle className="flex items-center justify-between text-base">
+              <div className="flex items-center gap-2">
+                <Eye className="h-4 w-4 text-emerald-400" />
+                Publicités réelles trouvées ({realAds.length})
+              </div>
+              {realAdsExpanded ? (
+                <ChevronUp className="h-4 w-4 text-text-muted" />
+              ) : (
+                <ChevronDown className="h-4 w-4 text-text-muted" />
+              )}
+            </CardTitle>
+          </CardHeader>
+          {realAdsExpanded && (
+            <CardContent>
+              <div className="grid gap-4 md:grid-cols-2">
+                {realAds.map((ad, i) => (
+                  <div
+                    key={i}
+                    className="p-4 rounded-xl bg-[#141719] border border-border-default space-y-3 hover:border-accent/30 transition-colors"
+                  >
+                    {/* En-tête : marque + format */}
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2.5">
+                        <div className="h-8 w-8 rounded-full bg-[#1C1F23] border border-border-default flex items-center justify-center text-xs font-bold text-accent uppercase">
+                          {ad.brand ? ad.brand.charAt(0) : "?"}
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-text-primary">
+                            {ad.brand || "Marque inconnue"}
+                          </p>
+                          {ad.startDate && (
+                            <p className="text-xs text-text-muted flex items-center gap-1">
+                              <Calendar className="h-3 w-3" />
+                              Depuis le {ad.startDate}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                      {ad.format && (
+                        <Badge variant="muted" className="text-[10px]">
+                          {ad.format}
+                        </Badge>
+                      )}
+                    </div>
+
+                    {/* Image miniature */}
+                    {ad.imageUrls && ad.imageUrls.length > 0 && (
+                      <div className="relative w-full h-36 rounded-lg overflow-hidden bg-[#1C1F23] border border-border-default">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={ad.imageUrls[0]}
+                          alt={`Publicité ${ad.brand || ""}`}
+                          className="w-full h-full object-cover"
+                          loading="lazy"
+                        />
+                        {ad.imageUrls.length > 1 && (
+                          <div className="absolute bottom-2 right-2 flex items-center gap-1 px-2 py-0.5 rounded-md bg-black/70 text-xs text-white">
+                            <ImageIcon className="h-3 w-3" />
+                            +{ad.imageUrls.length - 1}
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Texte de la pub */}
+                    {ad.body && (
+                      <div className="relative">
+                        <p className="text-sm text-text-secondary line-clamp-4">
+                          {ad.body}
+                        </p>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-6 text-[10px] mt-1 text-text-muted hover:text-accent"
+                          onClick={() => copyToClipboard(ad.body)}
+                        >
+                          <Copy className="h-3 w-3 mr-1" />
+                          Copier le texte
+                        </Button>
+                      </div>
+                    )}
+
+                    {/* Headline */}
+                    {ad.headline && (
+                      <p className="text-sm font-medium text-text-primary border-t border-border-default pt-2">
+                        {ad.headline}
+                      </p>
+                    )}
+
+                    {/* CTA + Plateformes */}
+                    <div className="flex items-center justify-between border-t border-border-default pt-2">
+                      <div className="flex items-center gap-2">
+                        {ad.ctaText && (
+                          <Badge variant="default" className="text-[10px]">
+                            <MousePointerClick className="h-3 w-3 mr-1" />
+                            {ad.ctaText}
+                          </Badge>
+                        )}
+                      </div>
+                      <div className="flex gap-1">
+                        {ad.platforms?.map((p, j) => (
+                          <Badge key={j} variant="muted" className="text-[10px]">
+                            {p}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Lien CTA */}
+                    {ad.ctaUrl && (
+                      <a
+                        href={ad.ctaUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1.5 text-xs text-text-muted hover:text-accent transition-colors truncate"
+                      >
+                        <ExternalLink className="h-3 w-3 shrink-0" />
+                        <span className="truncate">{ad.ctaUrl}</span>
+                      </a>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          )}
+        </Card>
+      )}
+
+      {/* Sources scrapées (Firecrawl) */}
+      {sources.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Globe className="h-4 w-4 text-accent" />
+              Sources analysées ({sources.length})
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-1.5">
+              {sources.slice(0, 8).map((src, i) => (
+                <a
+                  key={i}
+                  href={src}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 text-sm text-text-secondary hover:text-accent transition-colors truncate"
+                >
+                  <ExternalLink className="h-3 w-3 shrink-0" />
+                  <span className="truncate">{src}</span>
+                </a>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Vue d'ensemble */}
       <GlowCard glowColor="purple">

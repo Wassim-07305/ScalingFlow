@@ -31,10 +31,21 @@ import {
   searchAndScrape,
   type ScrapeResult,
 } from "@/lib/scraping/firecrawl";
+import {
+  isApifyConfigured,
+  scrapeInstagramProfile,
+  scrapeInstagramPosts,
+  scrapeTikTok,
+  type InstagramProfileResult,
+  type InstagramPostResult,
+  type TikTokResult,
+} from "@/lib/scraping/apify";
 import { awardXP } from "@/lib/gamification/xp-engine";
 import { notifyGeneration } from "@/lib/notifications/create";
 import { rateLimit } from "@/lib/utils/rate-limit";
 import { SupabaseClient } from "@supabase/supabase-js";
+
+export const maxDuration = 60;
 
 // ─── #74 + #75 : Fetch ad performance + sales insights for content enrichment ───
 
@@ -230,7 +241,7 @@ export async function POST(req: NextRequest) {
         ? `Analyse de marche disponible : ${latestAnalysis.market}`
         : "Parcours client standard";
 
-    // --- Content Spy (#44) — avec scraping Firecrawl hybride ---
+    // --- Content Spy (#44) — avec scraping Apify + Firecrawl hybride ---
     if (contentType === "content_spy") {
       if (!competitor || !platform) {
         return NextResponse.json(
@@ -239,12 +250,102 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      // Phase 1 : Scraping réel via Firecrawl (si configuré)
+      // Phase 1 : Scraping réel via Apify (prioritaire) puis Firecrawl (fallback)
       let scrapedContext = "";
       let sourceUrls: string[] = [];
-      const useRealScraping = isFirecrawlConfigured();
+      let dataSource: "instagram_api" | "tiktok_api" | "web_scraping" | "ai_only" = "ai_only";
+      let scrapedPosts: { caption: string; likes: number; comments: number; ownerUsername?: string }[] = [];
+      let profileData: InstagramProfileResult | null = null;
 
-      if (useRealScraping) {
+      const apifyReady = isApifyConfigured();
+      const firecrawlReady = isFirecrawlConfigured();
+
+      // --- Apify: Instagram ---
+      if (apifyReady && platform === "instagram") {
+        try {
+          const cleanHandle = handle ? handle.replace(/^@/, "").replace(/https?:\/\/(www\.)?instagram\.com\//, "").replace(/\/.*$/, "").trim() : "";
+
+          // Scrape le profil Instagram si handle fourni
+          if (cleanHandle) {
+            profileData = await scrapeInstagramProfile(cleanHandle);
+            if (profileData) {
+              scrapedContext += `## PROFIL INSTAGRAM RÉEL — @${profileData.username}
+- Nom : ${profileData.fullName}
+- Bio : ${profileData.bio}
+- Followers : ${profileData.followers.toLocaleString("fr-FR")}
+- Following : ${profileData.following.toLocaleString("fr-FR")}
+- Nombre de posts : ${profileData.posts.toLocaleString("fr-FR")}
+
+### Posts récents du profil :
+${profileData.recentPosts.slice(0, 10).map((p, i) => `${i + 1}. "${p.caption.slice(0, 200)}" — ${p.likes} likes, ${p.comments} commentaires`).join("\n")}
+`;
+              scrapedPosts = profileData.recentPosts.slice(0, 10).map((p) => ({
+                caption: p.caption,
+                likes: p.likes,
+                comments: p.comments,
+              }));
+              sourceUrls.push(`https://www.instagram.com/${profileData.username}/`);
+            }
+          }
+
+          // Scrape les posts par hashtag lié au concurrent
+          const hashtagPosts: InstagramPostResult[] = await scrapeInstagramPosts({
+            hashtag: competitor.replace(/\s+/g, ""),
+            limit: 15,
+          });
+          if (hashtagPosts.length > 0) {
+            scrapedContext += `\n### Posts Instagram trouvés via hashtag #${competitor.replace(/\s+/g, "")} :
+${hashtagPosts.slice(0, 10).map((p, i) => `${i + 1}. @${p.ownerUsername}: "${p.caption.slice(0, 200)}" — ${p.likes} likes, ${p.comments} commentaires | Hashtags: ${p.hashtags.join(", ")}`).join("\n")}
+`;
+            // Ajouter au tableau de posts si pas de profil
+            if (scrapedPosts.length === 0) {
+              scrapedPosts = hashtagPosts.slice(0, 10).map((p) => ({
+                caption: p.caption,
+                likes: p.likes,
+                comments: p.comments,
+                ownerUsername: p.ownerUsername,
+              }));
+            }
+          }
+
+          if (scrapedContext.length > 0) {
+            dataSource = "instagram_api";
+          }
+        } catch (err) {
+          console.warn("Apify Instagram scraping failed for content_spy:", err);
+        }
+      }
+
+      // --- Apify: TikTok ---
+      if (apifyReady && platform === "tiktok" && dataSource === "ai_only") {
+        try {
+          const isTikTokUrl = handle && handle.includes("tiktok.com");
+          const tiktokResults: TikTokResult[] = await scrapeTikTok({
+            profileUrl: isTikTokUrl ? handle : undefined,
+            hashtag: !isTikTokUrl ? competitor.replace(/\s+/g, "") : undefined,
+            limit: 15,
+          });
+
+          if (tiktokResults.length > 0) {
+            scrapedContext += `## DONNÉES TIKTOK RÉELLES
+### Vidéos TikTok trouvées (${tiktokResults.length} résultats) :
+${tiktokResults.slice(0, 10).map((v, i) => `${i + 1}. @${v.authorName}: "${v.description.slice(0, 200)}" — ${v.likes} likes, ${v.comments} commentaires, ${v.shares} partages, ${v.plays.toLocaleString("fr-FR")} vues | Hashtags: ${v.hashtags.join(", ")}`).join("\n")}
+`;
+            scrapedPosts = tiktokResults.slice(0, 10).map((v) => ({
+              caption: v.description,
+              likes: v.likes,
+              comments: v.comments,
+              ownerUsername: v.authorName,
+            }));
+            dataSource = "tiktok_api";
+          }
+        } catch (err) {
+          console.warn("Apify TikTok scraping failed for content_spy:", err);
+        }
+      }
+
+      // --- Fallback Firecrawl ---
+      if (firecrawlReady && dataSource === "ai_only") {
         try {
           const scrapedPages: ScrapeResult[] = [];
 
@@ -277,6 +378,7 @@ export async function POST(req: NextRequest) {
             scrapedContext = pages
               .map((p) => `### Source : ${p.title}\nURL : ${p.url}\n${p.content}`)
               .join("\n\n---\n\n");
+            dataSource = "web_scraping";
           }
         } catch (err) {
           console.warn("Firecrawl scraping failed for content_spy, falling back to AI-only:", err);
@@ -308,7 +410,16 @@ export async function POST(req: NextRequest) {
         contentType: "content_spy",
         result,
         sources: sourceUrls.length > 0 ? sourceUrls : undefined,
-        scraping_used: useRealScraping && scrapedContext.length > 0,
+        scraping_used: dataSource !== "ai_only",
+        data_source: dataSource,
+        scraped_posts: scrapedPosts.length > 0 ? scrapedPosts.slice(0, 5) : undefined,
+        profile_data: profileData ? {
+          username: profileData.username,
+          fullName: profileData.fullName,
+          bio: profileData.bio,
+          followers: profileData.followers,
+          posts: profileData.posts,
+        } : undefined,
       });
     }
 

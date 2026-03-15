@@ -65,6 +65,9 @@ export default function MarketPage() {
   const [competitors, setCompetitors] = useState<Competitor[]>([]);
   const [loadingPersona, setLoadingPersona] = useState(false);
   const [loadingCompetitors, setLoadingCompetitors] = useState(false);
+  const [competitorDataSource, setCompetitorDataSource] = useState<string>("ai_only");
+  const [competitorScrapingUsed, setCompetitorScrapingUsed] = useState(false);
+  const [competitorTrendsData, setCompetitorTrendsData] = useState<{ term: string; timelineData: { date: string; value: number }[]; relatedQueries: string[] }[] | undefined>(undefined);
   const [loadingSchwartz, setLoadingSchwartz] = useState(false);
   const [loadingData, setLoadingData] = useState(true);
   const [usageLimited, setUsageLimited] = useState<{currentUsage: number; limit: number} | null>(null);
@@ -174,10 +177,15 @@ export default function MarketPage() {
         throw new Error(errData.error || "Erreur lors de la génération");
       }
 
-      await res.json();
+      const resData = await res.json();
+      // Stocker les infos de source de données
+      setCompetitorDataSource(resData.data_source || "ai_only");
+      setCompetitorScrapingUsed(resData.scraping_used || false);
+      setCompetitorTrendsData(resData.trends_data || undefined);
       // Recharger les concurrents depuis la DB
       await loadCompetitors();
-      toast.success("Analyse concurrentielle terminée !");
+      const sourceLabel = resData.data_source === "apify_crawl" ? "Apify" : resData.data_source === "google_trends" ? "Google Trends" : resData.scraping_used ? "données réelles" : "IA";
+      toast.success(`Analyse concurrentielle terminée via ${sourceLabel} !`);
     } catch (error) {
       toast.error(
         error instanceof Error
@@ -567,6 +575,9 @@ export default function MarketPage() {
                   positioningOpportunities={fullAnalysis?.positioning_opportunities}
                   recommendedDifferentiation={fullAnalysis?.recommended_differentiation}
                   industryBenchmarks={benchmarks}
+                  dataSource={competitorDataSource as "apify_crawl" | "google_trends" | "web_scraping" | "ai_only"}
+                  scrapingUsed={competitorScrapingUsed}
+                  trendsData={competitorTrendsData}
                 />
               );
             })()

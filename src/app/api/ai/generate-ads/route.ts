@@ -20,9 +20,16 @@ import {
   searchAndScrape,
   type ScrapeResult,
 } from "@/lib/scraping/firecrawl";
+import {
+  isApifyConfigured,
+  scrapeMetaAdLibrary,
+  type MetaAdResult,
+} from "@/lib/scraping/apify";
 import { awardXP } from "@/lib/gamification/xp-engine";
 import { notifyGeneration } from "@/lib/notifications/create";
 import { rateLimit } from "@/lib/utils/rate-limit";
+
+export const maxDuration = 60;
 
 export async function POST(req: NextRequest) {
   try {
@@ -99,7 +106,7 @@ export async function POST(req: NextRequest) {
     const avatarContext =
       typeof avatar === "object" ? JSON.stringify(avatar, null, 2) : String(avatar);
 
-    // --- Ad Spy (#43) — avec scraping Firecrawl hybride ---
+    // --- Ad Spy (#43) — avec scraping Apify > Firecrawl > AI-only ---
     if (adType === "ad_spy") {
       const { competitor, url: competitorUrl, industry, platform: adPlatform } = body;
       if (!competitor || !industry || !adPlatform) {
@@ -109,12 +116,49 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      // Phase 1 : Scraping réel via Firecrawl (si configuré)
       let scrapedContext = "";
       let sourceUrls: string[] = [];
-      const useRealScraping = isFirecrawlConfigured();
+      let realAds: MetaAdResult[] = [];
+      let scrapingSource: "apify" | "firecrawl" | "ai_only" = "ai_only";
 
-      if (useRealScraping) {
+      // Priorité 1 : Apify Meta Ad Library (données réelles des pubs)
+      if (isApifyConfigured()) {
+        try {
+          const searchQuery = competitor.trim();
+          const apifyResults = await scrapeMetaAdLibrary({
+            searchQuery,
+            country: "FR",
+            limit: 20,
+          });
+
+          if (apifyResults.length > 0) {
+            realAds = apifyResults;
+            scrapingSource = "apify";
+
+            // Construire un contexte textuel pour enrichir le prompt IA
+            scrapedContext = realAds
+              .slice(0, 10)
+              .map((ad, i) => {
+                const parts = [`### Publicité réelle #${i + 1}`];
+                if (ad.brand) parts.push(`Marque : ${ad.brand}`);
+                if (ad.body) parts.push(`Texte : ${ad.body}`);
+                if (ad.headline) parts.push(`Titre : ${ad.headline}`);
+                if (ad.ctaText) parts.push(`CTA : ${ad.ctaText}`);
+                if (ad.ctaUrl) parts.push(`URL CTA : ${ad.ctaUrl}`);
+                if (ad.format) parts.push(`Format : ${ad.format}`);
+                if (ad.platforms?.length) parts.push(`Plateformes : ${ad.platforms.join(", ")}`);
+                if (ad.startDate) parts.push(`Date de début : ${ad.startDate}`);
+                return parts.join("\n");
+              })
+              .join("\n\n---\n\n");
+          }
+        } catch (err) {
+          console.warn("Apify scraping failed for ad_spy, trying Firecrawl fallback:", err);
+        }
+      }
+
+      // Priorité 2 : Firecrawl web scraping (fallback)
+      if (!scrapedContext && isFirecrawlConfigured()) {
         try {
           const scrapedPages: ScrapeResult[] = [];
 
@@ -147,6 +191,7 @@ export async function POST(req: NextRequest) {
             scrapedContext = pages
               .map((p) => `### Source : ${p.title}\nURL : ${p.url}\n${p.content}`)
               .join("\n\n---\n\n");
+            scrapingSource = "firecrawl";
           }
         } catch (err) {
           console.warn("Firecrawl scraping failed for ad_spy, falling back to AI-only:", err);
@@ -155,7 +200,7 @@ export async function POST(req: NextRequest) {
         }
       }
 
-      // Phase 2 : Analyse IA (enrichie par les données scrapées si disponibles)
+      // Phase finale : Analyse IA (enrichie par les données scrapées si disponibles)
       const prompt = adSpyPrompt(
         {
           name: competitor,
@@ -179,7 +224,9 @@ export async function POST(req: NextRequest) {
         adType: "ad_spy",
         result,
         sources: sourceUrls.length > 0 ? sourceUrls : undefined,
-        scraping_used: useRealScraping && scrapedContext.length > 0,
+        scraping_used: scrapingSource !== "ai_only",
+        scraping_source: scrapingSource,
+        real_ads: realAds.length > 0 ? realAds : undefined,
       });
     }
 

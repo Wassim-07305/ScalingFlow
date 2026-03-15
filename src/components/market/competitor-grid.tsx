@@ -12,6 +12,8 @@ import {
   TrendingUp,
   BarChart3,
   Globe,
+  Bot,
+  Zap,
 } from "lucide-react";
 
 interface AdInsight {
@@ -52,12 +54,23 @@ interface IndustryBenchmarks {
   dominant_content_platform: string;
 }
 
+type DataSource = "apify_crawl" | "google_trends" | "web_scraping" | "ai_only";
+
+interface TrendsDataItem {
+  term: string;
+  timelineData: { date: string; value: number }[];
+  relatedQueries: string[];
+}
+
 interface CompetitorGridProps {
   competitors: Competitor[];
   marketGaps?: string[];
   positioningOpportunities?: string[];
   recommendedDifferentiation?: string;
   industryBenchmarks?: IndustryBenchmarks;
+  dataSource?: DataSource;
+  scrapingUsed?: boolean;
+  trendsData?: TrendsDataItem[];
 }
 
 function CompetitorCard({ competitor }: { competitor: Competitor }) {
@@ -193,15 +206,85 @@ function CompetitorCard({ competitor }: { competitor: Competitor }) {
   );
 }
 
+const DATA_SOURCE_LABELS: Record<DataSource, { label: string; color: string; bgColor: string; borderColor: string }> = {
+  apify_crawl: { label: "Apify Crawl", color: "text-emerald-400", bgColor: "bg-emerald-500/10", borderColor: "border-emerald-500/20" },
+  google_trends: { label: "Google Trends", color: "text-blue-400", bgColor: "bg-blue-500/10", borderColor: "border-blue-500/20" },
+  web_scraping: { label: "Web Scraping", color: "text-orange-400", bgColor: "bg-orange-500/10", borderColor: "border-orange-500/20" },
+  ai_only: { label: "Analyse IA", color: "text-purple-400", bgColor: "bg-purple-500/10", borderColor: "border-purple-500/20" },
+};
+
 export function CompetitorGrid({
   competitors,
   marketGaps,
   positioningOpportunities,
   recommendedDifferentiation,
   industryBenchmarks,
+  dataSource = "ai_only",
+  scrapingUsed = false,
+  trendsData,
 }: CompetitorGridProps) {
+  const sourceConfig = DATA_SOURCE_LABELS[dataSource];
+
   return (
     <div className="space-y-6">
+      {/* Data source badge */}
+      <div className={`flex items-center gap-2 p-3 rounded-lg ${sourceConfig.bgColor} border ${sourceConfig.borderColor}`}>
+        {scrapingUsed ? (
+          <Zap className={`h-4 w-4 shrink-0 ${sourceConfig.color}`} />
+        ) : (
+          <Bot className={`h-4 w-4 shrink-0 ${sourceConfig.color}`} />
+        )}
+        <p className={`text-sm ${sourceConfig.color}`}>
+          {scrapingUsed
+            ? `Analyse enrichie via ${sourceConfig.label} — données réelles`
+            : "Analyse basée sur l'intelligence artificielle"
+          }
+        </p>
+        <Badge variant="default" className="ml-auto shrink-0 text-xs">
+          {sourceConfig.label}
+        </Badge>
+      </div>
+
+      {/* Google Trends data */}
+      {trendsData && trendsData.length > 0 && (
+        <Card className="border-blue-500/20 bg-blue-500/5">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <TrendingUp className="h-4 w-4 text-blue-400" />
+              Tendances Google Trends
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {trendsData.map((trend, i) => {
+                const avgValue = trend.timelineData.length > 0
+                  ? Math.round(trend.timelineData.reduce((s, d) => s + d.value, 0) / trend.timelineData.length)
+                  : 0;
+                return (
+                  <div key={i} className="p-3 rounded-lg bg-bg-tertiary border border-border-default">
+                    <div className="flex items-center justify-between mb-2">
+                      <p className="text-sm font-medium text-text-primary">{trend.term}</p>
+                      <Badge variant={avgValue > 60 ? "default" : avgValue > 30 ? "blue" : "cyan"}>
+                        Intérêt : {avgValue}/100
+                      </Badge>
+                    </div>
+                    {trend.relatedQueries.length > 0 && (
+                      <div className="flex flex-wrap gap-1.5">
+                        {trend.relatedQueries.slice(0, 6).map((q, j) => (
+                          <Badge key={j} variant="muted" className="text-xs">
+                            {q}
+                          </Badge>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Industry Benchmarks */}
       {industryBenchmarks && (
         <Card className="border-blue-500/20 bg-blue-500/5">

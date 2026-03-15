@@ -28,6 +28,15 @@ import {
   MessageSquare,
   BarChart3,
   Zap,
+  Globe,
+  ExternalLink,
+  Instagram,
+  ChevronDown,
+  ChevronUp,
+  Heart,
+  MessageCircle,
+  Bot,
+  Radio,
 } from "lucide-react";
 
 // Types pour les résultats Content Spy
@@ -96,6 +105,30 @@ const PLATFORMS = [
   { value: "linkedin", label: "LinkedIn" },
 ];
 
+type DataSource = "instagram_api" | "tiktok_api" | "web_scraping" | "ai_only";
+
+interface ScrapedPost {
+  caption: string;
+  likes: number;
+  comments: number;
+  ownerUsername?: string;
+}
+
+interface ProfileData {
+  username: string;
+  fullName: string;
+  bio: string;
+  followers: number;
+  posts: number;
+}
+
+const DATA_SOURCE_CONFIG: Record<DataSource, { label: string; icon: React.ElementType; color: string; bgColor: string; borderColor: string }> = {
+  instagram_api: { label: "Instagram API", icon: Instagram, color: "text-pink-400", bgColor: "bg-pink-500/10", borderColor: "border-pink-500/20" },
+  tiktok_api: { label: "TikTok API", icon: Radio, color: "text-cyan-400", bgColor: "bg-cyan-500/10", borderColor: "border-cyan-500/20" },
+  web_scraping: { label: "Web Scraping", icon: Globe, color: "text-blue-400", bgColor: "bg-blue-500/10", borderColor: "border-blue-500/20" },
+  ai_only: { label: "Analyse IA", icon: Bot, color: "text-purple-400", bgColor: "bg-purple-500/10", borderColor: "border-purple-500/20" },
+};
+
 interface ContentSpyProps {
   className?: string;
 }
@@ -103,6 +136,12 @@ interface ContentSpyProps {
 export function ContentSpy({ className }: ContentSpyProps) {
   const [loading, setLoading] = React.useState(false);
   const [result, setResult] = React.useState<ContentSpyResult | null>(null);
+  const [sources, setSources] = React.useState<string[]>([]);
+  const [scrapingUsed, setScrapingUsed] = React.useState(false);
+  const [dataSource, setDataSource] = React.useState<DataSource>("ai_only");
+  const [scrapedPosts, setScrapedPosts] = React.useState<ScrapedPost[]>([]);
+  const [profileData, setProfileData] = React.useState<ProfileData | null>(null);
+  const [postsExpanded, setPostsExpanded] = React.useState(false);
 
   // Champs du formulaire
   const [competitor, setCompetitor] = React.useState("");
@@ -139,7 +178,16 @@ export function ContentSpy({ className }: ContentSpyProps) {
 
       const data = await response.json();
       setResult(data.result);
-      toast.success("Analyse terminée !");
+      setSources(data.sources || []);
+      setScrapingUsed(data.scraping_used || false);
+      setDataSource(data.data_source || "ai_only");
+      setScrapedPosts(data.scraped_posts || []);
+      setProfileData(data.profile_data || null);
+      const source = data.data_source as DataSource;
+      const sourceLabel = DATA_SOURCE_CONFIG[source]?.label || "IA";
+      toast.success(data.scraping_used
+        ? `Analyse terminée avec ${sourceLabel} !`
+        : "Analyse terminée !");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Erreur lors de l'analyse");
     } finally {
@@ -239,10 +287,141 @@ export function ContentSpy({ className }: ContentSpyProps) {
           </h3>
           <Badge variant="default">{result.platform}</Badge>
         </div>
-        <Button variant="outline" size="sm" onClick={() => setResult(null)}>
+        <Button variant="outline" size="sm" onClick={() => { setResult(null); setSources([]); setScrapingUsed(false); setDataSource("ai_only"); setScrapedPosts([]); setProfileData(null); setPostsExpanded(false); }}>
           Nouvelle analyse
         </Button>
       </div>
+
+      {/* Badge source de données */}
+      {(() => {
+        const config = DATA_SOURCE_CONFIG[dataSource];
+        const Icon = config.icon;
+        return (
+          <div className={cn("flex items-center gap-2 p-3 rounded-lg", config.bgColor, "border", config.borderColor)}>
+            <Icon className={cn("h-4 w-4 shrink-0", config.color)} />
+            <p className={cn("text-sm", config.color)}>
+              {scrapingUsed
+                ? `Analyse enrichie via ${config.label} — données réelles`
+                : "Analyse basée sur l'intelligence artificielle"
+              }
+            </p>
+            <Badge variant="default" className="ml-auto shrink-0 text-xs">
+              {config.label}
+            </Badge>
+          </div>
+        );
+      })()}
+
+      {/* Profil Instagram scrapé */}
+      {profileData && (
+        <Card className="border-pink-500/20">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Instagram className="h-4 w-4 text-pink-400" />
+              Profil @{profileData.username}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div className="text-center p-2 rounded-lg bg-bg-tertiary">
+                <p className="text-xs text-text-muted">Nom</p>
+                <p className="text-sm font-medium text-text-primary">{profileData.fullName}</p>
+              </div>
+              <div className="text-center p-2 rounded-lg bg-bg-tertiary">
+                <p className="text-xs text-text-muted">Followers</p>
+                <p className="text-sm font-semibold text-text-primary">{profileData.followers.toLocaleString("fr-FR")}</p>
+              </div>
+              <div className="text-center p-2 rounded-lg bg-bg-tertiary">
+                <p className="text-xs text-text-muted">Posts</p>
+                <p className="text-sm font-semibold text-text-primary">{profileData.posts.toLocaleString("fr-FR")}</p>
+              </div>
+              <div className="col-span-2 sm:col-span-1 p-2 rounded-lg bg-bg-tertiary">
+                <p className="text-xs text-text-muted">Bio</p>
+                <p className="text-xs text-text-secondary line-clamp-2">{profileData.bio}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Posts réels analysés (collapsible) */}
+      {scrapedPosts.length > 0 && (
+        <Card>
+          <CardHeader
+            className="cursor-pointer"
+            onClick={() => setPostsExpanded(!postsExpanded)}
+          >
+            <CardTitle className="flex items-center justify-between text-base">
+              <div className="flex items-center gap-2">
+                <MessageCircle className="h-4 w-4 text-accent" />
+                Posts réels analysés ({scrapedPosts.length})
+              </div>
+              {postsExpanded ? (
+                <ChevronUp className="h-4 w-4 text-text-muted" />
+              ) : (
+                <ChevronDown className="h-4 w-4 text-text-muted" />
+              )}
+            </CardTitle>
+          </CardHeader>
+          {postsExpanded && (
+            <CardContent>
+              <div className="space-y-3">
+                {scrapedPosts.slice(0, 5).map((post, i) => (
+                  <div
+                    key={i}
+                    className="p-3 rounded-lg bg-bg-tertiary border border-border-default space-y-2"
+                  >
+                    {post.ownerUsername && (
+                      <p className="text-xs text-text-muted font-medium">@{post.ownerUsername}</p>
+                    )}
+                    <p className="text-sm text-text-secondary line-clamp-3">
+                      {post.caption || "(Pas de légende)"}
+                    </p>
+                    <div className="flex items-center gap-4 text-xs text-text-muted">
+                      <span className="flex items-center gap-1">
+                        <Heart className="h-3 w-3 text-red-400" />
+                        {post.likes.toLocaleString("fr-FR")}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <MessageCircle className="h-3 w-3 text-blue-400" />
+                        {post.comments.toLocaleString("fr-FR")}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          )}
+        </Card>
+      )}
+
+      {/* Sources scrapées */}
+      {sources.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Globe className="h-4 w-4 text-accent" />
+              Sources analysées ({sources.length})
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-1.5">
+              {sources.slice(0, 8).map((src, i) => (
+                <a
+                  key={i}
+                  href={src}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 text-sm text-text-secondary hover:text-accent transition-colors truncate"
+                >
+                  <ExternalLink className="h-3 w-3 shrink-0" />
+                  <span className="truncate">{src}</span>
+                </a>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Vue d'ensemble */}
       <GlowCard glowColor="blue">

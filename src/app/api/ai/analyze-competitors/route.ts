@@ -16,6 +16,15 @@ import {
   searchAndScrape,
   type ScrapeResult,
 } from "@/lib/scraping/firecrawl";
+import {
+  isApifyConfigured,
+  crawlWebsite,
+  scrapeGoogleTrends,
+  type WebCrawlResult,
+  type GoogleTrendsResult,
+} from "@/lib/scraping/apify";
+
+export const maxDuration = 60;
 
 export async function POST(req: NextRequest) {
   try {
@@ -81,12 +90,86 @@ export async function POST(req: NextRequest) {
       .eq("id", user.id)
       .single();
 
-    // Phase 1 : Scraping réel via Firecrawl (si configuré)
+    // Phase 1 : Scraping réel via Apify (prioritaire) puis Firecrawl (fallback)
     let scrapedContext = "";
     let sourceUrls: string[] = [];
-    const useRealScraping = isFirecrawlConfigured();
+    let dataSource: "apify_crawl" | "google_trends" | "web_scraping" | "ai_only" = "ai_only";
+    let trendsData: GoogleTrendsResult[] = [];
 
-    if (useRealScraping) {
+    const apifyReady = isApifyConfigured();
+    const firecrawlReady = isFirecrawlConfigured();
+
+    // --- Apify : crawl des URLs concurrents + Google Trends ---
+    if (apifyReady) {
+      try {
+        const apifyPromises: Promise<unknown>[] = [];
+
+        // Crawl des URLs de concurrents (max 3 en parallèle)
+        const urlsToCrawl = (competitor_urls || []).filter((u) => u.startsWith("http")).slice(0, 3);
+        if (urlsToCrawl.length > 0) {
+          for (const url of urlsToCrawl) {
+            apifyPromises.push(
+              crawlWebsite(url).then((result: WebCrawlResult | null) => {
+                if (result) {
+                  scrapedContext += `### Source Apify : ${result.title}\nURL : ${result.url}\n${result.markdown.slice(0, 4000)}\n\n---\n\n`;
+                  if (!sourceUrls.includes(result.url)) sourceUrls.push(result.url);
+                  dataSource = "apify_crawl";
+                }
+              }),
+            );
+          }
+        }
+
+        // Google Trends pour les noms de concurrents
+        const competitorNames = (competitor_urls || [])
+          .map((u) => {
+            try {
+              const hostname = new URL(u).hostname.replace("www.", "").split(".")[0];
+              return hostname.charAt(0).toUpperCase() + hostname.slice(1);
+            } catch {
+              return "";
+            }
+          })
+          .filter(Boolean)
+          .slice(0, 5);
+
+        // Ajouter le nom du marché comme terme de tendance
+        const trendsTerms = competitorNames.length > 0
+          ? [marketAnalysis.market_name, ...competitorNames].slice(0, 5)
+          : [marketAnalysis.market_name];
+
+        apifyPromises.push(
+          scrapeGoogleTrends({
+            terms: trendsTerms,
+            geo: marketAnalysis.country === "France" ? "FR" : marketAnalysis.country || "FR",
+          }).then((results: GoogleTrendsResult[]) => {
+            if (results.length > 0) {
+              trendsData = results;
+              scrapedContext += `\n## TENDANCES GOOGLE TRENDS (données réelles)\n`;
+              for (const trend of results) {
+                const avgValue = trend.timelineData.length > 0
+                  ? Math.round(trend.timelineData.reduce((s, d) => s + d.value, 0) / trend.timelineData.length)
+                  : 0;
+                scrapedContext += `- **${trend.term}** : intérêt moyen ${avgValue}/100`;
+                if (trend.relatedQueries.length > 0) {
+                  scrapedContext += ` | Requêtes liées : ${trend.relatedQueries.slice(0, 5).join(", ")}`;
+                }
+                scrapedContext += "\n";
+              }
+              scrapedContext += "\n";
+              if (dataSource === "ai_only") dataSource = "google_trends";
+            }
+          }),
+        );
+
+        await Promise.all(apifyPromises);
+      } catch (err) {
+        console.warn("Apify scraping failed for analyze-competitors:", err);
+      }
+    }
+
+    // --- Fallback Firecrawl ---
+    if (firecrawlReady && dataSource === "ai_only") {
       try {
         const scrapedPages: ScrapeResult[] = [];
 
@@ -119,9 +202,10 @@ export async function POST(req: NextRequest) {
         // Construire le contexte scrapé (max 8 pages)
         if (scrapedPages.length > 0) {
           const pages = scrapedPages.slice(0, 8);
-          scrapedContext = pages
+          scrapedContext += pages
             .map((p) => `### Source : ${p.title}\nURL : ${p.url}\n${p.content}`)
             .join("\n\n---\n\n");
+          dataSource = "web_scraping";
         }
       } catch (err) {
         console.warn("Firecrawl scraping failed for analyze-competitors, falling back to AI-only:", err);
@@ -188,7 +272,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       ...result,
       sources: sourceUrls.length > 0 ? sourceUrls : undefined,
-      scraping_used: useRealScraping && scrapedContext.length > 0,
+      scraping_used: dataSource !== "ai_only",
+      data_source: dataSource,
+      trends_data: trendsData.length > 0 ? trendsData : undefined,
     });
   } catch (error) {
     console.error("[analyze-competitors] Error:", error);
