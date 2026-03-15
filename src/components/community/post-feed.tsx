@@ -2,12 +2,8 @@
 
 import React from "react";
 import { cn } from "@/lib/utils/cn";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,16 +11,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
   Heart,
   MessageCircle,
-  Share2,
   Send,
   Loader2,
   MessageSquare,
@@ -36,7 +24,10 @@ import {
   X,
   Check,
   Search,
-  Filter,
+  ImagePlus,
+  Smile,
+  Pin,
+  Bookmark,
   Award,
   Calendar,
   Zap,
@@ -48,16 +39,28 @@ import { toast } from "sonner";
 import { formatDistanceToNow, format } from "date-fns";
 import { fr } from "date-fns/locale";
 
+// ─── Constants ──────────────────────────────────────────────
 const CATEGORIES = [
-  "Tous",
-  "Victoires",
-  "Questions",
-  "Ressources",
-  "Feedback",
+  { id: "all", label: "Tous", emoji: "" },
+  { id: "wins", label: "Victoires", emoji: "🏆" },
+  { id: "questions", label: "Questions", emoji: "❓" },
+  { id: "general", label: "Général", emoji: "💬" },
+  { id: "feedback", label: "Feedback", emoji: "📝" },
 ] as const;
 
-type Category = (typeof CATEGORIES)[number];
+type CategoryId = (typeof CATEGORIES)[number]["id"];
 
+// DB categories for the post composer (excludes "all" filter)
+const POST_CATEGORIES = CATEGORIES.filter((c) => c.id !== "all");
+
+const CATEGORY_STYLES: Record<string, { bg: string; text: string; border: string }> = {
+  wins: { bg: "bg-emerald-500/10", text: "text-emerald-400", border: "border-emerald-500/20" },
+  questions: { bg: "bg-blue-500/10", text: "text-blue-400", border: "border-blue-500/20" },
+  general: { bg: "bg-amber-500/10", text: "text-amber-400", border: "border-amber-500/20" },
+  feedback: { bg: "bg-purple-500/10", text: "text-purple-400", border: "border-purple-500/20" },
+};
+
+// ─── Types ──────────────────────────────────────────────────
 interface PostProfile {
   full_name: string | null;
   avatar_url: string | null;
@@ -91,18 +94,29 @@ interface Comment {
   profiles: PostProfile | null;
 }
 
-interface PostFeedProps {
-  className?: string;
+// ─── Helpers ────────────────────────────────────────────────
+function getInitials(name: string | null | undefined) {
+  if (!name) return "??";
+  return name.split(" ").map((w) => w[0]).filter(Boolean).join("").toUpperCase().slice(0, 2);
 }
 
-// ─── Mini Profile Card ─────────────────────────────────────────
-interface MiniProfileProps {
+const EXPERIENCE_LABELS: Record<string, string> = {
+  beginner: "Débutant",
+  intermediate: "Intermédiaire",
+  advanced: "Avancé",
+  expert: "Expert",
+};
+
+// ─── Mini Profile Card ──────────────────────────────────────
+function MiniProfileCard({
+  userId,
+  profile,
+  onClose,
+}: {
   userId: string;
   profile: PostProfile | null;
   onClose: () => void;
-}
-
-function MiniProfileCard({ userId, profile, onClose }: MiniProfileProps) {
+}) {
   const [fullProfile, setFullProfile] = React.useState<{
     full_name: string | null;
     avatar_url: string | null;
@@ -123,7 +137,6 @@ function MiniProfileCard({ userId, profile, onClose }: MiniProfileProps) {
         .select("full_name, avatar_url, niche, experience_level, xp_points, badges, created_at")
         .eq("id", userId)
         .single();
-
       if (data) {
         setFullProfile({
           full_name: data.full_name,
@@ -150,18 +163,7 @@ function MiniProfileCard({ userId, profile, onClose }: MiniProfileProps) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [onClose]);
 
-  const getInitials = (name: string | null | undefined) => {
-    if (!name) return "??";
-    return name.split(" ").map((w) => w[0]).join("").toUpperCase().slice(0, 2);
-  };
-
-  const experienceLabels: Record<string, string> = {
-    beginner: "Débutant",
-    intermediate: "Intermédiaire",
-    advanced: "Avancé",
-  };
-
-  const displayProfile = fullProfile || {
+  const dp = fullProfile || {
     full_name: profile?.full_name || "Membre ScalingFlow",
     avatar_url: profile?.avatar_url || null,
     niche: null,
@@ -174,79 +176,74 @@ function MiniProfileCard({ userId, profile, onClose }: MiniProfileProps) {
   return (
     <div
       ref={cardRef}
-      className="absolute z-50 top-full left-0 mt-2 w-72 bg-bg-secondary border border-border-default rounded-xl shadow-xl p-4 animate-in fade-in slide-in-from-top-2 duration-200"
+      className="absolute z-50 top-full left-0 mt-2 w-80 bg-bg-secondary border border-border-default rounded-2xl shadow-2xl shadow-black/20 p-5 animate-in fade-in slide-in-from-top-2 duration-200"
     >
       {loading ? (
-        <div className="flex items-center justify-center py-4">
-          <Loader2 className="h-4 w-4 animate-spin text-text-muted" />
+        <div className="flex items-center justify-center py-6">
+          <Loader2 className="h-5 w-5 animate-spin text-text-muted" />
         </div>
       ) : (
         <>
-          <div className="flex items-center gap-3 mb-3">
-            <Avatar className="h-12 w-12">
-              {displayProfile.avatar_url && (
-                <AvatarImage src={displayProfile.avatar_url} />
-              )}
-              <AvatarFallback className="bg-bg-tertiary text-text-secondary text-sm">
-                {getInitials(displayProfile.full_name)}
+          {/* Header with gradient */}
+          <div className="flex items-center gap-3 mb-4">
+            <Avatar className="h-14 w-14 ring-2 ring-accent/20">
+              {dp.avatar_url && <AvatarImage src={dp.avatar_url} />}
+              <AvatarFallback className="bg-accent/10 text-accent text-sm font-bold">
+                {getInitials(dp.full_name)}
               </AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-text-primary truncate">
-                {displayProfile.full_name || "Membre ScalingFlow"}
+              <p className="text-sm font-bold text-text-primary truncate">
+                {dp.full_name || "Membre ScalingFlow"}
               </p>
-              {displayProfile.niche && (
-                <p className="text-xs text-accent truncate">{displayProfile.niche}</p>
+              {dp.niche && (
+                <p className="text-xs text-accent truncate">{dp.niche}</p>
+              )}
+              {dp.experience_level && (
+                <span className="inline-block mt-1 text-[10px] font-medium px-2 py-0.5 rounded-full bg-accent/10 text-accent">
+                  {EXPERIENCE_LABELS[dp.experience_level] || dp.experience_level}
+                </span>
               )}
             </div>
             <button
               onClick={onClose}
-              className="p-1 text-text-muted hover:text-text-primary rounded"
+              className="p-1.5 text-text-muted hover:text-text-primary hover:bg-bg-tertiary rounded-lg transition-colors"
             >
-              <X className="h-3.5 w-3.5" />
+              <X className="h-4 w-4" />
             </button>
           </div>
 
-          <div className="grid grid-cols-3 gap-2 mb-3">
-            {displayProfile.experience_level && (
-              <div className="text-center p-2 bg-bg-tertiary rounded-lg">
-                <Award className="h-3.5 w-3.5 text-accent mx-auto mb-1" />
-                <p className="text-[10px] text-text-muted">Niveau</p>
-                <p className="text-xs font-medium text-text-primary">
-                  {experienceLabels[displayProfile.experience_level] || displayProfile.experience_level}
-                </p>
-              </div>
-            )}
-            <div className="text-center p-2 bg-bg-tertiary rounded-lg">
-              <Zap className="h-3.5 w-3.5 text-yellow-400 mx-auto mb-1" />
+          {/* Stats grid */}
+          <div className="grid grid-cols-3 gap-2 mb-4">
+            <div className="text-center p-2.5 bg-bg-tertiary rounded-xl">
+              <Zap className="h-4 w-4 text-yellow-400 mx-auto mb-1" />
+              <p className="text-xs font-bold text-text-primary">
+                {dp.xp_points.toLocaleString("fr-FR")}
+              </p>
               <p className="text-[10px] text-text-muted">XP</p>
-              <p className="text-xs font-medium text-text-primary">
-                {displayProfile.xp_points.toLocaleString("fr-FR")}
-              </p>
             </div>
-            <div className="text-center p-2 bg-bg-tertiary rounded-lg">
-              <Award className="h-3.5 w-3.5 text-cyan-400 mx-auto mb-1" />
+            <div className="text-center p-2.5 bg-bg-tertiary rounded-xl">
+              <Award className="h-4 w-4 text-cyan-400 mx-auto mb-1" />
+              <p className="text-xs font-bold text-text-primary">
+                {dp.badges?.length || 0}
+              </p>
               <p className="text-[10px] text-text-muted">Badges</p>
-              <p className="text-xs font-medium text-text-primary">
-                {displayProfile.badges?.length || 0}
-              </p>
             </div>
-          </div>
-
-          <div className="flex items-center gap-1.5 text-[10px] text-text-muted mb-3">
-            <Calendar className="h-3 w-3" />
-            <span>
-              Membre depuis{" "}
-              {format(new Date(displayProfile.created_at), "MMMM yyyy", { locale: fr })}
-            </span>
+            <div className="text-center p-2.5 bg-bg-tertiary rounded-xl">
+              <Calendar className="h-4 w-4 text-accent mx-auto mb-1" />
+              <p className="text-xs font-bold text-text-primary">
+                {format(new Date(dp.created_at), "MMM yy", { locale: fr })}
+              </p>
+              <p className="text-[10px] text-text-muted">Membre</p>
+            </div>
           </div>
 
           <a
-            href={`/leaderboard`}
-            className="flex items-center justify-center gap-1.5 w-full py-1.5 rounded-lg bg-bg-tertiary hover:bg-accent/10 text-xs text-text-secondary hover:text-accent transition-colors"
+            href="/leaderboard"
+            className="flex items-center justify-center gap-2 w-full py-2 rounded-xl bg-accent/10 hover:bg-accent/20 text-xs font-medium text-accent transition-colors"
           >
-            <ExternalLink className="h-3 w-3" />
-            Voir le profil
+            <ExternalLink className="h-3.5 w-3.5" />
+            Voir le profil complet
           </a>
         </>
       )}
@@ -254,63 +251,566 @@ function MiniProfileCard({ userId, profile, onClose }: MiniProfileProps) {
   );
 }
 
-// ─── Main PostFeed component ───────────────────────────────────
-export function PostFeed({ className }: PostFeedProps) {
+// ─── Post Composer ──────────────────────────────────────────
+function PostComposer({
+  profile,
+  onSubmit,
+}: {
+  profile: PostProfile | null;
+  onSubmit: (content: string, category: string) => Promise<void>;
+}) {
+  const [content, setContent] = React.useState("");
+  const [category, setCategory] = React.useState("questions");
+  const [submitting, setSubmitting] = React.useState(false);
+  const [focused, setFocused] = React.useState(false);
+  const textareaRef = React.useRef<HTMLTextAreaElement>(null);
+
+  const handleSubmit = async () => {
+    if (!content.trim()) return;
+    setSubmitting(true);
+    await onSubmit(content.trim(), category);
+    setContent("");
+    setSubmitting(false);
+    setFocused(false);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
+      e.preventDefault();
+      handleSubmit();
+    }
+  };
+
+  return (
+    <div
+      className={cn(
+        "rounded-2xl border bg-bg-secondary/80 backdrop-blur-sm transition-all duration-300",
+        focused
+          ? "border-accent/40 shadow-lg shadow-accent/5"
+          : "border-border-default"
+      )}
+    >
+      <div className="p-4">
+        <div className="flex gap-3">
+          <Avatar className="h-10 w-10 shrink-0">
+            {profile?.avatar_url && <AvatarImage src={profile.avatar_url} />}
+            <AvatarFallback className="bg-accent/10 text-accent text-xs font-bold">
+              {getInitials(profile?.full_name)}
+            </AvatarFallback>
+          </Avatar>
+          <div className="flex-1 min-w-0">
+            <textarea
+              ref={textareaRef}
+              placeholder="Partage une victoire, pose une question, aide la communauté..."
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              onFocus={() => setFocused(true)}
+              onKeyDown={handleKeyDown}
+              rows={focused ? 3 : 1}
+              className="w-full resize-none bg-transparent text-sm text-text-primary placeholder:text-text-muted/60 focus:outline-none"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Bottom bar — shown when focused or has content */}
+      {(focused || content) && (
+        <div className="flex items-center justify-between border-t border-border-default px-4 py-3">
+          <div className="flex items-center gap-1.5">
+            {POST_CATEGORIES.map((cat) => {
+              const style = CATEGORY_STYLES[cat.id];
+              return (
+                <button
+                  key={cat.id}
+                  onClick={() => setCategory(cat.id)}
+                  className={cn(
+                    "px-3 py-1.5 rounded-lg text-xs font-medium transition-all border",
+                    category === cat.id
+                      ? `${style?.bg} ${style?.text} ${style?.border}`
+                      : "border-transparent text-text-muted hover:text-text-secondary hover:bg-bg-tertiary"
+                  )}
+                >
+                  {cat.emoji} {cat.label}
+                </button>
+              );
+            })}
+          </div>
+          <div className="flex items-center gap-2">
+            <button className="p-2 rounded-lg text-text-muted hover:text-text-primary hover:bg-bg-tertiary transition-colors">
+              <ImagePlus className="h-4 w-4" />
+            </button>
+            <button className="p-2 rounded-lg text-text-muted hover:text-text-primary hover:bg-bg-tertiary transition-colors">
+              <Smile className="h-4 w-4" />
+            </button>
+            <button
+              onClick={handleSubmit}
+              disabled={!content.trim() || submitting}
+              className={cn(
+                "flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all",
+                content.trim()
+                  ? "bg-accent text-white hover:bg-accent/90 shadow-lg shadow-accent/20"
+                  : "bg-bg-tertiary text-text-muted cursor-not-allowed"
+              )}
+            >
+              {submitting ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Send className="h-4 w-4" />
+              )}
+              Publier
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Single Post Card ───────────────────────────────────────
+function PostCard({
+  post,
+  currentUserId,
+  onLike,
+  onDelete,
+  onEdit,
+  onToggleComments,
+  isCommentsExpanded,
+  comments: postComments,
+  isLoadingComments,
+  onSubmitComment,
+  isSubmittingComment,
+  onDeleteComment,
+  onEditComment,
+}: {
+  post: Post;
+  currentUserId: string | null;
+  onLike: (id: string) => void;
+  onDelete: (id: string) => void;
+  onEdit: (id: string, content: string) => void;
+  onToggleComments: (id: string) => void;
+  isCommentsExpanded: boolean;
+  comments: Comment[];
+  isLoadingComments: boolean;
+  onSubmitComment: (postId: string, content: string) => void;
+  isSubmittingComment: boolean;
+  onDeleteComment: (commentId: string, postId: string) => void;
+  onEditComment: (commentId: string, postId: string, content: string) => void;
+}) {
+  const [editing, setEditing] = React.useState(false);
+  const [editContent, setEditContent] = React.useState(post.content);
+  const [commentInput, setCommentInput] = React.useState("");
+  const [activeProfileUserId, setActiveProfileUserId] = React.useState<string | null>(null);
+  const [editingCommentId, setEditingCommentId] = React.useState<string | null>(null);
+  const [editCommentContent, setEditCommentContent] = React.useState("");
+
+  const displayName = post.profiles?.full_name || "Membre ScalingFlow";
+  const catStyle = CATEGORY_STYLES[post.category || ""] || null;
+
+  return (
+    <div
+      className={cn(
+        "group rounded-2xl border bg-bg-secondary/60 backdrop-blur-sm transition-all duration-200 hover:border-border-default/80",
+        post.pinned
+          ? "border-accent/30 bg-accent/[0.02]"
+          : "border-border-default/50"
+      )}
+    >
+      <div className="p-5">
+        {/* Pinned indicator */}
+        {post.pinned && (
+          <div className="flex items-center gap-1.5 mb-3 text-accent">
+            <Pin className="h-3 w-3" />
+            <span className="text-[11px] font-medium">Épinglé</span>
+          </div>
+        )}
+
+        {/* Author row */}
+        <div className="flex items-start gap-3 mb-3">
+          <Avatar className="h-10 w-10 shrink-0 ring-1 ring-border-default">
+            {post.profiles?.avatar_url && (
+              <AvatarImage src={post.profiles.avatar_url} />
+            )}
+            <AvatarFallback className="bg-bg-tertiary text-text-secondary text-xs font-bold">
+              {getInitials(post.profiles?.full_name)}
+            </AvatarFallback>
+          </Avatar>
+          <div className="flex-1 min-w-0 relative">
+            <div className="flex items-center gap-2 flex-wrap">
+              <button
+                onClick={() => {
+                  setActiveProfileUserId(
+                    activeProfileUserId === post.user_id ? null : post.user_id
+                  );
+                }}
+                className="text-sm font-semibold text-text-primary hover:text-accent transition-colors"
+              >
+                {displayName}
+              </button>
+              {post.profiles?.niche && (
+                <span className="text-[10px] text-text-muted bg-bg-tertiary px-2 py-0.5 rounded-full">
+                  {post.profiles.niche}
+                </span>
+              )}
+              {catStyle && post.category && (
+                <span
+                  className={cn(
+                    "text-[10px] font-medium px-2 py-0.5 rounded-full border",
+                    catStyle.bg,
+                    catStyle.text,
+                    catStyle.border
+                  )}
+                >
+                  {CATEGORIES.find((c) => c.id === post.category)?.emoji}{" "}
+                  {CATEGORIES.find((c) => c.id === post.category)?.label || post.category}
+                </span>
+              )}
+            </div>
+            <p className="text-[11px] text-text-muted mt-0.5">
+              {formatDistanceToNow(new Date(post.created_at), {
+                addSuffix: true,
+                locale: fr,
+              })}
+            </p>
+
+            {/* Mini profile card */}
+            {activeProfileUserId === post.user_id && (
+              <MiniProfileCard
+                userId={post.user_id}
+                profile={post.profiles}
+                onClose={() => setActiveProfileUserId(null)}
+              />
+            )}
+          </div>
+
+          {/* Post actions dropdown */}
+          {currentUserId && currentUserId === post.user_id && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="p-1.5 rounded-lg text-text-muted opacity-0 group-hover:opacity-100 hover:bg-bg-tertiary hover:text-text-primary transition-all">
+                  <MoreHorizontal className="h-4 w-4" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-36">
+                <DropdownMenuItem
+                  onClick={() => {
+                    setEditing(true);
+                    setEditContent(post.content);
+                  }}
+                >
+                  <Pencil className="h-3.5 w-3.5 mr-2" />
+                  Modifier
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="text-danger focus:text-danger"
+                  onClick={() => onDelete(post.id)}
+                >
+                  <Trash2 className="h-3.5 w-3.5 mr-2" />
+                  Supprimer
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+        </div>
+
+        {/* Content */}
+        {editing ? (
+          <div className="mb-4 ml-[52px]">
+            <textarea
+              value={editContent}
+              onChange={(e) => setEditContent(e.target.value)}
+              rows={3}
+              className="w-full resize-none rounded-xl border border-border-default bg-bg-tertiary px-3 py-2 text-sm text-text-primary focus:border-accent/40 focus:outline-none"
+            />
+            <div className="flex items-center gap-2 mt-2">
+              <button
+                onClick={() => {
+                  onEdit(post.id, editContent);
+                  setEditing(false);
+                }}
+                disabled={!editContent.trim()}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-accent text-white text-xs font-medium hover:bg-accent/90 transition-colors"
+              >
+                <Check className="h-3 w-3" />
+                Enregistrer
+              </button>
+              <button
+                onClick={() => setEditing(false)}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-bg-tertiary text-text-secondary text-xs font-medium hover:text-text-primary transition-colors"
+              >
+                <X className="h-3 w-3" />
+                Annuler
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="ml-[52px] mb-4">
+            {post.title && (
+              <h3 className="font-semibold text-text-primary mb-1.5">
+                {post.title}
+              </h3>
+            )}
+            <p className="text-sm text-text-secondary/90 whitespace-pre-wrap leading-relaxed">
+              {post.content}
+            </p>
+          </div>
+        )}
+
+        {/* Action buttons */}
+        <div className="flex items-center gap-1 ml-[52px] pt-3 border-t border-border-default/50">
+          <button
+            onClick={() => onLike(post.id)}
+            disabled={!currentUserId}
+            className={cn(
+              "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-all",
+              post.liked_by_me
+                ? "text-rose-400 bg-rose-500/10 hover:bg-rose-500/15"
+                : "text-text-muted hover:text-rose-400 hover:bg-rose-500/10"
+            )}
+          >
+            <Heart
+              className={cn(
+                "h-4 w-4 transition-transform",
+                post.liked_by_me && "fill-current scale-110"
+              )}
+            />
+            <span className="text-xs font-medium">{post.likes_count || ""}</span>
+          </button>
+
+          <button
+            onClick={() => onToggleComments(post.id)}
+            className={cn(
+              "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-all",
+              isCommentsExpanded
+                ? "text-info bg-info/10"
+                : "text-text-muted hover:text-info hover:bg-info/10"
+            )}
+          >
+            <MessageCircle className="h-4 w-4" />
+            <span className="text-xs font-medium">
+              {post.comments_count || ""}
+            </span>
+            {isCommentsExpanded ? (
+              <ChevronUp className="h-3 w-3" />
+            ) : (
+              <ChevronDown className="h-3 w-3" />
+            )}
+          </button>
+
+          <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm text-text-muted hover:text-accent hover:bg-accent/10 transition-all">
+            <Bookmark className="h-4 w-4" />
+          </button>
+        </div>
+      </div>
+
+      {/* Comments section */}
+      {isCommentsExpanded && (
+        <div className="border-t border-border-default/50 bg-bg-tertiary/30 rounded-b-2xl p-4 space-y-3">
+          {isLoadingComments ? (
+            <div className="flex justify-center py-4">
+              <Loader2 className="h-4 w-4 animate-spin text-text-muted" />
+            </div>
+          ) : (
+            <>
+              {postComments.length === 0 && (
+                <p className="text-xs text-text-muted text-center py-3">
+                  Sois le premier à commenter !
+                </p>
+              )}
+              {postComments.map((comment) => {
+                const cName = comment.profiles?.full_name || "Membre";
+                const cAvatar = comment.profiles?.avatar_url;
+
+                return (
+                  <div key={comment.id} className="flex gap-2.5 group/comment">
+                    <Avatar className="h-7 w-7 shrink-0">
+                      {cAvatar && <AvatarImage src={cAvatar} />}
+                      <AvatarFallback className="bg-bg-tertiary text-text-secondary text-[10px] font-bold">
+                        {getInitials(comment.profiles?.full_name)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1 min-w-0">
+                      <div className="bg-bg-secondary rounded-xl px-3 py-2 border border-border-default/30">
+                        <div className="flex items-center gap-2 mb-0.5">
+                          <span className="text-xs font-semibold text-text-primary">
+                            {cName}
+                          </span>
+                          <span className="text-[10px] text-text-muted">
+                            {formatDistanceToNow(new Date(comment.created_at), {
+                              addSuffix: true,
+                              locale: fr,
+                            })}
+                          </span>
+                          {currentUserId === comment.user_id && (
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <button className="p-0.5 rounded text-text-muted opacity-0 group-hover/comment:opacity-100 hover:text-text-primary transition-all ml-auto">
+                                  <MoreHorizontal className="h-3 w-3" />
+                                </button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end" className="w-32">
+                                <DropdownMenuItem
+                                  onClick={() => {
+                                    setEditingCommentId(comment.id);
+                                    setEditCommentContent(comment.content);
+                                  }}
+                                >
+                                  <Pencil className="h-3 w-3 mr-2" />
+                                  Modifier
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  className="text-danger focus:text-danger"
+                                  onClick={() =>
+                                    onDeleteComment(comment.id, post.id)
+                                  }
+                                >
+                                  <Trash2 className="h-3 w-3 mr-2" />
+                                  Supprimer
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          )}
+                        </div>
+                        {editingCommentId === comment.id ? (
+                          <div className="flex items-center gap-1.5 mt-1">
+                            <input
+                              value={editCommentContent}
+                              onChange={(e) =>
+                                setEditCommentContent(e.target.value)
+                              }
+                              onKeyDown={(e) => {
+                                if (e.key === "Enter") {
+                                  e.preventDefault();
+                                  onEditComment(
+                                    comment.id,
+                                    post.id,
+                                    editCommentContent
+                                  );
+                                  setEditingCommentId(null);
+                                }
+                                if (e.key === "Escape") {
+                                  setEditingCommentId(null);
+                                }
+                              }}
+                              className="flex-1 h-6 rounded-md border border-border-default bg-bg-tertiary px-2 text-xs text-text-primary focus:border-accent/40 focus:outline-none"
+                            />
+                            <button
+                              onClick={() => {
+                                onEditComment(
+                                  comment.id,
+                                  post.id,
+                                  editCommentContent
+                                );
+                                setEditingCommentId(null);
+                              }}
+                              className="text-accent hover:text-accent/80"
+                            >
+                              <Check className="h-3.5 w-3.5" />
+                            </button>
+                            <button
+                              onClick={() => setEditingCommentId(null)}
+                              className="text-text-muted hover:text-text-primary"
+                            >
+                              <X className="h-3.5 w-3.5" />
+                            </button>
+                          </div>
+                        ) : (
+                          <p className="text-xs text-text-secondary/90 leading-relaxed">
+                            {comment.content}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </>
+          )}
+
+          {/* Comment input */}
+          {currentUserId && (
+            <div className="flex gap-2 pt-1">
+              <Avatar className="h-7 w-7 shrink-0">
+                <AvatarFallback className="bg-accent/10 text-accent text-[10px] font-bold">
+                  {getInitials(null)}
+                </AvatarFallback>
+              </Avatar>
+              <div className="flex-1 flex gap-2">
+                <input
+                  placeholder="Écrire un commentaire..."
+                  value={commentInput}
+                  onChange={(e) => setCommentInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      e.preventDefault();
+                      if (commentInput.trim()) {
+                        onSubmitComment(post.id, commentInput.trim());
+                        setCommentInput("");
+                      }
+                    }
+                  }}
+                  className="flex-1 h-8 rounded-xl border border-border-default bg-bg-secondary px-3 text-xs text-text-primary placeholder:text-text-muted/60 focus:border-accent/40 focus:outline-none"
+                />
+                <button
+                  onClick={() => {
+                    if (commentInput.trim()) {
+                      onSubmitComment(post.id, commentInput.trim());
+                      setCommentInput("");
+                    }
+                  }}
+                  disabled={!commentInput.trim() || isSubmittingComment}
+                  className={cn(
+                    "flex items-center justify-center w-8 h-8 rounded-xl transition-all",
+                    commentInput.trim()
+                      ? "bg-accent text-white hover:bg-accent/90"
+                      : "bg-bg-tertiary text-text-muted"
+                  )}
+                >
+                  {isSubmittingComment ? (
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                  ) : (
+                    <Send className="h-3 w-3" />
+                  )}
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ─── Main PostFeed Component ─────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+export function PostFeed({ className }: { className?: string }) {
   const { user, profile } = useUser();
   const supabase = createClient();
 
   const [posts, setPosts] = React.useState<Post[]>([]);
   const [loading, setLoading] = React.useState(true);
-  const [activeCategory, setActiveCategory] = React.useState<Category>("Tous");
-
-  // Recherche et filtrage
+  const [activeCategory, setActiveCategory] = React.useState<CategoryId>("all");
   const [searchQuery, setSearchQuery] = React.useState("");
-  const [nicheFilter, setNicheFilter] = React.useState<string>("all");
-  const [availableNiches, setAvailableNiches] = React.useState<string[]>([]);
-  const [showFilters, setShowFilters] = React.useState(false);
+  const [searchOpen, setSearchOpen] = React.useState(false);
 
-  // Mini profil
-  const [activeProfileUserId, setActiveProfileUserId] = React.useState<string | null>(null);
-  const [activeProfileData, setActiveProfileData] = React.useState<PostProfile | null>(null);
-
-  // Nouveau post
-  const [newContent, setNewContent] = React.useState("");
-  const [newCategory, setNewCategory] = React.useState<string>("Questions");
-  const [submitting, setSubmitting] = React.useState(false);
-
-  // Commentaires
-  const [expandedComments, setExpandedComments] = React.useState<Set<string>>(
-    new Set()
-  );
+  // Comments state
+  const [expandedComments, setExpandedComments] = React.useState<Set<string>>(new Set());
   const [comments, setComments] = React.useState<Record<string, Comment[]>>({});
-  const [commentInputs, setCommentInputs] = React.useState<
-    Record<string, string>
-  >({});
-  const [loadingComments, setLoadingComments] = React.useState<Set<string>>(
-    new Set()
-  );
-  const [submittingComment, setSubmittingComment] = React.useState<Set<string>>(
-    new Set()
-  );
+  const [loadingComments, setLoadingComments] = React.useState<Set<string>>(new Set());
+  const [submittingComment, setSubmittingComment] = React.useState<Set<string>>(new Set());
 
-  // Likes en cours
+  // Likes
   const [likingPosts, setLikingPosts] = React.useState<Set<string>>(new Set());
 
-  // Edition post
-  const [editingPostId, setEditingPostId] = React.useState<string | null>(null);
-  const [editPostContent, setEditPostContent] = React.useState("");
-
-  // Edition commentaire
-  const [editingCommentId, setEditingCommentId] = React.useState<string | null>(null);
-  const [editCommentContent, setEditCommentContent] = React.useState("");
-
-  // ---- Fetch posts ----
+  // ─── Fetch posts ────────────────────────────────────────────
   const fetchPosts = React.useCallback(async () => {
     setLoading(true);
 
     const { data, error } = await supabase
       .from("community_posts")
-      .select("*, profiles:user_id(full_name, avatar_url, niche, experience_level, xp_points, badges, created_at)")
+      .select(
+        "*, profiles:user_id(full_name, avatar_url, niche, experience_level, xp_points, badges, created_at)"
+      )
       .order("pinned", { ascending: false })
       .order("created_at", { ascending: false });
 
@@ -320,14 +820,12 @@ export function PostFeed({ className }: PostFeedProps) {
       return;
     }
 
-    // Vérifier les likes de l'utilisateur courant
     let likedPostIds: Set<string> = new Set();
     if (user) {
       const { data: likes } = await supabase
         .from("community_likes")
         .select("post_id")
         .eq("user_id", user.id);
-
       if (likes) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         likedPostIds = new Set((likes as any[]).map((l: any) => l.post_id));
@@ -342,16 +840,6 @@ export function PostFeed({ className }: PostFeedProps) {
     }));
 
     setPosts(postsWithLikes);
-
-    // Extraire les niches uniques
-    const niches = new Set<string>();
-    postsWithLikes.forEach((p) => {
-      if (p.profiles?.niche) {
-        niches.add(p.profiles.niche);
-      }
-    });
-    setAvailableNiches(Array.from(niches).sort());
-
     setLoading(false);
   }, [supabase, user]);
 
@@ -359,37 +847,27 @@ export function PostFeed({ className }: PostFeedProps) {
     fetchPosts();
   }, [fetchPosts]);
 
-  // ---- Filtrage par catégorie, niche et recherche ----
+  // ─── Filtered posts ─────────────────────────────────────────
   const filteredPosts = React.useMemo(() => {
     let result = posts;
-
-    // Catégorie
-    if (activeCategory !== "Tous") {
+    if (activeCategory !== "all") {
       result = result.filter((p) => p.category === activeCategory);
     }
-
-    // Niche
-    if (nicheFilter !== "all") {
-      result = result.filter((p) => p.profiles?.niche === nicheFilter);
-    }
-
-    // Recherche texte
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase().trim();
       result = result.filter(
         (p) =>
           p.content.toLowerCase().includes(q) ||
           (p.title && p.title.toLowerCase().includes(q)) ||
-          (p.profiles?.full_name && p.profiles.full_name.toLowerCase().includes(q))
+          (p.profiles?.full_name &&
+            p.profiles.full_name.toLowerCase().includes(q))
       );
     }
-
     return result;
-  }, [posts, activeCategory, nicheFilter, searchQuery]);
+  }, [posts, activeCategory, searchQuery]);
 
-  // ---- Post counts per filter ----
   const postCountByCategory = React.useMemo(() => {
-    const counts: Record<string, number> = { Tous: posts.length };
+    const counts: Record<string, number> = { all: posts.length };
     posts.forEach((p) => {
       if (p.category) {
         counts[p.category] = (counts[p.category] || 0) + 1;
@@ -398,51 +876,39 @@ export function PostFeed({ className }: PostFeedProps) {
     return counts;
   }, [posts]);
 
-  // ---- Créer un post ----
-  const handleSubmitPost = async () => {
-    if (!newContent.trim() || !user) return;
-    setSubmitting(true);
-
+  // ─── CRUD handlers ─────────────────────────────────────────
+  const handleSubmitPost = async (content: string, category: string) => {
+    if (!user) return;
     const { error } = await supabase.from("community_posts").insert({
       user_id: user.id,
-      content: newContent.trim(),
-      category: newCategory,
+      content,
+      category,
       likes_count: 0,
       comments_count: 0,
       pinned: false,
     });
-
     if (error) {
       toast.error("Impossible de publier le post");
-      setSubmitting(false);
       return;
     }
-
     toast.success("Post publié !");
-    // Attribuer XP (non bloquant)
     fetch("/api/gamification/award", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ activityType: "community.post" }),
     }).catch(() => {});
-    setNewContent("");
-    setSubmitting(false);
     await fetchPosts();
   };
 
-  // ---- Like / Unlike ----
   const toggleLike = async (postId: string) => {
-    if (!user) return;
-    if (likingPosts.has(postId)) return;
-
+    if (!user || likingPosts.has(postId)) return;
     setLikingPosts((prev) => new Set(prev).add(postId));
 
     const post = posts.find((p) => p.id === postId);
     if (!post) return;
-
     const wasLiked = post.liked_by_me;
 
-    // Mise à jour optimiste
+    // Optimistic update
     setPosts((prev) =>
       prev.map((p) =>
         p.id === postId
@@ -463,7 +929,6 @@ export function PostFeed({ className }: PostFeedProps) {
         .delete()
         .eq("post_id", postId)
         .eq("user_id", user.id);
-
       if (!error) {
         await supabase
           .from("community_posts")
@@ -477,13 +942,11 @@ export function PostFeed({ className }: PostFeedProps) {
               : p
           )
         );
-        toast.error("Erreur lors du unlike");
       }
     } else {
       const { error } = await supabase
         .from("community_likes")
         .insert({ post_id: postId, user_id: user.id });
-
       if (!error) {
         await supabase
           .from("community_posts")
@@ -497,7 +960,6 @@ export function PostFeed({ className }: PostFeedProps) {
               : p
           )
         );
-        toast.error("Erreur lors du like");
       }
     }
 
@@ -508,10 +970,8 @@ export function PostFeed({ className }: PostFeedProps) {
     });
   };
 
-  // ---- Charger les commentaires ----
   const toggleComments = async (postId: string) => {
     const isExpanded = expandedComments.has(postId);
-
     if (isExpanded) {
       setExpandedComments((prev) => {
         const next = new Set(prev);
@@ -520,22 +980,17 @@ export function PostFeed({ className }: PostFeedProps) {
       });
       return;
     }
-
     setExpandedComments((prev) => new Set(prev).add(postId));
-
     if (comments[postId]) return;
 
     setLoadingComments((prev) => new Set(prev).add(postId));
-
     const { data, error } = await supabase
       .from("community_comments")
       .select("*, profiles:user_id(full_name, avatar_url)")
       .eq("post_id", postId)
       .order("created_at", { ascending: true });
 
-    if (error) {
-      toast.error("Impossible de charger les commentaires");
-    } else {
+    if (!error) {
       setComments((prev) => ({
         ...prev,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -545,7 +1000,6 @@ export function PostFeed({ className }: PostFeedProps) {
         })),
       }));
     }
-
     setLoadingComments((prev) => {
       const next = new Set(prev);
       next.delete(postId);
@@ -553,11 +1007,8 @@ export function PostFeed({ className }: PostFeedProps) {
     });
   };
 
-  // ---- Poster un commentaire ----
-  const handleSubmitComment = async (postId: string) => {
-    const content = commentInputs[postId]?.trim();
-    if (!content || !user) return;
-
+  const handleSubmitComment = async (postId: string, content: string) => {
+    if (!user) return;
     setSubmittingComment((prev) => new Set(prev).add(postId));
 
     const { data, error } = await supabase
@@ -568,44 +1019,37 @@ export function PostFeed({ className }: PostFeedProps) {
 
     if (error) {
       toast.error("Impossible de poster le commentaire");
-      setSubmittingComment((prev) => {
-        const next = new Set(prev);
-        next.delete(postId);
-        return next;
-      });
-      return;
+    } else {
+      const newComment: Comment = {
+        ...data,
+        profiles: data.profiles as unknown as PostProfile | null,
+      };
+      setComments((prev) => ({
+        ...prev,
+        [postId]: [...(prev[postId] || []), newComment],
+      }));
+      fetch("/api/gamification/award", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ activityType: "community.comment" }),
+      }).catch(() => {});
+
+      const post = posts.find((p) => p.id === postId);
+      setPosts((prev) =>
+        prev.map((p) =>
+          p.id === postId
+            ? { ...p, comments_count: p.comments_count + 1 }
+            : p
+        )
+      );
+      if (post) {
+        await supabase
+          .from("community_posts")
+          .update({ comments_count: post.comments_count + 1 })
+          .eq("id", postId);
+      }
     }
 
-    const newComment: Comment = {
-      ...data,
-      profiles: data.profiles as unknown as PostProfile | null,
-    };
-    setComments((prev) => ({
-      ...prev,
-      [postId]: [...(prev[postId] || []), newComment],
-    }));
-
-    fetch("/api/gamification/award", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ activityType: "community.comment" }),
-    }).catch(() => {});
-
-    setPosts((prev) =>
-      prev.map((p) =>
-        p.id === postId ? { ...p, comments_count: p.comments_count + 1 } : p
-      )
-    );
-
-    const post = posts.find((p) => p.id === postId);
-    if (post) {
-      await supabase
-        .from("community_posts")
-        .update({ comments_count: post.comments_count + 1 })
-        .eq("id", postId);
-    }
-
-    setCommentInputs((prev) => ({ ...prev, [postId]: "" }));
     setSubmittingComment((prev) => {
       const next = new Set(prev);
       next.delete(postId);
@@ -613,83 +1057,48 @@ export function PostFeed({ className }: PostFeedProps) {
     });
   };
 
-  // ---- Editer un post ----
-  const handleEditPost = async (postId: string) => {
-    if (!editPostContent.trim()) return;
+  const handleEditPost = async (postId: string, content: string) => {
     const { error } = await supabase
       .from("community_posts")
-      .update({ content: editPostContent.trim() })
+      .update({ content })
       .eq("id", postId);
-
     if (error) {
       toast.error("Impossible de modifier le post");
       return;
     }
-
     setPosts((prev) =>
-      prev.map((p) =>
-        p.id === postId ? { ...p, content: editPostContent.trim() } : p
-      )
+      prev.map((p) => (p.id === postId ? { ...p, content } : p))
     );
-    setEditingPostId(null);
     toast.success("Post modifié");
   };
 
-  // ---- Supprimer un post ----
   const handleDeletePost = async (postId: string) => {
     const { error } = await supabase
       .from("community_posts")
       .delete()
       .eq("id", postId);
-
     if (error) {
       toast.error("Impossible de supprimer le post");
       return;
     }
-
     setPosts((prev) => prev.filter((p) => p.id !== postId));
     toast.success("Post supprimé");
   };
 
-  // ---- Editer un commentaire ----
-  const handleEditComment = async (commentId: string, postId: string) => {
-    if (!editCommentContent.trim()) return;
-    const { error } = await supabase
-      .from("community_comments")
-      .update({ content: editCommentContent.trim() })
-      .eq("id", commentId);
-
-    if (error) {
-      toast.error("Impossible de modifier le commentaire");
-      return;
-    }
-
-    setComments((prev) => ({
-      ...prev,
-      [postId]: (prev[postId] || []).map((c) =>
-        c.id === commentId ? { ...c, content: editCommentContent.trim() } : c
-      ),
-    }));
-    setEditingCommentId(null);
-    toast.success("Commentaire modifié");
-  };
-
-  // ---- Supprimer un commentaire ----
   const handleDeleteComment = async (commentId: string, postId: string) => {
     const { error } = await supabase
       .from("community_comments")
       .delete()
       .eq("id", commentId);
-
     if (error) {
       toast.error("Impossible de supprimer le commentaire");
       return;
     }
-
     setComments((prev) => ({
       ...prev,
       [postId]: (prev[postId] || []).filter((c) => c.id !== commentId),
     }));
+    const post = posts.find((p) => p.id === postId);
     setPosts((prev) =>
       prev.map((p) =>
         p.id === postId
@@ -697,557 +1106,182 @@ export function PostFeed({ className }: PostFeedProps) {
           : p
       )
     );
-
-    const post = posts.find((p) => p.id === postId);
     if (post) {
       await supabase
         .from("community_posts")
         .update({ comments_count: Math.max(0, post.comments_count - 1) })
         .eq("id", postId);
     }
-
     toast.success("Commentaire supprimé");
   };
 
-  // ---- Helpers d'affichage ----
-  const getInitials = (name: string | null | undefined) => {
-    if (!name) return "??";
-    return name
-      .split(" ")
-      .map((w) => w[0])
-      .join("")
-      .toUpperCase()
-      .slice(0, 2);
+  const handleEditComment = async (
+    commentId: string,
+    postId: string,
+    content: string
+  ) => {
+    if (!content.trim()) return;
+    const { error } = await supabase
+      .from("community_comments")
+      .update({ content: content.trim() })
+      .eq("id", commentId);
+    if (error) {
+      toast.error("Impossible de modifier le commentaire");
+      return;
+    }
+    setComments((prev) => ({
+      ...prev,
+      [postId]: (prev[postId] || []).map((c) =>
+        c.id === commentId ? { ...c, content: content.trim() } : c
+      ),
+    }));
+    toast.success("Commentaire modifié");
   };
 
-  const categoryColor: Record<
-    string,
-    "default" | "blue" | "cyan" | "purple" | "muted"
-  > = {
-    Victoires: "cyan",
-    Questions: "blue",
-    Ressources: "default",
-    Feedback: "purple",
-  };
-
-  // ---- Loading state ----
+  // ─── Loading state ──────────────────────────────────────────
   if (loading) {
     return (
-      <div className={cn("flex items-center justify-center py-12", className)}>
-        <Loader2 className="h-6 w-6 animate-spin text-text-muted" />
+      <div className={cn("space-y-4", className)}>
+        {[1, 2, 3].map((i) => (
+          <div
+            key={i}
+            className="rounded-2xl border border-border-default/50 bg-bg-secondary/60 p-5 animate-pulse"
+          >
+            <div className="flex items-center gap-3 mb-4">
+              <div className="h-10 w-10 rounded-full bg-bg-tertiary" />
+              <div className="flex-1">
+                <div className="h-3.5 w-32 rounded bg-bg-tertiary mb-1.5" />
+                <div className="h-2.5 w-20 rounded bg-bg-tertiary" />
+              </div>
+            </div>
+            <div className="ml-[52px] space-y-2">
+              <div className="h-3 w-full rounded bg-bg-tertiary" />
+              <div className="h-3 w-3/4 rounded bg-bg-tertiary" />
+            </div>
+          </div>
+        ))}
       </div>
     );
   }
 
   return (
-    <div className={cn("space-y-6", className)}>
-      {/* Barre de recherche et filtres */}
-      <Card>
-        <CardContent className="pt-4 pb-4">
-          <div className="flex items-center gap-2 mb-3">
+    <div className={cn("space-y-4", className)}>
+      {/* Search bar */}
+      <div className="flex items-center gap-2">
+        <div
+          className={cn(
+            "flex items-center gap-2 transition-all duration-300",
+            searchOpen ? "flex-1" : ""
+          )}
+        >
+          {searchOpen ? (
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-text-muted" />
-              <Input
+              <input
+                autoFocus
                 placeholder="Rechercher dans les posts..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9 h-9"
+                className="w-full h-9 rounded-xl border border-border-default bg-bg-secondary pl-9 pr-8 text-sm text-text-primary placeholder:text-text-muted/60 focus:border-accent/40 focus:outline-none"
               />
-            </div>
-            <Button
-              variant={showFilters ? "default" : "ghost"}
-              size="sm"
-              onClick={() => setShowFilters(!showFilters)}
-              className="gap-1.5"
-            >
-              <Filter className="h-4 w-4" />
-              Filtres
-            </Button>
-          </div>
-
-          {showFilters && (
-            <div className="flex items-center gap-3 pt-2 border-t border-border-default">
-              <div className="flex-1">
-                <Select value={nicheFilter} onValueChange={setNicheFilter}>
-                  <SelectTrigger className="h-8 text-xs">
-                    <SelectValue placeholder="Filtrer par niche" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Toutes les niches</SelectItem>
-                    {availableNiches.map((niche) => (
-                      <SelectItem key={niche} value={niche}>
-                        {niche}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              {(nicheFilter !== "all" || searchQuery) && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => {
-                    setNicheFilter("all");
-                    setSearchQuery("");
-                  }}
-                  className="text-xs text-text-muted"
-                >
-                  <X className="h-3 w-3 mr-1" />
-                  Réinitialiser
-                </Button>
-              )}
-            </div>
-          )}
-
-          {/* Résultat du filtre */}
-          {(searchQuery || nicheFilter !== "all") && (
-            <p className="text-xs text-text-muted mt-2">
-              {filteredPosts.length} post{filteredPosts.length !== 1 ? "s" : ""} trouvé{filteredPosts.length !== 1 ? "s" : ""}
-              {nicheFilter !== "all" && ` dans la niche "${nicheFilter}"`}
-              {searchQuery && ` pour "${searchQuery}"`}
-            </p>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Nouveau post */}
-      {user && (
-        <Card>
-          <CardContent className="pt-6">
-            <Textarea
-              placeholder="Partage une victoire, pose une question..."
-              value={newContent}
-              onChange={(e) => setNewContent(e.target.value)}
-              className="mb-3"
-            />
-            <div className="flex items-center justify-between">
-              <div className="flex gap-2">
-                {(
-                  ["Victoires", "Questions", "Ressources", "Feedback"] as const
-                ).map((cat) => (
-                  <button
-                    key={cat}
-                    onClick={() => setNewCategory(cat)}
-                    className={cn(
-                      "px-2.5 py-1 rounded-lg text-xs font-medium transition-all",
-                      newCategory === cat
-                        ? "bg-accent text-white"
-                        : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
-                    )}
-                  >
-                    {cat}
-                  </button>
-                ))}
-              </div>
-              <Button
-                size="sm"
-                onClick={handleSubmitPost}
-                disabled={!newContent.trim() || submitting}
+              <button
+                onClick={() => {
+                  setSearchOpen(false);
+                  setSearchQuery("");
+                }}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-primary"
               >
-                {submitting ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Send className="h-4 w-4" />
-                )}
-                Publier
-              </Button>
+                <X className="h-3.5 w-3.5" />
+              </button>
             </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Filtres par catégorie */}
-      <div className="flex gap-2 overflow-x-auto pb-1">
-        {CATEGORIES.map((cat) => (
-          <button
-            key={cat}
-            onClick={() => setActiveCategory(cat)}
-            className={cn(
-              "px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all flex items-center gap-1.5",
-              activeCategory === cat
-                ? "bg-accent text-white"
-                : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
-            )}
-          >
-            {cat}
-            <span
-              className={cn(
-                "text-[10px] px-1.5 py-0.5 rounded-full",
-                activeCategory === cat
-                  ? "bg-white/20"
-                  : "bg-bg-secondary"
-              )}
+          ) : (
+            <button
+              onClick={() => setSearchOpen(true)}
+              className="flex items-center gap-2 px-3 py-2 rounded-xl border border-border-default bg-bg-secondary/80 text-sm text-text-muted hover:text-text-primary hover:border-border-default transition-colors"
             >
-              {postCountByCategory[cat] || 0}
-            </span>
-          </button>
-        ))}
+              <Search className="h-4 w-4" />
+              Rechercher
+            </button>
+          )}
+        </div>
       </div>
 
-      {/* Liste des posts */}
+      {/* Post composer */}
+      {user && (
+        <PostComposer
+          profile={profile as PostProfile | null}
+          onSubmit={handleSubmitPost}
+        />
+      )}
+
+      {/* Category filter pills */}
+      <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-hide">
+        {CATEGORIES.map((cat) => {
+          const count = postCountByCategory[cat.id] || 0;
+          const isActive = activeCategory === cat.id;
+          return (
+            <button
+              key={cat.id}
+              onClick={() => setActiveCategory(cat.id)}
+              className={cn(
+                "flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-medium whitespace-nowrap transition-all border",
+                isActive
+                  ? "bg-accent text-white border-accent shadow-lg shadow-accent/20"
+                  : "bg-bg-secondary/80 text-text-secondary border-border-default/50 hover:border-border-default hover:text-text-primary"
+              )}
+            >
+              {cat.emoji && <span>{cat.emoji}</span>}
+              {cat.label}
+              <span
+                className={cn(
+                  "text-[10px] px-1.5 py-0.5 rounded-full font-bold",
+                  isActive ? "bg-white/20" : "bg-bg-tertiary"
+                )}
+              >
+                {count}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Posts list */}
       {filteredPosts.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-12 text-center">
-          <MessageSquare className="h-10 w-10 text-text-muted/40 mb-3" />
-          <p className="text-sm text-text-muted">
-            {searchQuery || nicheFilter !== "all"
-              ? "Aucun post ne correspond à vos filtres."
-              : "Aucun post dans cette catégorie pour le moment."}
+        <div className="flex flex-col items-center justify-center py-16 text-center">
+          <div className="h-16 w-16 rounded-2xl bg-bg-tertiary flex items-center justify-center mb-4">
+            <MessageSquare className="h-8 w-8 text-text-muted/30" />
+          </div>
+          <p className="text-sm font-medium text-text-secondary mb-1">
+            {searchQuery
+              ? "Aucun post ne correspond à ta recherche"
+              : "Aucun post dans cette catégorie"}
+          </p>
+          <p className="text-xs text-text-muted">
+            {searchQuery
+              ? "Essaie d'autres mots-clés"
+              : "Sois le premier à publier !"}
           </p>
         </div>
       ) : (
-        <div className="space-y-4">
-          {filteredPosts.map((post) => {
-            const displayName =
-              post.profiles?.full_name || "Membre ScalingFlow";
-            const avatarUrl = post.profiles?.avatar_url;
-            const initials = getInitials(post.profiles?.full_name);
-            const isCommentsExpanded = expandedComments.has(post.id);
-            const postComments = comments[post.id] || [];
-            const isLoadingComments = loadingComments.has(post.id);
-
-            return (
-              <Card key={post.id}>
-                <CardContent className="pt-6">
-                  {/* Auteur */}
-                  <div className="flex items-center gap-3 mb-3">
-                    <Avatar className="h-9 w-9">
-                      {avatarUrl && <AvatarImage src={avatarUrl} />}
-                      <AvatarFallback className="bg-bg-tertiary text-text-secondary text-xs">
-                        {initials}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1 relative">
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => {
-                            if (activeProfileUserId === post.user_id) {
-                              setActiveProfileUserId(null);
-                            } else {
-                              setActiveProfileUserId(post.user_id);
-                              setActiveProfileData(post.profiles);
-                            }
-                          }}
-                          className="text-sm font-medium text-text-primary hover:text-accent transition-colors cursor-pointer"
-                        >
-                          {displayName}
-                        </button>
-                        {post.pinned && (
-                          <Badge variant="default" className="text-[10px]">
-                            Épinglé
-                          </Badge>
-                        )}
-                        {post.profiles?.niche && (
-                          <span className="text-[10px] text-text-muted bg-bg-tertiary px-1.5 py-0.5 rounded">
-                            {post.profiles.niche}
-                          </span>
-                        )}
-                      </div>
-                      <span className="text-xs text-text-muted">
-                        {formatDistanceToNow(new Date(post.created_at), {
-                          addSuffix: true,
-                          locale: fr,
-                        })}
-                      </span>
-                      {/* Mini profile card */}
-                      {activeProfileUserId === post.user_id && (
-                        <MiniProfileCard
-                          userId={post.user_id}
-                          profile={post.profiles}
-                          onClose={() => setActiveProfileUserId(null)}
-                        />
-                      )}
-                    </div>
-                    {post.category && (
-                      <Badge
-                        variant={categoryColor[post.category] || "muted"}
-                      >
-                        {post.category}
-                      </Badge>
-                    )}
-                    {user && user.id === post.user_id && (
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <button aria-label="Options du post" className="p-1 rounded-lg text-text-muted hover:bg-bg-tertiary hover:text-text-primary transition-colors">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem
-                            onClick={() => {
-                              setEditingPostId(post.id);
-                              setEditPostContent(post.content);
-                            }}
-                          >
-                            <Pencil className="h-3.5 w-3.5 mr-2" />
-                            Modifier
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            className="text-danger focus:text-danger"
-                            onClick={() => handleDeletePost(post.id)}
-                          >
-                            <Trash2 className="h-3.5 w-3.5 mr-2" />
-                            Supprimer
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    )}
-                  </div>
-
-                  {/* Titre */}
-                  {post.title && (
-                    <h3 className="font-semibold text-text-primary mb-1">
-                      {post.title}
-                    </h3>
-                  )}
-
-                  {/* Contenu */}
-                  {editingPostId === post.id ? (
-                    <div className="mb-4">
-                      <Textarea
-                        value={editPostContent}
-                        onChange={(e) => setEditPostContent(e.target.value)}
-                        className="mb-2"
-                      />
-                      <div className="flex items-center gap-2">
-                        <Button
-                          size="sm"
-                          onClick={() => handleEditPost(post.id)}
-                          disabled={!editPostContent.trim()}
-                        >
-                          <Check className="h-3.5 w-3.5 mr-1" />
-                          Enregistrer
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => setEditingPostId(null)}
-                        >
-                          <X className="h-3.5 w-3.5 mr-1" />
-                          Annuler
-                        </Button>
-                      </div>
-                    </div>
-                  ) : (
-                    <p className="text-sm text-text-secondary mb-4 whitespace-pre-wrap">
-                      {post.content}
-                    </p>
-                  )}
-
-                  {/* Actions */}
-                  <div className="flex items-center gap-4 pt-3 border-t border-border-default">
-                    <button
-                      onClick={() => toggleLike(post.id)}
-                      disabled={!user || likingPosts.has(post.id)}
-                      aria-label={post.liked_by_me ? "Retirer le like" : "Aimer ce post"}
-                      className={cn(
-                        "flex items-center gap-1.5 text-sm transition-colors",
-                        post.liked_by_me
-                          ? "text-danger"
-                          : "text-text-muted hover:text-danger"
-                      )}
-                    >
-                      <Heart
-                        className={cn(
-                          "h-4 w-4",
-                          post.liked_by_me && "fill-current"
-                        )}
-                      />
-                      {post.likes_count}
-                    </button>
-                    <button
-                      onClick={() => toggleComments(post.id)}
-                      aria-label={isCommentsExpanded ? "Masquer les commentaires" : "Afficher les commentaires"}
-                      aria-expanded={isCommentsExpanded}
-                      className="flex items-center gap-1.5 text-sm text-text-muted hover:text-info transition-colors"
-                    >
-                      <MessageCircle className="h-4 w-4" />
-                      {post.comments_count}
-                      {isCommentsExpanded ? (
-                        <ChevronUp className="h-3 w-3" />
-                      ) : (
-                        <ChevronDown className="h-3 w-3" />
-                      )}
-                    </button>
-                    <button aria-label="Partager ce post" className="flex items-center gap-1.5 text-sm text-text-muted hover:text-accent transition-colors">
-                      <Share2 className="h-4 w-4" />
-                    </button>
-                  </div>
-
-                  {/* Section commentaires */}
-                  {isCommentsExpanded && (
-                    <div className="mt-4 pt-3 border-t border-border-default space-y-3">
-                      {isLoadingComments ? (
-                        <div className="flex justify-center py-3">
-                          <Loader2 className="h-4 w-4 animate-spin text-text-muted" />
-                        </div>
-                      ) : (
-                        <>
-                          {postComments.length === 0 && (
-                            <p className="text-xs text-text-muted text-center py-2">
-                              Aucun commentaire pour le moment.
-                            </p>
-                          )}
-                          {postComments.map((comment) => {
-                            const cName =
-                              comment.profiles?.full_name ||
-                              "Membre ScalingFlow";
-                            const cInitials = getInitials(
-                              comment.profiles?.full_name
-                            );
-                            const cAvatar = comment.profiles?.avatar_url;
-
-                            return (
-                              <div
-                                key={comment.id}
-                                className="flex gap-2.5 pl-2 group"
-                              >
-                                <Avatar className="h-7 w-7 flex-shrink-0">
-                                  {cAvatar && <AvatarImage src={cAvatar} />}
-                                  <AvatarFallback className="bg-bg-tertiary text-text-secondary text-[10px]">
-                                    {cInitials}
-                                  </AvatarFallback>
-                                </Avatar>
-                                <div className="flex-1 bg-bg-tertiary rounded-xl px-3 py-2">
-                                  <div className="flex items-center gap-2 mb-0.5">
-                                    <button
-                                      onClick={() => {
-                                        if (activeProfileUserId === comment.user_id) {
-                                          setActiveProfileUserId(null);
-                                        } else {
-                                          setActiveProfileUserId(comment.user_id);
-                                          setActiveProfileData(comment.profiles);
-                                        }
-                                      }}
-                                      className="text-xs font-medium text-text-primary hover:text-accent transition-colors"
-                                    >
-                                      {cName}
-                                    </button>
-                                    <span className="text-[10px] text-text-muted">
-                                      {formatDistanceToNow(
-                                        new Date(comment.created_at),
-                                        { addSuffix: true, locale: fr }
-                                      )}
-                                    </span>
-                                    {user && user.id === comment.user_id && (
-                                      <DropdownMenu>
-                                        <DropdownMenuTrigger asChild>
-                                          <button aria-label="Options du commentaire" className="p-0.5 rounded text-text-muted opacity-0 group-hover:opacity-100 hover:text-text-primary transition-all">
-                                            <MoreHorizontal className="h-3 w-3" />
-                                          </button>
-                                        </DropdownMenuTrigger>
-                                        <DropdownMenuContent align="end">
-                                          <DropdownMenuItem
-                                            onClick={() => {
-                                              setEditingCommentId(comment.id);
-                                              setEditCommentContent(comment.content);
-                                            }}
-                                          >
-                                            <Pencil className="h-3 w-3 mr-2" />
-                                            Modifier
-                                          </DropdownMenuItem>
-                                          <DropdownMenuItem
-                                            className="text-danger focus:text-danger"
-                                            onClick={() =>
-                                              handleDeleteComment(comment.id, post.id)
-                                            }
-                                          >
-                                            <Trash2 className="h-3 w-3 mr-2" />
-                                            Supprimer
-                                          </DropdownMenuItem>
-                                        </DropdownMenuContent>
-                                      </DropdownMenu>
-                                    )}
-                                  </div>
-                                  {editingCommentId === comment.id ? (
-                                    <div className="flex items-center gap-1.5 mt-1">
-                                      <Input
-                                        value={editCommentContent}
-                                        onChange={(e) =>
-                                          setEditCommentContent(e.target.value)
-                                        }
-                                        onKeyDown={(e) => {
-                                          if (e.key === "Enter") {
-                                            e.preventDefault();
-                                            handleEditComment(comment.id, post.id);
-                                          }
-                                          if (e.key === "Escape") {
-                                            setEditingCommentId(null);
-                                          }
-                                        }}
-                                        className="h-6 text-xs"
-                                      />
-                                      <button
-                                        onClick={() =>
-                                          handleEditComment(comment.id, post.id)
-                                        }
-                                        aria-label="Confirmer la modification"
-                                        className="text-accent hover:text-accent/80"
-                                      >
-                                        <Check className="h-3.5 w-3.5" />
-                                      </button>
-                                      <button
-                                        onClick={() => setEditingCommentId(null)}
-                                        aria-label="Annuler la modification"
-                                        className="text-text-muted hover:text-text-primary"
-                                      >
-                                        <X className="h-3.5 w-3.5" />
-                                      </button>
-                                    </div>
-                                  ) : (
-                                    <p className="text-xs text-text-secondary">
-                                      {comment.content}
-                                    </p>
-                                  )}
-                                </div>
-                              </div>
-                            );
-                          })}
-                        </>
-                      )}
-
-                      {/* Formulaire nouveau commentaire */}
-                      {user && (
-                        <div className="flex gap-2 pl-2">
-                          <Input
-                            placeholder="Écrire un commentaire..."
-                            value={commentInputs[post.id] || ""}
-                            onChange={(e) =>
-                              setCommentInputs((prev) => ({
-                                ...prev,
-                                [post.id]: e.target.value,
-                              }))
-                            }
-                            onKeyDown={(e) => {
-                              if (e.key === "Enter" && !e.shiftKey) {
-                                e.preventDefault();
-                                handleSubmitComment(post.id);
-                              }
-                            }}
-                            className="h-8 text-xs"
-                          />
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => handleSubmitComment(post.id)}
-                            disabled={
-                              !commentInputs[post.id]?.trim() ||
-                              submittingComment.has(post.id)
-                            }
-                          >
-                            {submittingComment.has(post.id) ? (
-                              <Loader2 className="h-3 w-3 animate-spin" />
-                            ) : (
-                              <Send className="h-3 w-3" />
-                            )}
-                          </Button>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            );
-          })}
+        <div className="space-y-3">
+          {filteredPosts.map((post) => (
+            <PostCard
+              key={post.id}
+              post={post}
+              currentUserId={user?.id || null}
+              onLike={toggleLike}
+              onDelete={handleDeletePost}
+              onEdit={handleEditPost}
+              onToggleComments={toggleComments}
+              isCommentsExpanded={expandedComments.has(post.id)}
+              comments={comments[post.id] || []}
+              isLoadingComments={loadingComments.has(post.id)}
+              onSubmitComment={handleSubmitComment}
+              isSubmittingComment={submittingComment.has(post.id)}
+              onDeleteComment={handleDeleteComment}
+              onEditComment={handleEditComment}
+            />
+          ))}
         </div>
       )}
     </div>

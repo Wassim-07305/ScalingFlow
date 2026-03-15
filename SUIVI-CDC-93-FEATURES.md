@@ -195,10 +195,10 @@
 | # | Feature | Statut | Détails |
 |---|---------|--------|---------|
 | 78 | Paliers de croissance | ✅ | `growth-tiers.tsx` amélioré avec données revenue Supabase, calcul CA mensuel, progression vers palier suivant, recommandations adaptées, chart Recharts. |
-| 79 | Whitelabel complet | 🟡 | API `whitelabel/route.ts` + `whitelabel/members/route.ts`. Structure basique, pas de dashboard/funnel/assets/tracking/rapports sous marque élève. |
+| 79 | Whitelabel complet | ✅ | API CRUD org + members, UI settings complète (branding, logo, couleurs, domaine custom, gestion membres), `OrgBrandingProvider` CSS dynamique, portail membre `/portal` (dashboard, funnels, assets, campagnes, analytics, calendrier éditorial), sidebar/layout rebrandés automatiquement. |
 | 80 | Générateur OTO | ✅ | API `generate-oto/route.ts`, prompt `oto-offer.ts`, composant `oto-generator.tsx`. |
 
-**Score section : 2.5 / 3**
+**Score section : 3 / 3**
 
 ---
 
@@ -250,10 +250,21 @@
 | Tracking & Analytics | 1.5 / 7 | 5 / 7 | 7 / 7 | 100% |
 | Managing Automatisé Ads | 0 / 4 | 4 / 4 | 4 / 4 | 100% |
 | Contenu & Vente Continu | 0.5 / 5 | 4 / 5 | 5 / 5 | 100% |
-| Scaling & Business | 1.5 / 3 | 1.5 / 3 | 2.5 / 3 | 83% |
+| Scaling & Business | 1.5 / 3 | 1.5 / 3 | 3 / 3 | 100% |
 | Modules Transversaux | 2.5 / 5 | 2.5 / 5 | 5 / 5 | 100% |
 | Agent IA | 1.5 / 8 | 8 / 8 | 8 / 8 | 100% |
-| **TOTAL** | **48 / 93** | **75.5 / 93** | **89 / 93** | **96%** |
+| **TOTAL** | **48 / 93** | **75.5 / 93** | **89.5 / 93** | **96%** |
+
+### Changelog 2026-03-15 (v3.2)
+- ✅ #79 Whitelabel complet — implémentation complète :
+  - `useOrganization` hook (fetch org, role, members)
+  - `OrgBrandingProvider` (override CSS variables accent/brand/sidebar dynamiquement)
+  - `WhitelabelSettings` component complet (création org, branding logo/couleurs/domaine, gestion membres invite/remove)
+  - Sidebar + layout rebrandés automatiquement (logo, nom, couleurs)
+  - Page `/portal` — portail membre avec dashboard org (stats 30j, funnels, campagnes, assets, calendrier éditorial)
+  - API `/api/integrations/whitelabel/portal` — données partagées org owner → members
+  - Types TypeScript `organizations` + `organization_members` ajoutés
+  - Navigation mise à jour avec lien Portail
 
 ### Changelog 2026-03-15
 - ✅ Fix bug onboarding validate button (API route server-side)
@@ -314,6 +325,5 @@
 | 43 | Ad Spy | Analyse IA, pas de vrai scraping Meta Ad Library |
 | 44 | Content Spy | Analyse IA, pas de vrai scraping Instagram/YouTube |
 | 54 | Pixel + CAPI | Génère le code mais pas d'installation automatique |
-| 79 | Whitelabel | Structure API OK mais pas de dashboard complet sous marque |
 
-**Total : 4 points restants pour atteindre 93/93** (scraping limité par TOS, pixel auto-install irréalisable côté SaaS)
+**Total : 3.5 points restants pour atteindre 93/93** (scraping limité par TOS, pixel auto-install irréalisable côté SaaS)

@@ -115,13 +115,24 @@ export function Sidebar({
             )}
             onClick={closeMobile}
           >
-            <Image
-              src={logoSrc}
-              alt="Logo"
-              width={32}
-              height={32}
-              className="shrink-0 rounded-[6px]"
-            />
+            {logoSrc.startsWith("http") ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={logoSrc}
+                alt="Logo"
+                width={32}
+                height={32}
+                className="h-8 w-8 shrink-0 rounded-[6px] object-contain"
+              />
+            ) : (
+              <Image
+                src={logoSrc}
+                alt="Logo"
+                width={32}
+                height={32}
+                className="shrink-0 rounded-[6px]"
+              />
+            )}
             {!isCollapsed && (
               <span className="text-lg font-bold text-text-primary whitespace-nowrap">
                 {appName}

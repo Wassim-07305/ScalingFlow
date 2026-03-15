@@ -191,7 +191,7 @@ export function subscriptionCanceledEmail(firstName: string) {
       Tes contenus g&eacute;n&eacute;r&eacute;s restent accessibles. Tu peux te r&eacute;abonner
       &agrave; tout moment.
     </p>
-    ${ctaButton("Se réabonner", `${APP_URL}/pricing`)}
+    ${ctaButton("Se réabonner", `${APP_URL}/settings`)}
   `);
 
   return {

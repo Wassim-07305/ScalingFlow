@@ -16,12 +16,12 @@ import {
   Bot,
   Settings,
   Archive,
-  CreditCard,
   ShieldCheck,
   BarChart3,
   MessageSquare,
   Rocket,
   Activity,
+  Building2,
 } from "lucide-react";
 import type { NavItem, NavSection } from "@/lib/types/appshell";
 
@@ -48,7 +48,7 @@ export const NAV_ITEMS: NavItem[] = [
   { label: "Communauté", href: "/community", icon: Users, roles: ["user", "student", "admin", "coach"] },
   { label: "Activité", href: "/activity-log", icon: Activity, roles: ["user", "student", "admin", "coach"] },
   { label: "Assistant IA", href: "/assistant", icon: Bot, roles: ["user", "student", "admin", "coach"] },
-  { label: "Tarifs", href: "/pricing", icon: CreditCard, roles: ["user", "student", "admin", "coach"] },
+  { label: "Portail", href: "/portal", icon: Building2, roles: ["user", "student", "admin", "coach"] },
   { label: "Admin", href: "/admin", icon: ShieldCheck, roles: ["admin"] },
 ];
 
@@ -92,7 +92,7 @@ export const NAV_SECTIONS: NavSection[] = [
   {
     label: "Outils",
     items: NAV_ITEMS.filter((i) =>
-      ["/assistant", "/pricing", "/admin"].includes(i.href)
+      ["/assistant", "/portal", "/admin"].includes(i.href)
     ),
   },
 ];
@@ -122,7 +122,7 @@ export const BREADCRUMB_LABELS: Record<string, string> = {
   assistant: "Assistant IA",
   settings: "Paramètres",
   admin: "Administration",
-  pricing: "Tarifs",
+  portal: "Portail",
 };
 
 // ─── Quick links (Cmd+K) ─────────────────────────────────────
@@ -146,6 +146,6 @@ export const QUICK_LINKS = [
   { label: "Communauté", href: "/community", icon: Users },
   { label: "Activité", href: "/activity-log", icon: Activity },
   { label: "Paramètres", href: "/settings", icon: Settings },
-  { label: "Tarifs", href: "/pricing", icon: CreditCard },
+  { label: "Portail", href: "/portal", icon: Building2 },
   { label: "Admin", href: "/admin", icon: ShieldCheck },
 ];

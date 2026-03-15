@@ -41,7 +41,8 @@ import {
 } from "lucide-react";
 import { useUIStore, type Theme } from "@/stores/ui-store";
 import { usePushNotifications } from "@/hooks/use-push-notifications";
-import { Smartphone } from "lucide-react";
+import { Smartphone, Building2 } from "lucide-react";
+import { WhitelabelSettings } from "@/components/whitelabel/whitelabel-settings";
 
 const EXPERIENCE_LABELS: Record<string, string> = {
   beginner: "Débutant",
@@ -454,6 +455,17 @@ export default function SettingsPage() {
 
         {/* Integrations */}
         <IntegrationsCard />
+
+        {/* Whitelabel */}
+        <Separator />
+        <div>
+          <h2 className="text-lg font-semibold text-text-primary flex items-center gap-2 mb-4">
+            <Building2 className="h-5 w-5 text-accent" />
+            Whitelabel
+          </h2>
+          <WhitelabelSettings />
+        </div>
+        <Separator />
 
         {/* Export */}
         <ExportDataCard />

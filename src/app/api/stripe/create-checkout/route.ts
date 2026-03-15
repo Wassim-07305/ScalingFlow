@@ -61,7 +61,7 @@ export async function POST(req: NextRequest) {
       payment_method_types: ["card"],
       line_items: [{ price: priceId, quantity: 1 }],
       success_url: `${appUrl}/settings?checkout=success`,
-      cancel_url: `${appUrl}/pricing?checkout=cancel`,
+      cancel_url: `${appUrl}/settings?checkout=cancel`,
       metadata: { supabase_user_id: user.id },
     });
 

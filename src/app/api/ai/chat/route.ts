@@ -18,48 +18,53 @@ async function fetchAgentContext(
   const blocks: string[] = [];
   const tables = agent.contextTables;
 
-  // "profile" and "offer" are already handled by vault + offer block
-  // Fetch additional domain data based on contextTables
-
   if (tables.includes("market")) {
     const { data } = await supabase
       .from("market_analyses")
-      .select("market_name, target_audience, pain_points, sophistication_level, market_size")
+      .select("market_name, market_description, problems, opportunities, viability_score, recommended_positioning, schwartz_level, schwartz_analysis, persona")
       .eq("user_id", userId)
       .order("created_at", { ascending: false })
       .limit(1)
       .single();
     if (data) {
+      const problems = Array.isArray(data.problems) ? data.problems.join(", ") : "N/A";
+      const opportunities = Array.isArray(data.opportunities) ? data.opportunities.join(", ") : "N/A";
       blocks.push(
-        `## Analyse de marché\n- Marche : ${data.market_name || "N/A"}\n- Audience cible : ${data.target_audience || "N/A"}\n- Douleurs : ${data.pain_points || "N/A"}\n- Niveau de sophistication : ${data.sophistication_level || "N/A"}\n- Taille du marché : ${data.market_size || "N/A"}`
+        `## Analyse de marché\n- Marché : ${data.market_name || "N/A"}\n- Description : ${data.market_description || "N/A"}\n- Problèmes identifiés : ${problems}\n- Opportunités : ${opportunities}\n- Score de viabilité : ${data.viability_score || "N/A"}/100\n- Positionnement recommandé : ${data.recommended_positioning || "N/A"}\n- Niveau Schwartz : ${data.schwartz_level || "N/A"}`
       );
+      if (data.persona && typeof data.persona === "object") {
+        blocks.push(`## Avatar client (ICP)\n${JSON.stringify(data.persona, null, 2).slice(0, 2000)}`);
+      }
     }
   }
 
   if (tables.includes("competitors")) {
     const { data } = await supabase
       .from("market_analyses")
-      .select("competitors")
+      .select("competitors, competitor_analysis")
       .eq("user_id", userId)
       .order("created_at", { ascending: false })
       .limit(1)
       .single();
     if (data?.competitors) {
-      blocks.push(`## Concurrents identifiés\n${JSON.stringify(data.competitors, null, 2)}`);
+      blocks.push(`## Concurrents identifiés\n${JSON.stringify(data.competitors, null, 2).slice(0, 2000)}`);
+    }
+    if (data?.competitor_analysis) {
+      blocks.push(`## Analyse concurrentielle\n${JSON.stringify(data.competitor_analysis, null, 2).slice(0, 2000)}`);
     }
   }
 
   if (tables.includes("funnel")) {
     const { data } = await supabase
       .from("funnels")
-      .select("funnel_type, headline, sub_headline, cta_text, vsl_script")
+      .select("funnel_name, status, optin_page, vsl_page, total_visits, total_optins, conversion_rate")
       .eq("user_id", userId)
       .order("created_at", { ascending: false })
       .limit(1)
       .single();
     if (data) {
       blocks.push(
-        `## Dernier funnel\n- Type : ${data.funnel_type || "N/A"}\n- Headline : ${data.headline || "N/A"}\n- Sous-headline : ${data.sub_headline || "N/A"}\n- CTA : ${data.cta_text || "N/A"}${data.vsl_script ? `\n- Script VSL : (disponible)` : ""}`
+        `## Dernier funnel\n- Nom : ${data.funnel_name || "N/A"}\n- Statut : ${data.status || "N/A"}\n- Visites : ${data.total_visits || 0}\n- Optins : ${data.total_optins || 0}\n- Taux conversion : ${((data.conversion_rate || 0) * 100).toFixed(1)}%`
       );
     }
   }
@@ -67,28 +72,28 @@ async function fetchAgentContext(
   if (tables.includes("ads")) {
     const { data } = await supabase
       .from("ad_creatives")
-      .select("hook, primary_text, ad_type, target_audience")
+      .select("creative_type, hook, headline, ad_copy, target_audience, angle, ctr, spend, conversions")
       .eq("user_id", userId)
       .order("created_at", { ascending: false })
       .limit(3);
     if (data && data.length > 0) {
       const adLines = data.map(
-        (a, i) => `${i + 1}. [${a.ad_type || "ad"}] Hook: "${a.hook || "N/A"}" — Audience: ${a.target_audience || "N/A"}`
+        (a, i) => `${i + 1}. [${a.creative_type || "ad"}] Hook: "${a.hook || "N/A"}" — Headline: "${a.headline || "N/A"}" — Audience: ${a.target_audience || "N/A"} — Angle: ${a.angle || "N/A"}`
       );
-      blocks.push(`## Dernières publicités\n${adLines.join("\n")}`);
+      blocks.push(`## Dernières créatives publicitaires\n${adLines.join("\n")}`);
     }
   }
 
   if (tables.includes("content")) {
     const { data } = await supabase
       .from("content_pieces")
-      .select("content_type, title, platform")
+      .select("content_type, title, hook")
       .eq("user_id", userId)
       .order("created_at", { ascending: false })
       .limit(5);
     if (data && data.length > 0) {
       const contentLines = data.map(
-        (c, i) => `${i + 1}. [${c.platform || ""}] ${c.content_type || ""} — ${c.title || "Sans titre"}`
+        (c, i) => `${i + 1}. [${c.content_type || ""}] ${c.title || "Sans titre"}${c.hook ? ` — Hook: "${c.hook}"` : ""}`
       );
       blocks.push(`## Derniers contenus créés\n${contentLines.join("\n")}`);
     }
@@ -202,7 +207,7 @@ export async function POST(req: NextRequest) {
     const stream = streamText({
       prompt: userPrompt,
       systemPrompt: fullSystemPrompt,
-      maxTokens: 2048,
+      maxTokens: 4096,
     });
 
     return new Response(createStreamingResponse(stream), {

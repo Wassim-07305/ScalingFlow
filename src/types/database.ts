@@ -57,6 +57,7 @@ export interface Database {
           meta_access_token: string | null;
           meta_ad_account_id: string | null;
           ghl_webhook_url: string | null;
+          organization_id: string | null;
           stripe_connect_account_id: string | null;
           created_at: string;
           updated_at: string;
@@ -108,6 +109,7 @@ export interface Database {
           meta_access_token?: string | null;
           meta_ad_account_id?: string | null;
           ghl_webhook_url?: string | null;
+          organization_id?: string | null;
           stripe_connect_account_id?: string | null;
         };
         Update: {
@@ -156,6 +158,7 @@ export interface Database {
           subscription_plan?: string;
           meta_access_token?: string | null;
           meta_ad_account_id?: string | null;
+          organization_id?: string | null;
           ghl_webhook_url?: string | null;
           stripe_connect_account_id?: string | null;
         };
@@ -943,6 +946,69 @@ export interface Database {
           logo_concept?: string | null;
           brand_kit?: Json | null;
           status?: "draft" | "validated" | "active";
+        };
+      };
+      organizations: {
+        Row: {
+          id: string;
+          name: string;
+          slug: string;
+          logo_url: string | null;
+          custom_domain: string | null;
+          primary_color: string;
+          accent_color: string;
+          brand_name: string | null;
+          features: Json;
+          limits: Json;
+          owner_id: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          name: string;
+          slug: string;
+          logo_url?: string | null;
+          custom_domain?: string | null;
+          primary_color?: string;
+          accent_color?: string;
+          brand_name?: string | null;
+          features?: Json;
+          limits?: Json;
+          owner_id: string;
+        };
+        Update: {
+          name?: string;
+          slug?: string;
+          logo_url?: string | null;
+          custom_domain?: string | null;
+          primary_color?: string;
+          accent_color?: string;
+          brand_name?: string | null;
+          features?: Json;
+          limits?: Json;
+        };
+      };
+      organization_members: {
+        Row: {
+          id: string;
+          organization_id: string;
+          user_id: string;
+          role: "owner" | "admin" | "member";
+          invited_at: string;
+          joined_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          organization_id: string;
+          user_id: string;
+          role?: "owner" | "admin" | "member";
+          invited_at?: string;
+          joined_at?: string | null;
+        };
+        Update: {
+          role?: "owner" | "admin" | "member";
+          joined_at?: string | null;
         };
       };
       agent_conversations: {
