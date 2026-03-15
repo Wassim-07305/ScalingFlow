@@ -28,6 +28,9 @@ ${skills.join(", ")}
    - uniqueness : pourquoi SEUL ton mecanisme peut fonctionner (barriere a l'entree)
 4. **Strategie de pricing** :
    - Regle du 10% : le prix = 10% du resultat potentiel pour le client
+   - Multiplicateur de probabilite : ajuste le prix selon la probabilite d'atteindre le resultat (prix × probabilite%)
+   - Plancher obligatoire : le prix ne peut JAMAIS etre inferieur a (CAC + cout de delivery) × 2
+   - Ratio minimum : valeur percue / prix >= 3:1 (idealement 10:1)
    - Prix ancre + prix reel + decomposition de valeur
    - Structure hybride recommandee : setup_fee (frais d'installation), performance_fee (% des resultats), monthly_retainer (accompagnement mensuel)
    - Options de paiement (1x, 3x, 6x, 12x)
@@ -42,6 +45,11 @@ ${skills.join(", ")}
 8. **OTO (One Time Offer)** : offre complementaire page de remerciements
 
 ### COUCHE 2 — STRUCTURE DE DELIVERY (9 PILIERS BUSINESS)
+Recommande le modele de delivery le plus adapte parmi :
+- **DFY (Done For You)** : L'expert delivre tout. Prix premium, faible scalabilite.
+- **DWY (Done With You)** : L'expert guide, le client execute. Prix moyen, scalabilite moyenne.
+- **DIY (Do It Yourself)** : Le client suit un programme/framework. Prix bas, forte scalabilite.
+
 Mappe la livraison sur les 9 piliers business. Pour chaque pilier applicable :
 - pillar_name : nom du pilier
 - agents_ia : quels agents IA automatisent ce pilier
@@ -81,6 +89,10 @@ Empile la valeur de maniere visuelle et irresistible :
     "pricing": {
       "anchor_price": 0,
       "real_price": 0,
+      "resultat_potentiel": 0,
+      "probability_multiplier": 0.8,
+      "price_floor": 0,
+      "price_floor_formula": "(CAC + cout_delivery) × 2",
       "value_breakdown": [{"item": "...", "value": 0}],
       "payment_options": ["..."],
       "hybrid_structure": {
@@ -88,7 +100,7 @@ Empile la valeur de maniere visuelle et irresistible :
         "performance_fee_percent": 0,
         "monthly_retainer": 0
       },
-      "pricing_rule": "10% du resultat potentiel"
+      "pricing_rule": "10% du resultat potentiel × probabilite"
     },
     "guarantees": [{
       "type": "...",
@@ -105,6 +117,12 @@ Empile la valeur de maniere visuelle et irresistible :
     "oto": { "name": "...", "description": "...", "price": 0, "value_proposition": "..." }
   },
   "delivery": {
+    "recommended_model": "DFY|DWY|DIY",
+    "model_comparison": {
+      "dfy": { "inclus": ["..."], "implication_client": "...", "prix_relatif": "...", "scalabilite": "..." },
+      "dwy": { "inclus": ["..."], "implication_client": "...", "prix_relatif": "...", "scalabilite": "..." },
+      "diy": { "inclus": ["..."], "implication_client": "...", "prix_relatif": "...", "scalabilite": "..." }
+    },
     "piliers": [
       {
         "pillar_name": "...",

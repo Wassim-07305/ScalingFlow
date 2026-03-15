@@ -67,6 +67,20 @@ Réponds UNIQUEMENT en JSON valide :
       "strengths": ["..."],
       "improvements": ["..."],
       "key_moment": "..."
+    },
+    "tonality_energy": {
+      "score": 7,
+      "max": 10,
+      "strengths": ["Ton engageant, voix posée et confiante"],
+      "improvements": ["Manque d'enthousiasme dans la phase de présentation"],
+      "key_moment": "Moment où le ton a changé (positif ou négatif)"
+    },
+    "conversation_control": {
+      "score": 6,
+      "max": 10,
+      "strengths": ["Bonne gestion du temps", "Transitions fluides"],
+      "improvements": ["Le prospect a monopolisé la parole trop longtemps"],
+      "key_moment": "Moment où le contrôle a été perdu/repris"
     }
   },
   "key_phrases_to_keep": [
@@ -106,9 +120,22 @@ Réponds UNIQUEMENT en JSON valide :
       "priority": "moyenne"
     }
   ],
+  "speaker_analysis": {
+    "seller_talk_ratio": 35,
+    "prospect_talk_ratio": 65,
+    "ideal_ratio_met": true,
+    "longest_monologue_seller": "Description du plus long monologue du vendeur et son impact",
+    "longest_monologue_prospect": "Description du plus long monologue du prospect et ce qu'il révèle",
+    "interruptions": 2,
+    "silence_management": "Comment les silences ont été gérés (bien/mal, utilisés stratégiquement ou remplis par anxiété)"
+  },
   "next_steps": ["Action recommandée 1", "Action recommandée 2"],
   "training_focus": ["Compétence à travailler en priorité"]
 }
 
-IMPORTANT : Le champ "playbook" doit contenir 5 à 7 actions concrètes basées sur les faiblesses identifiées. Chaque action a une priorité : "haute", "moyenne" ou "basse".`;
+IMPORTANT :
+- Le champ "playbook" doit contenir 5 à 7 actions concrètes basées sur les faiblesses identifiées. Chaque action a une priorité : "haute", "moyenne" ou "basse".
+- Le scoring couvre 7 dimensions (pas 5) : discovery, rapport_building, problem_reframing, objection_handling, closing, tonality_energy, conversation_control.
+- L'analyse des speakers doit estimer le ratio de parole vendeur/prospect (idéal : 30-40% vendeur / 60-70% prospect pour un discovery call, 40-50% / 50-60% pour un closing).
+- Détecte les interruptions et la gestion des silences.`;
 }

@@ -23,6 +23,7 @@ import {
   ArrowRight,
   PartyPopper,
   RefreshCw,
+  Wifi,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -62,6 +63,7 @@ export function PreLaunchChecklist() {
       adsResult,
       campaignsResult,
       integrationsResult,
+      apiTestResult,
     ] = await Promise.all([
       // 1. Offre créée
       supabase
@@ -97,6 +99,10 @@ export function PreLaunchChecklist() {
       fetch("/api/integrations/status")
         .then((r) => r.json())
         .catch(() => ({ status: {} })),
+      // 8. F60 — Real API connectivity tests
+      fetch("/api/integrations/test-connectivity")
+        .then((r) => r.json())
+        .catch(() => ({ tests: [], passedCount: 0, totalCount: 0 })),
     ]);
 
     const offersCount = offersResult.count ?? 0;
@@ -237,6 +243,28 @@ export function PreLaunchChecklist() {
         fixLink: "/ads",
         fixLabel: "Configurer l'audience",
       },
+      {
+        id: "api_connectivity",
+        label: "Connectivité API",
+        description: "Test en temps réel de la connectivité des APIs externes (Meta, Stripe, Supabase).",
+        icon: <Wifi className="h-5 w-5" />,
+        status:
+          apiTestResult.totalCount === 0
+            ? "warn"
+            : apiTestResult.passedCount === apiTestResult.totalCount
+              ? "pass"
+              : apiTestResult.passedCount > 0
+                ? "warn"
+                : "fail",
+        detail:
+          apiTestResult.totalCount === 0
+            ? "Aucun service configuré à tester"
+            : apiTestResult.passedCount === apiTestResult.totalCount
+              ? `${apiTestResult.passedCount}/${apiTestResult.totalCount} APIs connectées et fonctionnelles`
+              : `${apiTestResult.passedCount}/${apiTestResult.totalCount} APIs fonctionnelles — ${(apiTestResult.tests || []).filter((t: { status: string }) => t.status === "fail").map((t: { name: string }) => t.name).join(", ")} en erreur`,
+        fixLink: "/settings",
+        fixLabel: "Vérifier les APIs",
+      },
     ];
 
     setChecks(items);
@@ -251,7 +279,7 @@ export function PreLaunchChecklist() {
   const warnCount = checks.filter((c) => c.status === "warn").length;
   const failCount = checks.filter((c) => c.status === "fail").length;
   const progressPct = checks.length > 0 ? Math.round((passedCount / checks.length) * 100) : 0;
-  const allGreen = passedCount === 8 && checks.length === 8;
+  const allGreen = checks.length > 0 && passedCount === checks.length;
 
   // ─── Loading skeleton ────────────────────────────────────────
   if (loading) {
@@ -315,7 +343,7 @@ export function PreLaunchChecklist() {
                 Checklist pré-lancement
               </h3>
               <p className="text-xs text-text-muted mt-0.5">
-                {passedCount}/8 vérifications réussies
+                {passedCount}/{checks.length} vérifications réussies
               </p>
             </div>
             <div className="flex items-center gap-2">

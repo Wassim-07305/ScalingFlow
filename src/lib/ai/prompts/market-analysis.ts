@@ -130,6 +130,15 @@ Analyse le marche et identifie les 3 meilleures opportunites de positionnement p
 7. **Avatar client** : persona detaille (nom, role, CA, problemes quotidiens, desirs, objections)
 8. **Concurrents principaux** : 3-5 concurrents avec forces/faiblesses
 9. **Signaux de demande** : indices concrets que ce marche est pret
+10. **Niveau Schwartz** : quel est le niveau de sophistication du marche (1 a 5) selon Eugene Schwartz (Breakthrough Advertising) :
+    - Niveau 1 : marche vierge — promesse directe, pas besoin de preuves
+    - Niveau 2 : debut de concurrence — amplifier la promesse, ajouter des details
+    - Niveau 3 : marche sature — mecanisme unique obligatoire
+    - Niveau 4 : tres sature — empiler les mecanismes, preuves massives
+    - Niveau 5 : hyper sature — identification (le prospect ne croit plus aux promesses, il achete une identite)
+11. **Recommandation pricing Schwartz** : le pricing adapte au niveau de sophistication (Niveau 1-2 = pricing simple et direct, Niveau 3 = pricing avec value stack, Niveau 4-5 = pricing avec garanties massives et inversion totale du risque)
+12. **Recommandation contenu social** : quel type de contenu fonctionne le mieux pour ce niveau de marche (Niveau 1-2 = contenu educatif et promesses directes, Niveau 3 = contenu mecanisme unique et preuves, Niveau 4-5 = contenu storytelling, polarisant, identitaire)
+13. **Style VSL recommande** : le style de VSL adapte au marche (Niveau 1-2 = VSL courte et directe 5-10min, Niveau 3 = VSL mecanisme 15-20min, Niveau 4-5 = VSL storytelling longue 30-45min avec preuves massives)
 
 ## FORMAT DE REPONSE
 Reponds en JSON structure :
@@ -146,7 +155,11 @@ Reponds en JSON structure :
       "avatar": { "name": "...", "role": "...", "revenue": "...", "pain_points": ["..."], "desires": ["..."], "objections": ["..."] },
       "competitors": [{ "name": "...", "strengths": ["..."], "weaknesses": ["..."] }],
       "demand_signals": ["...", "..."],
-      "why_good_fit": "..."
+      "why_good_fit": "...",
+      "schwartz_level": 3,
+      "schwartz_pricing_reco": "Pricing avec value stack et mecanisme unique obligatoire",
+      "social_content_reco": "Contenu axe sur le mecanisme unique avec preuves tangibles",
+      "vsl_style_reco": "VSL mecanisme 15-20min avec demonstration du process unique"
     }
   ],
   "recommended_market_index": 0,

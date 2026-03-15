@@ -11,9 +11,11 @@ export interface GuaranteeResult {
     type: string;
     name: string;
     description: string;
-    conditions: string;
-    metric: string;
+    pourcentage_remboursement: string;
     timeframe: string;
+    conditions: string;
+    metrique: string;
+    clause_protection: string;
     risk_level: string;
     psychological_impact: string;
   }[];
@@ -39,16 +41,21 @@ export function guaranteeGeneratorPrompt(ctx: GuaranteeContext): string {
 3. **Anti-risque** — Garantie qui inverse complètement le risque (plus qu'un remboursement)
 4. **Performance** — Garantie conditionnelle liée à des KPIs précis
 
-Pour chaque garantie, fournis :
+Pour chaque garantie, fournis les **5 éléments CDC obligatoires** + métadonnées :
 
-1. **type** : Le type parmi les 4 ci-dessus
-2. **name** : Nom accrocheur de la garantie (ex : "Garantie Résultat ou Remboursé x2", "Garantie Zéro Risque 90 jours")
-3. **description** : Description complète de la garantie (2-3 phrases percutantes)
-4. **conditions** : Les conditions d'application (ce que le client doit faire pour en bénéficier)
-5. **metric** : La métrique ou le critère mesurable de la garantie
-6. **timeframe** : La période couverte par la garantie
-7. **risk_level** : Niveau de risque pour le vendeur ("faible", "moyen", "élevé")
-8. **psychological_impact** : Explication de l'impact psychologique sur le prospect
+### 5 éléments obligatoires (CDC) :
+1. **pourcentage_remboursement** : Le % remboursé si la garantie est déclenchée (ex: "100%", "200%", "50%")
+2. **timeframe** : Délai de la garantie (ex: "30 jours", "60 jours", "90 jours")
+3. **conditions** : Conditions claires et mesurables que le client doit respecter pour bénéficier de la garantie
+4. **metrique** : La métrique EXACTE qui déclenche la garantie (ex: "Si vous n'avez pas 10 leads qualifiés en 30 jours")
+5. **clause_protection** : Clause de protection du prestataire — engagement minimum du client, accès requis, actions obligatoires, délai de réclamation (ex: "Le client doit avoir suivi 100% des modules, répondu à tous les feedbacks, et donné accès admin au compte Meta Ads")
+
+### Métadonnées additionnelles :
+6. **type** : Le type parmi les 4 ci-dessus
+7. **name** : Nom accrocheur de la garantie
+8. **description** : Description complète (2-3 phrases percutantes)
+9. **risk_level** : Niveau de risque pour le vendeur ("faible", "moyen", "élevé")
+10. **psychological_impact** : Impact psychologique sur le prospect
 
 ## FORMAT DE RÉPONSE (JSON)
 {
@@ -57,9 +64,11 @@ Pour chaque garantie, fournis :
       "type": "résultat garanti",
       "name": "...",
       "description": "...",
+      "pourcentage_remboursement": "100%",
+      "timeframe": "90 jours",
       "conditions": "...",
-      "metric": "...",
-      "timeframe": "...",
+      "metrique": "...",
+      "clause_protection": "...",
       "risk_level": "...",
       "psychological_impact": "..."
     }

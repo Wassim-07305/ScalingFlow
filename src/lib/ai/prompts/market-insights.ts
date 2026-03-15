@@ -20,11 +20,18 @@ export interface MarketInsight {
   language_pattern: string; // exact words/phrases used by the target
 }
 
+export interface PainLayer {
+  surface_symptoms: Array<{ symptom: string; frequency: number; exact_quotes: string[] }>;
+  root_causes: Array<{ cause: string; frequency: number; exact_quotes: string[] }>;
+  triggering_events: Array<{ event: string; frequency: number; exact_quotes: string[] }>;
+}
+
 export interface MarketInsightsResult {
   insights: MarketInsight[];
+  pain_layers: PainLayer;
   top_pain_points: Array<{
     pain: string;
-    frequency: number; // how often mentioned (simulated 1-100)
+    frequency: number;
     intensity: string; // "critique" | "forte" | "moderee" | "legere"
     exact_quotes: string[];
   }>;
@@ -77,12 +84,23 @@ Pour chaque insight :
 4. Note la pertinence (1-10)
 5. Capture les MOTS EXACTS utilises par la cible (language patterns)
 
+## STRUCTURATION PAR COUCHES (PersonaForge)
+Tu DOIS structurer les douleurs en 3 niveaux :
+1. **Symptômes de surface** (5-7) : Ce que les gens DISENT (plaintes visibles, expressions utilisées)
+2. **Causes racines** (7-10) : Ce qui BLOQUE réellement (problèmes profonds sous-jacents)
+3. **Événements déclencheurs** (4-5) : Les MOMENTS bascules qui poussent à agir (rupture, échec, deadline, etc.)
+
 ## Output JSON
 
 Reponds UNIQUEMENT en JSON avec cette structure :
 {
-  "insights": [...],  // 15-25 insights detailles
-  "top_pain_points": [...],  // Top 5-8 douleurs avec frequence et citations
+  "insights": [...],  // 25-35 insights detailles (PAS 15, MINIMUM 25)
+  "pain_layers": {
+    "surface_symptoms": [{ "symptom": "...", "frequency": 80, "exact_quotes": ["..."] }],
+    "root_causes": [{ "cause": "...", "frequency": 60, "exact_quotes": ["..."] }],
+    "triggering_events": [{ "event": "...", "frequency": 40, "exact_quotes": ["..."] }]
+  },
+  "top_pain_points": [...],  // Top 8-12 douleurs avec frequence et citations
   "top_desires": [...],  // Top 5-8 desirs
   "common_objections": [...],  // 5-8 objections courantes avec contre-arguments
   "language_vault": {

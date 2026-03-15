@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import Anthropic from "@anthropic-ai/sdk";
 
 // ─── F73 Contenu continu + F74 Adaptation intelligente ───────
-// CRON hebdomadaire : génère 3-5 scripts/semaine adaptés aux performances
+// CRON hebdomadaire : génère 12+ pièces/semaine (3-5 Reels + 1-2 Carousels + 5-7 Stories + 1 YouTube)
 // L'IA analyse les types de contenu qui performent le mieux et génère plus de ce format
 
 const anthropic = new Anthropic();
@@ -99,31 +99,43 @@ Retourne EXACTEMENT un JSON valide sans markdown.`,
         messages: [
           {
             role: "user",
-            content: `Génère le contenu de la semaine : 5 pièces de contenu.
+            content: `Génère le contenu COMPLET de la semaine. Tu DOIS respecter ces quotas MINIMUM :
+
+QUOTAS OBLIGATOIRES PAR SEMAINE :
+- 3-5 scripts de Reels (15-60 secondes, avec hook + script + CTA)
+- 1-2 Carousels complets (7-10 slides avec texte par slide)
+- 5-7 séquences de Stories quotidiennes (story_sequence : 5-8 slides narratives)
+- 1 script YouTube (8-15 min, avec titre SEO, description, chapitres)
+
+TOTAL MINIMUM : 12 pièces de contenu.
 
 RÈGLES D'ADAPTATION :
-- Si un format performe bien → génère 2-3 contenus de ce format
-- Si des objections de vente existent → transforme-les en contenu éducatif
-- Chaque contenu doit avoir un rôle dans le funnel social (Know/Like/Trust/Conversion)
-- Varie les hooks (curiosité, contrarian, story, direct)
+- Si un format performe bien → génère 2-3 contenus SUPPLÉMENTAIRES de ce format
+- Si des objections de vente existent → transforme-les en contenu éducatif (Reels ou Carousels)
+- Chaque contenu doit avoir un rôle dans le funnel social (Know 35-40% / Like 20-25% / Trust 25-30% / Conversion 10-15%)
+- Varie les hooks par niveau : curiosité, contrarian, storytelling, direct, choc
 
 Format JSON :
 {
   "adaptation_strategy": {
     "rationale": "Pourquoi cette distribution de contenu",
-    "top_performing_format": "reel|carousel|post|story",
-    "distribution": { "know": 2, "like": 1, "trust": 1, "conversion": 1 },
+    "top_performing_format": "reel|carousel|story_sequence|youtube",
+    "distribution": { "know": 5, "like": 3, "trust": 3, "conversion": 1 },
     "objections_addressed": ["objection transformée en contenu"]
   },
   "contents": [
     {
-      "type": "reel|carousel|post|story",
+      "type": "reel|carousel|story_sequence|youtube|post",
       "pillar": "know|like|trust|conversion",
       "title": "Titre court",
-      "hook": "Phrase d'accroche",
-      "script": "Script complet ou texte du post",
+      "hook": "Phrase d'accroche (3 premières secondes pour Reel/YouTube)",
+      "script": "Script complet ou texte. Pour carousel: slide 1: ... | slide 2: ... Pour YouTube: intro, chapitre 1, chapitre 2... Pour story_sequence: story 1:... story 2:...",
       "hashtags": "#tag1 #tag2",
       "best_posting_time": "Mardi 12h",
+      "duration": "30s|60s|10min (pour video)",
+      "seo_title": "Titre SEO (YouTube uniquement)",
+      "thumbnail_idea": "Idée de miniature (YouTube uniquement)",
+      "chapters": "00:00 Intro | 02:00 Chapitre 1 | ... (YouTube uniquement)",
       "reasoning": "Pourquoi ce contenu maintenant",
       "based_on_performance": true,
       "addresses_objection": "objection ciblée ou null"

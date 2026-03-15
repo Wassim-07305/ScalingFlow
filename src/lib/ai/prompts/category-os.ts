@@ -24,6 +24,18 @@ export interface CategoryOSResult {
     value_proposition: string;
     tone_of_voice: string;
   };
+  differentiation_scoring: {
+    alternatives: {
+      name: string;
+      type: "concurrent_direct" | "concurrent_indirect" | "substitut" | "statu_quo";
+      score_differenciation: number;
+      forces: string[];
+      faiblesses: string[];
+      notre_avantage: string;
+    }[];
+    score_global: number;
+    verdict: string;
+  };
 }
 
 interface CategoryOSInput {
@@ -99,6 +111,17 @@ Definis l'identite verbale de la marque dans cette nouvelle categorie.
 - value_proposition : proposition de valeur claire et differenciante
 - tone_of_voice : description du ton de communication (ex: "Direct, sans BS, avec une touche d'humour provocateur")
 
+### Etape 6 — DIFFERENTIATION SCORING (Analyse des alternatives)
+Evalue ta nouvelle categorie CONTRE les alternatives existantes. Pour chaque alternative (4-6 minimum) :
+- name : nom de l'alternative (concurrent direct, indirect, substitut, ou statu quo)
+- type : "concurrent_direct" | "concurrent_indirect" | "substitut" | "statu_quo"
+- score_differenciation : score de 1 a 10 (10 = tu es radicalement different)
+- forces : 2-3 forces de cette alternative
+- faiblesses : 2-3 faiblesses exploitables
+- notre_avantage : pourquoi ton Category OS est superieur sur ce point
+
+Calcule un score_global de differenciation (moyenne ponderee) et donne un verdict clair.
+
 ## FORMAT JSON
-Reponds UNIQUEMENT avec un objet JSON valide contenant les 5 cles : new_game, ennemi, truth_bombs, modele_tangible, identite. Pas de markdown, pas de texte autour.`;
+Reponds UNIQUEMENT avec un objet JSON valide contenant les 6 cles : new_game, ennemi, truth_bombs, modele_tangible, identite, differentiation_scoring. Pas de markdown, pas de texte autour.`;
 }

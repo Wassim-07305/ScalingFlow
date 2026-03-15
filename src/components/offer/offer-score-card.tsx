@@ -22,12 +22,12 @@ import type { OfferScoreResult } from "@/lib/ai/prompts/offer-scoring";
 import { UpgradeWall } from "@/components/shared/upgrade-wall";
 
 const CRITERIA_LABELS: Record<string, { label: string; maxScore: number }> = {
-  clarte_promesse: { label: "Clarte de la promesse", maxScore: 17 },
-  force_mecanisme: { label: "Force du mecanisme", maxScore: 17 },
-  pricing_justifie: { label: "Pricing justifie", maxScore: 17 },
-  garantie_solide: { label: "Garantie solide", maxScore: 17 },
-  urgence_rarete: { label: "Urgence & rarete", maxScore: 16 },
-  value_stack: { label: "Value Stack", maxScore: 16 },
+  credibilite: { label: "Crédibilité", maxScore: 20 },
+  pricing: { label: "Pricing", maxScore: 20 },
+  garantie: { label: "Garantie", maxScore: 15 },
+  delivery: { label: "Delivery", maxScore: 15 },
+  marche: { label: "Marché", maxScore: 15 },
+  differenciation: { label: "Différenciation", maxScore: 15 },
 };
 
 interface OfferScoreCardProps {

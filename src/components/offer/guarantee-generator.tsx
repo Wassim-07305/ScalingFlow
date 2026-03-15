@@ -31,11 +31,15 @@ interface Guarantee {
   type: string;
   name: string;
   description: string;
-  conditions: string;
-  metric: string;
+  pourcentage_remboursement: string;
   timeframe: string;
+  conditions: string;
+  metrique: string;
+  clause_protection: string;
   risk_level: string;
   psychological_impact: string;
+  // Legacy field support
+  metric?: string;
 }
 
 interface GuaranteeResult {
@@ -213,9 +217,11 @@ export function GuaranteeGenerator({ offerId }: GuaranteeGeneratorProps) {
           `## Garantie ${i + 1} : ${g.name}\n\n` +
           `Type : ${g.type}\n\n` +
           `Description : ${g.description}\n\n` +
-          `Conditions : ${g.conditions}\n\n` +
-          `Métrique : ${g.metric}\n\n` +
+          `Remboursement : ${g.pourcentage_remboursement || "—"}\n\n` +
           `Durée : ${g.timeframe}\n\n` +
+          `Conditions : ${g.conditions}\n\n` +
+          `Métrique : ${g.metrique || g.metric || "—"}\n\n` +
+          `Clause de protection : ${g.clause_protection || "—"}\n\n` +
           `Niveau de risque : ${g.risk_level}\n\n` +
           `Impact psychologique : ${g.psychological_impact}\n`
       )
@@ -371,23 +377,13 @@ export function GuaranteeGenerator({ offerId }: GuaranteeGeneratorProps) {
 
                   {isExpanded && (
                     <CardContent className="space-y-4 pt-2">
-                      {/* Conditions */}
-                      <div>
-                        <h4 className="text-sm font-semibold text-text-primary flex items-center gap-2 mb-1">
-                          <AlertTriangle className="h-4 w-4 text-yellow-400" />
-                          Conditions
-                        </h4>
-                        <p className="text-sm text-text-secondary">{guarantee.conditions}</p>
-                      </div>
-
-                      {/* Métrique & Durée */}
-                      <div className="grid gap-3 sm:grid-cols-2">
+                      {/* 5 éléments CDC */}
+                      <div className="grid gap-3 sm:grid-cols-3">
                         <div className="rounded-lg bg-bg-tertiary p-3">
-                          <h4 className="text-xs font-semibold text-text-muted flex items-center gap-1.5 mb-1">
-                            <Target className="h-3.5 w-3.5" />
-                            Métrique
+                          <h4 className="text-xs font-semibold text-text-muted mb-1">
+                            Remboursement
                           </h4>
-                          <p className="text-sm text-text-primary">{guarantee.metric}</p>
+                          <p className="text-lg font-bold text-accent">{guarantee.pourcentage_remboursement || "—"}</p>
                         </div>
                         <div className="rounded-lg bg-bg-tertiary p-3">
                           <h4 className="text-xs font-semibold text-text-muted flex items-center gap-1.5 mb-1">
@@ -396,13 +392,42 @@ export function GuaranteeGenerator({ offerId }: GuaranteeGeneratorProps) {
                           </h4>
                           <p className="text-sm text-text-primary">{guarantee.timeframe}</p>
                         </div>
+                        <div className="rounded-lg bg-bg-tertiary p-3">
+                          <h4 className="text-xs font-semibold text-text-muted">
+                            Risque vendeur
+                          </h4>
+                          <Badge variant={riskConf.badgeVariant} className="mt-1">{guarantee.risk_level}</Badge>
+                        </div>
                       </div>
 
-                      {/* Risque */}
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-text-muted">Risque vendeur :</span>
-                        <Badge variant={riskConf.badgeVariant}>{guarantee.risk_level}</Badge>
+                      {/* Métrique déclencheur */}
+                      <div className="rounded-lg bg-bg-tertiary p-3">
+                        <h4 className="text-xs font-semibold text-text-muted flex items-center gap-1.5 mb-1">
+                          <Target className="h-3.5 w-3.5" />
+                          Métrique déclencheur
+                        </h4>
+                        <p className="text-sm text-text-primary">{guarantee.metrique || guarantee.metric || "—"}</p>
                       </div>
+
+                      {/* Conditions */}
+                      <div>
+                        <h4 className="text-sm font-semibold text-text-primary flex items-center gap-2 mb-1">
+                          <AlertTriangle className="h-4 w-4 text-yellow-400" />
+                          Conditions d&apos;application
+                        </h4>
+                        <p className="text-sm text-text-secondary">{guarantee.conditions}</p>
+                      </div>
+
+                      {/* Clause de protection */}
+                      {guarantee.clause_protection && (
+                        <div className="rounded-lg border border-yellow-500/20 bg-yellow-500/5 p-3">
+                          <h4 className="text-sm font-semibold text-text-primary flex items-center gap-2 mb-1">
+                            <Shield className="h-4 w-4 text-yellow-400" />
+                            Clause de protection prestataire
+                          </h4>
+                          <p className="text-sm text-text-secondary">{guarantee.clause_protection}</p>
+                        </div>
+                      )}
 
                       {/* Impact psychologique */}
                       <div className="rounded-lg border border-accent/20 bg-accent/5 p-3">

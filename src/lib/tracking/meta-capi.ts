@@ -70,6 +70,15 @@ function buildUserData(userData: CAPIUserData): Record<string, unknown> {
 }
 
 /**
+ * Génère un event_id unique pour la déduplication pixel/CAPI.
+ * Le même event_id doit être envoyé côté client (pixel) et côté serveur (CAPI)
+ * pour que Meta déduplique les événements.
+ */
+export function generateEventId(): string {
+  return `${Date.now()}_${crypto.randomUUID()}`;
+}
+
+/**
  * Envoie un événement de conversion à Meta Conversions API
  */
 export async function sendConversionEvent(
@@ -78,11 +87,16 @@ export async function sendConversionEvent(
   eventName: CAPIEventName,
   userData: CAPIUserData,
   customData?: CAPICustomData,
-  sourceUrl?: string
-): Promise<{ success: boolean; events_received?: number; error?: string }> {
+  sourceUrl?: string,
+  eventId?: string
+): Promise<{ success: boolean; events_received?: number; event_id?: string; error?: string }> {
   try {
+    // F54 — event_id pour la déduplication pixel/CAPI
+    const dedupEventId = eventId || generateEventId();
+
     const eventPayload: Record<string, unknown> = {
       event_name: eventName,
+      event_id: dedupEventId,
       event_time: Math.floor(Date.now() / 1000),
       action_source: "website",
       user_data: buildUserData(userData),
@@ -130,6 +144,7 @@ export async function sendConversionEvent(
     return {
       success: true,
       events_received: result.events_received,
+      event_id: dedupEventId,
     };
   } catch (error) {
     const message = error instanceof Error ? error.message : "Erreur inconnue";
@@ -182,7 +197,8 @@ export async function sendCAPIIfConfigured(
   eventName: CAPIEventName,
   userData: CAPIUserData,
   customData?: CAPICustomData,
-  sourceUrl?: string
+  sourceUrl?: string,
+  eventId?: string
 ): Promise<void> {
   try {
     const config = await getMetaPixelConfig(supabase, userId);
@@ -194,7 +210,8 @@ export async function sendCAPIIfConfigured(
       eventName,
       userData,
       customData,
-      sourceUrl
+      sourceUrl,
+      eventId
     );
 
     if (!result.success) {

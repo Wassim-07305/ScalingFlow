@@ -52,6 +52,8 @@ interface CallAnalysisResult {
     problem_reframing: ScoreSection;
     objection_handling: ScoreSection;
     closing: ScoreSection;
+    tonality_energy?: ScoreSection;
+    conversation_control?: ScoreSection;
   };
   key_phrases_to_keep: Array<{ phrase: string; why: string }>;
   key_phrases_to_improve: Array<{ phrase: string; suggestion: string }>;
@@ -66,6 +68,15 @@ interface CallAnalysisResult {
     warning_signals: string[];
     emotional_triggers: string[];
   };
+  speaker_analysis?: {
+    seller_talk_ratio: number;
+    prospect_talk_ratio: number;
+    ideal_ratio_met: boolean;
+    longest_monologue_seller: string;
+    longest_monologue_prospect: string;
+    interruptions: number;
+    silence_management: string;
+  };
   playbook?: PlaybookAction[];
   next_steps: string[];
   training_focus: string[];
@@ -77,6 +88,8 @@ const SCORE_LABELS: Record<string, string> = {
   problem_reframing: "Recadrage",
   objection_handling: "Objections",
   closing: "Closing",
+  tonality_energy: "Tonalité & Énergie",
+  conversation_control: "Contrôle de conversation",
 };
 
 const SCORE_ICONS: Record<string, string> = {
@@ -85,6 +98,8 @@ const SCORE_ICONS: Record<string, string> = {
   problem_reframing: "🎯",
   objection_handling: "🛡️",
   closing: "🏆",
+  tonality_energy: "🎤",
+  conversation_control: "⚡",
 };
 
 const PROSPECT_ORIGINS = [
@@ -892,6 +907,49 @@ export function CallAnalyzer() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Speaker Analysis */}
+      {result.speaker_analysis && (
+        <Card>
+          <CardHeader className="py-3">
+            <CardTitle className="text-sm flex items-center gap-2">
+              <Mic className="h-4 w-4 text-accent" />
+              Analyse des speakers
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-0 space-y-4">
+            <div className="grid gap-3 sm:grid-cols-3">
+              <div className="rounded-lg bg-bg-tertiary p-3 text-center">
+                <p className="text-xs text-text-muted">Vendeur</p>
+                <p className="text-2xl font-bold text-blue-400">{result.speaker_analysis.seller_talk_ratio}%</p>
+              </div>
+              <div className="rounded-lg bg-bg-tertiary p-3 text-center">
+                <p className="text-xs text-text-muted">Prospect</p>
+                <p className="text-2xl font-bold text-accent">{result.speaker_analysis.prospect_talk_ratio}%</p>
+              </div>
+              <div className="rounded-lg bg-bg-tertiary p-3 text-center">
+                <p className="text-xs text-text-muted">Interruptions</p>
+                <p className={cn("text-2xl font-bold", result.speaker_analysis.interruptions <= 2 ? "text-accent" : "text-yellow-400")}>
+                  {result.speaker_analysis.interruptions}
+                </p>
+              </div>
+            </div>
+            <div className={cn(
+              "rounded-lg p-3 border text-xs",
+              result.speaker_analysis.ideal_ratio_met
+                ? "bg-accent/5 border-accent/20 text-accent"
+                : "bg-yellow-500/5 border-yellow-500/20 text-yellow-400"
+            )}>
+              {result.speaker_analysis.ideal_ratio_met
+                ? "Ratio de parole idéal respecté"
+                : "Ratio de parole à améliorer — le prospect devrait parler plus"}
+            </div>
+            <div className="text-xs text-text-secondary space-y-1">
+              <p><span className="text-text-muted">Gestion des silences :</span> {result.speaker_analysis.silence_management}</p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Next steps & Training */}
       <div className="grid gap-4 md:grid-cols-2">

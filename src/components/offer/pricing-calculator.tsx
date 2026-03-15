@@ -30,9 +30,21 @@ export function PricingCalculator({ className }: PricingCalculatorProps) {
   const [coutDelivery, setCoutDelivery] = useState<number>(0);
   const [nombreClients, setNombreClients] = useState<number>(0);
   const [prixMarche, setPrixMarche] = useState<number>(0);
+  const [coutAcquisition, setCoutAcquisition] = useState<number>(0);
+  const [probabiliteResultat, setProbabiliteResultat] = useState<number>(80);
 
   const calculations = useMemo(() => {
-    const prixRecommande = Math.round(revenuPotentiel * 0.1);
+    // Règle du 10% ajustée par le multiplicateur de probabilité
+    const prixBrut = Math.round(revenuPotentiel * 0.1);
+    const multiplicateurProba = probabiliteResultat / 100;
+    const prixAjuste = Math.round(prixBrut * multiplicateurProba);
+
+    // Floor : (CAC + coût delivery) × 2
+    const prixPlancher = Math.round((coutAcquisition + coutDelivery) * 2);
+
+    // Le prix recommandé est le MAX entre le prix ajusté et le plancher
+    const prixRecommande = Math.max(prixAjuste, prixPlancher);
+    const floorApplied = prixRecommande === prixPlancher && prixPlancher > prixAjuste;
 
     const tiers = {
       basic: {
@@ -74,6 +86,10 @@ export function PricingCalculator({ className }: PricingCalculatorProps) {
 
     return {
       prixRecommande,
+      prixPlancher,
+      floorApplied,
+      prixAjuste,
+      multiplicateurProba,
       tiers,
       margeNette,
       roiClient,
@@ -81,7 +97,7 @@ export function PricingCalculator({ className }: PricingCalculatorProps) {
       positionnementDelta,
       revenuMensuelEstime,
     };
-  }, [revenuPotentiel, dureeAccompagnement, coutDelivery, nombreClients, prixMarche]);
+  }, [revenuPotentiel, dureeAccompagnement, coutDelivery, nombreClients, prixMarche, coutAcquisition, probabiliteResultat]);
 
   const getPositionnementIcon = () => {
     switch (calculations.positionnement) {
@@ -176,6 +192,38 @@ export function PricingCalculator({ className }: PricingCalculatorProps) {
                 min={0}
               />
             </div>
+            <div>
+              <Label className="flex items-center gap-1.5 mb-1.5">
+                <Target className="h-3.5 w-3.5 text-text-muted" />
+                Coût d&apos;acquisition client — CAC (€)
+              </Label>
+              <Input
+                type="number"
+                value={coutAcquisition || ""}
+                onChange={(e) => setCoutAcquisition(parseInt(e.target.value) || 0)}
+                placeholder="Ex : 200"
+              />
+              <p className="text-xs text-text-muted mt-1">
+                Combien tu dépenses pour acquérir un client (ads, sales, etc.)
+              </p>
+            </div>
+            <div>
+              <Label className="flex items-center gap-1.5 mb-1.5">
+                <TrendingUp className="h-3.5 w-3.5 text-text-muted" />
+                Probabilité de résultat (%)
+              </Label>
+              <Input
+                type="number"
+                value={probabiliteResultat || ""}
+                onChange={(e) => setProbabiliteResultat(Math.min(100, Math.max(1, parseInt(e.target.value) || 80)))}
+                placeholder="Ex : 80"
+                min={1}
+                max={100}
+              />
+              <p className="text-xs text-text-muted mt-1">
+                Probabilité que le client atteigne le résultat promis (ajuste le prix)
+              </p>
+            </div>
             <div className="sm:col-span-2">
               <Label className="flex items-center gap-1.5 mb-1.5">
                 <Target className="h-3.5 w-3.5 text-text-muted" />
@@ -206,8 +254,18 @@ export function PricingCalculator({ className }: PricingCalculatorProps) {
                   {calculations.prixRecommande.toLocaleString("fr-FR")} €
                 </p>
                 <p className="text-xs text-text-muted">
-                  = 10 % du revenu potentiel ajusté du client
+                  = 10% × {revenuPotentiel.toLocaleString("fr-FR")} € × {calculations.multiplicateurProba * 100}% probabilité
                 </p>
+                {calculations.floorApplied && (
+                  <p className="text-xs text-warning font-medium">
+                    Plancher appliqué : (CAC {coutAcquisition.toLocaleString("fr-FR")} € + Delivery {coutDelivery.toLocaleString("fr-FR")} €) × 2 = {calculations.prixPlancher.toLocaleString("fr-FR")} €
+                  </p>
+                )}
+                {!calculations.floorApplied && coutAcquisition > 0 && (
+                  <p className="text-xs text-text-muted">
+                    Plancher (CAC + Delivery) × 2 = {calculations.prixPlancher.toLocaleString("fr-FR")} € — non appliqué
+                  </p>
+                )}
               </div>
             </CardContent>
           </Card>

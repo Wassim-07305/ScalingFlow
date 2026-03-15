@@ -5,9 +5,13 @@ interface ExportPDFOptions {
   subtitle?: string;
   content: string | Record<string, unknown>;
   filename?: string;
+  branding?: {
+    brand_name?: string;
+    logo_url?: string;
+  };
 }
 
-export function exportToPDF({ title, subtitle, content, filename }: ExportPDFOptions) {
+export function exportToPDF({ title, subtitle, content, filename, branding }: ExportPDFOptions) {
   const doc = new jsPDF();
   const margin = 20;
   let y = margin;
@@ -58,7 +62,8 @@ export function exportToPDF({ title, subtitle, content, filename }: ExportPDFOpt
     doc.setPage(i);
     doc.setFontSize(8);
     doc.setTextColor(150, 150, 150);
-    doc.text(`ScalingFlow — ${date} — Page ${i}/${pageCount}`, margin, 290);
+    const footerBrand = branding?.brand_name || "ScalingFlow";
+    doc.text(`${footerBrand} — ${date} — Page ${i}/${pageCount}`, margin, 290);
   }
 
   const safeName = filename || `${title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}.pdf`;

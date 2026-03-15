@@ -49,9 +49,33 @@ interface KPI {
   frequency: string;
 }
 
+interface ModelOption {
+  inclus: string[];
+  implication_client: string;
+  prix_relatif: string;
+  scalabilite: string;
+}
+
+interface Pilier {
+  pillar_name: string;
+  agents_ia: string[];
+  personnes: string[];
+  process: string[];
+  outils: string[];
+  automations: string[];
+  kpi: string;
+}
+
 interface DeliveryResult {
   delivery_name: string;
   overview: string;
+  recommended_model?: string;
+  model_comparison?: {
+    dfy: ModelOption;
+    dwy: ModelOption;
+    diy: ModelOption;
+  };
+  piliers?: Pilier[];
   phases: DeliveryPhase[];
   tech_stack: TechTool[];
   ai_agents: AIAgent[];
@@ -167,6 +191,90 @@ export function DeliveryDesigner({ offerId, className, initialData }: DeliveryDe
           </CardContent>
         </Card>
       </div>
+
+      {/* DFY / DWY / DIY Model Comparison */}
+      {delivery.model_comparison && (
+        <div>
+          <h4 className="font-medium text-text-primary flex items-center gap-2 mb-3">
+            <Settings className="h-4 w-4 text-accent" />
+            Modèle de delivery
+            {delivery.recommended_model && (
+              <Badge variant="default">{delivery.recommended_model} recommandé</Badge>
+            )}
+          </h4>
+          <div className="grid gap-3 md:grid-cols-3">
+            {(["dfy", "dwy", "diy"] as const).map((key) => {
+              const model = delivery.model_comparison![key];
+              const isRecommended = delivery.recommended_model?.toLowerCase() === key;
+              const labels = { dfy: "Done For You", dwy: "Done With You", diy: "Do It Yourself" };
+              return (
+                <Card key={key} className={cn(isRecommended && "border-accent/50")}>
+                  <CardHeader className="py-3">
+                    <CardTitle className="text-sm flex items-center gap-2">
+                      {labels[key]}
+                      {isRecommended && <Badge variant="default" className="text-xs">Recommandé</Badge>}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="pt-0 space-y-2">
+                    <div className="text-xs">
+                      <span className="text-text-muted">Implication client : </span>
+                      <span className="text-text-secondary">{model.implication_client}</span>
+                    </div>
+                    <div className="text-xs">
+                      <span className="text-text-muted">Prix : </span>
+                      <span className="text-text-secondary">{model.prix_relatif}</span>
+                    </div>
+                    <div className="text-xs">
+                      <span className="text-text-muted">Scalabilité : </span>
+                      <span className="text-text-secondary">{model.scalabilite}</span>
+                    </div>
+                    <div className="flex flex-wrap gap-1 mt-2">
+                      {model.inclus.map((item, i) => (
+                        <Badge key={i} variant="muted" className="text-xs">{item}</Badge>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* 9 Piliers Business */}
+      {delivery.piliers && delivery.piliers.length > 0 && (
+        <div>
+          <h4 className="font-medium text-text-primary flex items-center gap-2 mb-3">
+            <BarChart3 className="h-4 w-4 text-accent" />
+            9 Piliers Business
+          </h4>
+          <div className="grid gap-3 md:grid-cols-3">
+            {delivery.piliers.map((pilier, i) => (
+              <Card key={i}>
+                <CardHeader className="py-3">
+                  <CardTitle className="text-sm">{pilier.pillar_name}</CardTitle>
+                </CardHeader>
+                <CardContent className="pt-0 space-y-2">
+                  {pilier.agents_ia.length > 0 && pilier.agents_ia[0] && (
+                    <div className="text-xs">
+                      <span className="text-text-muted block mb-1">Agents IA</span>
+                      <div className="flex flex-wrap gap-1">
+                        {pilier.agents_ia.map((a, j) => (
+                          <Badge key={j} variant="blue" className="text-xs">{a}</Badge>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  <div className="text-xs">
+                    <span className="text-text-muted">KPI : </span>
+                    <span className="text-accent font-medium">{pilier.kpi}</span>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Phases */}
       <div className="space-y-3">

@@ -196,6 +196,80 @@ function detectBottlenecks(steps: FunnelStep[]): Bottleneck[] {
   return bottlenecks.sort((a, b) => b.gap - a.gap);
 }
 
+// ─── Contextual bottleneck detection (CDC 8 types) ──────────
+interface ContextualData {
+  creativeFatigue: boolean;
+  noShows: boolean;
+  showUpRate: number;
+  contentGap: boolean;
+  daysSinceContent: number;
+  revenueStalled: boolean;
+  monthlyRevenues: number[];
+}
+
+function detectContextualBottlenecks(ctx: ContextualData): Bottleneck[] {
+  const extra: Bottleneck[] = [];
+
+  // Fatigue créative (CDC: CTR down + high frequency)
+  if (ctx.creativeFatigue) {
+    extra.push({
+      stepIndex: -1,
+      stepLabel: "Fatigue créative",
+      currentRate: 0,
+      benchmarkRate: 0,
+      gap: 50,
+      severity: "critical",
+      recommendation: "Tes créatives montrent des signes de fatigue (fréquence élevée, CTR en baisse). Génère de nouvelles variations depuis l'onglet Créatives.",
+      impact: "Renouveler les créatives peut relancer le CTR de +50% et réduire le CPL.",
+    });
+  }
+
+  // No-shows (CDC: Show-up < 60%)
+  if (ctx.noShows && ctx.showUpRate < 60) {
+    extra.push({
+      stepIndex: -1,
+      stepLabel: "No-shows appels",
+      currentRate: ctx.showUpRate,
+      benchmarkRate: 60,
+      gap: 60 - ctx.showUpRate,
+      severity: ctx.showUpRate < 40 ? "critical" : "warning",
+      recommendation: "Taux de présence aux appels trop bas. Renforce tes rappels SMS/email (J-1, H-1). Ajoute une vidéo de confirmation post-booking.",
+      impact: `Passer de ${ctx.showUpRate}% à 60% de show-up = ${Math.round((60 - ctx.showUpRate) / ctx.showUpRate * 100)}% d'appels en plus sans générer plus de leads.`,
+    });
+  }
+
+  // Gap contenu (CDC: 0 posts in 7 days = procrastination)
+  if (ctx.contentGap) {
+    extra.push({
+      stepIndex: -1,
+      stepLabel: "Gap contenu",
+      currentRate: 0,
+      benchmarkRate: 0,
+      gap: 40,
+      severity: ctx.daysSinceContent > 14 ? "critical" : "warning",
+      recommendation: `Aucun contenu publié depuis ${ctx.daysSinceContent} jours. L'algorithme pénalise l'inactivité. Publie au minimum 3 contenus cette semaine.`,
+      impact: "L'absence de contenu organique réduit ta portée et ton autorité. Chaque semaine sans contenu = perte d'engagement cumulée.",
+    });
+  }
+
+  // Revenue stagnation (CDC: Same CA 2 months)
+  if (ctx.revenueStalled && ctx.monthlyRevenues.length >= 2) {
+    const lastMonth = ctx.monthlyRevenues[ctx.monthlyRevenues.length - 1] || 0;
+    extra.push({
+      stepIndex: -1,
+      stepLabel: "Revenue stagnant",
+      currentRate: lastMonth,
+      benchmarkRate: lastMonth * 1.2,
+      gap: 30,
+      severity: "warning",
+      recommendation: "Ton CA stagne depuis 2 mois. Envisage : (1) tester de nouvelles audiences, (2) ajouter une offre complémentaire (OTO/upsell), (3) augmenter les budgets ads sur les winners.",
+      impact: "La stagnation signale un plafond. Sans action, le CA risque de baisser à cause de la fatigue d'audience.",
+    });
+  }
+
+  return extra;
+}
+
 // ─── Main Component ──────────────────────────────────────────
 export function BottleneckDetector() {
   const { user } = useUser();
@@ -204,6 +278,10 @@ export function BottleneckDetector() {
   const [isDemo, setIsDemo] = useState(true);
   const [loading, setLoading] = useState(true);
   const [analyzing, setAnalyzing] = useState(false);
+  const [contextualData, setContextualData] = useState<ContextualData>({
+    creativeFatigue: false, noShows: false, showUpRate: 100,
+    contentGap: false, daysSinceContent: 0, revenueStalled: false, monthlyRevenues: [],
+  });
 
   useEffect(() => {
     if (!user) return;
@@ -211,7 +289,7 @@ export function BottleneckDetector() {
       setLoading(true);
 
       // Fetch real metrics from multiple tables
-      const [impressionsRes, leadsRes, callsRes, salesRes] = await Promise.all([
+      const [impressionsRes, leadsRes, callsRes, salesRes, contentRes, revenueRes, decisionsRes] = await Promise.all([
         supabase
           .from("ad_campaigns")
           .select("impressions, clicks, daily_budget")
@@ -222,12 +300,30 @@ export function BottleneckDetector() {
           .eq("user_id", user.id),
         supabase
           .from("sales_calls")
-          .select("id", { count: "exact", head: true })
+          .select("id, call_result", { count: "exact" })
           .eq("user_id", user.id),
         supabase
           .from("revenue_entries")
-          .select("id", { count: "exact", head: true })
-          .eq("user_id", user.id),
+          .select("id, amount, created_at")
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: false }),
+        supabase
+          .from("content_library")
+          .select("created_at")
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: false })
+          .limit(1),
+        supabase
+          .from("revenue_entries")
+          .select("amount, created_at")
+          .eq("user_id", user.id)
+          .gte("created_at", new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString()),
+        supabase
+          .from("ad_decisions")
+          .select("decision_type")
+          .eq("user_id", user.id)
+          .eq("decision_type", "creative_fatigue")
+          .gte("created_at", new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()),
       ]);
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -246,13 +342,47 @@ export function BottleneckDetector() {
         });
         setIsDemo(false);
       }
+
+      // Contextual bottleneck data
+      const lastContentDate = contentRes.data?.[0]?.created_at;
+      const daysSinceContent = lastContentDate
+        ? Math.floor((Date.now() - new Date(lastContentDate).getTime()) / (1000 * 60 * 60 * 24))
+        : 999;
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const calls = callsRes.data as any[] ?? [];
+      const totalCalls = calls.length;
+      const noShowCalls = calls.filter((c) => c.call_result === "no_show").length;
+      const showUpRate = totalCalls > 0 ? ((totalCalls - noShowCalls) / totalCalls) * 100 : 100;
+
+      // Revenue stagnation: compare last 2 months
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const revEntries = (revenueRes.data ?? []) as any[];
+      const now = new Date();
+      const thisMonthRev = revEntries.filter((r) => new Date(r.created_at).getMonth() === now.getMonth()).reduce((s: number, r: { amount: number }) => s + (r.amount || 0), 0);
+      const lastMonthRev = revEntries.filter((r) => new Date(r.created_at).getMonth() === (now.getMonth() - 1 + 12) % 12).reduce((s: number, r: { amount: number }) => s + (r.amount || 0), 0);
+      const prevMonthRev = revEntries.filter((r) => new Date(r.created_at).getMonth() === (now.getMonth() - 2 + 12) % 12).reduce((s: number, r: { amount: number }) => s + (r.amount || 0), 0);
+      const revenueStalled = lastMonthRev > 0 && prevMonthRev > 0 && Math.abs(lastMonthRev - prevMonthRev) / prevMonthRev < 0.1;
+
+      setContextualData({
+        creativeFatigue: (decisionsRes.data ?? []).length > 0,
+        noShows: noShowCalls > 0,
+        showUpRate: Math.round(showUpRate),
+        contentGap: daysSinceContent > 7,
+        daysSinceContent,
+        revenueStalled,
+        monthlyRevenues: [prevMonthRev, lastMonthRev, thisMonthRev],
+      });
+
       setLoading(false);
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   const steps = buildFunnelSteps(metrics);
-  const bottlenecks = detectBottlenecks(steps);
+  const funnelBottlenecks = detectBottlenecks(steps);
+  const contextualBottlenecks = detectContextualBottlenecks(contextualData);
+  const bottlenecks = [...funnelBottlenecks, ...contextualBottlenecks];
 
   const criticalCount = bottlenecks.filter((b) => b.severity === "critical").length;
   const warningCount = bottlenecks.filter((b) => b.severity === "warning").length;
