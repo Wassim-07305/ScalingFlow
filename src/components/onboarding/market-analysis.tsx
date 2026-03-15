@@ -24,13 +24,31 @@ export function MarketAnalysis({ result, onSelect }: MarketAnalysisProps) {
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
-      <div className="text-center space-y-2">
-        <h2 className="text-2xl font-bold">
+      <div className="text-center space-y-3">
+        <motion.div
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ type: "spring", stiffness: 200, delay: 0.1 }}
+          className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-accent/10 mx-auto"
+        >
+          <Target className="h-7 w-7 text-accent" />
+        </motion.div>
+        <motion.h2
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="text-2xl font-bold"
+        >
           3 opportunités identifiées
-        </h2>
-        <p className="text-text-secondary">
+        </motion.h2>
+        <motion.p
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="text-text-secondary max-w-lg mx-auto"
+        >
           {result.reasoning}
-        </p>
+        </motion.p>
       </div>
 
       <div className="space-y-4">

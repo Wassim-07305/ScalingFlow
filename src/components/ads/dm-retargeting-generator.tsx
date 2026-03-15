@@ -4,7 +4,10 @@ import React from "react";
 import { cn } from "@/lib/utils/cn";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader2, MessageCircle, Copy, RefreshCw, Send } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { AILoading } from "@/components/shared/ai-loading";
+import { GenerateButton } from "@/components/shared/generate-button";
+import { MessageCircle, Copy, Check, RefreshCw, Send } from "lucide-react";
 import { toast } from "sonner";
 import { UnipileSendDialog } from "@/components/shared/unipile-send-dialog";
 
@@ -56,6 +59,7 @@ export function DmRetargetingGenerator({ initialData }: Props) {
   const [retargetingType, setRetargetingType] = React.useState<string>("Visiteurs site");
   const [sendDialogOpen, setSendDialogOpen] = React.useState(false);
   const [sendMessage, setSendMessage] = React.useState("");
+  const [copiedKey, setCopiedKey] = React.useState<string | null>(null);
 
   const generate = async () => {
     setLoading(true);
@@ -82,10 +86,16 @@ export function DmRetargetingGenerator({ initialData }: Props) {
     }
   };
 
-  const copyText = (text: string) => {
+  const copyText = (text: string, key: string) => {
     navigator.clipboard.writeText(text);
-    toast.success("Copié !");
+    setCopiedKey(key);
+    toast.success("Copié dans le presse-papiers");
+    setTimeout(() => setCopiedKey(null), 2000);
   };
+
+  if (loading) {
+    return <AILoading variant="immersive" text="Création de tes DM Retargeting Ads" />;
+  }
 
   if (!data) {
     return (
@@ -93,27 +103,28 @@ export function DmRetargetingGenerator({ initialData }: Props) {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <MessageCircle className="h-5 w-5" />
+              <MessageCircle className="h-5 w-5 text-accent" />
               DM Retargeting Ads
             </CardTitle>
             <CardDescription>
               Génère des publicités de retargeting pour pousser tes followers chauds à t&apos;envoyer un DM. Inclut les ads, l&apos;automation DM, les audiences et le setup campagne.
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-5">
             {/* Retargeting type */}
             <div>
-              <label className="text-sm font-medium text-text-primary mb-2 block">Type de retargeting</label>
+              <label className="text-sm font-medium text-text-primary mb-1.5 block">Type de retargeting</label>
+              <p className="text-xs text-text-muted mb-2">Quel segment tu veux recibler</p>
               <div className="flex flex-wrap gap-2">
                 {RETARGETING_TYPES.map((type) => (
                   <button
                     key={type}
                     onClick={() => setRetargetingType(type)}
                     className={cn(
-                      "px-3 py-1.5 rounded-lg text-sm font-medium transition-all",
+                      "px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200",
                       retargetingType === type
-                        ? "bg-accent text-white"
-                        : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
+                        ? "bg-accent text-white shadow-md shadow-accent/25"
+                        : "bg-bg-tertiary text-text-secondary hover:text-text-primary hover:bg-bg-tertiary/80"
                     )}
                   >
                     {type}
@@ -122,10 +133,9 @@ export function DmRetargetingGenerator({ initialData }: Props) {
               </div>
             </div>
 
-            <Button className="w-full" onClick={generate} disabled={loading}>
-              {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <MessageCircle className="h-4 w-4 mr-2" />}
+            <GenerateButton onClick={generate} className="w-full" icon={<MessageCircle className="h-4 w-4 mr-2" />}>
               Générer les DM Retargeting Ads
-            </Button>
+            </GenerateButton>
           </CardContent>
         </Card>
       </div>
@@ -134,14 +144,13 @@ export function DmRetargetingGenerator({ initialData }: Props) {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-2">
         <h3 className="text-lg font-semibold text-text-primary">DM Retargeting Ads</h3>
         <div className="flex gap-2">
-          <Button size="sm" onClick={generate} disabled={loading}>
-            {loading && <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />}
+          <Button size="sm" variant="outline" onClick={generate} disabled={loading}>
             Régénérer
           </Button>
-          <Button size="sm" variant="outline" onClick={() => setData(null)}>
+          <Button size="sm" variant="ghost" onClick={() => setData(null)}>
             <RefreshCw className="h-3.5 w-3.5 mr-1.5" />
             Nouveau brief
           </Button>
@@ -151,7 +160,10 @@ export function DmRetargetingGenerator({ initialData }: Props) {
       {/* DM Ads */}
       {data.dm_ads && data.dm_ads.length > 0 && (
         <section>
-          <h4 className="text-sm font-medium text-accent mb-3">Publicités DM ({data.dm_ads.length} variations)</h4>
+          <div className="flex items-center gap-2 mb-3">
+            <h4 className="text-sm font-medium text-accent">Publicités DM</h4>
+            <Badge variant="default" className="text-[10px]">{data.dm_ads.length} variations</Badge>
+          </div>
           <div className="space-y-3">
             {data.dm_ads.map((ad, i) => {
               const typeColor: Record<string, string> = {
@@ -160,20 +172,23 @@ export function DmRetargetingGenerator({ initialData }: Props) {
                 reel_ad: "bg-purple-500/10 text-purple-400",
               };
               return (
-                <div key={i} className="rounded-xl border border-border-default bg-bg-tertiary p-4 group">
+                <div key={i} className="rounded-xl border border-border-default bg-bg-secondary hover:border-border-hover p-4 group transition-all duration-200">
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2 flex-wrap">
-                        <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${typeColor[ad.type] || "bg-bg-primary text-text-muted"}`}>
+                        <span className="text-xs font-bold text-text-muted">#{i + 1}</span>
+                        <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${typeColor[ad.type] || "bg-bg-tertiary text-text-muted"}`}>
                           {ad.type.replace("_", " ")}
                         </span>
-                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-bg-primary text-text-muted">{ad.angle}</span>
+                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-bg-tertiary text-text-muted">{ad.angle}</span>
                         <span className="text-[10px] px-2 py-0.5 rounded-full bg-accent/10 text-accent">{ad.audience_segment.replace(/_/g, " ")}</span>
                       </div>
                       <p className="text-sm font-semibold text-text-primary mb-1">{ad.hook}</p>
                       <p className="text-xs text-text-secondary">{ad.body}</p>
                       <div className="flex items-center gap-3 mt-2">
-                        <p className="text-xs text-accent font-medium">{ad.cta}</p>
+                        <div className="p-1.5 rounded-lg bg-accent/10 border border-accent/20 inline-block">
+                          <p className="text-xs text-accent font-medium">{ad.cta}</p>
+                        </div>
                         <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-mono">
                           &ldquo;{ad.dm_keyword}&rdquo;
                         </span>
@@ -181,15 +196,22 @@ export function DmRetargetingGenerator({ initialData }: Props) {
                     </div>
                     <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all">
                       <button
-                        onClick={() => copyText(`Hook: ${ad.hook}\n\n${ad.body}\n\nCTA: ${ad.cta}\nMot-clé: ${ad.dm_keyword}`)}
-                        className="p-1.5 rounded-lg hover:bg-bg-primary transition-all"
+                        onClick={() => copyText(`Hook: ${ad.hook}\n\n${ad.body}\n\nCTA: ${ad.cta}\nMot-clé: ${ad.dm_keyword}`, `ad-${i}`)}
+                        className={cn(
+                          "p-1.5 rounded-lg hover:bg-bg-tertiary transition-all",
+                          copiedKey === `ad-${i}` && "opacity-100"
+                        )}
                         title="Copier"
                       >
-                        <Copy className="h-3.5 w-3.5 text-text-muted" />
+                        {copiedKey === `ad-${i}` ? (
+                          <Check className="h-3.5 w-3.5 text-accent animate-in zoom-in-50 duration-200" />
+                        ) : (
+                          <Copy className="h-3.5 w-3.5 text-text-muted" />
+                        )}
                       </button>
                       <button
                         onClick={() => { setSendMessage(`${ad.hook}\n\n${ad.body}\n\n${ad.cta}`); setSendDialogOpen(true); }}
-                        className="p-1.5 rounded-lg hover:bg-bg-primary transition-all"
+                        className="p-1.5 rounded-lg hover:bg-bg-tertiary transition-all"
                         title="Envoyer via Unipile"
                       >
                         <Send className="h-3.5 w-3.5 text-accent" />
@@ -207,56 +229,56 @@ export function DmRetargetingGenerator({ initialData }: Props) {
       {data.dm_automation && (
         <section>
           <h4 className="text-sm font-medium text-accent mb-3">Automation DM</h4>
-          <div className="rounded-xl border border-border-default bg-bg-tertiary p-4 space-y-4">
+          <div className="rounded-xl border border-border-default bg-bg-secondary p-4 space-y-4">
             <div>
               <div className="flex items-center justify-between mb-1">
-                <p className="text-xs text-text-muted">Message d&apos;accueil automatique</p>
+                <p className="text-xs text-text-muted font-medium">Message d&apos;accueil automatique</p>
                 <button
                   onClick={() => { setSendMessage(data.dm_automation!.welcome_message); setSendDialogOpen(true); }}
-                  className="p-1 rounded-md hover:bg-bg-primary transition-colors"
+                  className="p-1 rounded-md hover:bg-bg-tertiary transition-colors"
                   title="Envoyer via Unipile"
                 >
                   <Send className="h-3.5 w-3.5 text-accent" />
                 </button>
               </div>
-              <p className="text-sm text-text-primary bg-bg-primary rounded-lg p-3">{data.dm_automation.welcome_message}</p>
+              <p className="text-sm text-text-primary bg-bg-tertiary rounded-xl p-3">{data.dm_automation.welcome_message}</p>
             </div>
             <div>
-              <p className="text-xs text-text-muted mb-2">Questions de qualification</p>
+              <p className="text-xs text-text-muted font-medium mb-2">Questions de qualification</p>
               <div className="space-y-2">
                 {data.dm_automation.qualification_questions.map((q, i) => (
                   <div key={i} className="flex items-start gap-2">
-                    <span className="text-[10px] text-accent font-medium mt-0.5">Q{i + 1}</span>
-                    <p className="text-xs text-text-primary bg-bg-primary rounded-lg p-2 flex-1">{q}</p>
+                    <span className="text-[10px] text-accent font-bold mt-0.5 bg-accent/10 rounded-full w-5 h-5 flex items-center justify-center flex-shrink-0">Q{i + 1}</span>
+                    <p className="text-xs text-text-primary bg-bg-tertiary rounded-xl p-2 flex-1">{q}</p>
                   </div>
                 ))}
               </div>
             </div>
             <div>
               <div className="flex items-center justify-between mb-1">
-                <p className="text-xs text-text-muted">Message de booking</p>
+                <p className="text-xs text-text-muted font-medium">Message de booking</p>
                 <button
                   onClick={() => { setSendMessage(data.dm_automation!.booking_message); setSendDialogOpen(true); }}
-                  className="p-1 rounded-md hover:bg-bg-primary transition-colors"
+                  className="p-1 rounded-md hover:bg-bg-tertiary transition-colors"
                   title="Envoyer via Unipile"
                 >
                   <Send className="h-3.5 w-3.5 text-accent" />
                 </button>
               </div>
-              <p className="text-sm text-text-primary bg-bg-primary rounded-lg p-3">{data.dm_automation.booking_message}</p>
+              <p className="text-sm text-text-primary bg-bg-tertiary rounded-xl p-3">{data.dm_automation.booking_message}</p>
             </div>
             <div>
               <div className="flex items-center justify-between mb-1">
-                <p className="text-xs text-text-muted">Relance no-show</p>
+                <p className="text-xs text-text-muted font-medium">Relance no-show</p>
                 <button
                   onClick={() => { setSendMessage(data.dm_automation!.no_show_followup); setSendDialogOpen(true); }}
-                  className="p-1 rounded-md hover:bg-bg-primary transition-colors"
+                  className="p-1 rounded-md hover:bg-bg-tertiary transition-colors"
                   title="Envoyer via Unipile"
                 >
                   <Send className="h-3.5 w-3.5 text-accent" />
                 </button>
               </div>
-              <p className="text-sm text-text-primary bg-bg-primary rounded-lg p-3">{data.dm_automation.no_show_followup}</p>
+              <p className="text-sm text-text-primary bg-bg-tertiary rounded-xl p-3">{data.dm_automation.no_show_followup}</p>
             </div>
           </div>
         </section>
@@ -274,7 +296,7 @@ export function DmRetargetingGenerator({ initialData }: Props) {
                 basse: "text-text-muted",
               };
               return (
-                <div key={i} className="rounded-xl border border-border-default bg-bg-tertiary p-4">
+                <div key={i} className="rounded-xl border border-border-default bg-bg-secondary hover:border-border-hover p-4 transition-all duration-200">
                   <div className="flex items-center justify-between mb-1">
                     <p className="text-sm font-medium text-text-primary">{aud.name}</p>
                     <span className={`text-[10px] font-medium ${priorityColor[aud.priority] || "text-text-muted"}`}>
@@ -294,34 +316,34 @@ export function DmRetargetingGenerator({ initialData }: Props) {
       {data.campaign_setup && (
         <section>
           <h4 className="text-sm font-medium text-accent mb-3">Setup Campagne</h4>
-          <div className="rounded-xl border border-border-default bg-bg-tertiary p-4 grid gap-3 md:grid-cols-3">
+          <div className="rounded-xl border border-border-default bg-bg-secondary p-4 grid gap-3 md:grid-cols-3">
             <div>
-              <p className="text-xs text-text-muted">Objectif</p>
-              <p className="text-xs text-text-primary font-medium">{data.campaign_setup.objective}</p>
+              <p className="text-xs text-text-muted font-medium">Objectif</p>
+              <p className="text-xs text-text-primary font-semibold mt-0.5">{data.campaign_setup.objective}</p>
             </div>
             <div>
-              <p className="text-xs text-text-muted">Budget / jour</p>
-              <p className="text-xs text-text-primary font-medium">{data.campaign_setup.budget_daily}</p>
+              <p className="text-xs text-text-muted font-medium">Budget / jour</p>
+              <p className="text-xs text-text-primary font-semibold mt-0.5">{data.campaign_setup.budget_daily}</p>
             </div>
             <div>
-              <p className="text-xs text-text-muted">Placements</p>
+              <p className="text-xs text-text-muted font-medium">Placements</p>
               <div className="flex gap-1 flex-wrap mt-0.5">
                 {data.campaign_setup.placements.map((p, i) => (
-                  <span key={i} className="text-[10px] px-1.5 py-0.5 rounded bg-bg-primary text-text-secondary">{p}</span>
+                  <span key={i} className="text-[10px] px-1.5 py-0.5 rounded bg-bg-tertiary text-text-secondary">{p}</span>
                 ))}
               </div>
             </div>
             <div>
-              <p className="text-xs text-text-muted">Coût / DM cible</p>
-              <p className="text-xs text-accent font-medium">{data.campaign_setup.kpi_targets.cost_per_dm}</p>
+              <p className="text-xs text-text-muted font-medium">Coût / DM cible</p>
+              <p className="text-xs text-accent font-semibold mt-0.5">{data.campaign_setup.kpi_targets.cost_per_dm}</p>
             </div>
             <div>
-              <p className="text-xs text-text-muted">Taux DM → appel</p>
-              <p className="text-xs text-accent font-medium">{data.campaign_setup.kpi_targets.dm_to_call_rate}</p>
+              <p className="text-xs text-text-muted font-medium">Taux DM vers appel</p>
+              <p className="text-xs text-accent font-semibold mt-0.5">{data.campaign_setup.kpi_targets.dm_to_call_rate}</p>
             </div>
             <div>
-              <p className="text-xs text-text-muted">ROAS cible</p>
-              <p className="text-xs text-accent font-medium">{data.campaign_setup.kpi_targets.roas_target}</p>
+              <p className="text-xs text-text-muted font-medium">ROAS cible</p>
+              <p className="text-xs text-accent font-semibold mt-0.5">{data.campaign_setup.kpi_targets.roas_target}</p>
             </div>
           </div>
         </section>

@@ -169,13 +169,28 @@ function RadarChart({
       viewBox={`0 0 ${size} ${size}`}
       className="w-full max-w-[320px] mx-auto"
     >
+      <defs>
+        <linearGradient id="radarFill" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#34D399" stopOpacity="0.2" />
+          <stop offset="50%" stopColor="#3B82F6" stopOpacity="0.15" />
+          <stop offset="100%" stopColor="#A78BFA" stopOpacity="0.1" />
+        </linearGradient>
+        <filter id="radarGlow">
+          <feGaussianBlur stdDeviation="3" result="blur" />
+          <feMerge>
+            <feMergeNode in="blur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+      </defs>
+
       {/* Grid rings */}
       {rings.map((pct) => (
         <polygon
           key={pct}
           points={getPoints(Array(n).fill(pct))}
           fill="none"
-          stroke="rgba(255,255,255,0.06)"
+          stroke="rgba(255,255,255,0.05)"
           strokeWidth="1"
         />
       ))}
@@ -188,7 +203,7 @@ function RadarChart({
           y1={cy}
           x2={a.x}
           y2={a.y}
-          stroke="rgba(255,255,255,0.06)"
+          stroke="rgba(255,255,255,0.05)"
           strokeWidth="1"
         />
       ))}
@@ -196,9 +211,10 @@ function RadarChart({
       {/* Data polygon */}
       <polygon
         points={getPoints(dataPoints)}
-        fill="rgba(52,211,153,0.12)"
+        fill="url(#radarFill)"
         stroke="#34D399"
         strokeWidth="2"
+        filter="url(#radarGlow)"
       />
 
       {/* Data dots */}
@@ -206,30 +222,50 @@ function RadarChart({
         const angle = (Math.PI * 2 * i) / n - Math.PI / 2;
         const r = (v / 100) * maxR;
         return (
-          <circle
-            key={i}
-            cx={cx + r * Math.cos(angle)}
-            cy={cy + r * Math.sin(angle)}
-            r="5"
-            fill={colors[i]}
-            stroke="#0B0E11"
-            strokeWidth="2.5"
-          />
+          <g key={i}>
+            {/* Glow circle */}
+            <circle
+              cx={cx + r * Math.cos(angle)}
+              cy={cy + r * Math.sin(angle)}
+              r="10"
+              fill={colors[i]}
+              opacity="0.15"
+            />
+            <circle
+              cx={cx + r * Math.cos(angle)}
+              cy={cy + r * Math.sin(angle)}
+              r="5"
+              fill={colors[i]}
+              stroke="#0B0E11"
+              strokeWidth="2.5"
+            />
+          </g>
         );
       })}
 
-      {/* Labels */}
+      {/* Labels with scores */}
       {labelPositions.map((pos, i) => (
-        <text
-          key={i}
-          x={pos.x}
-          y={pos.y}
-          textAnchor="middle"
-          dominantBaseline="middle"
-          className="fill-text-secondary text-[11px] font-medium"
-        >
-          {labels[i]}
-        </text>
+        <g key={i}>
+          <text
+            x={pos.x}
+            y={pos.y - 7}
+            textAnchor="middle"
+            dominantBaseline="middle"
+            className="fill-text-secondary text-[11px] font-semibold"
+          >
+            {labels[i]}
+          </text>
+          <text
+            x={pos.x}
+            y={pos.y + 7}
+            textAnchor="middle"
+            dominantBaseline="middle"
+            className="text-[10px] font-bold"
+            fill={colors[i]}
+          >
+            {dataPoints[i]}
+          </text>
+        </g>
       ))}
     </svg>
   );
@@ -258,15 +294,35 @@ function ScoreBadge({ score, size = "lg" }: { score: number; size?: "sm" | "lg" 
 }
 
 // ─── Score Progress Ring ────────────────────────────────────
+function AnimatedScore({ score }: { score: number }) {
+  const [displayScore, setDisplayScore] = useState(0);
+  React.useEffect(() => {
+    let current = 0;
+    const increment = Math.max(1, Math.floor(score / 40));
+    const timer = setInterval(() => {
+      current += increment;
+      if (current >= score) {
+        current = score;
+        clearInterval(timer);
+      }
+      setDisplayScore(current);
+    }, 30);
+    return () => clearInterval(timer);
+  }, [score]);
+  return <>{displayScore}</>;
+}
+
 function ScoreRing({ score }: { score: number }) {
   const color =
     score >= 75 ? "#34D399" : score >= 50 ? "#FBBF24" : "#EF4444";
+  const glowColor =
+    score >= 75 ? "rgba(52,211,153,0.15)" : score >= 50 ? "rgba(251,191,36,0.15)" : "rgba(239,68,68,0.15)";
   const circumference = 2 * Math.PI * 52;
   const offset = circumference - (score / 100) * circumference;
 
   return (
-    <div className="relative inline-flex items-center justify-center">
-      <svg className="w-32 h-32 -rotate-90" viewBox="0 0 120 120">
+    <div className="relative inline-flex items-center justify-center" style={{ filter: `drop-shadow(0 0 20px ${glowColor})` }}>
+      <svg className="w-36 h-36 -rotate-90" viewBox="0 0 120 120">
         <circle
           cx="60"
           cy="60"
@@ -289,7 +345,7 @@ function ScoreRing({ score }: { score: number }) {
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className="text-3xl font-bold text-text-primary">{score}</span>
+        <span className="text-4xl font-black text-text-primary"><AnimatedScore score={score} /></span>
         <span className="text-[10px] font-medium text-text-muted uppercase tracking-wider">
           / 100
         </span>
@@ -469,7 +525,8 @@ export default function DiagnosticPage() {
               return (
                 <div
                   key={key}
-                  className="p-5 rounded-2xl border border-border-default/50 bg-bg-secondary/30 backdrop-blur-sm space-y-3 text-center transition-all duration-200 hover:border-border-default"
+                  className="group p-5 rounded-2xl border border-border-default/50 bg-bg-secondary/30 backdrop-blur-sm space-y-3 text-center transition-all duration-300 hover:border-border-default hover:shadow-lg hover:scale-[1.02]"
+                  style={{ borderColor: `${meta.color}20` }}
                 >
                   <div className="flex items-center justify-center gap-2">
                     <div

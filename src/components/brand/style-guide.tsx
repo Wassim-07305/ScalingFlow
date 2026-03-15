@@ -122,10 +122,13 @@ export function StyleGuide({ direction, className }: StyleGuideProps) {
               {normalized.palette.map((color, i) => (
                 <div
                   key={i}
-                  className="flex items-center gap-3 p-3 rounded-xl bg-bg-tertiary border border-border-default"
+                  className="group relative flex items-center gap-3 p-3 rounded-xl bg-bg-tertiary border border-border-default hover:border-border-hover transition-all duration-200 cursor-pointer"
+                  onClick={() => {
+                    navigator.clipboard.writeText(color.hex);
+                  }}
                 >
                   <div
-                    className="w-12 h-12 rounded-lg border border-border-default shrink-0"
+                    className="w-14 h-14 rounded-xl border border-white/10 shrink-0 shadow-lg transition-transform duration-200 group-hover:scale-105"
                     style={{ backgroundColor: color.hex }}
                   />
                   <div className="min-w-0">
@@ -137,20 +140,43 @@ export function StyleGuide({ direction, className }: StyleGuideProps) {
                       <p className="text-xs text-text-secondary mt-0.5">{color.usage}</p>
                     )}
                   </div>
+                  <span className="absolute top-2 right-2 text-[9px] text-text-muted opacity-0 group-hover:opacity-100 transition-opacity">
+                    Copier
+                  </span>
                 </div>
               ))}
             </div>
 
             {/* Color strip preview */}
-            <div className="mt-4 flex rounded-xl overflow-hidden h-8">
+            <div className="mt-4 flex rounded-2xl overflow-hidden h-10 shadow-lg ring-1 ring-white/5">
               {normalized.palette.map((color, i) => (
                 <div
                   key={i}
-                  className="flex-1"
+                  className="flex-1 relative group/strip"
                   style={{ backgroundColor: color.hex }}
-                />
+                >
+                  <span className="absolute inset-0 flex items-center justify-center text-[9px] font-mono opacity-0 group-hover/strip:opacity-80 transition-opacity text-white drop-shadow-lg">
+                    {color.hex}
+                  </span>
+                </div>
               ))}
             </div>
+
+            {/* Live preview card */}
+            {normalized.palette.length >= 2 && (
+              <div className="mt-4 p-4 rounded-xl border border-border-default/50" style={{ backgroundColor: normalized.palette[0]?.hex + "15" }}>
+                <p className="text-xs text-text-muted uppercase tracking-wider mb-2">Aperçu en temps réel</p>
+                <div className="flex gap-3">
+                  <div className="flex-1 p-3 rounded-lg" style={{ backgroundColor: normalized.palette[0]?.hex + "20" }}>
+                    <p className="text-xs font-semibold" style={{ color: normalized.palette[0]?.hex }}>Titre principal</p>
+                    <p className="text-[10px] text-text-muted mt-1">Exemple de texte avec ta palette</p>
+                  </div>
+                  <div className="px-4 py-2 rounded-lg flex items-center text-xs font-semibold text-white" style={{ backgroundColor: normalized.palette[normalized.palette.length > 1 ? 1 : 0]?.hex }}>
+                    Bouton CTA
+                  </div>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
       )}
@@ -169,20 +195,29 @@ export function StyleGuide({ direction, className }: StyleGuideProps) {
               {normalized.typographies.map((typo, i) => (
                 <div
                   key={i}
-                  className="p-4 rounded-xl bg-bg-tertiary border border-border-default"
+                  className="p-5 rounded-xl bg-bg-tertiary border border-border-default"
                 >
-                  <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center justify-between mb-3">
                     <Badge variant="muted">{typo.role}</Badge>
                     {typo.style && (
                       <span className="text-xs text-text-muted">{typo.style}</span>
                     )}
                   </div>
-                  <p className="text-lg font-semibold text-text-primary">
+                  <p className="text-xl font-bold text-text-primary mb-1">
                     {typo.font_family}
                   </p>
-                  <p className="text-sm text-text-secondary mt-1">
-                    Aa Bb Cc Dd Ee Ff Gg Hh Ii Jj Kk Ll Mm Nn Oo Pp Qq Rr Ss Tt Uu Vv Ww Xx Yy Zz
+                  <p className="text-2xl text-text-secondary/80 mt-2 leading-tight">
+                    Aa Bb Cc Dd Ee
                   </p>
+                  <p className="text-sm text-text-secondary/60 mt-1 tracking-wide">
+                    0123456789 !@#$%
+                  </p>
+                  <div className="mt-3 p-2.5 rounded-lg bg-bg-secondary/50 border border-border-default/30">
+                    <p className="text-xs text-text-muted">Rendu :</p>
+                    <p className="text-base text-text-primary mt-1">
+                      Le quick brown fox jumps over the lazy dog.
+                    </p>
+                  </div>
                 </div>
               ))}
             </div>

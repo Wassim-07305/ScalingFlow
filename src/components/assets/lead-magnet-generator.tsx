@@ -8,7 +8,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { AILoading } from "@/components/shared/ai-loading";
 import { GlowCard } from "@/components/shared/glow-card";
 import {
-  Sparkles,
   Magnet,
   CheckSquare,
   GraduationCap,
@@ -19,6 +18,7 @@ import {
 } from "lucide-react";
 import type { LeadMagnetResult } from "@/lib/ai/prompts/lead-magnet";
 import { UpgradeWall } from "@/components/shared/upgrade-wall";
+import { GenerateButton } from "@/components/shared/generate-button";
 
 interface LeadMagnetGeneratorProps {
   className?: string;
@@ -120,6 +120,7 @@ export function LeadMagnetGenerator({ className, initialData }: LeadMagnetGenera
   if (loading) {
     return (
       <AILoading
+        variant="immersive"
         text="Création de ton lead magnet"
         className={className}
       />
@@ -184,14 +185,13 @@ export function LeadMagnetGenerator({ className, initialData }: LeadMagnetGenera
         </div>
 
         <div className="text-center">
-          <Button
-            size="lg"
+          <GenerateButton
             onClick={handleGenerate}
             disabled={!selectedType}
+            icon={<Magnet className="h-4 w-4 mr-2" />}
           >
-            <Sparkles className="h-4 w-4 mr-2" />
             Générer le lead magnet
-          </Button>
+          </GenerateButton>
         </div>
       </div>
     );

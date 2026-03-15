@@ -304,7 +304,7 @@ export function AIChat({
   return (
     <div
       className={cn(
-        "flex h-[calc(100vh-200px)] max-h-[700px] rounded-xl border border-border-default bg-bg-secondary overflow-hidden",
+        "flex h-[calc(100vh-200px)] max-h-[700px] rounded-2xl border border-border-default/50 bg-bg-secondary/50 backdrop-blur-sm overflow-hidden shadow-xl shadow-black/10 animate-in fade-in duration-500",
         className
       )}
     >
@@ -386,7 +386,9 @@ export function AIChat({
         <div className="flex-1 overflow-y-auto p-4 space-y-4" role="log" aria-live="polite">
           {messages.length === 0 && (
             <div className="flex flex-col items-center justify-center h-full text-center px-4">
-              <Bot className="h-12 w-12 text-text-muted mb-3" aria-hidden="true" />
+              <div className="h-16 w-16 rounded-2xl bg-accent/10 border border-accent/20 flex items-center justify-center mb-4" aria-hidden="true">
+                <Bot className="h-8 w-8 text-accent" />
+              </div>
               <p className="text-text-secondary font-medium">
                 {agentName}
               </p>
@@ -402,7 +404,7 @@ export function AIChat({
                         setInput(q);
                         setTimeout(() => inputRef.current?.focus(), 50);
                       }}
-                      className="text-xs px-3 py-1.5 rounded-lg bg-bg-tertiary text-text-secondary hover:text-accent hover:bg-accent/10 border border-border-default transition-colors text-left"
+                      className="text-xs px-3 py-2 rounded-xl bg-bg-tertiary text-text-secondary hover:text-accent hover:bg-accent/10 border border-border-default hover:border-accent/20 transition-all duration-200 text-left hover:shadow-sm"
                     >
                       {q}
                     </button>
@@ -427,10 +429,10 @@ export function AIChat({
               )}
               <div
                 className={cn(
-                  "max-w-[80%] rounded-xl px-4 py-2.5 text-sm",
+                  "max-w-[80%] rounded-2xl px-4 py-3 text-sm shadow-sm",
                   msg.role === "user"
-                    ? "bg-accent text-white"
-                    : "bg-bg-tertiary text-text-primary"
+                    ? "bg-accent text-white rounded-br-md shadow-accent/10"
+                    : "bg-bg-tertiary text-text-primary rounded-bl-md"
                 )}
               >
                 <div className="whitespace-pre-wrap">

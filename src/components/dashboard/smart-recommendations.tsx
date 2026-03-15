@@ -19,7 +19,6 @@ import {
   PenTool,
   Handshake,
   ArrowRight,
-  Loader2,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -152,7 +151,7 @@ export function SmartRecommendations() {
       if ((adsRes.count ?? 0) === 0 && (funnelsRes.count ?? 0) > 0) {
         recs.push({
           id: "ads",
-          title: "Lance tes publicites",
+          title: "Lance tes publicités",
           description: "Crée des créatives publicitaires pour attirer du trafic vers ton funnel.",
           href: "/ads",
           icon: Megaphone,
@@ -163,7 +162,7 @@ export function SmartRecommendations() {
       if ((contentRes.count ?? 0) === 0 && (offersRes.count ?? 0) > 0) {
         recs.push({
           id: "content",
-          title: "Généré du contenu organique",
+          title: "Génère du contenu organique",
           description: "Crée des idées de posts, reels et articles pour attirer une audience.",
           href: "/content",
           icon: PenTool,
@@ -182,11 +181,11 @@ export function SmartRecommendations() {
         });
       }
 
-      // Si tout est fait, felicitations
+      // Si tout est fait, félicitations
       if (recs.length === 0) {
         recs.push({
           id: "sales",
-          title: "Prepare tes scripts de vente",
+          title: "Prépare tes scripts de vente",
           description: "Tu as tout en place ! Peaufine tes scripts de closing pour maximiser tes conversions.",
           href: "/sales",
           icon: Handshake,
@@ -210,12 +209,21 @@ export function SmartRecommendations() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-accent" />
-            Recommandations
+            Prochaines étapes
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center justify-center py-6">
-            <Loader2 className="h-5 w-5 animate-spin text-text-muted" />
+          <div className="space-y-3">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="flex items-center gap-4 p-4 rounded-xl border border-border-default">
+                <div className="h-10 w-10 rounded-xl bg-bg-tertiary animate-pulse shrink-0" />
+                <div className="flex-1 space-y-2">
+                  <div className="h-4 w-36 rounded bg-bg-tertiary animate-pulse" />
+                  <div className="h-3 w-56 rounded bg-bg-tertiary animate-pulse" />
+                </div>
+                <div className="h-4 w-4 rounded bg-bg-tertiary animate-pulse shrink-0" />
+              </div>
+            ))}
           </div>
         </CardContent>
       </Card>
@@ -230,7 +238,7 @@ export function SmartRecommendations() {
 
   const priorityLabels = {
     high: { text: "Prioritaire", variant: "cyan" as const },
-    medium: { text: "Recommande", variant: "blue" as const },
+    medium: { text: "Recommandé", variant: "blue" as const },
     low: { text: "Optionnel", variant: "muted" as const },
   };
 
@@ -254,7 +262,7 @@ export function SmartRecommendations() {
                 key={rec.id}
                 onClick={() => router.push(rec.href)}
                 className={cn(
-                  "w-full flex items-center gap-4 p-4 rounded-xl border transition-all hover:scale-[1.01] text-left",
+                  "w-full flex items-center gap-4 p-4 rounded-2xl border transition-all duration-300 hover:scale-[1.01] hover:shadow-lg text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50",
                   pStyle
                 )}
               >

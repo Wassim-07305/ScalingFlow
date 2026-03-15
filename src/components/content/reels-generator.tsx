@@ -7,11 +7,12 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AILoading } from "@/components/shared/ai-loading";
 import { GlowCard } from "@/components/shared/glow-card";
-import { Sparkles, Copy, ChevronDown, ChevronUp, Clock, Pencil, Check, Film, Send, Save, Loader2 } from "lucide-react";
+import { Copy, ChevronDown, ChevronUp, Clock, Pencil, Check, Film, Send, Save, Loader2, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import type { ReelsScriptsResult } from "@/lib/ai/prompts/reels-scripts";
 import { UpgradeWall } from "@/components/shared/upgrade-wall";
 import { UnipilePublishDialog } from "@/components/shared/unipile-publish-dialog";
+import { GenerateButton } from "@/components/shared/generate-button";
 import { createClient } from "@/lib/supabase/client";
 import { useUser } from "@/hooks/use-user";
 
@@ -180,7 +181,7 @@ export function ReelsGenerator({ className, initialData }: ReelsGeneratorProps) 
   }
 
   if (loading) {
-    return <AILoading text="Génération des scripts Reels" className={className} />;
+    return <AILoading variant="immersive" text="Génération des scripts Reels" className={className} />;
   }
 
   if (scripts.length === 0 || showForm) {
@@ -234,10 +235,9 @@ export function ReelsGenerator({ className, initialData }: ReelsGeneratorProps) 
 
             {error && <p className="text-sm text-danger">{error}</p>}
 
-            <Button size="lg" onClick={() => handleGenerate()} className="w-full">
-              <Sparkles className="h-4 w-4 mr-2" />
+            <GenerateButton onClick={() => handleGenerate()} className="w-full" icon={<Film className="h-4 w-4 mr-2" />}>
               Générer 12 scripts Reels
-            </Button>
+            </GenerateButton>
             <p className="text-xs text-text-muted text-center">
               Scripts optimisés pour Instagram Reels, TikTok et YouTube Shorts
             </p>
@@ -258,12 +258,12 @@ export function ReelsGenerator({ className, initialData }: ReelsGeneratorProps) 
               size="sm"
               onClick={handleSaveEdits}
               disabled={saving}
-              className="bg-accent hover:bg-accent/90"
+              className="bg-gradient-to-r from-accent to-emerald-400 hover:from-accent/90 hover:to-emerald-400/90 text-white shadow-md shadow-accent/20"
             >
               {saving ? (
                 <><Loader2 className="h-3 w-3 animate-spin mr-1" /> Sauvegarde...</>
               ) : (
-                <><Save className="h-3 w-3 mr-1" /> Sauvegarder les modifications</>
+                <><Save className="h-3 w-3 mr-1" /> Sauvegarder</>
               )}
             </Button>
           )}
@@ -321,9 +321,13 @@ export function ReelsGenerator({ className, initialData }: ReelsGeneratorProps) 
                         i
                       )
                     }
+                    className={cn(copiedIndex === i && "text-accent")}
                   >
-                    <Copy className="h-3 w-3 mr-1" />
-                    {copiedIndex === i ? "Copié !" : "Copier"}
+                    {copiedIndex === i ? (
+                      <><Check className="h-3 w-3 mr-1 animate-in zoom-in-50 duration-200" /> Copié !</>
+                    ) : (
+                      <><Copy className="h-3 w-3 mr-1" /> Copier</>
+                    )}
                   </Button>
                   <Button
                     variant="ghost"

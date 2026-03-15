@@ -220,14 +220,16 @@ export function StatsOverview() {
       {stats.map((stat) => {
         const colors = colorMap[stat.color];
         return (
-          <div
+          <button
             key={stat.label}
             className={cn(
-              "group relative overflow-hidden rounded-xl border border-border-default bg-bg-secondary p-3 sm:p-4 cursor-pointer transition-all duration-300",
+              "group relative overflow-hidden rounded-2xl border border-white/5 bg-bg-secondary p-3 sm:p-4 cursor-pointer transition-all duration-300 text-left w-full",
               "hover:border-transparent hover:translate-y-[-2px]",
+              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 focus-visible:ring-offset-1 focus-visible:ring-offset-bg-primary",
               colors.glow
             )}
             onClick={() => stat.href && router.push(stat.href)}
+            aria-label={`${stat.label}: ${stat.value}${stat.suffix || ""}`}
           >
             {/* Gradient background on hover */}
             <div className={cn(
@@ -263,7 +265,7 @@ export function StatsOverview() {
 
             {/* Subtle shine effect */}
             <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/5 to-transparent group-hover:translate-x-full transition-transform duration-700" />
-          </div>
+          </button>
         );
       })}
     </div>

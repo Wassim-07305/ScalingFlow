@@ -186,7 +186,7 @@ export function ActivityFeed() {
           </div>
         ) : (
           <div className="space-y-1">
-            {activities.map((a) => {
+            {activities.map((a, idx) => {
               const meta = activityMeta[a.activity_type] || {
                 label: a.activity_type,
                 icon: Zap,
@@ -198,7 +198,8 @@ export function ActivityFeed() {
               return (
                 <div
                   key={a.id}
-                  className="flex items-center gap-3 py-2.5 px-2 rounded-lg hover:bg-bg-tertiary transition-colors"
+                  className="flex items-center gap-3 py-2.5 px-2 rounded-xl hover:bg-bg-tertiary transition-all duration-200"
+                  style={{ animationDelay: `${idx * 50}ms` }}
                 >
                   <div
                     className={cn(

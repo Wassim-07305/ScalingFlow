@@ -44,8 +44,8 @@ export function PipelineColumn({ config, leads, onCardClick, onDrop }: PipelineC
   return (
     <div
       className={cn(
-        "flex flex-col min-w-[280px] w-[280px] shrink-0 snap-center rounded-2xl border border-border-default bg-bg-primary/50 transition-all duration-200",
-        dragOver && "border-accent/40 bg-accent/5 shadow-lg shadow-accent/5"
+        "flex flex-col min-w-[280px] w-[280px] shrink-0 snap-center rounded-2xl border border-border-default bg-bg-primary/50 transition-all duration-300",
+        dragOver && "border-accent/50 bg-accent/5 shadow-xl shadow-accent/10 scale-[1.02] ring-1 ring-accent/20"
       )}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
@@ -72,15 +72,15 @@ export function PipelineColumn({ config, leads, onCardClick, onDrop }: PipelineC
       <div className="flex flex-col gap-2 p-2 overflow-y-auto max-h-[calc(100vh-320px)] min-h-[100px]">
         {leads.length === 0 ? (
           <div className={cn(
-            "flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-border-default p-8 text-center transition-all duration-200",
-            dragOver && "border-accent/40 bg-accent/5"
+            "flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border-default p-8 text-center transition-all duration-300",
+            dragOver && "border-accent/50 bg-accent/5 scale-[1.02] shadow-inner shadow-accent/5"
           )}>
             {dragOver ? (
-              <span className="text-xs font-medium text-accent">Relâcher ici</span>
+              <span className="text-xs font-semibold text-accent animate-pulse">Relâcher ici</span>
             ) : (
               <>
-                <Inbox className="h-5 w-5 text-text-muted/50" />
-                <span className="text-xs text-text-muted">Aucun lead</span>
+                <Inbox className="h-5 w-5 text-text-muted/30" />
+                <span className="text-xs text-text-muted/60">Aucun lead</span>
               </>
             )}
           </div>

@@ -8,7 +8,6 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { AILoading } from "@/components/shared/ai-loading";
 import { GlowCard } from "@/components/shared/glow-card";
 import {
-  Sparkles,
   FileText,
   ChevronDown,
   ChevronUp,
@@ -18,6 +17,7 @@ import {
 import { CopyExportBar } from "@/components/shared/copy-export-bar";
 import type { SalesLetterResult } from "@/lib/ai/prompts/sales-letter";
 import { UpgradeWall } from "@/components/shared/upgrade-wall";
+import { GenerateButton } from "@/components/shared/generate-button";
 
 interface SalesLetterGeneratorProps {
   className?: string;
@@ -74,6 +74,7 @@ export function SalesLetterGenerator({ className, initialData }: SalesLetterGene
   if (loading) {
     return (
       <AILoading
+        variant="immersive"
         text="Rédaction de ta sales letter"
         className={className}
       />
@@ -122,10 +123,9 @@ export function SalesLetterGenerator({ className, initialData }: SalesLetterGene
               />
             </div>
 
-            <Button className="w-full" size="lg" onClick={handleGenerate}>
-              <Sparkles className="h-4 w-4 mr-2" />
+            <GenerateButton onClick={handleGenerate} className="w-full" icon={<FileText className="h-4 w-4 mr-2" />}>
               Générer la sales letter
-            </Button>
+            </GenerateButton>
           </CardContent>
         </Card>
       </div>

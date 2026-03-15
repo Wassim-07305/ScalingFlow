@@ -123,11 +123,12 @@ export function NextTasks() {
               return (
                 <div
                   key={task.id}
-                  className="flex items-start gap-3 py-3 px-2 rounded-lg hover:bg-bg-tertiary transition-colors group"
+                  className="flex items-start gap-3 py-3 px-2 rounded-xl hover:bg-bg-tertiary transition-all duration-200 group"
                 >
                   <button
                     onClick={() => toggleTask(task.id)}
-                    className="mt-0.5 shrink-0"
+                    className="mt-0.5 shrink-0 rounded-full p-0.5 transition-all duration-200 hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50"
+                    aria-label={`Marquer "${task.title}" comme terminée`}
                   >
                     <Circle className="h-5 w-5 text-text-muted group-hover:text-accent transition-colors" />
                   </button>

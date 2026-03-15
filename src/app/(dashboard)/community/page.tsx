@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { PostFeed } from "@/components/community/post-feed";
 import { AutoWins } from "@/components/community/auto-wins";
 import { DirectMessages } from "@/components/community/direct-messages";
@@ -35,6 +35,7 @@ function CommunityStats({ streakDays }: { streakDays: number }) {
     streak: "—",
     wins: "—",
   });
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
     async function fetchStats() {
@@ -43,17 +44,14 @@ function CommunityStats({ streakDays }: { streakDays: number }) {
       const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString();
 
       const [membersRes, postsRes, winsRes] = await Promise.all([
-        // Membres actifs (last_active_date dans les 30 derniers jours)
         supabase
           .from("profiles")
           .select("id", { count: "exact", head: true })
           .gte("last_active_date", thirtyDaysAgo.split("T")[0]),
-        // Posts ce mois
         supabase
           .from("community_posts")
           .select("id", { count: "exact", head: true })
           .gte("created_at", startOfMonth),
-        // Victoires (auto-generated posts)
         supabase
           .from("community_posts")
           .select("id", { count: "exact", head: true })
@@ -66,6 +64,7 @@ function CommunityStats({ streakDays }: { streakDays: number }) {
         streak: `${streakDays}j`,
         wins: (winsRes.count ?? 0).toLocaleString("fr-FR"),
       });
+      setLoaded(true);
     }
 
     fetchStats();
@@ -80,16 +79,20 @@ function CommunityStats({ streakDays }: { streakDays: number }) {
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-      {statItems.map((stat) => (
+      {statItems.map((stat, i) => (
         <div
           key={stat.label}
-          className="flex items-center gap-3 rounded-2xl border border-border-default bg-bg-secondary/50 px-4 py-3 backdrop-blur-sm"
+          className={cn(
+            "flex items-center gap-3 rounded-2xl border border-border-default bg-bg-secondary/50 px-4 py-3 backdrop-blur-sm transition-all duration-500",
+            loaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
+          )}
+          style={{ transitionDelay: loaded ? `${i * 80}ms` : "0ms" }}
         >
           <div className={cn("rounded-xl bg-bg-tertiary p-2.5", stat.color)}>
             <stat.icon className="h-4 w-4" />
           </div>
           <div>
-            <p className="text-lg font-bold text-text-primary">{stat.value}</p>
+            <p className="text-lg font-bold text-text-primary tabular-nums">{stat.value}</p>
             <p className="text-[11px] text-text-muted">{stat.label}</p>
           </div>
         </div>
@@ -102,12 +105,26 @@ function CommunityStats({ streakDays }: { streakDays: number }) {
 export default function CommunityPage() {
   const [activeTab, setActiveTab] = useState<TabId>("feed");
   const { profile } = useUser();
+  const tabIndicatorRef = useRef<HTMLDivElement>(null);
+  const tabsContainerRef = useRef<HTMLDivElement>(null);
+
+  // Animated tab indicator
+  useEffect(() => {
+    if (!tabsContainerRef.current || !tabIndicatorRef.current) return;
+    const activeIndex = TABS.findIndex((t) => t.id === activeTab);
+    const buttons = tabsContainerRef.current.querySelectorAll<HTMLButtonElement>("button[data-tab]");
+    const btn = buttons[activeIndex];
+    if (!btn) return;
+    const container = tabsContainerRef.current;
+    tabIndicatorRef.current.style.left = `${btn.offsetLeft - container.offsetLeft}px`;
+    tabIndicatorRef.current.style.width = `${btn.offsetWidth}px`;
+  }, [activeTab]);
 
   return (
     <div className="max-w-4xl mx-auto">
       {/* Hero header */}
       <div className="relative mb-8 overflow-hidden rounded-2xl border border-border-default bg-gradient-to-br from-accent/5 via-bg-secondary to-bg-secondary p-6 md:p-8">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-accent/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+        <div className="absolute top-0 right-0 w-64 h-64 bg-accent/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
         <div className="relative">
           <div className="flex items-center gap-3 mb-2">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent/10">
@@ -144,29 +161,41 @@ export default function CommunityPage() {
       {/* Stats */}
       <CommunityStats streakDays={profile?.streak_days ?? 0} />
 
-      {/* Tab navigation — Skool-style */}
-      <div className="flex gap-1 mb-6 rounded-xl bg-bg-secondary/80 border border-border-default p-1">
+      {/* Tab navigation — Premium animated indicator */}
+      <div
+        ref={tabsContainerRef}
+        className="relative flex gap-1 mb-6 rounded-xl bg-bg-secondary/80 border border-border-default p-1"
+      >
+        {/* Sliding indicator */}
+        <div
+          ref={tabIndicatorRef}
+          className="absolute top-1 bottom-1 rounded-lg bg-accent shadow-lg shadow-accent/20 transition-all duration-300 ease-out pointer-events-none"
+        />
+
         {TABS.map((tab) => (
           <button
             key={tab.id}
+            data-tab={tab.id}
             onClick={() => setActiveTab(tab.id)}
             className={cn(
-              "flex flex-1 items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200",
+              "relative z-10 flex flex-1 items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors duration-200",
               activeTab === tab.id
-                ? "bg-accent text-white shadow-lg shadow-accent/20"
-                : "text-text-secondary hover:text-text-primary hover:bg-bg-tertiary"
+                ? "text-white"
+                : "text-text-secondary hover:text-text-primary"
             )}
           >
             <tab.icon className="h-4 w-4" />
-            {tab.label}
+            <span className="hidden xs:inline">{tab.label}</span>
           </button>
         ))}
       </div>
 
-      {/* Tab content */}
-      {activeTab === "feed" && <PostFeed />}
-      {activeTab === "wins" && <AutoWins />}
-      {activeTab === "messages" && <DirectMessages />}
+      {/* Tab content with fade transition */}
+      <div key={activeTab} className="animate-in fade-in duration-300">
+        {activeTab === "feed" && <PostFeed />}
+        {activeTab === "wins" && <AutoWins />}
+        {activeTab === "messages" && <DirectMessages />}
+      </div>
     </div>
   );
 }

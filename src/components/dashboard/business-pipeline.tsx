@@ -119,7 +119,7 @@ export function BusinessPipeline() {
                 />
               </div>
               <p className="text-xs text-text-muted mt-1.5">
-                {progressPercent}% de ton business est structure
+                {progressPercent}% de ton business est structuré
               </p>
             </div>
 
@@ -132,7 +132,7 @@ export function BusinessPipeline() {
                     key={step.href}
                     href={step.href}
                     className={cn(
-                      "flex items-center gap-3 py-2.5 px-3 rounded-xl transition-all group",
+                      "flex items-center gap-3 py-2.5 px-3 rounded-xl transition-all duration-200 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50",
                       step.completed
                         ? "hover:bg-bg-tertiary"
                         : "hover:bg-accent/5"
@@ -172,7 +172,7 @@ export function BusinessPipeline() {
                 className="mt-4 flex items-center gap-2 px-4 py-2.5 rounded-xl bg-accent/10 text-accent text-sm font-medium hover:bg-accent/15 transition-colors"
               >
                 <nextStep.icon className="h-4 w-4" />
-                Prochaine etape : {nextStep.label}
+                Prochaine étape : {nextStep.label}
                 <ArrowRight className="h-3.5 w-3.5 ml-auto" />
               </Link>
             )}

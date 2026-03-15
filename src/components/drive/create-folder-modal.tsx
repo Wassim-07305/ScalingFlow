@@ -101,7 +101,7 @@ export function CreateFolderModal({
                   key={c}
                   type="button"
                   onClick={() => setColor(c)}
-                  className="h-8 w-8 rounded-full transition-all duration-150"
+                  className="h-8 w-8 rounded-full transition-all duration-200 hover:scale-110 hover:shadow-lg"
                   style={{
                     backgroundColor: c,
                     outline: color === c ? `2px solid ${c}` : "none",

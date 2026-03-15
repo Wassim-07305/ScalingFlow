@@ -2,7 +2,9 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Lock } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Lock, Sparkles } from "lucide-react";
+import { cn } from "@/lib/utils/cn";
 
 interface UpgradeWallProps {
   currentUsage: number;
@@ -11,28 +13,68 @@ interface UpgradeWallProps {
 }
 
 export function UpgradeWall({ currentUsage, limit, className }: UpgradeWallProps) {
-  return (
-    <Card className={className}>
-      <CardContent className="py-10 text-center space-y-4">
-        <div className="flex items-center justify-center">
-          <div className="h-14 w-14 rounded-2xl bg-accent/10 flex items-center justify-center">
-            <Lock className="h-7 w-7 text-accent" />
-          </div>
-        </div>
+  const percent = Math.round((currentUsage / limit) * 100);
 
-        <div className="space-y-2">
-          <h3 className="text-lg font-semibold text-text-primary">
-            Limite atteinte
-          </h3>
-          <p className="text-sm text-text-secondary max-w-md mx-auto">
-            Tu as utilisé{" "}
-            <Badge variant="muted" className="mx-1">
-              {currentUsage}/{limit}
-            </Badge>{" "}
-            générations IA ce mois-ci. Ta limite mensuelle est atteinte, réessaie le mois prochain.
+  return (
+    <div className={cn("relative", className)}>
+      {/* Glassmorphism backdrop */}
+      <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-accent/5 via-transparent to-purple-500/5 blur-3xl" />
+
+      <Card className="relative overflow-hidden border-accent/20 backdrop-blur-sm bg-bg-secondary/80">
+        {/* Decorative gradient border top */}
+        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-accent/50 to-transparent" />
+
+        <CardContent className="py-12 text-center space-y-6">
+          {/* Animated lock icon with glow */}
+          <div className="flex items-center justify-center">
+            <div className="relative">
+              <div className="absolute inset-0 rounded-2xl bg-accent/20 blur-xl animate-pulse" />
+              <div className="relative h-16 w-16 rounded-2xl bg-gradient-to-br from-accent/20 to-emerald-600/10 border border-accent/30 flex items-center justify-center backdrop-blur-sm">
+                <Lock className="h-8 w-8 text-accent" />
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            <h3 className="text-xl font-bold text-text-primary">
+              Limite de générations atteinte
+            </h3>
+            <p className="text-sm text-text-secondary max-w-md mx-auto leading-relaxed">
+              Tu as utilisé toutes tes générations IA pour ce mois-ci.
+              Passe au plan supérieur pour débloquer plus de générations.
+            </p>
+          </div>
+
+          {/* Usage bar */}
+          <div className="max-w-xs mx-auto space-y-2">
+            <div className="flex items-center justify-between text-xs">
+              <span className="text-text-muted">Utilisation</span>
+              <Badge variant="muted">{currentUsage}/{limit}</Badge>
+            </div>
+            <div className="h-2 rounded-full bg-bg-tertiary overflow-hidden">
+              <div
+                className="h-full rounded-full bg-gradient-to-r from-accent to-emerald-400 transition-all duration-500"
+                style={{ width: `${Math.min(percent, 100)}%` }}
+              />
+            </div>
+            <p className="text-[10px] text-text-muted">{percent}% de ton quota mensuel utilisé</p>
+          </div>
+
+          {/* CTA */}
+          <Button
+            size="lg"
+            className="bg-gradient-to-r from-accent to-emerald-400 hover:from-accent/90 hover:to-emerald-400/90 text-white font-semibold shadow-lg shadow-accent/25 hover:shadow-accent/40 transition-all duration-300"
+            onClick={() => window.location.href = "/settings"}
+          >
+            <Sparkles className="h-4 w-4 mr-2" />
+            Voir les plans
+          </Button>
+
+          <p className="text-xs text-text-muted">
+            Ou réessaie le mois prochain avec ton plan actuel
           </p>
-        </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </div>
   );
 }

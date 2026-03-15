@@ -215,25 +215,32 @@ export function OptimizationRecommendations() {
           <Card>
             <CardContent className="py-6">
               <div className="flex items-center gap-6">
-                <div
-                  className={cn(
-                    "w-20 h-20 rounded-2xl flex items-center justify-center",
-                    HEALTH_CONFIG[result.overall_health]?.bgColor || "bg-bg-tertiary"
-                  )}
-                >
-                  <span
-                    className={cn(
-                      "text-2xl font-bold",
-                      HEALTH_CONFIG[result.overall_health]?.color || "text-text-primary"
-                    )}
-                  >
-                    {result.health_score}
-                  </span>
+                <div className="relative w-20 h-20 shrink-0">
+                  <svg viewBox="0 0 80 80" className="w-full h-full -rotate-90">
+                    <circle cx="40" cy="40" r="34" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="6" />
+                    <circle
+                      cx="40" cy="40" r="34" fill="none"
+                      stroke={result.health_score >= 70 ? "#34D399" : result.health_score >= 40 ? "#F59E0B" : "#EF4444"}
+                      strokeWidth="6" strokeLinecap="round"
+                      strokeDasharray={`${(result.health_score / 100) * 213.6} 213.6`}
+                      className="transition-all duration-1000 ease-out"
+                    />
+                  </svg>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span
+                      className={cn(
+                        "text-2xl font-bold",
+                        HEALTH_CONFIG[result.overall_health]?.color || "text-text-primary"
+                      )}
+                    >
+                      {result.health_score}
+                    </span>
+                  </div>
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
                     <h3 className="text-lg font-semibold text-text-primary">
-                      Sante globale
+                      Santé globale
                     </h3>
                     <Badge
                       variant={

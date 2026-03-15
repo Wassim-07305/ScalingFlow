@@ -246,9 +246,9 @@ export function InstagramStats() {
   ];
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
       {/* Profile + Stats */}
-      <Card>
+      <Card className="border-border-default/50 bg-bg-secondary/30 backdrop-blur-sm">
         <CardHeader className="pb-4">
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center gap-2.5 text-sm">
@@ -293,7 +293,7 @@ export function InstagramStats() {
                 <div
                   key={stat.label}
                   className={cn(
-                    "rounded-xl bg-gradient-to-br p-4 text-center border",
+                    "rounded-xl bg-gradient-to-br p-4 text-center border transition-all duration-300 hover:scale-[1.03] hover:shadow-lg",
                     stat.gradient,
                     stat.borderColor
                   )}

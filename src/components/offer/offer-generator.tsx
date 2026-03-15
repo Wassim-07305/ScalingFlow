@@ -2,6 +2,7 @@
 
 import React from "react";
 import { Sparkles, Package } from "lucide-react";
+import { GenerateButton } from "@/components/shared/generate-button";
 import { cn } from "@/lib/utils/cn";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
@@ -85,7 +86,7 @@ export function OfferGenerator({ className, marketAnalysisId, marketName, initia
   }
 
   if (loading) {
-    return <AILoading text="Génération de ton offre irrésistible" className={className} />;
+    return <AILoading variant="immersive" text="Génération de ton offre irrésistible" className={className} />;
   }
 
   return (
@@ -109,10 +110,9 @@ export function OfferGenerator({ className, marketAnalysisId, marketName, initia
               </div>
             )}
             {error && <p className="text-sm text-danger">{error}</p>}
-            <Button size="lg" onClick={handleGenerate}>
-              <Sparkles className="h-4 w-4 mr-2" />
+            <GenerateButton onClick={handleGenerate}>
               Générer mon offre
-            </Button>
+            </GenerateButton>
           </CardContent>
         </Card>
       ) : (

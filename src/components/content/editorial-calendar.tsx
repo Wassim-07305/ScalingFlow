@@ -169,8 +169,8 @@ export function EditorialCalendar({ className, initialData }: EditorialCalendarP
 
   if (items.length === 0 || showForm) {
     return (
-      <div className={cn("space-y-6", className)}>
-        <Card>
+      <div className={cn("space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500", className)}>
+        <Card className="border-border-default/50 bg-bg-secondary/30 backdrop-blur-sm">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <CalendarDays className="h-5 w-5 text-accent" />
@@ -232,8 +232,8 @@ export function EditorialCalendar({ className, initialData }: EditorialCalendarP
 
             {error && <p className="text-sm text-danger">{error}</p>}
 
-            <Button size="lg" onClick={handleGenerate} className="w-full">
-              <Sparkles className="h-4 w-4 mr-2" />
+            <Button size="lg" onClick={handleGenerate} className="w-full group">
+              <Sparkles className="h-4 w-4 mr-2 group-hover:rotate-12 transition-transform" />
               Générer le plan éditorial {duration} jours
             </Button>
             <p className="text-xs text-text-muted text-center">
@@ -246,7 +246,7 @@ export function EditorialCalendar({ className, initialData }: EditorialCalendarP
   }
 
   return (
-    <div className={cn("space-y-4", className)}>
+    <div className={cn("space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500", className)}>
       {/* Date de début */}
       <div className="flex items-center gap-3">
         <Calendar className="h-4 w-4 text-accent shrink-0" />
@@ -322,8 +322,8 @@ export function EditorialCalendar({ className, initialData }: EditorialCalendarP
             <Card
               key={item.jour}
               className={cn(
-                "cursor-pointer transition-all",
-                expandedDay === item.jour && "ring-1 ring-accent"
+                "cursor-pointer transition-all duration-300 hover:border-accent/20 hover:shadow-md hover:shadow-accent/5",
+                expandedDay === item.jour && "ring-1 ring-accent shadow-lg shadow-accent/10"
               )}
               onClick={() => setExpandedDay(expandedDay === item.jour ? null : item.jour)}
             >

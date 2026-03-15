@@ -9,14 +9,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils/cn";
 import Image from "next/image";
-import { Check, X } from "lucide-react";
+import { Check, X, Loader2, Sparkles } from "lucide-react";
 
 function translateRegisterError(message: string): string {
   const msg = message.toLowerCase();
   if (msg.includes("already registered") || msg.includes("already been registered"))
-    return "Un compte existe deja avec cet email.";
+    return "Un compte existe déjà avec cet email.";
   if (msg.includes("password") && (msg.includes("short") || msg.includes("least")))
-    return "Le mot de passe doit avoir au moins 6 caracteres.";
+    return "Le mot de passe doit avoir au moins 6 caractères.";
   if (msg.includes("valid email") || msg.includes("invalid email"))
     return "Format d'email invalide.";
   if (msg.includes("rate limit") || msg.includes("too many"))
@@ -24,7 +24,7 @@ function translateRegisterError(message: string): string {
   if (msg.includes("weak password"))
     return "Le mot de passe est trop faible. Ajoute des chiffres ou des majuscules.";
   if (msg.includes("signup") && msg.includes("disabled"))
-    return "Les inscriptions sont temporairement desactivees.";
+    return "Les inscriptions sont temporairement désactivées.";
   return "Erreur lors de l'inscription. Vérifie tes informations et réessaie.";
 }
 
@@ -38,7 +38,7 @@ export default function RegisterPage() {
   const supabase = createClient();
 
   const passwordChecks = useMemo(() => [
-    { label: "6 caracteres minimum", met: password.length >= 6 },
+    { label: "6 caractères minimum", met: password.length >= 6 },
     { label: "Une majuscule", met: /[A-Z]/.test(password) },
     { label: "Un chiffre", met: /\d/.test(password) },
   ], [password]);
@@ -77,7 +77,7 @@ export default function RegisterPage() {
         }),
       });
     } catch {
-      // L'echec de l'email ne doit pas bloquer l'inscription
+      // L'échec de l'email ne doit pas bloquer l'inscription
     }
 
     router.push("/onboarding");
@@ -85,11 +85,11 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
       {/* Header */}
-      <div className="text-center space-y-2">
+      <div className="text-center space-y-3">
         <div className="flex items-center justify-center gap-3">
-          <Image src="/icons/icon-192.png" alt="ScalingFlow" width={40} height={40} className="rounded-[8px]" />
+          <Image src="/icons/icon-192.png" alt="ScalingFlow" width={44} height={44} className="rounded-xl shadow-lg shadow-accent/10" />
           <h1 className="text-3xl font-bold text-text-primary">ScalingFlow</h1>
         </div>
         <p className="text-text-secondary">
@@ -98,7 +98,7 @@ export default function RegisterPage() {
       </div>
 
       {/* Form */}
-      <form onSubmit={handleRegister} className="space-y-4">
+      <form onSubmit={handleRegister} className="space-y-5">
         <div className="space-y-2">
           <Label htmlFor="fullName">Nom complet</Label>
           <Input
@@ -108,6 +108,8 @@ export default function RegisterPage() {
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
             required
+            autoFocus
+            className="h-11"
           />
         </div>
 
@@ -118,8 +120,12 @@ export default function RegisterPage() {
             type="email"
             placeholder="ton@email.com"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              if (error) setError(null);
+            }}
             required
+            className="h-11"
           />
         </div>
 
@@ -128,43 +134,51 @@ export default function RegisterPage() {
           <Input
             id="password"
             type="password"
-            placeholder="Min. 6 caracteres"
+            placeholder="Min. 6 caractères"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e) => {
+              setPassword(e.target.value);
+              if (error) setError(null);
+            }}
             minLength={6}
             required
+            className="h-11"
           />
           {password.length > 0 && (
-            <div className="space-y-2 pt-1">
+            <div className="space-y-2.5 pt-1.5 animate-in fade-in slide-in-from-top-2 duration-300">
               {/* Strength bar */}
-              <div className="flex gap-1">
+              <div className="flex gap-1.5">
                 {[1, 2, 3].map((level) => (
                   <div
                     key={level}
                     className={cn(
-                      "h-1 flex-1 rounded-full transition-all",
+                      "h-1.5 flex-1 rounded-full transition-all duration-500",
                       passwordStrength >= level
                         ? passwordStrength === 3
-                          ? "bg-accent"
+                          ? "bg-accent shadow-sm shadow-accent/30"
                           : passwordStrength === 2
-                            ? "bg-yellow-500"
-                            : "bg-danger"
+                            ? "bg-yellow-500 shadow-sm shadow-yellow-500/30"
+                            : "bg-danger shadow-sm shadow-danger/30"
                         : "bg-bg-tertiary"
                     )}
                   />
                 ))}
               </div>
               {/* Checklist */}
-              <div className="space-y-0.5">
+              <div className="space-y-1">
                 {passwordChecks.map((check) => (
-                  <div key={check.label} className="flex items-center gap-1.5">
+                  <div key={check.label} className="flex items-center gap-2">
                     {check.met ? (
-                      <Check className="h-3 w-3 text-accent" />
+                      <div className="h-4 w-4 rounded-full bg-accent/15 flex items-center justify-center">
+                        <Check className="h-2.5 w-2.5 text-accent" />
+                      </div>
                     ) : (
-                      <X className="h-3 w-3 text-text-muted" />
+                      <div className="h-4 w-4 rounded-full bg-bg-tertiary flex items-center justify-center">
+                        <X className="h-2.5 w-2.5 text-text-muted" />
+                      </div>
                     )}
                     <span className={cn(
-                      "text-[11px]",
+                      "text-[11px] transition-colors",
                       check.met ? "text-text-secondary" : "text-text-muted"
                     )}>
                       {check.label}
@@ -177,30 +191,35 @@ export default function RegisterPage() {
         </div>
 
         {error && (
-          <div className="rounded-[8px] bg-danger/10 border border-danger/20 p-3 text-sm text-danger">
+          <div className="rounded-xl bg-danger/10 border border-danger/20 p-3 text-sm text-danger animate-in fade-in slide-in-from-top-2 duration-300">
             {error}
           </div>
         )}
 
-        <Button type="submit" className="w-full" disabled={loading}>
+        <Button type="submit" className="w-full h-11 text-base group" disabled={loading}>
+          {loading ? (
+            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+          ) : (
+            <Sparkles className="h-4 w-4 mr-2 group-hover:rotate-12 transition-transform" />
+          )}
           {loading ? "Création..." : "Créer mon compte"}
         </Button>
       </form>
 
       {/* Footer */}
-      <div className="text-center space-y-2">
+      <div className="text-center space-y-3">
         <p className="text-sm text-text-secondary">
-          Deja un compte ?{" "}
+          Déjà un compte ?{" "}
           <Link
             href="/login"
-            className="text-info hover:underline font-medium"
+            className="text-accent hover:underline font-medium transition-colors"
           >
             Se connecter
           </Link>
         </p>
         <p className="text-xs text-text-muted">
           <Link href="/welcome" className="hover:text-text-secondary transition-colors">
-            Retour a l&apos;accueil
+            Retour à l&apos;accueil
           </Link>
         </p>
       </div>

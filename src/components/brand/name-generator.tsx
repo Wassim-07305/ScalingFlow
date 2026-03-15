@@ -106,10 +106,10 @@ export function NameGenerator({ brandId, names, selectedName: initialSelected, c
         <Card
           key={i}
           className={cn(
-            "cursor-pointer transition-all",
+            "cursor-pointer transition-all duration-200",
             selected === item.name
-              ? "border-accent bg-accent-muted/10"
-              : "hover:border-border-hover"
+              ? "border-accent bg-gradient-to-r from-accent/8 to-transparent shadow-lg shadow-accent/5 ring-1 ring-accent/30"
+              : "hover:border-border-hover hover:shadow-md"
           )}
           onClick={() => handleSelect(item.name)}
         >
@@ -118,20 +118,22 @@ export function NameGenerator({ brandId, names, selectedName: initialSelected, c
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-3">
                   {selected === item.name ? (
-                    <CheckCircle className="h-5 w-5 text-accent shrink-0" />
+                    <div className="h-6 w-6 rounded-full bg-accent/20 flex items-center justify-center ring-2 ring-accent/40">
+                      <CheckCircle className="h-4 w-4 text-accent" />
+                    </div>
                   ) : (
-                    <div className="h-5 w-5 rounded-full border-2 border-border-default shrink-0" />
+                    <div className="h-6 w-6 rounded-full border-2 border-border-default shrink-0 transition-all hover:border-accent/30" />
                   )}
-                  <p className="text-base font-semibold text-text-primary">{item.name}</p>
+                  <p className="text-base font-bold text-text-primary">{item.name}</p>
                 </div>
                 {item.rationale && (
-                  <p className="text-sm text-text-secondary mt-1 pl-8">{item.rationale}</p>
+                  <p className="text-sm text-text-secondary mt-1.5 pl-9 leading-relaxed">{item.rationale}</p>
                 )}
               </div>
               <div className="flex items-center gap-2 ml-4 shrink-0">
                 <Globe className="h-3.5 w-3.5 text-text-muted" />
                 <Badge variant={disponibiliteVariant(item.disponibilite_probable)}>
-                  {item.disponibilite_probable || "—"}
+                  {item.disponibilite_probable || "\u2014"}
                 </Badge>
               </div>
             </div>

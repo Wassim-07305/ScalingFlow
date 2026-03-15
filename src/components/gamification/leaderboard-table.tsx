@@ -175,14 +175,26 @@ export function LeaderboardTable({ className }: LeaderboardTableProps) {
     );
   }
 
+  // Top 3 for podium
+  const top3 = entries.slice(0, 3);
+  const rest = entries.slice(3);
+
+  const medalConfig: Record<number, { gradient: string; ring: string; label: string; shadow: string }> = {
+    1: { gradient: "from-yellow-400/20 to-yellow-600/10", ring: "ring-yellow-400/50", label: "Or", shadow: "shadow-yellow-400/20" },
+    2: { gradient: "from-gray-300/20 to-gray-400/10", ring: "ring-gray-300/40", label: "Argent", shadow: "shadow-gray-300/10" },
+    3: { gradient: "from-amber-600/20 to-amber-700/10", ring: "ring-amber-600/40", label: "Bronze", shadow: "shadow-amber-600/10" },
+  };
+
   return (
     <div className={cn("space-y-4", className)}>
       {/* Your rank card */}
       {myEntry && (
-        <Card className="border-accent/20 bg-accent/5">
+        <Card className="border-accent/20 bg-gradient-to-r from-accent/5 to-transparent">
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
-              <Star className="h-5 w-5 text-accent" />
+              <div className="h-10 w-10 rounded-xl bg-accent/15 flex items-center justify-center">
+                <Star className="h-5 w-5 text-accent" />
+              </div>
               <div className="flex-1">
                 <p className="text-sm font-medium text-text-primary">Ta position</p>
                 <p className="text-xs text-text-muted">
@@ -196,6 +208,58 @@ export function LeaderboardTable({ className }: LeaderboardTableProps) {
             </div>
           </CardContent>
         </Card>
+      )}
+
+      {/* Podium — Top 3 */}
+      {!loading && top3.length >= 3 && (
+        <div className="grid grid-cols-3 gap-3">
+          {[top3[1], top3[0], top3[2]].map((entry, podiumIdx) => {
+            const actualRank = [2, 1, 3][podiumIdx];
+            const medal = medalConfig[actualRank];
+            const isCenter = podiumIdx === 1;
+            return (
+              <div
+                key={entry.rank}
+                className={cn(
+                  "relative flex flex-col items-center text-center p-4 rounded-2xl border transition-all duration-500",
+                  `bg-gradient-to-b ${medal.gradient}`,
+                  isCenter ? "border-yellow-400/30 -mt-2 pb-6" : "border-border-default/30 mt-2",
+                  entry.userId === user?.id && "ring-2 ring-accent/40"
+                )}
+                style={{ animationDelay: `${podiumIdx * 100}ms` }}
+              >
+                {/* Medal */}
+                <div className={cn(
+                  "w-12 h-12 rounded-full flex items-center justify-center mb-2 ring-2",
+                  medal.ring,
+                  `shadow-lg ${medal.shadow}`,
+                  isCenter ? "bg-yellow-400/20" : actualRank === 2 ? "bg-gray-300/15" : "bg-amber-600/15"
+                )}>
+                  <span className={cn(
+                    "text-lg font-black",
+                    rankColors[actualRank] || "text-text-muted"
+                  )}>
+                    {actualRank}
+                  </span>
+                </div>
+                <Avatar className="h-10 w-10 mb-1.5 ring-2 ring-border-default/30">
+                  <AvatarFallback className="bg-bg-tertiary text-text-secondary text-xs font-semibold">
+                    {entry.name.split(" ").map(n => n[0]).join("")}
+                  </AvatarFallback>
+                </Avatar>
+                <p className="text-sm font-semibold text-text-primary truncate w-full">{entry.name}</p>
+                <p className="text-[10px] text-text-muted mb-1">Niveau {entry.level}</p>
+                <Badge variant="default" className="text-xs">
+                  {entry.xp.toLocaleString("fr-FR")} XP
+                </Badge>
+                <div className="flex items-center gap-1 mt-1.5">
+                  <Flame className="h-3 w-3 text-danger" />
+                  <span className="text-[10px] text-text-muted">{entry.streak}j</span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       )}
 
       <Card>
@@ -216,7 +280,7 @@ export function LeaderboardTable({ className }: LeaderboardTableProps) {
             Array.from({ length: 5 }).map((_, i) => (
               <div
                 key={i}
-                className="flex items-center gap-4 p-3 rounded-xl bg-bg-tertiary animate-pulse"
+                className="flex items-center gap-4 p-3 rounded-xl bg-bg-tertiary/50 animate-pulse"
               >
                 <span className="w-8 h-6 bg-bg-tertiary rounded" />
                 <div className="h-9 w-9 rounded-full bg-bg-tertiary" />
@@ -230,14 +294,15 @@ export function LeaderboardTable({ className }: LeaderboardTableProps) {
               </div>
             ))
           ) : (
-            entries.map((entry) => (
+            (top3.length >= 3 ? rest : entries).map((entry, idx) => (
               <div
                 key={entry.rank}
                 className={cn(
-                  "flex items-center gap-4 p-3 rounded-xl transition-all",
-                  entry.rank <= 3 ? "bg-accent/5 border border-accent/10" : "bg-bg-tertiary",
+                  "flex items-center gap-4 p-3 rounded-xl transition-all duration-300 hover:bg-bg-tertiary/80",
+                  entry.rank <= 3 ? "bg-accent/5 border border-accent/10" : "bg-bg-tertiary/50",
                   entry.userId === user?.id && "ring-1 ring-accent/40"
                 )}
+                style={{ animationDelay: `${idx * 40}ms` }}
               >
                 {/* Rank */}
                 <span className={cn(

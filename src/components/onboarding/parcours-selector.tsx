@@ -67,7 +67,7 @@ export function ParcoursSelector({
           <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" />
           <div>
             <p className="text-sm font-medium text-emerald-300">
-              Parcours recommande : {PARCOURS_LIST.find((p) => p.id === topRec.id)?.label}
+              Parcours recommandé : {PARCOURS_LIST.find((p) => p.id === topRec.id)?.label}
             </p>
             <p className="mt-0.5 text-xs text-white/40">{topRec.reason}</p>
           </div>
@@ -138,22 +138,32 @@ export function ParcoursSelector({
                     </span>
                     {isRecommended && (
                       <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] font-semibold text-emerald-400">
-                        Recommande
+                        Recommandé
                       </span>
                     )}
                   </div>
                   <p className="mt-1 text-sm leading-relaxed text-white/40">
                     {parcours.description}
                   </p>
-                  <div className="mt-2 flex items-center gap-3">
+                  <div className="mt-2.5 flex items-center gap-3">
                     <span className="flex items-center gap-1 text-xs text-white/25">
                       <Clock className="h-3 w-3" />
                       {parcours.timeline}
                     </span>
                     {fitScore > 0 && (
-                      <span className="text-xs text-white/25">
-                        Fit : {Math.min(fitScore, 100)}%
-                      </span>
+                      <div className="flex items-center gap-2 flex-1">
+                        <span className="text-xs text-white/25 shrink-0">
+                          Fit : {Math.min(fitScore, 100)}%
+                        </span>
+                        <div className="h-1 flex-1 max-w-20 rounded-full bg-white/10 overflow-hidden">
+                          <motion.div
+                            className="h-full rounded-full bg-emerald-400/60"
+                            initial={{ width: 0 }}
+                            animate={{ width: `${Math.min(fitScore, 100)}%` }}
+                            transition={{ delay: i * 0.06 + 0.3, duration: 0.4 }}
+                          />
+                        </div>
+                      </div>
                     )}
                   </div>
                 </div>

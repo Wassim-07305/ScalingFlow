@@ -259,14 +259,15 @@ export function AutoWins({ className }: { className?: string }) {
         </div>
       </div>
 
-      {wins.slice(0, 15).map((win) => {
+      {wins.slice(0, 15).map((win, idx) => {
         const config = WIN_CONFIG[win.type];
         const IconComponent = config.icon;
 
         return (
           <div
             key={win.id}
-            className="group rounded-2xl border border-border-default/50 bg-bg-secondary/60 backdrop-blur-sm overflow-hidden transition-all duration-200 hover:border-accent/20"
+            className="group rounded-2xl border border-border-default/50 bg-bg-secondary/60 backdrop-blur-sm overflow-hidden transition-all duration-500 hover:border-accent/20 hover:shadow-lg hover:shadow-accent/5 animate-in fade-in slide-in-from-bottom-3"
+            style={{ animationDelay: `${idx * 60}ms`, animationFillMode: "both" }}
           >
             {/* Gradient accent bar */}
             <div className={cn("h-0.5 bg-gradient-to-r", config.gradient)} />
@@ -331,14 +332,14 @@ export function AutoWins({ className }: { className?: string }) {
                           disabled={!user || reactingTo === win.id}
                           title={label}
                           className={cn(
-                            "inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs transition-all border",
+                            "inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs border transition-all duration-200",
                             hasReacted
-                              ? "bg-accent/15 border-accent/30 shadow-sm"
-                              : "bg-bg-tertiary/80 border-transparent hover:border-border-default hover:bg-bg-tertiary",
-                            "disabled:opacity-50"
+                              ? "bg-accent/15 border-accent/30 shadow-sm scale-105"
+                              : "bg-bg-tertiary/80 border-transparent hover:border-border-default hover:bg-bg-tertiary hover:scale-105",
+                            "disabled:opacity-50 active:scale-95"
                           )}
                         >
-                          <span className="text-sm">{emoji}</span>
+                          <span className={cn("text-sm transition-transform duration-200", hasReacted && "animate-in zoom-in duration-300")}>{emoji}</span>
                           {reactionUsers.length > 0 && (
                             <span
                               className={cn(

@@ -253,7 +253,7 @@ export function GoogleCalendarWidget({ className }: { className?: string }) {
                   {group.events.map((evt) => (
                     <div
                       key={evt.id}
-                      className="p-3.5 rounded-xl border border-border-default/50 bg-bg-tertiary/30 hover:border-accent/20 hover:bg-bg-tertiary/50 transition-all duration-200 group"
+                      className="p-3.5 rounded-xl border border-border-default/50 bg-bg-tertiary/30 hover:border-accent/20 hover:bg-bg-tertiary/50 hover:shadow-lg hover:shadow-accent/5 transition-all duration-300 group"
                     >
                       <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0 flex-1">

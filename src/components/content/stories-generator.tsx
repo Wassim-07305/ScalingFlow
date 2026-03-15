@@ -7,11 +7,12 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AILoading } from "@/components/shared/ai-loading";
 import { GlowCard } from "@/components/shared/glow-card";
-import { Sparkles, Copy, Eye, MessageCircle, GraduationCap, Megaphone, Heart, BookOpen, Send } from "lucide-react";
+import { Copy, Check, Eye, MessageCircle, GraduationCap, Megaphone, Heart, BookOpen, Send } from "lucide-react";
 import { toast } from "sonner";
 import type { StoriesResult } from "@/lib/ai/prompts/stories-scripts";
 import { UpgradeWall } from "@/components/shared/upgrade-wall";
 import { UnipilePublishDialog } from "@/components/shared/unipile-publish-dialog";
+import { GenerateButton } from "@/components/shared/generate-button";
 
 const STORY_THEMES = [
   { key: "educatif", label: "Éducatif" },
@@ -128,7 +129,7 @@ export function StoriesGenerator({ className, initialData }: StoriesGeneratorPro
   }
 
   if (loading) {
-    return <AILoading text="Génération des stories" className={className} />;
+    return <AILoading variant="immersive" text="Génération des stories" className={className} />;
   }
 
   if (stories.length === 0 || showForm) {
@@ -182,10 +183,9 @@ export function StoriesGenerator({ className, initialData }: StoriesGeneratorPro
 
             {error && <p className="text-sm text-danger">{error}</p>}
 
-            <Button size="lg" onClick={handleGenerate} className="w-full">
-              <Sparkles className="h-4 w-4 mr-2" />
+            <GenerateButton onClick={handleGenerate} className="w-full" icon={<BookOpen className="h-4 w-4 mr-2" />}>
               Générer 5 séries de Stories
-            </Button>
+            </GenerateButton>
             <p className="text-xs text-text-muted text-center">
               5 types : Coulisses, Témoignage, Éducation, CTA, Engagement
             </p>
@@ -223,9 +223,12 @@ export function StoriesGenerator({ className, initialData }: StoriesGeneratorPro
                   <Badge variant={config.badge}>{config.label}</Badge>
                 </div>
                 <div className="flex items-center gap-1">
-                  <Button variant="ghost" size="sm" onClick={() => copyStory(story, i)}>
-                    <Copy className="h-3 w-3 mr-1" />
-                    {copiedIndex === i ? "Copié !" : "Copier"}
+                  <Button variant="ghost" size="sm" onClick={() => copyStory(story, i)} className={cn(copiedIndex === i && "text-accent")}>
+                    {copiedIndex === i ? (
+                      <><Check className="h-3 w-3 mr-1 animate-in zoom-in-50 duration-200" /> Copié !</>
+                    ) : (
+                      <><Copy className="h-3 w-3 mr-1" /> Copier</>
+                    )}
                   </Button>
                   <Button
                     variant="ghost"

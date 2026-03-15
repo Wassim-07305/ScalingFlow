@@ -7,11 +7,12 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AILoading } from "@/components/shared/ai-loading";
 import { GlowCard } from "@/components/shared/glow-card";
-import { Sparkles, Copy, MessageSquare, Send, RotateCcw, RefreshCw } from "lucide-react";
+import { Sparkles, Copy, Check, MessageSquare, Send, RotateCcw, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import type { DMScriptsResult } from "@/lib/ai/prompts/dm-scripts";
 import { UpgradeWall } from "@/components/shared/upgrade-wall";
 import { UnipileSendDialog } from "@/components/shared/unipile-send-dialog";
+import { GenerateButton } from "@/components/shared/generate-button";
 
 interface DMScriptGeneratorProps {
   className?: string;
@@ -81,7 +82,7 @@ export function DMScriptGenerator({ className, initialData }: DMScriptGeneratorP
   }
 
   if (loading) {
-    return <AILoading text="Génération des scripts DM" className={className} />;
+    return <AILoading variant="immersive" text="Génération des scripts DM" className={className} />;
   }
 
   if (!result) {
@@ -126,10 +127,9 @@ export function DMScriptGenerator({ className, initialData }: DMScriptGeneratorP
               />
             </div>
 
-            <Button className="w-full" size="lg" onClick={handleGenerate}>
-              <Sparkles className="h-4 w-4 mr-2" />
+            <GenerateButton onClick={handleGenerate} className="w-full">
               Générer les scripts DM
-            </Button>
+            </GenerateButton>
           </CardContent>
         </Card>
       </div>
@@ -202,7 +202,7 @@ export function DMScriptGenerator({ className, initialData }: DMScriptGeneratorP
                             size="sm"
                             onClick={() => copyToClipboard(seq.opener, `${seqKey}-opener`)}
                           >
-                            <Copy className="h-3 w-3 mr-1" />
+                            {copiedField === `${seqKey}-opener` ? <Check className="h-3 w-3 mr-1 animate-in zoom-in-50 duration-200" /> : <Copy className="h-3 w-3 mr-1" />}
                             {copiedField === `${seqKey}-opener` ? "Copié !" : "Copier"}
                           </Button>
                           <Button
@@ -228,7 +228,7 @@ export function DMScriptGenerator({ className, initialData }: DMScriptGeneratorP
                             size="sm"
                             onClick={() => copyToClipboard(seq.follow_up_1, `${seqKey}-fu1`)}
                           >
-                            <Copy className="h-3 w-3 mr-1" />
+                            {copiedField === `${seqKey}-fu1` ? <Check className="h-3 w-3 mr-1 animate-in zoom-in-50 duration-200" /> : <Copy className="h-3 w-3 mr-1" />}
                             {copiedField === `${seqKey}-fu1` ? "Copié !" : "Copier"}
                           </Button>
                           <Button
@@ -256,7 +256,7 @@ export function DMScriptGenerator({ className, initialData }: DMScriptGeneratorP
                             size="sm"
                             onClick={() => copyToClipboard(seq.follow_up_2, `${seqKey}-fu2`)}
                           >
-                            <Copy className="h-3 w-3 mr-1" />
+                            {copiedField === `${seqKey}-fu2` ? <Check className="h-3 w-3 mr-1 animate-in zoom-in-50 duration-200" /> : <Copy className="h-3 w-3 mr-1" />}
                             {copiedField === `${seqKey}-fu2` ? "Copié !" : "Copier"}
                           </Button>
                           <Button
@@ -284,7 +284,7 @@ export function DMScriptGenerator({ className, initialData }: DMScriptGeneratorP
                             size="sm"
                             onClick={() => copyToClipboard(seq.closing, `${seqKey}-closing`)}
                           >
-                            <Copy className="h-3 w-3 mr-1" />
+                            {copiedField === `${seqKey}-closing` ? <Check className="h-3 w-3 mr-1 animate-in zoom-in-50 duration-200" /> : <Copy className="h-3 w-3 mr-1" />}
                             {copiedField === `${seqKey}-closing` ? "Copié !" : "Copier"}
                           </Button>
                           <Button
@@ -320,7 +320,7 @@ export function DMScriptGenerator({ className, initialData }: DMScriptGeneratorP
                     size="sm"
                     onClick={() => copyToClipboard(item.message, `retarget-${i}`)}
                   >
-                    <Copy className="h-3 w-3 mr-1" />
+                    {copiedField === `retarget-${i}` ? <Check className="h-3 w-3 mr-1 animate-in zoom-in-50 duration-200" /> : <Copy className="h-3 w-3 mr-1" />}
                     {copiedField === `retarget-${i}` ? "Copié !" : "Copier"}
                   </Button>
                   <Button

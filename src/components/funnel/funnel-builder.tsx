@@ -11,6 +11,7 @@ import { Sparkles, FileText, Video, Gift, ChevronRight, FileDown, Code, Pencil, 
 import { exportToPDF } from "@/lib/utils/export-pdf";
 import { exportFunnelToHTML, downloadHTML } from "@/lib/utils/export-html";
 import { UpgradeWall } from "@/components/shared/upgrade-wall";
+import { GenerateButton } from "@/components/shared/generate-button";
 import { createClient } from "@/lib/supabase/client";
 import { useUser } from "@/hooks/use-user";
 import { toast } from "sonner";
@@ -155,7 +156,7 @@ export function FunnelBuilder({ className, initialData }: FunnelBuilderProps) {
   };
 
   if (loading) {
-    return <AILoading text="Création de ton funnel de conversion" className={className} />;
+    return <AILoading variant="immersive" text="Création de ton funnel de conversion" className={className} />;
   }
 
   if (!funnelData) {
@@ -190,7 +191,7 @@ export function FunnelBuilder({ className, initialData }: FunnelBuilderProps) {
                 <select
                   value={selectedOfferId || ""}
                   onChange={(e) => setSelectedOfferId(e.target.value)}
-                  className="w-full rounded-lg border border-border-default bg-bg-secondary px-3 py-2 text-sm text-text-primary"
+                  className="w-full rounded-xl border border-border-default bg-bg-secondary px-3 py-2.5 text-sm text-text-primary focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20 transition-all"
                 >
                   {offers.map((o) => (
                     <option key={o.id} value={o.id}>{o.offer_name}</option>
@@ -199,10 +200,9 @@ export function FunnelBuilder({ className, initialData }: FunnelBuilderProps) {
               </div>
             )}
             {error && <p className="text-sm text-danger">{error}</p>}
-            <Button size="lg" onClick={handleGenerate} disabled={!selectedOfferId}>
-              <Sparkles className="h-4 w-4 mr-2" />
+            <GenerateButton onClick={handleGenerate} disabled={!selectedOfferId}>
               Générer le funnel complet
-            </Button>
+            </GenerateButton>
           </CardContent>
         </Card>
       </div>
@@ -244,12 +244,12 @@ export function FunnelBuilder({ className, initialData }: FunnelBuilderProps) {
             size="sm"
             onClick={handleSaveEdits}
             disabled={saving}
-            className="bg-accent hover:bg-accent/90"
+            className="bg-gradient-to-r from-accent to-emerald-400 hover:from-accent/90 hover:to-emerald-400/90 text-white shadow-md shadow-accent/20"
           >
             {saving ? (
               <><Loader2 className="h-3 w-3 animate-spin mr-1" /> Sauvegarde...</>
             ) : (
-              <><Save className="h-3 w-3 mr-1" /> Sauvegarder les modifications</>
+              <><Save className="h-3 w-3 mr-1" /> Sauvegarder</>
             )}
           </Button>
         )}

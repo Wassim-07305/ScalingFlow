@@ -299,7 +299,7 @@ function StatCard({
   bgColor: string;
 }) {
   return (
-    <div className="flex items-center gap-3 rounded-2xl border border-border-default bg-bg-secondary/50 px-4 py-3 backdrop-blur-sm transition-all duration-200 hover:border-border-hover">
+    <div className="flex items-center gap-3 rounded-2xl border border-border-default bg-bg-secondary/50 px-4 py-3 backdrop-blur-sm transition-all duration-300 hover:border-accent/20 hover:shadow-lg hover:shadow-accent/5 hover:-translate-y-0.5 hover:bg-bg-secondary">
       <div className={cn("flex h-9 w-9 items-center justify-center rounded-xl", bgColor)}>
         <Icon className={cn("h-4 w-4", color)} />
       </div>

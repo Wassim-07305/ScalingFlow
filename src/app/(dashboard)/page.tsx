@@ -21,7 +21,7 @@ function SectionFallback({ className }: { className?: string }) {
 
 export default function DashboardPage() {
   return (
-    <div>
+    <div className="animate-in fade-in duration-500">
       <PageHeader
         title="Tableau de Bord"
         description="Vue d'ensemble de ton business."

@@ -14,6 +14,7 @@ import {
   Bot,
   Shield,
   Crown,
+  Star,
 } from "lucide-react";
 
 import type { Metadata } from "next";
@@ -72,17 +73,17 @@ const FEATURES = [
   },
   {
     icon: Sparkles,
-    title: "Offre irresistible",
+    title: "Offre irrésistible",
     description: "Génère une offre complète : positionnement, pricing, garanties, mécanisme unique.",
   },
   {
     icon: Filter,
     title: "Funnel de vente",
-    description: "Construis ton funnel de A a Z : landing page, page de vente, upsells, emails.",
+    description: "Construis ton funnel de A à Z : landing page, page de vente, upsells, emails.",
   },
   {
     icon: Megaphone,
-    title: "Ads & Creatives",
+    title: "Ads & Créatives",
     description: "Crée des publicités qui convertissent : hooks, copy, scripts vidéo, DM automatisés.",
   },
   {
@@ -93,7 +94,7 @@ const FEATURES = [
   {
     icon: Bot,
     title: "Assistant IA",
-    description: "Un coach IA disponible 24/7 qui connait ton business et t'accompagne a chaque etape.",
+    description: "Un coach IA disponible 24/7 qui connaît ton business et t'accompagne à chaque étape.",
   },
 ];
 
@@ -101,12 +102,12 @@ const STEPS = [
   {
     step: "01",
     title: "Remplis ton Vault",
-    description: "Decris ton expertise, tes competences et tes objectifs en 5 minutes.",
+    description: "Décris ton expertise, tes compétences et tes objectifs en 5 minutes.",
   },
   {
     step: "02",
     title: "L'IA analyse ton marché",
-    description: "ScalingFlow identifie tes opportunites, ton avatar client et tes concurrents.",
+    description: "ScalingFlow identifie tes opportunités, ton avatar client et tes concurrents.",
   },
   {
     step: "03",
@@ -119,17 +120,20 @@ const TESTIMONIALS = [
   {
     name: "Thomas D.",
     role: "Coach business",
-    text: "En 2 heures j'avais mon offre, mon funnel et mes 5 premieres pubs. Ce qui m'aurait pris 3 semaines.",
+    text: "En 2 heures j'avais mon offre, mon funnel et mes 5 premières pubs. Ce qui m'aurait pris 3 semaines.",
+    stars: 5,
   },
   {
     name: "Sarah M.",
     role: "Consultante marketing",
     text: "La qualité des textes générés est bluffante. Mes clients pensent que j'ai une équipe de copywriters.",
+    stars: 5,
   },
   {
     name: "Kevin L.",
     role: "Agence digitale",
     text: "On utilise ScalingFlow pour onboarder nos clients 10x plus vite. Un game-changer pour notre agence.",
+    stars: 5,
   },
 ];
 
@@ -158,7 +162,7 @@ export default function WelcomePage() {
             </Link>
             <Link
               href="/register"
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-accent text-white text-sm font-medium hover:bg-accent/90 transition-colors"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-accent text-white text-sm font-medium hover:bg-accent/90 transition-all shadow-lg shadow-accent/15 hover:shadow-accent/25"
             >
               Commencer gratuitement
               <ArrowRight className="h-4 w-4" />
@@ -169,22 +173,26 @@ export default function WelcomePage() {
 
       {/* ─── Hero ─── */}
       <section className="relative overflow-hidden">
-        {/* Glow effect */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-accent/8 rounded-full blur-[120px] pointer-events-none" />
+        {/* Glow effects */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[500px] bg-accent/8 rounded-full blur-[150px] pointer-events-none" />
+        <div className="absolute top-40 left-0 w-[300px] h-[300px] bg-purple-500/5 rounded-full blur-[100px] pointer-events-none" />
+        <div className="absolute top-20 right-0 w-[300px] h-[300px] bg-blue-500/5 rounded-full blur-[100px] pointer-events-none" />
 
-        <div className="max-w-4xl mx-auto px-4 pt-24 pb-20 text-center relative">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-accent/20 bg-accent/5 text-accent text-xs font-medium mb-8">
+        <div className="max-w-4xl mx-auto px-4 pt-28 pb-24 text-center relative">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-accent/20 bg-accent/5 text-accent text-xs font-medium mb-8 backdrop-blur-sm">
             <Sparkles className="h-3.5 w-3.5" />
             Infrastructure IA Plug &amp; Play
           </div>
 
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-text-primary leading-tight mb-6">
+          <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold text-text-primary leading-[1.1] mb-6 tracking-tight">
             Scale ton business
             <br />
-            <span className="text-accent">avec l&apos;IA</span>
+            <span className="bg-gradient-to-r from-accent via-emerald-300 to-accent bg-clip-text text-transparent">
+              avec l&apos;IA
+            </span>
           </h1>
 
-          <p className="text-lg text-text-secondary max-w-2xl mx-auto mb-10 leading-relaxed">
+          <p className="text-lg sm:text-xl text-text-secondary max-w-2xl mx-auto mb-12 leading-relaxed">
             Offre, funnel, ads, contenu, emails — tout ce dont tu as besoin pour
             lancer et scaler, généré par l&apos;IA en quelques clics.{" "}
             <span className="text-text-primary font-medium">Gratuit pour commencer.</span>
@@ -193,27 +201,27 @@ export default function WelcomePage() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
               href="/register"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-accent text-white font-semibold text-base hover:bg-accent/90 transition-all shadow-[0_0_24px_rgba(52,211,153,0.15)]"
+              className="group inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-accent text-white font-semibold text-base hover:bg-accent/90 transition-all shadow-[0_0_32px_rgba(52,211,153,0.2)] hover:shadow-[0_0_48px_rgba(52,211,153,0.3)]"
             >
               Commencer gratuitement
-              <ArrowRight className="h-5 w-5" />
+              <ArrowRight className="h-5 w-5 group-hover:translate-x-0.5 transition-transform" />
             </Link>
             <Link
               href="#features"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-border-default text-text-secondary font-medium text-base hover:text-text-primary hover:border-border-hover transition-all"
+              className="inline-flex items-center gap-2 px-8 py-4 rounded-xl border border-border-default text-text-secondary font-medium text-base hover:text-text-primary hover:border-border-hover transition-all"
             >
-              Voir les fonctionnalites
+              Voir les fonctionnalités
             </Link>
           </div>
 
-          <p className="text-xs text-text-muted mt-6">
-            5 generations IA gratuites &middot; Pas de carte bancaire requise
+          <p className="text-xs text-text-muted mt-8">
+            5 générations IA gratuites &middot; Pas de carte bancaire requise
           </p>
         </div>
       </section>
 
       {/* ─── Social proof bar ─── */}
-      <section className="border-y border-border-default/50 bg-bg-secondary/30">
+      <section className="border-y border-border-default/50 bg-bg-secondary/30 backdrop-blur-sm">
         <div className="max-w-4xl mx-auto px-4 py-6 flex flex-wrap items-center justify-center gap-8 text-sm text-text-muted">
           <div className="flex items-center gap-2">
             <BarChart3 className="h-4 w-4 text-accent" />
@@ -231,12 +239,12 @@ export default function WelcomePage() {
       </section>
 
       {/* ─── Features ─── */}
-      <section id="features" className="max-w-6xl mx-auto px-4 py-24">
+      <section id="features" className="max-w-6xl mx-auto px-4 py-28">
         <div className="text-center mb-16">
-          <h2 className="text-3xl font-bold text-text-primary mb-4">
+          <h2 className="text-3xl sm:text-4xl font-bold text-text-primary mb-4">
             Tout pour scaler, en un seul endroit
           </h2>
-          <p className="text-text-secondary max-w-xl mx-auto">
+          <p className="text-text-secondary max-w-xl mx-auto text-lg">
             De l&apos;analyse de marché au closing, ScalingFlow génère tous les assets
             dont tu as besoin pour lancer et scaler ton business.
           </p>
@@ -246,12 +254,12 @@ export default function WelcomePage() {
           {FEATURES.map((feature) => (
             <div
               key={feature.title}
-              className="p-6 rounded-2xl border border-border-default bg-bg-secondary/30 hover:border-accent/20 transition-all group"
+              className="group p-6 rounded-2xl border border-border-default/50 bg-bg-secondary/30 hover:border-accent/20 hover:shadow-xl hover:shadow-accent/5 transition-all duration-300 backdrop-blur-sm"
             >
-              <div className="h-10 w-10 rounded-xl bg-accent/10 flex items-center justify-center mb-4 group-hover:bg-accent/15 transition-colors">
-                <feature.icon className="h-5 w-5 text-accent" />
+              <div className="h-12 w-12 rounded-xl bg-accent/10 flex items-center justify-center mb-5 group-hover:bg-accent/15 group-hover:scale-110 transition-all duration-300">
+                <feature.icon className="h-6 w-6 text-accent" />
               </div>
-              <h3 className="font-semibold text-text-primary mb-2">{feature.title}</h3>
+              <h3 className="font-semibold text-text-primary mb-2 text-lg">{feature.title}</h3>
               <p className="text-sm text-text-secondary leading-relaxed">{feature.description}</p>
             </div>
           ))}
@@ -260,25 +268,25 @@ export default function WelcomePage() {
 
       {/* ─── How it works ─── */}
       <section className="bg-bg-secondary/30 border-y border-border-default/50">
-        <div className="max-w-4xl mx-auto px-4 py-24">
+        <div className="max-w-4xl mx-auto px-4 py-28">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold text-text-primary mb-4">
+            <h2 className="text-3xl sm:text-4xl font-bold text-text-primary mb-4">
               Comment ça marche
             </h2>
-            <p className="text-text-secondary">
-              3 etapes pour passer de zero a un business structure.
+            <p className="text-text-secondary text-lg">
+              3 étapes pour passer de zéro à un business structuré.
             </p>
           </div>
 
           <div className="space-y-12">
             {STEPS.map((step, i) => (
-              <div key={i} className="flex gap-6 items-start">
-                <div className="shrink-0 h-12 w-12 rounded-2xl bg-accent/10 border border-accent/20 flex items-center justify-center">
-                  <span className="text-sm font-bold text-accent">{step.step}</span>
+              <div key={i} className="flex gap-6 items-start group">
+                <div className="shrink-0 h-14 w-14 rounded-2xl bg-accent/10 border border-accent/20 flex items-center justify-center group-hover:bg-accent/15 group-hover:scale-105 transition-all duration-300">
+                  <span className="text-base font-bold text-accent">{step.step}</span>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-text-primary text-lg mb-1">{step.title}</h3>
-                  <p className="text-text-secondary">{step.description}</p>
+                  <h3 className="font-semibold text-text-primary text-xl mb-2">{step.title}</h3>
+                  <p className="text-text-secondary leading-relaxed text-lg">{step.description}</p>
                 </div>
               </div>
             ))}
@@ -287,9 +295,9 @@ export default function WelcomePage() {
       </section>
 
       {/* ─── Testimonials ─── */}
-      <section className="max-w-6xl mx-auto px-4 py-24">
+      <section className="max-w-6xl mx-auto px-4 py-28">
         <div className="text-center mb-16">
-          <h2 className="text-3xl font-bold text-text-primary mb-4">
+          <h2 className="text-3xl sm:text-4xl font-bold text-text-primary mb-4">
             Ils scalent avec ScalingFlow
           </h2>
         </div>
@@ -298,14 +306,25 @@ export default function WelcomePage() {
           {TESTIMONIALS.map((t, i) => (
             <div
               key={i}
-              className="p-6 rounded-2xl border border-border-default bg-bg-secondary/30"
+              className="group p-6 rounded-2xl border border-border-default/50 bg-bg-secondary/30 hover:border-accent/20 hover:shadow-xl hover:shadow-accent/5 transition-all duration-300 backdrop-blur-sm"
             >
-              <p className="text-sm text-text-secondary leading-relaxed mb-4">
+              {/* Stars */}
+              <div className="flex gap-1 mb-4">
+                {Array.from({ length: t.stars }).map((_, si) => (
+                  <Star key={si} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                ))}
+              </div>
+              <p className="text-sm text-text-secondary leading-relaxed mb-5">
                 &ldquo;{t.text}&rdquo;
               </p>
-              <div>
-                <p className="text-sm font-semibold text-text-primary">{t.name}</p>
-                <p className="text-xs text-text-muted">{t.role}</p>
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-full bg-accent/10 flex items-center justify-center text-accent font-bold text-sm">
+                  {t.name[0]}
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-text-primary">{t.name}</p>
+                  <p className="text-xs text-text-muted">{t.role}</p>
+                </div>
               </div>
             </div>
           ))}
@@ -314,13 +333,13 @@ export default function WelcomePage() {
 
       {/* ─── Pricing ─── */}
       <section id="pricing" className="bg-bg-secondary/30 border-y border-border-default/50">
-        <div className="max-w-5xl mx-auto px-4 py-24">
+        <div className="max-w-5xl mx-auto px-4 py-28">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold text-text-primary mb-4">
+            <h2 className="text-3xl sm:text-4xl font-bold text-text-primary mb-4">
               Tarifs simples, pas de surprise
             </h2>
-            <p className="text-text-secondary">
-              Commence gratuitement, upgrade quand tu es pret.
+            <p className="text-text-secondary text-lg">
+              Commence gratuitement, upgrade quand tu es prêt.
             </p>
           </div>
 
@@ -330,23 +349,23 @@ export default function WelcomePage() {
               return (
                 <div
                   key={plan.id}
-                  className={`relative p-6 rounded-2xl border ${
+                  className={`relative p-6 rounded-2xl border transition-all duration-300 hover:shadow-xl ${
                     plan.popular
-                      ? "border-accent/50 shadow-[0_0_32px_rgba(52,211,153,0.08)]"
-                      : "border-border-default"
+                      ? "border-accent/50 shadow-[0_0_40px_rgba(52,211,153,0.1)] hover:shadow-accent/15"
+                      : "border-border-default hover:border-border-hover"
                   } bg-bg-primary`}
                 >
                   {plan.popular && (
                     <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                      <span className="px-3 py-1 rounded-full bg-accent text-white text-xs font-semibold">
+                      <span className="px-4 py-1.5 rounded-full bg-accent text-white text-xs font-semibold shadow-lg shadow-accent/25">
                         Le plus populaire
                       </span>
                     </div>
                   )}
 
-                  <div className="flex items-center gap-2 mb-3">
+                  <div className="flex items-center gap-2 mb-4">
                     <div
-                      className={`h-8 w-8 rounded-lg flex items-center justify-center ${
+                      className={`h-10 w-10 rounded-xl flex items-center justify-center ${
                         plan.id === "free"
                           ? "bg-bg-tertiary text-text-secondary"
                           : plan.id === "pro"
@@ -354,38 +373,38 @@ export default function WelcomePage() {
                           : "bg-[rgba(139,92,246,0.12)] text-[#A78BFA]"
                       }`}
                     >
-                      <Icon className="h-4 w-4" />
+                      <Icon className="h-5 w-5" />
                     </div>
-                    <h3 className="font-semibold text-text-primary">{plan.name}</h3>
+                    <h3 className="font-semibold text-text-primary text-lg">{plan.name}</h3>
                   </div>
 
-                  <div className="flex items-baseline gap-1 mb-4">
-                    <span className="text-3xl font-bold text-text-primary">{plan.price}</span>
+                  <div className="flex items-baseline gap-1 mb-5">
+                    <span className="text-4xl font-bold text-text-primary">{plan.price}</span>
                     <span className="text-sm text-text-muted">
                       {plan.price === 0 ? "EUR" : "EUR/mois"}
                     </span>
                   </div>
 
-                  <p className="text-xs text-text-muted mb-4">{plan.description}</p>
+                  <p className="text-xs text-text-muted mb-5">{plan.description}</p>
 
-                  <div className="space-y-2 mb-6">
+                  <div className="space-y-2.5 mb-6">
                     {plan.features.map((f) => (
-                      <div key={f} className="flex items-start gap-2 text-sm text-text-secondary">
+                      <div key={f} className="flex items-start gap-2.5 text-sm text-text-secondary">
                         <Check
                           className={`h-4 w-4 mt-0.5 shrink-0 ${
                             plan.id === "premium" ? "text-[#A78BFA]" : "text-accent"
                           }`}
                         />
-                        {f}
+                        <span className="leading-relaxed">{f}</span>
                       </div>
                     ))}
                   </div>
 
                   <Link
                     href="/register"
-                    className={`block w-full text-center py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                    className={`block w-full text-center py-3 rounded-xl text-sm font-medium transition-all ${
                       plan.popular
-                        ? "bg-accent text-white hover:bg-accent/90"
+                        ? "bg-accent text-white hover:bg-accent/90 shadow-lg shadow-accent/15"
                         : "border border-border-default text-text-secondary hover:text-text-primary hover:border-border-hover"
                     }`}
                   >
@@ -399,11 +418,11 @@ export default function WelcomePage() {
       </section>
 
       {/* ─── FAQ ─── */}
-      <section className="max-w-3xl mx-auto px-4 py-24">
-        <h2 className="text-3xl font-bold text-text-primary text-center mb-4">
-          Questions frequentes
+      <section className="max-w-3xl mx-auto px-4 py-28">
+        <h2 className="text-3xl sm:text-4xl font-bold text-text-primary text-center mb-4">
+          Questions fréquentes
         </h2>
-        <p className="text-text-secondary text-center mb-12">
+        <p className="text-text-secondary text-center mb-12 text-lg">
           Tout ce que tu dois savoir avant de commencer.
         </p>
         <div className="space-y-3">
@@ -417,31 +436,31 @@ export default function WelcomePage() {
               a: "Absolument. Tous les textes générés (offres, funnels, ads, emails) sont entièrement éditables. L'IA te donne une base solide que tu peux affiner selon tes besoins.",
             },
             {
-              q: "Existe-t-il une periode d'essai gratuite ?",
-              a: "Oui, le plan Free te permet de tester la plateforme avec 5 generations IA par mois. Tu peux upgrader a tout moment vers Pro ou Premium pour debloquer toutes les fonctionnalites.",
+              q: "Existe-t-il une période d'essai gratuite ?",
+              a: "Oui, le plan Free te permet de tester la plateforme avec 5 générations IA par mois. Tu peux upgrader à tout moment vers Pro ou Premium pour débloquer toutes les fonctionnalités.",
             },
             {
               q: "Quels types de contenu l'IA peut-elle générer ?",
               a: "ScalingFlow génère : analyses de marché, offres complètes, pages de funnel, créatives publicitaires, scripts de vente, VSL, séquences email/SMS, posts reels, scripts YouTube, et plus encore.",
             },
             {
-              q: "Mes donnees sont-elles securisees ?",
-              a: "Oui. Toutes les donnees sont chiffrees et stockees sur Supabase (infrastructure AWS). Les paiements sont securises par Stripe. Nous ne partageons jamais tes donnees avec des tiers.",
+              q: "Mes données sont-elles sécurisées ?",
+              a: "Oui. Toutes les données sont chiffrées et stockées sur Supabase (infrastructure AWS). Les paiements sont sécurisés par Stripe. Nous ne partageons jamais tes données avec des tiers.",
             },
             {
-              q: "Puis-je annuler mon abonnement a tout moment ?",
-              a: "Oui, sans engagement. Tu peux annuler ton abonnement depuis les parametres de ton compte. Tu conserves l'acces jusqu'a la fin de la periode de facturation en cours.",
+              q: "Puis-je annuler mon abonnement à tout moment ?",
+              a: "Oui, sans engagement. Tu peux annuler ton abonnement depuis les paramètres de ton compte. Tu conserves l'accès jusqu'à la fin de la période de facturation en cours.",
             },
           ].map((faq) => (
             <details
               key={faq.q}
-              className="group rounded-xl border border-border-default/60 bg-bg-secondary/50 transition-all open:bg-bg-secondary"
+              className="group rounded-2xl border border-border-default/60 bg-bg-secondary/50 transition-all duration-300 open:bg-bg-secondary open:border-accent/20 open:shadow-lg open:shadow-accent/5 hover:border-border-hover"
             >
-              <summary className="flex cursor-pointer items-center justify-between px-6 py-4 text-sm font-medium text-text-primary list-none [&::-webkit-details-marker]:hidden">
+              <summary className="flex cursor-pointer items-center justify-between px-6 py-5 text-sm font-medium text-text-primary list-none [&::-webkit-details-marker]:hidden">
                 {faq.q}
-                <span className="ml-4 shrink-0 text-text-muted transition-transform group-open:rotate-45 text-lg">+</span>
+                <span className="ml-4 shrink-0 text-text-muted transition-transform duration-300 group-open:rotate-45 text-lg">+</span>
               </summary>
-              <div className="px-6 pb-4 text-sm text-text-secondary leading-relaxed">
+              <div className="px-6 pb-5 text-sm text-text-secondary leading-relaxed">
                 {faq.a}
               </div>
             </details>
@@ -450,20 +469,23 @@ export default function WelcomePage() {
       </section>
 
       {/* ─── Final CTA ─── */}
-      <section className="max-w-4xl mx-auto px-4 py-24 text-center">
-        <h2 className="text-3xl font-bold text-text-primary mb-4">
-          Pret a scaler ?
-        </h2>
-        <p className="text-text-secondary mb-8 max-w-lg mx-auto">
-          Rejoins ScalingFlow et lance ton business structure par l&apos;IA en moins de 30 minutes.
-        </p>
-        <Link
-          href="/register"
-          className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-accent text-white font-semibold text-lg hover:bg-accent/90 transition-all shadow-[0_0_32px_rgba(52,211,153,0.15)]"
-        >
-          Créer mon compte gratuitement
-          <ArrowRight className="h-5 w-5" />
-        </Link>
+      <section className="relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-bg-primary via-accent/[0.03] to-bg-primary pointer-events-none" />
+        <div className="max-w-4xl mx-auto px-4 py-28 text-center relative">
+          <h2 className="text-3xl sm:text-4xl font-bold text-text-primary mb-4">
+            Prêt à scaler ?
+          </h2>
+          <p className="text-text-secondary text-lg mb-10 max-w-lg mx-auto">
+            Rejoins ScalingFlow et lance ton business structuré par l&apos;IA en moins de 30 minutes.
+          </p>
+          <Link
+            href="/register"
+            className="group inline-flex items-center gap-2 px-10 py-5 rounded-2xl bg-accent text-white font-semibold text-lg hover:bg-accent/90 transition-all shadow-[0_0_40px_rgba(52,211,153,0.2)] hover:shadow-[0_0_60px_rgba(52,211,153,0.3)]"
+          >
+            Créer mon compte gratuitement
+            <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
+          </Link>
+        </div>
       </section>
 
       {/* ─── Footer ─── */}
@@ -478,7 +500,7 @@ export default function WelcomePage() {
             <Link href="/register" className="hover:text-text-secondary transition-colors">Inscription</Link>
             <div className="flex items-center gap-1">
               <Shield className="h-3 w-3" />
-              Paiements securises via Stripe
+              Paiements sécurisés via Stripe
             </div>
           </div>
         </div>

@@ -7,12 +7,17 @@ interface OnboardingSummaryProps {
 function Section({
   title,
   children,
+  delay = 0,
 }: {
   title: string;
   children: React.ReactNode;
+  delay?: number;
 }) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
+    <div
+      className="rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur-sm transition-all duration-500 hover:border-white/20 hover:bg-white/[0.07] animate-in fade-in slide-in-from-bottom-3"
+      style={{ animationDelay: `${delay}ms`, animationFillMode: "both" }}
+    >
       <h4 className="mb-3 text-xs font-medium uppercase tracking-wider text-emerald-400">
         {title}
       </h4>
@@ -24,9 +29,9 @@ function Section({
 function Row({ label, value }: { label: string; value: string }) {
   if (!value) return null;
   return (
-    <div className="flex justify-between text-sm">
+    <div className="flex justify-between text-sm py-1">
       <span className="text-white/40">{label}</span>
-      <span className="text-right text-white/80">{value}</span>
+      <span className="text-right text-white/80 font-medium">{value}</span>
     </div>
   );
 }
@@ -55,7 +60,7 @@ export function OnboardingSummary({ data }: OnboardingSummaryProps) {
   return (
     <div className="grid gap-4 sm:grid-cols-2">
       {/* Identité */}
-      <Section title="Identité">
+      <Section title="Identité" delay={0}>
         <Row label="Prénom" value={String(data.firstName || "")} />
         <Row
           label="Situation"
@@ -65,12 +70,12 @@ export function OnboardingSummary({ data }: OnboardingSummaryProps) {
       </Section>
 
       {/* Objectifs */}
-      <Section title="Objectifs">
+      <Section title="Objectifs" delay={80}>
         <Row
           label="Objectif revenus"
           value={
             data.targetRevenue
-              ? `${Number(data.targetRevenue).toLocaleString("fr-FR")} €/mois`
+              ? `${Number(data.targetRevenue).toLocaleString("fr-FR")} EUR/mois`
               : ""
           }
         />
@@ -78,9 +83,9 @@ export function OnboardingSummary({ data }: OnboardingSummaryProps) {
           label="Budget disponible"
           value={
             data.budgetMonthly !== undefined && Number(data.budgetMonthly) > 0
-              ? `${Number(data.budgetMonthly).toLocaleString("fr-FR")} €`
+              ? `${Number(data.budgetMonthly).toLocaleString("fr-FR")} EUR`
               : String(data.budgetMonthly) === "0"
-                ? "0 €"
+                ? "0 EUR"
                 : ""
           }
         />
@@ -88,7 +93,7 @@ export function OnboardingSummary({ data }: OnboardingSummaryProps) {
 
       {/* Objectifs business */}
       {objectives.length > 0 && (
-        <Section title="Objectifs business">
+        <Section title="Objectifs business" delay={160}>
           <div className="flex flex-wrap gap-2">
             {objectives.map((o) => (
               <span
@@ -104,7 +109,7 @@ export function OnboardingSummary({ data }: OnboardingSummaryProps) {
 
       {/* Industries */}
       {industries.length > 0 && (
-        <Section title="Industries">
+        <Section title="Industries" delay={240}>
           <div className="flex flex-wrap gap-2">
             {industries.map((i) => (
               <span
@@ -120,8 +125,8 @@ export function OnboardingSummary({ data }: OnboardingSummaryProps) {
 
       {/* Expertise */}
       {expertiseAnswers.q1 && (
-        <Section title="Expertise">
-          <p className="text-sm text-white/60">
+        <Section title="Expertise" delay={320}>
+          <p className="text-sm text-white/60 leading-relaxed">
             {expertiseAnswers.q1.length > 120
               ? expertiseAnswers.q1.slice(0, 120) + "..."
               : expertiseAnswers.q1}

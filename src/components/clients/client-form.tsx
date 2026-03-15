@@ -99,7 +99,7 @@ export function ClientForm({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent className="sm:max-w-lg rounded-2xl">
         <DialogHeader>
           <DialogTitle>
             {mode === "create" ? "Ajouter un client" : "Modifier le client"}

@@ -7,9 +7,10 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AILoading } from "@/components/shared/ai-loading";
 import { GlowCard } from "@/components/shared/glow-card";
-import { Sparkles, Copy, Linkedin, Twitter, Instagram, Pencil, Check, Send } from "lucide-react";
+import { Sparkles, Copy, Check, Linkedin, Twitter, Instagram, Pencil, Send } from "lucide-react";
 import { UpgradeWall } from "@/components/shared/upgrade-wall";
 import { UnipilePublishDialog } from "@/components/shared/unipile-publish-dialog";
+import { GenerateButton } from "@/components/shared/generate-button";
 import { toast } from "sonner";
 
 const PLATFORMS = [
@@ -96,7 +97,7 @@ export function PostGenerator({ className }: PostGeneratorProps) {
   }
 
   if (loading) {
-    return <AILoading text="Création de tes posts" className={className} />;
+    return <AILoading variant="immersive" text="Création de tes posts" className={className} />;
   }
 
   return (
@@ -169,10 +170,9 @@ export function PostGenerator({ className }: PostGeneratorProps) {
 
             {error && <p className="text-sm text-danger">{error}</p>}
 
-            <Button size="lg" onClick={handleGenerate} className="w-full">
-              <Sparkles className="h-4 w-4 mr-2" />
+            <GenerateButton onClick={handleGenerate} className="w-full">
               Générer des posts {platform}
-            </Button>
+            </GenerateButton>
           </CardContent>
         </Card>
       ) : (
@@ -219,9 +219,13 @@ export function PostGenerator({ className }: PostGeneratorProps) {
                         variant="ghost"
                         size="sm"
                         onClick={() => copyToClipboard(post.content || post.text || JSON.stringify(post), i)}
+                        className={cn(copiedIndex === i && "text-accent")}
                       >
-                        <Copy className="h-3 w-3 mr-1" />
-                        {copiedIndex === i ? "Copié !" : "Copier"}
+                        {copiedIndex === i ? (
+                          <><Check className="h-3 w-3 mr-1 animate-in zoom-in-50 duration-200" /> Copié !</>
+                        ) : (
+                          <><Copy className="h-3 w-3 mr-1" /> Copier</>
+                        )}
                       </Button>
                       <Button
                         variant="ghost"

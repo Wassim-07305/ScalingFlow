@@ -49,7 +49,7 @@ export function WelcomeBanner() {
   const usagePercent = usage?.limit ? Math.min((usage.currentUsage / usage.limit) * 100, 100) : 0;
 
   return (
-    <div className="relative overflow-hidden rounded-xl border border-border-default bg-bg-secondary">
+    <div className="relative overflow-hidden rounded-2xl border border-white/5 bg-bg-secondary backdrop-blur-sm">
       {/* Animated gradient background */}
       <div className={cn(
         "absolute inset-0 bg-gradient-to-r opacity-50",

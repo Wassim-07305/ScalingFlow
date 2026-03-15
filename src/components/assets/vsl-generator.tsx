@@ -7,9 +7,10 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { AILoading } from "@/components/shared/ai-loading";
 import { GlowCard } from "@/components/shared/glow-card";
-import { Sparkles, Clock, Play, Pencil, Check, Save, Loader2 } from "lucide-react";
+import { Clock, Play, Pencil, Check, Save, Loader2 } from "lucide-react";
 import { CopyExportBar } from "@/components/shared/copy-export-bar";
 import { UpgradeWall } from "@/components/shared/upgrade-wall";
+import { GenerateButton } from "@/components/shared/generate-button";
 import { createClient } from "@/lib/supabase/client";
 import { useUser } from "@/hooks/use-user";
 import { toast } from "sonner";
@@ -139,7 +140,7 @@ export function VSLGenerator({ className, initialData }: VSLGeneratorProps) {
   }
 
   if (loading) {
-    return <AILoading text="Rédaction de ton script VSL" className={className} />;
+    return <AILoading variant="immersive" text="Rédaction de ton script VSL" className={className} />;
   }
 
   if (!script) {
@@ -214,10 +215,9 @@ export function VSLGenerator({ className, initialData }: VSLGeneratorProps) {
 
             {error && <p className="text-sm text-danger">{error}</p>}
 
-            <Button size="lg" onClick={handleGenerate} className="w-full">
-              <Sparkles className="h-4 w-4 mr-2" />
+            <GenerateButton onClick={handleGenerate} className="w-full" icon={<Play className="h-4 w-4 mr-2" />}>
               Générer le script VSL
-            </Button>
+            </GenerateButton>
           </CardContent>
         </Card>
       </div>
@@ -249,12 +249,12 @@ export function VSLGenerator({ className, initialData }: VSLGeneratorProps) {
               size="sm"
               onClick={handleSaveEdits}
               disabled={saving}
-              className="bg-accent hover:bg-accent/90"
+              className="bg-gradient-to-r from-accent to-emerald-400 hover:from-accent/90 hover:to-emerald-400/90 text-white shadow-md shadow-accent/20"
             >
               {saving ? (
                 <><Loader2 className="h-3 w-3 animate-spin mr-1" /> Sauvegarde...</>
               ) : (
-                <><Save className="h-3 w-3 mr-1" /> Sauvegarder les modifications</>
+                <><Save className="h-3 w-3 mr-1" /> Sauvegarder</>
               )}
             </Button>
           )}

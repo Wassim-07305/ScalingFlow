@@ -68,64 +68,90 @@ export function ProgressBar() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       {/* XP Progress */}
-      <Card>
+      <Card className="group transition-all duration-300 hover:border-accent/20 hover:shadow-[0_0_20px_rgba(52,211,153,0.06)]">
         <CardContent className="py-4">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent-muted">
-              <Zap className="h-5 w-5 text-accent" />
+          {isLoading ? (
+            <div className="space-y-3">
+              <div className="flex items-center gap-3">
+                <div className="h-9 w-9 rounded-lg bg-bg-tertiary animate-pulse" />
+                <div className="space-y-1.5">
+                  <div className="h-4 w-20 rounded bg-bg-tertiary animate-pulse" />
+                  <div className="h-3 w-16 rounded bg-bg-tertiary animate-pulse" />
+                </div>
+              </div>
+              <div className="h-2 rounded-full bg-bg-tertiary animate-pulse" />
+              <div className="h-3 w-40 rounded bg-bg-tertiary animate-pulse" />
             </div>
-            <div>
-              <p className="text-sm font-medium text-text-primary">
-                Niveau {level}
+          ) : (
+            <>
+              <div className="flex items-center gap-3 mb-3">
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent-muted transition-transform duration-300 group-hover:scale-110">
+                  <Zap className="h-5 w-5 text-accent" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-text-primary">
+                    Niveau {level}
+                  </p>
+                  <p className="text-xs text-text-muted">
+                    {xp} XP total
+                  </p>
+                </div>
+              </div>
+              <div className="h-2 rounded-full bg-bg-tertiary overflow-hidden">
+                <div
+                  className="h-full rounded-full bg-accent transition-all duration-700"
+                  style={{ width: `${xpPercent}%` }}
+                />
+              </div>
+              <p className="text-xs text-text-muted mt-1.5">
+                {xpInLevel} / {xpNeeded} XP pour le niveau {level + 1}
               </p>
-              <p className="text-xs text-text-muted">
-                {isLoading ? "..." : `${xp} XP total`}
-              </p>
-            </div>
-          </div>
-          <div className="h-2 rounded-full bg-bg-tertiary overflow-hidden">
-            <div
-              className={cn(
-                "h-full rounded-full bg-accent transition-all duration-700"
-              )}
-              style={{ width: isLoading ? "0%" : `${xpPercent}%` }}
-            />
-          </div>
-          <p className="text-xs text-text-muted mt-1.5">
-            {isLoading
-              ? "Chargement..."
-              : `${xpInLevel} / ${xpNeeded} XP pour le niveau ${level + 1}`}
-          </p>
+            </>
+          )}
         </CardContent>
       </Card>
 
       {/* Roadmap Progress */}
-      <Card>
+      <Card className="group transition-all duration-300 hover:border-info/20 hover:shadow-[0_0_20px_rgba(59,130,246,0.06)]">
         <CardContent className="py-4">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-info/12">
-              <TrendingUp className="h-5 w-5 text-info" />
+          {isLoading ? (
+            <div className="space-y-3">
+              <div className="flex items-center gap-3">
+                <div className="h-9 w-9 rounded-lg bg-bg-tertiary animate-pulse" />
+                <div className="space-y-1.5">
+                  <div className="h-4 w-32 rounded bg-bg-tertiary animate-pulse" />
+                  <div className="h-3 w-20 rounded bg-bg-tertiary animate-pulse" />
+                </div>
+              </div>
+              <div className="h-2 rounded-full bg-bg-tertiary animate-pulse" />
+              <div className="h-3 w-24 rounded bg-bg-tertiary animate-pulse" />
             </div>
-            <div>
-              <p className="text-sm font-medium text-text-primary">
-                Progression roadmap
+          ) : (
+            <>
+              <div className="flex items-center gap-3 mb-3">
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-info/12 transition-transform duration-300 group-hover:scale-110">
+                  <TrendingUp className="h-5 w-5 text-info" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-text-primary">
+                    Progression roadmap
+                  </p>
+                  <p className="text-xs text-text-muted">
+                    {taskProgress.completed} / {taskProgress.total} tâches
+                  </p>
+                </div>
+              </div>
+              <div className="h-2 rounded-full bg-bg-tertiary overflow-hidden">
+                <div
+                  className="h-full rounded-full bg-info transition-all duration-700"
+                  style={{ width: `${taskPercent}%` }}
+                />
+              </div>
+              <p className="text-xs text-text-muted mt-1.5">
+                {taskPercent}% complété
               </p>
-              <p className="text-xs text-text-muted">
-                {isLoading
-                  ? "..."
-                  : `${taskProgress.completed} / ${taskProgress.total} tâches`}
-              </p>
-            </div>
-          </div>
-          <div className="h-2 rounded-full bg-bg-tertiary overflow-hidden">
-            <div
-              className="h-full rounded-full bg-info transition-all duration-700"
-              style={{ width: isLoading ? "0%" : `${taskPercent}%` }}
-            />
-          </div>
-          <p className="text-xs text-text-muted mt-1.5">
-            {isLoading ? "Chargement..." : `${taskPercent}% complété`}
-          </p>
+            </>
+          )}
         </CardContent>
       </Card>
     </div>

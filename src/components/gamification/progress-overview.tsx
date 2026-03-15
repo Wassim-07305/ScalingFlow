@@ -209,14 +209,21 @@ export function ProgressOverview({ className }: ProgressOverviewProps) {
               ))
             ) : (
               modules.map((mod) => (
-                <div key={mod.name} className="flex items-center gap-4">
-                  <mod.icon className={cn("h-5 w-5", mod.color)} />
+                <div key={mod.name} className="flex items-center gap-4 group">
+                  <div className="h-9 w-9 rounded-lg bg-bg-tertiary/80 flex items-center justify-center ring-1 ring-white/5 group-hover:ring-accent/20 transition-all">
+                    <mod.icon className={cn("h-4.5 w-4.5", mod.color)} />
+                  </div>
                   <div className="flex-1">
-                    <div className="flex justify-between mb-1">
-                      <span className="text-sm text-text-primary">{mod.name}</span>
-                      <span className="text-sm text-text-muted">{mod.progress}%</span>
+                    <div className="flex justify-between mb-1.5">
+                      <span className="text-sm font-medium text-text-primary">{mod.name}</span>
+                      <span className={cn("text-sm font-semibold", mod.progress === 100 ? "text-accent" : "text-text-muted")}>{mod.progress}%</span>
                     </div>
-                    <Progress value={mod.progress} className="h-2" />
+                    <div className="h-2 bg-bg-tertiary rounded-full overflow-hidden">
+                      <div
+                        className="h-full rounded-full bg-gradient-to-r from-accent/80 to-accent transition-all duration-700 ease-out"
+                        style={{ width: `${mod.progress}%` }}
+                      />
+                    </div>
                   </div>
                 </div>
               ))
@@ -269,7 +276,7 @@ export function ProgressOverview({ className }: ProgressOverviewProps) {
                       <p className="font-semibold">{badgeDef.name}</p>
                       <p className="text-xs text-text-secondary">{badgeDef.description}</p>
                       {!unlocked && (
-                        <p className="text-xs text-text-muted mt-1 italic">Non debloque</p>
+                        <p className="text-xs text-text-muted mt-1 italic">Non débloqué</p>
                       )}
                     </TooltipContent>
                   </Tooltip>

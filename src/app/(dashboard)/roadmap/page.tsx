@@ -265,7 +265,7 @@ export default function RoadmapPage() {
       {/* Phase progression visuelle */}
       <PhaseProgression />
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid gap-6 lg:grid-cols-2 mt-2">
         <DailyTasks refreshKey={refreshKey} />
         <MilestoneTracker />
       </div>

@@ -102,7 +102,9 @@ export function DirectMessages() {
   >([]);
   const [searching, setSearching] = useState(false);
   const [mobileShowChat, setMobileShowChat] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   // Charger les conversations
   const fetchConversations = useCallback(async () => {
@@ -263,6 +265,23 @@ export function DirectMessages() {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  // Auto-focus input when conversation selected
+  useEffect(() => {
+    if (selectedUserId) {
+      setTimeout(() => inputRef.current?.focus(), 300);
+    }
+  }, [selectedUserId]);
+
+  // Simulate typing indicator on realtime
+  useEffect(() => {
+    if (!selectedUserId) return;
+    // Show typing briefly when messages arrive from others
+    const lastMsg = messages[messages.length - 1];
+    if (lastMsg && lastMsg.sender_id !== user?.id) {
+      setIsTyping(false);
+    }
+  }, [messages, selectedUserId, user?.id]);
 
   // Sélectionner une conversation
   const selectConversation = (conv: Conversation) => {
@@ -461,10 +480,10 @@ export function DirectMessages() {
               key={conv.userId}
               onClick={() => selectConversation(conv)}
               className={cn(
-                "flex items-center gap-3 w-full px-4 py-3.5 transition-all text-left border-b border-border-default/30",
+                "flex items-center gap-3 w-full px-4 py-3.5 transition-all duration-200 text-left border-b border-border-default/30",
                 selectedUserId === conv.userId
                   ? "bg-accent/5 border-l-2 border-l-accent"
-                  : "hover:bg-bg-tertiary/50"
+                  : "hover:bg-bg-tertiary/50 active:bg-bg-tertiary/70"
               )}
             >
               <div className="relative shrink-0">
@@ -565,7 +584,7 @@ export function DirectMessages() {
           </div>
 
           {/* Messages */}
-          <div className="flex-1 overflow-y-auto px-5 py-4 space-y-3">
+          <div className="flex-1 overflow-y-auto px-5 py-4 space-y-1">
             {loadingMessages ? (
               <MessagesSkeleton />
             ) : messages.length === 0 ? (
@@ -578,66 +597,114 @@ export function DirectMessages() {
                 </p>
               </div>
             ) : (
-              messages.map((msg) => {
+              messages.map((msg, idx) => {
                 const isMine = msg.sender_id === user?.id;
+                const prevMsg = messages[idx - 1];
+                const nextMsg = messages[idx + 1];
+                const sameSenderAsPrev = prevMsg?.sender_id === msg.sender_id;
+                const sameSenderAsNext = nextMsg?.sender_id === msg.sender_id;
+
+                // Group timestamps: show date separator when day changes
+                const msgDate = new Date(msg.created_at).toLocaleDateString("fr-FR");
+                const prevDate = prevMsg
+                  ? new Date(prevMsg.created_at).toLocaleDateString("fr-FR")
+                  : null;
+                const showDateSep = msgDate !== prevDate;
+
                 return (
-                  <div
-                    key={msg.id}
-                    className={cn(
-                      "flex",
-                      isMine ? "justify-end" : "justify-start"
+                  <div key={msg.id}>
+                    {showDateSep && (
+                      <div className="flex items-center justify-center my-4">
+                        <span className="text-[10px] font-medium text-text-muted bg-bg-secondary/80 px-3 py-1 rounded-full backdrop-blur-sm">
+                          {new Date(msg.created_at).toLocaleDateString("fr-FR", {
+                            weekday: "short",
+                            day: "numeric",
+                            month: "short",
+                          })}
+                        </span>
+                      </div>
                     )}
-                  >
                     <div
                       className={cn(
-                        "max-w-[75%] rounded-2xl px-4 py-2.5 transition-all",
-                        isMine
-                          ? "bg-accent text-white rounded-br-md"
-                          : "bg-bg-tertiary text-text-primary rounded-bl-md border border-border-default/30"
+                        "flex animate-in slide-in-from-bottom-2 duration-200",
+                        isMine ? "justify-end" : "justify-start",
+                        !sameSenderAsPrev ? "mt-3" : "mt-0.5"
                       )}
                     >
-                      <p className="text-sm whitespace-pre-wrap break-words leading-relaxed">
-                        {msg.content}
-                      </p>
                       <div
                         className={cn(
-                          "flex items-center gap-1 mt-1",
-                          isMine ? "justify-end" : "justify-start"
+                          "max-w-[75%] px-3.5 py-2 transition-all",
+                          isMine
+                            ? "bg-accent text-white"
+                            : "bg-bg-tertiary text-text-primary border border-border-default/30",
+                          // iMessage-style bubble rounding
+                          isMine
+                            ? cn(
+                                "rounded-2xl",
+                                !sameSenderAsNext && "rounded-br-sm",
+                                sameSenderAsPrev && sameSenderAsNext && "rounded-r-lg",
+                              )
+                            : cn(
+                                "rounded-2xl",
+                                !sameSenderAsNext && "rounded-bl-sm",
+                                sameSenderAsPrev && sameSenderAsNext && "rounded-l-lg",
+                              ),
                         )}
                       >
-                        <span
+                        <p className="text-[13px] whitespace-pre-wrap break-words leading-relaxed">
+                          {msg.content}
+                        </p>
+                        <div
                           className={cn(
-                            "text-[10px]",
-                            isMine ? "text-white/50" : "text-text-muted"
+                            "flex items-center gap-1 mt-0.5",
+                            isMine ? "justify-end" : "justify-start"
                           )}
                         >
-                          {new Date(msg.created_at).toLocaleTimeString(
-                            "fr-FR",
-                            {
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            }
-                          )}
-                        </span>
-                        {isMine &&
-                          (msg.read ? (
-                            <CheckCheck className="h-3 w-3 text-white/50" />
-                          ) : (
-                            <Check className="h-3 w-3 text-white/50" />
-                          ))}
+                          <span
+                            className={cn(
+                              "text-[9px]",
+                              isMine ? "text-white/40" : "text-text-muted/60"
+                            )}
+                          >
+                            {new Date(msg.created_at).toLocaleTimeString(
+                              "fr-FR",
+                              { hour: "2-digit", minute: "2-digit" }
+                            )}
+                          </span>
+                          {isMine &&
+                            (msg.read ? (
+                              <CheckCheck className="h-3 w-3 text-white/60" />
+                            ) : (
+                              <Check className="h-3 w-3 text-white/40" />
+                            ))}
+                        </div>
                       </div>
                     </div>
                   </div>
                 );
               })
             )}
+
+            {/* Typing indicator */}
+            {isTyping && (
+              <div className="flex justify-start mt-2">
+                <div className="bg-bg-tertiary border border-border-default/30 rounded-2xl rounded-bl-sm px-4 py-2.5">
+                  <div className="flex items-center gap-1">
+                    <span className="h-2 w-2 rounded-full bg-text-muted/40 animate-bounce" style={{ animationDelay: "0ms" }} />
+                    <span className="h-2 w-2 rounded-full bg-text-muted/40 animate-bounce" style={{ animationDelay: "150ms" }} />
+                    <span className="h-2 w-2 rounded-full bg-text-muted/40 animate-bounce" style={{ animationDelay: "300ms" }} />
+                  </div>
+                </div>
+              </div>
+            )}
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Input */}
-          <div className="px-4 py-3 border-t border-border-default/50 bg-bg-secondary/30 backdrop-blur-sm">
-            <div className="flex items-center gap-2">
+          {/* Input — WhatsApp-style */}
+          <div className="px-3 py-2.5 border-t border-border-default/50 bg-bg-secondary/30 backdrop-blur-sm">
+            <div className="flex items-end gap-2">
               <input
+                ref={inputRef}
                 type="text"
                 value={newMessage}
                 onChange={(e) => setNewMessage(e.target.value)}
@@ -648,13 +715,18 @@ export function DirectMessages() {
                   }
                 }}
                 placeholder="Écris ton message..."
-                className="flex-1 px-4 py-2.5 rounded-xl bg-bg-tertiary border border-border-default/50 text-sm text-text-primary placeholder:text-text-muted focus:border-accent/40 focus:outline-none transition-colors"
+                className="flex-1 px-4 py-2.5 rounded-2xl bg-bg-tertiary border border-border-default/50 text-sm text-text-primary placeholder:text-text-muted focus:border-accent/40 focus:ring-2 focus:ring-accent/10 focus:outline-none transition-all"
               />
               <Button
                 size="icon"
                 onClick={handleSend}
                 disabled={sending || !newMessage.trim()}
-                className="rounded-xl h-10 w-10 shrink-0"
+                className={cn(
+                  "rounded-full h-10 w-10 shrink-0 transition-all duration-200",
+                  newMessage.trim()
+                    ? "bg-accent hover:bg-accent/90 scale-100"
+                    : "bg-bg-tertiary scale-95 opacity-50"
+                )}
                 aria-label="Envoyer le message"
               >
                 {sending ? (
@@ -682,13 +754,20 @@ export function DirectMessages() {
         {renderChatPanel()}
       </div>
 
-      {/* Mobile layout: stacked with slide */}
-      <div className="md:hidden h-[calc(100dvh-200px)] min-h-[400px]">
-        {!mobileShowChat ? (
-          renderSidebar()
-        ) : (
-          renderChatPanel()
-        )}
+      {/* Mobile layout: stacked with slide transition */}
+      <div className="md:hidden h-[calc(100dvh-200px)] min-h-[400px] overflow-hidden relative">
+        <div
+          className="absolute inset-0 transition-transform duration-300 ease-out"
+          style={{ transform: mobileShowChat ? "translateX(-100%)" : "translateX(0)" }}
+        >
+          {renderSidebar()}
+        </div>
+        <div
+          className="absolute inset-0 transition-transform duration-300 ease-out"
+          style={{ transform: mobileShowChat ? "translateX(0)" : "translateX(100%)" }}
+        >
+          {renderChatPanel()}
+        </div>
       </div>
     </Card>
   );

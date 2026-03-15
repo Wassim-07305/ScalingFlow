@@ -153,10 +153,10 @@ export function LeadDetailPanel({ lead, onClose, onUpdate, onDelete }: LeadDetai
   return (
     <>
       {/* Backdrop */}
-      <div className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+      <div className="fixed inset-0 z-40 bg-black/60 backdrop-blur-md animate-in fade-in-0 duration-200" onClick={onClose} />
 
       {/* Panel */}
-      <div className="fixed right-0 top-0 z-50 h-full w-full max-w-lg border-l border-border-default bg-bg-primary overflow-y-auto shadow-2xl animate-in slide-in-from-right duration-200">
+      <div className="fixed right-0 top-0 z-50 h-full w-full max-w-lg border-l border-border-default bg-bg-primary overflow-y-auto shadow-2xl shadow-black/30 animate-in slide-in-from-right-full duration-300 ease-out">
         {/* Header */}
         <div className="sticky top-0 z-10 border-b border-border-default bg-gradient-to-r from-accent/5 via-bg-primary to-bg-primary backdrop-blur-sm px-6 py-4">
           <div className="flex items-center justify-between">
@@ -244,7 +244,7 @@ export function LeadDetailPanel({ lead, onClose, onUpdate, onDelete }: LeadDetai
               step="1"
               className={cn(
                 "w-full rounded-xl border border-border-default bg-bg-tertiary px-3.5 py-2.5 text-sm text-text-primary",
-                "focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent transition-colors",
+                "focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30 focus:shadow-sm focus:shadow-accent/10 transition-colors",
                 "[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
               )}
             />
@@ -261,7 +261,7 @@ export function LeadDetailPanel({ lead, onClose, onUpdate, onDelete }: LeadDetai
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Ajouter des notes..."
               rows={4}
-              className="w-full rounded-xl border border-border-default bg-bg-tertiary px-3.5 py-2.5 text-sm text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent resize-none transition-colors"
+              className="w-full rounded-xl border border-border-default bg-bg-tertiary px-3.5 py-2.5 text-sm text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30 focus:shadow-sm focus:shadow-accent/10 resize-none transition-colors"
             />
           </div>
 
@@ -298,8 +298,8 @@ export function LeadDetailPanel({ lead, onClose, onUpdate, onDelete }: LeadDetai
                 ))}
               </div>
             ) : activities.length === 0 ? (
-              <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border-default py-8 text-center">
-                <Activity className="h-5 w-5 text-text-muted/50 mb-2" />
+              <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border-default py-8 text-center animate-in fade-in-0 duration-300">
+                <Activity className="h-5 w-5 text-text-muted/30 mb-2" />
                 <p className="text-sm text-text-muted">
                   Aucune activité enregistrée
                 </p>

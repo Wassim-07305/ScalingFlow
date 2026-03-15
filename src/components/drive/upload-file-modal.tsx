@@ -134,10 +134,10 @@ export function UploadFileModal({
         {/* Drop zone */}
         <div
           className={cn(
-            "relative border-2 border-dashed rounded-xl p-8 text-center transition-all duration-150 cursor-pointer",
+            "relative border-2 border-dashed rounded-xl p-8 text-center transition-all duration-300 cursor-pointer",
             dragOver
-              ? "border-accent bg-accent/5"
-              : "border-border-default hover:border-border-hover"
+              ? "border-accent bg-accent/5 scale-[1.01] shadow-inner shadow-accent/10"
+              : "border-border-default hover:border-accent/30 hover:bg-accent/[0.02]"
           )}
           onDragOver={(e) => {
             e.preventDefault();
@@ -173,7 +173,7 @@ export function UploadFileModal({
             {files.map((file, i) => (
               <div
                 key={i}
-                className="flex items-center justify-between gap-3 px-3 py-2 rounded-lg bg-bg-tertiary"
+                className="flex items-center justify-between gap-3 px-3 py-2 rounded-lg bg-bg-tertiary transition-all duration-200 hover:bg-bg-tertiary/80 animate-in fade-in-0 slide-in-from-left-2 duration-200"
               >
                 <div className="flex items-center gap-2 min-w-0">
                   <FileText className="h-4 w-4 text-text-muted shrink-0" />

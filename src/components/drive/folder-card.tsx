@@ -28,11 +28,11 @@ export function FolderCard({
   onDelete,
 }: FolderCardProps) {
   return (
-    <div className="group relative rounded-2xl bg-bg-secondary/50 border border-border-default/50 p-4 transition-all duration-200 hover:border-accent/20 hover:shadow-lg hover:shadow-accent/5 hover:bg-bg-secondary cursor-pointer backdrop-blur-sm">
+    <div className="group relative rounded-2xl bg-bg-secondary/50 border border-border-default/50 p-4 transition-all duration-300 ease-out hover:border-accent/30 hover:shadow-xl hover:shadow-accent/5 hover:bg-bg-secondary hover:-translate-y-1 hover:scale-[1.01] cursor-pointer backdrop-blur-sm animate-in fade-in-0 zoom-in-95 duration-300">
       <div className="flex items-start justify-between">
         <button onClick={onClick} className="flex-1 text-left" aria-label={`Ouvrir le dossier ${name}`}>
           <div
-            className="flex h-12 w-12 items-center justify-center rounded-xl mb-3 transition-transform duration-200 group-hover:scale-105"
+            className="flex h-12 w-12 items-center justify-center rounded-xl mb-3 transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg"
             style={{ backgroundColor: `${color}15` }}
           >
             <Folder className="h-6 w-6" style={{ color }} />

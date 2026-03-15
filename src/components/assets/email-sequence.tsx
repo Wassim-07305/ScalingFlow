@@ -6,10 +6,11 @@ import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AILoading } from "@/components/shared/ai-loading";
-import { Sparkles, Mail, ChevronDown, ChevronUp, Pencil, Check, Send, Save, Loader2 } from "lucide-react";
+import { Mail, ChevronDown, ChevronUp, Pencil, Check, Send, Save, Loader2 } from "lucide-react";
 import { CopyExportBar } from "@/components/shared/copy-export-bar";
 import { UnipileSendDialog } from "@/components/shared/unipile-send-dialog";
 import { UpgradeWall } from "@/components/shared/upgrade-wall";
+import { GenerateButton } from "@/components/shared/generate-button";
 import { createClient } from "@/lib/supabase/client";
 import { useUser } from "@/hooks/use-user";
 import { toast } from "sonner";
@@ -126,7 +127,7 @@ export function EmailSequence({ className, initialData }: EmailSequenceProps) {
   }
 
   if (loading) {
-    return <AILoading text="Rédaction de ta séquence email" className={className} />;
+    return <AILoading variant="immersive" text="Rédaction de ta séquence email" className={className} />;
   }
 
   if (!sequence) {
@@ -201,10 +202,9 @@ export function EmailSequence({ className, initialData }: EmailSequenceProps) {
 
             {error && <p className="text-sm text-danger">{error}</p>}
 
-            <Button size="lg" onClick={handleGenerate} className="w-full">
-              <Sparkles className="h-4 w-4 mr-2" />
+            <GenerateButton onClick={handleGenerate} className="w-full" icon={<Mail className="h-4 w-4 mr-2" />}>
               Générer la séquence email
-            </Button>
+            </GenerateButton>
           </CardContent>
         </Card>
       </div>
@@ -235,12 +235,12 @@ export function EmailSequence({ className, initialData }: EmailSequenceProps) {
               size="sm"
               onClick={handleSaveEdits}
               disabled={saving}
-              className="bg-accent hover:bg-accent/90"
+              className="bg-gradient-to-r from-accent to-emerald-400 hover:from-accent/90 hover:to-emerald-400/90 text-white shadow-md shadow-accent/20"
             >
               {saving ? (
                 <><Loader2 className="h-3 w-3 animate-spin mr-1" /> Sauvegarde...</>
               ) : (
-                <><Save className="h-3 w-3 mr-1" /> Sauvegarder les modifications</>
+                <><Save className="h-3 w-3 mr-1" /> Sauvegarder</>
               )}
             </Button>
           )}

@@ -305,6 +305,16 @@ export function InsightsScraper({ marketName, targetAvatar, existingPains }: Ins
                     <span className="text-xs text-text-muted">fréq. {pain.frequency}%</span>
                   </div>
                 </div>
+                {/* Frequency bar */}
+                <div className="h-1 bg-bg-secondary rounded-full overflow-hidden mb-2">
+                  <div
+                    className={cn(
+                      "h-full rounded-full transition-all duration-500",
+                      pain.intensity === "critique" ? "bg-red-400" : pain.intensity === "forte" ? "bg-yellow-400" : "bg-blue-400"
+                    )}
+                    style={{ width: `${Math.min(pain.frequency, 100)}%` }}
+                  />
+                </div>
                 <div className="space-y-1">
                   {pain.exact_quotes.map((q, j) => (
                     <p key={j} className="text-xs text-text-secondary italic">&ldquo;{q}&rdquo;</p>

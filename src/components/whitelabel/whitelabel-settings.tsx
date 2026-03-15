@@ -598,14 +598,39 @@ export function WhitelabelSettings() {
 
   if (loading) {
     return (
-      <Card>
-        <CardContent className="py-12">
-          <div className="flex items-center justify-center gap-3">
-            <Loader2 className="h-5 w-5 animate-spin text-text-muted" />
-            <span className="text-sm text-text-muted">Chargement...</span>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="space-y-6">
+        <Card>
+          <CardContent className="pt-6">
+            <div className="animate-pulse space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="h-12 w-12 rounded-xl bg-bg-tertiary" />
+                <div className="space-y-2 flex-1">
+                  <div className="h-5 w-40 rounded-lg bg-bg-tertiary" />
+                  <div className="h-3 w-24 rounded-lg bg-bg-tertiary" />
+                </div>
+              </div>
+              <div className="grid grid-cols-3 gap-3">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="h-20 rounded-xl bg-bg-tertiary/50" />
+                ))}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-6">
+            <div className="animate-pulse space-y-4">
+              <div className="h-5 w-48 rounded-lg bg-bg-tertiary" />
+              <div className="h-16 w-16 rounded-xl bg-bg-tertiary" />
+              <div className="h-10 w-full rounded-xl bg-bg-tertiary/50" />
+              <div className="grid grid-cols-2 gap-3">
+                <div className="h-10 rounded-xl bg-bg-tertiary/50" />
+                <div className="h-10 rounded-xl bg-bg-tertiary/50" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     );
   }
 
@@ -655,9 +680,9 @@ export function WhitelabelSettings() {
 
   // Owner/Admin view: full management
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       {/* Org info */}
-      <Card>
+      <Card className="border-border-default/50 bg-bg-secondary/30 backdrop-blur-sm">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Building2 className="h-5 w-5 text-accent" />

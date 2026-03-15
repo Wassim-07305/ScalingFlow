@@ -61,7 +61,7 @@ export function Header({
   }
 
   return (
-    <header className="flex h-16 shrink-0 items-center justify-between border-b border-border-default bg-bg-secondary/80 px-4 backdrop-blur-sm md:px-6">
+    <header className="flex h-16 shrink-0 items-center justify-between border-b border-border-default bg-bg-secondary/80 px-4 backdrop-blur-xl md:px-6">
       {/* Left: Hamburger (mobile) + Breadcrumb */}
       <div className="flex items-center gap-2">
         <button
@@ -118,7 +118,8 @@ export function Header({
         {/* Search mobile */}
         <button
           onClick={() => setSearchOpen(true)}
-          className="rounded-lg p-2 text-text-muted transition-colors hover:bg-bg-tertiary hover:text-text-primary md:hidden"
+          className="rounded-lg p-2 text-text-muted transition-colors hover:bg-bg-tertiary hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 md:hidden"
+          aria-label="Rechercher"
         >
           <Search className="h-5 w-5" />
         </button>
@@ -126,12 +127,12 @@ export function Header({
         {/* Notification bell */}
         <button
           onClick={() => setNotificationsPanelOpen(true)}
-          className="relative rounded-lg p-2 text-text-muted transition-colors hover:bg-bg-tertiary hover:text-text-primary"
-          title="Notifications"
+          className="relative rounded-lg p-2 text-text-muted transition-all duration-200 hover:bg-bg-tertiary hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50"
+          aria-label={`Notifications${unreadCount > 0 ? ` (${unreadCount} non lues)` : ""}`}
         >
           <Bell className="h-5 w-5" />
           {unreadCount > 0 && (
-            <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-accent px-1 text-[10px] font-bold text-bg-primary">
+            <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-accent px-1 text-[10px] font-bold text-bg-primary animate-in zoom-in-50 duration-200">
               {unreadCount > 99 ? "99+" : unreadCount}
             </span>
           )}
@@ -139,7 +140,10 @@ export function Header({
 
         {/* User dropdown */}
         <div className="relative group">
-          <button className="flex items-center gap-2 rounded-xl p-1.5 transition-colors hover:bg-bg-tertiary">
+          <button
+            className="flex items-center gap-2 rounded-xl p-1.5 transition-all duration-200 hover:bg-bg-tertiary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50"
+            aria-label="Menu utilisateur"
+          >
             {avatarUrl ? (
               <img
                 src={avatarUrl}
@@ -154,7 +158,7 @@ export function Header({
           </button>
 
           {/* Dropdown */}
-          <div className="invisible absolute right-0 top-full z-50 mt-1 w-56 rounded-xl border border-border-default bg-bg-secondary p-1 opacity-0 shadow-lg transition-all group-focus-within:visible group-focus-within:opacity-100">
+          <div className="invisible absolute right-0 top-full z-50 mt-1 w-56 rounded-xl border border-border-default bg-bg-secondary/95 backdrop-blur-xl p-1 opacity-0 shadow-2xl shadow-black/20 transition-all duration-200 group-focus-within:visible group-focus-within:opacity-100 group-focus-within:translate-y-0 translate-y-1">
             <div className="px-3 py-2">
               <p className="text-sm font-medium text-text-primary">{userName}</p>
               <p className="text-xs text-text-secondary">{email}</p>

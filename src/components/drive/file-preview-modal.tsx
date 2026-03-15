@@ -111,8 +111,9 @@ export function FilePreviewModal({
     if (mimeType.startsWith("text/")) {
       if (textLoading) {
         return (
-          <div className="flex items-center justify-center h-40">
-            <div className="h-6 w-6 animate-spin rounded-full border-2 border-text-muted border-t-accent" />
+          <div className="flex flex-col items-center justify-center h-40 gap-3">
+            <div className="h-8 w-8 animate-spin rounded-full border-2 border-text-muted/30 border-t-accent" />
+            <p className="text-xs text-text-muted animate-pulse">Chargement...</p>
           </div>
         );
       }
@@ -160,8 +161,8 @@ export function FilePreviewModal({
 
     // Aperçu non disponible
     return (
-      <div className="flex flex-col items-center justify-center py-16 gap-4">
-        <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-bg-tertiary">
+      <div className="flex flex-col items-center justify-center py-16 gap-4 animate-in fade-in-0 zoom-in-95 duration-300">
+        <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-bg-tertiary animate-in zoom-in-50 duration-500">
           <FileQuestion className="h-8 w-8 text-text-muted" />
         </div>
         <div className="text-center">
@@ -182,7 +183,7 @@ export function FilePreviewModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl w-[95vw] max-h-[90vh] overflow-hidden flex flex-col">
+      <DialogContent className="max-w-4xl w-[95vw] max-h-[90vh] overflow-hidden flex flex-col rounded-2xl">
         <DialogHeader>
           <div className="flex items-center justify-between pr-8">
             <DialogTitle className="truncate">{file.name}</DialogTitle>

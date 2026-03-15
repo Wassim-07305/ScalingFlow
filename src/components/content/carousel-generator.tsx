@@ -9,11 +9,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { AILoading } from "@/components/shared/ai-loading";
 import { GlowCard } from "@/components/shared/glow-card";
-import { Sparkles, Copy, Hash, Layers, Send } from "lucide-react";
+import { Sparkles, Copy, Check, Hash, Layers, Send } from "lucide-react";
 import { toast } from "sonner";
 import type { CarouselResult } from "@/lib/ai/prompts/carousel-content";
 import { UpgradeWall } from "@/components/shared/upgrade-wall";
 import { UnipilePublishDialog } from "@/components/shared/unipile-publish-dialog";
+import { GenerateButton } from "@/components/shared/generate-button";
 
 interface CarouselGeneratorProps {
   className?: string;
@@ -84,7 +85,7 @@ export function CarouselGenerator({ className, initialData }: CarouselGeneratorP
   }
 
   if (loading) {
-    return <AILoading text="Génération du carousel" className={className} />;
+    return <AILoading variant="immersive" text="Génération du carousel" className={className} />;
   }
 
   if (!result) {
@@ -102,10 +103,9 @@ export function CarouselGenerator({ className, initialData }: CarouselGeneratorP
             />
           </div>
           {error && <p className="text-sm text-danger">{error}</p>}
-          <Button size="lg" className="w-full" onClick={handleGenerate}>
-            <Sparkles className="h-4 w-4 mr-2" />
+          <GenerateButton onClick={handleGenerate} className="w-full" icon={<Layers className="h-4 w-4 mr-2" />}>
             Générer le carousel
-          </Button>
+          </GenerateButton>
           <p className="text-sm text-text-secondary text-center">
             Carousel 8-10 slides avec cover, contenu et CTA
           </p>
@@ -162,7 +162,7 @@ export function CarouselGenerator({ className, initialData }: CarouselGeneratorP
             size="sm"
             onClick={() => copyToClipboard(result.hook_cover, "cover")}
           >
-            <Copy className="h-3 w-3 mr-1" />
+            {copiedField === "cover" ? <Check className="h-3 w-3 mr-1 animate-in zoom-in-50 duration-200" /> : <Copy className="h-3 w-3 mr-1" />}
             {copiedField === "cover" ? "Copié !" : "Copier"}
           </Button>
         </div>
@@ -205,7 +205,7 @@ export function CarouselGenerator({ className, initialData }: CarouselGeneratorP
               size="sm"
               onClick={() => copyToClipboard(result.caption, "caption")}
             >
-              <Copy className="h-3 w-3 mr-1" />
+              {copiedField === "caption" ? <Check className="h-3 w-3 mr-1 animate-in zoom-in-50 duration-200" /> : <Copy className="h-3 w-3 mr-1" />}
               {copiedField === "caption" ? "Copié !" : "Copier"}
             </Button>
           </div>

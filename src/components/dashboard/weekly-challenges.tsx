@@ -292,8 +292,19 @@ export function WeeklyChallenges() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center justify-center py-6">
-            <Loader2 className="h-5 w-5 animate-spin text-text-muted" />
+          <div className="grid gap-3 sm:grid-cols-2">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="p-4 rounded-xl border border-border-default bg-bg-tertiary">
+                <div className="flex items-start gap-3">
+                  <div className="h-10 w-10 rounded-xl bg-bg-secondary animate-pulse shrink-0" />
+                  <div className="flex-1 space-y-2">
+                    <div className="h-4 w-28 rounded bg-bg-secondary animate-pulse" />
+                    <div className="h-3 w-40 rounded bg-bg-secondary animate-pulse" />
+                    <div className="h-1.5 w-full rounded-full bg-bg-secondary animate-pulse" />
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </CardContent>
       </Card>
@@ -332,12 +343,12 @@ export function WeeklyChallenges() {
               <div
                 key={challenge.id}
                 className={cn(
-                  "relative p-4 rounded-xl border transition-all",
+                  "relative p-4 rounded-2xl border transition-all duration-300",
                   challenge.completed
                     ? "bg-accent/5 border-accent/20"
                     : isReady
-                      ? "bg-accent/10 border-accent/40 cursor-pointer hover:border-accent/60"
-                      : "bg-bg-tertiary border-border-default"
+                      ? "bg-accent/10 border-accent/40 cursor-pointer hover:border-accent/60 hover:shadow-[0_0_20px_rgba(52,211,153,0.1)] hover:scale-[1.01]"
+                      : "bg-bg-tertiary border-white/5 hover:border-white/10"
                 )}
                 onClick={() => isReady && handleClaimReward(challenge)}
               >

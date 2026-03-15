@@ -77,8 +77,8 @@ export function ClientActivityFeed({ activities, loading }: ClientActivityFeedPr
 
   if (activities.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border-default bg-bg-secondary/30 py-14 text-center backdrop-blur-sm">
-        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-bg-tertiary mb-4">
+      <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border-default bg-bg-secondary/30 py-14 text-center backdrop-blur-sm animate-in fade-in-0 zoom-in-95 duration-300">
+        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-bg-tertiary mb-4 animate-in zoom-in-50 duration-500">
           <Activity className="h-7 w-7 text-text-muted/50" />
         </div>
         <h3 className="text-base font-semibold text-text-primary mb-1">
@@ -106,7 +106,7 @@ export function ClientActivityFeed({ activities, loading }: ClientActivityFeedPr
         const Icon = cfg.icon;
 
         return (
-          <div key={activity.id} className="relative flex items-start gap-4 py-3 pl-1">
+          <div key={activity.id} className="relative flex items-start gap-4 py-3 pl-1 rounded-xl transition-all duration-200 hover:bg-bg-secondary/50 hover:px-2 group/item">
             {/* Dot */}
             <div
               className={cn(

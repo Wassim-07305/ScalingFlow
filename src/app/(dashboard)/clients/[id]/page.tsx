@@ -388,8 +388,8 @@ export default function ClientDetailPage() {
           <ArrowLeft className="h-4 w-4 mr-1" />
           Retour aux clients
         </Button>
-        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border-default bg-bg-secondary/30 py-16 text-center backdrop-blur-sm">
-          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-bg-tertiary mb-4">
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border-default bg-bg-secondary/30 py-16 text-center backdrop-blur-sm animate-in fade-in-0 zoom-in-95 duration-300">
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-bg-tertiary mb-4 animate-in zoom-in-50 duration-500">
             <Activity className="h-7 w-7 text-text-muted" />
           </div>
           <h3 className="text-base font-semibold text-text-primary mb-1">
@@ -444,7 +444,7 @@ export default function ClientDetailPage() {
                 "inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium",
                 statusCfg.bgColor, statusCfg.color
               )}>
-                <span className={cn("h-1.5 w-1.5 rounded-full", statusCfg.color === "text-text-muted" ? "bg-text-muted" : "bg-current")} />
+                <span className={cn("h-1.5 w-1.5 rounded-full", statusCfg.color === "text-text-muted" ? "bg-text-muted" : "bg-current", client.status === "actif" && "animate-pulse")} />
                 {statusCfg.label}
               </span>
             </div>
@@ -481,8 +481,8 @@ export default function ClientDetailPage() {
       </div>
 
       {/* Mini stats row */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
-        <div className="flex items-center gap-3 rounded-2xl border border-border-default bg-bg-secondary/50 px-4 py-3 backdrop-blur-sm">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6 animate-in fade-in-0 slide-in-from-bottom-2 duration-300" style={{ animationDelay: "100ms" }}>
+        <div className="flex items-center gap-3 rounded-2xl border border-border-default bg-bg-secondary/50 px-4 py-3 backdrop-blur-sm transition-all duration-300 hover:border-accent/20 hover:shadow-lg hover:shadow-accent/5 hover:-translate-y-0.5">
           <div className="rounded-xl bg-accent/10 p-2.5">
             <DollarSign className="h-4 w-4 text-accent" />
           </div>
@@ -493,7 +493,7 @@ export default function ClientDetailPage() {
             <p className="text-[11px] text-text-muted">CA total</p>
           </div>
         </div>
-        <div className="flex items-center gap-3 rounded-2xl border border-border-default bg-bg-secondary/50 px-4 py-3 backdrop-blur-sm">
+        <div className="flex items-center gap-3 rounded-2xl border border-border-default bg-bg-secondary/50 px-4 py-3 backdrop-blur-sm transition-all duration-300 hover:border-accent/20 hover:shadow-lg hover:shadow-accent/5 hover:-translate-y-0.5">
           <div className="rounded-xl bg-accent/10 p-2.5">
             <CheckCircle2 className="h-4 w-4 text-accent" />
           </div>
@@ -504,7 +504,7 @@ export default function ClientDetailPage() {
             <p className="text-[11px] text-text-muted">CA closé</p>
           </div>
         </div>
-        <div className="flex items-center gap-3 rounded-2xl border border-border-default bg-bg-secondary/50 px-4 py-3 backdrop-blur-sm">
+        <div className="flex items-center gap-3 rounded-2xl border border-border-default bg-bg-secondary/50 px-4 py-3 backdrop-blur-sm transition-all duration-300 hover:border-accent/20 hover:shadow-lg hover:shadow-accent/5 hover:-translate-y-0.5">
           <div className="rounded-xl bg-info/10 p-2.5">
             <TrendingUp className="h-4 w-4 text-info" />
           </div>
@@ -678,8 +678,8 @@ export default function ClientDetailPage() {
           </div>
 
           {deals.length === 0 ? (
-            <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border-default bg-bg-secondary/30 py-14 text-center backdrop-blur-sm">
-              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-bg-tertiary mb-4">
+            <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border-default bg-bg-secondary/30 py-14 text-center backdrop-blur-sm animate-in fade-in-0 zoom-in-95 duration-300">
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-bg-tertiary mb-4 animate-in zoom-in-50 duration-500">
                 <DollarSign className="h-7 w-7 text-text-muted" />
               </div>
               <h3 className="text-base font-semibold text-text-primary mb-1">
@@ -726,7 +726,7 @@ export default function ClientDetailPage() {
                 return (
                   <div
                     key={deal.id}
-                    className="group rounded-2xl border border-border-default bg-bg-secondary/50 p-4 transition-all duration-200 hover:border-border-hover hover:bg-bg-secondary backdrop-blur-sm"
+                    className="group rounded-2xl border border-border-default bg-bg-secondary/50 p-4 transition-all duration-300 ease-out hover:border-accent/20 hover:bg-bg-secondary hover:shadow-lg hover:shadow-accent/5 hover:-translate-y-0.5 backdrop-blur-sm animate-in fade-in-0 slide-in-from-bottom-2 duration-300"
                   >
                     <div className="flex items-center justify-between gap-3">
                       <div className="flex-1 min-w-0">

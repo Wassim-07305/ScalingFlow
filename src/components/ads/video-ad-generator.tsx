@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AILoading } from "@/components/shared/ai-loading";
 import { GlowCard } from "@/components/shared/glow-card";
-import { Sparkles, Copy, Video } from "lucide-react";
+import { GenerateButton } from "@/components/shared/generate-button";
+import { Copy, Check, Video } from "lucide-react";
 import { toast } from "sonner";
 import type { VideoAdScriptResult } from "@/lib/ai/prompts/video-ad-scripts";
 import { UpgradeWall } from "@/components/shared/upgrade-wall";
@@ -102,7 +103,7 @@ export function VideoAdGenerator({ className, initialData }: VideoAdGeneratorPro
     navigator.clipboard.writeText(text);
     setCopiedIndex(index);
     setTimeout(() => setCopiedIndex(null), 2000);
-    toast.success("Copié !");
+    toast.success("Copié dans le presse-papiers");
   };
 
   if (usageLimited) {
@@ -110,7 +111,7 @@ export function VideoAdGenerator({ className, initialData }: VideoAdGeneratorPro
   }
 
   if (loading) {
-    return <AILoading text="Génération des scripts vidéo" className={className} />;
+    return <AILoading variant="immersive" text="Génération des scripts vidéo" className={className} />;
   }
 
   if (scripts.length === 0 || showForm) {
@@ -129,17 +130,18 @@ export function VideoAdGenerator({ className, initialData }: VideoAdGeneratorPro
           <CardContent className="space-y-5">
             {/* Video duration */}
             <div>
-              <label className="text-sm font-medium text-text-primary mb-2 block">Durée de la vidéo</label>
+              <label className="text-sm font-medium text-text-primary mb-1.5 block">Durée de la vidéo</label>
+              <p className="text-xs text-text-muted mb-2">La durée impacte la plateforme optimale</p>
               <div className="flex flex-wrap gap-2">
                 {VIDEO_DURATIONS.map((d) => (
                   <button
                     key={d.key}
                     onClick={() => setVideoDuration(d.key)}
                     className={cn(
-                      "px-3 py-1.5 rounded-lg text-sm font-medium transition-all",
+                      "px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200",
                       videoDuration === d.key
-                        ? "bg-accent text-white"
-                        : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
+                        ? "bg-accent text-white shadow-md shadow-accent/25"
+                        : "bg-bg-tertiary text-text-secondary hover:text-text-primary hover:bg-bg-tertiary/80"
                     )}
                   >
                     {d.label}
@@ -150,17 +152,18 @@ export function VideoAdGenerator({ className, initialData }: VideoAdGeneratorPro
 
             {/* Video style */}
             <div>
-              <label className="text-sm font-medium text-text-primary mb-2 block">Style de vidéo</label>
+              <label className="text-sm font-medium text-text-primary mb-1.5 block">Style de vidéo</label>
+              <p className="text-xs text-text-muted mb-2">L&apos;approche créative du script</p>
               <div className="flex flex-wrap gap-2">
                 {VIDEO_STYLES.map((s) => (
                   <button
                     key={s.key}
                     onClick={() => setVideoStyle(s.key)}
                     className={cn(
-                      "px-3 py-1.5 rounded-lg text-sm font-medium transition-all",
+                      "px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200",
                       videoStyle === s.key
-                        ? "bg-accent text-white"
-                        : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
+                        ? "bg-accent text-white shadow-md shadow-accent/25"
+                        : "bg-bg-tertiary text-text-secondary hover:text-text-primary hover:bg-bg-tertiary/80"
                     )}
                   >
                     {s.label}
@@ -174,21 +177,25 @@ export function VideoAdGenerator({ className, initialData }: VideoAdGeneratorPro
               <label className="text-sm font-medium text-text-primary mb-1 block">
                 Angle ou thème <span className="text-text-muted font-normal">(optionnel)</span>
               </label>
+              <p className="text-xs text-text-muted mb-2">Précise un angle pour des scripts plus ciblés</p>
               <input
                 type="text"
                 value={angleTheme}
                 onChange={(e) => setAngleTheme(e.target.value)}
                 placeholder="Ex: preuve sociale, résultat rapide, problème douloureux..."
-                className="w-full rounded-lg border border-border-default bg-bg-secondary px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+                className="w-full rounded-xl border border-border-default bg-bg-secondary px-3 py-2.5 text-sm text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20 transition-all"
               />
             </div>
 
-            {error && <p className="text-sm text-danger">{error}</p>}
+            {error && (
+              <div className="p-3 rounded-xl bg-danger/10 border border-danger/20">
+                <p className="text-sm text-danger">{error}</p>
+              </div>
+            )}
 
-            <Button size="lg" onClick={handleGenerate} className="w-full">
-              <Sparkles className="h-4 w-4 mr-2" />
+            <GenerateButton onClick={handleGenerate} className="w-full">
               Générer des scripts vidéo
-            </Button>
+            </GenerateButton>
             <p className="text-xs text-text-muted text-center">
               Scripts optimisés pour les publicités vidéo
             </p>
@@ -200,8 +207,8 @@ export function VideoAdGenerator({ className, initialData }: VideoAdGeneratorPro
 
   return (
     <div className={cn("space-y-4", className)}>
-      <div className="flex items-center justify-between">
-        <Badge variant="default">{scripts.length} scripts vidéo</Badge>
+      <div className="flex items-center justify-between flex-wrap gap-2">
+        <Badge variant="default" className="text-xs">{scripts.length} scripts vidéo générés</Badge>
         <div className="flex items-center gap-2">
           <Button variant="ghost" size="sm" onClick={() => setShowForm(true)}>
             Nouveau brief
@@ -220,6 +227,7 @@ export function VideoAdGenerator({ className, initialData }: VideoAdGeneratorPro
               {/* Header */}
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold text-text-muted">#{i + 1}</span>
                   <Video className="h-4 w-4 text-text-muted" />
                   <Badge variant={config.badge}>{config.label}</Badge>
                 </div>
@@ -227,41 +235,47 @@ export function VideoAdGenerator({ className, initialData }: VideoAdGeneratorPro
                   variant="ghost"
                   size="sm"
                   onClick={() => copyToClipboard(script, i)}
+                  className={cn(copiedIndex === i && "text-accent")}
                 >
-                  <Copy className="h-3 w-3 mr-1" />
-                  {copiedIndex === i ? "Copié !" : "Copier"}
+                  {copiedIndex === i ? (
+                    <><Check className="h-3 w-3 mr-1 animate-in zoom-in-50 duration-200" /> Copié !</>
+                  ) : (
+                    <><Copy className="h-3 w-3 mr-1" /> Copier</>
+                  )}
                 </Button>
               </div>
 
               {/* Platform */}
-              <p className="text-xs text-text-muted mb-3">{config.platform}</p>
+              <p className="text-xs text-text-muted mb-3">
+                <span className="inline-block px-2 py-0.5 rounded-md bg-bg-tertiary">{config.platform}</span>
+              </p>
 
               {/* Angle */}
               <div className="mb-3">
-                <p className="text-xs text-text-muted mb-0.5">Angle</p>
+                <p className="text-xs text-text-muted mb-0.5 font-medium">Angle</p>
                 <p className="text-sm text-text-secondary">{script.angle}</p>
               </div>
 
               {/* Hook */}
               <div className="mb-3">
-                <p className="text-xs text-text-muted mb-0.5">Hook</p>
+                <p className="text-xs text-text-muted mb-0.5 font-medium">Hook</p>
                 <p className="text-sm font-medium text-accent">{script.hook}</p>
               </div>
 
               {/* Corps */}
               <div className="mb-3">
-                <p className="text-xs text-text-muted mb-0.5">Script</p>
+                <p className="text-xs text-text-muted mb-0.5 font-medium">Script</p>
                 <p className="text-sm text-text-secondary whitespace-pre-wrap">{script.corps}</p>
               </div>
 
               {/* CTA */}
-              <div className="p-2 rounded-lg bg-accent/10 border border-accent/20 mb-3">
+              <div className="p-2.5 rounded-xl bg-accent/10 border border-accent/20 mb-3">
                 <p className="text-sm font-medium text-accent text-center">{script.cta}</p>
               </div>
 
               {/* Visual notes */}
               <div className="pt-3 border-t border-border-default">
-                <p className="text-xs text-text-muted mb-1">Notes de production</p>
+                <p className="text-xs text-text-muted mb-1 font-medium">Notes de production</p>
                 <p className="text-xs text-text-secondary">{script.visual_notes}</p>
               </div>
             </GlowCard>

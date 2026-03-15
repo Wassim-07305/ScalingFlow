@@ -65,7 +65,7 @@ const PROVIDER_CONFIG: Record<string, { label: string; icon: React.ElementType; 
   INSTAGRAM: { label: "Instagram", icon: Instagram, color: "text-pink-400", badgeVariant: "default" },
   MESSENGER: { label: "Messenger", icon: MessageSquare, color: "text-blue-300", badgeVariant: "blue" },
   TELEGRAM: { label: "Telegram", icon: Send, color: "text-cyan-400", badgeVariant: "cyan" },
-  TWITTER: { label: "Twitter", icon: Twitter, color: "text-sky-400", badgeVariant: "default" },
+  TWITTER: { label: "Twitter/X", icon: Twitter, color: "text-sky-400", badgeVariant: "default" },
 };
 
 function getProviderInfo(provider: string) {
@@ -260,19 +260,23 @@ export function UnifiedInbox() {
 
   if (!loadingAccounts && accounts.length === 0) {
     return (
-      <Card>
-        <CardContent className="flex flex-col items-center justify-center py-16 text-center">
-          <MessageCircle className="h-12 w-12 text-text-muted mb-4" />
-          <h3 className="text-lg font-semibold text-text-primary mb-2">
+      <Card className="border-border-default/50 bg-bg-secondary/30 backdrop-blur-sm">
+        <CardContent className="flex flex-col items-center justify-center py-20 text-center animate-in fade-in duration-500">
+          <div className="h-16 w-16 rounded-2xl bg-accent/10 border border-accent/20 flex items-center justify-center mb-5">
+            <MessageCircle className="h-8 w-8 text-accent" />
+          </div>
+          <h3 className="text-lg font-bold text-text-primary mb-2">
             Aucun compte connecté
           </h3>
-          <p className="text-sm text-text-secondary max-w-md">
-            Connecte tes comptes de messagerie depuis les{" "}
-            <a href="/settings" className="text-accent underline">
-              paramètres
-            </a>{" "}
+          <p className="text-sm text-text-secondary max-w-md mb-6 leading-relaxed">
+            Connecte tes comptes de messagerie depuis les paramètres
             pour accéder à ta messagerie unifiée.
           </p>
+          <Button asChild className="rounded-xl">
+            <a href="/settings">
+              Aller dans les paramètres
+            </a>
+          </Button>
         </CardContent>
       </Card>
     );
@@ -281,9 +285,9 @@ export function UnifiedInbox() {
   // ── Render ──────────────────────────────────────────────────
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-[380px_1fr] gap-4 h-[calc(100vh-280px)] min-h-[500px]">
+    <div className="grid grid-cols-1 lg:grid-cols-[380px_1fr] gap-4 h-[calc(100vh-280px)] min-h-[500px] animate-in fade-in duration-500">
       {/* ── Left panel: Conversations list ── */}
-      <Card className={cn("flex flex-col overflow-hidden", selectedChat && "hidden lg:flex")}>
+      <Card className={cn("flex flex-col overflow-hidden border-border-default/50 bg-bg-secondary/30 backdrop-blur-sm", selectedChat && "hidden lg:flex")}>
         {/* Top bar: search + filter */}
         <div className="p-3 border-b border-border-default space-y-2">
           <div className="relative">
@@ -339,9 +343,12 @@ export function UnifiedInbox() {
               <Loader2 className="h-5 w-5 animate-spin text-text-muted" />
             </div>
           ) : filteredChats.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 text-center px-4">
-              <Inbox className="h-8 w-8 text-text-muted mb-2" />
-              <p className="text-sm text-text-muted">Aucune conversation</p>
+            <div className="flex flex-col items-center justify-center py-16 text-center px-4">
+              <div className="h-12 w-12 rounded-2xl bg-bg-tertiary flex items-center justify-center mb-3">
+                <Inbox className="h-6 w-6 text-text-muted" />
+              </div>
+              <p className="text-sm font-medium text-text-primary mb-1">Aucune conversation</p>
+              <p className="text-xs text-text-muted">Les conversations apparaîtront ici.</p>
             </div>
           ) : (
             filteredChats.map((chat) => {
@@ -418,7 +425,7 @@ export function UnifiedInbox() {
       </Card>
 
       {/* ── Right panel: Message thread ── */}
-      <Card className={cn("flex flex-col overflow-hidden", !selectedChat && "hidden lg:flex")}>
+      <Card className={cn("flex flex-col overflow-hidden border-border-default/50 bg-bg-secondary/30 backdrop-blur-sm", !selectedChat && "hidden lg:flex")}>
         {!selectedChat ? (
           <CardContent className="flex-1 flex flex-col items-center justify-center text-center py-16">
             <MessageCircle className="h-12 w-12 text-text-muted mb-4" />

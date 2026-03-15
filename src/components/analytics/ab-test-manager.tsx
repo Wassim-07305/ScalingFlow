@@ -401,7 +401,7 @@ export function ABTestManager() {
                     {/* Variant A */}
                     <div className="p-4 rounded-xl bg-bg-tertiary/50 border border-border-default">
                       <div className="flex items-center gap-2 mb-2">
-                        <span className="w-6 h-6 rounded-md bg-info/20 text-info text-xs font-bold flex items-center justify-center">
+                        <span className="w-6 h-6 rounded-lg bg-info/20 text-info text-xs font-bold flex items-center justify-center ring-1 ring-info/30">
                           A
                         </span>
                         <span className="text-sm font-medium text-text-primary">Variante A</span>
@@ -419,7 +419,7 @@ export function ABTestManager() {
                       {/* Visual bar */}
                       <div className="mt-2 h-2 bg-bg-tertiary rounded-full overflow-hidden">
                         <div
-                          className="h-full bg-info rounded-full transition-all"
+                          className="h-full bg-gradient-to-r from-info/80 to-info rounded-full transition-all duration-500"
                           style={{ width: `${Math.min(rateA * 5, 100)}%` }}
                         />
                       </div>
@@ -428,7 +428,7 @@ export function ABTestManager() {
                     {/* Variant B */}
                     <div className="p-4 rounded-xl bg-bg-tertiary/50 border border-border-default">
                       <div className="flex items-center gap-2 mb-2">
-                        <span className="w-6 h-6 rounded-md bg-accent/20 text-accent text-xs font-bold flex items-center justify-center">
+                        <span className="w-6 h-6 rounded-lg bg-accent/20 text-accent text-xs font-bold flex items-center justify-center ring-1 ring-accent/30">
                           B
                         </span>
                         <span className="text-sm font-medium text-text-primary">Variante B</span>
@@ -445,7 +445,7 @@ export function ABTestManager() {
                       </div>
                       <div className="mt-2 h-2 bg-bg-tertiary rounded-full overflow-hidden">
                         <div
-                          className="h-full bg-accent rounded-full transition-all"
+                          className="h-full bg-gradient-to-r from-accent/80 to-accent rounded-full transition-all duration-500"
                           style={{ width: `${Math.min(rateB * 5, 100)}%` }}
                         />
                       </div>
@@ -503,11 +503,11 @@ export function ABTestManager() {
                   <div className="mt-3">
                     <div className="flex justify-between text-xs text-text-muted mb-1">
                       <span>Progression {test.variantA.traffic + test.variantB.traffic >= 200 ? "(seuil 100+/variante atteint)" : `(seuil: 100 visites/variante)`}</span>
-                      <span>{progress.toFixed(0)}%</span>
+                      <span className={cn(progress >= 100 ? "text-accent font-semibold" : "")}>{progress.toFixed(0)}%</span>
                     </div>
                     <div className="h-1.5 bg-bg-tertiary rounded-full overflow-hidden">
                       <div
-                        className="h-full bg-accent/50 rounded-full transition-all"
+                        className="h-full bg-gradient-to-r from-accent/40 to-accent rounded-full transition-all duration-500"
                         style={{ width: `${progress}%` }}
                       />
                     </div>

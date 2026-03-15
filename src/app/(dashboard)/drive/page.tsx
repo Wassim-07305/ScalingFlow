@@ -41,14 +41,15 @@ interface DriveFile {
 // ─── Skeleton Grid ────────────────────────────────────────
 function DriveSkeleton() {
   return (
-    <div className="space-y-6 animate-pulse">
+    <div className="space-y-6">
       <div>
-        <div className="h-4 w-24 bg-bg-tertiary rounded mb-3" />
+        <div className="h-4 w-24 bg-bg-tertiary rounded animate-pulse mb-3" />
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
           {[1, 2, 3, 4, 5].map((i) => (
             <div
               key={i}
-              className="rounded-2xl border border-border-default bg-bg-secondary/50 p-4"
+              className="rounded-2xl border border-border-default bg-bg-secondary/50 p-4 animate-pulse"
+              style={{ animationDelay: `${i * 75}ms` }}
             >
               <div className="h-12 w-12 rounded-xl bg-bg-tertiary mb-3" />
               <div className="h-4 w-3/4 bg-bg-tertiary rounded mb-1.5" />
@@ -58,12 +59,13 @@ function DriveSkeleton() {
         </div>
       </div>
       <div>
-        <div className="h-4 w-20 bg-bg-tertiary rounded mb-3" />
+        <div className="h-4 w-20 bg-bg-tertiary rounded animate-pulse mb-3" />
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
           {[1, 2, 3].map((i) => (
             <div
               key={i}
-              className="rounded-2xl border border-border-default bg-bg-secondary/50 p-4"
+              className="rounded-2xl border border-border-default bg-bg-secondary/50 p-4 animate-pulse"
+              style={{ animationDelay: `${(i + 5) * 75}ms` }}
             >
               <div className="h-12 w-12 rounded-xl bg-bg-tertiary mb-3" />
               <div className="h-4 w-3/4 bg-bg-tertiary rounded mb-1.5" />
@@ -334,13 +336,13 @@ export default function DrivePage() {
           {/* Stats bar */}
           {!loading && (
             <div className="flex items-center gap-4 mt-4">
-              <div className="flex items-center gap-1.5 rounded-full bg-bg-tertiary/80 px-3 py-1">
+              <div className="flex items-center gap-1.5 rounded-full bg-bg-tertiary/80 px-3 py-1 transition-all duration-200 hover:bg-accent/10 hover:scale-105">
                 <Folder className="h-3 w-3 text-accent" />
                 <span className="text-xs font-medium text-text-secondary">
                   {folders.length} {folders.length <= 1 ? "dossier" : "dossiers"}
                 </span>
               </div>
-              <div className="flex items-center gap-1.5 rounded-full bg-bg-tertiary/80 px-3 py-1">
+              <div className="flex items-center gap-1.5 rounded-full bg-bg-tertiary/80 px-3 py-1 transition-all duration-200 hover:bg-blue-500/10 hover:scale-105">
                 <FileText className="h-3 w-3 text-blue-400" />
                 <span className="text-xs font-medium text-text-secondary">
                   {files.length} {files.length <= 1 ? "fichier" : "fichiers"}
@@ -361,8 +363,8 @@ export default function DrivePage() {
 
       {/* Empty state */}
       {!loading && isEmpty && (
-        <div className="flex flex-col items-center justify-center py-20 text-center">
-          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-accent/10 mb-4">
+        <div className="flex flex-col items-center justify-center py-20 text-center animate-in fade-in-0 zoom-in-95 duration-300">
+          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-accent/10 mb-4 animate-in zoom-in-50 duration-500">
             <FolderOpen className="h-8 w-8 text-accent" />
           </div>
           <h3 className="text-lg font-semibold text-text-primary mb-1">
@@ -403,17 +405,18 @@ export default function DrivePage() {
                 Dossiers ({folders.length})
               </p>
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-                {folders.map((folder) => (
-                  <FolderCard
-                    key={folder.id}
-                    id={folder.id}
-                    name={folder.name}
-                    color={folder.color}
-                    fileCount={folder.fileCount || 0}
-                    onClick={() => navigateToFolder(folder.id)}
-                    onRename={() => setRenameFolderId(folder.id)}
-                    onDelete={() => handleDeleteFolder(folder.id)}
-                  />
+                {folders.map((folder, idx) => (
+                  <div key={folder.id} style={{ animationDelay: `${idx * 50}ms` }} className="animate-in fade-in-0 zoom-in-95 duration-300 fill-mode-both">
+                    <FolderCard
+                      id={folder.id}
+                      name={folder.name}
+                      color={folder.color}
+                      fileCount={folder.fileCount || 0}
+                      onClick={() => navigateToFolder(folder.id)}
+                      onRename={() => setRenameFolderId(folder.id)}
+                      onDelete={() => handleDeleteFolder(folder.id)}
+                    />
+                  </div>
                 ))}
               </div>
             </div>
@@ -426,25 +429,26 @@ export default function DrivePage() {
                 Fichiers ({files.length})
               </p>
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-                {files.map((file) => (
-                  <FileCard
-                    key={file.id}
-                    id={file.id}
-                    name={file.name}
-                    fileUrl={file.file_url}
-                    fileSize={file.file_size}
-                    mimeType={file.mime_type}
-                    createdAt={file.created_at}
-                    onRename={() => handleRenameFile(file.id)}
-                    onDelete={() => handleDeleteFile(file.id)}
-                    onPreview={() =>
-                      setPreviewFile({
-                        name: file.name,
-                        fileUrl: file.file_url,
-                        mimeType: file.mime_type,
-                      })
-                    }
-                  />
+                {files.map((file, idx) => (
+                  <div key={file.id} style={{ animationDelay: `${idx * 50}ms` }} className="animate-in fade-in-0 zoom-in-95 duration-300 fill-mode-both">
+                    <FileCard
+                      id={file.id}
+                      name={file.name}
+                      fileUrl={file.file_url}
+                      fileSize={file.file_size}
+                      mimeType={file.mime_type}
+                      createdAt={file.created_at}
+                      onRename={() => handleRenameFile(file.id)}
+                      onDelete={() => handleDeleteFile(file.id)}
+                      onPreview={() =>
+                        setPreviewFile({
+                          name: file.name,
+                          fileUrl: file.file_url,
+                          mimeType: file.mime_type,
+                        })
+                      }
+                    />
+                  </div>
                 ))}
               </div>
             </div>

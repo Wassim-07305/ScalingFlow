@@ -84,14 +84,15 @@ export function Sidebar({
       {/* Mobile backdrop */}
       {sidebarMobileOpen && (
         <div
-          className="fixed inset-0 z-20 bg-black/40 backdrop-blur-sm md:hidden"
+          className="fixed inset-0 z-20 bg-black/40 backdrop-blur-sm md:hidden animate-in fade-in duration-200"
           onClick={closeMobile}
+          aria-hidden="true"
         />
       )}
 
       <aside
         className={cn(
-          "z-30 flex h-screen flex-col border-r border-sidebar-border bg-sidebar transition-all duration-300",
+          "z-30 flex h-screen flex-col border-r border-sidebar-border bg-sidebar/95 backdrop-blur-md transition-all duration-300",
           "fixed left-0 top-0",
           "md:static",
           sidebarMobileOpen ? "translate-x-0" : "-translate-x-full",
@@ -174,7 +175,7 @@ export function Sidebar({
                         href={item.href}
                         onClick={closeMobile}
                         className={cn(
-                          "group relative flex items-center rounded-xl px-3 py-2.5 text-[13px] font-medium transition-all duration-200",
+                          "group relative flex items-center rounded-xl px-3 py-2.5 text-[13px] font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 focus-visible:ring-offset-1 focus-visible:ring-offset-sidebar",
                           isActive
                             ? "bg-sidebar-accent text-accent"
                             : "text-sidebar-foreground/60 hover:bg-sidebar-accent hover:text-sidebar-foreground",

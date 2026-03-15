@@ -385,14 +385,14 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      {/* Tab navigation */}
-      <div className="flex gap-1 mb-6 rounded-xl bg-bg-secondary/80 border border-border-default p-1 overflow-x-auto scrollbar-hide">
+      {/* Tab navigation — animated indicator */}
+      <div className="relative flex gap-1 mb-6 rounded-xl bg-bg-secondary/80 border border-border-default p-1 overflow-x-auto scrollbar-hide">
         {TABS.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
             className={cn(
-              "flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 whitespace-nowrap flex-shrink-0",
+              "relative z-10 flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 whitespace-nowrap flex-shrink-0",
               activeTab === tab.id
                 ? "bg-accent text-white shadow-lg shadow-accent/20"
                 : "text-text-secondary hover:text-text-primary hover:bg-bg-tertiary"
@@ -404,8 +404,8 @@ export default function SettingsPage() {
         ))}
       </div>
 
-      {/* Tab content */}
-      <div className="space-y-6 max-w-2xl">
+      {/* Tab content with fade */}
+      <div key={activeTab} className="space-y-6 max-w-2xl animate-in fade-in slide-in-from-bottom-2 duration-300">
         {/* ─── Profil ──────────────────────────────────────── */}
         {activeTab === "profil" && (
           <>
@@ -578,11 +578,11 @@ export default function SettingsPage() {
               <Separator className="my-4" />
 
               <p className="text-xs text-text-muted mb-3 uppercase font-medium">E-mails</p>
-              <div className="space-y-3">
+              <div className="space-y-1">
                 {NOTIF_KEYS.map(({ key, label }) => (
                   <div
                     key={key}
-                    className="flex items-center justify-between py-2"
+                    className="flex items-center justify-between py-3 px-3 -mx-3 rounded-xl hover:bg-bg-tertiary/30 transition-colors"
                   >
                     <span className="text-sm text-text-primary">{label}</span>
                     <button
@@ -591,14 +591,14 @@ export default function SettingsPage() {
                       aria-checked={notifPrefs[key]}
                       aria-label={label}
                       className={cn(
-                        "relative inline-flex h-6 w-11 items-center rounded-full transition-colors",
-                        notifPrefs[key] ? "bg-accent" : "bg-bg-tertiary border border-border-default"
+                        "relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 ease-out",
+                        notifPrefs[key] ? "bg-accent shadow-sm shadow-accent/30" : "bg-bg-tertiary border border-border-default"
                       )}
                     >
                       <span
                         className={cn(
-                          "inline-block h-4 w-4 rounded-full bg-white transition-transform",
-                          notifPrefs[key] ? "translate-x-6" : "translate-x-1"
+                          "inline-block h-4 w-4 rounded-full bg-white shadow-sm transition-all duration-300 ease-out",
+                          notifPrefs[key] ? "translate-x-6 scale-100" : "translate-x-1 scale-90"
                         )}
                       />
                     </button>

@@ -22,13 +22,15 @@ import {
   Linkedin,
   Instagram,
   Send,
+  CheckCircle2,
+  XCircle,
 } from "lucide-react";
 import { UnipileSendDialog } from "@/components/shared/unipile-send-dialog";
 
 const PLATFORMS = [
-  { key: "linkedin", label: "LinkedIn", icon: Linkedin },
-  { key: "instagram", label: "Instagram", icon: Instagram },
-  { key: "messenger", label: "Messenger", icon: Send },
+  { key: "linkedin", label: "LinkedIn", icon: Linkedin, color: "bg-blue-500/15 text-blue-400 border-blue-500/20", activeColor: "bg-blue-500 text-white shadow-blue-500/25" },
+  { key: "instagram", label: "Instagram", icon: Instagram, color: "bg-pink-500/15 text-pink-400 border-pink-500/20", activeColor: "bg-gradient-to-r from-pink-500 to-purple-500 text-white shadow-pink-500/25" },
+  { key: "messenger", label: "Messenger", icon: Send, color: "bg-blue-400/15 text-blue-300 border-blue-400/20", activeColor: "bg-blue-400 text-white shadow-blue-400/25" },
 ] as const;
 
 interface DmMessage {
@@ -129,14 +131,15 @@ export function DmScripts() {
 
   if (result) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
         {/* Actions */}
         <div className="flex items-center justify-between">
-          <Badge variant="default">Scripts générés</Badge>
+          <Badge variant="default" className="animate-in fade-in duration-300">Scripts générés</Badge>
           <div className="flex items-center gap-2">
             <Button
               variant="outline"
               size="sm"
+              className="transition-all hover:border-accent/40 hover:shadow-sm"
               onClick={() =>
                 exportToPDF({
                   title: "Scripts DM - Prospection",
@@ -149,7 +152,7 @@ export function DmScripts() {
               <FileDown className="h-4 w-4 mr-1" />
               PDF
             </Button>
-            <Button variant="outline" size="sm" onClick={copyAll}>
+            <Button variant="outline" size="sm" onClick={copyAll} className="transition-all hover:border-accent/40 hover:shadow-sm">
               <Copy className="h-4 w-4 mr-1" />
               {copied ? "Copié !" : "Copier tout"}
             </Button>
@@ -163,10 +166,11 @@ export function DmScripts() {
           </GlowCard>
         )}
 
-        {/* Selecteur de plateforme */}
-        <div className="flex gap-2">
+        {/* Sélecteur de plateforme avec couleurs spécifiques */}
+        <div className="flex gap-2 flex-wrap">
           {PLATFORMS.map((platform) => {
             const PlatformIcon = platform.icon;
+            const isActive = activePlatform === platform.key;
             return (
               <button
                 key={platform.key}
@@ -175,10 +179,10 @@ export function DmScripts() {
                   setExpandedMessage(0);
                 }}
                 className={cn(
-                  "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all",
-                  activePlatform === platform.key
-                    ? "bg-accent text-white"
-                    : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
+                  "flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 border",
+                  isActive
+                    ? cn(platform.activeColor, "shadow-lg")
+                    : cn(platform.color, "hover:scale-[1.02]")
                 )}
               >
                 <PlatformIcon className="h-4 w-4" />
@@ -188,20 +192,20 @@ export function DmScripts() {
           })}
         </div>
 
-        {/* Sequence de messages */}
+        {/* Séquence de messages */}
         {activeSequence ? (
           <div className="space-y-4">
             {/* Contexte de la séquence */}
             {activeSequence.context && (
-              <div className="p-3 rounded-lg bg-bg-tertiary">
-                <p className="text-xs text-text-muted uppercase mb-1">Contexte</p>
-                <p className="text-sm text-text-secondary">{activeSequence.context}</p>
+              <div className="p-4 rounded-xl bg-bg-tertiary/50 border border-border-default/50 backdrop-blur-sm">
+                <p className="text-xs text-text-muted uppercase tracking-wider mb-1.5">Contexte</p>
+                <p className="text-sm text-text-secondary leading-relaxed">{activeSequence.context}</p>
               </div>
             )}
 
             {activeSequence.target_persona && (
-              <div className="flex items-center gap-2">
-                <Target className="h-4 w-4 text-accent" />
+              <div className="flex items-center gap-2.5 p-3 rounded-xl bg-accent/5 border border-accent/10">
+                <Target className="h-4 w-4 text-accent shrink-0" />
                 <span className="text-sm text-text-secondary">
                   Cible : <span className="text-text-primary font-medium">{activeSequence.target_persona}</span>
                 </span>
@@ -212,17 +216,23 @@ export function DmScripts() {
             {activeSequence.messages?.map((msg, i) => {
               const isExpanded = expandedMessage === i;
               return (
-                <Card key={i}>
+                <Card
+                  key={i}
+                  className={cn(
+                    "transition-all duration-300 hover:border-border-hover",
+                    isExpanded && "border-accent/30 shadow-lg shadow-accent/5"
+                  )}
+                >
                   <CardHeader
                     className="cursor-pointer py-3"
                     onClick={() => setExpandedMessage(isExpanded ? null : i)}
                   >
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-sm flex items-center gap-3">
-                        <div className="flex items-center justify-center h-7 w-7 rounded-full bg-accent/20 text-accent text-xs font-bold">
+                        <div className="flex items-center justify-center h-8 w-8 rounded-full bg-accent/20 text-accent text-xs font-bold ring-2 ring-accent/10">
                           {msg.step}
                         </div>
-                        Message {msg.step}
+                        <span className="text-text-primary">Message {msg.step}</span>
                         {msg.timing && (
                           <Badge variant="muted" className="text-xs">
                             <Clock className="h-3 w-3 mr-1" />
@@ -230,68 +240,74 @@ export function DmScripts() {
                           </Badge>
                         )}
                       </CardTitle>
-                      {isExpanded ? (
-                        <ChevronUp className="h-4 w-4 text-text-muted" />
-                      ) : (
+                      <div className={cn(
+                        "p-1 rounded-lg transition-transform duration-200",
+                        isExpanded && "rotate-180"
+                      )}>
                         <ChevronDown className="h-4 w-4 text-text-muted" />
-                      )}
+                      </div>
                     </div>
                   </CardHeader>
-                  {isExpanded && (
-                    <CardContent className="pt-0 space-y-3">
-                      {/* Le message */}
-                      <div className="relative p-4 rounded-lg bg-bg-tertiary border-l-2 border-accent">
-                        <p className="text-sm text-text-primary whitespace-pre-wrap pr-8">
-                          {msg.message}
-                        </p>
-                        <div className="absolute top-2 right-2 flex items-center gap-1">
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              copyMessage(msg.message);
-                            }}
-                            className="p-1.5 rounded-md bg-bg-secondary hover:bg-accent/20 transition-colors"
-                            title="Copier le message"
-                          >
-                            <Copy className="h-3.5 w-3.5 text-text-muted" />
-                          </button>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setSendMessage(msg.message);
-                              setSendDialogOpen(true);
-                            }}
-                            className="p-1.5 rounded-md bg-bg-secondary hover:bg-accent/20 transition-colors"
-                            title="Envoyer via Unipile"
-                          >
-                            <Send className="h-3.5 w-3.5 text-accent" />
-                          </button>
-                        </div>
-                      </div>
-
-                      {/* Objectif */}
-                      {msg.purpose && (
-                        <div className="flex items-start gap-2 p-2 rounded-lg bg-accent/5">
-                          <Target className="h-3.5 w-3.5 text-accent mt-0.5 shrink-0" />
-                          <div>
-                            <p className="text-xs text-accent uppercase font-medium">Objectif</p>
-                            <p className="text-xs text-text-secondary">{msg.purpose}</p>
+                  <div className={cn(
+                    "grid transition-all duration-300",
+                    isExpanded ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+                  )}>
+                    <div className="overflow-hidden">
+                      <CardContent className="pt-0 space-y-3 pb-4">
+                        {/* Le message */}
+                        <div className="relative p-4 rounded-xl bg-bg-tertiary/50 border-l-3 border-accent backdrop-blur-sm">
+                          <p className="text-sm text-text-primary whitespace-pre-wrap pr-16 leading-relaxed">
+                            {msg.message}
+                          </p>
+                          <div className="absolute top-3 right-3 flex items-center gap-1.5">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                copyMessage(msg.message);
+                              }}
+                              className="p-2 rounded-lg bg-bg-secondary/80 hover:bg-accent/20 transition-all duration-200 hover:scale-105"
+                              title="Copier le message"
+                            >
+                              <Copy className="h-3.5 w-3.5 text-text-muted" />
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSendMessage(msg.message);
+                                setSendDialogOpen(true);
+                              }}
+                              className="p-2 rounded-lg bg-accent/10 hover:bg-accent/25 transition-all duration-200 hover:scale-105"
+                              title="Envoyer via Unipile"
+                            >
+                              <Send className="h-3.5 w-3.5 text-accent" />
+                            </button>
                           </div>
                         </div>
-                      )}
 
-                      {/* Déclencheur du prochain message */}
-                      {msg.next_step_trigger && (
-                        <div className="flex items-start gap-2 p-2 rounded-lg bg-bg-tertiary">
-                          <ArrowRight className="h-3.5 w-3.5 text-accent mt-0.5 shrink-0" />
-                          <div>
-                            <p className="text-xs text-text-muted uppercase">Envoyer le suivant si</p>
-                            <p className="text-xs text-text-secondary">{msg.next_step_trigger}</p>
+                        {/* Objectif */}
+                        {msg.purpose && (
+                          <div className="flex items-start gap-2.5 p-3 rounded-xl bg-accent/5 border border-accent/10">
+                            <Target className="h-3.5 w-3.5 text-accent mt-0.5 shrink-0" />
+                            <div>
+                              <p className="text-xs text-accent uppercase font-medium mb-0.5">Objectif</p>
+                              <p className="text-xs text-text-secondary leading-relaxed">{msg.purpose}</p>
+                            </div>
                           </div>
-                        </div>
-                      )}
-                    </CardContent>
-                  )}
+                        )}
+
+                        {/* Déclencheur du prochain message */}
+                        {msg.next_step_trigger && (
+                          <div className="flex items-start gap-2.5 p-3 rounded-xl bg-bg-tertiary/50 border border-border-default/50">
+                            <ArrowRight className="h-3.5 w-3.5 text-accent mt-0.5 shrink-0" />
+                            <div>
+                              <p className="text-xs text-text-muted uppercase">Envoyer le suivant si</p>
+                              <p className="text-xs text-text-secondary leading-relaxed">{msg.next_step_trigger}</p>
+                            </div>
+                          </div>
+                        )}
+                      </CardContent>
+                    </div>
+                  </div>
                 </Card>
               );
             })}
@@ -300,16 +316,19 @@ export function DmScripts() {
             {(activeSequence.dos?.length > 0 || activeSequence.donts?.length > 0) && (
               <div className="grid gap-4 md:grid-cols-2">
                 {activeSequence.dos && activeSequence.dos.length > 0 && (
-                  <Card>
+                  <Card className="border-green-500/10 bg-green-500/[0.02]">
                     <CardHeader className="py-3">
-                      <CardTitle className="text-sm text-green-400">À faire</CardTitle>
+                      <CardTitle className="text-sm text-green-400 flex items-center gap-2">
+                        <CheckCircle2 className="h-4 w-4" />
+                        À faire
+                      </CardTitle>
                     </CardHeader>
                     <CardContent className="pt-0">
-                      <ul className="space-y-1">
+                      <ul className="space-y-1.5">
                         {activeSequence.dos.map((d, i) => (
                           <li key={i} className="text-xs text-text-secondary flex items-start gap-2">
-                            <span className="text-green-400">+</span>
-                            {d}
+                            <span className="text-green-400 mt-0.5 shrink-0">+</span>
+                            <span className="leading-relaxed">{d}</span>
                           </li>
                         ))}
                       </ul>
@@ -317,16 +336,19 @@ export function DmScripts() {
                   </Card>
                 )}
                 {activeSequence.donts && activeSequence.donts.length > 0 && (
-                  <Card>
+                  <Card className="border-red-500/10 bg-red-500/[0.02]">
                     <CardHeader className="py-3">
-                      <CardTitle className="text-sm text-red-400">À éviter</CardTitle>
+                      <CardTitle className="text-sm text-red-400 flex items-center gap-2">
+                        <XCircle className="h-4 w-4" />
+                        À éviter
+                      </CardTitle>
                     </CardHeader>
                     <CardContent className="pt-0">
-                      <ul className="space-y-1">
+                      <ul className="space-y-1.5">
                         {activeSequence.donts.map((d, i) => (
                           <li key={i} className="text-xs text-text-secondary flex items-start gap-2">
-                            <span className="text-red-400">-</span>
-                            {d}
+                            <span className="text-red-400 mt-0.5 shrink-0">-</span>
+                            <span className="leading-relaxed">{d}</span>
                           </li>
                         ))}
                       </ul>
@@ -337,16 +359,21 @@ export function DmScripts() {
             )}
           </div>
         ) : (
-          <div className="text-center py-8">
+          <div className="text-center py-12">
+            <MessageSquare className="h-10 w-10 text-text-muted mx-auto mb-3 opacity-40" />
             <p className="text-sm text-text-muted">
               Aucune séquence trouvée pour cette plateforme.
             </p>
+            <Button variant="outline" size="sm" className="mt-4" onClick={handleGenerate}>
+              <Sparkles className="h-3.5 w-3.5 mr-1.5" />
+              Régénérer
+            </Button>
           </div>
         )}
 
-        {/* Tips generaux */}
+        {/* Tips généraux */}
         {result.general_tips && result.general_tips.length > 0 && (
-          <Card>
+          <Card className="border-accent/10">
             <CardHeader className="py-3">
               <CardTitle className="text-sm flex items-center gap-2">
                 <Sparkles className="h-4 w-4 text-accent" />
@@ -354,11 +381,11 @@ export function DmScripts() {
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-0">
-              <ul className="space-y-1.5">
+              <ul className="space-y-2">
                 {result.general_tips.map((tip, i) => (
-                  <li key={i} className="text-xs text-text-secondary flex items-start gap-2">
-                    <span className="text-accent">{"\u2192"}</span>
-                    {tip}
+                  <li key={i} className="text-xs text-text-secondary flex items-start gap-2.5">
+                    <span className="text-accent mt-0.5 shrink-0">{"\u2192"}</span>
+                    <span className="leading-relaxed">{tip}</span>
                   </li>
                 ))}
               </ul>
@@ -366,7 +393,8 @@ export function DmScripts() {
           </Card>
         )}
 
-        <Button variant="outline" onClick={() => setResult(null)}>
+        <Button variant="outline" onClick={() => setResult(null)} className="transition-all hover:border-accent/40">
+          <Sparkles className="h-4 w-4 mr-2" />
           Régénérer les scripts
         </Button>
 
@@ -380,18 +408,20 @@ export function DmScripts() {
     );
   }
 
-  // Etat initial
+  // État initial
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="text-center">
-        <MessageSquare className="h-10 w-10 text-accent mx-auto mb-3" />
-        <h3 className="font-semibold text-text-primary mb-1">Scripts de DM</h3>
-        <p className="text-sm text-text-secondary max-w-md mx-auto">
+        <div className="inline-flex items-center justify-center h-14 w-14 rounded-2xl bg-accent/10 border border-accent/20 mb-4">
+          <MessageSquare className="h-7 w-7 text-accent" />
+        </div>
+        <h3 className="font-semibold text-text-primary text-lg mb-1.5">Scripts de DM</h3>
+        <p className="text-sm text-text-secondary max-w-md mx-auto leading-relaxed">
           L&apos;IA va créer des séquences de messages pour prospecter sur LinkedIn, Instagram et Messenger.
         </p>
       </div>
 
-      <Card>
+      <Card className="border-border-default/50 bg-bg-secondary/30 backdrop-blur-sm">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-accent" />
@@ -401,24 +431,25 @@ export function DmScripts() {
             Choisis la plateforme puis génère des séquences de messages.
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-5">
           {/* Sélecteur de plateforme */}
           <div>
-            <label className="text-sm font-medium text-text-primary mb-2 block">
+            <label className="text-sm font-medium text-text-primary mb-3 block">
               Plateforme
             </label>
-            <div className="flex gap-2">
+            <div className="flex gap-2 flex-wrap">
               {PLATFORMS.map((platform) => {
                 const PlatformIcon = platform.icon;
+                const isActive = activePlatform === platform.key;
                 return (
                   <button
                     key={platform.key}
                     onClick={() => setActivePlatform(platform.key)}
                     className={cn(
-                      "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all",
-                      activePlatform === platform.key
-                        ? "bg-accent text-white"
-                        : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
+                      "flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 border",
+                      isActive
+                        ? cn(platform.activeColor, "shadow-lg")
+                        : cn(platform.color, "hover:scale-[1.02]")
                     )}
                   >
                     <PlatformIcon className="h-4 w-4" />
@@ -429,10 +460,14 @@ export function DmScripts() {
             </div>
           </div>
 
-          {error && <p className="text-sm text-danger">{error}</p>}
+          {error && (
+            <div className="rounded-xl bg-danger/10 border border-danger/20 p-3 text-sm text-danger">
+              {error}
+            </div>
+          )}
 
-          <Button size="lg" onClick={handleGenerate} className="w-full">
-            <Sparkles className="h-4 w-4 mr-2" />
+          <Button size="lg" onClick={handleGenerate} className="w-full group">
+            <Sparkles className="h-4 w-4 mr-2 group-hover:rotate-12 transition-transform" />
             Générer les scripts DM
           </Button>
         </CardContent>

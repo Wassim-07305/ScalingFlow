@@ -9,11 +9,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { AILoading } from "@/components/shared/ai-loading";
 import { GlowCard } from "@/components/shared/glow-card";
-import { Sparkles, Copy, ChevronDown, ChevronUp, Youtube, Image, FileText, Send } from "lucide-react";
+import { Sparkles, Copy, Check, ChevronDown, ChevronUp, Youtube, Image, FileText, Send } from "lucide-react";
 import { toast } from "sonner";
 import type { YouTubeScriptResult } from "@/lib/ai/prompts/youtube-scripts";
 import { UpgradeWall } from "@/components/shared/upgrade-wall";
 import { UnipilePublishDialog } from "@/components/shared/unipile-publish-dialog";
+import { GenerateButton } from "@/components/shared/generate-button";
 
 interface YouTubeGeneratorProps {
   className?: string;
@@ -85,7 +86,7 @@ export function YouTubeGenerator({ className, initialData }: YouTubeGeneratorPro
   }
 
   if (loading) {
-    return <AILoading text="Génération du script YouTube" className={className} />;
+    return <AILoading variant="immersive" text="Génération du script YouTube" className={className} />;
   }
 
   if (!result) {
@@ -103,10 +104,9 @@ export function YouTubeGenerator({ className, initialData }: YouTubeGeneratorPro
             />
           </div>
           {error && <p className="text-sm text-danger">{error}</p>}
-          <Button size="lg" className="w-full" onClick={handleGenerate}>
-            <Sparkles className="h-4 w-4 mr-2" />
+          <GenerateButton onClick={handleGenerate} className="w-full" icon={<Youtube className="h-4 w-4 mr-2" />}>
             Générer le script YouTube
-          </Button>
+          </GenerateButton>
           <p className="text-sm text-text-secondary text-center">
             Script complet avec plan, thumbnail et description
           </p>
@@ -164,7 +164,7 @@ export function YouTubeGenerator({ className, initialData }: YouTubeGeneratorPro
             size="sm"
             onClick={() => copyToClipboard(result.titre, "titre")}
           >
-            <Copy className="h-3 w-3 mr-1" />
+            {copiedField === "titre" ? <Check className="h-3 w-3 mr-1 animate-in zoom-in-50 duration-200" /> : <Copy className="h-3 w-3 mr-1" />}
             {copiedField === "titre" ? "Copié !" : "Copier"}
           </Button>
         </div>
@@ -181,7 +181,7 @@ export function YouTubeGenerator({ className, initialData }: YouTubeGeneratorPro
               size="sm"
               onClick={() => copyToClipboard(result.hook, "hook")}
             >
-              <Copy className="h-3 w-3 mr-1" />
+              {copiedField === "hook" ? <Check className="h-3 w-3 mr-1 animate-in zoom-in-50 duration-200" /> : <Copy className="h-3 w-3 mr-1" />}
               {copiedField === "hook" ? "Copié !" : "Copier"}
             </Button>
           </div>
@@ -229,7 +229,7 @@ export function YouTubeGenerator({ className, initialData }: YouTubeGeneratorPro
                   copyToClipboard(result.script_complet, "script");
                 }}
               >
-                <Copy className="h-3 w-3 mr-1" />
+                {copiedField === "script" ? <Check className="h-3 w-3 mr-1 animate-in zoom-in-50 duration-200" /> : <Copy className="h-3 w-3 mr-1" />}
                 {copiedField === "script" ? "Copié !" : "Copier"}
               </Button>
               {showFullScript ? (
@@ -268,7 +268,7 @@ export function YouTubeGenerator({ className, initialData }: YouTubeGeneratorPro
               size="sm"
               onClick={() => copyToClipboard(result.description_youtube, "desc")}
             >
-              <Copy className="h-3 w-3 mr-1" />
+              {copiedField === "desc" ? <Check className="h-3 w-3 mr-1 animate-in zoom-in-50 duration-200" /> : <Copy className="h-3 w-3 mr-1" />}
               {copiedField === "desc" ? "Copié !" : "Copier"}
             </Button>
           </div>

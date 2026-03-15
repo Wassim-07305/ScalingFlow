@@ -67,7 +67,7 @@ export function DailyTasks({ className, refreshKey }: DailyTasksProps) {
         .order("task_order", { ascending: true });
 
       if (error) {
-        toast.error("Impossible de charger les taches");
+        toast.error("Impossible de charger les tâches");
         setLoading(false);
         return;
       }
@@ -138,12 +138,20 @@ export function DailyTasks({ className, refreshKey }: DailyTasksProps) {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Target className="h-5 w-5 text-accent" />
-            Taches du jour
+            Tâches du jour
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center justify-center py-8">
-            <Loader2 className="h-5 w-5 animate-spin text-text-muted" />
+          <div className="space-y-2">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-bg-tertiary/30 animate-pulse">
+                <div className="h-4 w-4 rounded bg-bg-tertiary" />
+                <div className="flex-1 space-y-1.5">
+                  <div className="h-4 w-3/4 rounded bg-bg-tertiary" />
+                </div>
+                <div className="h-4 w-12 rounded bg-bg-tertiary" />
+              </div>
+            ))}
           </div>
         </CardContent>
       </Card>
@@ -156,7 +164,7 @@ export function DailyTasks({ className, refreshKey }: DailyTasksProps) {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Target className="h-5 w-5 text-accent" />
-            Taches du jour
+            Tâches du jour
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -177,7 +185,7 @@ export function DailyTasks({ className, refreshKey }: DailyTasksProps) {
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2">
             <Target className="h-5 w-5 text-accent" />
-            Taches du jour
+            Tâches du jour
           </CardTitle>
           <Badge variant="default">
             <Flame className="h-3 w-3 mr-1" />
@@ -186,7 +194,7 @@ export function DailyTasks({ className, refreshKey }: DailyTasksProps) {
         </div>
         <div className="w-full h-2 rounded-full bg-bg-tertiary overflow-hidden">
           <div
-            className="h-full rounded-full bg-gradient-to-r from-accent to-accent transition-all duration-500"
+            className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-accent transition-all duration-700 ease-out"
             style={{ width: `${progress}%` }}
           />
         </div>

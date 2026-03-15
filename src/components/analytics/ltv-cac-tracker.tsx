@@ -245,7 +245,7 @@ export function LTVCACTracker() {
     setIsDemo(false);
     await upsertEntryToDB(user.id, formData);
     setShowForm(false);
-    toast.success("Donnees LTV/CAC enregistrees");
+    toast.success("Données LTV/CAC enregistrées");
     setFormData({
       date: format(new Date(), "yyyy-MM"),
       avgDealValue: 0,
@@ -260,7 +260,7 @@ export function LTVCACTracker() {
     await clearEntriesFromDB(user.id);
     setEntries(DEMO_ENTRIES);
     setIsDemo(true);
-    toast.success("Donnees reinitialisees");
+    toast.success("Données réinitialisées");
   }, [user]);
 
   // ─── Current metrics (latest entry) ─────────────────────────
@@ -300,13 +300,13 @@ export function LTVCACTracker() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          {isDemo && <Badge variant="yellow">Donnees de demonstration</Badge>}
+          {isDemo && <Badge variant="yellow">Données de démonstration</Badge>}
         </div>
         <div className="flex items-center gap-2">
           {!isDemo && (
             <Button variant="ghost" size="sm" onClick={handleClear}>
               <Trash2 className="h-4 w-4 mr-1" />
-              Reinitialiser
+              Réinitialiser
             </Button>
           )}
           <Button onClick={() => setShowForm(true)}>
@@ -455,7 +455,7 @@ export function LTVCACTracker() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Info className="h-5 w-5 text-text-muted" />
-              Indicateurs de sante
+              Indicateurs de santé
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -546,7 +546,7 @@ export function LTVCACTracker() {
                       <stop offset="95%" stopColor="#F87171" stopOpacity={0} />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#1C1F23" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
                   <XAxis
                     dataKey="date"
                     stroke="#6B7280"
@@ -559,17 +559,29 @@ export function LTVCACTracker() {
                     fontSize={12}
                     tickLine={false}
                     axisLine={false}
-                    tickFormatter={(v: number) => `${v}EUR`}
+                    tickFormatter={(v: number) => `${v} \u20AC`}
                   />
                   <Tooltip
                     contentStyle={{
                       backgroundColor: "#141719",
-                      border: "1px solid #2A2D31",
-                      borderRadius: "8px",
+                      border: "1px solid rgba(255,255,255,0.08)",
+                      borderRadius: "12px",
                       color: "#F9FAFB",
+                      boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
+                      padding: "12px 16px",
                     }}
+                    labelStyle={{ color: "#9CA3AF", fontSize: 11, marginBottom: 4 }}
+                    itemStyle={{ fontSize: 13, fontWeight: 600, padding: "2px 0" }}
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    formatter={(value: any) => [`${Number(value).toLocaleString("fr-FR")} \u20AC`, undefined]}
+                    cursor={{ stroke: "rgba(52,211,153,0.2)", strokeWidth: 1 }}
                   />
-                  <Legend />
+                  <Legend
+                    wrapperStyle={{ paddingTop: 8 }}
+                    iconType="circle"
+                    iconSize={8}
+                    formatter={(value: string) => <span className="text-text-secondary text-xs ml-1">{value}</span>}
+                  />
                   <Area
                     type="monotone"
                     dataKey="LTV"
@@ -659,7 +671,7 @@ export function LTVCACTracker() {
       <Dialog open={showForm} onOpenChange={setShowForm}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Donnees mensuelles LTV / CAC</DialogTitle>
+            <DialogTitle>Données mensuelles LTV / CAC</DialogTitle>
             <DialogDescription>
               Saisis tes indicateurs business du mois pour calculer ta LTV, CAC et ratio.
             </DialogDescription>

@@ -215,7 +215,7 @@ export function PerformanceDashboard() {
     setIsDemo(false);
     await upsertMetricToDB(user.id, formData);
     setShowForm(false);
-    toast.success("Donnees enregistrees");
+    toast.success("Données enregistrées");
     setFormData({
       date: format(new Date(), "yyyy-MM-dd"),
       spend: 0,
@@ -233,7 +233,7 @@ export function PerformanceDashboard() {
     await clearMetricsFromDB(user.id);
     setMetrics(DEMO_DATA);
     setIsDemo(true);
-    toast.success("Donnees reinitialisees");
+    toast.success("Données réinitialisées");
   }, [user]);
 
   // ─── KPIs aggregation ───────────────────────────────────────
@@ -352,14 +352,14 @@ export function PerformanceDashboard() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           {isDemo && (
-            <Badge variant="yellow">Donnees de demonstration</Badge>
+            <Badge variant="yellow">Données de démonstration</Badge>
           )}
           <span className="text-[10px] text-text-muted">
             MAJ : {format(lastRefresh, "HH:mm", { locale: fr })}
           </span>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="sm" onClick={loadData} title="Rafraichir">
+          <Button variant="ghost" size="sm" onClick={loadData} title="Rafraîchir">
             <RefreshCw className="h-4 w-4" />
           </Button>
           {!isDemo && (
@@ -370,40 +370,45 @@ export function PerformanceDashboard() {
               </Button>
               <Button variant="ghost" size="sm" onClick={handleClearData}>
                 <Trash2 className="h-4 w-4 mr-1" />
-                Reinitialiser
+                Réinitialiser
               </Button>
             </>
           )}
           <Button onClick={() => setShowForm(true)}>
             <Plus className="h-4 w-4 mr-1" />
-            Ajouter donnees
+            Ajouter données
           </Button>
         </div>
       </div>
 
       {/* KPI Cards */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-        {kpis.map((kpi) => (
-          <Card key={kpi.label} className="p-4">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-text-secondary text-xs font-medium">{kpi.label}</span>
-              <kpi.icon className="h-4 w-4 text-text-muted" />
-            </div>
-            <div className="text-xl font-bold text-text-primary">{kpi.value}</div>
-            <div className="flex items-center gap-1 mt-1">
-              {kpi.trend >= 0 ? (
-                <TrendingUp className="h-3 w-3 text-accent" />
-              ) : (
-                <TrendingDown className="h-3 w-3 text-danger" />
-              )}
-              <span
-                className={cn(
-                  "text-xs font-medium",
-                  kpi.trend >= 0 ? "text-accent" : "text-danger"
+        {kpis.map((kpi, idx) => (
+          <Card key={kpi.label} className="group relative overflow-hidden p-4 transition-all duration-300 hover:border-accent/20 hover:shadow-lg hover:shadow-accent/5" style={{ animationDelay: `${idx * 60}ms` }}>
+            <div className="absolute inset-0 bg-gradient-to-br from-accent/[0.03] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            <div className="relative">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-text-secondary text-xs font-medium">{kpi.label}</span>
+                <div className="h-8 w-8 rounded-lg bg-bg-tertiary/80 flex items-center justify-center">
+                  <kpi.icon className="h-4 w-4 text-text-muted" />
+                </div>
+              </div>
+              <div className="text-xl font-bold text-text-primary">{kpi.value}</div>
+              <div className="flex items-center gap-1 mt-1">
+                {kpi.trend >= 0 ? (
+                  <TrendingUp className="h-3 w-3 text-accent" />
+                ) : (
+                  <TrendingDown className="h-3 w-3 text-danger" />
                 )}
-              >
-                {fmtPercent(kpi.trend)}
-              </span>
+                <span
+                  className={cn(
+                    "text-xs font-medium",
+                    kpi.trend >= 0 ? "text-accent" : "text-danger"
+                  )}
+                >
+                  {fmtPercent(kpi.trend)}
+                </span>
+              </div>
             </div>
           </Card>
         ))}
@@ -428,7 +433,7 @@ export function PerformanceDashboard() {
                     <stop offset="95%" stopColor="#F59E0B" stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1C1F23" />
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
                 <XAxis
                   dataKey="date"
                   stroke="#6B7280"
@@ -441,17 +446,29 @@ export function PerformanceDashboard() {
                   fontSize={12}
                   tickLine={false}
                   axisLine={false}
-                  tickFormatter={(v: number) => `${v}EUR`}
+                  tickFormatter={(v: number) => `${v} \u20AC`}
                 />
                 <Tooltip
                   contentStyle={{
                     backgroundColor: "#141719",
-                    border: "1px solid #2A2D31",
-                    borderRadius: "8px",
+                    border: "1px solid rgba(255,255,255,0.08)",
+                    borderRadius: "12px",
                     color: "#F9FAFB",
+                    boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
+                    padding: "12px 16px",
                   }}
+                  labelStyle={{ color: "#9CA3AF", fontSize: 11, marginBottom: 4 }}
+                  itemStyle={{ fontSize: 13, fontWeight: 600, padding: "2px 0" }}
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  formatter={(value: any) => [`${Number(value).toLocaleString("fr-FR")} \u20AC`, undefined]}
+                  cursor={{ stroke: "rgba(52,211,153,0.2)", strokeWidth: 1 }}
                 />
-                <Legend />
+                <Legend
+                  wrapperStyle={{ paddingTop: 8 }}
+                  iconType="circle"
+                  iconSize={8}
+                  formatter={(value: string) => <span className="text-text-secondary text-xs ml-1">{value}</span>}
+                />
                 <Area
                   type="monotone"
                   dataKey="Revenu"
@@ -481,45 +498,50 @@ export function PerformanceDashboard() {
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-between gap-2 overflow-x-auto pb-2">
-            {funnel.map((step, idx) => (
-              <React.Fragment key={step.label}>
-                <div className="flex flex-col items-center min-w-[100px]">
-                  <div
-                    className={cn(
-                      "w-16 h-16 rounded-xl flex items-center justify-center mb-2",
-                      idx === 0 && "bg-info/12",
-                      idx === 1 && "bg-accent-muted",
-                      idx === 2 && "bg-warning/12",
-                      idx === 3 && "bg-[rgba(139,92,246,0.12)]",
-                      idx === 4 && "bg-accent/20"
-                    )}
-                  >
-                    <step.icon
+            {funnel.map((step, idx) => {
+              const funnelColors = [
+                { bg: "bg-info/12", text: "text-info", ring: "ring-info/20" },
+                { bg: "bg-accent/12", text: "text-accent", ring: "ring-accent/20" },
+                { bg: "bg-warning/12", text: "text-warning", ring: "ring-warning/20" },
+                { bg: "bg-[rgba(139,92,246,0.12)]", text: "text-[#A78BFA]", ring: "ring-[rgba(139,92,246,0.2)]" },
+                { bg: "bg-accent/20", text: "text-accent", ring: "ring-accent/30" },
+              ];
+              const c = funnelColors[idx];
+              return (
+                <React.Fragment key={step.label}>
+                  <div className="flex flex-col items-center min-w-[100px] group">
+                    <div
                       className={cn(
-                        "h-6 w-6",
-                        idx === 0 && "text-info",
-                        idx === 1 && "text-accent",
-                        idx === 2 && "text-warning",
-                        idx === 3 && "text-[#A78BFA]",
-                        idx === 4 && "text-accent"
+                        "w-16 h-16 rounded-2xl flex items-center justify-center mb-2 ring-1 transition-all duration-300 group-hover:scale-105",
+                        c.bg,
+                        c.ring
                       )}
-                    />
+                    >
+                      <step.icon className={cn("h-6 w-6", c.text)} />
+                    </div>
+                    <span className="text-text-secondary text-xs font-medium">{step.label}</span>
+                    <span className="text-text-primary text-lg font-bold">
+                      {fmtNumber(step.value)}
+                    </span>
+                    {step.rate !== null && (
+                      <Badge variant="muted" className="mt-1 text-[10px]">
+                        {step.rate.toFixed(1)}%
+                      </Badge>
+                    )}
                   </div>
-                  <span className="text-text-secondary text-xs font-medium">{step.label}</span>
-                  <span className="text-text-primary text-lg font-bold">
-                    {fmtNumber(step.value)}
-                  </span>
-                  {step.rate !== null && (
-                    <Badge variant="muted" className="mt-1 text-[10px]">
-                      {step.rate.toFixed(1)}%
-                    </Badge>
+                  {idx < funnel.length - 1 && (
+                    <div className="flex flex-col items-center shrink-0 gap-0.5">
+                      <ArrowRight className="h-4 w-4 text-text-muted/60" />
+                      {funnel[idx + 1].rate !== null && (
+                        <span className="text-[9px] text-text-muted/50 font-medium">
+                          {funnel[idx + 1].rate!.toFixed(1)}%
+                        </span>
+                      )}
+                    </div>
                   )}
-                </div>
-                {idx < funnel.length - 1 && (
-                  <ArrowRight className="h-5 w-5 text-text-muted shrink-0" />
-                )}
-              </React.Fragment>
-            ))}
+                </React.Fragment>
+              );
+            })}
           </div>
         </CardContent>
       </Card>
@@ -527,7 +549,7 @@ export function PerformanceDashboard() {
       {/* Campaign Performance Table */}
       <Card>
         <CardHeader>
-          <CardTitle>Performance par periode</CardTitle>
+          <CardTitle>Performance par période</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">

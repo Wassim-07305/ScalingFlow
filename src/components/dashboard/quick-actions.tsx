@@ -113,13 +113,13 @@ export function QuickActions() {
                 key={action.href}
                 href={action.href}
                 className={cn(
-                  "group flex items-start gap-3 rounded-xl border border-border-default bg-bg-secondary p-4 transition-all duration-300",
+                  "group flex items-start gap-3 rounded-2xl border border-white/5 bg-bg-secondary p-4 transition-all duration-300 hover:translate-y-[-1px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50",
                   colors.hover
                 )}
               >
                 <div
                   className={cn(
-                    "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl",
+                    "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-transform duration-300 group-hover:scale-110",
                     colors.bg
                   )}
                 >

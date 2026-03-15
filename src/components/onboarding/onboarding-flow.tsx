@@ -617,7 +617,7 @@ export function OnboardingFlow() {
               value={String(fieldValue || "")}
               onChange={(e) => setField(q.field!, e.target.value)}
               placeholder={q.placeholder}
-              className="w-full border-b-2 border-white/20 bg-transparent pb-3 text-2xl font-medium text-white outline-none placeholder:text-white/25 transition-colors focus:border-emerald-400 sm:text-3xl"
+              className="w-full border-b-2 border-white/20 bg-transparent pb-3 text-2xl font-medium text-white outline-none placeholder:text-white/25 transition-all duration-300 focus:border-emerald-400 focus:shadow-[0_2px_0_0_rgba(52,211,153,0.3)] sm:text-3xl"
             />
           </div>
         );
@@ -640,7 +640,7 @@ export function OnboardingFlow() {
               onChange={(e) => setField(q.field!, e.target.value)}
               placeholder={q.placeholder}
               rows={4}
-              className="w-full resize-none rounded-xl border-2 border-white/20 bg-white/5 px-5 py-4 text-lg text-white outline-none placeholder:text-white/25 transition-colors focus:border-emerald-400"
+              className="w-full resize-none rounded-xl border-2 border-white/20 bg-white/5 px-5 py-4 text-lg text-white outline-none placeholder:text-white/25 transition-all duration-300 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/20"
             />
           </div>
         );
@@ -725,7 +725,7 @@ export function OnboardingFlow() {
                       }}
                       placeholder={f.placeholder}
                       rows={3}
-                      className="w-full resize-none rounded-xl border-2 border-white/20 bg-white/5 px-5 py-3.5 text-lg text-white outline-none placeholder:text-white/25 transition-colors focus:border-emerald-400"
+                      className="w-full resize-none rounded-xl border-2 border-white/20 bg-white/5 px-5 py-3.5 text-lg text-white outline-none placeholder:text-white/25 transition-all duration-300 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/20"
                     />
                   ) : (
                     <input
@@ -745,7 +745,7 @@ export function OnboardingFlow() {
                         setField("situationDetails", updated);
                       }}
                       placeholder={f.placeholder}
-                      className="w-full rounded-xl border-2 border-white/20 bg-white/5 px-5 py-3.5 text-lg text-white outline-none placeholder:text-white/25 transition-colors focus:border-emerald-400"
+                      className="w-full rounded-xl border-2 border-white/20 bg-white/5 px-5 py-3.5 text-lg text-white outline-none placeholder:text-white/25 transition-all duration-300 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/20"
                     />
                   )}
                 </div>
@@ -909,10 +909,10 @@ export function OnboardingFlow() {
                       isSummary ? "Lancer l'analyse IA" : "Étape suivante"
                     }
                     className={cn(
-                      "flex items-center gap-2 rounded-xl text-base font-semibold text-white transition-all",
+                      "flex items-center gap-2 rounded-xl text-base font-semibold text-white transition-all duration-200 active:scale-[0.97]",
                       isSummary
-                        ? "bg-gradient-to-r from-emerald-500 to-teal-500 px-7 py-3.5 shadow-lg shadow-emerald-500/25 hover:scale-105 hover:shadow-xl hover:shadow-emerald-500/40 disabled:opacity-50"
-                        : "bg-emerald-500 px-6 py-3 hover:bg-emerald-400 disabled:opacity-50",
+                        ? "bg-gradient-to-r from-emerald-500 to-teal-500 px-7 py-3.5 shadow-lg shadow-emerald-500/25 hover:scale-105 hover:shadow-xl hover:shadow-emerald-500/40 disabled:opacity-50 disabled:hover:scale-100"
+                        : "bg-emerald-500 px-6 py-3 hover:bg-emerald-400 hover:shadow-lg hover:shadow-emerald-500/20 disabled:opacity-50 disabled:hover:shadow-none",
                     )}
                   >
                     {isSummary ? (
@@ -952,8 +952,15 @@ export function OnboardingFlow() {
 
       {/* Error toast */}
       {error && (
-        <div className="fixed bottom-8 left-1/2 z-50 -translate-x-1/2 rounded-xl border border-red-500/30 bg-red-500/20 px-6 py-3 text-sm text-red-300 backdrop-blur">
-          {error}
+        <div className="fixed bottom-8 left-1/2 z-50 -translate-x-1/2 max-w-md w-[calc(100%-3rem)] rounded-xl border border-red-500/30 bg-red-500/15 px-5 py-3 text-sm text-red-300 backdrop-blur-md shadow-xl shadow-red-500/10 flex items-center gap-3 animate-in slide-in-from-bottom-3 fade-in">
+          <span className="flex-1">{error}</span>
+          <button
+            onClick={() => setError(null)}
+            className="shrink-0 text-red-400/60 hover:text-red-300 transition-colors"
+            aria-label="Fermer"
+          >
+            &times;
+          </button>
         </div>
       )}
     </div>

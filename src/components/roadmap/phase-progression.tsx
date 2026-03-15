@@ -22,6 +22,13 @@ interface Phase {
   milestoneKeys: string[];
 }
 
+const PHASE_COLORS = {
+  hook: { accent: "#3B82F6", bg: "rgba(59,130,246,0.12)", ring: "ring-blue-400/30", text: "text-blue-400", gradient: "from-blue-400" },
+  build: { accent: "#A78BFA", bg: "rgba(167,139,250,0.12)", ring: "ring-purple-400/30", text: "text-purple-400", gradient: "from-purple-400" },
+  deliver: { accent: "#F59E0B", bg: "rgba(245,158,11,0.12)", ring: "ring-orange-400/30", text: "text-orange-400", gradient: "from-orange-400" },
+  scale: { accent: "#34D399", bg: "rgba(52,211,153,0.12)", ring: "ring-emerald-400/30", text: "text-emerald-400", gradient: "from-emerald-400" },
+};
+
 const PHASES: Phase[] = [
   {
     key: "hook",
@@ -188,6 +195,7 @@ export function PhaseProgression({ className }: PhaseProgressionProps) {
           const isCompleted = completion === 100;
           const isFuture = index > activeIndex;
           const Icon = phase.icon;
+          const phaseColor = PHASE_COLORS[phase.key as keyof typeof PHASE_COLORS];
 
           return (
             <React.Fragment key={phase.key}>
@@ -197,11 +205,16 @@ export function PhaseProgression({ className }: PhaseProgressionProps) {
                   className={cn(
                     "relative flex flex-col items-center text-center p-5 rounded-2xl border transition-all duration-300",
                     isActive
-                      ? "border-accent/40 bg-gradient-to-b from-accent/10 to-accent/5 shadow-lg shadow-accent/10"
+                      ? `border-[${phaseColor.accent}]/40 shadow-lg`
                       : isCompleted
                         ? "border-accent/20 bg-accent/5"
                         : "border-border-default/50 bg-bg-secondary/30"
                   )}
+                  style={isActive ? {
+                    borderColor: `${phaseColor.accent}40`,
+                    background: `linear-gradient(to bottom, ${phaseColor.accent}18, ${phaseColor.accent}08)`,
+                    boxShadow: `0 8px 32px ${phaseColor.accent}15`,
+                  } : undefined}
                 >
                   {/* Completed checkmark */}
                   {isCompleted && (
@@ -222,19 +235,23 @@ export function PhaseProgression({ className }: PhaseProgressionProps) {
                     className={cn(
                       "flex h-12 w-12 items-center justify-center rounded-xl mb-3 transition-all duration-300",
                       isActive
-                        ? "bg-accent/20 ring-2 ring-accent/30 shadow-lg shadow-accent/20"
+                        ? "ring-2 shadow-lg"
                         : isCompleted
                           ? "bg-accent/15"
                           : "bg-bg-tertiary"
                     )}
+                    style={isActive ? {
+                      backgroundColor: `${phaseColor.accent}30`,
+                      boxShadow: `0 4px 16px ${phaseColor.accent}25`,
+                      outlineColor: `${phaseColor.accent}40`,
+                    } : undefined}
                   >
                     <Icon
                       className={cn(
                         "h-6 w-6 transition-colors",
-                        isActive || isCompleted
-                          ? "text-accent"
-                          : "text-text-muted/60"
+                        isCompleted ? "text-accent" : "text-text-muted/60"
                       )}
+                      style={isActive ? { color: phaseColor.accent } : undefined}
                     />
                   </div>
 
@@ -275,13 +292,11 @@ export function PhaseProgression({ className }: PhaseProgressionProps) {
                   {/* Progress bar */}
                   <div className="w-full h-1.5 bg-bg-tertiary rounded-full overflow-hidden">
                     <div
-                      className={cn(
-                        "h-full rounded-full transition-all duration-700 ease-out",
-                        isCompleted || isActive
-                          ? "bg-accent"
-                          : "bg-text-muted/20"
-                      )}
-                      style={{ width: `${completion}%` }}
+                      className="h-full rounded-full transition-all duration-700 ease-out"
+                      style={{
+                        width: `${completion}%`,
+                        backgroundColor: (isCompleted || isActive) ? phaseColor.accent : "rgba(255,255,255,0.08)",
+                      }}
                     />
                   </div>
 
@@ -289,12 +304,9 @@ export function PhaseProgression({ className }: PhaseProgressionProps) {
                   <span
                     className={cn(
                       "text-xs font-semibold mt-2",
-                      isCompleted
-                        ? "text-accent"
-                        : isActive
-                          ? "text-accent"
-                          : "text-text-muted/40"
+                      !isCompleted && !isActive && "text-text-muted/40"
                     )}
+                    style={(isCompleted || isActive) ? { color: phaseColor.accent } : undefined}
                   >
                     {completion}%
                   </span>

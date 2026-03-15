@@ -104,8 +104,18 @@ export function RevenueChart() {
       <CardContent>
         <div className="h-[220px] sm:h-[300px]">
           {isLoading ? (
-            <div className="flex h-full items-center justify-center">
-              <div className="h-8 w-8 animate-spin rounded-full border-2 border-accent border-t-transparent" />
+            <div className="flex h-full flex-col justify-end gap-2 px-4 pb-4">
+              <div className="flex items-end gap-3 h-full">
+                {[40, 65, 45, 80, 55, 70].map((h, i) => (
+                  <div key={i} className="flex-1 flex flex-col justify-end gap-1">
+                    <div
+                      className="w-full rounded-t bg-bg-tertiary animate-pulse"
+                      style={{ height: `${h}%` }}
+                    />
+                    <div className="h-3 w-8 mx-auto rounded bg-bg-tertiary animate-pulse" />
+                  </div>
+                ))}
+              </div>
             </div>
           ) : !hasData ? (
             <div className="flex flex-col h-full items-center justify-center text-center">

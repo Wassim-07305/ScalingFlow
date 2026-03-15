@@ -153,8 +153,20 @@ export function GenerationHistory({
         {[1, 2, 3].map((i) => (
           <div
             key={i}
-            className="h-20 rounded-xl bg-bg-tertiary animate-pulse"
-          />
+            className="rounded-xl border border-border-default bg-bg-secondary p-4 animate-pulse"
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex-1 space-y-2">
+                <div className="h-4 w-3/4 bg-bg-tertiary rounded-md" />
+                <div className="h-3 w-1/2 bg-bg-tertiary rounded-md" />
+                <div className="flex items-center gap-2 mt-1">
+                  <div className="h-3 w-3 bg-bg-tertiary rounded-full" />
+                  <div className="h-3 w-24 bg-bg-tertiary rounded-md" />
+                </div>
+              </div>
+              <div className="h-5 w-16 bg-bg-tertiary rounded-full" />
+            </div>
+          </div>
         ))}
       </div>
     );

@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AILoading } from "@/components/shared/ai-loading";
 import { GlowCard } from "@/components/shared/glow-card";
-import { Sparkles, Image, Video, Target, Copy, Loader2, ImagePlus, Pencil, Check, Save } from "lucide-react";
+import { GenerateButton } from "@/components/shared/generate-button";
+import { Sparkles, Image, Video, Target, Copy, Check, Loader2, ImagePlus, Pencil, Save } from "lucide-react";
 import { UpgradeWall } from "@/components/shared/upgrade-wall";
 import { createClient } from "@/lib/supabase/client";
 import { useUser } from "@/hooks/use-user";
@@ -159,6 +160,7 @@ export function CreativeGenerator({ className, initialData }: CreativeGeneratorP
   const copyToClipboard = (text: string, index: number) => {
     navigator.clipboard.writeText(text);
     setCopiedIndex(index);
+    toast.success("Copié dans le presse-papiers");
     setTimeout(() => setCopiedIndex(null), 2000);
   };
 
@@ -195,7 +197,7 @@ export function CreativeGenerator({ className, initialData }: CreativeGeneratorP
   }
 
   if (loading) {
-    return <AILoading text="Création de tes publicités" className={className} />;
+    return <AILoading variant="immersive" text="Création de tes publicités" className={className} />;
   }
 
   if (variations.length === 0) {
@@ -214,17 +216,18 @@ export function CreativeGenerator({ className, initialData }: CreativeGeneratorP
           <CardContent className="space-y-5">
             {/* Tone selector */}
             <div>
-              <label className="text-sm font-medium text-text-primary mb-2 block">Tonalité</label>
+              <label className="text-sm font-medium text-text-primary mb-1.5 block">Tonalité</label>
+              <p className="text-xs text-text-muted mb-2">Le ton général de tes publicités</p>
               <div className="flex flex-wrap gap-2">
                 {TONES.map((t) => (
                   <button
                     key={t.key}
                     onClick={() => setTone(t.key)}
                     className={cn(
-                      "px-3 py-1.5 rounded-lg text-sm font-medium transition-all",
+                      "px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200",
                       tone === t.key
-                        ? "bg-accent text-white"
-                        : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
+                        ? "bg-accent text-white shadow-md shadow-accent/25"
+                        : "bg-bg-tertiary text-text-secondary hover:text-text-primary hover:bg-bg-tertiary/80"
                     )}
                   >
                     {t.label}
@@ -235,17 +238,18 @@ export function CreativeGenerator({ className, initialData }: CreativeGeneratorP
 
             {/* Objective selector */}
             <div>
-              <label className="text-sm font-medium text-text-primary mb-2 block">Objectif</label>
+              <label className="text-sm font-medium text-text-primary mb-1.5 block">Objectif</label>
+              <p className="text-xs text-text-muted mb-2">Ce que tu veux accomplir avec ces publicités</p>
               <div className="flex flex-wrap gap-2">
                 {OBJECTIVES.map((o) => (
                   <button
                     key={o.key}
                     onClick={() => setObjective(o.key)}
                     className={cn(
-                      "px-3 py-1.5 rounded-lg text-sm font-medium transition-all",
+                      "px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200",
                       objective === o.key
-                        ? "bg-accent text-white"
-                        : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
+                        ? "bg-accent text-white shadow-md shadow-accent/25"
+                        : "bg-bg-tertiary text-text-secondary hover:text-text-primary hover:bg-bg-tertiary/80"
                     )}
                   >
                     {o.label}
@@ -259,12 +263,13 @@ export function CreativeGenerator({ className, initialData }: CreativeGeneratorP
               <label className="text-sm font-medium text-text-primary mb-1 block">
                 Audience cible <span className="text-text-muted font-normal">(optionnel)</span>
               </label>
+              <p className="text-xs text-text-muted mb-2">Décris qui tu veux cibler pour des résultats plus précis</p>
               <input
                 type="text"
                 value={targetAudience}
                 onChange={(e) => setTargetAudience(e.target.value)}
                 placeholder="Ex: entrepreneurs 25-45 ans, coaches, e-commerçants..."
-                className="w-full rounded-lg border border-border-default bg-bg-secondary px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+                className="w-full rounded-xl border border-border-default bg-bg-secondary px-3 py-2.5 text-sm text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20 transition-all"
               />
             </div>
 
@@ -273,21 +278,25 @@ export function CreativeGenerator({ className, initialData }: CreativeGeneratorP
               <label className="text-sm font-medium text-text-primary mb-1 block">
                 Contexte produit <span className="text-text-muted font-normal">(optionnel)</span>
               </label>
+              <p className="text-xs text-text-muted mb-2">Ton produit/service pour des publicités plus pertinentes</p>
               <textarea
                 value={productContext}
                 onChange={(e) => setProductContext(e.target.value)}
                 placeholder="Décris brièvement ton produit/service pour des résultats plus pertinents..."
                 rows={2}
-                className="w-full rounded-lg border border-border-default bg-bg-secondary px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent resize-none"
+                className="w-full rounded-xl border border-border-default bg-bg-secondary px-3 py-2.5 text-sm text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20 transition-all resize-none"
               />
             </div>
 
-            {error && <p className="text-sm text-danger">{error}</p>}
+            {error && (
+              <div className="p-3 rounded-xl bg-danger/10 border border-danger/20">
+                <p className="text-sm text-danger">{error}</p>
+              </div>
+            )}
 
-            <Button size="lg" onClick={handleGenerate} className="w-full">
-              <Sparkles className="h-4 w-4 mr-2" />
+            <GenerateButton onClick={handleGenerate} className="w-full">
               Générer 5 variations
-            </Button>
+            </GenerateButton>
           </CardContent>
         </Card>
       </div>
@@ -296,8 +305,8 @@ export function CreativeGenerator({ className, initialData }: CreativeGeneratorP
 
   return (
     <div className={cn("space-y-4", className)}>
-      <div className="flex items-center justify-between">
-        <Badge variant="default">{variations.length} variations</Badge>
+      <div className="flex items-center justify-between flex-wrap gap-2">
+        <Badge variant="default" className="text-xs">{variations.length} variations générées</Badge>
         <div className="flex items-center gap-2">
           {isDirty && savedIds.length > 0 && (
             <Button
@@ -305,12 +314,12 @@ export function CreativeGenerator({ className, initialData }: CreativeGeneratorP
               size="sm"
               onClick={handleSaveEdits}
               disabled={saving}
-              className="bg-accent hover:bg-accent/90"
+              className="bg-gradient-to-r from-accent to-emerald-400 hover:from-accent/90 hover:to-emerald-400/90 text-white shadow-md shadow-accent/20"
             >
               {saving ? (
                 <><Loader2 className="h-3 w-3 animate-spin mr-1" /> Sauvegarde...</>
               ) : (
-                <><Save className="h-3 w-3 mr-1" /> Sauvegarder les modifications</>
+                <><Save className="h-3 w-3 mr-1" /> Sauvegarder</>
               )}
             </Button>
           )}
@@ -329,13 +338,16 @@ export function CreativeGenerator({ className, initialData }: CreativeGeneratorP
           return (
             <GlowCard key={i} glowColor={i % 2 === 0 ? "orange" : "blue"}>
               <div className="flex items-center justify-between mb-3">
-                <Badge variant={v.estimated_format === "video" ? "blue" : "cyan"}>
-                  {v.estimated_format === "video" ? (
-                    <><Video className="h-3 w-3 mr-1" /> Vidéo</>
-                  ) : (
-                    <><Image className="h-3 w-3 mr-1" /> Image</>
-                  )}
-                </Badge>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold text-text-muted">#{i + 1}</span>
+                  <Badge variant={v.estimated_format === "video" ? "blue" : "cyan"}>
+                    {v.estimated_format === "video" ? (
+                      <><Video className="h-3 w-3 mr-1" /> Vidéo</>
+                    ) : (
+                      <><Image className="h-3 w-3 mr-1" /> Image</>
+                    )}
+                  </Badge>
+                </div>
                 <div className="flex items-center gap-1">
                   <Button
                     variant="ghost"
@@ -343,11 +355,12 @@ export function CreativeGenerator({ className, initialData }: CreativeGeneratorP
                     onClick={() => {
                       if (isEditing) {
                         setEditingIndex(null);
-                        toast.success("Modifications sauvegardées");
+                        toast.success("Modifications appliquées");
                       } else {
                         setEditingIndex(i);
                       }
                     }}
+                    className={cn(isEditing && "text-accent")}
                   >
                     {isEditing ? (
                       <><Check className="h-3 w-3 mr-1" /> OK</>
@@ -359,16 +372,20 @@ export function CreativeGenerator({ className, initialData }: CreativeGeneratorP
                     variant="ghost"
                     size="sm"
                     onClick={() => copyToClipboard(`${v.hook}\n\n${v.body}\n\n${v.headline}\n\nCTA: ${v.cta}`, i)}
+                    className={cn(copiedIndex === i && "text-accent")}
                   >
-                    <Copy className="h-3 w-3 mr-1" />
-                    {copiedIndex === i ? "Copié !" : "Copier"}
+                    {copiedIndex === i ? (
+                      <><Check className="h-3 w-3 mr-1 animate-in zoom-in-50 duration-200" /> Copié !</>
+                    ) : (
+                      <><Copy className="h-3 w-3 mr-1" /> Copier</>
+                    )}
                   </Button>
                 </div>
               </div>
 
               <div className="space-y-3">
                 <div>
-                  <p className="text-xs text-text-muted mb-1">Hook</p>
+                  <p className="text-xs text-text-muted mb-1 font-medium">Hook</p>
                   {isEditing ? (
                     <textarea
                       value={v.hook}
@@ -381,7 +398,7 @@ export function CreativeGenerator({ className, initialData }: CreativeGeneratorP
                   )}
                 </div>
                 <div>
-                  <p className="text-xs text-text-muted mb-1">Body</p>
+                  <p className="text-xs text-text-muted mb-1 font-medium">Corps</p>
                   {isEditing ? (
                     <textarea
                       value={v.body}
@@ -394,7 +411,7 @@ export function CreativeGenerator({ className, initialData }: CreativeGeneratorP
                   )}
                 </div>
                 <div>
-                  <p className="text-xs text-text-muted mb-1">Headline</p>
+                  <p className="text-xs text-text-muted mb-1 font-medium">Titre</p>
                   {isEditing ? (
                     <input
                       type="text"
@@ -406,7 +423,7 @@ export function CreativeGenerator({ className, initialData }: CreativeGeneratorP
                     <p className="text-sm font-medium text-text-primary">{v.headline}</p>
                   )}
                 </div>
-                <div className="p-2 rounded-lg bg-accent/10 border border-accent/20">
+                <div className="p-2.5 rounded-xl bg-accent/10 border border-accent/20">
                   {isEditing ? (
                     <input
                       type="text"
@@ -438,16 +455,19 @@ export function CreativeGenerator({ className, initialData }: CreativeGeneratorP
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="w-full mt-2"
+                    className={cn(
+                      "w-full mt-2 transition-all",
+                      generatingImage === i && "text-accent"
+                    )}
                     disabled={generatingImage === i}
                     onClick={() => generateAdImage(i)}
                   >
                     {generatingImage === i ? (
-                      <><Loader2 className="h-3 w-3 animate-spin mr-1" /> Génération...</>
+                      <><Loader2 className="h-3 w-3 animate-spin mr-1" /> Génération en cours...</>
                     ) : generatedImages[i] ? (
-                      <><ImagePlus className="h-3 w-3 mr-1" /> Régénérer visuels</>
+                      <><ImagePlus className="h-3 w-3 mr-1" /> Régénérer les visuels</>
                     ) : (
-                      <><ImagePlus className="h-3 w-3 mr-1" /> Générer visuels IA</>
+                      <><ImagePlus className="h-3 w-3 mr-1" /> Générer des visuels IA</>
                     )}
                   </Button>
                 )}

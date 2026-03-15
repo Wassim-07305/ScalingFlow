@@ -267,7 +267,7 @@ export default function ClientsPage() {
         {STAT_CARDS.map((stat) => (
           <div
             key={stat.label}
-            className="flex items-center gap-3 rounded-2xl border border-border-default bg-bg-secondary/50 px-4 py-3 backdrop-blur-sm transition-all duration-200 hover:border-border-hover"
+            className="flex items-center gap-3 rounded-2xl border border-border-default bg-bg-secondary/50 px-4 py-3 backdrop-blur-sm transition-all duration-300 hover:border-accent/20 hover:shadow-lg hover:shadow-accent/5 hover:-translate-y-0.5 hover:bg-bg-secondary"
           >
             <div className={cn("rounded-xl p-2.5", stat.bgColor)}>
               <stat.icon className={cn("h-4 w-4", stat.color)} />
@@ -316,8 +316,8 @@ export default function ClientsPage() {
           ))}
         </div>
       ) : filtered.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border-default bg-bg-secondary/30 py-16 text-center backdrop-blur-sm">
-          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-bg-tertiary mb-4">
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border-default bg-bg-secondary/30 py-16 text-center backdrop-blur-sm animate-in fade-in-0 zoom-in-95 duration-300">
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-bg-tertiary mb-4 animate-in zoom-in-50 duration-500">
             <UserX className="h-7 w-7 text-text-muted" />
           </div>
           <h3 className="text-base font-semibold text-text-primary mb-1">
@@ -345,12 +345,13 @@ export default function ClientsPage() {
             </Badge>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-            {filtered.map((client) => (
-              <ClientCard
-                key={client.id}
-                client={client}
-                onClick={() => router.push(`/clients/${client.id}`)}
-              />
+            {filtered.map((client, index) => (
+              <div key={client.id} style={{ animationDelay: `${index * 50}ms` }} className="animate-in fade-in-0 slide-in-from-bottom-3 duration-300 fill-mode-both">
+                <ClientCard
+                  client={client}
+                  onClick={() => router.push(`/clients/${client.id}`)}
+                />
+              </div>
             ))}
           </div>
         </>

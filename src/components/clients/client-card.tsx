@@ -72,13 +72,14 @@ export function ClientCard({ client, onClick }: ClientCardProps) {
     <div
       className={cn(
         "cursor-pointer group rounded-2xl border border-border-default bg-bg-secondary/50 p-4",
-        "transition-all duration-200 backdrop-blur-sm",
-        "hover:border-accent/20 hover:bg-bg-secondary hover:shadow-lg hover:shadow-black/10 hover:-translate-y-0.5"
+        "transition-all duration-300 ease-out backdrop-blur-sm",
+        "hover:border-accent/30 hover:bg-bg-secondary hover:shadow-xl hover:shadow-accent/5 hover:-translate-y-1 hover:scale-[1.01]",
+        "animate-in fade-in-0 slide-in-from-bottom-2 duration-300"
       )}
       onClick={onClick}
     >
       <div className="flex items-start gap-4">
-        <Avatar className="h-11 w-11 ring-1 ring-border-default group-hover:ring-accent/20 transition-all">
+        <Avatar className="h-11 w-11 ring-1 ring-border-default group-hover:ring-accent/30 transition-all duration-300 group-hover:shadow-md group-hover:shadow-accent/10">
           {client.avatar_url && <AvatarImage src={client.avatar_url} alt={client.name} />}
           <AvatarFallback className="bg-accent/10 text-accent text-sm font-semibold">
             {getInitials(client.name)}
@@ -87,14 +88,18 @@ export function ClientCard({ client, onClick }: ClientCardProps) {
 
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between gap-2">
-            <h3 className="text-sm font-semibold text-text-primary truncate group-hover:text-accent transition-colors">
+            <h3 className="text-sm font-semibold text-text-primary truncate group-hover:text-accent transition-colors duration-200">
               {client.name}
             </h3>
             <span className={cn(
-              "inline-flex items-center gap-1 shrink-0 rounded-full px-2 py-0.5 text-[11px] font-medium",
+              "inline-flex items-center gap-1.5 shrink-0 rounded-full px-2 py-0.5 text-[11px] font-medium transition-all duration-200 group-hover:shadow-sm",
               statusCfg.bgColor, statusCfg.color
             )}>
-              <span className={cn("h-1.5 w-1.5 rounded-full", statusCfg.color === "text-text-muted" ? "bg-text-muted" : "bg-current")} />
+              <span className={cn(
+                "h-1.5 w-1.5 rounded-full",
+                statusCfg.color === "text-text-muted" ? "bg-text-muted" : "bg-current",
+                client.status === "actif" && "animate-pulse"
+              )} />
               {statusCfg.label}
             </span>
           </div>
@@ -106,11 +111,11 @@ export function ClientCard({ client, onClick }: ClientCardProps) {
             </p>
           )}
 
-          <div className="flex items-center gap-4 mt-3 pt-3 border-t border-border-default/50">
+          <div className="flex items-center gap-4 mt-3 pt-3 border-t border-border-default/50 group-hover:border-accent/10 transition-colors duration-200">
             {typeof client.total_deals_amount === "number" && (
               <span className="flex items-center gap-1 text-xs text-text-secondary">
                 <DollarSign className="h-3 w-3 text-accent" />
-                {formatCurrency(client.total_deals_amount)}
+                <span className="font-medium">{formatCurrency(client.total_deals_amount)}</span>
               </span>
             )}
             {typeof client.deals_count === "number" && client.deals_count > 0 && (

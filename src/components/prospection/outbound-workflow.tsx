@@ -144,7 +144,7 @@ export function OutboundWorkflow() {
 
   if (result) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
         {/* Actions */}
         <div className="flex items-center justify-between">
           <Badge variant="default">Workflow généré</Badge>
@@ -385,25 +385,28 @@ export function OutboundWorkflow() {
           </Card>
         )}
 
-        <Button variant="outline" onClick={() => setResult(null)}>
+        <Button variant="outline" onClick={() => setResult(null)} className="transition-all hover:border-accent/40">
+          <Sparkles className="h-4 w-4 mr-2" />
           Régénérer le workflow
         </Button>
       </div>
     );
   }
 
-  // Etat initial
+  // État initial
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="text-center">
-        <GitBranch className="h-10 w-10 text-accent mx-auto mb-3" />
-        <h3 className="font-semibold text-text-primary mb-1">Workflow Outbound</h3>
+        <div className="inline-flex items-center justify-center h-14 w-14 rounded-2xl bg-accent/10 border border-accent/20 mb-4">
+          <GitBranch className="h-7 w-7 text-accent" />
+        </div>
+        <h3 className="font-semibold text-text-primary text-lg mb-1.5">Workflow Outbound</h3>
         <p className="text-sm text-text-secondary max-w-md mx-auto">
           L&apos;IA va créer un workflow complet de prospection outbound multi-canal avec templates, timings et KPIs.
         </p>
       </div>
 
-      <Card>
+      <Card className="border-border-default/50 bg-bg-secondary/30 backdrop-blur-sm">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-accent" />
@@ -414,9 +417,13 @@ export function OutboundWorkflow() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {error && <p className="text-sm text-danger mb-4">{error}</p>}
-          <Button size="lg" onClick={handleGenerate} className="w-full">
-            <Sparkles className="h-4 w-4 mr-2" />
+          {error && (
+            <div className="rounded-xl bg-danger/10 border border-danger/20 p-3 text-sm text-danger mb-4">
+              {error}
+            </div>
+          )}
+          <Button size="lg" onClick={handleGenerate} className="w-full group">
+            <Sparkles className="h-4 w-4 mr-2 group-hover:rotate-12 transition-transform" />
             Générer le workflow
           </Button>
         </CardContent>

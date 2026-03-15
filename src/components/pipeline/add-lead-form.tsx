@@ -69,8 +69,8 @@ export function AddLeadForm({ onSubmit, onClose }: AddLeadFormProps) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-      <div className="w-full max-w-lg rounded-2xl border border-border-default bg-bg-secondary p-6 shadow-2xl">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md p-4 animate-in fade-in-0 duration-200">
+      <div className="w-full max-w-lg rounded-2xl border border-border-default bg-bg-secondary p-6 shadow-2xl shadow-black/30 animate-in zoom-in-95 slide-in-from-bottom-4 duration-300 ease-out">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-2">
             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-accent-muted">
@@ -98,7 +98,7 @@ export function AddLeadForm({ onSubmit, onClose }: AddLeadFormProps) {
               onChange={(e) => setName(e.target.value)}
               placeholder="Nom du prospect"
               required
-              className="w-full rounded-xl border border-border-default bg-bg-tertiary px-3.5 py-2.5 text-sm text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+              className="w-full rounded-xl border border-border-default bg-bg-tertiary px-3.5 py-2.5 text-sm text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30 focus:shadow-sm focus:shadow-accent/10 transition-all duration-200"
             />
           </div>
 
@@ -113,7 +113,7 @@ export function AddLeadForm({ onSubmit, onClose }: AddLeadFormProps) {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="email@exemple.com"
-                className="w-full rounded-xl border border-border-default bg-bg-tertiary px-3.5 py-2.5 text-sm text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+                className="w-full rounded-xl border border-border-default bg-bg-tertiary px-3.5 py-2.5 text-sm text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30 focus:shadow-sm focus:shadow-accent/10 transition-all duration-200"
               />
             </div>
             <div>
@@ -125,7 +125,7 @@ export function AddLeadForm({ onSubmit, onClose }: AddLeadFormProps) {
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="+33 6 12 34 56 78"
-                className="w-full rounded-xl border border-border-default bg-bg-tertiary px-3.5 py-2.5 text-sm text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+                className="w-full rounded-xl border border-border-default bg-bg-tertiary px-3.5 py-2.5 text-sm text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30 focus:shadow-sm focus:shadow-accent/10 transition-all duration-200"
               />
             </div>
           </div>
@@ -139,7 +139,7 @@ export function AddLeadForm({ onSubmit, onClose }: AddLeadFormProps) {
               <select
                 value={source}
                 onChange={(e) => setSource(e.target.value)}
-                className="w-full rounded-xl border border-border-default bg-bg-tertiary px-3.5 py-2.5 text-sm text-text-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+                className="w-full rounded-xl border border-border-default bg-bg-tertiary px-3.5 py-2.5 text-sm text-text-primary focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30 focus:shadow-sm focus:shadow-accent/10 transition-all duration-200"
               >
                 <option value="">Sélectionner...</option>
                 {SOURCES.map((s) => (
@@ -159,7 +159,7 @@ export function AddLeadForm({ onSubmit, onClose }: AddLeadFormProps) {
                 min="0"
                 step="1"
                 className={cn(
-                  "w-full rounded-xl border border-border-default bg-bg-tertiary px-3.5 py-2.5 text-sm text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent",
+                  "w-full rounded-xl border border-border-default bg-bg-tertiary px-3.5 py-2.5 text-sm text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30 focus:shadow-sm focus:shadow-accent/10 transition-all duration-200",
                   "[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                 )}
               />

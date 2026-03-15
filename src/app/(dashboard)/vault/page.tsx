@@ -5,8 +5,6 @@ import { PageHeader } from "@/components/layout/page-header";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { AILoading } from "@/components/shared/ai-loading";
-import { EmptyState } from "@/components/shared/empty-state";
 import { ResourceUpload, ResourceItem } from "@/components/vault/resource-upload";
 import { VaultResults } from "@/components/onboarding/vault-results";
 import type { VaultAnalysis } from "@/lib/ai/prompts/vault-analysis";
@@ -163,7 +161,28 @@ export default function VaultPage() {
     return (
       <div>
         <PageHeader title="Coffre-Fort" description="Ton coffre-fort de compétences et ressources." />
-        <AILoading text="Chargement du vault" />
+        <div className="grid gap-6 md:grid-cols-2 mt-6">
+          {[1, 2, 3, 4].map((i) => (
+            <Card key={i}>
+              <CardContent className="pt-6">
+                <div className="animate-pulse space-y-3">
+                  <div className="flex items-center gap-2">
+                    <div className="h-5 w-5 rounded bg-bg-tertiary" />
+                    <div className="h-4 w-28 rounded bg-bg-tertiary" />
+                  </div>
+                  <div className="space-y-2">
+                    <div className="h-3 w-full rounded bg-bg-tertiary/50" />
+                    <div className="h-3 w-3/4 rounded bg-bg-tertiary/50" />
+                  </div>
+                  <div className="flex gap-2">
+                    <div className="h-6 w-16 rounded-full bg-bg-tertiary/50" />
+                    <div className="h-6 w-20 rounded-full bg-bg-tertiary/50" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       </div>
     );
   }
@@ -172,11 +191,20 @@ export default function VaultPage() {
     return (
       <div>
         <PageHeader title="Coffre-Fort" description="Ton coffre-fort de compétences et ressources." />
-        <EmptyState
-          icon={Archive}
-          title="Vault non disponible"
-          description="Complète l'onboarding pour initialiser ton vault."
-        />
+        <Card className="mt-6 border-border-default/50 bg-bg-secondary/30 backdrop-blur-sm">
+          <CardContent className="flex flex-col items-center justify-center py-20 text-center">
+            <div className="h-16 w-16 rounded-2xl bg-accent/10 border border-accent/20 flex items-center justify-center mb-5">
+              <Archive className="h-8 w-8 text-accent" />
+            </div>
+            <h3 className="text-lg font-bold text-text-primary mb-2">Vault non disponible</h3>
+            <p className="text-sm text-text-secondary max-w-md mb-6 leading-relaxed">
+              Complète l&apos;onboarding pour initialiser ton vault et débloquer l&apos;analyse IA de tes compétences.
+            </p>
+            <Button asChild>
+              <a href="/onboarding">Commencer l&apos;onboarding</a>
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     );
   }
@@ -194,7 +222,7 @@ export default function VaultPage() {
   const parcoursLabel = parcours ? PARCOURS[parcours as ParcoursId]?.label : null;
 
   return (
-    <div>
+    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
       <PageHeader
         title="Coffre-Fort"
         description="Ton coffre-fort de compétences et ressources."
@@ -208,7 +236,7 @@ export default function VaultPage() {
 
       <div className="grid gap-6 md:grid-cols-2">
         {/* Skills */}
-        <Card>
+        <Card className="group hover:border-accent/20 transition-all duration-300 hover:shadow-lg hover:shadow-accent/5">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Brain className="h-5 w-5 text-accent" />
@@ -229,7 +257,7 @@ export default function VaultPage() {
         </Card>
 
         {/* Situation */}
-        <Card>
+        <Card className="group hover:border-accent/20 transition-all duration-300 hover:shadow-lg hover:shadow-accent/5">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Briefcase className="h-5 w-5 text-accent" />
@@ -253,7 +281,7 @@ export default function VaultPage() {
         </Card>
 
         {/* Formations */}
-        <Card>
+        <Card className="group hover:border-accent/20 transition-all duration-300 hover:shadow-lg hover:shadow-accent/5">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <GraduationCap className="h-5 w-5 text-accent" />
@@ -274,7 +302,7 @@ export default function VaultPage() {
         </Card>
 
         {/* Objectifs */}
-        <Card>
+        <Card className="group hover:border-accent/20 transition-all duration-300 hover:shadow-lg hover:shadow-accent/5">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Target className="h-5 w-5 text-accent" />
