@@ -3,17 +3,28 @@ export function contentSpyPrompt(
     name: string;
     handle?: string;
     platform: string;
-  }
+  },
+  scrapedData?: string
 ): string {
+  const scrapedSection = scrapedData
+    ? `\n## DONNÉES RÉELLES SCRAPÉES DU WEB
+Les données ci-dessous proviennent de VRAIES pages web liées à ce concurrent. Utilise-les comme base factuelle pour ton analyse.
+Identifie les sujets abordés, le ton, les formats de contenu, les hooks utilisés et la structure éditoriale.
+
+${scrapedData}
+
+IMPORTANT : Base ton analyse sur ces données réelles. Tes insights doivent refléter le contenu observé plutôt que des hypothèses génériques.\n`
+    : "";
+
   return `Tu es un expert en analyse de contenu organique et en strategie de content marketing.
 
 ## Concurrent a analyser
 - **Nom** : ${competitor.name}
 - **Handle/URL** : ${competitor.handle || "Non fourni"}
 - **Plateforme** : ${competitor.platform}
-
+${scrapedSection}
 ## Ta mission
-Analyse la strategie de contenu probable de ce concurrent sur ${competitor.platform} et fournis des insights actionnables.
+Analyse la strategie de contenu ${scrapedData ? "réelle" : "probable"} de ce concurrent sur ${competitor.platform} ${scrapedData ? "en te basant sur les données scrapées ci-dessus et " : "et "}fournis des insights actionnables.
 
 ## Format de reponse
 Reponds UNIQUEMENT en JSON valide :

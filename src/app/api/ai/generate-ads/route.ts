@@ -14,6 +14,12 @@ import {
 } from "@/lib/ai/prompts/dm-scripts";
 import { adSpyPrompt } from "@/lib/ai/prompts/ad-spy";
 import { buildFullVaultContext } from "@/lib/ai/vault-context";
+import {
+  isFirecrawlConfigured,
+  scrapeUrl,
+  searchAndScrape,
+  type ScrapeResult,
+} from "@/lib/scraping/firecrawl";
 import { awardXP } from "@/lib/gamification/xp-engine";
 import { notifyGeneration } from "@/lib/notifications/create";
 import { rateLimit } from "@/lib/utils/rate-limit";
@@ -93,7 +99,7 @@ export async function POST(req: NextRequest) {
     const avatarContext =
       typeof avatar === "object" ? JSON.stringify(avatar, null, 2) : String(avatar);
 
-    // --- Ad Spy (#43) ---
+    // --- Ad Spy (#43) — avec scraping Firecrawl hybride ---
     if (adType === "ad_spy") {
       const { competitor, url: competitorUrl, industry, platform: adPlatform } = body;
       if (!competitor || !industry || !adPlatform) {
@@ -102,12 +108,63 @@ export async function POST(req: NextRequest) {
           { status: 400 }
         );
       }
-      const prompt = adSpyPrompt({
-        name: competitor,
-        url: competitorUrl,
-        industry,
-        platform: adPlatform,
-      }) + (vaultContext ? "\n" + vaultContext : "");
+
+      // Phase 1 : Scraping réel via Firecrawl (si configuré)
+      let scrapedContext = "";
+      let sourceUrls: string[] = [];
+      const useRealScraping = isFirecrawlConfigured();
+
+      if (useRealScraping) {
+        try {
+          const scrapedPages: ScrapeResult[] = [];
+
+          // Scraper l'URL du concurrent si fournie
+          if (competitorUrl) {
+            const scraped = await scrapeUrl(competitorUrl);
+            if (scraped) {
+              scrapedPages.push(scraped);
+              sourceUrls.push(scraped.url);
+            }
+          }
+
+          // Rechercher des infos complémentaires sur le concurrent
+          const searchQuery = `${competitor} ${industry} ${adPlatform === "meta" ? "Facebook ads" : adPlatform} publicité`;
+          const { results, scrapedContent } = await searchAndScrape(searchQuery, 3);
+
+          for (const r of results) {
+            if (!sourceUrls.includes(r.url)) sourceUrls.push(r.url);
+          }
+          for (const page of scrapedContent) {
+            if (!sourceUrls.includes(page.url)) {
+              scrapedPages.push(page);
+              sourceUrls.push(page.url);
+            }
+          }
+
+          // Construire le contexte scrapé (max 5 pages)
+          if (scrapedPages.length > 0) {
+            const pages = scrapedPages.slice(0, 5);
+            scrapedContext = pages
+              .map((p) => `### Source : ${p.title}\nURL : ${p.url}\n${p.content}`)
+              .join("\n\n---\n\n");
+          }
+        } catch (err) {
+          console.warn("Firecrawl scraping failed for ad_spy, falling back to AI-only:", err);
+          scrapedContext = "";
+          sourceUrls = [];
+        }
+      }
+
+      // Phase 2 : Analyse IA (enrichie par les données scrapées si disponibles)
+      const prompt = adSpyPrompt(
+        {
+          name: competitor,
+          url: competitorUrl,
+          industry,
+          platform: adPlatform,
+        },
+        scrapedContext || undefined,
+      ) + (vaultContext ? "\n" + vaultContext : "");
 
       const result = await generateJSON<Record<string, unknown>>({
         prompt,
@@ -118,7 +175,12 @@ export async function POST(req: NextRequest) {
       try { await awardXP(user.id, "generation.ads"); } catch (e) { console.warn("XP award failed:", e); }
       try { await notifyGeneration(user.id, "generation.ads"); } catch (e) { console.warn("Notification failed:", e); }
 
-      return NextResponse.json({ adType: "ad_spy", result });
+      return NextResponse.json({
+        adType: "ad_spy",
+        result,
+        sources: sourceUrls.length > 0 ? sourceUrls : undefined,
+        scraping_used: useRealScraping && scrapedContext.length > 0,
+      });
     }
 
     // --- Video Ad Scripts ---

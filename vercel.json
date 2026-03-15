@@ -1,0 +1,20 @@
+{
+  "crons": [
+    {
+      "path": "/api/ads/monitor",
+      "schedule": "0 */6 * * *"
+    },
+    {
+      "path": "/api/ads/auto-decisions",
+      "schedule": "0 */6 * * *"
+    },
+    {
+      "path": "/api/ads/scale",
+      "schedule": "0 8 * * *"
+    },
+    {
+      "path": "/api/gamification/recalculate",
+      "schedule": "0 0 * * *"
+    }
+  ]
+}

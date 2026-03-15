@@ -4,8 +4,19 @@ export function adSpyPrompt(
     url?: string;
     industry: string;
     platform: string;
-  }
+  },
+  scrapedData?: string
 ): string {
+  const scrapedSection = scrapedData
+    ? `\n## DONNÉES RÉELLES SCRAPÉES DU SITE WEB DU CONCURRENT
+Les données ci-dessous proviennent du VRAI site web du concurrent. Utilise-les comme base factuelle pour ton analyse.
+Identifie les headlines, propositions de valeur, CTAs, témoignages, tarifs et structure de page réels.
+
+${scrapedData}
+
+IMPORTANT : Base ton analyse sur ces données réelles. Tes estimations de stratégie pub doivent être cohérentes avec le positionnement, le pricing et le messaging observés sur le site.\n`
+    : "";
+
   return `Tu es un expert en veille concurrentielle publicitaire et en analyse de strategies d'acquisition payante.
 
 ## Concurrent a analyser
@@ -13,9 +24,9 @@ export function adSpyPrompt(
 - **URL/Page** : ${competitor.url || "Non fournie"}
 - **Industrie** : ${competitor.industry}
 - **Plateforme** : ${competitor.platform}
-
+${scrapedSection}
 ## Ta mission
-En te basant sur ta connaissance du marche ${competitor.industry} et des strategies publicitaires de ce type d'entreprise, produis une analyse detaillee de la strategie publicitaire probable de ce concurrent.
+En te basant sur ${scrapedData ? "les données réelles scrapées ci-dessus et " : ""}ta connaissance du marche ${competitor.industry} et des strategies publicitaires de ce type d'entreprise, produis une analyse detaillee de la strategie publicitaire ${scrapedData ? "réelle" : "probable"} de ce concurrent.
 
 ## Format de reponse
 Reponds UNIQUEMENT en JSON valide :

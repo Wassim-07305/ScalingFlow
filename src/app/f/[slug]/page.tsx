@@ -1,8 +1,10 @@
 import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 import { generateFunnelPageHTML } from "@/lib/utils/export-html";
+import { getMetaPixelConfig } from "@/lib/tracking/meta-capi";
 import type { BrandTheme } from "@/lib/utils/export-html";
 import type { Metadata } from "next";
+import Script from "next/script";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -71,6 +73,9 @@ export default async function PublicFunnelPage({ params, searchParams }: Props) 
     .limit(1)
     .maybeSingle();
 
+  // Fetch the user's Meta pixel config
+  const pixelConfig = await getMetaPixelConfig(supabase, funnel.user_id);
+
   // Build theme from brand identity
   const theme: BrandTheme = {};
   if (brand?.brand_kit && typeof brand.brand_kit === "object") {
@@ -104,9 +109,38 @@ export default async function PublicFunnelPage({ params, searchParams }: Props) 
   );
 
   return (
-    <div
-      className="min-h-screen"
-      dangerouslySetInnerHTML={{ __html: html }}
-    />
+    <>
+      {/* Meta Pixel injection */}
+      {pixelConfig && (
+        <>
+          <Script id="meta-pixel-base" strategy="afterInteractive">
+            {`!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '${pixelConfig.pixelId}');
+fbq('track', 'PageView');`}
+          </Script>
+          <noscript>
+            <img
+              height="1"
+              width="1"
+              style={{ display: "none" }}
+              src={`https://www.facebook.com/tr?id=${pixelConfig.pixelId}&ev=PageView&noscript=1`}
+              alt=""
+            />
+          </noscript>
+        </>
+      )}
+
+      <div
+        className="min-h-screen"
+        dangerouslySetInnerHTML={{ __html: html }}
+      />
+    </>
   );
 }

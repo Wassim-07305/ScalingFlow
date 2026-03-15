@@ -25,6 +25,12 @@ import {
 } from "@/lib/ai/prompts/carousel-content";
 import { contentSpyPrompt } from "@/lib/ai/prompts/content-spy";
 import { buildFullVaultContext } from "@/lib/ai/vault-context";
+import {
+  isFirecrawlConfigured,
+  scrapeUrl,
+  searchAndScrape,
+  type ScrapeResult,
+} from "@/lib/scraping/firecrawl";
 import { awardXP } from "@/lib/gamification/xp-engine";
 import { notifyGeneration } from "@/lib/notifications/create";
 import { rateLimit } from "@/lib/utils/rate-limit";
@@ -224,7 +230,7 @@ export async function POST(req: NextRequest) {
         ? `Analyse de marche disponible : ${latestAnalysis.market}`
         : "Parcours client standard";
 
-    // --- Content Spy (#44) ---
+    // --- Content Spy (#44) — avec scraping Firecrawl hybride ---
     if (contentType === "content_spy") {
       if (!competitor || !platform) {
         return NextResponse.json(
@@ -232,11 +238,62 @@ export async function POST(req: NextRequest) {
           { status: 400 }
         );
       }
-      const prompt = withContext(contentSpyPrompt({
-        name: competitor,
-        handle,
-        platform,
-      }));
+
+      // Phase 1 : Scraping réel via Firecrawl (si configuré)
+      let scrapedContext = "";
+      let sourceUrls: string[] = [];
+      const useRealScraping = isFirecrawlConfigured();
+
+      if (useRealScraping) {
+        try {
+          const scrapedPages: ScrapeResult[] = [];
+
+          // Scraper l'URL/handle si c'est une URL complète
+          if (handle && handle.startsWith("http")) {
+            const scraped = await scrapeUrl(handle);
+            if (scraped) {
+              scrapedPages.push(scraped);
+              sourceUrls.push(scraped.url);
+            }
+          }
+
+          // Rechercher du contenu du concurrent sur la plateforme
+          const searchQuery = `${competitor} ${platform} contenu stratégie ${handle ? handle.replace("@", "") : ""}`;
+          const { results, scrapedContent } = await searchAndScrape(searchQuery, 3);
+
+          for (const r of results) {
+            if (!sourceUrls.includes(r.url)) sourceUrls.push(r.url);
+          }
+          for (const page of scrapedContent) {
+            if (!sourceUrls.includes(page.url)) {
+              scrapedPages.push(page);
+              sourceUrls.push(page.url);
+            }
+          }
+
+          // Construire le contexte scrapé (max 5 pages)
+          if (scrapedPages.length > 0) {
+            const pages = scrapedPages.slice(0, 5);
+            scrapedContext = pages
+              .map((p) => `### Source : ${p.title}\nURL : ${p.url}\n${p.content}`)
+              .join("\n\n---\n\n");
+          }
+        } catch (err) {
+          console.warn("Firecrawl scraping failed for content_spy, falling back to AI-only:", err);
+          scrapedContext = "";
+          sourceUrls = [];
+        }
+      }
+
+      // Phase 2 : Analyse IA (enrichie par les données scrapées si disponibles)
+      const prompt = withContext(contentSpyPrompt(
+        {
+          name: competitor,
+          handle,
+          platform,
+        },
+        scrapedContext || undefined,
+      ));
 
       const result = await generateJSON<Record<string, unknown>>({
         prompt,
@@ -247,7 +304,12 @@ export async function POST(req: NextRequest) {
       try { await awardXP(user.id, "generation.content_strategy"); } catch (e) { console.warn("Non-blocking op failed:", e); }
       try { await notifyGeneration(user.id, "generation.content_strategy"); } catch (e) { console.warn("Non-blocking op failed:", e); }
 
-      return NextResponse.json({ contentType: "content_spy", result });
+      return NextResponse.json({
+        contentType: "content_spy",
+        result,
+        sources: sourceUrls.length > 0 ? sourceUrls : undefined,
+        scraping_used: useRealScraping && scrapedContext.length > 0,
+      });
     }
 
     // --- Strategie de contenu ---

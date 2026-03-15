@@ -10,6 +10,12 @@ import { awardXP } from "@/lib/gamification/xp-engine";
 import { notifyGeneration } from "@/lib/notifications/create";
 import { buildFullVaultContext } from "@/lib/ai/vault-context";
 import { rateLimit } from "@/lib/utils/rate-limit";
+import {
+  isFirecrawlConfigured,
+  scrapeUrl,
+  searchAndScrape,
+  type ScrapeResult,
+} from "@/lib/scraping/firecrawl";
 
 export async function POST(req: NextRequest) {
   try {
@@ -41,8 +47,9 @@ export async function POST(req: NextRequest) {
     }
 
 
-    const { market_analysis_id } = (await req.json()) as {
+    const { market_analysis_id, competitor_urls } = (await req.json()) as {
       market_analysis_id: string;
+      competitor_urls?: string[];
     };
 
     if (!market_analysis_id) {
@@ -74,15 +81,67 @@ export async function POST(req: NextRequest) {
       .eq("id", user.id)
       .single();
 
+    // Phase 1 : Scraping réel via Firecrawl (si configuré)
+    let scrapedContext = "";
+    let sourceUrls: string[] = [];
+    const useRealScraping = isFirecrawlConfigured();
+
+    if (useRealScraping) {
+      try {
+        const scrapedPages: ScrapeResult[] = [];
+
+        // Scraper les URLs de concurrents fournies par l'utilisateur
+        if (competitor_urls && competitor_urls.length > 0) {
+          const scrapePromises = competitor_urls.slice(0, 5).map((url) => scrapeUrl(url));
+          const scrapeResults = await Promise.all(scrapePromises);
+          for (const scraped of scrapeResults) {
+            if (scraped) {
+              scrapedPages.push(scraped);
+              sourceUrls.push(scraped.url);
+            }
+          }
+        }
+
+        // Recherche complémentaire sur le marché
+        const searchQuery = `${marketAnalysis.market_name} concurrents avis ${marketAnalysis.country || "France"}`;
+        const { results, scrapedContent } = await searchAndScrape(searchQuery, 3);
+
+        for (const r of results) {
+          if (!sourceUrls.includes(r.url)) sourceUrls.push(r.url);
+        }
+        for (const page of scrapedContent) {
+          if (!sourceUrls.includes(page.url)) {
+            scrapedPages.push(page);
+            sourceUrls.push(page.url);
+          }
+        }
+
+        // Construire le contexte scrapé (max 8 pages)
+        if (scrapedPages.length > 0) {
+          const pages = scrapedPages.slice(0, 8);
+          scrapedContext = pages
+            .map((p) => `### Source : ${p.title}\nURL : ${p.url}\n${p.content}`)
+            .join("\n\n---\n\n");
+        }
+      } catch (err) {
+        console.warn("Firecrawl scraping failed for analyze-competitors, falling back to AI-only:", err);
+        scrapedContext = "";
+        sourceUrls = [];
+      }
+    }
+
     const [basePrompt, vaultContext] = await Promise.all([
-      Promise.resolve(buildCompetitorAnalysisPrompt({
-        market_name: marketAnalysis.market_name,
-        market_description: marketAnalysis.market_description,
-        recommended_positioning: marketAnalysis.recommended_positioning,
-        country: marketAnalysis.country,
-        language: marketAnalysis.language,
-        user_skills: profile?.skills ?? undefined,
-      })),
+      Promise.resolve(buildCompetitorAnalysisPrompt(
+        {
+          market_name: marketAnalysis.market_name,
+          market_description: marketAnalysis.market_description,
+          recommended_positioning: marketAnalysis.recommended_positioning,
+          country: marketAnalysis.country,
+          language: marketAnalysis.language,
+          user_skills: profile?.skills ?? undefined,
+        },
+        scrapedContext || undefined,
+      )),
       buildFullVaultContext(user.id),
     ]);
     const prompt = vaultContext ? basePrompt + "\n" + vaultContext : basePrompt;
@@ -126,8 +185,13 @@ export async function POST(req: NextRequest) {
     try { await awardXP(user.id, "generation.competitors"); } catch (e) { console.warn("XP award failed", e); }
     try { await notifyGeneration(user.id, "generation.competitors"); } catch (e) { console.warn("Notification failed", e); }
 
-    return NextResponse.json(result);
+    return NextResponse.json({
+      ...result,
+      sources: sourceUrls.length > 0 ? sourceUrls : undefined,
+      scraping_used: useRealScraping && scrapedContext.length > 0,
+    });
   } catch (error) {
+    console.error("[analyze-competitors] Error:", error);
     return NextResponse.json(
       { error: "Erreur lors de l'analyse concurrentielle" },
       { status: 500 }

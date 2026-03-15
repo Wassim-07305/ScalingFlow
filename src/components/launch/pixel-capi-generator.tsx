@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,6 +8,8 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils/cn";
 import { toast } from "sonner";
+import { useUser } from "@/hooks/use-user";
+import { createClient } from "@/lib/supabase/client";
 import {
   Copy,
   Check,
@@ -17,6 +19,11 @@ import {
   ChevronDown,
   ChevronUp,
   AlertTriangle,
+  Save,
+  Loader2,
+  CheckCircle2,
+  XCircle,
+  Zap,
 } from "lucide-react";
 
 // ─── Types ───────────────────────────────────────────────────
@@ -158,18 +165,180 @@ function useCopyToClipboard() {
 
 // ─── Main component ──────────────────────────────────────────
 export function PixelCAPIGenerator() {
+  const { user } = useUser();
+  const supabase = createClient();
+
   const [config, setConfig] = useState<PixelConfig>({
     pixelId: "",
     accessToken: "",
     domain: "",
   });
   const [expandedSection, setExpandedSection] = useState<string | null>("pixel");
+  const [saving, setSaving] = useState(false);
+  const [loadingConfig, setLoadingConfig] = useState(true);
+  const [savedConfig, setSavedConfig] = useState(false);
+  const [testing, setTesting] = useState(false);
+  const [testResult, setTestResult] = useState<{ success: boolean; message: string } | null>(null);
   const { copiedKey, copy } = useCopyToClipboard();
 
   const isConfigured = config.pixelId.trim().length > 0;
 
+  // ─── Load existing config from Supabase on mount ──────────
+  const loadConfig = useCallback(async () => {
+    if (!user) return;
+    try {
+      const { data: account } = await supabase
+        .from("connected_accounts")
+        .select("access_token, provider_account_id, metadata")
+        .eq("user_id", user.id)
+        .eq("provider", "meta")
+        .maybeSingle();
+
+      if (account) {
+        const metadata = account.metadata as Record<string, string> | null;
+        setConfig({
+          pixelId: metadata?.pixel_id || account.provider_account_id || "",
+          accessToken: account.access_token || "",
+          domain: metadata?.domain || "",
+        });
+        setSavedConfig(true);
+      }
+    } catch (err) {
+      console.error("Erreur chargement config pixel:", err);
+    } finally {
+      setLoadingConfig(false);
+    }
+  }, [user, supabase]);
+
+  useEffect(() => {
+    if (user) {
+      loadConfig();
+    } else {
+      setLoadingConfig(false);
+    }
+  }, [user, loadConfig]);
+
+  // ─── Save config to Supabase ──────────────────────────────
+  const handleSave = async () => {
+    if (!user) {
+      toast.error("Tu dois être connecté pour sauvegarder.");
+      return;
+    }
+    if (!config.pixelId.trim()) {
+      toast.error("Le Pixel ID est requis.");
+      return;
+    }
+
+    setSaving(true);
+    try {
+      // Upsert: check if a meta row already exists
+      const { data: existing } = await supabase
+        .from("connected_accounts")
+        .select("id")
+        .eq("user_id", user.id)
+        .eq("provider", "meta")
+        .maybeSingle();
+
+      const metadata = {
+        pixel_id: config.pixelId.trim(),
+        domain: config.domain.trim(),
+        installed_at: new Date().toISOString(),
+      };
+
+      if (existing) {
+        const { error } = await supabase
+          .from("connected_accounts")
+          .update({
+            provider_account_id: config.pixelId.trim(),
+            access_token: config.accessToken.trim() || null,
+            metadata,
+          })
+          .eq("id", existing.id);
+
+        if (error) throw error;
+      } else {
+        const { error } = await supabase
+          .from("connected_accounts")
+          .insert({
+            user_id: user.id,
+            provider: "meta",
+            provider_account_id: config.pixelId.trim(),
+            access_token: config.accessToken.trim() || null,
+            metadata,
+          });
+
+        if (error) throw error;
+      }
+
+      setSavedConfig(true);
+      toast.success("Configuration Pixel sauvegardée !");
+    } catch (err) {
+      console.error("Erreur sauvegarde config pixel:", err);
+      toast.error("Erreur lors de la sauvegarde. Réessaie.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  // ─── Test pixel via CAPI ──────────────────────────────────
+  const handleTestPixel = async () => {
+    if (!config.pixelId.trim() || !config.accessToken.trim()) {
+      toast.error("Le Pixel ID et l'Access Token sont requis pour tester.");
+      return;
+    }
+
+    setTesting(true);
+    setTestResult(null);
+
+    try {
+      const res = await fetch("/api/integrations/meta/conversions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          eventName: "ViewContent",
+          sourceUrl: config.domain || window.location.href,
+          contentName: "Test ScalingFlow Pixel",
+        }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        setTestResult({
+          success: true,
+          message: `Événement ViewContent envoyé avec succès (${data.events_received || 1} événement reçu).`,
+        });
+        toast.success("Test Pixel réussi !");
+      } else {
+        setTestResult({
+          success: false,
+          message: data.error || "Erreur lors de l'envoi de l'événement test.",
+        });
+        toast.error("Échec du test Pixel.");
+      }
+    } catch (err) {
+      console.error("Erreur test pixel:", err);
+      setTestResult({
+        success: false,
+        message: "Erreur réseau. Vérifie ta connexion et réessaie.",
+      });
+      toast.error("Erreur réseau lors du test.");
+    } finally {
+      setTesting(false);
+    }
+  };
+
   const toggle = (key: string) =>
     setExpandedSection(expandedSection === key ? null : key);
+
+  if (loadingConfig) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="h-6 w-6 animate-spin text-accent" />
+        <span className="ml-2 text-sm text-text-secondary">Chargement de la configuration...</span>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -189,7 +358,10 @@ export function PixelCAPIGenerator() {
                 id="pixel-id"
                 placeholder="123456789012345"
                 value={config.pixelId}
-                onChange={(e) => setConfig((p) => ({ ...p, pixelId: e.target.value }))}
+                onChange={(e) => {
+                  setConfig((p) => ({ ...p, pixelId: e.target.value }));
+                  setSavedConfig(false);
+                }}
               />
               <p className="text-xs text-text-muted mt-1">
                 Trouvé dans Meta Events Manager
@@ -202,7 +374,10 @@ export function PixelCAPIGenerator() {
                 type="password"
                 placeholder="EAABsb..."
                 value={config.accessToken}
-                onChange={(e) => setConfig((p) => ({ ...p, accessToken: e.target.value }))}
+                onChange={(e) => {
+                  setConfig((p) => ({ ...p, accessToken: e.target.value }));
+                  setSavedConfig(false);
+                }}
               />
               <p className="text-xs text-text-muted mt-1">
                 Token généré dans Events Manager &rarr; Settings
@@ -214,10 +389,72 @@ export function PixelCAPIGenerator() {
                 id="domain"
                 placeholder="https://monoffre.com"
                 value={config.domain}
-                onChange={(e) => setConfig((p) => ({ ...p, domain: e.target.value }))}
+                onChange={(e) => {
+                  setConfig((p) => ({ ...p, domain: e.target.value }));
+                  setSavedConfig(false);
+                }}
               />
             </div>
           </div>
+
+          {/* Action buttons */}
+          <div className="flex flex-wrap items-center gap-3">
+            <Button
+              onClick={handleSave}
+              disabled={saving || !config.pixelId.trim()}
+              className="gap-2"
+            >
+              {saving ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : savedConfig ? (
+                <CheckCircle2 className="h-4 w-4" />
+              ) : (
+                <Save className="h-4 w-4" />
+              )}
+              {saving ? "Sauvegarde..." : savedConfig ? "Sauvegardé" : "Sauvegarder"}
+            </Button>
+
+            <Button
+              variant="outline"
+              onClick={handleTestPixel}
+              disabled={testing || !config.pixelId.trim() || !config.accessToken.trim()}
+              className="gap-2"
+            >
+              {testing ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Zap className="h-4 w-4" />
+              )}
+              {testing ? "Test en cours..." : "Tester le Pixel"}
+            </Button>
+          </div>
+
+          {/* Test result */}
+          {testResult && (
+            <div
+              className={cn(
+                "flex items-start gap-2 p-3 rounded-xl border",
+                testResult.success
+                  ? "bg-emerald-500/10 border-emerald-500/20"
+                  : "bg-red-500/10 border-red-500/20"
+              )}
+            >
+              {testResult.success ? (
+                <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0 mt-0.5" />
+              ) : (
+                <XCircle className="h-4 w-4 text-red-400 shrink-0 mt-0.5" />
+              )}
+              <p
+                className={cn(
+                  "text-xs",
+                  testResult.success ? "text-emerald-300" : "text-red-300"
+                )}
+              >
+                {testResult.message}
+              </p>
+            </div>
+          )}
+
           {!isConfigured && (
             <div className="flex items-center gap-2 p-3 rounded-xl bg-yellow-500/10 border border-yellow-500/20">
               <AlertTriangle className="h-4 w-4 text-yellow-400 shrink-0" />

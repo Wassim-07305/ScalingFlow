@@ -49,12 +49,22 @@ export interface CompetitorAnalysisInput {
   user_skills?: string[];
 }
 
-export function buildCompetitorAnalysisPrompt(data: CompetitorAnalysisInput): string {
+export function buildCompetitorAnalysisPrompt(data: CompetitorAnalysisInput, scrapedData?: string): string {
   const skillsContext = data.user_skills && data.user_skills.length > 0
     ? `\n- Competences de l'utilisateur : ${data.user_skills.join(", ")}`
     : "";
 
-  return `Tu es un expert en veille concurrentielle et en analyse strategique de marche. Tu analyses les concurrents d'un marche donne sans scraping — tu utilises ta connaissance des marches, des acteurs cles et des tendances pour fournir une analyse pertinente.
+  const scrapedSection = scrapedData
+    ? `\n\n## DONNÉES RÉELLES SCRAPÉES DES SITES CONCURRENTS
+Les données ci-dessous proviennent de VRAIS sites web de concurrents. Utilise-les comme base factuelle pour ton analyse.
+Identifie le positionnement réel, le pricing, les forces/faiblesses, les landing pages, le messaging et les CTAs observés.
+
+${scrapedData}
+
+IMPORTANT : Intègre ces données réelles dans ton analyse. Les concurrents dont le site a été scrapé doivent figurer en priorité dans ta liste et leur analyse doit refléter les données observées.\n`
+    : "";
+
+  return `Tu es un expert en veille concurrentielle et en analyse strategique de marche. ${scrapedData ? "Tu combines des données réelles scrapées avec ta connaissance des marchés pour fournir une analyse factuelle et approfondie." : "Tu analyses les concurrents d'un marche donne sans scraping — tu utilises ta connaissance des marches, des acteurs cles et des tendances pour fournir une analyse pertinente."}
 
 ## MARCHE A ANALYSER
 - Nom du marche : ${data.market_name}
@@ -62,7 +72,7 @@ export function buildCompetitorAnalysisPrompt(data: CompetitorAnalysisInput): st
 - Positionnement envisage : ${data.recommended_positioning || "Non fourni"}
 - Pays cible : ${data.country || "Non specifie"}
 - Langue : ${data.language || "Francais"}${skillsContext}
-
+${scrapedSection}
 ## TA MISSION
 Realise une analyse concurrentielle ultra-approfondie de ce marche. Tu simules une veille complete comme si tu avais acces a Meta Ad Library, Instagram, YouTube, TikTok et LinkedIn. Utilise ta connaissance des marches pour fournir des donnees realistes et exploitables.
 
