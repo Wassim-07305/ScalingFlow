@@ -94,9 +94,6 @@ export default function BrandPage() {
           setOfferId(brand.offer_id);
 
           // Reconstruct generated data from DB
-          console.log("[Brand Debug] brand_names raw:", JSON.stringify(brand.brand_names));
-          console.log("[Brand Debug] art_direction raw:", JSON.stringify(brand.art_direction));
-          console.log("[Brand Debug] brand_kit raw:", JSON.stringify(brand.brand_kit));
           const brandNames = brand.brand_names as unknown as BrandIdentityResult["noms"] | null;
           const artDirection = brand.art_direction as unknown as BrandIdentityResult["direction_artistique"] | null;
           let logoConcept: BrandIdentityResult["logo_concept"] | null = null;
@@ -435,7 +432,8 @@ function BrandKitView({
 }: {
   kit: BrandIdentityResult["brand_kit"] | null;
 }) {
-  // Normalize: handle AI returning French/alternative keys
+  // Normalize: handle both old format (flat keys: tone_of_voice, primary_color, font_heading...)
+  // and new format (structured: mission, vision, valeurs, ton, do_list, dont_list)
   const normalized = React.useMemo(() => {
     if (!kit) return null;
     const raw = kit as Record<string, unknown>;
@@ -443,14 +441,33 @@ function BrandKitView({
       if (!Array.isArray(v)) return [];
       return v.map((item) => (typeof item === "string" ? item : JSON.stringify(item)));
     };
-    return {
-      mission: String(raw.mission || ""),
-      vision: String(raw.vision || ""),
-      valeurs: toStrArr(raw.valeurs || raw.values || raw.valeur || []),
-      ton: String(raw.ton || raw.tone || raw.ton_de_communication || ""),
-      do_list: toStrArr(raw.do_list || raw.do || raw.a_faire || []),
-      dont_list: toStrArr(raw.dont_list || raw.dont || raw.a_ne_pas_faire || []),
+
+    const mission = String(raw.mission || "");
+    const vision = String(raw.vision || "");
+    const valeurs = toStrArr(raw.valeurs || raw.values || raw.valeur || []);
+    const ton = String(raw.ton || raw.tone || raw.ton_de_communication || raw.tone_of_voice || "");
+    const do_list = toStrArr(raw.do_list || raw.do || raw.a_faire || []);
+    const dont_list = toStrArr(raw.dont_list || raw.dont || raw.a_ne_pas_faire || []);
+
+    // Old format: flat keys like primary_color, accent_color, font_heading, font_body, logo_url
+    const flatItems: { label: string; value: string }[] = [];
+    const flatKeys: Record<string, string> = {
+      primary_color: "Couleur primaire",
+      secondary_color: "Couleur secondaire",
+      accent_color: "Couleur d'accent",
+      font_heading: "Police de titres",
+      font_body: "Police de corps",
+      logo_url: "URL du logo",
     };
+    for (const [key, label] of Object.entries(flatKeys)) {
+      if (raw[key] && typeof raw[key] === "string" && (raw[key] as string).length > 0) {
+        flatItems.push({ label, value: String(raw[key]) });
+      }
+    }
+
+    const isOldFormat = flatItems.length > 0 && !mission && !vision && valeurs.length === 0;
+
+    return { mission, vision, valeurs, ton, do_list, dont_list, flatItems, isOldFormat };
   }, [kit]);
 
   if (!normalized) {
@@ -462,27 +479,70 @@ function BrandKitView({
     );
   }
 
-  return (
-    <div className="space-y-6">
-      {/* Mission & Vision */}
-      <div className="grid gap-4 sm:grid-cols-2">
+  // Old format: render flat key-value pairs
+  if (normalized.isOldFormat) {
+    return (
+      <div className="space-y-6">
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Mission</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <BookOpen className="h-5 w-5 text-accent" />
+              Kit de Marque
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-text-secondary">{normalized.mission || "—"}</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Vision</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-text-secondary">{normalized.vision || "—"}</p>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {normalized.flatItems.map((item, i) => (
+                <div key={i} className="p-4 rounded-xl bg-bg-tertiary border border-border-default">
+                  <p className="text-xs text-text-muted uppercase tracking-wide mb-1">{item.label}</p>
+                  <div className="flex items-center gap-2">
+                    {item.value.startsWith("#") && (
+                      <div
+                        className="w-6 h-6 rounded-md border border-border-default shrink-0"
+                        style={{ backgroundColor: item.value }}
+                      />
+                    )}
+                    <p className="text-sm font-medium text-text-primary">{item.value}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+            {normalized.ton && (
+              <div className="mt-4 p-4 rounded-xl bg-bg-tertiary border border-border-default">
+                <p className="text-xs text-text-muted uppercase tracking-wide mb-1">Ton de communication</p>
+                <p className="text-sm text-text-secondary">{normalized.ton}</p>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
+    );
+  }
+
+  // New format: structured mission/vision/valeurs/ton/do/dont
+  return (
+    <div className="space-y-6">
+      {/* Mission & Vision */}
+      {(normalized.mission || normalized.vision) && (
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Mission</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-text-secondary">{normalized.mission || "—"}</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Vision</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-text-secondary">{normalized.vision || "—"}</p>
+            </CardContent>
+          </Card>
+        </div>
+      )}
 
       {/* Values */}
       {normalized.valeurs.length > 0 && (

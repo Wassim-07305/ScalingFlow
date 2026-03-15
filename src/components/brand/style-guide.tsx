@@ -13,26 +13,86 @@ interface StyleGuideProps {
 }
 
 export function StyleGuide({ direction, className }: StyleGuideProps) {
-  // Normalize: handle AI returning French/alternative keys
+  // Normalize: handle both old format (flat keys: colors, typography, mood, style, imagery)
+  // and new format (structured: palette, typographies, style_visuel, moodboard_description)
   const normalized = React.useMemo(() => {
     if (!direction) return null;
     const raw = direction as Record<string, unknown>;
-    const paletteRaw = (raw.palette || raw.couleurs || []) as Record<string, unknown>[];
-    const typoRaw = (raw.typographies || raw.typography || raw.polices || []) as Record<string, unknown>[];
-    return {
-      palette: paletteRaw.map((c) => ({
+
+    // --- Palette ---
+    // New format: palette is array of {name, hex, usage}
+    // Old format: colors is a flat object like {primary_color: "#xxx", accent_color: "#xxx", ...}
+    let palette: { name: string; hex: string; usage: string }[] = [];
+    const paletteRaw = raw.palette || raw.couleurs;
+    if (Array.isArray(paletteRaw)) {
+      palette = paletteRaw.map((c: Record<string, unknown>) => ({
         name: String(c.name || c.nom || c.couleur || ""),
         hex: String(c.hex || c.code || c.code_hex || "#888"),
         usage: String(c.usage || c.utilisation || c.role || ""),
-      })),
-      typographies: typoRaw.map((t) => ({
+      }));
+    } else if (raw.colors && typeof raw.colors === "object") {
+      // Old format: {primary_color: "#xxx", secondary_color: "#xxx", accent_color: "#xxx"}
+      const colorsObj = raw.colors as Record<string, unknown>;
+      palette = Object.entries(colorsObj)
+        .filter(([, v]) => typeof v === "string" && (v as string).startsWith("#"))
+        .map(([k, v]) => ({
+          name: k.replace(/_/g, " ").replace(/color/i, "").trim(),
+          hex: String(v),
+          usage: k.replace(/_/g, " "),
+        }));
+    } else if (raw.primary_color || raw.accent_color || raw.secondary_color) {
+      // Flat keys at root level
+      const colorKeys = ["primary_color", "secondary_color", "accent_color"];
+      palette = colorKeys
+        .filter((k) => raw[k] && typeof raw[k] === "string")
+        .map((k) => ({
+          name: k.replace(/_/g, " ").replace("color", "").trim(),
+          hex: String(raw[k]),
+          usage: k.replace(/_/g, " "),
+        }));
+    }
+
+    // --- Typography ---
+    // New format: typographies is array of {role, font_family, style}
+    // Old format: typography is a flat object like {font_heading: "...", font_body: "..."}
+    let typographies: { role: string; font_family: string; style: string }[] = [];
+    const typoRaw = raw.typographies || raw.typography || raw.polices;
+    if (Array.isArray(typoRaw)) {
+      typographies = typoRaw.map((t: Record<string, unknown>) => ({
         role: String(t.role || t.usage || ""),
         font_family: String(t.font_family || t.famille || t.font || t.police || ""),
         style: String(t.style || t.description || ""),
-      })),
-      style_visuel: String(raw.style_visuel || raw.style || raw.visual_style || ""),
-      moodboard_description: String(raw.moodboard_description || raw.moodboard || raw.univers_visuel || ""),
-    };
+      }));
+    } else if (typoRaw && typeof typoRaw === "object") {
+      // Old format: {font_heading: "Montserrat", font_body: "Inter"}
+      const typoObj = typoRaw as Record<string, unknown>;
+      typographies = Object.entries(typoObj)
+        .filter(([, v]) => typeof v === "string" && (v as string).length > 0)
+        .map(([k, v]) => ({
+          role: k.replace(/font_?/i, "").trim() || k,
+          font_family: String(v),
+          style: "",
+        }));
+    } else if (raw.font_heading || raw.font_body) {
+      // Flat keys at root level
+      const fontKeys = ["font_heading", "font_body"];
+      typographies = fontKeys
+        .filter((k) => raw[k] && typeof raw[k] === "string")
+        .map((k) => ({
+          role: k.replace(/font_?/i, "").trim(),
+          font_family: String(raw[k]),
+          style: "",
+        }));
+    }
+
+    // --- Style & Mood ---
+    const style_visuel = String(raw.style_visuel || raw.style || raw.visual_style || "");
+    const moodboard_description = String(
+      raw.moodboard_description || raw.moodboard || raw.univers_visuel
+      || raw.mood || raw.imagery || ""
+    );
+
+    return { palette, typographies, style_visuel, moodboard_description };
   }, [direction]);
 
   if (!normalized || (normalized.palette.length === 0 && normalized.typographies.length === 0)) {
