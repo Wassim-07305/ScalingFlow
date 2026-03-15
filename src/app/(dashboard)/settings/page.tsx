@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import {
   Card,
   CardHeader,
@@ -43,6 +43,14 @@ import { useUIStore, type Theme } from "@/stores/ui-store";
 import { usePushNotifications } from "@/hooks/use-push-notifications";
 import { Smartphone, Building2 } from "lucide-react";
 import { WhitelabelSettings } from "@/components/whitelabel/whitelabel-settings";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 // ─── Constants ──────────────────────────────────────────────
 const EXPERIENCE_LABELS: Record<string, string> = {
@@ -67,9 +75,15 @@ type TabId = (typeof TABS)[number]["id"];
 export default function SettingsPage() {
   const { user, profile } = useUser();
   const searchParams = useSearchParams();
+  const router = useRouter();
   const supabase = createClient();
 
   const [activeTab, setActiveTab] = useState<TabId>("profil");
+
+  // --- Delete account ---
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState("");
+  const [deletingAccount, setDeletingAccount] = useState(false);
 
   // Handle checkout success redirect
   useEffect(() => {
@@ -255,9 +269,28 @@ export default function SettingsPage() {
   }, [newPassword, confirmPassword, supabase]);
 
   // --- Suppression de compte ---
-  const handleDeleteAccount = useCallback(() => {
-    toast.info("Contacte le support pour supprimer ton compte.");
-  }, []);
+  const handleDeleteAccount = useCallback(async () => {
+    if (deleteConfirmText !== "SUPPRIMER") return;
+    setDeletingAccount(true);
+
+    try {
+      const res = await fetch("/api/account/delete", { method: "DELETE" });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        toast.error(data.error || "Impossible de supprimer le compte.");
+        setDeletingAccount(false);
+        return;
+      }
+
+      toast.success("Ton compte a été supprimé.");
+      await supabase.auth.signOut();
+      router.push("/login");
+    } catch {
+      toast.error("Une erreur est survenue.");
+      setDeletingAccount(false);
+    }
+  }, [deleteConfirmText, supabase, router]);
 
   // --- Notifications ---
   const NOTIF_KEYS = [
@@ -706,11 +739,60 @@ export default function SettingsPage() {
                 <Button
                   variant="destructive"
                   size="sm"
-                  onClick={handleDeleteAccount}
+                  onClick={() => setShowDeleteDialog(true)}
                   aria-label="Supprimer mon compte"
                 >
                   Supprimer mon compte
                 </Button>
+
+                <Dialog open={showDeleteDialog} onOpenChange={(open) => {
+                  setShowDeleteDialog(open);
+                  if (!open) { setDeleteConfirmText(""); setDeletingAccount(false); }
+                }}>
+                  <DialogContent className="bg-bg-secondary border-border-default">
+                    <DialogHeader>
+                      <DialogTitle className="text-text-primary flex items-center gap-2">
+                        <Trash2 className="h-5 w-5 text-red-500" />
+                        Supprimer mon compte
+                      </DialogTitle>
+                      <DialogDescription className="text-text-secondary">
+                        Cette action est irréversible. Toutes tes données (profil, offres, funnels, posts, analyses) seront définitivement supprimées.
+                      </DialogDescription>
+                    </DialogHeader>
+
+                    <div className="space-y-3 py-2">
+                      <Label htmlFor="delete-confirm" className="text-sm text-text-secondary">
+                        Tape <span className="font-bold text-red-400">SUPPRIMER</span> pour confirmer
+                      </Label>
+                      <Input
+                        id="delete-confirm"
+                        value={deleteConfirmText}
+                        onChange={(e) => setDeleteConfirmText(e.target.value)}
+                        placeholder="SUPPRIMER"
+                        className="bg-bg-tertiary border-border-default text-text-primary"
+                        autoComplete="off"
+                      />
+                    </div>
+
+                    <DialogFooter className="gap-2">
+                      <Button
+                        variant="outline"
+                        onClick={() => setShowDeleteDialog(false)}
+                        disabled={deletingAccount}
+                      >
+                        Annuler
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        onClick={handleDeleteAccount}
+                        disabled={deleteConfirmText !== "SUPPRIMER" || deletingAccount}
+                      >
+                        {deletingAccount && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+                        Supprimer définitivement
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
               </div>
             </CardContent>
           </Card>

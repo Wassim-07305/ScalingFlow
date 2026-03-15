@@ -7,11 +7,13 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AILoading } from "@/components/shared/ai-loading";
 import { GlowCard } from "@/components/shared/glow-card";
-import { Sparkles, Copy, ChevronDown, ChevronUp, Clock, Pencil, Check, Film, Send } from "lucide-react";
+import { Sparkles, Copy, ChevronDown, ChevronUp, Clock, Pencil, Check, Film, Send, Save, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import type { ReelsScriptsResult } from "@/lib/ai/prompts/reels-scripts";
 import { UpgradeWall } from "@/components/shared/upgrade-wall";
 import { UnipilePublishDialog } from "@/components/shared/unipile-publish-dialog";
+import { createClient } from "@/lib/supabase/client";
+import { useUser } from "@/hooks/use-user";
 
 const HOOK_STYLES = [
   { key: "curiosite", label: "Curiosité" },
@@ -35,6 +37,7 @@ const PILIER_BADGE: Record<string, "default" | "blue" | "cyan" | "purple" | "yel
 };
 
 export function ReelsGenerator({ className, initialData }: ReelsGeneratorProps) {
+  const { user } = useUser();
   const [loading, setLoading] = React.useState(false);
   const [scripts, setScripts] = React.useState<ReelsScriptsResult["scripts"]>([]);
   const [error, setError] = React.useState<string | null>(null);
@@ -45,6 +48,9 @@ export function ReelsGenerator({ className, initialData }: ReelsGeneratorProps) 
   const [editingIndex, setEditingIndex] = React.useState<number | null>(null);
   const [publishDialogOpen, setPublishDialogOpen] = React.useState(false);
   const [publishContent, setPublishContent] = React.useState("");
+  const [savedIds, setSavedIds] = React.useState<string[]>([]);
+  const [isDirty, setIsDirty] = React.useState(false);
+  const [saving, setSaving] = React.useState(false);
 
   // Form state
   const [hookStyle, setHookStyle] = React.useState("curiosite");
@@ -85,9 +91,27 @@ export function ReelsGenerator({ className, initialData }: ReelsGeneratorProps) 
       }
       const data = await response.json();
       const result = data.result as ReelsScriptsResult;
-      setScripts(result.scripts || []);
+      const generatedScripts = result.scripts || [];
+      setScripts(generatedScripts);
       setShowForm(false);
-      toast.success(`${(result.scripts || []).length} scripts Reels générés !`);
+      setIsDirty(false);
+      // Fetch the IDs of the recently saved content_pieces
+      if (generatedScripts.length > 0) {
+        try {
+          const supabase = createClient();
+          const { data: pieces } = await supabase
+            .from("content_pieces")
+            .select("id")
+            .eq("content_type", "instagram_reel")
+            .order("created_at", { ascending: false })
+            .limit(generatedScripts.length);
+          if (pieces) {
+            // Reverse to match generation order (oldest first = index 0)
+            setSavedIds(pieces.reverse().map((p: { id: string }) => p.id));
+          }
+        } catch { /* non-blocking */ }
+      }
+      toast.success(`${generatedScripts.length} scripts Reels générés !`);
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Erreur";
       setError(msg);
@@ -114,6 +138,41 @@ export function ReelsGenerator({ className, initialData }: ReelsGeneratorProps) 
     setScripts((prev) =>
       prev.map((s, i) => (i === index ? { ...s, [field]: value } : s))
     );
+    setIsDirty(true);
+  };
+
+  const handleSaveEdits = async () => {
+    if (!user || savedIds.length === 0) return;
+    setSaving(true);
+    try {
+      const supabase = createClient();
+      let hasError = false;
+      for (let i = 0; i < scripts.length; i++) {
+        const id = savedIds[i];
+        if (!id) continue;
+        const s = scripts[i];
+        const { error } = await supabase
+          .from("content_pieces")
+          .update({
+            hook: s.hook,
+            content: s.corps,
+            hashtags: s.hashtags,
+          })
+          .eq("id", id)
+          .eq("user_id", user.id);
+        if (error) hasError = true;
+      }
+      if (hasError) {
+        toast.error("Erreur lors de la sauvegarde");
+      } else {
+        toast.success("Modifications sauvegardées");
+        setIsDirty(false);
+      }
+    } catch {
+      toast.error("Erreur lors de la sauvegarde");
+    } finally {
+      setSaving(false);
+    }
   };
 
   if (usageLimited) {
@@ -193,6 +252,21 @@ export function ReelsGenerator({ className, initialData }: ReelsGeneratorProps) 
       <div className="flex items-center justify-between">
         <Badge variant="default">{scripts.length} scripts (batch #{batchNumber})</Badge>
         <div className="flex items-center gap-2">
+          {isDirty && savedIds.length > 0 && (
+            <Button
+              variant="default"
+              size="sm"
+              onClick={handleSaveEdits}
+              disabled={saving}
+              className="bg-accent hover:bg-accent/90"
+            >
+              {saving ? (
+                <><Loader2 className="h-3 w-3 animate-spin mr-1" /> Sauvegarde...</>
+              ) : (
+                <><Save className="h-3 w-3 mr-1" /> Sauvegarder les modifications</>
+              )}
+            </Button>
+          )}
           <Button variant="ghost" size="sm" onClick={() => setShowForm(true)}>
             Nouveau brief
           </Button>

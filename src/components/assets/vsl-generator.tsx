@@ -7,9 +7,11 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { AILoading } from "@/components/shared/ai-loading";
 import { GlowCard } from "@/components/shared/glow-card";
-import { Sparkles, Clock, Play, Pencil, Check } from "lucide-react";
+import { Sparkles, Clock, Play, Pencil, Check, Save, Loader2 } from "lucide-react";
 import { CopyExportBar } from "@/components/shared/copy-export-bar";
 import { UpgradeWall } from "@/components/shared/upgrade-wall";
+import { createClient } from "@/lib/supabase/client";
+import { useUser } from "@/hooks/use-user";
 import { toast } from "sonner";
 
 const VSL_STYLES = [
@@ -33,6 +35,7 @@ interface VSLGeneratorProps {
 }
 
 export function VSLGenerator({ className, initialData }: VSLGeneratorProps) {
+  const { user } = useUser();
   const [loading, setLoading] = React.useState(false);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [script, setScript] = React.useState<any>(initialData || null);
@@ -40,6 +43,9 @@ export function VSLGenerator({ className, initialData }: VSLGeneratorProps) {
   const [activeSection, setActiveSection] = React.useState(0);
   const [usageLimited, setUsageLimited] = React.useState<{currentUsage: number; limit: number} | null>(null);
   const [isEditing, setIsEditing] = React.useState(false);
+  const [savedId, setSavedId] = React.useState<string | null>(null);
+  const [isDirty, setIsDirty] = React.useState(false);
+  const [saving, setSaving] = React.useState(false);
 
   // Form state
   const [vslStyle, setVslStyle] = React.useState("classique");
@@ -72,6 +78,8 @@ export function VSLGenerator({ className, initialData }: VSLGeneratorProps) {
         throw new Error(errData.error || "Erreur lors de la génération");
       }
       const data = await response.json();
+      if (data.id) setSavedId(data.id);
+      setIsDirty(false);
       setScript(data.ai_raw_response || data);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erreur");
@@ -87,6 +95,7 @@ export function VSLGenerator({ className, initialData }: VSLGeneratorProps) {
     sections[index] = { ...sections[index], script: value };
     updated.sections = sections;
     setScript(updated);
+    setIsDirty(true);
   };
 
   const updateSectionNotes = (index: number, value: string) => {
@@ -96,6 +105,33 @@ export function VSLGenerator({ className, initialData }: VSLGeneratorProps) {
     sections[index] = { ...sections[index], speaker_notes: value };
     updated.sections = sections;
     setScript(updated);
+    setIsDirty(true);
+  };
+
+  const handleSaveEdits = async () => {
+    if (!savedId || !user) return;
+    setSaving(true);
+    try {
+      const supabase = createClient();
+      const { error } = await supabase
+        .from("sales_assets")
+        .update({
+          ai_raw_response: script,
+          content: JSON.stringify(script),
+        })
+        .eq("id", savedId)
+        .eq("user_id", user.id);
+      if (error) {
+        toast.error("Erreur lors de la sauvegarde");
+      } else {
+        toast.success("Modifications sauvegardées");
+        setIsDirty(false);
+      }
+    } catch {
+      toast.error("Erreur lors de la sauvegarde");
+    } finally {
+      setSaving(false);
+    }
   };
 
   if (usageLimited) {
@@ -207,11 +243,25 @@ export function VSLGenerator({ className, initialData }: VSLGeneratorProps) {
           <Badge variant="muted">{sections.length} sections</Badge>
         </div>
         <div className="flex items-center gap-2">
+          {isDirty && savedId && (
+            <Button
+              variant="default"
+              size="sm"
+              onClick={handleSaveEdits}
+              disabled={saving}
+              className="bg-accent hover:bg-accent/90"
+            >
+              {saving ? (
+                <><Loader2 className="h-3 w-3 animate-spin mr-1" /> Sauvegarde...</>
+              ) : (
+                <><Save className="h-3 w-3 mr-1" /> Sauvegarder les modifications</>
+              )}
+            </Button>
+          )}
           <Button
             variant={isEditing ? "default" : "ghost"}
             size="sm"
             onClick={() => {
-              if (isEditing) toast.success("Modifications sauvegardées");
               setIsEditing(!isEditing);
             }}
           >

@@ -6,10 +6,12 @@ import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AILoading } from "@/components/shared/ai-loading";
-import { Sparkles, Mail, ChevronDown, ChevronUp, Pencil, Check, Send } from "lucide-react";
+import { Sparkles, Mail, ChevronDown, ChevronUp, Pencil, Check, Send, Save, Loader2 } from "lucide-react";
 import { CopyExportBar } from "@/components/shared/copy-export-bar";
 import { UnipileSendDialog } from "@/components/shared/unipile-send-dialog";
 import { UpgradeWall } from "@/components/shared/upgrade-wall";
+import { createClient } from "@/lib/supabase/client";
+import { useUser } from "@/hooks/use-user";
 import { toast } from "sonner";
 
 const EMAIL_TYPES = [
@@ -26,6 +28,7 @@ interface EmailSequenceProps {
 }
 
 export function EmailSequence({ className, initialData }: EmailSequenceProps) {
+  const { user } = useUser();
   const [loading, setLoading] = React.useState(false);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [sequence, setSequence] = React.useState<any>(initialData || null);
@@ -35,6 +38,9 @@ export function EmailSequence({ className, initialData }: EmailSequenceProps) {
   const [editingIndex, setEditingIndex] = React.useState<number | null>(null);
   const [sendDialogOpen, setSendDialogOpen] = React.useState(false);
   const [sendMessage, setSendMessage] = React.useState("");
+  const [savedId, setSavedId] = React.useState<string | null>(null);
+  const [isDirty, setIsDirty] = React.useState(false);
+  const [saving, setSaving] = React.useState(false);
 
   // Form state
   const [emailType, setEmailType] = React.useState("nurturing");
@@ -69,6 +75,8 @@ export function EmailSequence({ className, initialData }: EmailSequenceProps) {
         throw new Error("Erreur lors de la génération");
       }
       const data = await response.json();
+      if (data.id) setSavedId(data.id);
+      setIsDirty(false);
       setSequence(data.ai_raw_response || data);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erreur");
@@ -84,6 +92,33 @@ export function EmailSequence({ className, initialData }: EmailSequenceProps) {
     emails[index] = { ...emails[index], [field]: value };
     updated.emails = emails;
     setSequence(updated);
+    setIsDirty(true);
+  };
+
+  const handleSaveEdits = async () => {
+    if (!savedId || !user) return;
+    setSaving(true);
+    try {
+      const supabase = createClient();
+      const { error } = await supabase
+        .from("sales_assets")
+        .update({
+          ai_raw_response: sequence,
+          content: JSON.stringify(sequence),
+        })
+        .eq("id", savedId)
+        .eq("user_id", user.id);
+      if (error) {
+        toast.error("Erreur lors de la sauvegarde");
+      } else {
+        toast.success("Modifications sauvegardées");
+        setIsDirty(false);
+      }
+    } catch {
+      toast.error("Erreur lors de la sauvegarde");
+    } finally {
+      setSaving(false);
+    }
   };
 
   if (usageLimited) {
@@ -194,6 +229,21 @@ export function EmailSequence({ className, initialData }: EmailSequenceProps) {
           <Badge variant="blue">{emails.length} emails</Badge>
         </div>
         <div className="flex items-center gap-2">
+          {isDirty && savedId && (
+            <Button
+              variant="default"
+              size="sm"
+              onClick={handleSaveEdits}
+              disabled={saving}
+              className="bg-accent hover:bg-accent/90"
+            >
+              {saving ? (
+                <><Loader2 className="h-3 w-3 animate-spin mr-1" /> Sauvegarde...</>
+              ) : (
+                <><Save className="h-3 w-3 mr-1" /> Sauvegarder les modifications</>
+              )}
+            </Button>
+          )}
           <Button variant="ghost" size="sm" onClick={() => setSequence(null)}>
             Nouveau brief
           </Button>

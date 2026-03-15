@@ -99,7 +99,7 @@ export function AutoWins({ className }: { className?: string }) {
         type, title: (p.title as string) || "Nouvelle victoire !",
         description: content, emoji,
         timestamp: p.created_at as string,
-        reactions: {},
+        reactions: (p.reactions as Record<string, string[]>) || {},
       };
     });
 
@@ -160,10 +160,16 @@ export function AutoWins({ className }: { className?: string }) {
     fetchWins();
   }, [fetchWins]);
 
-  const handleReaction = (winId: string, emoji: string) => {
+  const handleReaction = async (winId: string, emoji: string) => {
     if (!user) return;
+
+    // Only persist reactions for real posts (not synthetic wins)
+    const isSyntheticWin = winId.startsWith("badge-") || winId.startsWith("xp-");
+
     setReactingTo(winId);
 
+    // Optimistic local update
+    let updatedReactions: Record<string, string[]> = {};
     setWins((prev) =>
       prev.map((w) => {
         if (w.id !== winId) return w;
@@ -175,9 +181,24 @@ export function AutoWins({ className }: { className?: string }) {
         } else {
           reactions[emoji] = [...users, user.id];
         }
+        updatedReactions = reactions;
         return { ...w, reactions };
       })
     );
+
+    // Persist to Supabase for real posts
+    if (!isSyntheticWin) {
+      const { error } = await supabase
+        .from("community_posts")
+        .update({ reactions: updatedReactions })
+        .eq("id", winId);
+
+      if (error) {
+        toast.error("Impossible de sauvegarder la réaction");
+        // Revert on error
+        fetchWins();
+      }
+    }
 
     setTimeout(() => setReactingTo(null), 300);
   };

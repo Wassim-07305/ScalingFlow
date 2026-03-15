@@ -7,10 +7,12 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AILoading } from "@/components/shared/ai-loading";
 import { GlowCard } from "@/components/shared/glow-card";
-import { Sparkles, FileText, Video, Gift, ChevronRight, FileDown, Code, Pencil, Check } from "lucide-react";
+import { Sparkles, FileText, Video, Gift, ChevronRight, FileDown, Code, Pencil, Check, Save, Loader2 } from "lucide-react";
 import { exportToPDF } from "@/lib/utils/export-pdf";
 import { exportFunnelToHTML, downloadHTML } from "@/lib/utils/export-html";
 import { UpgradeWall } from "@/components/shared/upgrade-wall";
+import { createClient } from "@/lib/supabase/client";
+import { useUser } from "@/hooks/use-user";
 import { toast } from "sonner";
 
 interface FunnelPage {
@@ -33,6 +35,7 @@ interface FunnelBuilderProps {
 }
 
 export function FunnelBuilder({ className, initialData }: FunnelBuilderProps) {
+  const { user } = useUser();
   const [loading, setLoading] = React.useState(false);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [funnelData, setFunnelData] = React.useState<any>(null);
@@ -43,6 +46,9 @@ export function FunnelBuilder({ className, initialData }: FunnelBuilderProps) {
   const [selectedOfferId, setSelectedOfferId] = React.useState<string | null>(null);
   const [usageLimited, setUsageLimited] = React.useState<{currentUsage: number; limit: number} | null>(null);
   const [isEditing, setIsEditing] = React.useState(false);
+  const [savedId, setSavedId] = React.useState<string | null>(null);
+  const [isDirty, setIsDirty] = React.useState(false);
+  const [saving, setSaving] = React.useState(false);
 
   // Charger les données historiques quand initialData change
   React.useEffect(() => {
@@ -92,6 +98,8 @@ export function FunnelBuilder({ className, initialData }: FunnelBuilderProps) {
         throw new Error("Erreur lors de la génération");
       }
       const data = await response.json();
+      if (data.id) setSavedId(data.id);
+      setIsDirty(false);
       setFunnelData(data.funnel_data || data);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erreur");
@@ -111,6 +119,39 @@ export function FunnelBuilder({ className, initialData }: FunnelBuilderProps) {
       ...funnelData,
       [pageKey]: { ...funnelData[pageKey], [field]: value },
     });
+    setIsDirty(true);
+  };
+
+  const handleSaveEdits = async () => {
+    if (!savedId || !user) return;
+    setSaving(true);
+    try {
+      const supabase = createClient();
+      const { error } = await supabase
+        .from("funnels")
+        .update({
+          optin_page: funnelData.optin_page,
+          vsl_page: funnelData.vsl_page,
+          thankyou_page: funnelData.thankyou_page,
+          ai_raw_response: {
+            optin_page: funnelData.optin_page,
+            vsl_page: funnelData.vsl_page,
+            thankyou_page: funnelData.thankyou_page,
+          },
+        })
+        .eq("id", savedId)
+        .eq("user_id", user.id);
+      if (error) {
+        toast.error("Erreur lors de la sauvegarde");
+      } else {
+        toast.success("Modifications sauvegardées");
+        setIsDirty(false);
+      }
+    } catch {
+      toast.error("Erreur lors de la sauvegarde");
+    } finally {
+      setSaving(false);
+    }
   };
 
   if (loading) {
@@ -196,12 +237,26 @@ export function FunnelBuilder({ className, initialData }: FunnelBuilderProps) {
       </div>
 
       {/* Edit toggle */}
-      <div className="flex items-center justify-end">
+      <div className="flex items-center justify-end gap-2">
+        {isDirty && savedId && (
+          <Button
+            variant="default"
+            size="sm"
+            onClick={handleSaveEdits}
+            disabled={saving}
+            className="bg-accent hover:bg-accent/90"
+          >
+            {saving ? (
+              <><Loader2 className="h-3 w-3 animate-spin mr-1" /> Sauvegarde...</>
+            ) : (
+              <><Save className="h-3 w-3 mr-1" /> Sauvegarder les modifications</>
+            )}
+          </Button>
+        )}
         <Button
           variant={isEditing ? "default" : "ghost"}
           size="sm"
           onClick={() => {
-            if (isEditing) toast.success("Modifications sauvegardées");
             setIsEditing(!isEditing);
           }}
         >

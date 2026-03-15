@@ -7,8 +7,10 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AILoading } from "@/components/shared/ai-loading";
 import { GlowCard } from "@/components/shared/glow-card";
-import { Sparkles, Image, Video, Target, Copy, Loader2, ImagePlus, Pencil, Check } from "lucide-react";
+import { Sparkles, Image, Video, Target, Copy, Loader2, ImagePlus, Pencil, Check, Save } from "lucide-react";
 import { UpgradeWall } from "@/components/shared/upgrade-wall";
+import { createClient } from "@/lib/supabase/client";
+import { useUser } from "@/hooks/use-user";
 import { toast } from "sonner";
 
 const TONES = [
@@ -33,6 +35,7 @@ interface CreativeGeneratorProps {
 }
 
 export function CreativeGenerator({ className, initialData }: CreativeGeneratorProps) {
+  const { user } = useUser();
   const [loading, setLoading] = React.useState(false);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [variations, setVariations] = React.useState<any[]>([]);
@@ -42,6 +45,9 @@ export function CreativeGenerator({ className, initialData }: CreativeGeneratorP
   const [generatingImage, setGeneratingImage] = React.useState<number | null>(null);
   const [generatedImages, setGeneratedImages] = React.useState<Record<number, string[]>>({});
   const [editingIndex, setEditingIndex] = React.useState<number | null>(null);
+  const [savedIds, setSavedIds] = React.useState<string[]>([]);
+  const [isDirty, setIsDirty] = React.useState(false);
+  const [saving, setSaving] = React.useState(false);
 
   // Form state
   const [tone, setTone] = React.useState("urgente");
@@ -89,6 +95,10 @@ export function CreativeGenerator({ className, initialData }: CreativeGeneratorP
       const data = await response.json();
       const raw = data.ai_raw_response || data;
       const creatives = raw.ad_creatives || raw.variations || [];
+      // Capture saved IDs from API response (ad_creatives have id from DB)
+      const ids = (data.ad_creatives || []).map((c: Record<string, unknown>) => c.id).filter(Boolean);
+      setSavedIds(ids);
+      setIsDirty(false);
       setVariations(creatives.map((c: Record<string, unknown>) => ({
         hook: c.hook || "",
         body: c.ad_copy || c.body || "",
@@ -108,6 +118,42 @@ export function CreativeGenerator({ className, initialData }: CreativeGeneratorP
     setVariations((prev) =>
       prev.map((v, i) => (i === index ? { ...v, [field]: value } : v))
     );
+    setIsDirty(true);
+  };
+
+  const handleSaveEdits = async () => {
+    if (!user || savedIds.length === 0) return;
+    setSaving(true);
+    try {
+      const supabase = createClient();
+      let hasError = false;
+      for (let i = 0; i < variations.length; i++) {
+        const id = savedIds[i];
+        if (!id) continue;
+        const v = variations[i];
+        const { error } = await supabase
+          .from("ad_creatives")
+          .update({
+            hook: v.hook,
+            ad_copy: v.body,
+            headline: v.headline,
+            cta: v.cta,
+          })
+          .eq("id", id)
+          .eq("user_id", user.id);
+        if (error) hasError = true;
+      }
+      if (hasError) {
+        toast.error("Erreur lors de la sauvegarde");
+      } else {
+        toast.success("Modifications sauvegardées");
+        setIsDirty(false);
+      }
+    } catch {
+      toast.error("Erreur lors de la sauvegarde");
+    } finally {
+      setSaving(false);
+    }
   };
 
   const copyToClipboard = (text: string, index: number) => {
@@ -253,6 +299,21 @@ export function CreativeGenerator({ className, initialData }: CreativeGeneratorP
       <div className="flex items-center justify-between">
         <Badge variant="default">{variations.length} variations</Badge>
         <div className="flex items-center gap-2">
+          {isDirty && savedIds.length > 0 && (
+            <Button
+              variant="default"
+              size="sm"
+              onClick={handleSaveEdits}
+              disabled={saving}
+              className="bg-accent hover:bg-accent/90"
+            >
+              {saving ? (
+                <><Loader2 className="h-3 w-3 animate-spin mr-1" /> Sauvegarde...</>
+              ) : (
+                <><Save className="h-3 w-3 mr-1" /> Sauvegarder les modifications</>
+              )}
+            </Button>
+          )}
           <Button variant="ghost" size="sm" onClick={() => setVariations([])}>
             Nouveau brief
           </Button>

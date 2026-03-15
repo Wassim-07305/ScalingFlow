@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { PostFeed } from "@/components/community/post-feed";
 import { AutoWins } from "@/components/community/auto-wins";
 import { DirectMessages } from "@/components/community/direct-messages";
@@ -15,6 +15,7 @@ import {
   Mail,
 } from "lucide-react";
 import { useUser } from "@/hooks/use-user";
+import { createClient } from "@/lib/supabase/client";
 
 // ─── Types ──────────────────────────────────────────────────
 const TABS = [
@@ -26,15 +27,60 @@ const TABS = [
 type TabId = (typeof TABS)[number]["id"];
 
 // ─── Stats bar component ────────────────────────────────────
-function CommunityStats() {
+function CommunityStats({ streakDays }: { streakDays: number }) {
+  const supabase = createClient();
+  const [stats, setStats] = useState({
+    activeMembers: "—",
+    postsThisMonth: "—",
+    streak: "—",
+    wins: "—",
+  });
+
+  useEffect(() => {
+    async function fetchStats() {
+      const now = new Date();
+      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+      const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString();
+
+      const [membersRes, postsRes, winsRes] = await Promise.all([
+        // Membres actifs (last_active_date dans les 30 derniers jours)
+        supabase
+          .from("profiles")
+          .select("id", { count: "exact", head: true })
+          .gte("last_active_date", thirtyDaysAgo.split("T")[0]),
+        // Posts ce mois
+        supabase
+          .from("community_posts")
+          .select("id", { count: "exact", head: true })
+          .gte("created_at", startOfMonth),
+        // Victoires (auto-generated posts)
+        supabase
+          .from("community_posts")
+          .select("id", { count: "exact", head: true })
+          .eq("auto_generated", true),
+      ]);
+
+      setStats({
+        activeMembers: (membersRes.count ?? 0).toLocaleString("fr-FR"),
+        postsThisMonth: (postsRes.count ?? 0).toLocaleString("fr-FR"),
+        streak: `${streakDays}j`,
+        wins: (winsRes.count ?? 0).toLocaleString("fr-FR"),
+      });
+    }
+
+    fetchStats();
+  }, [supabase, streakDays]);
+
+  const statItems = [
+    { icon: Users, label: "Membres actifs", value: stats.activeMembers, color: "text-accent" },
+    { icon: MessageSquare, label: "Posts ce mois", value: stats.postsThisMonth, color: "text-info" },
+    { icon: Flame, label: "Streak", value: stats.streak, color: "text-warning" },
+    { icon: Star, label: "Victoires", value: stats.wins, color: "text-cyan-400" },
+  ];
+
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-      {[
-        { icon: Users, label: "Membres actifs", value: "—", color: "text-accent" },
-        { icon: MessageSquare, label: "Posts ce mois", value: "—", color: "text-info" },
-        { icon: Flame, label: "Streak communauté", value: "—", color: "text-warning" },
-        { icon: Star, label: "Victoires", value: "—", color: "text-cyan-400" },
-      ].map((stat) => (
+      {statItems.map((stat) => (
         <div
           key={stat.label}
           className="flex items-center gap-3 rounded-2xl border border-border-default bg-bg-secondary/50 px-4 py-3 backdrop-blur-sm"
@@ -96,7 +142,7 @@ export default function CommunityPage() {
       </div>
 
       {/* Stats */}
-      <CommunityStats />
+      <CommunityStats streakDays={profile?.streak_days ?? 0} />
 
       {/* Tab navigation — Skool-style */}
       <div className="flex gap-1 mb-6 rounded-xl bg-bg-secondary/80 border border-border-default p-1">
