@@ -6,10 +6,12 @@ import { DailyTasks } from "@/components/roadmap/daily-tasks";
 import { MilestoneTracker } from "@/components/roadmap/milestone-tracker";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Loader2, Map } from "lucide-react";
+import { Sparkles, Loader2, Map, CalendarPlus } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import { toast } from "sonner";
 import { UpgradeWall } from "@/components/shared/upgrade-wall";
+import { createClient } from "@/lib/supabase/client";
+import { useUser } from "@/hooks/use-user";
 
 const TIMEFRAMES = [
   { key: "30", label: "30 jours" },
@@ -24,11 +26,46 @@ const FOCUS_AREAS = [
   { key: "scaling", label: "Scaling" },
 ] as const;
 
+// ─── iCal export helper ──────────────────────────────────────
+function generateICS(tasks: { title: string; description: string | null; due_date: string | null; estimated_minutes: number | null }[]): string {
+  const lines = [
+    "BEGIN:VCALENDAR",
+    "VERSION:2.0",
+    "PRODID:-//ScalingFlow//Roadmap//FR",
+    "CALSCALE:GREGORIAN",
+    "METHOD:PUBLISH",
+  ];
+
+  for (const task of tasks) {
+    const dueDate = task.due_date ? new Date(task.due_date) : new Date();
+    const dtStart = dueDate.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+    const durationMin = task.estimated_minutes || 30;
+    const endDate = new Date(dueDate.getTime() + durationMin * 60 * 1000);
+    const dtEnd = endDate.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+    const uid = `${Date.now()}-${Math.random().toString(36).slice(2)}@scalingflow`;
+
+    lines.push(
+      "BEGIN:VEVENT",
+      `UID:${uid}`,
+      `DTSTART:${dtStart}`,
+      `DTEND:${dtEnd}`,
+      `SUMMARY:${(task.title || "Tâche ScalingFlow").replace(/[,;\\]/g, " ")}`,
+      `DESCRIPTION:${(task.description || "").replace(/\n/g, "\\n").replace(/[,;\\]/g, " ")}`,
+      "END:VEVENT"
+    );
+  }
+
+  lines.push("END:VCALENDAR");
+  return lines.join("\r\n");
+}
+
 export default function RoadmapPage() {
+  const { user } = useUser();
   const [generating, setGenerating] = React.useState(false);
   const [refreshKey, setRefreshKey] = React.useState(0);
   const [usageLimited, setUsageLimited] = React.useState<{currentUsage: number; limit: number} | null>(null);
   const [showConfig, setShowConfig] = React.useState(false);
+  const [exporting, setExporting] = React.useState(false);
 
   // Form state
   const [timeframe, setTimeframe] = React.useState("30");
@@ -71,6 +108,39 @@ export default function RoadmapPage() {
     }
   };
 
+  const handleExportCalendar = async () => {
+    if (!user) return;
+    setExporting(true);
+    try {
+      const supabase = createClient();
+      const { data: tasks } = await supabase
+        .from("roadmap_tasks")
+        .select("title, description, due_date, estimated_minutes")
+        .eq("user_id", user.id)
+        .eq("completed", false)
+        .order("due_date", { ascending: true });
+
+      if (!tasks || tasks.length === 0) {
+        toast.error("Aucune tâche à exporter. Génère d'abord ta roadmap.");
+        return;
+      }
+
+      const ics = generateICS(tasks);
+      const blob = new Blob([ics], { type: "text/calendar;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "scalingflow-roadmap.ics";
+      a.click();
+      URL.revokeObjectURL(url);
+      toast.success(`${tasks.length} tâches exportées ! Importe le fichier .ics dans Google Calendar, Apple Calendar ou Outlook.`);
+    } catch {
+      toast.error("Erreur lors de l'export");
+    } finally {
+      setExporting(false);
+    }
+  };
+
   if (usageLimited) {
     return <UpgradeWall currentUsage={usageLimited.currentUsage} limit={usageLimited.limit} />;
   }
@@ -81,18 +151,33 @@ export default function RoadmapPage() {
         title="Feuille de Route"
         description="Ta feuille de route personnalisée pour scaler."
         actions={
-          <Button
-            variant={showConfig ? "outline" : "default"}
-            onClick={() => setShowConfig(!showConfig)}
-            disabled={generating}
-          >
-            {generating ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <Sparkles className="h-4 w-4" />
-            )}
-            {generating ? "Génération en cours..." : showConfig ? "Masquer" : "Générer ma roadmap IA"}
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              onClick={handleExportCalendar}
+              disabled={exporting}
+              title="Exporter vers Google Calendar / iCal"
+            >
+              {exporting ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <CalendarPlus className="h-4 w-4" />
+              )}
+              <span className="hidden sm:inline ml-1">Exporter .ics</span>
+            </Button>
+            <Button
+              variant={showConfig ? "outline" : "default"}
+              onClick={() => setShowConfig(!showConfig)}
+              disabled={generating}
+            >
+              {generating ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Sparkles className="h-4 w-4" />
+              )}
+              {generating ? "Génération en cours..." : showConfig ? "Masquer" : "Générer ma roadmap IA"}
+            </Button>
+          </div>
         }
       />
 

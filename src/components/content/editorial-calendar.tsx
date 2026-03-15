@@ -6,10 +6,11 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { AILoading } from "@/components/shared/ai-loading";
-import { Sparkles, LayoutGrid, List, ChevronDown, ChevronUp, CheckCircle2, Clock, Circle, CalendarDays } from "lucide-react";
+import { Sparkles, LayoutGrid, List, ChevronDown, ChevronUp, CheckCircle2, Clock, Circle, CalendarDays, Send } from "lucide-react";
 import { toast } from "sonner";
 import type { ContentStrategyResult } from "@/lib/ai/prompts/content-strategy";
 import { UpgradeWall } from "@/components/shared/upgrade-wall";
+import { UnipilePublishDialog } from "@/components/shared/unipile-publish-dialog";
 
 const CALENDAR_DURATIONS = [
   { key: "7", label: "7 jours" },
@@ -62,6 +63,8 @@ export function EditorialCalendar({ className, initialData }: EditorialCalendarP
   const [error, setError] = React.useState<string | null>(null);
   const [usageLimited, setUsageLimited] = React.useState<{currentUsage: number; limit: number} | null>(null);
   const [statuses, setStatuses] = React.useState<Record<number, ContentStatus>>({});
+  const [publishDialogOpen, setPublishDialogOpen] = React.useState(false);
+  const [publishContent, setPublishContent] = React.useState("");
 
   // Form state
   const [duration, setDuration] = React.useState("30");
@@ -304,9 +307,22 @@ export function EditorialCalendar({ className, initialData }: EditorialCalendarP
                       <p className="text-[10px] text-text-muted">Hook</p>
                       <p className="text-xs text-accent">{item.hook}</p>
                     </div>
-                    <div className="flex gap-2">
-                      <Badge variant="muted" className="text-[10px]">{item.plateforme}</Badge>
-                      <Badge variant="muted" className="text-[10px]">{item.format}</Badge>
+                    <div className="flex items-center justify-between">
+                      <div className="flex gap-2">
+                        <Badge variant="muted" className="text-[10px]">{item.plateforme}</Badge>
+                        <Badge variant="muted" className="text-[10px]">{item.format}</Badge>
+                      </div>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setPublishContent(`${item.titre}\n\n${item.hook}`);
+                          setPublishDialogOpen(true);
+                        }}
+                        title="Publier via Unipile"
+                        className="p-1 rounded hover:bg-bg-tertiary transition-colors text-accent"
+                      >
+                        <Send className="h-3.5 w-3.5" />
+                      </button>
                     </div>
                   </div>
                 )}
@@ -361,9 +377,22 @@ export function EditorialCalendar({ className, initialData }: EditorialCalendarP
                       <p className="text-xs text-text-muted">Hook</p>
                       <p className="text-sm text-accent">{item.hook}</p>
                     </div>
-                    <div className="flex gap-2">
-                      <Badge variant="muted">{item.plateforme}</Badge>
-                      <Badge variant="muted">{item.format}</Badge>
+                    <div className="flex items-center justify-between">
+                      <div className="flex gap-2">
+                        <Badge variant="muted">{item.plateforme}</Badge>
+                        <Badge variant="muted">{item.format}</Badge>
+                      </div>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setPublishContent(`${item.titre}\n\n${item.hook}`);
+                          setPublishDialogOpen(true);
+                        }}
+                        title="Publier via Unipile"
+                        className="p-1 rounded hover:bg-bg-tertiary transition-colors text-accent"
+                      >
+                        <Send className="h-3.5 w-3.5" />
+                      </button>
                     </div>
                   </div>
                 )}
@@ -381,6 +410,12 @@ export function EditorialCalendar({ className, initialData }: EditorialCalendarP
           Régénérer le plan
         </Button>
       </div>
+
+      <UnipilePublishDialog
+        open={publishDialogOpen}
+        onOpenChange={setPublishDialogOpen}
+        content={publishContent}
+      />
     </div>
   );
 }

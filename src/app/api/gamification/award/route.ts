@@ -10,6 +10,7 @@ const ALLOWED_ACTIVITIES = [
   "onboarding.completed",
   "streak.daily",
   "challenge.completed",
+  "quiz.completed",
 ] as const;
 
 type AllowedActivity = (typeof ALLOWED_ACTIVITIES)[number];

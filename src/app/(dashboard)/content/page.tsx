@@ -12,6 +12,9 @@ import { StoriesGenerator } from "@/components/content/stories-generator";
 import { CarouselGenerator } from "@/components/content/carousel-generator";
 import { InstagramOptimizer } from "@/components/content/instagram-optimizer";
 import { ContentSpy } from "@/components/ads/content-spy";
+import { WeeklyContentBatch } from "@/components/content/weekly-content-batch";
+import { ObjectionContent } from "@/components/content/objection-content";
+import { SocialPublisher } from "@/components/content/social-publisher";
 import { GenerationHistory } from "@/components/shared/generation-history";
 import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
@@ -25,6 +28,9 @@ import {
   CalendarDays,
   History,
   Search,
+  Zap,
+  MessageSquareWarning,
+  Share2,
 } from "lucide-react";
 
 const CONTENT_TYPE_TO_TAB: Record<string, string> = {
@@ -53,7 +59,10 @@ const TABS = [
   { key: "carousels", label: "Carousels", icon: Layers },
   { key: "instagram", label: "Instagram", icon: Instagram },
   { key: "editorial", label: "Plan Éditorial", icon: CalendarDays },
+  { key: "batch_hebdo", label: "Batch Hebdo", icon: Zap },
+  { key: "objections_contenu", label: "Objections → Contenu", icon: MessageSquareWarning },
   { key: "content_spy", label: "Content Spy", icon: Search },
+  { key: "publication", label: "Publication", icon: Share2 },
   { key: "history", label: "Historique", icon: History },
 ] as const;
 
@@ -100,7 +109,10 @@ export default function ContentPage() {
       {activeTab === "carousels" && <div role="tabpanel" id="tabpanel-carousels" aria-labelledby="tab-carousels"><CarouselGenerator initialData={loadedData.carousels} /></div>}
       {activeTab === "instagram" && <div role="tabpanel" id="tabpanel-instagram" aria-labelledby="tab-instagram"><InstagramOptimizer initialData={loadedData.instagram} /></div>}
       {activeTab === "editorial" && <div role="tabpanel" id="tabpanel-editorial" aria-labelledby="tab-editorial"><EditorialCalendar initialData={loadedData.editorial} /></div>}
+      {activeTab === "batch_hebdo" && <div role="tabpanel" id="tabpanel-batch_hebdo" aria-labelledby="tab-batch_hebdo"><WeeklyContentBatch /></div>}
+      {activeTab === "objections_contenu" && <div role="tabpanel" id="tabpanel-objections_contenu" aria-labelledby="tab-objections_contenu"><ObjectionContent /></div>}
       {activeTab === "content_spy" && <div role="tabpanel" id="tabpanel-content_spy" aria-labelledby="tab-content_spy"><ContentSpy /></div>}
+      {activeTab === "publication" && <div role="tabpanel" id="tabpanel-publication" aria-labelledby="tab-publication"><SocialPublisher /></div>}
       {activeTab === "history" && (<div role="tabpanel" id="tabpanel-history" aria-labelledby="tab-history">
         <GenerationHistory
           table="content_pieces"

@@ -8,6 +8,7 @@ import { CompetitorGrid } from "@/components/market/competitor-grid";
 import { PainIdentifier } from "@/components/market/pain-identifier";
 import { SchwartzDisplay } from "@/components/market/schwartz-display";
 import { InsightsScraper } from "@/components/market/insights-scraper";
+import { BusinessAudit } from "@/components/market/business-audit";
 import { cn } from "@/lib/utils/cn";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -35,6 +36,7 @@ import {
   AlertTriangle,
   Gauge,
   Search,
+  ClipboardCheck,
 } from "lucide-react";
 
 type MarketAnalysis = Database["public"]["Tables"]["market_analyses"]["Row"];
@@ -42,6 +44,7 @@ type Competitor = Database["public"]["Tables"]["competitors"]["Row"];
 
 const TABS = [
   { key: "analyse", label: "Analyse", icon: BarChart3 },
+  { key: "audit", label: "Audit Business", icon: ClipboardCheck },
   { key: "insights", label: "Insights", icon: Search },
   { key: "schwartz", label: "Schwartz", icon: Gauge },
   { key: "persona", label: "Persona", icon: User },
@@ -460,6 +463,11 @@ export default function MarketPage() {
             </Card>
           )}
         </div>
+      )}
+
+      {/* TAB: Audit Business */}
+      {activeTab === "audit" && (
+        <BusinessAudit />
       )}
 
       {/* TAB: Insights Scraper */}

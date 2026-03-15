@@ -11,6 +11,7 @@ import { Sparkles, Copy, MessageSquare, Send, RotateCcw, RefreshCw } from "lucid
 import { toast } from "sonner";
 import type { DMScriptsResult } from "@/lib/ai/prompts/dm-scripts";
 import { UpgradeWall } from "@/components/shared/upgrade-wall";
+import { UnipileSendDialog } from "@/components/shared/unipile-send-dialog";
 
 interface DMScriptGeneratorProps {
   className?: string;
@@ -29,6 +30,8 @@ export function DMScriptGenerator({ className, initialData }: DMScriptGeneratorP
   const [usageLimited, setUsageLimited] = React.useState<{currentUsage: number; limit: number} | null>(null);
   const [scriptStyle, setScriptStyle] = React.useState<string>("Direct");
   const [context, setContext] = React.useState("");
+  const [sendDialogOpen, setSendDialogOpen] = React.useState(false);
+  const [sendMessage, setSendMessage] = React.useState("");
 
   React.useEffect(() => {
     if (initialData) {
@@ -193,14 +196,24 @@ export function DMScriptGenerator({ className, initialData }: DMScriptGeneratorP
                     <div className="p-3 rounded-lg bg-bg-tertiary">
                       <div className="flex items-center justify-between mb-1">
                         <Badge variant="cyan">Jour 1 - Opener</Badge>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => copyToClipboard(seq.opener, `${seqKey}-opener`)}
-                        >
-                          <Copy className="h-3 w-3 mr-1" />
-                          {copiedField === `${seqKey}-opener` ? "Copié !" : "Copier"}
-                        </Button>
+                        <div className="flex items-center gap-1">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => copyToClipboard(seq.opener, `${seqKey}-opener`)}
+                          >
+                            <Copy className="h-3 w-3 mr-1" />
+                            {copiedField === `${seqKey}-opener` ? "Copié !" : "Copier"}
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => { setSendMessage(seq.opener); setSendDialogOpen(true); }}
+                            title="Envoyer via Unipile"
+                          >
+                            <Send className="h-3 w-3 text-accent" />
+                          </Button>
+                        </div>
                       </div>
                       <p className="text-sm text-text-secondary whitespace-pre-wrap">{seq.opener}</p>
                     </div>
@@ -209,14 +222,24 @@ export function DMScriptGenerator({ className, initialData }: DMScriptGeneratorP
                     <div className="p-3 rounded-lg bg-bg-tertiary">
                       <div className="flex items-center justify-between mb-1">
                         <Badge variant="blue">J+2 - Follow-up 1</Badge>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => copyToClipboard(seq.follow_up_1, `${seqKey}-fu1`)}
-                        >
-                          <Copy className="h-3 w-3 mr-1" />
-                          {copiedField === `${seqKey}-fu1` ? "Copié !" : "Copier"}
-                        </Button>
+                        <div className="flex items-center gap-1">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => copyToClipboard(seq.follow_up_1, `${seqKey}-fu1`)}
+                          >
+                            <Copy className="h-3 w-3 mr-1" />
+                            {copiedField === `${seqKey}-fu1` ? "Copié !" : "Copier"}
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => { setSendMessage(seq.follow_up_1); setSendDialogOpen(true); }}
+                            title="Envoyer via Unipile"
+                          >
+                            <Send className="h-3 w-3 text-accent" />
+                          </Button>
+                        </div>
                       </div>
                       <p className="text-sm text-text-secondary whitespace-pre-wrap">
                         {seq.follow_up_1}
@@ -227,14 +250,24 @@ export function DMScriptGenerator({ className, initialData }: DMScriptGeneratorP
                     <div className="p-3 rounded-lg bg-bg-tertiary">
                       <div className="flex items-center justify-between mb-1">
                         <Badge variant="purple">J+5 - Follow-up 2</Badge>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => copyToClipboard(seq.follow_up_2, `${seqKey}-fu2`)}
-                        >
-                          <Copy className="h-3 w-3 mr-1" />
-                          {copiedField === `${seqKey}-fu2` ? "Copié !" : "Copier"}
-                        </Button>
+                        <div className="flex items-center gap-1">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => copyToClipboard(seq.follow_up_2, `${seqKey}-fu2`)}
+                          >
+                            <Copy className="h-3 w-3 mr-1" />
+                            {copiedField === `${seqKey}-fu2` ? "Copié !" : "Copier"}
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => { setSendMessage(seq.follow_up_2); setSendDialogOpen(true); }}
+                            title="Envoyer via Unipile"
+                          >
+                            <Send className="h-3 w-3 text-accent" />
+                          </Button>
+                        </div>
                       </div>
                       <p className="text-sm text-text-secondary whitespace-pre-wrap">
                         {seq.follow_up_2}
@@ -245,14 +278,24 @@ export function DMScriptGenerator({ className, initialData }: DMScriptGeneratorP
                     <div className="p-3 rounded-lg bg-accent/5 border border-accent/20">
                       <div className="flex items-center justify-between mb-1">
                         <Badge variant="default">J+7 - Closing</Badge>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => copyToClipboard(seq.closing, `${seqKey}-closing`)}
-                        >
-                          <Copy className="h-3 w-3 mr-1" />
-                          {copiedField === `${seqKey}-closing` ? "Copié !" : "Copier"}
-                        </Button>
+                        <div className="flex items-center gap-1">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => copyToClipboard(seq.closing, `${seqKey}-closing`)}
+                          >
+                            <Copy className="h-3 w-3 mr-1" />
+                            {copiedField === `${seqKey}-closing` ? "Copié !" : "Copier"}
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => { setSendMessage(seq.closing); setSendDialogOpen(true); }}
+                            title="Envoyer via Unipile"
+                          >
+                            <Send className="h-3 w-3 text-accent" />
+                          </Button>
+                        </div>
                       </div>
                       <p className="text-sm text-accent whitespace-pre-wrap">{seq.closing}</p>
                     </div>
@@ -271,14 +314,24 @@ export function DMScriptGenerator({ className, initialData }: DMScriptGeneratorP
             <GlowCard key={i} glowColor={i % 2 === 0 ? "blue" : "cyan"}>
               <div className="flex items-center justify-between mb-3">
                 <Badge variant="muted">Scénario #{i + 1}</Badge>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => copyToClipboard(item.message, `retarget-${i}`)}
-                >
-                  <Copy className="h-3 w-3 mr-1" />
-                  {copiedField === `retarget-${i}` ? "Copié !" : "Copier"}
-                </Button>
+                <div className="flex items-center gap-1">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => copyToClipboard(item.message, `retarget-${i}`)}
+                  >
+                    <Copy className="h-3 w-3 mr-1" />
+                    {copiedField === `retarget-${i}` ? "Copié !" : "Copier"}
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => { setSendMessage(item.message); setSendDialogOpen(true); }}
+                    title="Envoyer via Unipile"
+                  >
+                    <Send className="h-3 w-3 text-accent" />
+                  </Button>
+                </div>
               </div>
               <p className="text-sm font-medium text-text-primary mb-2">{item.scenario}</p>
               <p className="text-sm text-text-secondary whitespace-pre-wrap">{item.message}</p>
@@ -286,6 +339,12 @@ export function DMScriptGenerator({ className, initialData }: DMScriptGeneratorP
           ))}
         </div>
       )}
+
+      <UnipileSendDialog
+        open={sendDialogOpen}
+        onOpenChange={setSendDialogOpen}
+        message={sendMessage}
+      />
     </div>
   );
 }

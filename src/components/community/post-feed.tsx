@@ -15,6 +15,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Heart,
   MessageCircle,
   Share2,
@@ -28,11 +35,17 @@ import {
   Trash2,
   X,
   Check,
+  Search,
+  Filter,
+  Award,
+  Calendar,
+  Zap,
+  ExternalLink,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useUser } from "@/hooks/use-user";
 import { toast } from "sonner";
-import { formatDistanceToNow } from "date-fns";
+import { formatDistanceToNow, format } from "date-fns";
 import { fr } from "date-fns/locale";
 
 const CATEGORIES = [
@@ -48,6 +61,11 @@ type Category = (typeof CATEGORIES)[number];
 interface PostProfile {
   full_name: string | null;
   avatar_url: string | null;
+  niche?: string | null;
+  experience_level?: string | null;
+  xp_points?: number;
+  badges?: string[] | null;
+  created_at?: string;
 }
 
 interface Post {
@@ -77,6 +95,166 @@ interface PostFeedProps {
   className?: string;
 }
 
+// ─── Mini Profile Card ─────────────────────────────────────────
+interface MiniProfileProps {
+  userId: string;
+  profile: PostProfile | null;
+  onClose: () => void;
+}
+
+function MiniProfileCard({ userId, profile, onClose }: MiniProfileProps) {
+  const [fullProfile, setFullProfile] = React.useState<{
+    full_name: string | null;
+    avatar_url: string | null;
+    niche: string | null;
+    experience_level: string | null;
+    xp_points: number;
+    badges: string[] | null;
+    created_at: string;
+  } | null>(null);
+  const [loading, setLoading] = React.useState(true);
+  const supabase = createClient();
+  const cardRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    const fetchProfile = async () => {
+      const { data } = await supabase
+        .from("profiles")
+        .select("full_name, avatar_url, niche, experience_level, xp_points, badges, created_at")
+        .eq("id", userId)
+        .single();
+
+      if (data) {
+        setFullProfile({
+          full_name: data.full_name,
+          avatar_url: data.avatar_url,
+          niche: data.niche,
+          experience_level: data.experience_level,
+          xp_points: data.xp_points ?? 0,
+          badges: data.badges as string[] | null,
+          created_at: data.created_at,
+        });
+      }
+      setLoading(false);
+    };
+    fetchProfile();
+  }, [userId, supabase]);
+
+  React.useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (cardRef.current && !cardRef.current.contains(e.target as Node)) {
+        onClose();
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [onClose]);
+
+  const getInitials = (name: string | null | undefined) => {
+    if (!name) return "??";
+    return name.split(" ").map((w) => w[0]).join("").toUpperCase().slice(0, 2);
+  };
+
+  const experienceLabels: Record<string, string> = {
+    beginner: "Débutant",
+    intermediate: "Intermédiaire",
+    advanced: "Avancé",
+  };
+
+  const displayProfile = fullProfile || {
+    full_name: profile?.full_name || "Membre ScalingFlow",
+    avatar_url: profile?.avatar_url || null,
+    niche: null,
+    experience_level: null,
+    xp_points: 0,
+    badges: null,
+    created_at: new Date().toISOString(),
+  };
+
+  return (
+    <div
+      ref={cardRef}
+      className="absolute z-50 top-full left-0 mt-2 w-72 bg-bg-secondary border border-border-default rounded-xl shadow-xl p-4 animate-in fade-in slide-in-from-top-2 duration-200"
+    >
+      {loading ? (
+        <div className="flex items-center justify-center py-4">
+          <Loader2 className="h-4 w-4 animate-spin text-text-muted" />
+        </div>
+      ) : (
+        <>
+          <div className="flex items-center gap-3 mb-3">
+            <Avatar className="h-12 w-12">
+              {displayProfile.avatar_url && (
+                <AvatarImage src={displayProfile.avatar_url} />
+              )}
+              <AvatarFallback className="bg-bg-tertiary text-text-secondary text-sm">
+                {getInitials(displayProfile.full_name)}
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-text-primary truncate">
+                {displayProfile.full_name || "Membre ScalingFlow"}
+              </p>
+              {displayProfile.niche && (
+                <p className="text-xs text-accent truncate">{displayProfile.niche}</p>
+              )}
+            </div>
+            <button
+              onClick={onClose}
+              className="p-1 text-text-muted hover:text-text-primary rounded"
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
+          </div>
+
+          <div className="grid grid-cols-3 gap-2 mb-3">
+            {displayProfile.experience_level && (
+              <div className="text-center p-2 bg-bg-tertiary rounded-lg">
+                <Award className="h-3.5 w-3.5 text-accent mx-auto mb-1" />
+                <p className="text-[10px] text-text-muted">Niveau</p>
+                <p className="text-xs font-medium text-text-primary">
+                  {experienceLabels[displayProfile.experience_level] || displayProfile.experience_level}
+                </p>
+              </div>
+            )}
+            <div className="text-center p-2 bg-bg-tertiary rounded-lg">
+              <Zap className="h-3.5 w-3.5 text-yellow-400 mx-auto mb-1" />
+              <p className="text-[10px] text-text-muted">XP</p>
+              <p className="text-xs font-medium text-text-primary">
+                {displayProfile.xp_points.toLocaleString("fr-FR")}
+              </p>
+            </div>
+            <div className="text-center p-2 bg-bg-tertiary rounded-lg">
+              <Award className="h-3.5 w-3.5 text-cyan-400 mx-auto mb-1" />
+              <p className="text-[10px] text-text-muted">Badges</p>
+              <p className="text-xs font-medium text-text-primary">
+                {displayProfile.badges?.length || 0}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-1.5 text-[10px] text-text-muted mb-3">
+            <Calendar className="h-3 w-3" />
+            <span>
+              Membre depuis{" "}
+              {format(new Date(displayProfile.created_at), "MMMM yyyy", { locale: fr })}
+            </span>
+          </div>
+
+          <a
+            href={`/leaderboard`}
+            className="flex items-center justify-center gap-1.5 w-full py-1.5 rounded-lg bg-bg-tertiary hover:bg-accent/10 text-xs text-text-secondary hover:text-accent transition-colors"
+          >
+            <ExternalLink className="h-3 w-3" />
+            Voir le profil
+          </a>
+        </>
+      )}
+    </div>
+  );
+}
+
+// ─── Main PostFeed component ───────────────────────────────────
 export function PostFeed({ className }: PostFeedProps) {
   const { user, profile } = useUser();
   const supabase = createClient();
@@ -84,6 +262,16 @@ export function PostFeed({ className }: PostFeedProps) {
   const [posts, setPosts] = React.useState<Post[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [activeCategory, setActiveCategory] = React.useState<Category>("Tous");
+
+  // Recherche et filtrage
+  const [searchQuery, setSearchQuery] = React.useState("");
+  const [nicheFilter, setNicheFilter] = React.useState<string>("all");
+  const [availableNiches, setAvailableNiches] = React.useState<string[]>([]);
+  const [showFilters, setShowFilters] = React.useState(false);
+
+  // Mini profil
+  const [activeProfileUserId, setActiveProfileUserId] = React.useState<string | null>(null);
+  const [activeProfileData, setActiveProfileData] = React.useState<PostProfile | null>(null);
 
   // Nouveau post
   const [newContent, setNewContent] = React.useState("");
@@ -122,7 +310,7 @@ export function PostFeed({ className }: PostFeedProps) {
 
     const { data, error } = await supabase
       .from("community_posts")
-      .select("*, profiles:user_id(full_name, avatar_url)")
+      .select("*, profiles:user_id(full_name, avatar_url, niche, experience_level, xp_points, badges, created_at)")
       .order("pinned", { ascending: false })
       .order("created_at", { ascending: false });
 
@@ -154,6 +342,16 @@ export function PostFeed({ className }: PostFeedProps) {
     }));
 
     setPosts(postsWithLikes);
+
+    // Extraire les niches uniques
+    const niches = new Set<string>();
+    postsWithLikes.forEach((p) => {
+      if (p.profiles?.niche) {
+        niches.add(p.profiles.niche);
+      }
+    });
+    setAvailableNiches(Array.from(niches).sort());
+
     setLoading(false);
   }, [supabase, user]);
 
@@ -161,11 +359,44 @@ export function PostFeed({ className }: PostFeedProps) {
     fetchPosts();
   }, [fetchPosts]);
 
-  // ---- Filtrage par catégorie ----
-  const filteredPosts =
-    activeCategory === "Tous"
-      ? posts
-      : posts.filter((p) => p.category === activeCategory);
+  // ---- Filtrage par catégorie, niche et recherche ----
+  const filteredPosts = React.useMemo(() => {
+    let result = posts;
+
+    // Catégorie
+    if (activeCategory !== "Tous") {
+      result = result.filter((p) => p.category === activeCategory);
+    }
+
+    // Niche
+    if (nicheFilter !== "all") {
+      result = result.filter((p) => p.profiles?.niche === nicheFilter);
+    }
+
+    // Recherche texte
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase().trim();
+      result = result.filter(
+        (p) =>
+          p.content.toLowerCase().includes(q) ||
+          (p.title && p.title.toLowerCase().includes(q)) ||
+          (p.profiles?.full_name && p.profiles.full_name.toLowerCase().includes(q))
+      );
+    }
+
+    return result;
+  }, [posts, activeCategory, nicheFilter, searchQuery]);
+
+  // ---- Post counts per filter ----
+  const postCountByCategory = React.useMemo(() => {
+    const counts: Record<string, number> = { Tous: posts.length };
+    posts.forEach((p) => {
+      if (p.category) {
+        counts[p.category] = (counts[p.category] || 0) + 1;
+      }
+    });
+    return counts;
+  }, [posts]);
 
   // ---- Créer un post ----
   const handleSubmitPost = async () => {
@@ -227,7 +458,6 @@ export function PostFeed({ className }: PostFeedProps) {
     );
 
     if (wasLiked) {
-      // Unlike
       const { error } = await supabase
         .from("community_likes")
         .delete()
@@ -240,7 +470,6 @@ export function PostFeed({ className }: PostFeedProps) {
           .update({ likes_count: Math.max(0, post.likes_count - 1) })
           .eq("id", postId);
       } else {
-        // Rollback
         setPosts((prev) =>
           prev.map((p) =>
             p.id === postId
@@ -251,7 +480,6 @@ export function PostFeed({ className }: PostFeedProps) {
         toast.error("Erreur lors du unlike");
       }
     } else {
-      // Like
       const { error } = await supabase
         .from("community_likes")
         .insert({ post_id: postId, user_id: user.id });
@@ -262,7 +490,6 @@ export function PostFeed({ className }: PostFeedProps) {
           .update({ likes_count: post.likes_count + 1 })
           .eq("id", postId);
       } else {
-        // Rollback
         setPosts((prev) =>
           prev.map((p) =>
             p.id === postId
@@ -296,7 +523,7 @@ export function PostFeed({ className }: PostFeedProps) {
 
     setExpandedComments((prev) => new Set(prev).add(postId));
 
-    if (comments[postId]) return; // Déjà chargé
+    if (comments[postId]) return;
 
     setLoadingComments((prev) => new Set(prev).add(postId));
 
@@ -349,7 +576,6 @@ export function PostFeed({ className }: PostFeedProps) {
       return;
     }
 
-    // Ajouter le commentaire en local
     const newComment: Comment = {
       ...data,
       profiles: data.profiles as unknown as PostProfile | null,
@@ -359,21 +585,18 @@ export function PostFeed({ className }: PostFeedProps) {
       [postId]: [...(prev[postId] || []), newComment],
     }));
 
-    // Attribuer XP pour le commentaire (non bloquant)
     fetch("/api/gamification/award", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ activityType: "community.comment" }),
     }).catch(() => {});
 
-    // Mettre à jour le compteur
     setPosts((prev) =>
       prev.map((p) =>
         p.id === postId ? { ...p, comments_count: p.comments_count + 1 } : p
       )
     );
 
-    // Mettre à jour le compteur en DB
     const post = posts.find((p) => p.id === postId);
     if (post) {
       await supabase
@@ -475,7 +698,6 @@ export function PostFeed({ className }: PostFeedProps) {
       )
     );
 
-    // Mettre à jour en DB
     const post = posts.find((p) => p.id === postId);
     if (post) {
       await supabase
@@ -519,6 +741,75 @@ export function PostFeed({ className }: PostFeedProps) {
 
   return (
     <div className={cn("space-y-6", className)}>
+      {/* Barre de recherche et filtres */}
+      <Card>
+        <CardContent className="pt-4 pb-4">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-text-muted" />
+              <Input
+                placeholder="Rechercher dans les posts..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-9 h-9"
+              />
+            </div>
+            <Button
+              variant={showFilters ? "default" : "ghost"}
+              size="sm"
+              onClick={() => setShowFilters(!showFilters)}
+              className="gap-1.5"
+            >
+              <Filter className="h-4 w-4" />
+              Filtres
+            </Button>
+          </div>
+
+          {showFilters && (
+            <div className="flex items-center gap-3 pt-2 border-t border-border-default">
+              <div className="flex-1">
+                <Select value={nicheFilter} onValueChange={setNicheFilter}>
+                  <SelectTrigger className="h-8 text-xs">
+                    <SelectValue placeholder="Filtrer par niche" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Toutes les niches</SelectItem>
+                    {availableNiches.map((niche) => (
+                      <SelectItem key={niche} value={niche}>
+                        {niche}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              {(nicheFilter !== "all" || searchQuery) && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setNicheFilter("all");
+                    setSearchQuery("");
+                  }}
+                  className="text-xs text-text-muted"
+                >
+                  <X className="h-3 w-3 mr-1" />
+                  Réinitialiser
+                </Button>
+              )}
+            </div>
+          )}
+
+          {/* Résultat du filtre */}
+          {(searchQuery || nicheFilter !== "all") && (
+            <p className="text-xs text-text-muted mt-2">
+              {filteredPosts.length} post{filteredPosts.length !== 1 ? "s" : ""} trouvé{filteredPosts.length !== 1 ? "s" : ""}
+              {nicheFilter !== "all" && ` dans la niche "${nicheFilter}"`}
+              {searchQuery && ` pour "${searchQuery}"`}
+            </p>
+          )}
+        </CardContent>
+      </Card>
+
       {/* Nouveau post */}
       {user && (
         <Card>
@@ -572,13 +863,23 @@ export function PostFeed({ className }: PostFeedProps) {
             key={cat}
             onClick={() => setActiveCategory(cat)}
             className={cn(
-              "px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all",
+              "px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all flex items-center gap-1.5",
               activeCategory === cat
                 ? "bg-accent text-white"
                 : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
             )}
           >
             {cat}
+            <span
+              className={cn(
+                "text-[10px] px-1.5 py-0.5 rounded-full",
+                activeCategory === cat
+                  ? "bg-white/20"
+                  : "bg-bg-secondary"
+              )}
+            >
+              {postCountByCategory[cat] || 0}
+            </span>
           </button>
         ))}
       </div>
@@ -588,7 +889,9 @@ export function PostFeed({ className }: PostFeedProps) {
         <div className="flex flex-col items-center justify-center py-12 text-center">
           <MessageSquare className="h-10 w-10 text-text-muted/40 mb-3" />
           <p className="text-sm text-text-muted">
-            Aucun post dans cette catégorie pour le moment.
+            {searchQuery || nicheFilter !== "all"
+              ? "Aucun post ne correspond à vos filtres."
+              : "Aucun post dans cette catégorie pour le moment."}
           </p>
         </div>
       ) : (
@@ -613,15 +916,30 @@ export function PostFeed({ className }: PostFeedProps) {
                         {initials}
                       </AvatarFallback>
                     </Avatar>
-                    <div className="flex-1">
+                    <div className="flex-1 relative">
                       <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium text-text-primary">
+                        <button
+                          onClick={() => {
+                            if (activeProfileUserId === post.user_id) {
+                              setActiveProfileUserId(null);
+                            } else {
+                              setActiveProfileUserId(post.user_id);
+                              setActiveProfileData(post.profiles);
+                            }
+                          }}
+                          className="text-sm font-medium text-text-primary hover:text-accent transition-colors cursor-pointer"
+                        >
                           {displayName}
-                        </span>
+                        </button>
                         {post.pinned && (
                           <Badge variant="default" className="text-[10px]">
                             Épinglé
                           </Badge>
+                        )}
+                        {post.profiles?.niche && (
+                          <span className="text-[10px] text-text-muted bg-bg-tertiary px-1.5 py-0.5 rounded">
+                            {post.profiles.niche}
+                          </span>
                         )}
                       </div>
                       <span className="text-xs text-text-muted">
@@ -630,6 +948,14 @@ export function PostFeed({ className }: PostFeedProps) {
                           locale: fr,
                         })}
                       </span>
+                      {/* Mini profile card */}
+                      {activeProfileUserId === post.user_id && (
+                        <MiniProfileCard
+                          userId={post.user_id}
+                          profile={post.profiles}
+                          onClose={() => setActiveProfileUserId(null)}
+                        />
+                      )}
                     </div>
                     {post.category && (
                       <Badge
@@ -783,9 +1109,19 @@ export function PostFeed({ className }: PostFeedProps) {
                                 </Avatar>
                                 <div className="flex-1 bg-bg-tertiary rounded-xl px-3 py-2">
                                   <div className="flex items-center gap-2 mb-0.5">
-                                    <span className="text-xs font-medium text-text-primary">
+                                    <button
+                                      onClick={() => {
+                                        if (activeProfileUserId === comment.user_id) {
+                                          setActiveProfileUserId(null);
+                                        } else {
+                                          setActiveProfileUserId(comment.user_id);
+                                          setActiveProfileData(comment.profiles);
+                                        }
+                                      }}
+                                      className="text-xs font-medium text-text-primary hover:text-accent transition-colors"
+                                    >
                                       {cName}
-                                    </span>
+                                    </button>
                                     <span className="text-[10px] text-text-muted">
                                       {formatDistanceToNow(
                                         new Date(comment.created_at),

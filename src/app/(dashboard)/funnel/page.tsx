@@ -4,13 +4,17 @@ import React from "react";
 import { PageHeader } from "@/components/layout/page-header";
 import { TabBar } from "@/components/shared/tab-bar";
 import { FunnelBuilder } from "@/components/funnel/funnel-builder";
+import { FunnelDeploy } from "@/components/funnel/funnel-deploy";
+import { FunnelPreview } from "@/components/funnel/funnel-preview";
 import { GenerationHistory } from "@/components/shared/generation-history";
 import { createClient } from "@/lib/supabase/client";
-import { Sparkles, History } from "lucide-react";
+import { Sparkles, Eye, Rocket, History } from "lucide-react";
 import { toast } from "sonner";
 
 const TABS = [
   { key: "generate", label: "Générer", icon: Sparkles },
+  { key: "preview", label: "Prévisualiser", icon: Eye },
+  { key: "deploy", label: "Déployer", icon: Rocket },
   { key: "history", label: "Historique", icon: History },
 ] as const;
 
@@ -51,6 +55,8 @@ export default function FunnelPage() {
       <TabBar tabs={TABS} activeTab={activeTab} onTabChange={setActiveTab} />
 
       {activeTab === "generate" && <FunnelBuilder initialData={loadedData} />}
+      {activeTab === "preview" && <FunnelPreview />}
+      {activeTab === "deploy" && <FunnelDeploy />}
       {activeTab === "history" && (
         <GenerationHistory
           table="funnels"

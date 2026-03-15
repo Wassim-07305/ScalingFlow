@@ -10,29 +10,31 @@ export interface PersonaForgeResult {
     situation_familiale: string;
     revenu_annuel: string;
     localisation: string;
+    situation_pro: string;
     niveau_education: string;
   };
   niveau_2_psycho: {
-    desirs_profonds: string[];
     peurs: string[];
     frustrations: string[];
-    objections_achat: string[];
+    desirs_profonds: string[];
     croyances_limitantes: string[];
-  };
-  niveau_3_langage: {
-    expressions_courantes: string[];
-    mots_cles_recherche: string[];
-    phrases_douleur: string[];
-    phrases_desir: string[];
-    ton_communication: string;
-  };
-  niveau_4_parcours: {
     declencheurs_achat: string[];
-    sources_info: string[];
+  };
+  niveau_3_comportemental: {
+    habitudes_digitales: string[];
+    reseaux_sociaux: string[];
+    type_contenu_consomme: string[];
+    objections_typiques: string[];
+    frequence_achat_en_ligne: string;
+    appareils_utilises: string[];
+  };
+  niveau_4_strategique: {
+    parcours_achat: string[];
+    points_contact_optimaux: string[];
+    messages_qui_resonnent: string[];
+    timing_ideal: string;
     criteres_decision: string[];
-    obstacles_achat: string[];
-    timeline_decision: string;
-    influenceurs: string[];
+    influenceurs_prescripteurs: string[];
   };
 }
 
@@ -62,7 +64,7 @@ export function buildPersonaForgePrompt(data: {
 
   let userContext = "";
   if (vaultData.skills && vaultData.skills.length > 0) {
-    userContext += `\n- Competences de l'utilisateur : ${vaultData.skills.join(", ")}`;
+    userContext += `\n- Compétences de l'utilisateur : ${vaultData.skills.join(", ")}`;
   }
   if (vaultData.situation) {
     userContext += `\n- Situation : ${vaultData.situation}`;
@@ -73,9 +75,9 @@ export function buildPersonaForgePrompt(data: {
 
   let vaultSkillsContext = "";
   if (vaultData.vaultSkills && vaultData.vaultSkills.length > 0) {
-    vaultSkillsContext = "\n\n## COMPETENCES DETAILLEES\n";
+    vaultSkillsContext = "\n\n## COMPÉTENCES DÉTAILLÉES\n";
     for (const skill of vaultData.vaultSkills) {
-      vaultSkillsContext += `- ${skill.name || skill.category || "Competence"} (${skill.level})${skill.details ? ` : ${skill.details}` : ""}\n`;
+      vaultSkillsContext += `- ${skill.name || skill.category || "Compétence"} (${skill.level})${skill.details ? ` : ${skill.details}` : ""}\n`;
     }
   }
 
@@ -88,50 +90,50 @@ export function buildPersonaForgePrompt(data: {
   }
 
   const avatarContext = marketAnalysis.target_avatar
-    ? `\n\n## AVATAR INITIAL (a approfondir)\n${JSON.stringify(marketAnalysis.target_avatar, null, 2)}`
+    ? `\n\n## AVATAR INITIAL (à approfondir)\n${JSON.stringify(marketAnalysis.target_avatar, null, 2)}`
     : "";
 
-  return `Tu es un expert en psychologie consommateur et en marketing, specialise dans la creation d'avatars clients ultra-detailles. Tu maitrises les frameworks de personas avances (Jobs-to-be-Done, Empathy Map, Buyer Journey).
+  return `Tu es un expert en psychologie consommateur et en marketing, spécialisé dans la création d'avatars clients ultra-détaillés. Tu maîtrises les frameworks de personas avancés (Jobs-to-be-Done, Empathy Map, Buyer Journey).
 
-## MARCHE ANALYSE
-- Nom du marche : ${marketAnalysis.market_name}
+## MARCHÉ ANALYSÉ
+- Nom du marché : ${marketAnalysis.market_name}
 - Description : ${marketAnalysis.market_description || "Non fournie"}
-- Problemes identifies : ${marketAnalysis.problems?.join(", ") || "Non fournis"}
-- Positionnement recommande : ${marketAnalysis.recommended_positioning || "Non fourni"}
-- Pays cible : ${marketAnalysis.country || "Non specifie"}
-- Langue : ${marketAnalysis.language || "Francais"}${userContext}${vaultSkillsContext}${expertiseContext}${avatarContext}
+- Problèmes identifiés : ${marketAnalysis.problems?.join(", ") || "Non fournis"}
+- Positionnement recommandé : ${marketAnalysis.recommended_positioning || "Non fourni"}
+- Pays cible : ${marketAnalysis.country || "Non spécifié"}
+- Langue : ${marketAnalysis.language || "Français"}${userContext}${vaultSkillsContext}${expertiseContext}${avatarContext}
 
 ## TA MISSION
-Cree un avatar client ultra-detaille sur 4 niveaux de profondeur pour le marche "${marketAnalysis.market_name}". Cet avatar doit etre tellement precis que l'utilisateur pourra ecrire du copy qui parle directement a cette personne.
+Crée un avatar client ultra-détaillé sur 4 niveaux de profondeur pour le marché "${marketAnalysis.market_name}". Cet avatar doit être tellement précis que l'utilisateur pourra écrire du copy qui parle directement à cette personne.
 
 ### BIO FICTIVE
-Ecris une bio fictive ultra-detaillee de 3-5 phrases : prenom, nom, age, situation, parcours pro, situation actuelle, personnalite. Comme si tu decrivais un vrai etre humain.
+Écris une bio fictive ultra-détaillée de 3-5 phrases : prénom, nom, âge, situation, parcours pro, situation actuelle, personnalité. Comme si tu décrivais un vrai être humain.
 
-### JOURNEE TYPE
-Decris une journee type de cet avatar : du reveil au coucher, ses habitudes, ses frustrations au quotidien, les moments ou il scrolle les reseaux, quand il est le plus receptif aux publicites.
+### JOURNÉE TYPE
+Décris une journée type de cet avatar : du réveil au coucher, ses habitudes, ses frustrations au quotidien, les moments où il scrolle les réseaux, quand il est le plus réceptif aux publicités.
 
-### CANAUX MEDIAS CONSOMMES
-Liste les 5-8 canaux medias qu'il consomme : reseaux sociaux specifiques, podcasts, newsletters, YouTube, blogs, groupes Facebook, forums, etc. Sois precis sur les types de contenu consommes.
+### CANAUX MÉDIAS CONSOMMÉS
+Liste les 5-8 canaux médias qu'il consomme : réseaux sociaux spécifiques, podcasts, newsletters, YouTube, blogs, groupes Facebook, forums, etc. Sois précis sur les types de contenu consommés.
 
-### NIVEAU 1 — Demographique
-Donne les caracteristiques demographiques precises : tranche d'age, genre predominant, situation familiale, revenu annuel, localisation type, niveau d'education.
+### NIVEAU 1 — Démographique
+Âge, sexe, localisation, revenus, situation professionnelle. Donne les caractéristiques démographiques précises : tranche d'âge, genre prédominant, situation familiale, revenu annuel, localisation type, situation professionnelle, niveau d'éducation.
 
 ### NIVEAU 2 — Psychographique
-Va en profondeur dans la psychologie : desirs profonds (pas juste de surface), peurs reelles, frustrations quotidiennes, objections a l'achat, croyances limitantes qui les empechent d'agir.
+Peurs, frustrations, désirs, croyances limitantes, déclencheurs d'achat. Va en profondeur dans la psychologie : peurs réelles, frustrations quotidiennes, désirs profonds (pas juste de surface), croyances limitantes qui les empêchent d'agir, déclencheurs émotionnels qui les font passer à l'action.
 
-### NIVEAU 3 — Langage
-Donne les mots exacts qu'ils utilisent : expressions courantes dans leur domaine, mots-cles qu'ils tapent sur Google, phrases qui decrivent leur douleur (verbatim), phrases qui decrivent leur desir ideal, ton de communication prefere.
+### NIVEAU 3 — Comportemental
+Habitudes digitales, réseaux sociaux utilisés, type de contenu consommé, objections typiques. Analyse le comportement en ligne : habitudes digitales quotidiennes, réseaux sociaux utilisés et comment, types de contenu qu'ils consomment et partagent, objections typiques avant un achat, fréquence d'achat en ligne, appareils utilisés.
 
-### NIVEAU 4 — Parcours d'achat
-Analyse leur processus de decision : declencheurs d'achat (qu'est-ce qui les fait passer a l'action), sources d'information (ou ils se renseignent), criteres de decision, obstacles a l'achat, timeline de decision moyenne, influenceurs/prescripteurs.
+### NIVEAU 4 — Stratégique
+Parcours d'achat, points de contact optimaux, messages qui résonnent, timing idéal. Analyse stratégique pour le marketing : les étapes de leur parcours d'achat, les points de contact optimaux pour les atteindre, les messages et angles qui résonnent le plus chez eux, le timing idéal pour les contacter, leurs critères de décision, les influenceurs et prescripteurs qui les influencent.
 
-## FORMAT DE REPONSE
-Reponds en JSON structure :
+## FORMAT DE RÉPONSE
+Réponds en JSON structuré :
 {
-  "avatar_name": "Prenom + Nom fictif mais realiste",
-  "avatar_role": "Titre / Role professionnel",
-  "bio_fictive": "Bio narrative detaillee de 3-5 phrases...",
-  "journee_type": "Description de la journee type de l'avatar...",
+  "avatar_name": "Prénom + Nom fictif mais réaliste",
+  "avatar_role": "Titre / Rôle professionnel",
+  "bio_fictive": "Bio narrative détaillée de 3-5 phrases...",
+  "journee_type": "Description de la journée type de l'avatar...",
   "canaux_medias": ["Instagram (Reels business)", "YouTube (formations)", "Podcast X", "Newsletter Y", "LinkedIn"],
   "niveau_1_demo": {
     "age_range": "35-45 ans",
@@ -139,29 +141,31 @@ Reponds en JSON structure :
     "situation_familiale": "...",
     "revenu_annuel": "...",
     "localisation": "...",
+    "situation_pro": "...",
     "niveau_education": "..."
   },
   "niveau_2_psycho": {
-    "desirs_profonds": ["...", "..."],
     "peurs": ["...", "..."],
     "frustrations": ["...", "..."],
-    "objections_achat": ["...", "..."],
-    "croyances_limitantes": ["...", "..."]
+    "desirs_profonds": ["...", "..."],
+    "croyances_limitantes": ["...", "..."],
+    "declencheurs_achat": ["...", "..."]
   },
-  "niveau_3_langage": {
-    "expressions_courantes": ["...", "..."],
-    "mots_cles_recherche": ["...", "..."],
-    "phrases_douleur": ["...", "..."],
-    "phrases_desir": ["...", "..."],
-    "ton_communication": "..."
+  "niveau_3_comportemental": {
+    "habitudes_digitales": ["...", "..."],
+    "reseaux_sociaux": ["...", "..."],
+    "type_contenu_consomme": ["...", "..."],
+    "objections_typiques": ["...", "..."],
+    "frequence_achat_en_ligne": "...",
+    "appareils_utilises": ["...", "..."]
   },
-  "niveau_4_parcours": {
-    "declencheurs_achat": ["...", "..."],
-    "sources_info": ["...", "..."],
+  "niveau_4_strategique": {
+    "parcours_achat": ["Étape 1 : ...", "Étape 2 : ...", "..."],
+    "points_contact_optimaux": ["...", "..."],
+    "messages_qui_resonnent": ["...", "..."],
+    "timing_ideal": "...",
     "criteres_decision": ["...", "..."],
-    "obstacles_achat": ["...", "..."],
-    "timeline_decision": "...",
-    "influenceurs": ["...", "..."]
+    "influenceurs_prescripteurs": ["...", "..."]
   }
 }`;
 }

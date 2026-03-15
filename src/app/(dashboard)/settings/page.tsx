@@ -33,6 +33,7 @@ import {
   Link2,
   Download,
   Palette,
+  MessageCircle,
   Sun,
   Moon,
   Monitor,
@@ -636,6 +637,220 @@ export default function SettingsPage() {
   );
 }
 
+// ─── Unipile Section (inside IntegrationsCard) ───────────────
+
+interface UnipileAccount {
+  id: string;
+  provider: string;
+  name?: string;
+  username?: string;
+  connected_at?: string;
+}
+
+const UNIPILE_PROVIDERS: Record<string, { label: string; emoji: string }> = {
+  LINKEDIN: { label: "LinkedIn", emoji: "💼" },
+  WHATSAPP: { label: "WhatsApp", emoji: "💬" },
+  INSTAGRAM: { label: "Instagram", emoji: "📸" },
+  MESSENGER: { label: "Messenger", emoji: "💬" },
+  TELEGRAM: { label: "Telegram", emoji: "✈️" },
+  TWITTER: { label: "Twitter", emoji: "🐦" },
+};
+
+function UnipileSection() {
+  const [accounts, setAccounts] = useState<UnipileAccount[]>([]);
+  const [loadingAccounts, setLoadingAccounts] = useState(true);
+  const [connecting, setConnecting] = useState(false);
+  const [disconnecting, setDisconnecting] = useState<string | null>(null);
+  const searchParams = useSearchParams();
+
+  const fetchAccounts = useCallback(async () => {
+    try {
+      const res = await fetch("/api/integrations/unipile/accounts");
+      if (!res.ok) throw new Error();
+      const data = await res.json();
+      setAccounts(data.accounts || []);
+    } catch {
+      // silent
+    } finally {
+      setLoadingAccounts(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchAccounts();
+  }, [fetchAccounts]);
+
+  // Legacy: auto-refresh if redirected with query param (fallback)
+  useEffect(() => {
+    if (searchParams.get("unipile") === "success") {
+      fetchAccounts();
+    }
+  }, [searchParams, fetchAccounts]);
+
+  // Listen for popup callback message
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      if (event.origin !== window.location.origin) return;
+      if (event.data?.type === "unipile-auth") {
+        if (event.data.status === "success") {
+          toast.success("Compte connecté avec succès !");
+          fetchAccounts();
+        } else {
+          toast.error("Erreur lors de la connexion du compte.");
+        }
+      }
+    };
+    window.addEventListener("message", handleMessage);
+    return () => window.removeEventListener("message", handleMessage);
+  }, [fetchAccounts]);
+
+  const handleConnect = async () => {
+    setConnecting(true);
+    try {
+      const res = await fetch("/api/integrations/unipile/auth", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          providers: ["LINKEDIN", "WHATSAPP", "INSTAGRAM", "MESSENGER", "TELEGRAM", "TWITTER"],
+        }),
+      });
+      if (!res.ok) throw new Error();
+      const data = await res.json();
+      if (data.url) {
+        // Open centered popup instead of new tab
+        const w = 500;
+        const h = 700;
+        const left = window.screenX + (window.innerWidth - w) / 2;
+        const top = window.screenY + (window.innerHeight - h) / 2;
+        window.open(
+          data.url,
+          "unipile-auth",
+          `width=${w},height=${h},left=${left},top=${top},toolbar=no,menubar=no,scrollbars=yes`
+        );
+      } else {
+        toast.error("URL de connexion introuvable");
+      }
+    } catch {
+      toast.error("Erreur lors de la connexion Unipile");
+    } finally {
+      setConnecting(false);
+    }
+  };
+
+  const handleDisconnect = async (accountId: string) => {
+    setDisconnecting(accountId);
+    try {
+      const res = await fetch("/api/integrations/unipile/disconnect", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ account_id: accountId }),
+      });
+      if (res.ok) {
+        setAccounts((prev) => prev.filter((a) => a.id !== accountId));
+        toast.success("Compte déconnecté");
+      } else {
+        toast.error("Erreur lors de la déconnexion");
+      }
+    } catch {
+      toast.error("Erreur réseau");
+    } finally {
+      setDisconnecting(null);
+    }
+  };
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <p className="text-xs font-semibold text-text-muted uppercase tracking-wider">
+          Messagerie unifiée (Unipile)
+        </p>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleConnect}
+          disabled={connecting}
+          className="flex items-center gap-2"
+        >
+          {connecting ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <MessageCircle className="h-4 w-4" />
+          )}
+          Connecter mes comptes
+        </Button>
+      </div>
+      <p className="text-xs text-text-muted">
+        Connecte LinkedIn, WhatsApp, Instagram, Messenger, Telegram ou Twitter pour gérer tes messages depuis ScalingFlow.
+      </p>
+
+      {loadingAccounts ? (
+        <div className="flex items-center justify-center py-4">
+          <Loader2 className="h-4 w-4 animate-spin text-text-muted" />
+        </div>
+      ) : accounts.length > 0 ? (
+        <div className="space-y-1">
+          {accounts.map((account) => {
+            const providerInfo = UNIPILE_PROVIDERS[account.provider.toUpperCase()] || {
+              label: account.provider,
+              emoji: "🔗",
+            };
+            const isDisconnecting = disconnecting === account.id;
+
+            return (
+              <div
+                key={account.id}
+                className="flex items-center justify-between py-2.5"
+              >
+                <div className="flex items-center gap-3">
+                  <span className="text-base">{providerInfo.emoji}</span>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium text-text-primary">
+                        {providerInfo.label}
+                      </span>
+                      <span className="h-2 w-2 rounded-full bg-green-400" />
+                    </div>
+                    <div className="flex items-center gap-2 text-xs text-text-muted">
+                      {account.username && <span>@{account.username}</span>}
+                      {account.connected_at && (
+                        <span>
+                          Connecté le{" "}
+                          {new Date(account.connected_at).toLocaleDateString("fr-FR", {
+                            day: "numeric",
+                            month: "short",
+                            year: "numeric",
+                          })}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleDisconnect(account.id)}
+                  disabled={isDisconnecting}
+                  className="text-danger hover:text-danger"
+                >
+                  {isDisconnecting ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    "Déconnecter"
+                  )}
+                </Button>
+              </div>
+            );
+          })}
+        </div>
+      ) : (
+        <p className="text-xs text-text-muted italic py-2">
+          Aucun compte connecté via Unipile.
+        </p>
+      )}
+    </div>
+  );
+}
+
 // ─── Integrations Card ────────────────────────────────────────
 
 type ConnectionStatus = {
@@ -839,6 +1054,11 @@ function IntegrationsCard() {
               disconnectUrl="/api/integrations/social/tiktok/disconnect"
               badgeVariant="default"
             />
+
+            <Separator className="my-3" />
+
+            {/* Messagerie unifiée (Unipile) */}
+            <UnipileSection />
 
             <Separator className="my-3" />
 

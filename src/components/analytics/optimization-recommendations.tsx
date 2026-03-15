@@ -46,19 +46,27 @@ interface OptimizationResult {
 }
 
 // ─── Helpers ─────────────────────────────────────────────────
-function getStorageKey(userId: string) {
-  return `sf_analytics_metrics_${userId}`;
-}
+import { createClient } from "@/lib/supabase/client";
 
-function loadMetrics(userId: string): DailyMetric[] {
-  if (typeof window === "undefined") return [];
-  try {
-    const raw = localStorage.getItem(getStorageKey(userId));
-    if (raw) return JSON.parse(raw) as DailyMetric[];
-  } catch {
-    // ignore
-  }
-  return [];
+async function loadMetricsFromSupabase(userId: string): Promise<DailyMetric[]> {
+  const supabase = createClient();
+  const { data } = await supabase
+    .from("daily_performance_metrics")
+    .select("date, spend, impressions, clicks, leads, calls, clients, revenue")
+    .eq("user_id", userId)
+    .order("date", { ascending: true });
+  if (!data || data.length === 0) return [];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (data as any[]).map((row: any) => ({
+    date: typeof row.date === "string" ? row.date : new Date(row.date).toISOString().split("T")[0],
+    spend: Number(row.spend),
+    impressions: row.impressions,
+    clicks: row.clicks,
+    leads: row.leads,
+    calls: row.calls,
+    clients: row.clients,
+    revenue: Number(row.revenue),
+  }));
 }
 
 const CATEGORY_ICONS: Record<string, React.ElementType> = {
@@ -91,14 +99,13 @@ export function OptimizationRecommendations() {
 
   useEffect(() => {
     if (!user) return;
-    const metrics = loadMetrics(user.id);
-    setHasMetrics(metrics.length > 0);
+    loadMetricsFromSupabase(user.id).then((m) => setHasMetrics(m.length > 0));
   }, [user]);
 
   const handleGenerate = useCallback(async () => {
     if (!user) return;
 
-    const metrics = loadMetrics(user.id);
+    const metrics = await loadMetricsFromSupabase(user.id);
 
     // Build summary from metrics (or demo data)
     let metricsData = metrics;

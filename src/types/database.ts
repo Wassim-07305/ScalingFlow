@@ -949,7 +949,7 @@ export interface Database {
         Row: {
           id: string;
           user_id: string;
-          agent_type: "strategist" | "copywriter" | "ad_expert" | "sales_coach" | "content_creator" | "funnel_expert" | "analytics" | "growth_hacker" | "general";
+          agent_type: "general" | "offre" | "funnel" | "ads" | "vente" | "contenu" | "strategie" | "recherche";
           title: string | null;
           messages: Json;
           created_at: string;
@@ -958,12 +958,12 @@ export interface Database {
         Insert: {
           id?: string;
           user_id: string;
-          agent_type?: "strategist" | "copywriter" | "ad_expert" | "sales_coach" | "content_creator" | "funnel_expert" | "analytics" | "growth_hacker" | "general";
+          agent_type?: "general" | "offre" | "funnel" | "ads" | "vente" | "contenu" | "strategie" | "recherche";
           title?: string | null;
           messages?: Json;
         };
         Update: {
-          agent_type?: "strategist" | "copywriter" | "ad_expert" | "sales_coach" | "content_creator" | "funnel_expert" | "analytics" | "growth_hacker" | "general";
+          agent_type?: "general" | "offre" | "funnel" | "ads" | "vente" | "contenu" | "strategie" | "recherche";
           title?: string | null;
           messages?: Json;
         };

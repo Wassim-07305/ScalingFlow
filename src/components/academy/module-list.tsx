@@ -15,11 +15,13 @@ import {
   BookOpen,
   Clock,
   Eye,
+  Trophy,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useUser } from "@/hooks/use-user";
 import { toast } from "sonner";
 import { VideoPlayer } from "@/components/academy/video-player";
+import { ModuleQuiz } from "@/components/academy/module-quiz";
 
 interface AcademyModule {
   id: string;
@@ -74,6 +76,9 @@ export function ModuleList({ className }: ModuleListProps) {
   const [activeVideo, setActiveVideo] = React.useState<AcademyVideo | null>(
     null
   );
+
+  // Quiz
+  const [showQuiz, setShowQuiz] = React.useState(false);
 
   // Progression globale
   const totalVideos = modules.reduce((sum, m) => sum + m.video_count, 0);
@@ -159,6 +164,7 @@ export function ModuleList({ className }: ModuleListProps) {
     setSelectedModule(mod);
     setLoadingVideos(true);
     setActiveVideo(null);
+    setShowQuiz(false);
 
     const { data: videosData, error } = await supabase
       .from("academy_videos")
@@ -280,6 +286,7 @@ export function ModuleList({ className }: ModuleListProps) {
     setSelectedModule(null);
     setVideos([]);
     setActiveVideo(null);
+    setShowQuiz(false);
     fetchModules(); // Rafraichir les compteurs
   };
 
@@ -323,7 +330,28 @@ export function ModuleList({ className }: ModuleListProps) {
               <span className="text-xs text-text-muted">{moduleProgress}%</span>
             </div>
           </div>
+          <Button
+            variant={showQuiz ? "default" : "ghost"}
+            size="sm"
+            onClick={() => setShowQuiz(!showQuiz)}
+            className="gap-2 shrink-0"
+          >
+            <Trophy className="h-4 w-4" />
+            {showQuiz ? "Masquer le quiz" : "Quiz"}
+          </Button>
         </div>
+
+        {showQuiz && (
+          <ModuleQuiz
+            moduleId={selectedModule.id}
+            moduleTitle={selectedModule.module_name}
+            onComplete={(score, total, passed) => {
+              if (passed) {
+                toast.success(`Quiz réussi ! ${score}/${total}`);
+              }
+            }}
+          />
+        )}
 
         <div className="grid gap-6 lg:grid-cols-3">
           {/* Lecteur video */}

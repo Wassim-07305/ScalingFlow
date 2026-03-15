@@ -4,8 +4,9 @@ import React from "react";
 import { cn } from "@/lib/utils/cn";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader2, MessageCircle, Copy, RefreshCw } from "lucide-react";
+import { Loader2, MessageCircle, Copy, RefreshCw, Send } from "lucide-react";
 import { toast } from "sonner";
+import { UnipileSendDialog } from "@/components/shared/unipile-send-dialog";
 
 interface DmRetargetingData {
   dm_ads?: Array<{
@@ -53,6 +54,8 @@ export function DmRetargetingGenerator({ initialData }: Props) {
   const [data, setData] = React.useState<DmRetargetingData | null>(initialData || null);
   const [loading, setLoading] = React.useState(false);
   const [retargetingType, setRetargetingType] = React.useState<string>("Visiteurs site");
+  const [sendDialogOpen, setSendDialogOpen] = React.useState(false);
+  const [sendMessage, setSendMessage] = React.useState("");
 
   const generate = async () => {
     setLoading(true);
@@ -176,12 +179,22 @@ export function DmRetargetingGenerator({ initialData }: Props) {
                         </span>
                       </div>
                     </div>
-                    <button
-                      onClick={() => copyText(`Hook: ${ad.hook}\n\n${ad.body}\n\nCTA: ${ad.cta}\nMot-clé: ${ad.dm_keyword}`)}
-                      className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg hover:bg-bg-primary transition-all"
-                    >
-                      <Copy className="h-3.5 w-3.5 text-text-muted" />
-                    </button>
+                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all">
+                      <button
+                        onClick={() => copyText(`Hook: ${ad.hook}\n\n${ad.body}\n\nCTA: ${ad.cta}\nMot-clé: ${ad.dm_keyword}`)}
+                        className="p-1.5 rounded-lg hover:bg-bg-primary transition-all"
+                        title="Copier"
+                      >
+                        <Copy className="h-3.5 w-3.5 text-text-muted" />
+                      </button>
+                      <button
+                        onClick={() => { setSendMessage(`${ad.hook}\n\n${ad.body}\n\n${ad.cta}`); setSendDialogOpen(true); }}
+                        className="p-1.5 rounded-lg hover:bg-bg-primary transition-all"
+                        title="Envoyer via Unipile"
+                      >
+                        <Send className="h-3.5 w-3.5 text-accent" />
+                      </button>
+                    </div>
                   </div>
                 </div>
               );
@@ -196,7 +209,16 @@ export function DmRetargetingGenerator({ initialData }: Props) {
           <h4 className="text-sm font-medium text-accent mb-3">Automation DM</h4>
           <div className="rounded-xl border border-border-default bg-bg-tertiary p-4 space-y-4">
             <div>
-              <p className="text-xs text-text-muted mb-1">Message d&apos;accueil automatique</p>
+              <div className="flex items-center justify-between mb-1">
+                <p className="text-xs text-text-muted">Message d&apos;accueil automatique</p>
+                <button
+                  onClick={() => { setSendMessage(data.dm_automation!.welcome_message); setSendDialogOpen(true); }}
+                  className="p-1 rounded-md hover:bg-bg-primary transition-colors"
+                  title="Envoyer via Unipile"
+                >
+                  <Send className="h-3.5 w-3.5 text-accent" />
+                </button>
+              </div>
               <p className="text-sm text-text-primary bg-bg-primary rounded-lg p-3">{data.dm_automation.welcome_message}</p>
             </div>
             <div>
@@ -211,11 +233,29 @@ export function DmRetargetingGenerator({ initialData }: Props) {
               </div>
             </div>
             <div>
-              <p className="text-xs text-text-muted mb-1">Message de booking</p>
+              <div className="flex items-center justify-between mb-1">
+                <p className="text-xs text-text-muted">Message de booking</p>
+                <button
+                  onClick={() => { setSendMessage(data.dm_automation!.booking_message); setSendDialogOpen(true); }}
+                  className="p-1 rounded-md hover:bg-bg-primary transition-colors"
+                  title="Envoyer via Unipile"
+                >
+                  <Send className="h-3.5 w-3.5 text-accent" />
+                </button>
+              </div>
               <p className="text-sm text-text-primary bg-bg-primary rounded-lg p-3">{data.dm_automation.booking_message}</p>
             </div>
             <div>
-              <p className="text-xs text-text-muted mb-1">Relance no-show</p>
+              <div className="flex items-center justify-between mb-1">
+                <p className="text-xs text-text-muted">Relance no-show</p>
+                <button
+                  onClick={() => { setSendMessage(data.dm_automation!.no_show_followup); setSendDialogOpen(true); }}
+                  className="p-1 rounded-md hover:bg-bg-primary transition-colors"
+                  title="Envoyer via Unipile"
+                >
+                  <Send className="h-3.5 w-3.5 text-accent" />
+                </button>
+              </div>
               <p className="text-sm text-text-primary bg-bg-primary rounded-lg p-3">{data.dm_automation.no_show_followup}</p>
             </div>
           </div>
@@ -286,6 +326,12 @@ export function DmRetargetingGenerator({ initialData }: Props) {
           </div>
         </section>
       )}
+
+      <UnipileSendDialog
+        open={sendDialogOpen}
+        onOpenChange={setSendDialogOpen}
+        message={sendMessage}
+      />
     </div>
   );
 }

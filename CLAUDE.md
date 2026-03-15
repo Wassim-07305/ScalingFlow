@@ -106,6 +106,8 @@ Defined in `.env.local`:
 - `META_ACCESS_TOKEN` — Meta/Facebook API token
 - `META_AD_ACCOUNT_ID` — Meta Ads account ID
 - `REPLICATE_API_TOKEN` — Replicate AI token
+- `UNIPILE_API_URL` — Unipile API base URL (e.g., https://api4.unipile.com:13443)
+- `UNIPILE_ACCESS_TOKEN` — Unipile API access token (server-side only)
 - `NEXT_PUBLIC_APP_URL` — Public app URL
 
 ### Supabase

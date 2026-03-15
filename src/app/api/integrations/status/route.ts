@@ -43,7 +43,31 @@ export async function GET() {
         : { connected: false };
     }
 
-    return NextResponse.json({ status });
+    // Unipile-managed accounts (unipile_linkedin, unipile_instagram, etc.)
+    const unipileConnections = connections?.filter((c) =>
+      c.provider.startsWith("unipile_")
+    ) || [];
+
+    const unipile: Record<string, {
+      connected: boolean;
+      username?: string;
+      accountId?: string;
+      connectedAt?: string;
+      metadata?: Record<string, unknown>;
+    }> = {};
+
+    for (const conn of unipileConnections) {
+      const platformName = conn.provider.replace("unipile_", "");
+      unipile[platformName] = {
+        connected: true,
+        username: conn.provider_username || undefined,
+        accountId: conn.provider_account_id || undefined,
+        connectedAt: conn.connected_at || undefined,
+        metadata: (conn.metadata as Record<string, unknown>) || undefined,
+      };
+    }
+
+    return NextResponse.json({ status, unipile });
   } catch {
     return NextResponse.json(
       { error: "Erreur lors de la recuperation du statut" },

@@ -4,8 +4,9 @@ import React from "react";
 import { cn } from "@/lib/utils/cn";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader2, Share2, Download, RefreshCw } from "lucide-react";
+import { Loader2, Share2, Download, RefreshCw, Send } from "lucide-react";
 import { toast } from "sonner";
+import { UnipilePublishDialog } from "@/components/shared/unipile-publish-dialog";
 
 interface SocialAssetsData {
   testimonial_cards?: Array<{
@@ -55,6 +56,8 @@ export function SocialAssetsGenerator({ initialData }: Props) {
   const [data, setData] = React.useState<SocialAssetsData | null>(initialData || null);
   const [loading, setLoading] = React.useState(false);
   const [assetType, setAssetType] = React.useState<string>("Bannières");
+  const [publishDialogOpen, setPublishDialogOpen] = React.useState(false);
+  const [publishContent, setPublishContent] = React.useState("");
 
   const generate = async () => {
     setLoading(true);
@@ -140,6 +143,17 @@ export function SocialAssetsGenerator({ initialData }: Props) {
           <Button size="sm" variant="outline" onClick={copyAll}>
             <Download className="h-3.5 w-3.5 mr-1.5" />
             Copier tout
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => {
+              setPublishContent(JSON.stringify(data, null, 2));
+              setPublishDialogOpen(true);
+            }}
+          >
+            <Send className="h-3.5 w-3.5 mr-1.5" />
+            Publier via Unipile
           </Button>
           <Button size="sm" onClick={generate} disabled={loading}>
             {loading && <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />}
@@ -236,6 +250,12 @@ export function SocialAssetsGenerator({ initialData }: Props) {
           </div>
         </section>
       )}
+
+      <UnipilePublishDialog
+        open={publishDialogOpen}
+        onOpenChange={setPublishDialogOpen}
+        content={publishContent}
+      />
     </div>
   );
 }

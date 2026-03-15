@@ -27,6 +27,7 @@ import {
 import { toast } from "sonner";
 import { GenerationHistory } from "@/components/shared/generation-history";
 import { LogoGenerator } from "@/components/brand/logo-generator";
+import { BrandKitExport } from "@/components/brand/brand-kit-export";
 import type { BrandIdentityResult } from "@/lib/ai/prompts/brand-identity";
 import { UpgradeWall } from "@/components/shared/upgrade-wall";
 
@@ -93,6 +94,9 @@ export default function BrandPage() {
           setOfferId(brand.offer_id);
 
           // Reconstruct generated data from DB
+          console.log("[Brand Debug] brand_names raw:", JSON.stringify(brand.brand_names));
+          console.log("[Brand Debug] art_direction raw:", JSON.stringify(brand.art_direction));
+          console.log("[Brand Debug] brand_kit raw:", JSON.stringify(brand.brand_kit));
           const brandNames = brand.brand_names as unknown as BrandIdentityResult["noms"] | null;
           const artDirection = brand.art_direction as unknown as BrandIdentityResult["direction_artistique"] | null;
           let logoConcept: BrandIdentityResult["logo_concept"] | null = null;
@@ -410,7 +414,13 @@ export default function BrandPage() {
             />
           )}
           {activeTab === "kit" && (
-            <BrandKitView kit={generated.brand_kit} />
+            <div className="space-y-6">
+              <BrandKitExport
+                brandName={selectedName || generated.noms?.[0]?.name || null}
+                generated={generated}
+              />
+              <BrandKitView kit={generated.brand_kit} />
+            </div>
           )}
         </>
       )}
@@ -425,7 +435,25 @@ function BrandKitView({
 }: {
   kit: BrandIdentityResult["brand_kit"] | null;
 }) {
-  if (!kit) {
+  // Normalize: handle AI returning French/alternative keys
+  const normalized = React.useMemo(() => {
+    if (!kit) return null;
+    const raw = kit as Record<string, unknown>;
+    const toStrArr = (v: unknown): string[] => {
+      if (!Array.isArray(v)) return [];
+      return v.map((item) => (typeof item === "string" ? item : JSON.stringify(item)));
+    };
+    return {
+      mission: String(raw.mission || ""),
+      vision: String(raw.vision || ""),
+      valeurs: toStrArr(raw.valeurs || raw.values || raw.valeur || []),
+      ton: String(raw.ton || raw.tone || raw.ton_de_communication || ""),
+      do_list: toStrArr(raw.do_list || raw.do || raw.a_faire || []),
+      dont_list: toStrArr(raw.dont_list || raw.dont || raw.a_ne_pas_faire || []),
+    };
+  }, [kit]);
+
+  if (!normalized) {
     return (
       <div className="text-center py-12">
         <BookOpen className="h-12 w-12 text-text-muted mx-auto mb-3" />
@@ -443,7 +471,7 @@ function BrandKitView({
             <CardTitle className="text-base">Mission</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-text-secondary">{kit.mission}</p>
+            <p className="text-sm text-text-secondary">{normalized.mission || "—"}</p>
           </CardContent>
         </Card>
         <Card>
@@ -451,72 +479,78 @@ function BrandKitView({
             <CardTitle className="text-base">Vision</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-text-secondary">{kit.vision}</p>
+            <p className="text-sm text-text-secondary">{normalized.vision || "—"}</p>
           </CardContent>
         </Card>
       </div>
 
       {/* Values */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Valeurs</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-wrap gap-2">
-            {kit.valeurs.map((v, i) => (
-              <Badge key={i} variant="default">
-                {typeof v === "string" ? v : JSON.stringify(v)}
-              </Badge>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+      {normalized.valeurs.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Valeurs</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-wrap gap-2">
+              {normalized.valeurs.map((v, i) => (
+                <Badge key={i} variant="default">
+                  {v}
+                </Badge>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Tone */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Ton de communication</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-text-secondary">{kit.ton}</p>
-        </CardContent>
-      </Card>
+      {normalized.ton && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Ton de communication</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-text-secondary">{normalized.ton}</p>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Do / Don't */}
-      <div className="grid gap-4 sm:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base">
-              <CheckCircle className="h-4 w-4 text-accent" />
-              À faire
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            {kit.do_list.map((item, i) => (
-              <div key={i} className="flex items-start gap-2">
-                <CheckCircle className="h-3.5 w-3.5 text-accent mt-0.5 shrink-0" />
-                <p className="text-sm text-text-secondary">{typeof item === "string" ? item : JSON.stringify(item)}</p>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base">
-              <XCircle className="h-4 w-4 text-danger" />
-              À ne pas faire
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            {kit.dont_list.map((item, i) => (
-              <div key={i} className="flex items-start gap-2">
-                <XCircle className="h-3.5 w-3.5 text-danger mt-0.5 shrink-0" />
-                <p className="text-sm text-text-secondary">{typeof item === "string" ? item : JSON.stringify(item)}</p>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
-      </div>
+      {(normalized.do_list.length > 0 || normalized.dont_list.length > 0) && (
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-base">
+                <CheckCircle className="h-4 w-4 text-accent" />
+                À faire
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              {normalized.do_list.map((item, i) => (
+                <div key={i} className="flex items-start gap-2">
+                  <CheckCircle className="h-3.5 w-3.5 text-accent mt-0.5 shrink-0" />
+                  <p className="text-sm text-text-secondary">{item}</p>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-base">
+                <XCircle className="h-4 w-4 text-danger" />
+                À ne pas faire
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              {normalized.dont_list.map((item, i) => (
+                <div key={i} className="flex items-start gap-2">
+                  <XCircle className="h-3.5 w-3.5 text-danger mt-0.5 shrink-0" />
+                  <p className="text-sm text-text-secondary">{item}</p>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </div>
   );
 }

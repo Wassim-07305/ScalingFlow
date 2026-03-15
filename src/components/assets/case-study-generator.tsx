@@ -15,7 +15,9 @@ import {
   TrendingUp,
   Quote,
   Star,
+  Send,
 } from "lucide-react";
+import { UnipilePublishDialog } from "@/components/shared/unipile-publish-dialog";
 
 interface CaseStudyGeneratorProps {
   className?: string;
@@ -30,6 +32,8 @@ export function CaseStudyGenerator({ className, initialData }: CaseStudyGenerato
   const [error, setError] = React.useState<string | null>(null);
   const [metric, setMetric] = React.useState("");
   const [value, setValue] = React.useState("");
+  const [publishDialogOpen, setPublishDialogOpen] = React.useState(false);
+  const [publishContent, setPublishContent] = React.useState("");
 
   React.useEffect(() => {
     if (initialData) setCaseStudy(initialData);
@@ -116,11 +120,32 @@ export function CaseStudyGenerator({ className, initialData }: CaseStudyGenerato
   return (
     <div className={cn("space-y-6", className)}>
       {/* Title */}
-      <div className="flex items-center gap-3 flex-wrap">
-        <h3 className="font-semibold text-text-primary text-lg">
-          {caseStudy.title || "Étude de cas"}
-        </h3>
-        <Badge variant="purple">Étude de cas</Badge>
+      <div className="flex items-center justify-between flex-wrap gap-3">
+        <div className="flex items-center gap-3">
+          <h3 className="font-semibold text-text-primary text-lg">
+            {caseStudy.title || "Étude de cas"}
+          </h3>
+          <Badge variant="purple">Étude de cas</Badge>
+        </div>
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => {
+            const text = [
+              caseStudy.title,
+              problem.client_profile && `Profil : ${problem.client_profile}`,
+              problem.initial_situation && `Situation : ${problem.initial_situation}`,
+              solution.approach && `Solution : ${solution.approach}`,
+              results.roi && `ROI : ${results.roi}`,
+              testimonial.quote && `"${testimonial.quote}"`,
+            ].filter(Boolean).join("\n\n");
+            setPublishContent(text);
+            setPublishDialogOpen(true);
+          }}
+        >
+          <Send className="h-3.5 w-3.5 mr-1.5" />
+          Partager
+        </Button>
       </div>
 
       {/* Problem section */}
@@ -315,6 +340,12 @@ export function CaseStudyGenerator({ className, initialData }: CaseStudyGenerato
           </CardContent>
         </Card>
       )}
+
+      <UnipilePublishDialog
+        open={publishDialogOpen}
+        onOpenChange={setPublishDialogOpen}
+        content={publishContent}
+      />
     </div>
   );
 }

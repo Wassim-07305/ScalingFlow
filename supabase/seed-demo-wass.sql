@@ -367,10 +367,10 @@ INSERT INTO activity_log (user_id, activity_type, activity_data, created_at) VAL
 
 -- ─── 20. AGENT CONVERSATIONS ────────────────────────────
 INSERT INTO agent_conversations (user_id, agent_type, title, messages, created_at) VALUES
-(demo_user_id, 'strategist', 'Stratégie pricing AutoGrowth',
+(demo_user_id, 'strategie', 'Stratégie pricing AutoGrowth',
  '[{"role": "user", "content": "Je veux passer de 4.5K à 20K/mois. Comment structurer mon offre récurrente ?"}, {"role": "assistant", "content": "3 axes : 1. Setup fee 2997€ + maintenance 997€/mois 2. Upsell Content Automation 3. Viser 8-10 clients récurrents."}]'::jsonb,
  NOW() - INTERVAL '15 days'),
-(demo_user_id, 'ad_expert', 'Optimisation campagne LinkedIn Ads',
+(demo_user_id, 'ads', 'Optimisation campagne LinkedIn Ads',
  '[{"role": "user", "content": "Mon CPA est à 15€ mais le volume de leads est faible."}, {"role": "assistant", "content": "Élargis ton audience : ajoute les fondateurs de startups 10-50 personnes. Teste un angle vidéo témoignage client."}]'::jsonb,
  NOW() - INTERVAL '8 days'),
 (demo_user_id, 'recherche', 'Analyse concurrence automatisation IA France',

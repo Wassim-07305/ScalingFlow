@@ -7,10 +7,11 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AILoading } from "@/components/shared/ai-loading";
 import { GlowCard } from "@/components/shared/glow-card";
-import { Sparkles, Copy, Eye, MessageCircle, GraduationCap, Megaphone, Heart, BookOpen } from "lucide-react";
+import { Sparkles, Copy, Eye, MessageCircle, GraduationCap, Megaphone, Heart, BookOpen, Send } from "lucide-react";
 import { toast } from "sonner";
 import type { StoriesResult } from "@/lib/ai/prompts/stories-scripts";
 import { UpgradeWall } from "@/components/shared/upgrade-wall";
+import { UnipilePublishDialog } from "@/components/shared/unipile-publish-dialog";
 
 const STORY_THEMES = [
   { key: "educatif", label: "Éducatif" },
@@ -60,6 +61,8 @@ export function StoriesGenerator({ className, initialData }: StoriesGeneratorPro
   const [error, setError] = React.useState<string | null>(null);
   const [copiedIndex, setCopiedIndex] = React.useState<number | null>(null);
   const [usageLimited, setUsageLimited] = React.useState<{currentUsage: number; limit: number} | null>(null);
+  const [publishDialogOpen, setPublishDialogOpen] = React.useState(false);
+  const [publishContent, setPublishContent] = React.useState("");
 
   // Form state
   const [storyTheme, setStoryTheme] = React.useState("educatif");
@@ -219,10 +222,26 @@ export function StoriesGenerator({ className, initialData }: StoriesGeneratorPro
                   <Icon className="h-4 w-4 text-text-muted" />
                   <Badge variant={config.badge}>{config.label}</Badge>
                 </div>
-                <Button variant="ghost" size="sm" onClick={() => copyStory(story, i)}>
-                  <Copy className="h-3 w-3 mr-1" />
-                  {copiedIndex === i ? "Copié !" : "Copier"}
-                </Button>
+                <div className="flex items-center gap-1">
+                  <Button variant="ghost" size="sm" onClick={() => copyStory(story, i)}>
+                    <Copy className="h-3 w-3 mr-1" />
+                    {copiedIndex === i ? "Copié !" : "Copier"}
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    title="Publier via Unipile"
+                    onClick={() => {
+                      const text = story.slides
+                        .map((s, j) => `Slide ${j + 1}:\n${s.text}`)
+                        .join("\n\n");
+                      setPublishContent(text);
+                      setPublishDialogOpen(true);
+                    }}
+                  >
+                    <Send className="h-3 w-3" />
+                  </Button>
+                </div>
               </div>
 
               {/* Slides */}
@@ -262,6 +281,12 @@ export function StoriesGenerator({ className, initialData }: StoriesGeneratorPro
           );
         })}
       </div>
+
+      <UnipilePublishDialog
+        open={publishDialogOpen}
+        onOpenChange={setPublishDialogOpen}
+        content={publishContent}
+      />
     </div>
   );
 }

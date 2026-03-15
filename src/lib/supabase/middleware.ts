@@ -3,6 +3,7 @@ import { NextResponse, type NextRequest } from "next/server";
 
 export async function updateSession(request: NextRequest) {
   const publicRoutes = ["/login", "/register", "/welcome", "/forgot-password", "/reset-password"];
+  const isPublicFunnel = request.nextUrl.pathname.startsWith("/f/");
   const isPublicRoute = publicRoutes.some(
     (route) => request.nextUrl.pathname === route
   );
@@ -50,7 +51,8 @@ export async function updateSession(request: NextRequest) {
     } = await supabase.auth.getUser();
 
     // Redirect unauthenticated users to landing page
-    if (!user && !isPublicRoute) {
+    // API routes handle their own auth (return 401 JSON, not redirect)
+    if (!user && !isPublicRoute && !isPublicFunnel && !isApiRoute) {
       const url = request.nextUrl.clone();
       url.pathname = "/welcome";
       return NextResponse.redirect(url);

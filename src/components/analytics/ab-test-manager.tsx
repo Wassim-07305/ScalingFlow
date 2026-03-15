@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils/cn";
 import { useUser } from "@/hooks/use-user";
+import { createClient } from "@/lib/supabase/client";
 import {
   Plus,
   FlaskConical,
@@ -33,6 +34,7 @@ import {
   Pause,
   Play,
   CheckCircle2,
+  Loader2,
 } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
@@ -87,25 +89,27 @@ const DEMO_TESTS: ABTest[] = [
   },
 ];
 
-// ─── localStorage helpers ────────────────────────────────────
-function getStorageKey(userId: string) {
-  return `sf_analytics_ab_tests_${userId}`;
-}
-
-function loadTests(userId: string): ABTest[] {
-  if (typeof window === "undefined") return [];
-  try {
-    const raw = localStorage.getItem(getStorageKey(userId));
-    if (raw) return JSON.parse(raw) as ABTest[];
-  } catch {
-    // ignore
-  }
-  return [];
-}
-
-function saveTests(userId: string, tests: ABTest[]) {
-  if (typeof window === "undefined") return;
-  localStorage.setItem(getStorageKey(userId), JSON.stringify(tests));
+// ─── Supabase helpers ────────────────────────────────────────
+function mapRowToTest(row: Record<string, unknown>): ABTest {
+  return {
+    id: row.id as string,
+    name: row.name as string,
+    variantA: {
+      description: (row.variant_a_description as string) || "",
+      conversions: (row.variant_a_conversions as number) || 0,
+      traffic: (row.variant_a_traffic as number) || 0,
+    },
+    variantB: {
+      description: (row.variant_b_description as string) || "",
+      conversions: (row.variant_b_conversions as number) || 0,
+      traffic: (row.variant_b_traffic as number) || 0,
+    },
+    metric: (row.metric as string) || "Taux de conversion",
+    targetSampleSize: (row.target_sample_size as number) || 500,
+    status: (row.status as "active" | "paused" | "completed") || "active",
+    createdAt: (row.created_at as string) || new Date().toISOString(),
+    winner: (row.winner as "A" | "B" | null) || null,
+  };
 }
 
 // ─── Stats helpers ───────────────────────────────────────────
@@ -139,8 +143,10 @@ function getProgressPct(test: ABTest): number {
 // ─── Main component ──────────────────────────────────────────
 export function ABTestManager() {
   const { user } = useUser();
+  const supabase = createClient();
   const [tests, setTests] = useState<ABTest[]>([]);
   const [isDemo, setIsDemo] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [showUpdateForm, setShowUpdateForm] = useState<string | null>(null);
   const [newTest, setNewTest] = useState({
@@ -159,17 +165,46 @@ export function ABTestManager() {
 
   useEffect(() => {
     if (!user) return;
-    const stored = loadTests(user.id);
-    if (stored.length > 0) {
-      setTests(stored);
-      setIsDemo(false);
-    } else {
-      setTests(DEMO_TESTS);
-      setIsDemo(true);
-    }
+    (async () => {
+      setLoading(true);
+      const { data } = await supabase
+        .from("ab_tests")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false });
+
+      if (data && data.length > 0) {
+        setTests(data.map(mapRowToTest));
+        setIsDemo(false);
+      } else {
+        setTests(DEMO_TESTS);
+        setIsDemo(true);
+      }
+      setLoading(false);
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
-  const handleCreate = useCallback(() => {
+  const saveToSupabase = useCallback(async (test: ABTest) => {
+    await supabase.from("ab_tests").upsert({
+      id: test.id,
+      user_id: user!.id,
+      name: test.name,
+      metric: test.metric,
+      target_sample_size: test.targetSampleSize,
+      status: test.status,
+      winner: test.winner,
+      variant_a_description: test.variantA.description,
+      variant_a_conversions: test.variantA.conversions,
+      variant_a_traffic: test.variantA.traffic,
+      variant_b_description: test.variantB.description,
+      variant_b_conversions: test.variantB.conversions,
+      variant_b_traffic: test.variantB.traffic,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
+
+  const handleCreate = useCallback(async () => {
     if (!user || !newTest.name.trim()) return;
 
     const test: ABTest = {
@@ -187,15 +222,16 @@ export function ABTestManager() {
     const updated = isDemo ? [test] : [...tests, test];
     setTests(updated);
     setIsDemo(false);
-    saveTests(user.id, updated);
+    await saveToSupabase(test);
     setShowCreateForm(false);
     setNewTest({ name: "", variantADesc: "", variantBDesc: "", metric: "Taux de conversion", targetSampleSize: 500 });
     toast.success("Test A/B créé !");
-  }, [user, newTest, tests, isDemo]);
+  }, [user, newTest, tests, isDemo, saveToSupabase]);
 
   const handleUpdateStats = useCallback(
-    (testId: string) => {
+    async (testId: string) => {
       if (!user) return;
+      let updatedTest: ABTest | null = null;
       const updated = tests.map((t) => {
         if (t.id !== testId) return t;
         const newA = {
@@ -217,38 +253,41 @@ export function ABTestManager() {
             const rateB = calcConversionRate(newB.conversions, newB.traffic);
             const winner = rateA > rateB ? "A" as const : rateB > rateA ? "B" as const : null;
             if (winner) {
-              toast.success(`Auto-complete : Variante ${winner} gagnante (${(newA.traffic + newB.traffic)} visites, confiance ${conf.toFixed(0)}%)`);
-              return { ...t, variantA: newA, variantB: newB, status: "completed" as const, winner };
+              toast.success(`Terminé automatiquement : Variante ${winner} gagnante (${(newA.traffic + newB.traffic)} visites, confiance ${conf.toFixed(0)}%)`);
+              updatedTest = { ...t, variantA: newA, variantB: newB, status: "completed" as const, winner };
+              return updatedTest;
             }
           }
         }
 
-        return { ...t, variantA: newA, variantB: newB };
+        updatedTest = { ...t, variantA: newA, variantB: newB };
+        return updatedTest;
       });
       setTests(updated);
-      saveTests(user.id, updated);
+      if (updatedTest && !isDemo) await saveToSupabase(updatedTest);
       setShowUpdateForm(null);
       setUpdateData({ variantAConversions: 0, variantATraffic: 0, variantBConversions: 0, variantBTraffic: 0 });
       toast.success("Statistiques mises à jour");
     },
-    [user, tests, updateData]
+    [user, tests, updateData, isDemo, saveToSupabase]
   );
 
   const handleToggleStatus = useCallback(
-    (testId: string) => {
+    async (testId: string) => {
       if (!user) return;
       const updated = tests.map((t) => {
         if (t.id !== testId) return t;
         return { ...t, status: t.status === "active" ? "paused" as const : "active" as const };
       });
       setTests(updated);
-      if (!isDemo) saveTests(user.id, updated);
+      const toggled = updated.find((t) => t.id === testId);
+      if (!isDemo && toggled) await saveToSupabase(toggled);
     },
-    [user, tests, isDemo]
+    [user, tests, isDemo, saveToSupabase]
   );
 
   const handleComplete = useCallback(
-    (testId: string) => {
+    async (testId: string) => {
       if (!user) return;
       const updated = tests.map((t) => {
         if (t.id !== testId) return t;
@@ -258,20 +297,24 @@ export function ABTestManager() {
         return { ...t, status: "completed" as const, winner };
       });
       setTests(updated);
-      if (!isDemo) saveTests(user.id, updated);
-      toast.success("Test termine !");
+      const completed = updated.find((t) => t.id === testId);
+      if (!isDemo && completed) await saveToSupabase(completed);
+      toast.success("Test terminé !");
     },
-    [user, tests, isDemo]
+    [user, tests, isDemo, saveToSupabase]
   );
 
   const handleDelete = useCallback(
-    (testId: string) => {
+    async (testId: string) => {
       if (!user) return;
       const updated = tests.filter((t) => t.id !== testId);
       setTests(updated);
-      if (!isDemo) saveTests(user.id, updated);
+      if (!isDemo) {
+        await supabase.from("ab_tests").delete().eq("id", testId);
+      }
       toast.success("Test supprimé");
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [user, tests, isDemo]
   );
 
@@ -283,7 +326,8 @@ export function ABTestManager() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          {isDemo && <Badge variant="yellow">Donnees de demonstration</Badge>}
+          {loading && <Loader2 className="h-4 w-4 animate-spin text-text-muted" />}
+          {isDemo && !loading && <Badge variant="yellow">Données de démonstration</Badge>}
         </div>
         <Button onClick={() => setShowCreateForm(true)}>
           <Plus className="h-4 w-4 mr-1" />
@@ -426,7 +470,7 @@ export function ABTestManager() {
                         </Badge>
                       </div>
                       <div className="flex items-center gap-1">
-                        <span className="text-text-muted">Metrique :</span>
+                        <span className="text-text-muted">Métrique :</span>
                         <span className="text-text-secondary">{test.metric}</span>
                       </div>
                     </div>
@@ -451,7 +495,7 @@ export function ABTestManager() {
                   {/* Auto-complete info */}
                   {test.variantA.traffic >= 100 && test.variantB.traffic >= 100 && confidence >= 90 && (
                     <div className="mt-2 p-2 rounded-lg bg-accent/10 border border-accent/20 text-xs text-accent">
-                      Ce test sera automatiquement complete à la prochaine mise à jour (100+ visites par variante atteint, confiance {">"}90%)
+                      Ce test sera automatiquement complété à la prochaine mise à jour (100+ visites par variante atteint, confiance {">"}90%)
                     </div>
                   )}
 
@@ -479,7 +523,7 @@ export function ABTestManager() {
       {completedTests.length > 0 && (
         <div className="space-y-3">
           <h3 className="text-base font-semibold text-text-primary">
-            Tests termines ({completedTests.length})
+            Tests terminés ({completedTests.length})
           </h3>
           {completedTests.map((test) => {
             const rateA = calcConversionRate(test.variantA.conversions, test.variantA.traffic);
@@ -553,7 +597,7 @@ export function ABTestManager() {
           <DialogHeader>
             <DialogTitle>Nouveau test A/B</DialogTitle>
             <DialogDescription>
-              Définissez les deux variantes à comparer et la métrique à suivre.
+              Définis les deux variantes à comparer et la métrique à suivre.
             </DialogDescription>
           </DialogHeader>
 

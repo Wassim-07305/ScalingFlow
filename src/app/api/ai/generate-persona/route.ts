@@ -102,7 +102,7 @@ export async function POST(req: NextRequest) {
 
     const result = await generateJSON<PersonaForgeResult>({
       prompt,
-      maxTokens: 8192,
+      maxTokens: 10000,
       temperature: 0.7,
     });
 

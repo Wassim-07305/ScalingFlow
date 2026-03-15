@@ -23,7 +23,9 @@ import {
   Crown,
   Zap,
   RefreshCw,
+  BookOpen,
 } from "lucide-react";
+import { KnowledgeBaseAdmin } from "@/components/admin/knowledge-base-admin";
 import { formatDistanceToNow } from "date-fns";
 import { fr } from "date-fns/locale";
 
@@ -492,6 +494,19 @@ export default function AdminPage() {
               })}
             </div>
           )}
+        </CardContent>
+      </Card>
+
+      {/* ─── Base de connaissances ─────────────────────────────── */}
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <BookOpen className="h-5 w-5 text-accent" />
+            Base de connaissances
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <KnowledgeBaseAdmin />
         </CardContent>
       </Card>
 

@@ -7,8 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AILoading } from "@/components/shared/ai-loading";
 import { GlowCard } from "@/components/shared/glow-card";
-import { Sparkles, Copy, Linkedin, Twitter, Instagram, Pencil, Check } from "lucide-react";
+import { Sparkles, Copy, Linkedin, Twitter, Instagram, Pencil, Check, Send } from "lucide-react";
 import { UpgradeWall } from "@/components/shared/upgrade-wall";
+import { UnipilePublishDialog } from "@/components/shared/unipile-publish-dialog";
 import { toast } from "sonner";
 
 const PLATFORMS = [
@@ -38,6 +39,8 @@ export function PostGenerator({ className }: PostGeneratorProps) {
   const [copiedIndex, setCopiedIndex] = React.useState<number | null>(null);
   const [usageLimited, setUsageLimited] = React.useState<{currentUsage: number; limit: number} | null>(null);
   const [editingIndex, setEditingIndex] = React.useState<number | null>(null);
+  const [publishDialogOpen, setPublishDialogOpen] = React.useState(false);
+  const [publishContent, setPublishContent] = React.useState("");
 
   // Form state
   const [topic, setTopic] = React.useState("");
@@ -220,6 +223,17 @@ export function PostGenerator({ className }: PostGeneratorProps) {
                         <Copy className="h-3 w-3 mr-1" />
                         {copiedIndex === i ? "Copié !" : "Copier"}
                       </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        title="Publier via Unipile"
+                        onClick={() => {
+                          setPublishContent(post.content || post.text || "");
+                          setPublishDialogOpen(true);
+                        }}
+                      >
+                        <Send className="h-3 w-3" />
+                      </Button>
                     </div>
                   </div>
                   {post.title && !isEditing && (
@@ -256,6 +270,12 @@ export function PostGenerator({ className }: PostGeneratorProps) {
               );
             })}
           </div>
+
+          <UnipilePublishDialog
+            open={publishDialogOpen}
+            onOpenChange={setPublishDialogOpen}
+            content={publishContent}
+          />
         </>
       )}
     </div>

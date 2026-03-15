@@ -421,7 +421,6 @@ export function OnboardingFlow() {
     }
     const market = analysisResult.markets[marketIndex];
     const payload = {
-      onboarding_completed: true,
       onboarding_step: totalSteps,
       ...buildProfilePayload(formData),
       selected_market: market.name,
@@ -429,28 +428,19 @@ export function OnboardingFlow() {
       niche: market.name,
     };
 
-    console.log("[onboarding] Saving profile with payload:", JSON.stringify(payload, null, 2));
+    // Use server-side API to bypass RLS and ensure reliable save
+    const res = await fetch("/api/onboarding/complete", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
 
-    const { error: dbError } = await supabase
-      .from("profiles")
-      .update(payload)
-      .eq("id", user.id);
-
-    if (dbError) {
-      console.error("[onboarding] DB error:", dbError);
-      const msg = `Erreur lors de la sauvegarde : ${dbError.message}`;
+    if (!res.ok) {
+      const errorBody = await res.json().catch(() => null);
+      const msg = errorBody?.error || `Erreur serveur (${res.status})`;
       setError(msg);
       throw new Error(msg);
     }
-
-    console.log("[onboarding] Profile saved successfully, redirecting...");
-
-    // Attribuer XP pour l'onboarding (non bloquant)
-    fetch("/api/gamification/award", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ activityType: "onboarding.completed" }),
-    }).catch(() => {});
 
     try {
       confetti({

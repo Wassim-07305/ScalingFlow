@@ -70,6 +70,7 @@ interface AIChatProps {
   agentName: string;
   conversationId?: string | null;
   initialMessages?: ChatMessage[];
+  suggestedQuestions?: string[];
   onConversationSaved?: (id: string, title: string) => void;
   className?: string;
 }
@@ -79,6 +80,7 @@ export function AIChat({
   agentName,
   conversationId: initialConversationId,
   initialMessages,
+  suggestedQuestions,
   onConversationSaved,
   className,
 }: AIChatProps) {
@@ -383,14 +385,30 @@ export function AIChat({
         {/* Messages */}
         <div className="flex-1 overflow-y-auto p-4 space-y-4" role="log" aria-live="polite">
           {messages.length === 0 && (
-            <div className="flex flex-col items-center justify-center h-full text-center">
+            <div className="flex flex-col items-center justify-center h-full text-center px-4">
               <Bot className="h-12 w-12 text-text-muted mb-3" aria-hidden="true" />
               <p className="text-text-secondary font-medium">
                 {agentName}
               </p>
-              <p className="text-sm text-text-muted mt-1">
+              <p className="text-sm text-text-muted mt-1 mb-4">
                 Pose-moi une question pour commencer.
               </p>
+              {suggestedQuestions && suggestedQuestions.length > 0 && (
+                <div className="flex flex-wrap justify-center gap-2 max-w-lg">
+                  {suggestedQuestions.map((q, i) => (
+                    <button
+                      key={i}
+                      onClick={() => {
+                        setInput(q);
+                        setTimeout(() => inputRef.current?.focus(), 50);
+                      }}
+                      className="text-xs px-3 py-1.5 rounded-lg bg-bg-tertiary text-text-secondary hover:text-accent hover:bg-accent/10 border border-border-default transition-colors text-left"
+                    >
+                      {q}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           )}
 

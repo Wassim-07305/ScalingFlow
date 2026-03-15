@@ -7,10 +7,11 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AILoading } from "@/components/shared/ai-loading";
 import { GlowCard } from "@/components/shared/glow-card";
-import { Sparkles, Copy, ChevronDown, ChevronUp, Clock, Pencil, Check, Film } from "lucide-react";
+import { Sparkles, Copy, ChevronDown, ChevronUp, Clock, Pencil, Check, Film, Send } from "lucide-react";
 import { toast } from "sonner";
 import type { ReelsScriptsResult } from "@/lib/ai/prompts/reels-scripts";
 import { UpgradeWall } from "@/components/shared/upgrade-wall";
+import { UnipilePublishDialog } from "@/components/shared/unipile-publish-dialog";
 
 const HOOK_STYLES = [
   { key: "curiosite", label: "Curiosité" },
@@ -42,6 +43,8 @@ export function ReelsGenerator({ className, initialData }: ReelsGeneratorProps) 
   const [copiedIndex, setCopiedIndex] = React.useState<number | null>(null);
   const [usageLimited, setUsageLimited] = React.useState<{currentUsage: number; limit: number} | null>(null);
   const [editingIndex, setEditingIndex] = React.useState<number | null>(null);
+  const [publishDialogOpen, setPublishDialogOpen] = React.useState(false);
+  const [publishContent, setPublishContent] = React.useState("");
 
   // Form state
   const [hookStyle, setHookStyle] = React.useState("curiosite");
@@ -248,6 +251,17 @@ export function ReelsGenerator({ className, initialData }: ReelsGeneratorProps) 
                     <Copy className="h-3 w-3 mr-1" />
                     {copiedIndex === i ? "Copié !" : "Copier"}
                   </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    title="Publier via Unipile"
+                    onClick={() => {
+                      setPublishContent(`Hook: ${script.hook}\n\n${script.corps}\n\nCTA: ${script.cta}\n\n${script.hashtags.join(" ")}`);
+                      setPublishDialogOpen(true);
+                    }}
+                  >
+                    <Send className="h-3 w-3" />
+                  </Button>
                 </div>
               </div>
 
@@ -330,6 +344,12 @@ export function ReelsGenerator({ className, initialData }: ReelsGeneratorProps) 
           );
         })}
       </div>
+
+      <UnipilePublishDialog
+        open={publishDialogOpen}
+        onOpenChange={setPublishDialogOpen}
+        content={publishContent}
+      />
     </div>
   );
 }

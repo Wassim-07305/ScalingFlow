@@ -63,6 +63,7 @@ const GENERATION_LABELS: Record<string, { label: string; link: string }> = {
   "generation.post": { label: "Post", link: "/content" },
   "generation.roadmap": { label: "Roadmap", link: "/roadmap" },
   "generation.vault_analysis": { label: "Analyse vault", link: "/vault" },
+  "generation.business_audit": { label: "Audit business", link: "/market" },
   "generation.chat": { label: "Chat IA", link: "/assistant" },
 };
 

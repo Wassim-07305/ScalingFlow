@@ -470,7 +470,7 @@ INSERT INTO activity_log (user_id, activity_type, activity_data, created_at) VAL
 
 -- ─── 20. AGENT CONVERSATIONS ────────────────────────────
 INSERT INTO agent_conversations (user_id, agent_type, title, messages, created_at) VALUES
-(demo_user_id, 'strategist', 'Stratégie de scaling Q1 2026',
+(demo_user_id, 'strategie', 'Stratégie de scaling Q1 2026',
  '[
    {"role": "user", "content": "Je veux passer de 8.5K à 30K/mois d''ici juin. Par où commencer ?"},
    {"role": "assistant", "content": "Excellente ambition ! Basé sur ton profil, je recommande 3 axes prioritaires :\n\n1. **Optimiser ton funnel actuel** — ton taux de conversion optin (25%) est bon, mais on peut viser 30%+ avec un A/B test sur le headline.\n\n2. **Augmenter le budget ads** — ton ROAS est stable à 3.8x. Avec un budget de 75€/jour (au lieu de 50€), tu devrais générer 15-20 leads/jour.\n\n3. **Recruter un closer** — tu perds ~30% des calls qualifiés. Un closer dédié peut doubler ton taux de closing.\n\nVeux-tu qu''on détaille un de ces axes ?"},
@@ -479,7 +479,7 @@ INSERT INTO agent_conversations (user_id, agent_type, title, messages, created_a
  ]'::jsonb,
  NOW() - INTERVAL '15 days'),
 
-(demo_user_id, 'ad_expert', 'Optimisation campagne Meta Ads',
+(demo_user_id, 'ads', 'Optimisation campagne Meta Ads',
  '[
    {"role": "user", "content": "Ma campagne retargeting a un ROAS de 5.1x mais le volume est faible. Comment augmenter ?"},
    {"role": "assistant", "content": "Un ROAS de 5.1x en retargeting, c''est excellent ! Pour augmenter le volume sans diluer la performance :\n\n1. **Élargis ta fenêtre de retargeting** — passe de 7 jours à 30 jours de visiteurs.\n2. **Ajoute des audiences custom** — engagement Instagram 90 jours, viewers vidéo 75%.\n3. **Crée un DPA dynamique** — montre le contenu consulté aux visiteurs.\n\nAttention : le ROAS va probablement baisser à 3.5-4x en élargissant, mais le volume de conversions augmentera. C''est un bon trade-off."}

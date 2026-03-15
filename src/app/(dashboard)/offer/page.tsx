@@ -10,16 +10,22 @@ import { GenerationHistory } from "@/components/shared/generation-history";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
 import { useUser } from "@/hooks/use-user";
-import { Sparkles, Crosshair, BarChart3, History, DollarSign, Settings, Gift } from "lucide-react";
+import { Sparkles, Crosshair, BarChart3, History, DollarSign, Settings, Gift, Fingerprint, Calculator, Shield } from "lucide-react";
 import { toast } from "sonner";
 import { PricingBuilder } from "@/components/offer/pricing-builder";
+import { PricingCalculator } from "@/components/offer/pricing-calculator";
+import { MechanismGenerator } from "@/components/offer/mechanism-generator";
 import { DeliveryDesigner } from "@/components/offer/delivery-designer";
 import { OtoGenerator } from "@/components/offer/oto-generator";
+import { GuaranteeGenerator } from "@/components/offer/guarantee-generator";
 
 const TABS = [
   { key: "generate", label: "Générer", icon: Sparkles },
   { key: "positioning", label: "Positionnement", icon: Crosshair },
+  { key: "mechanism", label: "Mécanisme", icon: Fingerprint },
   { key: "pricing", label: "Pricing", icon: DollarSign },
+  { key: "pricing-calc", label: "Calculateur", icon: Calculator },
+  { key: "guarantee", label: "Garantie", icon: Shield },
   { key: "delivery", label: "Livraison", icon: Settings },
   { key: "oto", label: "Upsell (OTO)", icon: Gift },
   { key: "score", label: "Score", icon: BarChart3 },
@@ -150,6 +156,9 @@ export default function OfferPage() {
       {activeTab === "positioning" && (
         <CategoryOSWizard offerId={latestOfferId || undefined} />
       )}
+      {activeTab === "mechanism" && (
+        <MechanismGenerator offerId={latestOfferId || undefined} />
+      )}
       {activeTab === "pricing" && (
         <div className="space-y-4">
           <PricingBuilder
@@ -162,6 +171,12 @@ export default function OfferPage() {
             {savingPricing ? "Sauvegarde..." : "Sauvegarder le pricing"}
           </Button>
         </div>
+      )}
+      {activeTab === "pricing-calc" && (
+        <PricingCalculator />
+      )}
+      {activeTab === "guarantee" && (
+        <GuaranteeGenerator offerId={latestOfferId || undefined} />
       )}
       {activeTab === "delivery" && (
         <DeliveryDesigner offerId={latestOfferId || undefined} />

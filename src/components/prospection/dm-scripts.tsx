@@ -23,6 +23,7 @@ import {
   Instagram,
   Send,
 } from "lucide-react";
+import { UnipileSendDialog } from "@/components/shared/unipile-send-dialog";
 
 const PLATFORMS = [
   { key: "linkedin", label: "LinkedIn", icon: Linkedin },
@@ -61,6 +62,8 @@ export function DmScripts() {
   const [copied, setCopied] = React.useState(false);
   const [activePlatform, setActivePlatform] = React.useState<string>("linkedin");
   const [expandedMessage, setExpandedMessage] = React.useState<number | null>(0);
+  const [sendDialogOpen, setSendDialogOpen] = React.useState(false);
+  const [sendMessage, setSendMessage] = React.useState("");
 
   const handleGenerate = async () => {
     setLoading(true);
@@ -241,16 +244,29 @@ export function DmScripts() {
                         <p className="text-sm text-text-primary whitespace-pre-wrap pr-8">
                           {msg.message}
                         </p>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            copyMessage(msg.message);
-                          }}
-                          className="absolute top-2 right-2 p-1.5 rounded-md bg-bg-secondary hover:bg-accent/20 transition-colors"
-                          title="Copier le message"
-                        >
-                          <Copy className="h-3.5 w-3.5 text-text-muted" />
-                        </button>
+                        <div className="absolute top-2 right-2 flex items-center gap-1">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              copyMessage(msg.message);
+                            }}
+                            className="p-1.5 rounded-md bg-bg-secondary hover:bg-accent/20 transition-colors"
+                            title="Copier le message"
+                          >
+                            <Copy className="h-3.5 w-3.5 text-text-muted" />
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSendMessage(msg.message);
+                              setSendDialogOpen(true);
+                            }}
+                            className="p-1.5 rounded-md bg-bg-secondary hover:bg-accent/20 transition-colors"
+                            title="Envoyer via Unipile"
+                          >
+                            <Send className="h-3.5 w-3.5 text-accent" />
+                          </button>
+                        </div>
                       </div>
 
                       {/* Objectif */}
@@ -353,6 +369,13 @@ export function DmScripts() {
         <Button variant="outline" onClick={() => setResult(null)}>
           Régénérer les scripts
         </Button>
+
+        <UnipileSendDialog
+          open={sendDialogOpen}
+          onOpenChange={setSendDialogOpen}
+          message={sendMessage}
+          platformFilter={activePlatform}
+        />
       </div>
     );
   }

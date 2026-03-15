@@ -10,6 +10,8 @@ import { AttributionModel } from "@/components/analytics/attribution-model";
 import { LTVCACTracker } from "@/components/analytics/ltv-cac-tracker";
 import { MetricsHistory } from "@/components/analytics/metrics-history";
 import { GrowthTiers } from "@/components/analytics/growth-tiers";
+import { RevenueTracker } from "@/components/analytics/revenue-tracker";
+import { RealRoas } from "@/components/analytics/real-roas";
 import {
   BarChart3,
   Sparkles,
@@ -18,6 +20,8 @@ import {
   TrendingUp,
   History,
   Rocket,
+  Receipt,
+  Calculator,
 } from "lucide-react";
 
 const TABS = [
@@ -27,6 +31,8 @@ const TABS = [
   { key: "ab_testing", label: "A/B Testing", icon: FlaskConical },
   { key: "attribution", label: "Attribution", icon: GitBranch },
   { key: "ltv_cac", label: "LTV / CAC", icon: TrendingUp },
+  { key: "revenue", label: "Revenue & Attribution", icon: Receipt },
+  { key: "roas", label: "Vrai ROAS", icon: Calculator },
   { key: "history", label: "Historique", icon: History },
 ] as const;
 
@@ -47,6 +53,10 @@ export default function AnalyticsPage() {
         return <AttributionModel />;
       case "ltv_cac":
         return <LTVCACTracker />;
+      case "revenue":
+        return <RevenueTracker />;
+      case "roas":
+        return <RealRoas />;
       case "history":
         return <MetricsHistory />;
       default:

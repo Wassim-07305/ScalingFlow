@@ -6,8 +6,9 @@ import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AILoading } from "@/components/shared/ai-loading";
-import { Sparkles, Mail, ChevronDown, ChevronUp, Pencil, Check } from "lucide-react";
+import { Sparkles, Mail, ChevronDown, ChevronUp, Pencil, Check, Send } from "lucide-react";
 import { CopyExportBar } from "@/components/shared/copy-export-bar";
+import { UnipileSendDialog } from "@/components/shared/unipile-send-dialog";
 import { UpgradeWall } from "@/components/shared/upgrade-wall";
 import { toast } from "sonner";
 
@@ -32,6 +33,8 @@ export function EmailSequence({ className, initialData }: EmailSequenceProps) {
   const [expandedEmail, setExpandedEmail] = React.useState<number | null>(0);
   const [usageLimited, setUsageLimited] = React.useState<{currentUsage: number; limit: number} | null>(null);
   const [editingIndex, setEditingIndex] = React.useState<number | null>(null);
+  const [sendDialogOpen, setSendDialogOpen] = React.useState(false);
+  const [sendMessage, setSendMessage] = React.useState("");
 
   // Form state
   const [emailType, setEmailType] = React.useState("nurturing");
@@ -255,7 +258,18 @@ export function EmailSequence({ className, initialData }: EmailSequenceProps) {
                 </CardHeader>
                 {expandedEmail === i && (
                   <CardContent className="pt-0">
-                    <div className="flex items-center justify-end mb-2">
+                    <div className="flex items-center justify-end gap-1 mb-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSendMessage(`Objet : ${email.subject}\n\n${email.body}\n\n${email.cta_text}`);
+                          setSendDialogOpen(true);
+                        }}
+                      >
+                        <Send className="h-3 w-3 mr-1" /> Envoyer
+                      </Button>
                       <Button
                         variant="ghost"
                         size="sm"
@@ -327,6 +341,12 @@ export function EmailSequence({ className, initialData }: EmailSequenceProps) {
           );
         })}
       </div>
+
+      <UnipileSendDialog
+        open={sendDialogOpen}
+        onOpenChange={setSendDialogOpen}
+        message={sendMessage}
+      />
     </div>
   );
 }

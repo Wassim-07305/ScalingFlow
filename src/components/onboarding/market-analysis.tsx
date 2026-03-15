@@ -216,13 +216,15 @@ export function MarketAnalysis({ result, onSelect }: MarketAnalysisProps) {
               try {
                 await onSelect(selectedIndex);
               } catch {
+                // Error handled — stop spinner
+              } finally {
                 setValidating(false);
               }
             }}
             className="px-10"
           >
             {validating && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-            Valider et passer à la création d&apos;offre
+            Valider et continuer
           </Button>
         </motion.div>
       )}

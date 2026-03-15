@@ -6,17 +6,19 @@ import { AcquisitionStrategy } from "@/components/prospection/acquisition-strate
 import { WarmCallScript } from "@/components/prospection/warm-call-script";
 import { DmScripts } from "@/components/prospection/dm-scripts";
 import { OutboundWorkflow } from "@/components/prospection/outbound-workflow";
+import { UnifiedInbox } from "@/components/prospection/unified-inbox";
 import { GenerationHistory } from "@/components/shared/generation-history";
 import { TabBar } from "@/components/shared/tab-bar";
 import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
-import { Compass, Phone, MessageSquare, GitBranch, History } from "lucide-react";
+import { Compass, Phone, MessageSquare, GitBranch, History, MessageCircle } from "lucide-react";
 
 const TABS = [
   { key: "strategy", label: "Stratégie d'Acquisition", icon: Compass },
   { key: "warm_call", label: "Script Appel Tiède", icon: Phone },
   { key: "dm", label: "Scripts DM", icon: MessageSquare },
   { key: "workflow", label: "Workflow Outbound", icon: GitBranch },
+  { key: "inbox", label: "Messagerie unifiée", icon: MessageCircle },
   { key: "history", label: "Historique", icon: History },
 ] as const;
 
@@ -69,6 +71,8 @@ export default function ProspectionPage() {
         return <DmScripts />;
       case "workflow":
         return <OutboundWorkflow />;
+      case "inbox":
+        return <UnifiedInbox />;
       case "history":
         return (
           <GenerationHistory

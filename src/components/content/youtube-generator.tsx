@@ -9,10 +9,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { AILoading } from "@/components/shared/ai-loading";
 import { GlowCard } from "@/components/shared/glow-card";
-import { Sparkles, Copy, ChevronDown, ChevronUp, Youtube, Image, FileText } from "lucide-react";
+import { Sparkles, Copy, ChevronDown, ChevronUp, Youtube, Image, FileText, Send } from "lucide-react";
 import { toast } from "sonner";
 import type { YouTubeScriptResult } from "@/lib/ai/prompts/youtube-scripts";
 import { UpgradeWall } from "@/components/shared/upgrade-wall";
+import { UnipilePublishDialog } from "@/components/shared/unipile-publish-dialog";
 
 interface YouTubeGeneratorProps {
   className?: string;
@@ -28,6 +29,8 @@ export function YouTubeGenerator({ className, initialData }: YouTubeGeneratorPro
   const [showFullScript, setShowFullScript] = React.useState(false);
   const [copiedField, setCopiedField] = React.useState<string | null>(null);
   const [usageLimited, setUsageLimited] = React.useState<{currentUsage: number; limit: number} | null>(null);
+  const [publishDialogOpen, setPublishDialogOpen] = React.useState(false);
+  const [publishContent, setPublishContent] = React.useState("");
 
   React.useEffect(() => {
     if (initialData) {
@@ -129,6 +132,25 @@ export function YouTubeGenerator({ className, initialData }: YouTubeGeneratorPro
           />
           <Button variant="outline" size="sm" onClick={handleGenerate}>
             Régénérer
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            title="Publier via Unipile"
+            onClick={() => {
+              const fullText = [
+                result.titre,
+                `\n${result.hook}`,
+                result.plan.map((s) => `${s.section} (${s.duree}): ${s.contenu}`).join("\n"),
+                `\n${result.description_youtube}`,
+                result.tags.join(", "),
+              ].join("\n\n");
+              setPublishContent(fullText);
+              setPublishDialogOpen(true);
+            }}
+          >
+            <Send className="h-3 w-3 mr-1" />
+            Publier
           </Button>
         </div>
       </div>
@@ -260,6 +282,12 @@ export function YouTubeGenerator({ className, initialData }: YouTubeGeneratorPro
           </div>
         </CardContent>
       </Card>
+
+      <UnipilePublishDialog
+        open={publishDialogOpen}
+        onOpenChange={setPublishDialogOpen}
+        content={publishContent}
+      />
     </div>
   );
 }

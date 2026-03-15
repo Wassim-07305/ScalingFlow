@@ -9,10 +9,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { AILoading } from "@/components/shared/ai-loading";
 import { GlowCard } from "@/components/shared/glow-card";
-import { Sparkles, Copy, Hash, Layers } from "lucide-react";
+import { Sparkles, Copy, Hash, Layers, Send } from "lucide-react";
 import { toast } from "sonner";
 import type { CarouselResult } from "@/lib/ai/prompts/carousel-content";
 import { UpgradeWall } from "@/components/shared/upgrade-wall";
+import { UnipilePublishDialog } from "@/components/shared/unipile-publish-dialog";
 
 interface CarouselGeneratorProps {
   className?: string;
@@ -27,6 +28,8 @@ export function CarouselGenerator({ className, initialData }: CarouselGeneratorP
   const [topic, setTopic] = React.useState("");
   const [copiedField, setCopiedField] = React.useState<string | null>(null);
   const [usageLimited, setUsageLimited] = React.useState<{currentUsage: number; limit: number} | null>(null);
+  const [publishDialogOpen, setPublishDialogOpen] = React.useState(false);
+  const [publishContent, setPublishContent] = React.useState("");
 
   React.useEffect(() => {
     if (initialData) {
@@ -129,6 +132,24 @@ export function CarouselGenerator({ className, initialData }: CarouselGeneratorP
           <Button variant="outline" size="sm" onClick={handleGenerate}>
             Régénérer
           </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            title="Publier via Unipile"
+            onClick={() => {
+              const fullText = [
+                result.hook_cover,
+                ...result.slides.map((s) => `Slide ${s.numero}: ${s.texte_principal}\n${s.texte_secondaire}`),
+                `CTA: ${result.cta_final}`,
+                result.caption,
+              ].join("\n\n");
+              setPublishContent(fullText);
+              setPublishDialogOpen(true);
+            }}
+          >
+            <Send className="h-3 w-3 mr-1" />
+            Publier
+          </Button>
         </div>
       </div>
 
@@ -201,6 +222,12 @@ export function CarouselGenerator({ className, initialData }: CarouselGeneratorP
           </Badge>
         ))}
       </div>
+
+      <UnipilePublishDialog
+        open={publishDialogOpen}
+        onOpenChange={setPublishDialogOpen}
+        content={publishContent}
+      />
     </div>
   );
 }

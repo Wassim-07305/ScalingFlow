@@ -9,56 +9,64 @@ import type { PersonaForgeResult } from "@/lib/ai/prompts/persona-forge";
 import {
   User,
   Brain,
-  MessageCircle,
-  Route,
+  MousePointerClick,
+  Target,
   BookOpen,
   Download,
   Tv,
+  Route,
+  Smartphone,
+  Clock,
+  MessageSquare,
+  ShieldAlert,
+  Zap,
+  Globe,
+  BarChart3,
 } from "lucide-react";
 import { exportToPDF } from "@/lib/utils/export-pdf";
 
 const PERSONA_TABS = [
   { key: "bio", label: "Bio & Journée", icon: BookOpen },
-  { key: "demo", label: "Demographique", icon: User },
+  { key: "demo", label: "Démographique", icon: User },
   { key: "psycho", label: "Psychographique", icon: Brain },
-  { key: "langage", label: "Langage", icon: MessageCircle },
-  { key: "parcours", label: "Parcours d'achat", icon: Route },
+  { key: "comportemental", label: "Comportemental", icon: MousePointerClick },
+  { key: "strategique", label: "Stratégique", icon: Target },
 ] as const;
 
 type PersonaTabKey = (typeof PERSONA_TABS)[number]["key"];
 
 function buildPersonaPDFContent(persona: PersonaForgeResult): string {
   let text = `AVATAR CLIENT — ${persona.avatar_name}\n`;
-  text += `Role : ${persona.avatar_role}\n\n`;
+  text += `Rôle : ${persona.avatar_role}\n\n`;
 
   if (persona.bio_fictive) {
     text += `=== BIO FICTIVE ===\n${persona.bio_fictive}\n\n`;
   }
   if (persona.journee_type) {
-    text += `=== JOURNEE TYPE ===\n${persona.journee_type}\n\n`;
+    text += `=== JOURNÉE TYPE ===\n${persona.journee_type}\n\n`;
   }
   if (persona.canaux_medias?.length) {
-    text += `=== CANAUX MEDIAS ===\n${persona.canaux_medias.join("\n")}\n\n`;
+    text += `=== CANAUX MÉDIAS ===\n${persona.canaux_medias.join("\n")}\n\n`;
   }
 
   const d = persona.niveau_1_demo;
   if (d) {
-    text += `=== DEMOGRAPHIQUE ===\nAge : ${d.age_range}\nGenre : ${d.genre}\nSituation familiale : ${d.situation_familiale}\nRevenu annuel : ${d.revenu_annuel}\nLocalisation : ${d.localisation}\nEducation : ${d.niveau_education}\n\n`;
+    text += `=== NIVEAU 1 — DÉMOGRAPHIQUE ===\nÂge : ${d.age_range}\nGenre : ${d.genre}\nSituation familiale : ${d.situation_familiale}\nRevenu annuel : ${d.revenu_annuel}\nLocalisation : ${d.localisation}\nSituation pro : ${d.situation_pro || "—"}\nÉducation : ${d.niveau_education}\n\n`;
   }
 
   const p = persona.niveau_2_psycho;
   if (p) {
-    text += `=== PSYCHOGRAPHIQUE ===\nDesirs profonds : ${p.desirs_profonds?.join(", ")}\nPeurs : ${p.peurs?.join(", ")}\nFrustrations : ${p.frustrations?.join(", ")}\nObjections : ${p.objections_achat?.join(", ")}\nCroyances limitantes : ${p.croyances_limitantes?.join(", ")}\n\n`;
+    text += `=== NIVEAU 2 — PSYCHOGRAPHIQUE ===\nPeurs : ${p.peurs?.join(", ")}\nFrustrations : ${p.frustrations?.join(", ")}\nDésirs profonds : ${p.desirs_profonds?.join(", ")}\nCroyances limitantes : ${p.croyances_limitantes?.join(", ")}\nDéclencheurs d'achat : ${p.declencheurs_achat?.join(", ")}\n\n`;
   }
 
-  const l = persona.niveau_3_langage;
-  if (l) {
-    text += `=== LANGAGE ===\nExpressions : ${l.expressions_courantes?.join(" | ")}\nMots-clés : ${l.mots_cles_recherche?.join(", ")}\nPhrases douleur : ${l.phrases_douleur?.join(" | ")}\nPhrases désir : ${l.phrases_desir?.join(" | ")}\nTon : ${l.ton_communication}\n\n`;
+  const c = persona.niveau_3_comportemental;
+  if (c) {
+    text += `=== NIVEAU 3 — COMPORTEMENTAL ===\nHabitudes digitales : ${c.habitudes_digitales?.join(", ")}\nRéseaux sociaux : ${c.reseaux_sociaux?.join(", ")}\nContenu consommé : ${c.type_contenu_consomme?.join(", ")}\nObjections typiques : ${c.objections_typiques?.join(", ")}\nFréquence d'achat : ${c.frequence_achat_en_ligne || "—"}\nAppareils : ${c.appareils_utilises?.join(", ")}\n\n`;
   }
 
-  const pa = persona.niveau_4_parcours;
-  if (pa) {
-    text += `=== PARCOURS D'ACHAT ===\nDéclencheurs : ${pa.declencheurs_achat?.join(", ")}\nSources info : ${pa.sources_info?.join(", ")}\nCritères : ${pa.criteres_decision?.join(", ")}\nObstacles : ${pa.obstacles_achat?.join(", ")}\nTimeline : ${pa.timeline_decision}\nInfluenceurs : ${pa.influenceurs?.join(", ")}`;
+  const s = persona.niveau_4_strategique;
+  if (s) {
+    text += `=== NIVEAU 4 — STRATÉGIQUE ===\nParcours d'achat : ${s.parcours_achat?.join(" → ")}\nPoints de contact : ${s.points_contact_optimaux?.join(", ")}\nMessages qui résonnent : ${s.messages_qui_resonnent?.join(" | ")}\nTiming idéal : ${s.timing_ideal}\nCritères de décision : ${s.criteres_decision?.join(", ")}\nInfluenceurs : ${s.influenceurs_prescripteurs?.join(", ")}`;
   }
 
   return text;
@@ -89,11 +97,25 @@ function TagList({ items, variant = "default" }: { items: string[]; variant?: "d
   );
 }
 
-function SectionBlock({ title, children }: { title: string; children: React.ReactNode }) {
+function SectionBlock({ title, icon: Icon, children }: { title: string; icon?: React.ComponentType<{ className?: string }>; children: React.ReactNode }) {
   return (
     <div className="space-y-2">
-      <h4 className="text-sm font-medium text-text-secondary">{title}</h4>
+      <h4 className="text-sm font-medium text-text-secondary flex items-center gap-2">
+        {Icon && <Icon className="h-3.5 w-3.5 text-accent/70" />}
+        {title}
+      </h4>
       {children}
+    </div>
+  );
+}
+
+function LevelBadge({ level, label }: { level: number; label: string }) {
+  return (
+    <div className="flex items-center gap-2 mb-1">
+      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-accent/20 text-accent text-xs font-bold">
+        {level}
+      </span>
+      <span className="text-xs font-medium text-text-muted uppercase tracking-wider">{label}</span>
     </div>
   );
 }
@@ -126,7 +148,7 @@ export function PersonaDisplay({ persona }: PersonaDisplayProps) {
           </div>
           <Button variant="ghost" size="sm" onClick={handleExportPDF}>
             <Download className="h-4 w-4 mr-1" />
-            Export PDF
+            Exporter PDF
           </Button>
         </CardContent>
       </Card>
@@ -150,7 +172,7 @@ export function PersonaDisplay({ persona }: PersonaDisplayProps) {
         ))}
       </div>
 
-      {/* Bio, Journée type & Canaux medias */}
+      {/* Bio, Journée type & Canaux médias */}
       {activeTab === "bio" && (
         <div className="space-y-4">
           {persona.bio_fictive && (
@@ -171,7 +193,7 @@ export function PersonaDisplay({ persona }: PersonaDisplayProps) {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Route className="h-4 w-4 text-accent" />
+                  <Clock className="h-4 w-4 text-accent" />
                   Journée type
                 </CardTitle>
               </CardHeader>
@@ -186,7 +208,7 @@ export function PersonaDisplay({ persona }: PersonaDisplayProps) {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Tv className="h-4 w-4 text-accent" />
-                  Canaux medias consommes
+                  Canaux médias consommés
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -203,22 +225,26 @@ export function PersonaDisplay({ persona }: PersonaDisplayProps) {
         </div>
       )}
 
-      {/* Niveau 1 : Demographique */}
+      {/* Niveau 1 : Démographique */}
       {activeTab === "demo" && persona.niveau_1_demo && (
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <User className="h-4 w-4 text-accent" />
-              Niveau 1 — Profil demographique
-            </CardTitle>
+            <div className="space-y-1">
+              <LevelBadge level={1} label="Démographique" />
+              <CardTitle className="flex items-center gap-2">
+                <User className="h-4 w-4 text-accent" />
+                Âge, sexe, localisation, revenus, situation pro
+              </CardTitle>
+            </div>
           </CardHeader>
           <CardContent className="divide-y divide-border-default">
-            <InfoRow label="Tranche d'age" value={persona.niveau_1_demo.age_range} />
+            <InfoRow label="Tranche d'âge" value={persona.niveau_1_demo.age_range} />
             <InfoRow label="Genre" value={persona.niveau_1_demo.genre} />
             <InfoRow label="Situation familiale" value={persona.niveau_1_demo.situation_familiale} />
             <InfoRow label="Revenu annuel" value={persona.niveau_1_demo.revenu_annuel} />
             <InfoRow label="Localisation" value={persona.niveau_1_demo.localisation} />
-            <InfoRow label="Education" value={persona.niveau_1_demo.niveau_education} />
+            <InfoRow label="Situation pro" value={persona.niveau_1_demo.situation_pro || "—"} />
+            <InfoRow label="Éducation" value={persona.niveau_1_demo.niveau_education} />
           </CardContent>
         </Card>
       )}
@@ -227,109 +253,131 @@ export function PersonaDisplay({ persona }: PersonaDisplayProps) {
       {activeTab === "psycho" && persona.niveau_2_psycho && (
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Brain className="h-4 w-4 text-accent" />
-              Niveau 2 — Profil psychographique
-            </CardTitle>
+            <div className="space-y-1">
+              <LevelBadge level={2} label="Psychographique" />
+              <CardTitle className="flex items-center gap-2">
+                <Brain className="h-4 w-4 text-accent" />
+                Peurs, frustrations, désirs, croyances, déclencheurs
+              </CardTitle>
+            </div>
           </CardHeader>
           <CardContent className="space-y-5">
-            <SectionBlock title="Desirs profonds">
-              <TagList items={persona.niveau_2_psycho.desirs_profonds ?? []} variant="default" />
-            </SectionBlock>
-            <SectionBlock title="Peurs">
+            <SectionBlock title="Peurs" icon={ShieldAlert}>
               <TagList items={persona.niveau_2_psycho.peurs ?? []} variant="red" />
             </SectionBlock>
             <SectionBlock title="Frustrations">
               <TagList items={persona.niveau_2_psycho.frustrations ?? []} variant="yellow" />
             </SectionBlock>
-            <SectionBlock title="Objections à l'achat">
-              <TagList items={persona.niveau_2_psycho.objections_achat ?? []} variant="purple" />
+            <SectionBlock title="Désirs profonds">
+              <TagList items={persona.niveau_2_psycho.desirs_profonds ?? []} variant="default" />
             </SectionBlock>
             <SectionBlock title="Croyances limitantes">
               <TagList items={persona.niveau_2_psycho.croyances_limitantes ?? []} variant="muted" />
             </SectionBlock>
+            <SectionBlock title="Déclencheurs d'achat" icon={Zap}>
+              <TagList items={persona.niveau_2_psycho.declencheurs_achat ?? []} variant="purple" />
+            </SectionBlock>
           </CardContent>
         </Card>
       )}
 
-      {/* Niveau 3 : Langage */}
-      {activeTab === "langage" && persona.niveau_3_langage && (
+      {/* Niveau 3 : Comportemental */}
+      {activeTab === "comportemental" && persona.niveau_3_comportemental && (
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <MessageCircle className="h-4 w-4 text-accent" />
-              Niveau 3 — Langage client
-            </CardTitle>
+            <div className="space-y-1">
+              <LevelBadge level={3} label="Comportemental" />
+              <CardTitle className="flex items-center gap-2">
+                <MousePointerClick className="h-4 w-4 text-accent" />
+                Habitudes digitales, réseaux, contenu, objections
+              </CardTitle>
+            </div>
           </CardHeader>
           <CardContent className="space-y-5">
-            <SectionBlock title="Expressions courantes">
+            <SectionBlock title="Habitudes digitales" icon={Globe}>
               <div className="space-y-1.5">
-                {(persona.niveau_3_langage.expressions_courantes ?? []).map((expr, i) => (
-                  <p key={i} className="text-sm text-text-primary italic">
-                    &laquo; {expr} &raquo;
-                  </p>
+                {(persona.niveau_3_comportemental.habitudes_digitales ?? []).map((h, i) => (
+                  <div key={i} className="flex items-start gap-2">
+                    <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-accent shrink-0" />
+                    <p className="text-sm text-text-primary">{h}</p>
+                  </div>
                 ))}
               </div>
             </SectionBlock>
-            <SectionBlock title="Mots-clés de recherche">
-              <TagList items={persona.niveau_3_langage.mots_cles_recherche ?? []} variant="blue" />
+            <SectionBlock title="Réseaux sociaux utilisés">
+              <TagList items={persona.niveau_3_comportemental.reseaux_sociaux ?? []} variant="blue" />
             </SectionBlock>
-            <SectionBlock title="Phrases de douleur (verbatim)">
+            <SectionBlock title="Type de contenu consommé">
+              <TagList items={persona.niveau_3_comportemental.type_contenu_consomme ?? []} variant="default" />
+            </SectionBlock>
+            <SectionBlock title="Objections typiques" icon={MessageSquare}>
               <div className="space-y-1.5">
-                {(persona.niveau_3_langage.phrases_douleur ?? []).map((phrase, i) => (
+                {(persona.niveau_3_comportemental.objections_typiques ?? []).map((obj, i) => (
                   <p key={i} className="text-sm text-danger/80 italic">
-                    &laquo; {phrase} &raquo;
+                    &laquo; {obj} &raquo;
                   </p>
                 ))}
               </div>
             </SectionBlock>
-            <SectionBlock title="Phrases de desir (verbatim)">
-              <div className="space-y-1.5">
-                {(persona.niveau_3_langage.phrases_desir ?? []).map((phrase, i) => (
-                  <p key={i} className="text-sm text-accent italic">
-                    &laquo; {phrase} &raquo;
-                  </p>
-                ))}
-              </div>
-            </SectionBlock>
-            <SectionBlock title="Ton de communication prefere">
+            <SectionBlock title="Fréquence d'achat en ligne">
               <p className="text-sm text-text-primary">
-                {persona.niveau_3_langage.ton_communication}
+                {persona.niveau_3_comportemental.frequence_achat_en_ligne || "—"}
               </p>
+            </SectionBlock>
+            <SectionBlock title="Appareils utilisés" icon={Smartphone}>
+              <TagList items={persona.niveau_3_comportemental.appareils_utilises ?? []} variant="muted" />
             </SectionBlock>
           </CardContent>
         </Card>
       )}
 
-      {/* Niveau 4 : Parcours d'achat */}
-      {activeTab === "parcours" && persona.niveau_4_parcours && (
+      {/* Niveau 4 : Stratégique */}
+      {activeTab === "strategique" && persona.niveau_4_strategique && (
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Route className="h-4 w-4 text-accent" />
-              Niveau 4 — Parcours d'achat
-            </CardTitle>
+            <div className="space-y-1">
+              <LevelBadge level={4} label="Stratégique" />
+              <CardTitle className="flex items-center gap-2">
+                <Target className="h-4 w-4 text-accent" />
+                Parcours d'achat, points de contact, messages, timing
+              </CardTitle>
+            </div>
           </CardHeader>
           <CardContent className="space-y-5">
-            <SectionBlock title="Déclencheurs d'achat">
-              <TagList items={persona.niveau_4_parcours.declencheurs_achat ?? []} variant="default" />
+            <SectionBlock title="Parcours d'achat" icon={Route}>
+              <div className="space-y-2">
+                {(persona.niveau_4_strategique.parcours_achat ?? []).map((etape, i) => (
+                  <div key={i} className="flex items-start gap-3">
+                    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-accent/10 text-accent text-xs font-bold shrink-0 mt-0.5">
+                      {i + 1}
+                    </span>
+                    <p className="text-sm text-text-primary">{etape}</p>
+                  </div>
+                ))}
+              </div>
             </SectionBlock>
-            <SectionBlock title="Sources d'information">
-              <TagList items={persona.niveau_4_parcours.sources_info ?? []} variant="blue" />
+            <SectionBlock title="Points de contact optimaux" icon={BarChart3}>
+              <TagList items={persona.niveau_4_strategique.points_contact_optimaux ?? []} variant="blue" />
             </SectionBlock>
-            <SectionBlock title="Critères de decision">
-              <TagList items={persona.niveau_4_parcours.criteres_decision ?? []} variant="purple" />
+            <SectionBlock title="Messages qui résonnent">
+              <div className="space-y-1.5">
+                {(persona.niveau_4_strategique.messages_qui_resonnent ?? []).map((msg, i) => (
+                  <p key={i} className="text-sm text-accent italic">
+                    &laquo; {msg} &raquo;
+                  </p>
+                ))}
+              </div>
             </SectionBlock>
-            <SectionBlock title="Obstacles à l'achat">
-              <TagList items={persona.niveau_4_parcours.obstacles_achat ?? []} variant="red" />
-            </SectionBlock>
-            <SectionBlock title="Timeline de decision">
+            <SectionBlock title="Timing idéal" icon={Clock}>
               <p className="text-sm text-text-primary">
-                {persona.niveau_4_parcours.timeline_decision}
+                {persona.niveau_4_strategique.timing_ideal}
               </p>
+            </SectionBlock>
+            <SectionBlock title="Critères de décision">
+              <TagList items={persona.niveau_4_strategique.criteres_decision ?? []} variant="purple" />
             </SectionBlock>
             <SectionBlock title="Influenceurs / Prescripteurs">
-              <TagList items={persona.niveau_4_parcours.influenceurs ?? []} variant="muted" />
+              <TagList items={persona.niveau_4_strategique.influenceurs_prescripteurs ?? []} variant="muted" />
             </SectionBlock>
           </CardContent>
         </Card>

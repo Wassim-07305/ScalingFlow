@@ -54,6 +54,7 @@
     "tailwind-merge": "^3.5.0",
     "tailwindcss": "^4.2.0",
     "typescript": "^5.9.3",
+    "unipile-node-sdk": "^1.9.3",
     "vaul": "^1.1.2",
     "web-push": "^3.6.7",
     "zustand": "^5.0.11"

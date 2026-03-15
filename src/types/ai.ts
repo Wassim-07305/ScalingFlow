@@ -111,6 +111,34 @@ export interface AdCopyResult {
   }[];
 }
 
+export interface BusinessAuditRecommendation {
+  title: string;
+  description: string;
+  priority: "urgent" | "important" | "nice-to-have";
+}
+
+export interface BusinessAuditCategory {
+  name: string;
+  score: number;
+  diagnostic: string;
+  recommendations: BusinessAuditRecommendation[];
+}
+
+export interface BusinessAuditResult {
+  overall_score: number;
+  summary: string;
+  categories: {
+    offre: BusinessAuditCategory;
+    funnel: BusinessAuditCategory;
+    acquisition: BusinessAuditCategory;
+    vente: BusinessAuditCategory;
+    retention: BusinessAuditCategory;
+    automatisation: BusinessAuditCategory;
+  };
+  quick_wins: string[];
+  plan_90_jours: string;
+}
+
 export interface SchwartzAnalysisResult {
   niveau: 1 | 2 | 3 | 4 | 5;
   description: string;
