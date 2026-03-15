@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AILoading } from "@/components/shared/ai-loading";
 import { GlowCard } from "@/components/shared/glow-card";
-import { Sparkles, FileText, Video, Gift, ChevronRight, FileDown, Code, Pencil, Check, Save, Loader2 } from "lucide-react";
+import { FunnelPreview } from "@/components/funnel/funnel-preview";
+import { Sparkles, FileText, Video, Gift, ChevronRight, FileDown, Code, Pencil, Check, Save, Loader2, Eye, Type } from "lucide-react";
 import { exportToPDF } from "@/lib/utils/export-pdf";
 import { exportFunnelToHTML, downloadHTML } from "@/lib/utils/export-html";
 import { UpgradeWall } from "@/components/shared/upgrade-wall";
@@ -28,6 +29,8 @@ const FUNNEL_PAGES: FunnelPage[] = [
   { type: "vsl", label: "Page VSL", icon: <Video className="h-5 w-5" />, color: "blue" },
   { type: "thankyou", label: "Page de Remerciement", icon: <Gift className="h-5 w-5" />, color: "cyan" },
 ];
+
+type ViewMode = "text" | "preview";
 
 interface FunnelBuilderProps {
   className?: string;
@@ -50,6 +53,7 @@ export function FunnelBuilder({ className, initialData }: FunnelBuilderProps) {
   const [savedId, setSavedId] = React.useState<string | null>(null);
   const [isDirty, setIsDirty] = React.useState(false);
   const [saving, setSaving] = React.useState(false);
+  const [viewMode, setViewMode] = React.useState<ViewMode>("text");
 
   // Charger les données historiques quand initialData change
   React.useEffect(() => {
@@ -217,174 +221,215 @@ export function FunnelBuilder({ className, initialData }: FunnelBuilderProps) {
 
   return (
     <div className={cn("space-y-6", className)}>
-      {/* Page Tabs */}
-      <div className="flex gap-3">
-        {FUNNEL_PAGES.map((page) => (
+      {/* View Mode Toggle: Texte / Preview */}
+      <div className="flex items-center justify-between">
+        <div className="flex rounded-xl border border-border-default overflow-hidden">
           <button
-            key={page.type}
-            onClick={() => setActivePage(page.type)}
+            onClick={() => setViewMode("text")}
             className={cn(
-              "flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all",
-              activePage === page.type
-                ? "bg-accent text-white"
-                : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
+              "flex items-center gap-2 px-4 py-2 text-sm font-medium transition-colors",
+              viewMode === "text"
+                ? "bg-accent/15 text-accent"
+                : "text-text-secondary hover:text-text-primary hover:bg-white/[0.04]"
             )}
           >
-            {page.icon}
-            {page.label}
+            <Type className="h-4 w-4" />
+            Texte
           </button>
-        ))}
-      </div>
-
-      {/* Edit toggle */}
-      <div className="flex items-center justify-end gap-2">
-        {isDirty && savedId && (
-          <Button
-            variant="default"
-            size="sm"
-            onClick={handleSaveEdits}
-            disabled={saving}
-            className="bg-gradient-to-r from-accent to-emerald-400 hover:from-accent/90 hover:to-emerald-400/90 text-white shadow-md shadow-accent/20"
+          <button
+            onClick={() => setViewMode("preview")}
+            className={cn(
+              "flex items-center gap-2 px-4 py-2 text-sm font-medium transition-colors border-l border-border-default",
+              viewMode === "preview"
+                ? "bg-accent/15 text-accent"
+                : "text-text-secondary hover:text-text-primary hover:bg-white/[0.04]"
+            )}
           >
-            {saving ? (
-              <><Loader2 className="h-3 w-3 animate-spin mr-1" /> Sauvegarde...</>
-            ) : (
-              <><Save className="h-3 w-3 mr-1" /> Sauvegarder</>
-            )}
-          </Button>
-        )}
-        <Button
-          variant={isEditing ? "default" : "ghost"}
-          size="sm"
-          onClick={() => {
-            setIsEditing(!isEditing);
-          }}
-        >
-          {isEditing ? (
-            <><Check className="h-3 w-3 mr-1" /> Terminer</>
-          ) : (
-            <><Pencil className="h-3 w-3 mr-1" /> Modifier</>
+            <Eye className="h-4 w-4" />
+            Preview visuelle
+          </button>
+        </div>
+
+        {/* Actions (top-right) */}
+        <div className="flex items-center gap-2">
+          {viewMode === "text" && isDirty && savedId && (
+            <Button
+              variant="default"
+              size="sm"
+              onClick={handleSaveEdits}
+              disabled={saving}
+              className="bg-gradient-to-r from-accent to-emerald-400 hover:from-accent/90 hover:to-emerald-400/90 text-white shadow-md shadow-accent/20"
+            >
+              {saving ? (
+                <><Loader2 className="h-3 w-3 animate-spin mr-1" /> Sauvegarde...</>
+              ) : (
+                <><Save className="h-3 w-3 mr-1" /> Sauvegarder</>
+              )}
+            </Button>
           )}
-        </Button>
+          {viewMode === "text" && (
+            <Button
+              variant={isEditing ? "default" : "ghost"}
+              size="sm"
+              onClick={() => setIsEditing(!isEditing)}
+            >
+              {isEditing ? (
+                <><Check className="h-3 w-3 mr-1" /> Terminer</>
+              ) : (
+                <><Pencil className="h-3 w-3 mr-1" /> Modifier</>
+              )}
+            </Button>
+          )}
+        </div>
       </div>
 
-      {/* Page Content */}
-      {activePage === "optin" && pageData && (
-        <div className="space-y-4">
-          <GlowCard glowColor="orange">
-            {isEditing ? (
-              <div className="space-y-3">
-                <input
-                  type="text"
-                  value={pageData.headline || ""}
-                  onChange={(e) => updatePageField("optin", "headline", e.target.value)}
-                  className="w-full bg-transparent text-xl font-bold text-text-primary border-b border-accent/30 pb-1 focus:outline-none"
-                />
-                <textarea
-                  value={pageData.subheadline || ""}
-                  onChange={(e) => updatePageField("optin", "subheadline", e.target.value)}
-                  className="w-full bg-transparent text-text-secondary resize-none focus:outline-none"
-                  rows={2}
-                />
-              </div>
-            ) : (
-              <>
-                <h3 className="text-xl font-bold text-text-primary mb-2">{pageData.headline}</h3>
-                <p className="text-text-secondary">{pageData.subheadline}</p>
-              </>
-            )}
-          </GlowCard>
-          <Card>
-            <CardContent className="pt-6">
-              <h4 className="font-medium text-text-primary mb-3">Bullet Points</h4>
-              <ul className="space-y-2">
-                {pageData.bullet_points?.map((bp: string, i: number) => (
-                  <li key={i} className="flex items-start gap-2 text-sm text-text-secondary">
-                    <span className="text-accent mt-0.5">&#x2714;</span>
-                    {bp}
-                  </li>
-                ))}
-              </ul>
-              <div className="mt-4 p-3 rounded-lg bg-accent-muted border border-accent/20">
-                <p className="text-sm font-medium text-accent">CTA: {pageData.cta_text}</p>
-              </div>
-              {pageData.social_proof_text && (
-                <p className="mt-3 text-xs text-text-muted italic">{pageData.social_proof_text}</p>
-              )}
-            </CardContent>
-          </Card>
-        </div>
+      {/* ─── Preview Mode ─── */}
+      {viewMode === "preview" && (
+        <FunnelPreview funnelData={funnelData} />
       )}
 
-      {activePage === "vsl" && pageData && (
-        <div className="space-y-4">
-          <GlowCard glowColor="blue">
-            <h3 className="text-xl font-bold text-text-primary mb-2">{pageData.headline}</h3>
-            <p className="text-text-secondary">{pageData.intro_text}</p>
-          </GlowCard>
-          <Card>
-            <CardContent className="pt-6">
-              <h4 className="font-medium text-text-primary mb-3">Bénéfices</h4>
-              <ul className="space-y-2">
-                {pageData.benefit_bullets?.map((b: string, i: number) => (
-                  <li key={i} className="flex items-start gap-2 text-sm text-text-secondary">
-                    <span className="text-info mt-0.5">&#x2714;</span>
-                    {b}
-                  </li>
-                ))}
-              </ul>
-            </CardContent>
-          </Card>
-          {pageData.faq?.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">FAQ</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {pageData.faq.map((f: { question: string; answer: string }, i: number) => (
-                    <div key={i}>
-                      <p className="font-medium text-text-primary text-sm">{f.question}</p>
-                      <p className="text-text-secondary text-sm mt-1">{f.answer}</p>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+      {/* ─── Text Mode ─── */}
+      {viewMode === "text" && (
+        <>
+          {/* Page Tabs */}
+          <div className="flex gap-3">
+            {FUNNEL_PAGES.map((page) => (
+              <button
+                key={page.type}
+                onClick={() => setActivePage(page.type)}
+                className={cn(
+                  "flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all",
+                  activePage === page.type
+                    ? "bg-accent text-white"
+                    : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
+                )}
+              >
+                {page.icon}
+                {page.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Page Content */}
+          {activePage === "optin" && pageData && (
+            <div className="space-y-4">
+              <GlowCard glowColor="orange">
+                {isEditing ? (
+                  <div className="space-y-3">
+                    <input
+                      type="text"
+                      value={pageData.headline || ""}
+                      onChange={(e) => updatePageField("optin", "headline", e.target.value)}
+                      className="w-full bg-transparent text-xl font-bold text-text-primary border-b border-accent/30 pb-1 focus:outline-none"
+                    />
+                    <textarea
+                      value={pageData.subheadline || ""}
+                      onChange={(e) => updatePageField("optin", "subheadline", e.target.value)}
+                      className="w-full bg-transparent text-text-secondary resize-none focus:outline-none"
+                      rows={2}
+                    />
+                  </div>
+                ) : (
+                  <>
+                    <h3 className="text-xl font-bold text-text-primary mb-2">{pageData.headline}</h3>
+                    <p className="text-text-secondary">{pageData.subheadline}</p>
+                  </>
+                )}
+              </GlowCard>
+              <Card>
+                <CardContent className="pt-6">
+                  <h4 className="font-medium text-text-primary mb-3">Bullet Points</h4>
+                  <ul className="space-y-2">
+                    {pageData.bullet_points?.map((bp: string, i: number) => (
+                      <li key={i} className="flex items-start gap-2 text-sm text-text-secondary">
+                        <span className="text-accent mt-0.5">&#x2714;</span>
+                        {bp}
+                      </li>
+                    ))}
+                  </ul>
+                  <div className="mt-4 p-3 rounded-lg bg-accent-muted border border-accent/20">
+                    <p className="text-sm font-medium text-accent">CTA: {pageData.cta_text}</p>
+                  </div>
+                  {pageData.social_proof_text && (
+                    <p className="mt-3 text-xs text-text-muted italic">{pageData.social_proof_text}</p>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
           )}
-        </div>
-      )}
 
-      {activePage === "thankyou" && pageData && (
-        <div className="space-y-4">
-          <GlowCard glowColor="cyan">
-            <h3 className="text-lg font-bold text-text-primary mb-2">{pageData.confirmation_message}</h3>
-          </GlowCard>
-          <Card>
-            <CardContent className="pt-6">
-              <h4 className="font-medium text-text-primary mb-3">Prochaines étapes</h4>
-              <ol className="space-y-2">
-                {pageData.next_steps?.map((step: string, i: number) => (
-                  <li key={i} className="flex items-start gap-3 text-sm text-text-secondary">
-                    <span className="flex-shrink-0 w-6 h-6 rounded-full bg-accent-muted text-accent text-xs font-bold flex items-center justify-center">
-                      {i + 1}
-                    </span>
-                    {step}
-                  </li>
-                ))}
-              </ol>
-              {pageData.upsell_headline && (
-                <div className="mt-6 p-4 rounded-xl bg-bg-tertiary border border-border-default">
-                  <p className="font-medium text-info">{pageData.upsell_headline}</p>
-                  <p className="text-sm text-text-secondary mt-1">{pageData.upsell_description}</p>
-                  <Badge variant="blue" className="mt-2">{pageData.upsell_cta}</Badge>
-                </div>
+          {activePage === "vsl" && pageData && (
+            <div className="space-y-4">
+              <GlowCard glowColor="blue">
+                <h3 className="text-xl font-bold text-text-primary mb-2">{pageData.headline}</h3>
+                <p className="text-text-secondary">{pageData.intro_text}</p>
+              </GlowCard>
+              <Card>
+                <CardContent className="pt-6">
+                  <h4 className="font-medium text-text-primary mb-3">Bénéfices</h4>
+                  <ul className="space-y-2">
+                    {pageData.benefit_bullets?.map((b: string, i: number) => (
+                      <li key={i} className="flex items-start gap-2 text-sm text-text-secondary">
+                        <span className="text-info mt-0.5">&#x2714;</span>
+                        {b}
+                      </li>
+                    ))}
+                  </ul>
+                </CardContent>
+              </Card>
+              {pageData.faq?.length > 0 && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-base">FAQ</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {pageData.faq.map((f: { question: string; answer: string }, i: number) => (
+                        <div key={i}>
+                          <p className="font-medium text-text-primary text-sm">{f.question}</p>
+                          <p className="text-text-secondary text-sm mt-1">{f.answer}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
               )}
-            </CardContent>
-          </Card>
-        </div>
+            </div>
+          )}
+
+          {activePage === "thankyou" && pageData && (
+            <div className="space-y-4">
+              <GlowCard glowColor="cyan">
+                <h3 className="text-lg font-bold text-text-primary mb-2">{pageData.confirmation_message}</h3>
+              </GlowCard>
+              <Card>
+                <CardContent className="pt-6">
+                  <h4 className="font-medium text-text-primary mb-3">Prochaines étapes</h4>
+                  <ol className="space-y-2">
+                    {pageData.next_steps?.map((step: string, i: number) => (
+                      <li key={i} className="flex items-start gap-3 text-sm text-text-secondary">
+                        <span className="flex-shrink-0 w-6 h-6 rounded-full bg-accent-muted text-accent text-xs font-bold flex items-center justify-center">
+                          {i + 1}
+                        </span>
+                        {step}
+                      </li>
+                    ))}
+                  </ol>
+                  {pageData.upsell_headline && (
+                    <div className="mt-6 p-4 rounded-xl bg-bg-tertiary border border-border-default">
+                      <p className="font-medium text-info">{pageData.upsell_headline}</p>
+                      <p className="text-sm text-text-secondary mt-1">{pageData.upsell_description}</p>
+                      <Badge variant="blue" className="mt-2">{pageData.upsell_cta}</Badge>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+          )}
+        </>
       )}
 
+      {/* Bottom actions bar */}
       <div className="flex gap-3">
         <Button
           variant="outline"
