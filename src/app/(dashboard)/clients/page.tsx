@@ -2,7 +2,6 @@
 
 import React from "react";
 import { useRouter } from "next/navigation";
-import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -27,13 +26,15 @@ import {
   Handshake,
   Plus,
   Search,
+  TrendingUp,
+  UserX,
 } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 
 type StatusFilter = "all" | ClientRow["status"];
 
 const STATUS_FILTERS: { value: StatusFilter; label: string }[] = [
-  { value: "all", label: "Tous" },
+  { value: "all", label: "Tous les statuts" },
   { value: "prospect", label: "Prospects" },
   { value: "actif", label: "Actifs" },
   { value: "inactif", label: "Inactifs" },
@@ -210,53 +211,72 @@ export default function ClientsPage() {
       value: stats.total,
       icon: Users,
       color: "text-text-primary",
+      bgColor: "bg-bg-tertiary",
     },
     {
       label: "Clients actifs",
       value: stats.actifs,
       icon: UserCheck,
       color: "text-accent",
+      bgColor: "bg-accent/10",
     },
     {
       label: "CA closé",
       value: formatCurrency(stats.caClosé),
       icon: DollarSign,
       color: "text-accent",
+      bgColor: "bg-accent/10",
     },
     {
       label: "Deals en cours",
       value: stats.dealsEnCours,
       icon: Handshake,
       color: "text-info",
+      bgColor: "bg-info/10",
     },
   ];
 
   return (
-    <div>
-      <PageHeader
-        title="Gestion des clients"
-        description="Suivez vos prospects, clients et deals au même endroit."
-      >
-        <Button onClick={() => setFormOpen(true)}>
-          <Plus className="h-4 w-4 mr-1" />
-          Ajouter un client
-        </Button>
-      </PageHeader>
+    <div className="max-w-7xl mx-auto">
+      {/* Hero header */}
+      <div className="relative mb-8 overflow-hidden rounded-2xl border border-border-default bg-gradient-to-br from-accent/5 via-bg-secondary to-bg-secondary p-6 md:p-8">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-accent/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+        <div className="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent/10">
+              <Users className="h-5 w-5 text-accent" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold text-text-primary">
+                Gestion des clients
+              </h1>
+              <p className="text-sm text-text-secondary">
+                Suivez vos prospects, clients et deals au même endroit.
+              </p>
+            </div>
+          </div>
+          <Button onClick={() => setFormOpen(true)} className="shrink-0">
+            <Plus className="h-4 w-4 mr-1" />
+            Ajouter un client
+          </Button>
+        </div>
+      </div>
 
       {/* Stats bar */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
         {STAT_CARDS.map((stat) => (
-          <Card key={stat.label} className="hover:border-border-default">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-bg-tertiary">
-                <stat.icon className={cn("h-5 w-5", stat.color)} />
-              </div>
-              <div>
-                <p className="text-xs text-text-muted">{stat.label}</p>
-                <p className="text-lg font-bold text-text-primary">{stat.value}</p>
-              </div>
+          <div
+            key={stat.label}
+            className="flex items-center gap-3 rounded-2xl border border-border-default bg-bg-secondary/50 px-4 py-3 backdrop-blur-sm transition-all duration-200 hover:border-border-hover"
+          >
+            <div className={cn("rounded-xl p-2.5", stat.bgColor)}>
+              <stat.icon className={cn("h-4 w-4", stat.color)} />
             </div>
-          </Card>
+            <div>
+              <p className="text-lg font-bold text-text-primary">{stat.value}</p>
+              <p className="text-[11px] text-text-muted">{stat.label}</p>
+            </div>
+          </div>
         ))}
       </div>
 
@@ -275,7 +295,7 @@ export default function ClientsPage() {
           value={statusFilter}
           onValueChange={(v) => setStatusFilter(v as StatusFilter)}
         >
-          <SelectTrigger className="w-full sm:w-44">
+          <SelectTrigger className="w-full sm:w-48">
             <SelectValue placeholder="Statut" />
           </SelectTrigger>
           <SelectContent>
@@ -296,14 +316,16 @@ export default function ClientsPage() {
           ))}
         </div>
       ) : filtered.length === 0 ? (
-        <Card className="flex flex-col items-center justify-center py-16 text-center">
-          <Users className="h-12 w-12 text-text-muted mb-4" />
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border-default bg-bg-secondary/30 py-16 text-center backdrop-blur-sm">
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-bg-tertiary mb-4">
+            <UserX className="h-7 w-7 text-text-muted" />
+          </div>
           <h3 className="text-base font-semibold text-text-primary mb-1">
             {clients.length === 0
               ? "Aucun client pour le moment"
               : "Aucun résultat"}
           </h3>
-          <p className="text-sm text-text-secondary mb-4 max-w-sm">
+          <p className="text-sm text-text-secondary mb-5 max-w-sm">
             {clients.length === 0
               ? "Ajoutez votre premier client pour commencer à suivre vos deals et votre pipeline."
               : "Essayez de modifier vos filtres ou votre recherche."}
@@ -314,7 +336,7 @@ export default function ClientsPage() {
               Ajouter un client
             </Button>
           )}
-        </Card>
+        </div>
       ) : (
         <>
           <div className="flex items-center gap-2 mb-3">

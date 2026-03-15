@@ -96,28 +96,29 @@ export function FileCard({
   };
 
   return (
-    <div className="group relative rounded-2xl bg-bg-secondary border border-border-default p-4 transition-all duration-150 hover:border-border-hover hover:shadow-lg hover:shadow-accent/5">
+    <div className="group relative rounded-2xl bg-bg-secondary/50 border border-border-default/50 p-4 transition-all duration-200 hover:border-accent/20 hover:shadow-lg hover:shadow-accent/5 hover:bg-bg-secondary backdrop-blur-sm">
       <div className="flex items-start justify-between">
         <button onClick={handleClick} className="flex-1 text-left">
           <div
-            className="flex h-12 w-12 items-center justify-center rounded-xl mb-3"
-            style={{ backgroundColor: `${iconColor}20` }}
+            className="flex h-12 w-12 items-center justify-center rounded-xl mb-3 transition-transform duration-200 group-hover:scale-105"
+            style={{ backgroundColor: `${iconColor}15` }}
           >
             <Icon className="h-6 w-6" style={{ color: iconColor }} />
           </div>
           <p className="text-sm font-medium text-text-primary truncate" title={name}>
             {name}
           </p>
-          <div className="flex items-center gap-2 mt-0.5">
-            <p className="text-xs text-text-muted">{formatFileSize(fileSize)}</p>
-            <span className="text-xs text-text-muted">&middot;</span>
-            <p className="text-xs text-text-muted">{formatDate(createdAt)}</p>
+          <div className="flex items-center gap-2 mt-1">
+            <span className="inline-flex items-center rounded-full bg-bg-tertiary/80 px-2 py-0.5 text-[10px] font-medium text-text-muted">
+              {formatFileSize(fileSize)}
+            </span>
+            <span className="text-[10px] text-text-muted">{formatDate(createdAt)}</span>
           </div>
         </button>
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="p-1.5 rounded-lg text-text-muted opacity-0 group-hover:opacity-100 transition-opacity hover:bg-bg-tertiary hover:text-text-primary">
+            <button className="p-1.5 rounded-lg text-text-muted opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-bg-tertiary hover:text-text-primary">
               <MoreVertical className="h-4 w-4" />
             </button>
           </DropdownMenuTrigger>

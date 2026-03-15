@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { cn } from "@/lib/utils/cn";
+import { Inbox } from "lucide-react";
 import { PipelineCard, type PipelineLead } from "./pipeline-card";
 
 export interface ColumnConfig {
@@ -43,15 +44,15 @@ export function PipelineColumn({ config, leads, onCardClick, onDrop }: PipelineC
   return (
     <div
       className={cn(
-        "flex flex-col min-w-[280px] w-[280px] shrink-0 rounded-2xl border border-border-default bg-bg-primary/50 transition-all duration-150",
-        dragOver && "border-accent bg-accent/5"
+        "flex flex-col min-w-[280px] w-[280px] shrink-0 snap-center rounded-2xl border border-border-default bg-bg-primary/50 transition-all duration-200",
+        dragOver && "border-accent/40 bg-accent/5 shadow-lg shadow-accent/5"
       )}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
     >
       {/* Column header */}
-      <div className="flex items-center justify-between p-3 pb-2">
+      <div className="flex items-center justify-between px-3 py-3">
         <div className="flex items-center gap-2">
           <div className={cn("h-2.5 w-2.5 rounded-full", config.bgColor)} />
           <span className="text-sm font-semibold text-text-primary">{config.label}</span>
@@ -64,14 +65,24 @@ export function PipelineColumn({ config, leads, onCardClick, onDrop }: PipelineC
         </span>
       </div>
 
+      {/* Separator */}
+      <div className="mx-3 h-px bg-border-default" />
+
       {/* Cards */}
-      <div className="flex flex-col gap-2 p-2 pt-0 overflow-y-auto max-h-[calc(100vh-320px)] min-h-[100px]">
+      <div className="flex flex-col gap-2 p-2 overflow-y-auto max-h-[calc(100vh-320px)] min-h-[100px]">
         {leads.length === 0 ? (
           <div className={cn(
-            "flex items-center justify-center rounded-xl border border-dashed border-border-default p-6 text-xs text-text-muted transition-colors",
-            dragOver && "border-accent text-accent"
+            "flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-border-default p-8 text-center transition-all duration-200",
+            dragOver && "border-accent/40 bg-accent/5"
           )}>
-            {dragOver ? "Relâcher ici" : "Aucun lead"}
+            {dragOver ? (
+              <span className="text-xs font-medium text-accent">Relâcher ici</span>
+            ) : (
+              <>
+                <Inbox className="h-5 w-5 text-text-muted/50" />
+                <span className="text-xs text-text-muted">Aucun lead</span>
+              </>
+            )}
           </div>
         ) : (
           leads.map((lead) => (

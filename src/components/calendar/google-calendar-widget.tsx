@@ -9,8 +9,8 @@ import {
   ExternalLink,
   RefreshCw,
   Link2,
+  CalendarX,
 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils/cn";
 
@@ -86,13 +86,13 @@ function groupByDay(events: CalendarEvent[]): GroupedEvents[] {
 // ─── Skeleton ───────────────────────────────────────────────
 function EventSkeleton() {
   return (
-    <div className="space-y-4 animate-pulse">
+    <div className="space-y-5 animate-pulse">
       {[1, 2, 3].map((i) => (
         <div key={i} className="space-y-2">
-          <div className="h-4 w-32 bg-bg-tertiary rounded" />
+          <div className="h-4 w-28 bg-bg-tertiary rounded" />
           <div className="space-y-2">
-            <div className="h-16 bg-bg-tertiary rounded-xl" />
-            <div className="h-16 bg-bg-tertiary rounded-xl" />
+            <div className="h-[68px] bg-bg-tertiary/50 rounded-xl border border-border-default/30" />
+            <div className="h-[68px] bg-bg-tertiary/50 rounded-xl border border-border-default/30" />
           </div>
         </div>
       ))}
@@ -145,19 +145,35 @@ export function GoogleCalendarWidget({ className }: { className?: string }) {
   const grouped = groupByDay(events);
 
   return (
-    <Card className={cn("", className)}>
-      <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle className="flex items-center gap-2">
-          <CalendarIcon className="h-5 w-5 text-accent" />
-          Google Calendar
-        </CardTitle>
+    <div
+      className={cn(
+        "rounded-2xl border border-border-default/50 bg-bg-secondary/30 backdrop-blur-sm overflow-hidden",
+        className
+      )}
+    >
+      {/* Header */}
+      <div className="flex items-center justify-between px-5 py-4 border-b border-border-default/30">
+        <div className="flex items-center gap-2.5">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent/10">
+            <CalendarIcon className="h-4 w-4 text-accent" />
+          </div>
+          <h3 className="text-sm font-semibold text-text-primary">
+            Google Calendar
+          </h3>
+          {connected && (
+            <span className="flex items-center gap-1 rounded-full bg-accent/10 px-2 py-0.5 text-[10px] font-medium text-accent">
+              <span className="h-1.5 w-1.5 rounded-full bg-accent" />
+              Connecté
+            </span>
+          )}
+        </div>
         {connected && (
           <Button
             variant="ghost"
             size="sm"
             onClick={() => fetchEvents(true)}
             disabled={refreshing}
-            className="h-8 w-8 p-0"
+            className="h-8 w-8 p-0 rounded-lg hover:bg-bg-tertiary"
           >
             <RefreshCw
               className={cn(
@@ -167,33 +183,33 @@ export function GoogleCalendarWidget({ className }: { className?: string }) {
             />
           </Button>
         )}
-      </CardHeader>
+      </div>
 
-      <CardContent>
+      <div className="p-5">
         {/* Loading state */}
         {loading && connected === null && <EventSkeleton />}
 
         {/* Not connected */}
         {!loading && connected === false && (
-          <div className="text-center py-8 space-y-4">
-            <div className="h-12 w-12 rounded-2xl bg-accent/10 flex items-center justify-center mx-auto">
-              <CalendarIcon className="h-6 w-6 text-accent" />
+          <div className="text-center py-10 space-y-4">
+            <div className="h-14 w-14 rounded-2xl bg-accent/10 flex items-center justify-center mx-auto">
+              <CalendarIcon className="h-7 w-7 text-accent" />
             </div>
             <div>
-              <p className="text-sm font-medium text-text-primary mb-1">
+              <p className="text-base font-semibold text-text-primary mb-1">
                 Connecte Google Calendar
               </p>
-              <p className="text-xs text-text-muted max-w-xs mx-auto">
+              <p className="text-sm text-text-secondary max-w-xs mx-auto leading-relaxed">
                 Synchronise tes événements pour voir ton planning directement
                 dans ScalingFlow.
               </p>
             </div>
             <Button
-              size="sm"
               onClick={() => {
                 window.location.href =
                   "/api/integrations/google-calendar/connect";
               }}
+              className="rounded-xl bg-accent hover:bg-accent/90 text-white"
             >
               <Link2 className="h-4 w-4 mr-2" />
               Connecter Google Calendar
@@ -210,17 +226,24 @@ export function GoogleCalendarWidget({ className }: { className?: string }) {
 
         {/* Connected, no events */}
         {!loading && connected && events.length === 0 && !error && (
-          <div className="text-center py-8 space-y-2">
-            <CalendarIcon className="h-8 w-8 text-text-muted mx-auto" />
-            <p className="text-sm text-text-muted">
-              Aucun événement dans les 30 prochains jours.
-            </p>
+          <div className="text-center py-10 space-y-3">
+            <div className="h-12 w-12 rounded-2xl bg-bg-tertiary flex items-center justify-center mx-auto">
+              <CalendarX className="h-6 w-6 text-text-muted" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-text-primary mb-0.5">
+                Aucun événement à venir
+              </p>
+              <p className="text-xs text-text-muted">
+                Aucun événement dans les 30 prochains jours.
+              </p>
+            </div>
           </div>
         )}
 
         {/* Events list */}
         {!loading && connected && events.length > 0 && (
-          <div className="space-y-6">
+          <div className="space-y-5">
             {grouped.map((group) => (
               <div key={group.date} className="space-y-2">
                 <p className="text-xs font-semibold text-text-muted uppercase tracking-wider">
@@ -230,15 +253,15 @@ export function GoogleCalendarWidget({ className }: { className?: string }) {
                   {group.events.map((evt) => (
                     <div
                       key={evt.id}
-                      className="p-3 rounded-xl border border-border-default bg-bg-tertiary/50 hover:border-accent/20 transition-colors group"
+                      className="p-3.5 rounded-xl border border-border-default/50 bg-bg-tertiary/30 hover:border-accent/20 hover:bg-bg-tertiary/50 transition-all duration-200 group"
                     >
                       <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0 flex-1">
                           <p className="text-sm font-medium text-text-primary truncate">
                             {evt.title}
                           </p>
-                          <div className="flex items-center gap-3 mt-1">
-                            <span className="flex items-center gap-1 text-xs text-text-muted">
+                          <div className="flex items-center gap-3 mt-1.5">
+                            <span className="inline-flex items-center gap-1 rounded-full bg-accent/10 px-2 py-0.5 text-[11px] font-medium text-accent">
                               <Clock className="h-3 w-3" />
                               {formatTime(evt.start)}
                               {evt.end &&
@@ -246,7 +269,7 @@ export function GoogleCalendarWidget({ className }: { className?: string }) {
                                 ` — ${formatTime(evt.end)}`}
                             </span>
                             {evt.location && (
-                              <span className="flex items-center gap-1 text-xs text-text-muted truncate max-w-[180px]">
+                              <span className="inline-flex items-center gap-1 text-xs text-text-muted truncate max-w-[180px]">
                                 <MapPin className="h-3 w-3 shrink-0" />
                                 {evt.location}
                               </span>
@@ -257,7 +280,7 @@ export function GoogleCalendarWidget({ className }: { className?: string }) {
                           href={`https://calendar.google.com/calendar/event?eid=${btoa(evt.id)}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="opacity-0 group-hover:opacity-100 transition-opacity"
+                          className="p-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-bg-tertiary"
                         >
                           <ExternalLink className="h-3.5 w-3.5 text-text-muted hover:text-accent" />
                         </a>
@@ -273,10 +296,10 @@ export function GoogleCalendarWidget({ className }: { className?: string }) {
         {/* Refreshing indicator */}
         {refreshing && (
           <div className="flex items-center justify-center py-2">
-            <Loader2 className="h-4 w-4 animate-spin text-text-muted" />
+            <Loader2 className="h-4 w-4 animate-spin text-accent" />
           </div>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

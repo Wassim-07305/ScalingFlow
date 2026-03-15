@@ -49,26 +49,27 @@ export function PipelineCard({ lead, onClick, isDragging }: PipelineCardProps) {
         e.dataTransfer.effectAllowed = "move";
         const target = e.currentTarget;
         requestAnimationFrame(() => {
-          target.classList.add("opacity-40");
+          target.classList.add("opacity-40", "scale-[0.97]");
         });
       }}
       onDragEnd={(e) => {
-        e.currentTarget.classList.remove("opacity-40");
+        e.currentTarget.classList.remove("opacity-40", "scale-[0.97]");
       }}
       onClick={() => onClick(lead)}
       className={cn(
-        "group rounded-2xl border border-border-default bg-bg-secondary/60 p-3.5 cursor-grab active:cursor-grabbing transition-all duration-150",
-        "hover:border-border-hover hover:bg-bg-secondary",
-        isDragging && "opacity-40 border-accent"
+        "group rounded-2xl border border-border-default bg-bg-secondary/60 p-3.5 cursor-grab active:cursor-grabbing",
+        "transition-all duration-200",
+        "hover:border-accent/20 hover:bg-bg-secondary hover:shadow-lg hover:shadow-black/10 hover:-translate-y-0.5",
+        isDragging && "opacity-40 border-accent scale-[0.97]"
       )}
     >
       {/* Header */}
       <div className="flex items-start justify-between mb-2">
         <div className="flex items-center gap-2 min-w-0">
-          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-accent-muted">
+          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-accent/10">
             <User className="h-3.5 w-3.5 text-accent" />
           </div>
-          <span className="text-sm font-medium text-text-primary truncate">
+          <span className="text-sm font-medium text-text-primary truncate group-hover:text-accent transition-colors">
             {lead.name}
           </span>
         </div>

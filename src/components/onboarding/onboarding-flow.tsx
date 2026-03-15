@@ -48,7 +48,7 @@ const slideVariants = {
 
 const SITUATION_FIELDS: Record<
   string,
-  { key: string; label: string; placeholder: string; type?: string }[]
+  { key: string; label: string; placeholder: string; type?: string; multiline?: boolean }[]
 > = {
   zero: [
     {
@@ -113,11 +113,13 @@ const SITUATION_FIELDS: Record<
       key: "business_model",
       label: "Comment fonctionne ton business ?",
       placeholder: "Ex : Vente de formations en ligne, prestations de service, SaaS...",
+      multiline: true,
     },
     {
       key: "delivery_description",
       label: "Que délivres-tu exactement ?",
       placeholder: "Ex : Accompagnement 1-to-1 sur 3 mois, formation vidéo + coaching de groupe...",
+      multiline: true,
     },
     {
       key: "active_clients",
@@ -129,6 +131,7 @@ const SITUATION_FIELDS: Record<
       key: "delivery_process",
       label: "Quel est ton process de delivery ?",
       placeholder: "Ex : Onboarding → audit → plan d'action → suivi hebdo → bilan...",
+      multiline: true,
     },
     {
       key: "best_result",
@@ -707,25 +710,44 @@ export function OnboardingFlow() {
                   <label className="mb-2 block text-sm font-medium text-white/50">
                     {f.label}
                   </label>
-                  <input
-                    {...(idx === 0 ? { "data-autofocus": true } : {})}
-                    type={f.type || "text"}
-                    value={String(
-                      details[f.key as keyof SituationDetails] || "",
-                    )}
-                    onChange={(e) => {
-                      const updated = {
-                        ...details,
-                        [f.key]:
-                          f.type === "number"
-                            ? Number(e.target.value)
-                            : e.target.value,
-                      };
-                      setField("situationDetails", updated);
-                    }}
-                    placeholder={f.placeholder}
-                    className="w-full rounded-xl border-2 border-white/20 bg-white/5 px-5 py-3.5 text-lg text-white outline-none placeholder:text-white/25 transition-colors focus:border-emerald-400"
-                  />
+                  {f.multiline ? (
+                    <textarea
+                      {...(idx === 0 ? { "data-autofocus": true } : {})}
+                      value={String(
+                        details[f.key as keyof SituationDetails] || "",
+                      )}
+                      onChange={(e) => {
+                        const updated = {
+                          ...details,
+                          [f.key]: e.target.value,
+                        };
+                        setField("situationDetails", updated);
+                      }}
+                      placeholder={f.placeholder}
+                      rows={3}
+                      className="w-full resize-none rounded-xl border-2 border-white/20 bg-white/5 px-5 py-3.5 text-lg text-white outline-none placeholder:text-white/25 transition-colors focus:border-emerald-400"
+                    />
+                  ) : (
+                    <input
+                      {...(idx === 0 ? { "data-autofocus": true } : {})}
+                      type={f.type || "text"}
+                      value={String(
+                        details[f.key as keyof SituationDetails] || "",
+                      )}
+                      onChange={(e) => {
+                        const updated = {
+                          ...details,
+                          [f.key]:
+                            f.type === "number"
+                              ? Number(e.target.value)
+                              : e.target.value,
+                        };
+                        setField("situationDetails", updated);
+                      }}
+                      placeholder={f.placeholder}
+                      className="w-full rounded-xl border-2 border-white/20 bg-white/5 px-5 py-3.5 text-lg text-white outline-none placeholder:text-white/25 transition-colors focus:border-emerald-400"
+                    />
+                  )}
                 </div>
               ))}
             </div>

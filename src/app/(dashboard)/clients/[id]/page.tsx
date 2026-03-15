@@ -2,20 +2,18 @@
 
 import React from "react";
 import { useParams, useRouter } from "next/navigation";
-import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { ClientForm, type ClientFormData } from "@/components/clients/client-form";
 import { DealForm, type DealFormData, type DealStatus } from "@/components/clients/deal-form";
 import {
   ClientActivityFeed,
   type ActivityItem,
 } from "@/components/clients/client-activity-feed";
-import { SkeletonCard, Skeleton } from "@/components/ui/skeleton";
+import { Skeleton, SkeletonCard, SkeletonLine, SkeletonCircle } from "@/components/ui/skeleton";
 import { createClient } from "@/lib/supabase/client";
 import { useUser } from "@/hooks/use-user";
 import { toast } from "sonner";
@@ -33,6 +31,10 @@ import {
   Calendar,
   Trash2,
   CheckCircle2,
+  Eye,
+  LayoutList,
+  Activity,
+  Sparkles,
 } from "lucide-react";
 
 interface ClientDetail {
@@ -61,26 +63,26 @@ interface DealRow {
 
 const STATUS_CONFIG: Record<
   string,
-  { label: string; variant: "default" | "blue" | "muted" | "red" | "yellow" }
+  { label: string; variant: "default" | "blue" | "muted" | "red" | "yellow"; color: string; bgColor: string }
 > = {
-  prospect: { label: "Prospect", variant: "blue" },
-  actif: { label: "Actif", variant: "default" },
-  inactif: { label: "Inactif", variant: "muted" },
-  churne: { label: "Churné", variant: "red" },
+  prospect: { label: "Prospect", variant: "blue", color: "text-blue-400", bgColor: "bg-blue-500/15" },
+  actif: { label: "Actif", variant: "default", color: "text-emerald-400", bgColor: "bg-emerald-500/15" },
+  inactif: { label: "Inactif", variant: "muted", color: "text-text-muted", bgColor: "bg-bg-tertiary" },
+  churne: { label: "Churné", variant: "red", color: "text-red-400", bgColor: "bg-red-500/15" },
 };
 
 const DEAL_STATUS_CONFIG: Record<
   DealStatus,
-  { label: string; variant: "default" | "blue" | "muted" | "red" | "yellow" | "purple" }
+  { label: string; variant: "default" | "blue" | "muted" | "red" | "yellow" | "purple"; color: string; bgColor: string }
 > = {
-  nouveau: { label: "Nouveau", variant: "blue" },
-  engage: { label: "Engagé", variant: "purple" },
-  call_booke: { label: "Call booké", variant: "blue" },
-  no_show: { label: "No-show", variant: "yellow" },
-  follow_up: { label: "Follow-up", variant: "yellow" },
-  depot_pose: { label: "Dépôt posé", variant: "purple" },
-  close: { label: "Closé", variant: "default" },
-  perdu: { label: "Perdu", variant: "red" },
+  nouveau: { label: "Nouveau", variant: "blue", color: "text-blue-400", bgColor: "bg-blue-500/15" },
+  engage: { label: "Engagé", variant: "purple", color: "text-violet-400", bgColor: "bg-violet-500/15" },
+  call_booke: { label: "Call booké", variant: "blue", color: "text-cyan-400", bgColor: "bg-cyan-500/15" },
+  no_show: { label: "No-show", variant: "yellow", color: "text-orange-400", bgColor: "bg-orange-500/15" },
+  follow_up: { label: "Follow-up", variant: "yellow", color: "text-yellow-400", bgColor: "bg-yellow-500/15" },
+  depot_pose: { label: "Dépôt posé", variant: "purple", color: "text-indigo-400", bgColor: "bg-indigo-500/15" },
+  close: { label: "Closé", variant: "default", color: "text-emerald-400", bgColor: "bg-emerald-500/15" },
+  perdu: { label: "Perdu", variant: "red", color: "text-red-400", bgColor: "bg-red-500/15" },
 };
 
 function formatCurrency(amount: number) {
@@ -108,6 +110,15 @@ function getInitials(name: string) {
     .slice(0, 2);
 }
 
+// ─── Tabs ────────────────────────────────────────────────────
+const TABS = [
+  { id: "apercu" as const, label: "Aperçu", icon: Eye },
+  { id: "deals" as const, label: "Deals", icon: LayoutList },
+  { id: "activite" as const, label: "Activité", icon: Activity },
+] as const;
+
+type TabId = (typeof TABS)[number]["id"];
+
 export default function ClientDetailPage() {
   const params = useParams();
   const router = useRouter();
@@ -122,6 +133,7 @@ export default function ClientDetailPage() {
   const [editFormOpen, setEditFormOpen] = React.useState(false);
   const [dealFormOpen, setDealFormOpen] = React.useState(false);
   const [editingDeal, setEditingDeal] = React.useState<DealRow | null>(null);
+  const [activeTab, setActiveTab] = React.useState<TabId>("apercu");
 
   const fetchAll = React.useCallback(async () => {
     if (!user || !clientId) return;
@@ -333,9 +345,29 @@ export default function ClientDetailPage() {
 
   if (loading) {
     return (
-      <div>
-        <Skeleton className="h-8 w-48 mb-6" />
-        <Skeleton className="h-32 w-full mb-6" />
+      <div className="max-w-4xl mx-auto">
+        {/* Back button skeleton */}
+        <Skeleton className="h-8 w-40 mb-4" />
+        {/* Hero skeleton */}
+        <div className="rounded-2xl border border-border-default bg-bg-secondary/50 p-6 mb-6">
+          <div className="flex items-center gap-4">
+            <SkeletonCircle className="h-16 w-16" />
+            <div className="flex-1 space-y-2">
+              <SkeletonLine className="h-6 w-48" />
+              <SkeletonLine className="h-4 w-32" />
+              <SkeletonLine className="h-3 w-24" />
+            </div>
+          </div>
+        </div>
+        {/* Stats skeleton */}
+        <div className="grid grid-cols-3 gap-3 mb-6">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <Skeleton key={i} className="h-20 rounded-2xl" />
+          ))}
+        </div>
+        {/* Tabs skeleton */}
+        <Skeleton className="h-12 w-full rounded-xl mb-6" />
+        {/* Content skeleton */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <SkeletonCard className="h-48" />
           <SkeletonCard className="h-48" />
@@ -349,26 +381,27 @@ export default function ClientDetailPage() {
   const statusCfg = STATUS_CONFIG[client.status];
 
   return (
-    <div>
+    <div className="max-w-4xl mx-auto">
       {/* Back button */}
       <Button
         variant="ghost"
         size="sm"
-        className="mb-4"
+        className="mb-4 text-text-secondary hover:text-text-primary"
         onClick={() => router.push("/clients")}
       >
         <ArrowLeft className="h-4 w-4 mr-1" />
         Retour aux clients
       </Button>
 
-      {/* Client header */}
-      <Card className="mb-6">
-        <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-          <Avatar className="h-16 w-16">
+      {/* Client profile header — premium gradient */}
+      <div className="relative mb-6 overflow-hidden rounded-2xl border border-border-default bg-gradient-to-br from-accent/5 via-bg-secondary to-bg-secondary p-6 md:p-8">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-accent/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+        <div className="relative flex flex-col sm:flex-row sm:items-center gap-4">
+          <Avatar className="h-16 w-16 ring-2 ring-accent/20 ring-offset-2 ring-offset-bg-primary">
             {client.avatar_url && (
               <AvatarImage src={client.avatar_url} alt={client.name} />
             )}
-            <AvatarFallback className="bg-accent-muted text-accent text-lg font-bold">
+            <AvatarFallback className="bg-accent/10 text-accent text-lg font-bold">
               {getInitials(client.name)}
             </AvatarFallback>
           </Avatar>
@@ -378,7 +411,13 @@ export default function ClientDetailPage() {
               <h1 className="text-xl font-bold text-text-primary">
                 {client.name}
               </h1>
-              <Badge variant={statusCfg.variant}>{statusCfg.label}</Badge>
+              <span className={cn(
+                "inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium",
+                statusCfg.bgColor, statusCfg.color
+              )}>
+                <span className={cn("h-1.5 w-1.5 rounded-full", statusCfg.color === "text-text-muted" ? "bg-text-muted" : "bg-current")} />
+                {statusCfg.label}
+              </span>
             </div>
             {client.company && (
               <p className="flex items-center gap-1.5 text-sm text-text-secondary mt-1">
@@ -391,7 +430,7 @@ export default function ClientDetailPage() {
             </p>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 shrink-0">
             <Button
               variant="outline"
               size="sm"
@@ -410,139 +449,189 @@ export default function ClientDetailPage() {
             </Button>
           </div>
         </div>
-      </Card>
+      </div>
 
-      {/* Tabs */}
-      <Tabs defaultValue="apercu">
-        <TabsList className="mb-6 w-full sm:w-auto">
-          <TabsTrigger value="apercu">Aperçu</TabsTrigger>
-          <TabsTrigger value="deals">Deals</TabsTrigger>
-          <TabsTrigger value="activite">Activité</TabsTrigger>
-        </TabsList>
-
-        {/* ─── Aperçu ─── */}
-        <TabsContent value="apercu">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Contact info */}
-            <Card className="lg:col-span-2">
-              <CardHeader>
-                <CardTitle>Informations de contact</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {client.email && (
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-bg-tertiary">
-                      <Mail className="h-4 w-4 text-text-muted" />
-                    </div>
-                    <div>
-                      <p className="text-xs text-text-muted">Email</p>
-                      <a
-                        href={`mailto:${client.email}`}
-                        className="text-sm text-accent hover:underline"
-                      >
-                        {client.email}
-                      </a>
-                    </div>
-                  </div>
-                )}
-                {client.phone && (
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-bg-tertiary">
-                      <Phone className="h-4 w-4 text-text-muted" />
-                    </div>
-                    <div>
-                      <p className="text-xs text-text-muted">Téléphone</p>
-                      <a
-                        href={`tel:${client.phone}`}
-                        className="text-sm text-text-primary hover:text-accent"
-                      >
-                        {client.phone}
-                      </a>
-                    </div>
-                  </div>
-                )}
-                {client.company && (
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-bg-tertiary">
-                      <Building2 className="h-4 w-4 text-text-muted" />
-                    </div>
-                    <div>
-                      <p className="text-xs text-text-muted">Entreprise</p>
-                      <p className="text-sm text-text-primary">{client.company}</p>
-                    </div>
-                  </div>
-                )}
-
-                {!client.email && !client.phone && !client.company && (
-                  <p className="text-sm text-text-muted italic">
-                    Aucune information de contact renseignée.
-                  </p>
-                )}
-
-                {client.notes && (
-                  <>
-                    <Separator className="my-3" />
-                    <div>
-                      <p className="flex items-center gap-1.5 text-xs text-text-muted uppercase tracking-wide mb-2">
-                        <FileText className="h-3.5 w-3.5" />
-                        Notes
-                      </p>
-                      <p className="text-sm text-text-secondary whitespace-pre-wrap leading-relaxed">
-                        {client.notes}
-                      </p>
-                    </div>
-                  </>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Stats summary */}
-            <div className="space-y-4">
-              <Card>
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent-muted">
-                    <DollarSign className="h-5 w-5 text-accent" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-text-muted">CA total</p>
-                    <p className="text-lg font-bold text-text-primary">
-                      {formatCurrency(totalDeals)}
-                    </p>
-                  </div>
-                </div>
-              </Card>
-              <Card>
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent-muted">
-                    <CheckCircle2 className="h-5 w-5 text-accent" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-text-muted">CA closé</p>
-                    <p className="text-lg font-bold text-accent">
-                      {formatCurrency(closedAmount)}
-                    </p>
-                  </div>
-                </div>
-              </Card>
-              <Card>
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-info/12">
-                    <TrendingUp className="h-5 w-5 text-info" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-text-muted">Deals en cours</p>
-                    <p className="text-lg font-bold text-text-primary">
-                      {activeDeals.length}
-                    </p>
-                  </div>
-                </div>
-              </Card>
-            </div>
+      {/* Mini stats row */}
+      <div className="grid grid-cols-3 gap-3 mb-6">
+        <div className="flex items-center gap-3 rounded-2xl border border-border-default bg-bg-secondary/50 px-4 py-3 backdrop-blur-sm">
+          <div className="rounded-xl bg-accent/10 p-2.5">
+            <DollarSign className="h-4 w-4 text-accent" />
           </div>
-        </TabsContent>
+          <div>
+            <p className="text-lg font-bold text-text-primary">
+              {formatCurrency(totalDeals)}
+            </p>
+            <p className="text-[11px] text-text-muted">CA total</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-3 rounded-2xl border border-border-default bg-bg-secondary/50 px-4 py-3 backdrop-blur-sm">
+          <div className="rounded-xl bg-accent/10 p-2.5">
+            <CheckCircle2 className="h-4 w-4 text-accent" />
+          </div>
+          <div>
+            <p className="text-lg font-bold text-accent">
+              {formatCurrency(closedAmount)}
+            </p>
+            <p className="text-[11px] text-text-muted">CA closé</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-3 rounded-2xl border border-border-default bg-bg-secondary/50 px-4 py-3 backdrop-blur-sm">
+          <div className="rounded-xl bg-info/10 p-2.5">
+            <TrendingUp className="h-4 w-4 text-info" />
+          </div>
+          <div>
+            <p className="text-lg font-bold text-text-primary">
+              {activeDeals.length}
+            </p>
+            <p className="text-[11px] text-text-muted">Deals en cours</p>
+          </div>
+        </div>
+      </div>
 
-        {/* ─── Deals ─── */}
-        <TabsContent value="deals">
+      {/* Pill-style tab navigation */}
+      <div className="flex gap-1 mb-6 rounded-xl bg-bg-secondary/80 border border-border-default p-1">
+        {TABS.map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={cn(
+              "flex flex-1 items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200",
+              activeTab === tab.id
+                ? "bg-accent text-white shadow-lg shadow-accent/20"
+                : "text-text-secondary hover:text-text-primary hover:bg-bg-tertiary"
+            )}
+          >
+            <tab.icon className="h-4 w-4" />
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {/* ─── Aperçu ─── */}
+      {activeTab === "apercu" && (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Contact info */}
+          <Card className="lg:col-span-2">
+            <CardHeader>
+              <CardTitle>Informations de contact</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {client.email && (
+                <div className="flex items-center gap-3">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-bg-tertiary">
+                    <Mail className="h-4 w-4 text-text-muted" />
+                  </div>
+                  <div>
+                    <p className="text-xs text-text-muted">Email</p>
+                    <a
+                      href={`mailto:${client.email}`}
+                      className="text-sm text-accent hover:underline"
+                    >
+                      {client.email}
+                    </a>
+                  </div>
+                </div>
+              )}
+              {client.phone && (
+                <div className="flex items-center gap-3">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-bg-tertiary">
+                    <Phone className="h-4 w-4 text-text-muted" />
+                  </div>
+                  <div>
+                    <p className="text-xs text-text-muted">Téléphone</p>
+                    <a
+                      href={`tel:${client.phone}`}
+                      className="text-sm text-text-primary hover:text-accent transition-colors"
+                    >
+                      {client.phone}
+                    </a>
+                  </div>
+                </div>
+              )}
+              {client.company && (
+                <div className="flex items-center gap-3">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-bg-tertiary">
+                    <Building2 className="h-4 w-4 text-text-muted" />
+                  </div>
+                  <div>
+                    <p className="text-xs text-text-muted">Entreprise</p>
+                    <p className="text-sm text-text-primary">{client.company}</p>
+                  </div>
+                </div>
+              )}
+
+              {!client.email && !client.phone && !client.company && (
+                <p className="text-sm text-text-muted italic">
+                  Aucune information de contact renseignée.
+                </p>
+              )}
+
+              {client.notes && (
+                <>
+                  <Separator className="my-3" />
+                  <div>
+                    <p className="flex items-center gap-1.5 text-xs text-text-muted uppercase tracking-wide mb-2">
+                      <FileText className="h-3.5 w-3.5" />
+                      Notes
+                    </p>
+                    <p className="text-sm text-text-secondary whitespace-pre-wrap leading-relaxed">
+                      {client.notes}
+                    </p>
+                  </div>
+                </>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Quick deal summary */}
+          <div className="space-y-4">
+            {closedDeals.length > 0 && (
+              <div className="rounded-2xl border border-accent/20 bg-gradient-to-br from-accent/5 to-bg-secondary p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <Sparkles className="h-4 w-4 text-accent" />
+                  <span className="text-sm font-semibold text-accent">Deals closés</span>
+                </div>
+                <p className="text-2xl font-bold text-accent">
+                  {formatCurrency(closedAmount)}
+                </p>
+                <p className="text-xs text-text-muted mt-1">
+                  {closedDeals.length} deal{closedDeals.length > 1 ? "s" : ""} closé{closedDeals.length > 1 ? "s" : ""}
+                </p>
+              </div>
+            )}
+
+            <Card>
+              <div className="space-y-3">
+                <p className="text-xs text-text-muted uppercase tracking-wide">Résumé rapide</p>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-text-secondary">Total deals</span>
+                    <span className="text-sm font-medium text-text-primary">{deals.length}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-text-secondary">En cours</span>
+                    <span className="text-sm font-medium text-text-primary">{activeDeals.length}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-text-secondary">Closés</span>
+                    <span className="text-sm font-medium text-accent">{closedDeals.length}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-text-secondary">Perdus</span>
+                    <span className="text-sm font-medium text-red-400">
+                      {deals.filter((d) => d.status === "perdu").length}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </Card>
+          </div>
+        </div>
+      )}
+
+      {/* ─── Deals ─── */}
+      {activeTab === "deals" && (
+        <div>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-base font-semibold text-text-primary">
               Deals ({deals.length})
@@ -560,10 +649,15 @@ export default function ClientDetailPage() {
           </div>
 
           {deals.length === 0 ? (
-            <Card className="flex flex-col items-center justify-center py-12 text-center">
-              <DollarSign className="h-10 w-10 text-text-muted mb-3" />
-              <p className="text-sm text-text-secondary mb-3">
-                Aucun deal pour ce client.
+            <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border-default bg-bg-secondary/30 py-14 text-center backdrop-blur-sm">
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-bg-tertiary mb-4">
+                <DollarSign className="h-7 w-7 text-text-muted" />
+              </div>
+              <h3 className="text-base font-semibold text-text-primary mb-1">
+                Aucun deal pour ce client
+              </h3>
+              <p className="text-sm text-text-secondary mb-4 max-w-sm">
+                Créez votre premier deal pour suivre le chiffre d&apos;affaires de ce client.
               </p>
               <Button
                 size="sm"
@@ -575,14 +669,17 @@ export default function ClientDetailPage() {
                 <Plus className="h-4 w-4 mr-1" />
                 Créer un deal
               </Button>
-            </Card>
+            </div>
           ) : (
             <div className="space-y-3">
               {/* iClosed summary */}
               {closedDeals.length > 0 && (
-                <Card className="border-accent/20 bg-accent/5">
-                  <div className="flex items-center gap-3">
-                    <CheckCircle2 className="h-5 w-5 text-accent" />
+                <div className="relative overflow-hidden rounded-2xl border border-accent/20 bg-gradient-to-r from-accent/10 via-accent/5 to-bg-secondary p-4">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-accent/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2" />
+                  <div className="relative flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent/15">
+                      <CheckCircle2 className="h-5 w-5 text-accent" />
+                    </div>
                     <div>
                       <p className="text-sm font-semibold text-accent">
                         {closedDeals.length} deal{closedDeals.length > 1 ? "s" : ""} closé{closedDeals.length > 1 ? "s" : ""}
@@ -592,24 +689,30 @@ export default function ClientDetailPage() {
                       </p>
                     </div>
                   </div>
-                </Card>
+                </div>
               )}
 
               {deals.map((deal) => {
                 const dealCfg = DEAL_STATUS_CONFIG[deal.status];
                 return (
-                  <Card key={deal.id} className="group">
+                  <div
+                    key={deal.id}
+                    className="group rounded-2xl border border-border-default bg-bg-secondary/50 p-4 transition-all duration-200 hover:border-border-hover hover:bg-bg-secondary backdrop-blur-sm"
+                  >
                     <div className="flex items-center justify-between gap-3">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
                           <h3 className="text-sm font-semibold text-text-primary truncate">
                             {deal.title}
                           </h3>
-                          <Badge variant={dealCfg.variant}>
+                          <span className={cn(
+                            "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium",
+                            dealCfg.bgColor, dealCfg.color
+                          )}>
                             {dealCfg.label}
-                          </Badge>
+                          </span>
                         </div>
-                        <div className="flex items-center gap-3 mt-1">
+                        <div className="flex items-center gap-3 mt-1.5">
                           <span className="text-sm font-medium text-accent">
                             {formatCurrency(Number(deal.amount))}
                           </span>
@@ -647,21 +750,23 @@ export default function ClientDetailPage() {
                         </Button>
                       </div>
                     </div>
-                  </Card>
+                  </div>
                 );
               })}
             </div>
           )}
-        </TabsContent>
+        </div>
+      )}
 
-        {/* ─── Activité ─── */}
-        <TabsContent value="activite">
+      {/* ─── Activité ─── */}
+      {activeTab === "activite" && (
+        <div>
           <h2 className="text-base font-semibold text-text-primary mb-4">
             Fil d&apos;activité
           </h2>
           <ClientActivityFeed activities={activities} />
-        </TabsContent>
-      </Tabs>
+        </div>
+      )}
 
       {/* Edit client modal */}
       <ClientForm

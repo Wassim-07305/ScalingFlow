@@ -12,7 +12,6 @@ import {
   TrendingUp,
   Heart,
   MessageCircle,
-  ExternalLink,
   RefreshCw,
   Star,
   Link2,
@@ -116,13 +115,11 @@ export function InstagramStats() {
       if (document.hidden) {
         stopPolling();
       } else {
-        // Rafraîchir immédiatement au retour puis relancer le polling
         fetchStats(false);
         startPolling();
       }
     };
 
-    // Démarrer le polling initial
     startPolling();
     document.addEventListener("visibilitychange", handleVisibilityChange);
 
@@ -140,51 +137,73 @@ export function InstagramStats() {
     return () => clearInterval(timer);
   }, []);
 
-  // Loading skeleton
+  /* ── Loading skeleton ── */
   if (loading) {
     return (
-      <Card>
-        <CardContent className="pt-6">
-          <div className="space-y-4 animate-pulse">
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-full bg-bg-tertiary" />
-              <div className="space-y-2 flex-1">
-                <div className="h-4 w-32 rounded bg-bg-tertiary" />
-                <div className="h-3 w-24 rounded bg-bg-tertiary" />
+      <div className="space-y-4">
+        <Card>
+          <CardContent className="pt-6">
+            <div className="space-y-5 animate-pulse">
+              {/* Profile header skeleton */}
+              <div className="flex items-center gap-3">
+                <div className="h-11 w-11 rounded-full bg-bg-tertiary" />
+                <div className="space-y-2 flex-1">
+                  <div className="h-4 w-36 rounded-md bg-bg-tertiary" />
+                  <div className="h-3 w-24 rounded-md bg-bg-tertiary" />
+                </div>
+              </div>
+              {/* Stats skeleton */}
+              <div className="grid grid-cols-3 gap-3">
+                {[1, 2, 3].map((i) => (
+                  <div
+                    key={i}
+                    className="h-20 rounded-xl bg-bg-tertiary"
+                  />
+                ))}
               </div>
             </div>
-            <div className="grid grid-cols-3 gap-3">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="h-16 rounded-xl bg-bg-tertiary" />
-              ))}
+          </CardContent>
+        </Card>
+        {/* Posts grid skeleton */}
+        <Card>
+          <CardContent className="pt-6">
+            <div className="animate-pulse">
+              <div className="h-4 w-28 rounded-md bg-bg-tertiary mb-4" />
+              <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+                {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+                  <div
+                    key={i}
+                    className="aspect-square rounded-xl bg-bg-tertiary"
+                  />
+                ))}
+              </div>
             </div>
-            <div className="grid grid-cols-3 gap-2">
-              {[1, 2, 3, 4, 5, 6].map((i) => (
-                <div key={i} className="aspect-square rounded-lg bg-bg-tertiary" />
-              ))}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </div>
     );
   }
 
-  // Not connected
+  /* ── Not connected ── */
   if (!data?.connected) {
     return (
-      <Card className="border-border-default">
-        <CardContent className="pt-6">
-          <div className="text-center py-8">
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 mx-auto mb-4">
-              <Instagram className="h-7 w-7 text-pink-400" />
+      <Card className="border-border-default overflow-hidden">
+        <CardContent className="pt-0 p-0">
+          {/* Instagram gradient top bar */}
+          <div className="h-1.5 bg-gradient-to-r from-yellow-400 via-pink-500 to-purple-600" />
+
+          <div className="text-center py-12 px-6">
+            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-yellow-400/15 via-pink-500/15 to-purple-600/15 border border-pink-500/20 mx-auto mb-5">
+              <Instagram className="h-8 w-8 text-pink-400" />
             </div>
-            <h3 className="text-lg font-semibold text-text-primary mb-1">
+            <h3 className="text-lg font-bold text-text-primary mb-2">
               Connecte ton compte Instagram
             </h3>
-            <p className="text-sm text-text-secondary max-w-sm mx-auto mb-6">
-              {data?.error || "Connecte ton compte Instagram dans les paramètres pour afficher tes statistiques ici."}
+            <p className="text-sm text-text-secondary max-w-sm mx-auto mb-8 leading-relaxed">
+              {data?.error ||
+                "Connecte ton compte Instagram dans les paramètres pour afficher tes statistiques ici."}
             </p>
-            <Button variant="outline" asChild>
+            <Button variant="outline" asChild className="rounded-xl">
               <a href="/settings">
                 <Link2 className="h-4 w-4 mr-2" />
                 Aller dans les paramètres
@@ -199,15 +218,44 @@ export function InstagramStats() {
   const { profile, recentPosts = [], engagementRate = 0, topPost } = data;
   if (!profile) return null;
 
+  const statCards = [
+    {
+      icon: Users,
+      value: formatNumber(profile.followers_count),
+      label: "Abonnés",
+      gradient: "from-emerald-400/10 to-emerald-400/5",
+      iconColor: "text-emerald-400",
+      borderColor: "border-emerald-400/10",
+    },
+    {
+      icon: ImageIcon,
+      value: formatNumber(profile.media_count),
+      label: "Posts",
+      gradient: "from-blue-400/10 to-blue-400/5",
+      iconColor: "text-blue-400",
+      borderColor: "border-blue-400/10",
+    },
+    {
+      icon: TrendingUp,
+      value: `${engagementRate}%`,
+      label: "Engagement",
+      gradient: "from-purple-400/10 to-purple-400/5",
+      iconColor: "text-purple-400",
+      borderColor: "border-purple-400/10",
+    },
+  ];
+
   return (
     <div className="space-y-4">
       {/* Profile + Stats */}
       <Card>
-        <CardHeader className="pb-3">
+        <CardHeader className="pb-4">
           <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center gap-2 text-sm">
-              <Instagram className="h-4 w-4 text-pink-400" />
-              Instagram — @{profile.username}
+            <CardTitle className="flex items-center gap-2.5 text-sm">
+              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-yellow-400/15 via-pink-500/15 to-purple-600/15">
+                <Instagram className="h-4 w-4 text-pink-400" />
+              </div>
+              @{profile.username}
               {isPolling && (
                 <span
                   className="relative flex h-2 w-2"
@@ -226,79 +274,85 @@ export function InstagramStats() {
               )}
               <button
                 onClick={() => fetchStats(false)}
-                className="p-1.5 rounded-lg text-text-muted hover:text-text-primary hover:bg-bg-tertiary transition-colors"
+                className="p-1.5 rounded-lg text-text-muted hover:text-text-primary hover:bg-bg-tertiary transition-all"
                 title="Rafraîchir maintenant"
               >
-                <RefreshCw className={cn("h-3.5 w-3.5", loading && "animate-spin")} />
+                <RefreshCw
+                  className={cn("h-3.5 w-3.5", loading && "animate-spin")}
+                />
               </button>
             </div>
           </div>
         </CardHeader>
         <CardContent className="pt-0">
           <div className="grid grid-cols-3 gap-3">
-            <div className="rounded-xl bg-bg-tertiary p-3 text-center">
-              <Users className="h-4 w-4 text-accent mx-auto mb-1" />
-              <p className="text-lg font-bold text-text-primary">
-                {formatNumber(profile.followers_count)}
-              </p>
-              <p className="text-xs text-text-muted">Abonnés</p>
-            </div>
-            <div className="rounded-xl bg-bg-tertiary p-3 text-center">
-              <ImageIcon className="h-4 w-4 text-accent mx-auto mb-1" />
-              <p className="text-lg font-bold text-text-primary">
-                {formatNumber(profile.media_count)}
-              </p>
-              <p className="text-xs text-text-muted">Posts</p>
-            </div>
-            <div className="rounded-xl bg-bg-tertiary p-3 text-center">
-              <TrendingUp className="h-4 w-4 text-accent mx-auto mb-1" />
-              <p className="text-lg font-bold text-text-primary">
-                {engagementRate}%
-              </p>
-              <p className="text-xs text-text-muted">Engagement</p>
-            </div>
+            {statCards.map((stat) => {
+              const Icon = stat.icon;
+              return (
+                <div
+                  key={stat.label}
+                  className={cn(
+                    "rounded-xl bg-gradient-to-br p-4 text-center border",
+                    stat.gradient,
+                    stat.borderColor
+                  )}
+                >
+                  <Icon
+                    className={cn("h-4 w-4 mx-auto mb-1.5", stat.iconColor)}
+                  />
+                  <p className="text-xl font-bold text-text-primary">
+                    {stat.value}
+                  </p>
+                  <p className="text-xs text-text-muted mt-0.5">{stat.label}</p>
+                </div>
+              );
+            })}
           </div>
         </CardContent>
       </Card>
 
       {/* Top Post */}
       {topPost && (
-        <Card className="border-accent/20">
-          <CardHeader className="pb-2">
+        <Card className="border-accent/20 bg-gradient-to-r from-accent/5 via-bg-secondary to-bg-secondary">
+          <CardHeader className="pb-3">
             <CardTitle className="text-sm flex items-center gap-2">
               <Star className="h-4 w-4 text-yellow-400" />
               Meilleur post récent
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-0">
-            <div className="flex gap-3">
+            <div className="flex gap-4">
               {(topPost.thumbnail_url || topPost.media_url) && (
                 <a
                   href={topPost.permalink}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="shrink-0"
+                  className="shrink-0 group"
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={topPost.thumbnail_url || topPost.media_url || ""}
                     alt="Top post"
-                    className="h-20 w-20 rounded-lg object-cover"
+                    className="h-24 w-24 rounded-xl object-cover ring-1 ring-border-default/30 group-hover:ring-accent/30 transition-all"
                   />
                 </a>
               )}
               <div className="min-w-0 flex-1">
-                <p className="text-sm text-text-secondary line-clamp-2">
+                <p className="text-sm text-text-secondary line-clamp-3 leading-relaxed">
                   {topPost.caption || "Sans légende"}
                 </p>
-                <div className="flex items-center gap-3 mt-2">
-                  <span className="flex items-center gap-1 text-xs text-text-muted">
-                    <Heart className="h-3 w-3 text-pink-400" />
-                    {formatNumber(topPost.like_count)}
+                <div className="flex items-center gap-4 mt-3">
+                  <span className="flex items-center gap-1.5 text-xs text-text-muted">
+                    <Heart className="h-3.5 w-3.5 text-pink-400" />
+                    <span className="font-medium text-text-secondary">
+                      {formatNumber(topPost.like_count)}
+                    </span>
                   </span>
-                  <span className="flex items-center gap-1 text-xs text-text-muted">
-                    <MessageCircle className="h-3 w-3 text-blue-400" />
-                    {formatNumber(topPost.comments_count)}
+                  <span className="flex items-center gap-1.5 text-xs text-text-muted">
+                    <MessageCircle className="h-3.5 w-3.5 text-blue-400" />
+                    <span className="font-medium text-text-secondary">
+                      {formatNumber(topPost.comments_count)}
+                    </span>
                   </span>
                   <span className="text-xs text-text-muted">
                     {formatDate(topPost.timestamp)}
@@ -313,7 +367,7 @@ export function InstagramStats() {
       {/* Recent Posts Grid */}
       {recentPosts.length > 0 && (
         <Card>
-          <CardHeader className="pb-2">
+          <CardHeader className="pb-3">
             <CardTitle className="text-sm">Posts récents</CardTitle>
           </CardHeader>
           <CardContent className="pt-0">
@@ -324,14 +378,14 @@ export function InstagramStats() {
                   href={post.permalink}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group relative aspect-square rounded-lg overflow-hidden bg-bg-tertiary"
+                  className="group relative aspect-square rounded-xl overflow-hidden bg-bg-tertiary ring-1 ring-border-default/20"
                 >
-                  {(post.thumbnail_url || post.media_url) ? (
+                  {post.thumbnail_url || post.media_url ? (
                     /* eslint-disable-next-line @next/next/no-img-element */
                     <img
                       src={post.thumbnail_url || post.media_url || ""}
                       alt={post.caption?.slice(0, 50) || "Post"}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
@@ -340,13 +394,13 @@ export function InstagramStats() {
                   )}
 
                   {/* Hover overlay */}
-                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center gap-3">
-                    <span className="flex items-center gap-1 text-xs text-white">
-                      <Heart className="h-3 w-3" />
+                  <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center gap-3">
+                    <span className="flex items-center gap-1 text-xs text-white font-medium">
+                      <Heart className="h-3.5 w-3.5" />
                       {formatNumber(post.like_count)}
                     </span>
-                    <span className="flex items-center gap-1 text-xs text-white">
-                      <MessageCircle className="h-3 w-3" />
+                    <span className="flex items-center gap-1 text-xs text-white font-medium">
+                      <MessageCircle className="h-3.5 w-3.5" />
                       {formatNumber(post.comments_count)}
                     </span>
                   </div>
@@ -355,7 +409,7 @@ export function InstagramStats() {
                   {post.media_type === "VIDEO" && (
                     <Badge
                       variant="muted"
-                      className="absolute top-1 right-1 text-[9px] px-1.5 py-0"
+                      className="absolute top-1.5 right-1.5 text-[9px] px-1.5 py-0.5 bg-black/50 backdrop-blur-sm border-none"
                     >
                       Vidéo
                     </Badge>
@@ -363,7 +417,7 @@ export function InstagramStats() {
                   {post.media_type === "CAROUSEL_ALBUM" && (
                     <Badge
                       variant="muted"
-                      className="absolute top-1 right-1 text-[9px] px-1.5 py-0"
+                      className="absolute top-1.5 right-1.5 text-[9px] px-1.5 py-0.5 bg-black/50 backdrop-blur-sm border-none"
                     >
                       Carrousel
                     </Badge>

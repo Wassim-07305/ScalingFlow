@@ -4,9 +4,10 @@ import React, { useEffect, useState, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useUser } from "@/hooks/use-user";
 import { toast } from "sonner";
-import { Loader2, UserPlus, DollarSign, TrendingUp, Users, BarChart3 } from "lucide-react";
+import { UserPlus, DollarSign, TrendingUp, Users, BarChart3 } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { PipelineColumn, type ColumnConfig } from "./pipeline-column";
 import { AddLeadForm } from "./add-lead-form";
 import { LeadDetailPanel } from "./lead-detail-panel";
@@ -160,8 +161,46 @@ export function PipelineBoard() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-20">
-        <Loader2 className="h-8 w-8 animate-spin text-accent" />
+      <div className="space-y-6">
+        {/* Stats skeleton */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="rounded-2xl border border-border-default bg-bg-secondary/50 p-4">
+              <div className="flex items-center gap-3">
+                <Skeleton className="h-9 w-9 rounded-xl" />
+                <div className="space-y-1.5 flex-1">
+                  <Skeleton className="h-3 w-16" />
+                  <Skeleton className="h-5 w-20" />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+        {/* Button skeleton */}
+        <div className="flex items-center justify-end">
+          <Skeleton className="h-10 w-40 rounded-xl" />
+        </div>
+        {/* Columns skeleton */}
+        <div className="overflow-x-auto pb-4 -mx-4 px-4 sm:-mx-0 sm:px-0">
+          <div className="flex gap-3 min-w-max">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div key={i} className="min-w-[280px] w-[280px] shrink-0 rounded-2xl border border-border-default bg-bg-primary/50 p-3">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <Skeleton className="h-2.5 w-2.5 rounded-full" />
+                    <Skeleton className="h-4 w-20" />
+                  </div>
+                  <Skeleton className="h-5 w-5 rounded-full" />
+                </div>
+                <div className="space-y-2">
+                  {Array.from({ length: Math.max(1, 3 - i % 3) }).map((_, j) => (
+                    <Skeleton key={j} className="h-24 rounded-2xl" />
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     );
   }
@@ -169,7 +208,7 @@ export function PipelineBoard() {
   return (
     <div className="space-y-6">
       {/* Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <StatCard
           icon={Users}
           label="Total leads"
@@ -196,7 +235,7 @@ export function PipelineBoard() {
           label="CA closé"
           value={`${closedRevenue.toLocaleString("fr-FR")} \u20AC`}
           color="text-accent"
-          bgColor="bg-accent-muted"
+          bgColor="bg-accent/10"
         />
       </div>
 
@@ -209,7 +248,7 @@ export function PipelineBoard() {
       </div>
 
       {/* Kanban board */}
-      <div className="overflow-x-auto pb-4 -mx-4 px-4 sm:-mx-0 sm:px-0">
+      <div className="overflow-x-auto pb-4 -mx-4 px-4 sm:-mx-0 sm:px-0 snap-x snap-mandatory md:snap-none">
         <div className="flex gap-3 min-w-max">
           {STATUSES.map((status) => (
             <PipelineColumn
@@ -260,15 +299,13 @@ function StatCard({
   bgColor: string;
 }) {
   return (
-    <div className="rounded-2xl border border-border-default bg-bg-secondary/60 p-4">
-      <div className="flex items-center gap-3">
-        <div className={cn("flex h-9 w-9 items-center justify-center rounded-xl", bgColor)}>
-          <Icon className={cn("h-4 w-4", color)} />
-        </div>
-        <div>
-          <p className="text-xs text-text-muted">{label}</p>
-          <p className="text-lg font-bold text-text-primary">{value}</p>
-        </div>
+    <div className="flex items-center gap-3 rounded-2xl border border-border-default bg-bg-secondary/50 px-4 py-3 backdrop-blur-sm transition-all duration-200 hover:border-border-hover">
+      <div className={cn("flex h-9 w-9 items-center justify-center rounded-xl", bgColor)}>
+        <Icon className={cn("h-4 w-4", color)} />
+      </div>
+      <div>
+        <p className="text-lg font-bold text-text-primary">{value}</p>
+        <p className="text-[11px] text-text-muted">{label}</p>
       </div>
     </div>
   );

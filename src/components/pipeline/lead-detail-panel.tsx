@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { cn } from "@/lib/utils/cn";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 import { createClient } from "@/lib/supabase/client";
 import {
   X,
@@ -19,12 +20,13 @@ import {
   Loader2,
   Save,
   Trash2,
+  Activity,
 } from "lucide-react";
 import { toast } from "sonner";
 import type { PipelineLead } from "./pipeline-card";
 import { STATUSES } from "./pipeline-board";
 
-interface Activity {
+interface PipelineActivity {
   id: string;
   action: string;
   old_status: string | null;
@@ -42,7 +44,7 @@ interface LeadDetailPanelProps {
 
 export function LeadDetailPanel({ lead, onClose, onUpdate, onDelete }: LeadDetailPanelProps) {
   const supabase = createClient();
-  const [activities, setActivities] = useState<Activity[]>([]);
+  const [activities, setActivities] = useState<PipelineActivity[]>([]);
   const [loadingActivities, setLoadingActivities] = useState(true);
   const [notes, setNotes] = useState(lead.notes || "");
   const [amount, setAmount] = useState(String(lead.amount || 0));
@@ -156,29 +158,32 @@ export function LeadDetailPanel({ lead, onClose, onUpdate, onDelete }: LeadDetai
       {/* Panel */}
       <div className="fixed right-0 top-0 z-50 h-full w-full max-w-lg border-l border-border-default bg-bg-primary overflow-y-auto shadow-2xl animate-in slide-in-from-right duration-200">
         {/* Header */}
-        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-border-default bg-bg-primary/95 backdrop-blur-sm px-6 py-4">
-          <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-accent-muted">
-              <User className="h-4 w-4 text-accent" />
+        <div className="sticky top-0 z-10 border-b border-border-default bg-gradient-to-r from-accent/5 via-bg-primary to-bg-primary backdrop-blur-sm px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent/10">
+                <User className="h-5 w-5 text-accent" />
+              </div>
+              <div>
+                <h2 className="text-base font-semibold text-text-primary">{lead.name}</h2>
+                {statusConfig && (
+                  <span className={cn(
+                    "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium mt-0.5",
+                    statusConfig.bgColor, statusConfig.color
+                  )}>
+                    <span className="h-1.5 w-1.5 rounded-full bg-current" />
+                    {statusConfig.label}
+                  </span>
+                )}
+              </div>
             </div>
-            <div>
-              <h2 className="text-base font-semibold text-text-primary">{lead.name}</h2>
-              {statusConfig && (
-                <Badge
-                  variant="muted"
-                  className={cn("text-[11px] mt-0.5", statusConfig.bgColor, statusConfig.color)}
-                >
-                  {statusConfig.label}
-                </Badge>
-              )}
-            </div>
+            <button
+              onClick={onClose}
+              className="flex h-8 w-8 items-center justify-center rounded-lg text-text-muted hover:text-text-primary hover:bg-bg-tertiary transition-colors"
+            >
+              <X className="h-4 w-4" />
+            </button>
           </div>
-          <button
-            onClick={onClose}
-            className="flex h-8 w-8 items-center justify-center rounded-lg text-text-muted hover:text-text-primary hover:bg-bg-tertiary transition-colors"
-          >
-            <X className="h-4 w-4" />
-          </button>
         </div>
 
         <div className="p-6 space-y-6">
@@ -187,10 +192,12 @@ export function LeadDetailPanel({ lead, onClose, onUpdate, onDelete }: LeadDetai
             <h3 className="text-xs font-medium text-text-muted uppercase tracking-wide">
               Informations de contact
             </h3>
-            <div className="space-y-2">
+            <div className="space-y-2.5">
               {lead.email && (
                 <div className="flex items-center gap-2.5 text-sm text-text-secondary">
-                  <Mail className="h-4 w-4 text-text-muted shrink-0" />
+                  <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-bg-tertiary shrink-0">
+                    <Mail className="h-3.5 w-3.5 text-text-muted" />
+                  </div>
                   <a href={`mailto:${lead.email}`} className="hover:text-accent transition-colors">
                     {lead.email}
                   </a>
@@ -198,7 +205,9 @@ export function LeadDetailPanel({ lead, onClose, onUpdate, onDelete }: LeadDetai
               )}
               {lead.phone && (
                 <div className="flex items-center gap-2.5 text-sm text-text-secondary">
-                  <Phone className="h-4 w-4 text-text-muted shrink-0" />
+                  <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-bg-tertiary shrink-0">
+                    <Phone className="h-3.5 w-3.5 text-text-muted" />
+                  </div>
                   <a href={`tel:${lead.phone}`} className="hover:text-accent transition-colors">
                     {lead.phone}
                   </a>
@@ -206,12 +215,16 @@ export function LeadDetailPanel({ lead, onClose, onUpdate, onDelete }: LeadDetai
               )}
               {lead.source && (
                 <div className="flex items-center gap-2.5 text-sm text-text-secondary">
-                  <Tag className="h-4 w-4 text-text-muted shrink-0" />
+                  <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-bg-tertiary shrink-0">
+                    <Tag className="h-3.5 w-3.5 text-text-muted" />
+                  </div>
                   {lead.source}
                 </div>
               )}
               <div className="flex items-center gap-2.5 text-sm text-text-secondary">
-                <Calendar className="h-4 w-4 text-text-muted shrink-0" />
+                <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-bg-tertiary shrink-0">
+                  <Calendar className="h-3.5 w-3.5 text-text-muted" />
+                </div>
                 Créé le {formatDate(lead.created_at)}
               </div>
             </div>
@@ -230,7 +243,8 @@ export function LeadDetailPanel({ lead, onClose, onUpdate, onDelete }: LeadDetai
               min="0"
               step="1"
               className={cn(
-                "w-full rounded-xl border border-border-default bg-bg-tertiary px-3.5 py-2.5 text-sm text-text-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent",
+                "w-full rounded-xl border border-border-default bg-bg-tertiary px-3.5 py-2.5 text-sm text-text-primary",
+                "focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent transition-colors",
                 "[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
               )}
             />
@@ -247,7 +261,7 @@ export function LeadDetailPanel({ lead, onClose, onUpdate, onDelete }: LeadDetai
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Ajouter des notes..."
               rows={4}
-              className="w-full rounded-xl border border-border-default bg-bg-tertiary px-3.5 py-2.5 text-sm text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent resize-none"
+              className="w-full rounded-xl border border-border-default bg-bg-tertiary px-3.5 py-2.5 text-sm text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent resize-none transition-colors"
             />
           </div>
 
@@ -272,28 +286,42 @@ export function LeadDetailPanel({ lead, onClose, onUpdate, onDelete }: LeadDetai
               Historique d&apos;activité
             </h3>
             {loadingActivities ? (
-              <div className="flex items-center justify-center py-6">
-                <Loader2 className="h-5 w-5 animate-spin text-text-muted" />
+              <div className="space-y-3">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <div key={i} className="flex gap-3 rounded-xl border border-border-default bg-bg-secondary/40 p-3">
+                    <Skeleton className="h-6 w-6 rounded-full shrink-0" />
+                    <div className="flex-1 space-y-1.5">
+                      <Skeleton className="h-4 w-3/4" />
+                      <Skeleton className="h-3 w-1/2" />
+                    </div>
+                  </div>
+                ))}
               </div>
             ) : activities.length === 0 ? (
-              <p className="text-sm text-text-muted py-4 text-center">
-                Aucune activité enregistrée
-              </p>
+              <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border-default py-8 text-center">
+                <Activity className="h-5 w-5 text-text-muted/50 mb-2" />
+                <p className="text-sm text-text-muted">
+                  Aucune activité enregistrée
+                </p>
+              </div>
             ) : (
-              <div className="space-y-3">
-                {activities.map((activity) => (
-                  <div
-                    key={activity.id}
-                    className="flex gap-3 rounded-xl border border-border-default bg-bg-secondary/40 p-3"
-                  >
-                    <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-bg-tertiary">
+              <div className="relative space-y-0">
+                {/* Timeline line */}
+                <div className="absolute left-[14px] top-3 bottom-3 w-px bg-border-default" />
+
+                {activities.map((activity, i) => (
+                  <div key={activity.id} className="relative flex items-start gap-3 py-2.5 pl-0">
+                    <div className={cn(
+                      "relative z-10 flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-border-default bg-bg-secondary",
+                      i === 0 && "border-accent/40"
+                    )}>
                       {activity.old_status && activity.new_status ? (
                         <ArrowRight className="h-3 w-3 text-accent" />
                       ) : (
                         <Clock className="h-3 w-3 text-text-muted" />
                       )}
                     </div>
-                    <div className="min-w-0 flex-1">
+                    <div className="min-w-0 flex-1 pt-0.5">
                       <p className="text-sm text-text-primary">{activity.action}</p>
                       {activity.old_status && activity.new_status && (
                         <p className="text-xs text-text-muted mt-0.5">

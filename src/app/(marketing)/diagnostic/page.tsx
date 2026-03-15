@@ -16,6 +16,8 @@ import {
   AlertTriangle,
   Shield,
   Globe,
+  Zap,
+  TrendingUp,
 } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 
@@ -97,20 +99,20 @@ const ACQUISITION_CHANNELS = [
 ];
 
 const STEPS = [
-  { label: "Offre", icon: Target },
-  { label: "Acquisition", icon: Megaphone },
-  { label: "Delivery", icon: Truck },
-  { label: "Funnel", icon: Filter },
+  { label: "Offre", icon: Target, description: "Ce que tu vends" },
+  { label: "Acquisition", icon: Megaphone, description: "Comment tu attires" },
+  { label: "Delivery", icon: Truck, description: "Comment tu livres" },
+  { label: "Funnel", icon: Filter, description: "Comment tu convertis" },
 ];
 
 const DIMENSION_META: Record<
   string,
-  { label: string; icon: typeof Target; color: string }
+  { label: string; icon: typeof Target; color: string; bgColor: string }
 > = {
-  offre: { label: "Offre", icon: Target, color: "#34D399" },
-  acquisition: { label: "Acquisition", icon: Megaphone, color: "#60A5FA" },
-  delivery: { label: "Delivery", icon: Truck, color: "#F59E0B" },
-  funnel: { label: "Funnel", icon: Filter, color: "#A78BFA" },
+  offre: { label: "Offre", icon: Target, color: "#34D399", bgColor: "rgba(52,211,153,0.1)" },
+  acquisition: { label: "Acquisition", icon: Megaphone, color: "#60A5FA", bgColor: "rgba(96,165,250,0.1)" },
+  delivery: { label: "Delivery", icon: Truck, color: "#F59E0B", bgColor: "rgba(245,158,11,0.1)" },
+  funnel: { label: "Funnel", icon: Filter, color: "#A78BFA", bgColor: "rgba(167,139,250,0.1)" },
 };
 
 // ─── Radar Chart (SVG) ─────────────────────────────────────
@@ -173,7 +175,7 @@ function RadarChart({
           key={pct}
           points={getPoints(Array(n).fill(pct))}
           fill="none"
-          stroke="rgba(255,255,255,0.08)"
+          stroke="rgba(255,255,255,0.06)"
           strokeWidth="1"
         />
       ))}
@@ -186,7 +188,7 @@ function RadarChart({
           y1={cy}
           x2={a.x}
           y2={a.y}
-          stroke="rgba(255,255,255,0.08)"
+          stroke="rgba(255,255,255,0.06)"
           strokeWidth="1"
         />
       ))}
@@ -194,7 +196,7 @@ function RadarChart({
       {/* Data polygon */}
       <polygon
         points={getPoints(dataPoints)}
-        fill="rgba(52,211,153,0.15)"
+        fill="rgba(52,211,153,0.12)"
         stroke="#34D399"
         strokeWidth="2"
       />
@@ -208,10 +210,10 @@ function RadarChart({
             key={i}
             cx={cx + r * Math.cos(angle)}
             cy={cy + r * Math.sin(angle)}
-            r="4"
+            r="5"
             fill={colors[i]}
             stroke="#0B0E11"
-            strokeWidth="2"
+            strokeWidth="2.5"
           />
         );
       })}
@@ -251,6 +253,47 @@ function ScoreBadge({ score, size = "lg" }: { score: number; size?: "sm" | "lg" 
       )}
     >
       {score}
+    </div>
+  );
+}
+
+// ─── Score Progress Ring ────────────────────────────────────
+function ScoreRing({ score }: { score: number }) {
+  const color =
+    score >= 75 ? "#34D399" : score >= 50 ? "#FBBF24" : "#EF4444";
+  const circumference = 2 * Math.PI * 52;
+  const offset = circumference - (score / 100) * circumference;
+
+  return (
+    <div className="relative inline-flex items-center justify-center">
+      <svg className="w-32 h-32 -rotate-90" viewBox="0 0 120 120">
+        <circle
+          cx="60"
+          cy="60"
+          r="52"
+          fill="none"
+          stroke="rgba(255,255,255,0.06)"
+          strokeWidth="8"
+        />
+        <circle
+          cx="60"
+          cy="60"
+          r="52"
+          fill="none"
+          stroke={color}
+          strokeWidth="8"
+          strokeLinecap="round"
+          strokeDasharray={circumference}
+          strokeDashoffset={offset}
+          className="transition-all duration-1000 ease-out"
+        />
+      </svg>
+      <div className="absolute inset-0 flex flex-col items-center justify-center">
+        <span className="text-3xl font-bold text-text-primary">{score}</span>
+        <span className="text-[10px] font-medium text-text-muted uppercase tracking-wider">
+          / 100
+        </span>
+      </div>
     </div>
   );
 }
@@ -353,12 +396,18 @@ export default function DiagnosticPage() {
 
         {/* Hero */}
         <section className="relative overflow-hidden">
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-accent/8 rounded-full blur-[120px] pointer-events-none" />
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-accent/8 rounded-full blur-[150px] pointer-events-none" />
           <div className="max-w-4xl mx-auto px-4 pt-16 pb-12 text-center relative">
-            <h1 className="text-3xl sm:text-4xl font-bold text-text-primary mb-4">
-              Résultats de ton Diagnostic
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-accent/20 bg-accent/5 text-accent text-xs font-medium mb-6">
+              <CheckCircle2 className="h-3.5 w-3.5" />
+              Analyse terminée
+            </div>
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-text-primary leading-tight mb-4">
+              Résultats de ton
+              <br />
+              <span className="text-accent">Diagnostic</span>
             </h1>
-            <p className="text-text-secondary max-w-xl mx-auto">
+            <p className="text-lg text-text-secondary max-w-xl mx-auto leading-relaxed">
               Voici l&apos;analyse complète de ton business avec des recommandations actionnables.
             </p>
           </div>
@@ -368,14 +417,14 @@ export default function DiagnosticPage() {
           {/* Global score + radar */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Score global */}
-            <div className="p-8 rounded-2xl border border-border-default bg-bg-secondary/30 text-center space-y-4">
-              <p className="text-sm font-medium text-text-muted uppercase tracking-wider">
+            <div className="p-8 rounded-2xl border border-border-default bg-bg-secondary/30 backdrop-blur-sm text-center space-y-4">
+              <p className="text-xs font-semibold text-text-muted uppercase tracking-wider">
                 Score Global
               </p>
               <div className="flex justify-center">
-                <ScoreBadge score={result.score_global} />
+                <ScoreRing score={result.score_global} />
               </div>
-              <p className="text-sm text-text-secondary">
+              <p className="text-sm text-text-secondary leading-relaxed max-w-xs mx-auto">
                 {result.score_global >= 75
                   ? "Excellent ! Ton business a de solides fondations."
                   : result.score_global >= 50
@@ -385,7 +434,7 @@ export default function DiagnosticPage() {
             </div>
 
             {/* Radar */}
-            <div className="p-6 rounded-2xl border border-border-default bg-bg-secondary/30 flex items-center justify-center">
+            <div className="p-6 rounded-2xl border border-border-default bg-bg-secondary/30 backdrop-blur-sm flex items-center justify-center">
               <RadarChart scores={result.scores} />
             </div>
           </div>
@@ -400,13 +449,18 @@ export default function DiagnosticPage() {
               return (
                 <div
                   key={key}
-                  className="p-5 rounded-2xl border border-border-default bg-bg-secondary/30 space-y-3 text-center"
+                  className="p-5 rounded-2xl border border-border-default/50 bg-bg-secondary/30 backdrop-blur-sm space-y-3 text-center transition-all duration-200 hover:border-border-default"
                 >
                   <div className="flex items-center justify-center gap-2">
-                    <meta.icon
-                      className="h-4 w-4"
-                      style={{ color: meta.color }}
-                    />
+                    <div
+                      className="flex h-7 w-7 items-center justify-center rounded-lg"
+                      style={{ backgroundColor: meta.bgColor }}
+                    >
+                      <meta.icon
+                        className="h-3.5 w-3.5"
+                        style={{ color: meta.color }}
+                      />
+                    </div>
                     <span className="text-sm font-medium text-text-primary">
                       {meta.label}
                     </span>
@@ -421,7 +475,8 @@ export default function DiagnosticPage() {
 
           {/* Recommandations */}
           <div className="space-y-6">
-            <h2 className="text-xl font-bold text-text-primary">
+            <h2 className="text-xl font-bold text-text-primary flex items-center gap-2">
+              <Zap className="h-5 w-5 text-accent" />
               Recommandations
             </h2>
             {(
@@ -436,14 +491,19 @@ export default function DiagnosticPage() {
               return (
                 <div
                   key={key}
-                  className="p-6 rounded-2xl border border-border-default bg-bg-secondary/30 space-y-4"
+                  className="p-6 rounded-2xl border border-border-default/50 bg-bg-secondary/30 backdrop-blur-sm space-y-4"
                 >
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <meta.icon
-                        className="h-5 w-5"
-                        style={{ color: meta.color }}
-                      />
+                    <div className="flex items-center gap-3">
+                      <div
+                        className="flex h-9 w-9 items-center justify-center rounded-xl"
+                        style={{ backgroundColor: meta.bgColor }}
+                      >
+                        <meta.icon
+                          className="h-4 w-4"
+                          style={{ color: meta.color }}
+                        />
+                      </div>
                       <h3 className="font-semibold text-text-primary">
                         {meta.label}
                       </h3>
@@ -472,33 +532,31 @@ export default function DiagnosticPage() {
           {/* Funnel scan results */}
           {funnelScan && (
             <div className="space-y-6">
-              <h2 className="text-xl font-bold text-text-primary">
+              <h2 className="text-xl font-bold text-text-primary flex items-center gap-2">
+                <Globe className="h-5 w-5 text-purple-400" />
                 Audit de ton Funnel
               </h2>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="p-5 rounded-2xl border border-border-default bg-bg-secondary/30 text-center space-y-2">
-                  <p className="text-xs font-medium text-text-muted uppercase">
-                    Headline
-                  </p>
-                  <ScoreBadge score={funnelScan.headline_analysis.score} size="sm" />
-                </div>
-                <div className="p-5 rounded-2xl border border-border-default bg-bg-secondary/30 text-center space-y-2">
-                  <p className="text-xs font-medium text-text-muted uppercase">
-                    CTA
-                  </p>
-                  <ScoreBadge score={funnelScan.cta_analysis.score} size="sm" />
-                </div>
-                <div className="p-5 rounded-2xl border border-border-default bg-bg-secondary/30 text-center space-y-2">
-                  <p className="text-xs font-medium text-text-muted uppercase">
-                    Structure
-                  </p>
-                  <ScoreBadge score={funnelScan.structure_score} size="sm" />
-                </div>
+                {[
+                  { label: "Headline", score: funnelScan.headline_analysis.score, color: "#60A5FA" },
+                  { label: "CTA", score: funnelScan.cta_analysis.score, color: "#34D399" },
+                  { label: "Structure", score: funnelScan.structure_score, color: "#A78BFA" },
+                ].map((item) => (
+                  <div
+                    key={item.label}
+                    className="p-5 rounded-2xl border border-border-default/50 bg-bg-secondary/30 backdrop-blur-sm text-center space-y-3"
+                  >
+                    <p className="text-xs font-semibold text-text-muted uppercase tracking-wider">
+                      {item.label}
+                    </p>
+                    <ScoreBadge score={item.score} size="sm" />
+                  </div>
+                ))}
               </div>
 
               {funnelScan.top_suggestions.length > 0 && (
-                <div className="p-6 rounded-2xl border border-border-default bg-bg-secondary/30 space-y-3">
+                <div className="p-6 rounded-2xl border border-border-default/50 bg-bg-secondary/30 backdrop-blur-sm space-y-3">
                   <h3 className="font-semibold text-text-primary">
                     Top suggestions
                   </h3>
@@ -519,22 +577,27 @@ export default function DiagnosticPage() {
           )}
 
           {/* CTA */}
-          <div className="p-8 rounded-2xl border border-accent/20 bg-accent/5 text-center space-y-4">
-            <Sparkles className="h-8 w-8 text-accent mx-auto" />
-            <h2 className="text-2xl font-bold text-text-primary">
-              Prêt à passer à l&apos;action ?
-            </h2>
-            <p className="text-text-secondary max-w-lg mx-auto">
-              ScalingFlow génère automatiquement ton offre, ton funnel, tes ads et tout le contenu
-              dont tu as besoin pour scaler. Commence gratuitement.
-            </p>
-            <Link
-              href="/register"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-accent text-white font-semibold hover:bg-accent/90 transition-all shadow-[0_0_24px_rgba(52,211,153,0.15)]"
-            >
-              Créer mon compte gratuitement
-              <ArrowRight className="h-5 w-5" />
-            </Link>
+          <div className="relative overflow-hidden p-8 sm:p-10 rounded-2xl border border-accent/20 bg-gradient-to-br from-accent/10 via-accent/5 to-transparent text-center space-y-5">
+            <div className="absolute top-0 right-0 w-48 h-48 bg-accent/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+            <div className="relative">
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-accent/10 mx-auto mb-4">
+                <TrendingUp className="h-7 w-7 text-accent" />
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-bold text-text-primary">
+                Prêt à passer à l&apos;action ?
+              </h2>
+              <p className="text-text-secondary max-w-lg mx-auto leading-relaxed mt-2">
+                ScalingFlow génère automatiquement ton offre, ton funnel, tes ads et tout le contenu
+                dont tu as besoin pour scaler. Commence gratuitement.
+              </p>
+              <Link
+                href="/register"
+                className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl bg-accent text-white font-semibold hover:bg-accent/90 transition-all duration-200 shadow-[0_0_32px_rgba(52,211,153,0.2)] hover:shadow-[0_0_48px_rgba(52,211,153,0.3)] mt-5"
+              >
+                Créer mon compte gratuitement
+                <ArrowRight className="h-5 w-5" />
+              </Link>
+            </div>
           </div>
 
           {/* Refaire le diagnostic */}
@@ -564,7 +627,7 @@ export default function DiagnosticPage() {
 
       {/* Hero */}
       <section className="relative overflow-hidden">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-accent/8 rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-accent/8 rounded-full blur-[150px] pointer-events-none" />
         <div className="max-w-4xl mx-auto px-4 pt-16 pb-8 text-center relative">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-accent/20 bg-accent/5 text-accent text-xs font-medium mb-6">
             <Sparkles className="h-3.5 w-3.5" />
@@ -584,27 +647,54 @@ export default function DiagnosticPage() {
 
       {/* Stepper */}
       <div className="max-w-2xl mx-auto px-4 mb-8">
+        {/* Step counter */}
+        <p className="text-center text-xs font-medium text-text-muted mb-3">
+          Étape {step + 1} sur {STEPS.length}
+        </p>
+        {/* Progress bar */}
+        <div className="h-1 rounded-full bg-bg-tertiary mb-5 overflow-hidden">
+          <div
+            className="h-full rounded-full bg-accent transition-all duration-500 ease-out"
+            style={{ width: `${((step + 1) / STEPS.length) * 100}%` }}
+          />
+        </div>
+        {/* Step buttons */}
         <div className="flex items-center justify-between">
           {STEPS.map((s, i) => (
             <React.Fragment key={i}>
               <button
                 onClick={() => i <= step && setStep(i)}
                 className={cn(
-                  "flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition-all",
+                  "flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200",
                   i === step
-                    ? "bg-accent/10 text-accent border border-accent/20"
+                    ? "bg-accent/10 text-accent border border-accent/20 shadow-sm shadow-accent/5"
                     : i < step
-                    ? "text-accent/60 cursor-pointer"
+                    ? "text-accent/60 cursor-pointer hover:bg-bg-tertiary"
                     : "text-text-muted cursor-default"
                 )}
               >
-                <s.icon className="h-4 w-4" />
+                <div
+                  className={cn(
+                    "flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold transition-all",
+                    i === step
+                      ? "bg-accent text-white"
+                      : i < step
+                      ? "bg-accent/20 text-accent"
+                      : "bg-bg-tertiary text-text-muted"
+                  )}
+                >
+                  {i < step ? (
+                    <CheckCircle2 className="h-3.5 w-3.5" />
+                  ) : (
+                    i + 1
+                  )}
+                </div>
                 <span className="hidden sm:inline">{s.label}</span>
               </button>
               {i < STEPS.length - 1 && (
                 <div
                   className={cn(
-                    "flex-1 h-px mx-2",
+                    "flex-1 h-px mx-2 transition-colors duration-300",
                     i < step ? "bg-accent/30" : "bg-border-default"
                   )}
                 />
@@ -616,7 +706,7 @@ export default function DiagnosticPage() {
 
       {/* Form */}
       <div className="max-w-2xl mx-auto px-4 pb-24">
-        <div className="p-6 sm:p-8 rounded-2xl border border-border-default bg-bg-secondary/30 space-y-6">
+        <div className="p-6 sm:p-8 rounded-2xl border border-border-default/50 bg-bg-secondary/30 backdrop-blur-sm space-y-6">
           {/* Step 1: Offre */}
           {step === 0 && (
             <>
@@ -692,9 +782,9 @@ export default function DiagnosticPage() {
                       type="button"
                       onClick={() => toggleChannel(ch)}
                       className={cn(
-                        "px-3 py-1.5 rounded-lg text-xs font-medium border transition-all",
+                        "px-3 py-1.5 rounded-xl text-xs font-medium border transition-all duration-200",
                         form.acquisition_channels.includes(ch)
-                          ? "border-accent/50 bg-accent/10 text-accent"
+                          ? "border-accent/50 bg-accent/10 text-accent shadow-sm shadow-accent/5"
                           : "border-border-default text-text-muted hover:text-text-secondary hover:border-border-hover"
                       )}
                     >
@@ -804,7 +894,7 @@ export default function DiagnosticPage() {
                       type="button"
                       onClick={handleScanFunnel}
                       disabled={scanLoading}
-                      className="shrink-0 px-3 py-2 rounded-lg border border-accent/30 bg-accent/5 text-accent text-sm font-medium hover:bg-accent/10 transition-colors disabled:opacity-50"
+                      className="shrink-0 px-4 py-2 rounded-xl border border-accent/30 bg-accent/5 text-accent text-sm font-medium hover:bg-accent/10 transition-all duration-200 disabled:opacity-50"
                     >
                       {scanLoading ? (
                         <Loader2 className="h-4 w-4 animate-spin" />
@@ -818,9 +908,12 @@ export default function DiagnosticPage() {
                   )}
                 </div>
                 {funnelScan && (
-                  <p className="text-xs text-accent mt-1">
-                    Funnel scanné avec succès (score : {funnelScan.overall_score}/100)
-                  </p>
+                  <div className="flex items-center gap-2 mt-2">
+                    <CheckCircle2 className="h-3.5 w-3.5 text-accent" />
+                    <p className="text-xs text-accent font-medium">
+                      Funnel scanné avec succès (score : {funnelScan.overall_score}/100)
+                    </p>
+                  </div>
                 )}
               </FieldGroup>
               <FieldGroup label="Headline principale">
@@ -848,7 +941,8 @@ export default function DiagnosticPage() {
 
           {/* Error */}
           {error && (
-            <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-sm text-red-400">
+            <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-sm text-red-400 flex items-center gap-2">
+              <AlertTriangle className="h-4 w-4 shrink-0" />
               {error}
             </div>
           )}
@@ -858,7 +952,7 @@ export default function DiagnosticPage() {
             {step > 0 ? (
               <button
                 onClick={() => setStep((s) => s - 1)}
-                className="flex items-center gap-2 text-sm text-text-secondary hover:text-text-primary transition-colors"
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm text-text-secondary hover:text-text-primary hover:bg-bg-tertiary transition-all duration-200"
               >
                 <ArrowLeft className="h-4 w-4" />
                 Précédent
@@ -871,7 +965,7 @@ export default function DiagnosticPage() {
               <button
                 onClick={() => setStep((s) => s + 1)}
                 disabled={!canNext}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-accent text-white text-sm font-medium hover:bg-accent/90 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-accent text-white text-sm font-medium hover:bg-accent/90 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed shadow-[0_0_20px_rgba(52,211,153,0.15)]"
               >
                 Suivant
                 <ArrowRight className="h-4 w-4" />
@@ -880,7 +974,7 @@ export default function DiagnosticPage() {
               <button
                 onClick={handleSubmit}
                 disabled={loading}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-accent text-white text-sm font-medium hover:bg-accent/90 transition-colors disabled:opacity-70"
+                className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-accent text-white text-sm font-medium hover:bg-accent/90 transition-all duration-200 disabled:opacity-70 shadow-[0_0_20px_rgba(52,211,153,0.15)]"
               >
                 {loading ? (
                   <>
@@ -947,7 +1041,7 @@ function Navbar() {
           </Link>
           <Link
             href="/register"
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-accent text-white text-sm font-medium hover:bg-accent/90 transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-accent text-white text-sm font-medium hover:bg-accent/90 transition-all duration-200 shadow-[0_0_16px_rgba(52,211,153,0.15)]"
           >
             Commencer
             <ArrowRight className="h-4 w-4" />

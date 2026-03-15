@@ -1,6 +1,5 @@
 "use client";
 
-import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Building2, Calendar, DollarSign } from "lucide-react";
@@ -24,12 +23,12 @@ export interface ClientRow {
 
 const STATUS_CONFIG: Record<
   ClientRow["status"],
-  { label: string; variant: "default" | "blue" | "muted" | "red" | "yellow" }
+  { label: string; variant: "default" | "blue" | "muted" | "red" | "yellow"; color: string; bgColor: string }
 > = {
-  prospect: { label: "Prospect", variant: "blue" },
-  actif: { label: "Actif", variant: "default" },
-  inactif: { label: "Inactif", variant: "muted" },
-  churne: { label: "Churné", variant: "red" },
+  prospect: { label: "Prospect", variant: "blue", color: "text-blue-400", bgColor: "bg-blue-500/15" },
+  actif: { label: "Actif", variant: "default", color: "text-emerald-400", bgColor: "bg-emerald-500/15" },
+  inactif: { label: "Inactif", variant: "muted", color: "text-text-muted", bgColor: "bg-bg-tertiary" },
+  churne: { label: "Churné", variant: "red", color: "text-red-400", bgColor: "bg-red-500/15" },
 };
 
 function getInitials(name: string) {
@@ -70,16 +69,18 @@ export function ClientCard({ client, onClick }: ClientCardProps) {
   const statusCfg = STATUS_CONFIG[client.status];
 
   return (
-    <Card
+    <div
       className={cn(
-        "cursor-pointer group hover:border-accent/40 transition-all duration-200"
+        "cursor-pointer group rounded-2xl border border-border-default bg-bg-secondary/50 p-4",
+        "transition-all duration-200 backdrop-blur-sm",
+        "hover:border-accent/20 hover:bg-bg-secondary hover:shadow-lg hover:shadow-black/10 hover:-translate-y-0.5"
       )}
       onClick={onClick}
     >
       <div className="flex items-start gap-4">
-        <Avatar className="h-11 w-11">
+        <Avatar className="h-11 w-11 ring-1 ring-border-default group-hover:ring-accent/20 transition-all">
           {client.avatar_url && <AvatarImage src={client.avatar_url} alt={client.name} />}
-          <AvatarFallback className="bg-accent-muted text-accent text-sm font-semibold">
+          <AvatarFallback className="bg-accent/10 text-accent text-sm font-semibold">
             {getInitials(client.name)}
           </AvatarFallback>
         </Avatar>
@@ -89,7 +90,13 @@ export function ClientCard({ client, onClick }: ClientCardProps) {
             <h3 className="text-sm font-semibold text-text-primary truncate group-hover:text-accent transition-colors">
               {client.name}
             </h3>
-            <Badge variant={statusCfg.variant}>{statusCfg.label}</Badge>
+            <span className={cn(
+              "inline-flex items-center gap-1 shrink-0 rounded-full px-2 py-0.5 text-[11px] font-medium",
+              statusCfg.bgColor, statusCfg.color
+            )}>
+              <span className={cn("h-1.5 w-1.5 rounded-full", statusCfg.color === "text-text-muted" ? "bg-text-muted" : "bg-current")} />
+              {statusCfg.label}
+            </span>
           </div>
 
           {client.company && (
@@ -99,7 +106,7 @@ export function ClientCard({ client, onClick }: ClientCardProps) {
             </p>
           )}
 
-          <div className="flex items-center gap-4 mt-3">
+          <div className="flex items-center gap-4 mt-3 pt-3 border-t border-border-default/50">
             {typeof client.total_deals_amount === "number" && (
               <span className="flex items-center gap-1 text-xs text-text-secondary">
                 <DollarSign className="h-3 w-3 text-accent" />
@@ -120,6 +127,6 @@ export function ClientCard({ client, onClick }: ClientCardProps) {
           </div>
         </div>
       </div>
-    </Card>
+    </div>
   );
 }

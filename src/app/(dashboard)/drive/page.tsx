@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
 import { BreadcrumbNav, type BreadcrumbFolder } from "@/components/drive/breadcrumb-nav";
 import { FolderCard } from "@/components/drive/folder-card";
@@ -15,7 +14,9 @@ import {
   FolderPlus,
   Upload,
   FolderOpen,
-  Loader2,
+  HardDrive,
+  FileText,
+  Folder,
 } from "lucide-react";
 
 interface DriveFolder {
@@ -35,6 +36,44 @@ interface DriveFile {
   file_size: number;
   mime_type: string;
   created_at: string;
+}
+
+// ─── Skeleton Grid ────────────────────────────────────────
+function DriveSkeleton() {
+  return (
+    <div className="space-y-6 animate-pulse">
+      <div>
+        <div className="h-4 w-24 bg-bg-tertiary rounded mb-3" />
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+          {[1, 2, 3, 4, 5].map((i) => (
+            <div
+              key={i}
+              className="rounded-2xl border border-border-default bg-bg-secondary/50 p-4"
+            >
+              <div className="h-12 w-12 rounded-xl bg-bg-tertiary mb-3" />
+              <div className="h-4 w-3/4 bg-bg-tertiary rounded mb-1.5" />
+              <div className="h-3 w-1/2 bg-bg-tertiary rounded" />
+            </div>
+          ))}
+        </div>
+      </div>
+      <div>
+        <div className="h-4 w-20 bg-bg-tertiary rounded mb-3" />
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+          {[1, 2, 3].map((i) => (
+            <div
+              key={i}
+              className="rounded-2xl border border-border-default bg-bg-secondary/50 p-4"
+            >
+              <div className="h-12 w-12 rounded-xl bg-bg-tertiary mb-3" />
+              <div className="h-4 w-3/4 bg-bg-tertiary rounded mb-1.5" />
+              <div className="h-3 w-2/3 bg-bg-tertiary rounded" />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default function DrivePage() {
@@ -250,34 +289,75 @@ export default function DrivePage() {
 
   const renameFolder = folders.find((f) => f.id === renameFolderId);
   const isEmpty = folders.length === 0 && files.length === 0;
+  const totalItems = folders.length + files.length;
 
   return (
-    <div>
-      <PageHeader
-        title="Drive"
-        description="Ton espace de stockage interne pour organiser tous tes fichiers."
-      >
-        <Button variant="outline" onClick={() => setCreateFolderOpen(true)}>
-          <FolderPlus className="h-4 w-4 mr-2" />
-          Nouveau dossier
-        </Button>
-        <Button onClick={() => setUploadOpen(true)}>
-          <Upload className="h-4 w-4 mr-2" />
-          Uploader un fichier
-        </Button>
-      </PageHeader>
+    <div className="max-w-6xl mx-auto">
+      {/* Hero header */}
+      <div className="relative mb-8 overflow-hidden rounded-2xl border border-border-default bg-gradient-to-br from-accent/5 via-bg-secondary to-bg-secondary p-6 md:p-8">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-accent/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+        <div className="relative">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent/10">
+                <HardDrive className="h-5 w-5 text-accent" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold text-text-primary">
+                  Drive
+                </h1>
+                <p className="text-sm text-text-secondary">
+                  Ton espace de stockage interne pour organiser tous tes fichiers.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                onClick={() => setCreateFolderOpen(true)}
+                className="rounded-xl"
+              >
+                <FolderPlus className="h-4 w-4 mr-2" />
+                Nouveau dossier
+              </Button>
+              <Button
+                onClick={() => setUploadOpen(true)}
+                className="rounded-xl bg-accent hover:bg-accent/90 text-white"
+              >
+                <Upload className="h-4 w-4 mr-2" />
+                Uploader
+              </Button>
+            </div>
+          </div>
+
+          {/* Stats bar */}
+          {!loading && (
+            <div className="flex items-center gap-4 mt-4">
+              <div className="flex items-center gap-1.5 rounded-full bg-bg-tertiary/80 px-3 py-1">
+                <Folder className="h-3 w-3 text-accent" />
+                <span className="text-xs font-medium text-text-secondary">
+                  {folders.length} {folders.length <= 1 ? "dossier" : "dossiers"}
+                </span>
+              </div>
+              <div className="flex items-center gap-1.5 rounded-full bg-bg-tertiary/80 px-3 py-1">
+                <FileText className="h-3 w-3 text-blue-400" />
+                <span className="text-xs font-medium text-text-secondary">
+                  {files.length} {files.length <= 1 ? "fichier" : "fichiers"}
+                </span>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
 
       {/* Breadcrumb */}
       <div className="mb-6">
         <BreadcrumbNav path={breadcrumbPath} onNavigate={navigateToFolder} />
       </div>
 
-      {/* Loading */}
-      {loading && (
-        <div className="flex items-center justify-center py-20">
-          <Loader2 className="h-6 w-6 text-accent animate-spin" />
-        </div>
-      )}
+      {/* Loading skeleton */}
+      {loading && <DriveSkeleton />}
 
       {/* Empty state */}
       {!loading && isEmpty && (
@@ -294,11 +374,18 @@ export default function DrivePage() {
               : "Commence par créer un dossier ou uploader tes premiers fichiers."}
           </p>
           <div className="flex gap-3">
-            <Button variant="outline" onClick={() => setCreateFolderOpen(true)}>
+            <Button
+              variant="outline"
+              onClick={() => setCreateFolderOpen(true)}
+              className="rounded-xl"
+            >
               <FolderPlus className="h-4 w-4 mr-2" />
               Nouveau dossier
             </Button>
-            <Button onClick={() => setUploadOpen(true)}>
+            <Button
+              onClick={() => setUploadOpen(true)}
+              className="rounded-xl bg-accent hover:bg-accent/90 text-white"
+            >
               <Upload className="h-4 w-4 mr-2" />
               Uploader
             </Button>

@@ -26,6 +26,7 @@ import {
   Loader2,
   ArrowUpRight,
   CheckCircle2,
+  RotateCcw,
 } from "lucide-react";
 
 interface ScoreSection {
@@ -78,6 +79,14 @@ const SCORE_LABELS: Record<string, string> = {
   closing: "Closing",
 };
 
+const SCORE_ICONS: Record<string, string> = {
+  discovery: "🔍",
+  rapport_building: "🤝",
+  problem_reframing: "🎯",
+  objection_handling: "🛡️",
+  closing: "🏆",
+};
+
 const PROSPECT_ORIGINS = [
   { key: "instagram_dm", label: "Instagram DM" },
   { key: "linkedin", label: "LinkedIn" },
@@ -101,10 +110,85 @@ const CALL_RESULTS = [
 ];
 
 const PRIORITY_CONFIG = {
-  haute: { color: "text-red-400", bg: "bg-red-400/10", border: "border-red-400/20" },
-  moyenne: { color: "text-yellow-400", bg: "bg-yellow-400/10", border: "border-yellow-400/20" },
-  basse: { color: "text-blue-400", bg: "bg-blue-400/10", border: "border-blue-400/20" },
+  haute: {
+    color: "text-red-400",
+    bg: "bg-red-400/10",
+    border: "border-red-400/20",
+  },
+  moyenne: {
+    color: "text-yellow-400",
+    bg: "bg-yellow-400/10",
+    border: "border-yellow-400/20",
+  },
+  basse: {
+    color: "text-blue-400",
+    bg: "bg-blue-400/10",
+    border: "border-blue-400/20",
+  },
 };
+
+/* ── Score ring component ── */
+
+function ScoreRing({
+  score,
+  max,
+  size = 72,
+  strokeWidth = 5,
+  className,
+}: {
+  score: number;
+  max: number;
+  size?: number;
+  strokeWidth?: number;
+  className?: string;
+}) {
+  const pct = (score / max) * 100;
+  const radius = (size - strokeWidth) / 2;
+  const circumference = 2 * Math.PI * radius;
+  const offset = circumference - (pct / 100) * circumference;
+
+  const color =
+    pct >= 80
+      ? "stroke-emerald-400"
+      : pct >= 60
+        ? "stroke-yellow-400"
+        : "stroke-red-400";
+  const textColor =
+    pct >= 80
+      ? "text-emerald-400"
+      : pct >= 60
+        ? "text-yellow-400"
+        : "text-red-400";
+
+  return (
+    <div className={cn("relative inline-flex items-center justify-center", className)}>
+      <svg width={size} height={size} className="-rotate-90">
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          fill="none"
+          className="stroke-bg-tertiary"
+          strokeWidth={strokeWidth}
+        />
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          fill="none"
+          className={cn(color, "transition-all duration-700 ease-out")}
+          strokeWidth={strokeWidth}
+          strokeLinecap="round"
+          strokeDasharray={circumference}
+          strokeDashoffset={offset}
+        />
+      </svg>
+      <span className={cn("absolute text-lg font-bold", textColor)}>
+        {score}
+      </span>
+    </div>
+  );
+}
 
 export function CallAnalyzer() {
   const [loading, setLoading] = React.useState(false);
@@ -115,15 +199,23 @@ export function CallAnalyzer() {
   const [prospectOrigin, setProspectOrigin] = React.useState("");
   const [analysisFocus, setAnalysisFocus] = React.useState("global");
   const [callResult, setCallResult] = React.useState("");
-  const [expandedSection, setExpandedSection] = React.useState<string | null>("discovery");
+  const [expandedSection, setExpandedSection] = React.useState<string | null>(
+    "discovery"
+  );
   const [scriptLoading, setScriptLoading] = React.useState(false);
-  const [generatedScript, setGeneratedScript] = React.useState<string | null>(null);
+  const [generatedScript, setGeneratedScript] = React.useState<string | null>(
+    null
+  );
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (!file.name.endsWith(".txt") && !file.name.endsWith(".srt") && !file.name.endsWith(".vtt")) {
+    if (
+      !file.name.endsWith(".txt") &&
+      !file.name.endsWith(".srt") &&
+      !file.name.endsWith(".vtt")
+    ) {
       toast.error("Format accepté : .txt, .srt, .vtt");
       return;
     }
@@ -189,7 +281,10 @@ export function CallAnalyzer() {
             overall_score: result.overall_score,
             weaknesses: Object.entries(result.scores)
               .filter(([, s]) => s.score < 7)
-              .map(([k, s]) => ({ area: SCORE_LABELS[k], improvements: s.improvements })),
+              .map(([k, s]) => ({
+                area: SCORE_LABELS[k],
+                improvements: s.improvements,
+              })),
             training_focus: result.training_focus,
             playbook: result.playbook,
           },
@@ -214,22 +309,32 @@ export function CallAnalyzer() {
     return <AILoading text="Analyse approfondie de ton call de vente" />;
   }
 
+  /* ═══════════════════════════════════════════
+     Form — Input state
+     ═══════════════════════════════════════════ */
+
   if (!result) {
     return (
       <div className="space-y-6">
-        <div className="text-center">
-          <Mic className="h-10 w-10 text-accent mx-auto mb-3" />
-          <h3 className="font-semibold text-text-primary mb-1">Analyse de call de vente</h3>
+        {/* Hero header */}
+        <div className="text-center py-2">
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-accent/20 to-accent/5 border border-accent/10 mx-auto mb-4">
+            <Mic className="h-7 w-7 text-accent" />
+          </div>
+          <h3 className="text-lg font-bold text-text-primary mb-1">
+            Analyse de call de vente
+          </h3>
           <p className="text-sm text-text-secondary max-w-md mx-auto">
-            Colle le transcript de ton appel et l&apos;IA analysera ta performance : discovery, objections, closing et plus.
+            Colle le transcript de ton appel et l&apos;IA analysera ta
+            performance : discovery, objections, closing et plus.
           </p>
         </div>
 
         <Card>
-          <CardContent className="pt-6 space-y-4">
+          <CardContent className="pt-6 space-y-5">
             {/* Call type */}
             <div>
-              <label className="text-sm font-medium text-text-primary mb-2 block">
+              <label className="text-sm font-medium text-text-primary mb-2.5 block">
                 Type d&apos;appel
               </label>
               <div className="flex gap-2 flex-wrap">
@@ -243,10 +348,10 @@ export function CallAnalyzer() {
                     key={t.key}
                     onClick={() => setCallType(t.key)}
                     className={cn(
-                      "px-3 py-1.5 rounded-lg text-sm font-medium transition-all",
+                      "px-4 py-2 rounded-xl text-sm font-medium transition-all border",
                       callType === t.key
-                        ? "bg-accent text-white"
-                        : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
+                        ? "bg-accent/10 text-accent border-accent/30"
+                        : "bg-bg-tertiary text-text-secondary border-border-default/50 hover:text-text-primary hover:border-border-default"
                     )}
                   >
                     {t.label}
@@ -258,20 +363,18 @@ export function CallAnalyzer() {
             {/* Recording URL */}
             <div>
               <label className="text-sm font-medium text-text-primary mb-2 block">
-                Lien d&apos;enregistrement (optionnel)
+                Lien d&apos;enregistrement{" "}
+                <span className="text-text-muted font-normal">(optionnel)</span>
               </label>
-              <input
-                value={recordingUrl}
-                onChange={(e) => setRecordingUrl(e.target.value)}
-                placeholder="https://fathom.video/... ou Zoom/Loom link"
-                className="w-full px-4 py-2.5 rounded-xl bg-bg-tertiary border border-border-default text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent text-sm"
-              />
-              {recordingUrl && (
-                <p className="text-xs text-text-muted mt-1 flex items-center gap-1">
-                  <Link2 className="h-3 w-3" />
-                  Colle ta transcription ci-dessous ou utilise le lien pour référence
-                </p>
-              )}
+              <div className="relative">
+                <Link2 className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-text-muted" />
+                <input
+                  value={recordingUrl}
+                  onChange={(e) => setRecordingUrl(e.target.value)}
+                  placeholder="https://fathom.video/... ou Zoom/Loom link"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-bg-tertiary border border-border-default/50 text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent/40 text-sm transition-colors"
+                />
+              </div>
             </div>
 
             {/* Context fields row */}
@@ -281,18 +384,21 @@ export function CallAnalyzer() {
                 <label className="text-sm font-medium text-text-primary mb-2 block">
                   Origine du prospect
                 </label>
-                <select
-                  value={prospectOrigin}
-                  onChange={(e) => setProspectOrigin(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-bg-tertiary border border-border-default text-text-primary text-sm focus:outline-none focus:border-accent appearance-none"
-                >
-                  <option value="">Sélectionner...</option>
-                  {PROSPECT_ORIGINS.map((o) => (
-                    <option key={o.key} value={o.key}>
-                      {o.label}
-                    </option>
-                  ))}
-                </select>
+                <div className="relative">
+                  <select
+                    value={prospectOrigin}
+                    onChange={(e) => setProspectOrigin(e.target.value)}
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-bg-tertiary border border-border-default/50 text-text-primary text-sm focus:outline-none focus:border-accent/40 appearance-none transition-colors cursor-pointer"
+                  >
+                    <option value="">Sélectionner...</option>
+                    {PROSPECT_ORIGINS.map((o) => (
+                      <option key={o.key} value={o.key}>
+                        {o.label}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-text-muted pointer-events-none" />
+                </div>
               </div>
 
               {/* Analysis focus */}
@@ -300,17 +406,20 @@ export function CallAnalyzer() {
                 <label className="text-sm font-medium text-text-primary mb-2 block">
                   Focus de l&apos;analyse
                 </label>
-                <select
-                  value={analysisFocus}
-                  onChange={(e) => setAnalysisFocus(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-bg-tertiary border border-border-default text-text-primary text-sm focus:outline-none focus:border-accent appearance-none"
-                >
-                  {ANALYSIS_FOCUSES.map((f) => (
-                    <option key={f.key} value={f.key}>
-                      {f.label}
-                    </option>
-                  ))}
-                </select>
+                <div className="relative">
+                  <select
+                    value={analysisFocus}
+                    onChange={(e) => setAnalysisFocus(e.target.value)}
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-bg-tertiary border border-border-default/50 text-text-primary text-sm focus:outline-none focus:border-accent/40 appearance-none transition-colors cursor-pointer"
+                  >
+                    {ANALYSIS_FOCUSES.map((f) => (
+                      <option key={f.key} value={f.key}>
+                        {f.label}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-text-muted pointer-events-none" />
+                </div>
               </div>
 
               {/* Call result */}
@@ -318,18 +427,21 @@ export function CallAnalyzer() {
                 <label className="text-sm font-medium text-text-primary mb-2 block">
                   Résultat du call
                 </label>
-                <select
-                  value={callResult}
-                  onChange={(e) => setCallResult(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-bg-tertiary border border-border-default text-text-primary text-sm focus:outline-none focus:border-accent appearance-none"
-                >
-                  <option value="">Sélectionner...</option>
-                  {CALL_RESULTS.map((r) => (
-                    <option key={r.key} value={r.key}>
-                      {r.label}
-                    </option>
-                  ))}
-                </select>
+                <div className="relative">
+                  <select
+                    value={callResult}
+                    onChange={(e) => setCallResult(e.target.value)}
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-bg-tertiary border border-border-default/50 text-text-primary text-sm focus:outline-none focus:border-accent/40 appearance-none transition-colors cursor-pointer"
+                  >
+                    <option value="">Sélectionner...</option>
+                    {CALL_RESULTS.map((r) => (
+                      <option key={r.key} value={r.key}>
+                        {r.label}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-text-muted pointer-events-none" />
+                </div>
               </div>
             </div>
 
@@ -342,7 +454,7 @@ export function CallAnalyzer() {
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-bg-tertiary text-text-secondary hover:text-text-primary transition-all"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border border-border-default/50 bg-bg-tertiary text-text-secondary hover:text-text-primary hover:border-border-default transition-all"
                 >
                   <Upload className="h-3.5 w-3.5" />
                   Importer fichier
@@ -359,19 +471,22 @@ export function CallAnalyzer() {
                 value={transcript}
                 onChange={(e) => setTranscript(e.target.value)}
                 placeholder={`Colle ici le transcript ou importe un fichier (.txt, .srt, .vtt)...\n\nVendeur : Bonjour, merci d'avoir pris le temps...\nProspect : Oui, j'ai vu votre publicité et...\n...`}
-                rows={12}
-                className="w-full px-4 py-3 rounded-xl bg-bg-tertiary border border-border-default text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent resize-none text-sm"
+                rows={10}
+                className="w-full px-4 py-3 rounded-xl bg-bg-tertiary border border-border-default/50 text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent/40 resize-none text-sm leading-relaxed transition-colors"
               />
-              <p className="text-xs text-text-muted mt-1">
-                {transcript.length} caractères — minimum 50
-              </p>
+              <div className="flex items-center justify-between mt-1.5">
+                <p className="text-xs text-text-muted">
+                  {transcript.length.toLocaleString("fr-FR")} caractères
+                </p>
+                <p className="text-xs text-text-muted">Minimum 50 caractères</p>
+              </div>
             </div>
 
             <Button
               size="lg"
               onClick={handleAnalyze}
               disabled={transcript.trim().length < 50}
-              className="w-full"
+              className="w-full rounded-xl"
             >
               <Sparkles className="h-4 w-4 mr-2" />
               Analyser le call
@@ -382,76 +497,136 @@ export function CallAnalyzer() {
     );
   }
 
-  // Display results
+  /* ═══════════════════════════════════════════
+     Results view
+     ═══════════════════════════════════════════ */
+
   const getScoreColor = (score: number, max: number) => {
     const pct = (score / max) * 100;
-    if (pct >= 80) return "text-green-400";
+    if (pct >= 80) return "text-emerald-400";
     if (pct >= 60) return "text-yellow-400";
     return "text-red-400";
   };
 
+  const getScoreBg = (score: number, max: number) => {
+    const pct = (score / max) * 100;
+    if (pct >= 80) return "bg-emerald-400/10 border-emerald-400/20";
+    if (pct >= 60) return "bg-yellow-400/10 border-yellow-400/20";
+    return "bg-red-400/10 border-red-400/20";
+  };
+
   return (
-    <div className="space-y-6">
-      {/* Overall score */}
-      <Card className="border-accent/30">
+    <div className="space-y-5">
+      {/* Overall score — hero card */}
+      <Card className="border-accent/20 bg-gradient-to-br from-accent/5 via-bg-secondary to-bg-secondary">
         <CardContent className="pt-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-text-muted">Score global</p>
-              <p className={cn("text-4xl font-bold", getScoreColor(result.overall_score, 10))}>
-                {result.overall_score}/10
+          <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
+            {/* Score ring */}
+            <ScoreRing
+              score={result.overall_score}
+              max={10}
+              size={100}
+              strokeWidth={7}
+              className="shrink-0"
+            />
+
+            <div className="flex-1 text-center sm:text-left">
+              <p className="text-xs text-text-muted uppercase tracking-wider mb-1">
+                Score global
               </p>
-              <p className="text-sm text-text-secondary mt-1">{result.overall_verdict}</p>
+              <p className="text-sm text-text-secondary leading-relaxed">
+                {result.overall_verdict}
+              </p>
+
+              {/* Context badges */}
+              <div className="flex flex-wrap gap-2 mt-3 justify-center sm:justify-start">
+                {prospectOrigin && (
+                  <Badge variant="muted" className="text-xs">
+                    {PROSPECT_ORIGINS.find((o) => o.key === prospectOrigin)
+                      ?.label || prospectOrigin}
+                  </Badge>
+                )}
+                {callResult && (
+                  <Badge
+                    variant={
+                      callResult === "close"
+                        ? "default"
+                        : callResult === "ghoste" || callResult === "parti"
+                          ? "red"
+                          : "yellow"
+                    }
+                    className="text-xs"
+                  >
+                    {CALL_RESULTS.find((r) => r.key === callResult)?.label ||
+                      callResult}
+                  </Badge>
+                )}
+                {recordingUrl && (
+                  <a
+                    href={recordingUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-xs text-accent hover:underline"
+                  >
+                    <Link2 className="h-3 w-3" />
+                    Enregistrement
+                    <ArrowUpRight className="h-3 w-3" />
+                  </a>
+                )}
+              </div>
             </div>
-            <Button variant="outline" onClick={() => { setResult(null); setTranscript(""); setGeneratedScript(null); }}>
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setResult(null);
+                setTranscript("");
+                setGeneratedScript(null);
+              }}
+              className="shrink-0"
+            >
+              <RotateCcw className="h-3.5 w-3.5 mr-1.5" />
               Nouveau call
             </Button>
           </div>
 
-          {/* Context badges */}
-          <div className="flex flex-wrap gap-2 mt-3">
-            {prospectOrigin && (
-              <Badge variant="muted" className="text-xs">
-                {PROSPECT_ORIGINS.find((o) => o.key === prospectOrigin)?.label || prospectOrigin}
-              </Badge>
-            )}
-            {callResult && (
-              <Badge
-                variant={callResult === "close" ? "default" : callResult === "ghoste" || callResult === "parti" ? "red" : "yellow"}
-                className="text-xs"
-              >
-                {CALL_RESULTS.find((r) => r.key === callResult)?.label || callResult}
-              </Badge>
-            )}
-            {recordingUrl && (
-              <a
-                href={recordingUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 text-xs text-accent hover:underline"
-              >
-                <Link2 className="h-3 w-3" />
-                Enregistrement
-                <ArrowUpRight className="h-3 w-3" />
-              </a>
-            )}
-          </div>
-
-          {/* Score breakdown bar */}
-          <div className="grid grid-cols-5 gap-2 mt-4">
+          {/* Score breakdown — mini rings */}
+          <div className="grid grid-cols-5 gap-3 mt-6 pt-5 border-t border-border-default/30">
             {Object.entries(result.scores).map(([key, section]) => (
-              <div key={key} className="text-center">
-                <p className={cn("text-lg font-bold", getScoreColor(section.score, section.max))}>
+              <button
+                key={key}
+                onClick={() =>
+                  setExpandedSection(expandedSection === key ? null : key)
+                }
+                className={cn(
+                  "flex flex-col items-center gap-1.5 p-2 rounded-xl transition-all",
+                  expandedSection === key
+                    ? "bg-accent/5 ring-1 ring-accent/20"
+                    : "hover:bg-bg-tertiary"
+                )}
+              >
+                <span className="text-base">{SCORE_ICONS[key]}</span>
+                <span
+                  className={cn(
+                    "text-lg font-bold",
+                    getScoreColor(section.score, section.max)
+                  )}
+                >
                   {section.score}
-                </p>
-                <p className="text-xs text-text-muted">{SCORE_LABELS[key]}</p>
-                <div className="h-1.5 bg-bg-tertiary rounded-full mt-1 overflow-hidden">
+                </span>
+                <span className="text-[10px] text-text-muted leading-none">
+                  {SCORE_LABELS[key]}
+                </span>
+                <div className="w-full h-1 bg-bg-tertiary rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-accent rounded-full"
-                    style={{ width: `${(section.score / section.max) * 100}%` }}
+                    className="h-full bg-accent rounded-full transition-all duration-500"
+                    style={{
+                      width: `${(section.score / section.max) * 100}%`,
+                    }}
                   />
                 </div>
-              </div>
+              </button>
             ))}
           </div>
         </CardContent>
@@ -459,17 +634,34 @@ export function CallAnalyzer() {
 
       {/* Detailed scores */}
       {Object.entries(result.scores).map(([key, section]) => (
-        <Card key={key}>
+        <Card
+          key={key}
+          className={cn(
+            "transition-all",
+            expandedSection === key && "border-accent/20"
+          )}
+        >
           <CardHeader
             className="cursor-pointer py-3"
-            onClick={() => setExpandedSection(expandedSection === key ? null : key)}
+            onClick={() =>
+              setExpandedSection(expandedSection === key ? null : key)
+            }
           >
             <div className="flex items-center justify-between">
-              <CardTitle className="text-sm flex items-center gap-2">
-                <span className={cn("text-lg font-bold", getScoreColor(section.score, section.max))}>
-                  {section.score}/{section.max}
+              <CardTitle className="text-sm flex items-center gap-3">
+                <span
+                  className={cn(
+                    "inline-flex items-center justify-center h-8 w-8 rounded-lg text-sm font-bold border",
+                    getScoreBg(section.score, section.max),
+                    getScoreColor(section.score, section.max)
+                  )}
+                >
+                  {section.score}
                 </span>
-                {SCORE_LABELS[key]}
+                <span>{SCORE_LABELS[key]}</span>
+                <span className="text-xs text-text-muted font-normal">
+                  /{section.max}
+                </span>
               </CardTitle>
               {expandedSection === key ? (
                 <ChevronUp className="h-4 w-4 text-text-muted" />
@@ -479,32 +671,50 @@ export function CallAnalyzer() {
             </div>
           </CardHeader>
           {expandedSection === key && (
-            <CardContent className="pt-0 space-y-3">
-              <div className="p-3 rounded-lg bg-bg-tertiary">
-                <p className="text-xs text-text-muted uppercase mb-1">Moment clé</p>
-                <p className="text-sm text-text-secondary italic">{section.key_moment}</p>
+            <CardContent className="pt-0 space-y-4">
+              {/* Key moment */}
+              <div className="p-3.5 rounded-xl bg-gradient-to-r from-accent/5 to-transparent border border-accent/10">
+                <p className="text-[10px] text-accent uppercase tracking-wider font-semibold mb-1">
+                  Moment clé
+                </p>
+                <p className="text-sm text-text-secondary italic leading-relaxed">
+                  {section.key_moment}
+                </p>
               </div>
-              <div className="grid md:grid-cols-2 gap-3">
-                <div>
-                  <p className="text-xs text-text-muted uppercase mb-1 flex items-center gap-1">
-                    <ThumbsUp className="h-3 w-3 text-green-400" /> Forces
+
+              <div className="grid md:grid-cols-2 gap-4">
+                {/* Strengths */}
+                <div className="p-3.5 rounded-xl bg-emerald-400/5 border border-emerald-400/10">
+                  <p className="text-[10px] text-emerald-400 uppercase tracking-wider font-semibold mb-2 flex items-center gap-1.5">
+                    <ThumbsUp className="h-3 w-3" /> Forces
                   </p>
-                  <ul className="space-y-1">
+                  <ul className="space-y-1.5">
                     {section.strengths.map((s, i) => (
-                      <li key={i} className="text-xs text-text-secondary flex items-start gap-1">
-                        <span className="text-green-400">+</span> {s}
+                      <li
+                        key={i}
+                        className="text-xs text-text-secondary flex items-start gap-2"
+                      >
+                        <span className="text-emerald-400 mt-0.5 shrink-0">
+                          +
+                        </span>
+                        {s}
                       </li>
                     ))}
                   </ul>
                 </div>
-                <div>
-                  <p className="text-xs text-text-muted uppercase mb-1 flex items-center gap-1">
-                    <ThumbsDown className="h-3 w-3 text-red-400" /> Améliorations
+                {/* Improvements */}
+                <div className="p-3.5 rounded-xl bg-red-400/5 border border-red-400/10">
+                  <p className="text-[10px] text-red-400 uppercase tracking-wider font-semibold mb-2 flex items-center gap-1.5">
+                    <ThumbsDown className="h-3 w-3" /> Améliorations
                   </p>
-                  <ul className="space-y-1">
+                  <ul className="space-y-1.5">
                     {section.improvements.map((s, i) => (
-                      <li key={i} className="text-xs text-text-secondary flex items-start gap-1">
-                        <span className="text-red-400">-</span> {s}
+                      <li
+                        key={i}
+                        className="text-xs text-text-secondary flex items-start gap-2"
+                      >
+                        <span className="text-red-400 mt-0.5 shrink-0">-</span>
+                        {s}
                       </li>
                     ))}
                   </ul>
@@ -518,36 +728,51 @@ export function CallAnalyzer() {
       {/* Playbook */}
       {result.playbook && result.playbook.length > 0 && (
         <Card className="border-accent/20">
-          <CardHeader className="py-3">
+          <CardHeader className="py-4">
             <CardTitle className="text-sm flex items-center gap-2">
-              <BookOpen className="h-4 w-4 text-accent" />
+              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-accent/10">
+                <BookOpen className="h-4 w-4 text-accent" />
+              </div>
               Playbook — Actions concrètes
             </CardTitle>
           </CardHeader>
-          <CardContent className="pt-0 space-y-2">
+          <CardContent className="pt-0 space-y-2.5">
             {result.playbook.map((action, i) => {
-              const config = PRIORITY_CONFIG[action.priority] || PRIORITY_CONFIG.moyenne;
+              const config =
+                PRIORITY_CONFIG[action.priority] || PRIORITY_CONFIG.moyenne;
               return (
                 <div
                   key={i}
                   className={cn(
-                    "p-3 rounded-xl border",
+                    "p-4 rounded-xl border transition-all",
                     config.bg,
                     config.border
                   )}
                 >
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="flex items-start gap-2 min-w-0">
-                      <CheckCircle2 className={cn("h-4 w-4 mt-0.5 shrink-0", config.color)} />
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex items-start gap-2.5 min-w-0">
+                      <CheckCircle2
+                        className={cn(
+                          "h-4 w-4 mt-0.5 shrink-0",
+                          config.color
+                        )}
+                      />
                       <div>
-                        <p className="text-sm font-medium text-text-primary">{action.title}</p>
-                        <p className="text-xs text-text-secondary mt-0.5">{action.description}</p>
+                        <p className="text-sm font-medium text-text-primary">
+                          {action.title}
+                        </p>
+                        <p className="text-xs text-text-secondary mt-1 leading-relaxed">
+                          {action.description}
+                        </p>
                       </div>
                     </div>
                     <Badge
                       variant={
-                        action.priority === "haute" ? "red" :
-                        action.priority === "moyenne" ? "yellow" : "blue"
+                        action.priority === "haute"
+                          ? "red"
+                          : action.priority === "moyenne"
+                            ? "yellow"
+                            : "blue"
                       }
                       className="text-[10px] shrink-0"
                     >
@@ -572,9 +797,14 @@ export function CallAnalyzer() {
           </CardHeader>
           <CardContent className="pt-0 space-y-2">
             {result.key_phrases_to_keep.map((p, i) => (
-              <div key={i} className="p-2 rounded-lg bg-bg-tertiary">
-                <p className="text-xs text-accent font-medium italic">&ldquo;{p.phrase}&rdquo;</p>
-                <p className="text-xs text-text-muted mt-1">{p.why}</p>
+              <div
+                key={i}
+                className="p-3 rounded-xl bg-emerald-400/5 border border-emerald-400/10"
+              >
+                <p className="text-xs text-accent font-medium italic">
+                  &ldquo;{p.phrase}&rdquo;
+                </p>
+                <p className="text-xs text-text-muted mt-1.5">{p.why}</p>
               </div>
             ))}
           </CardContent>
@@ -589,9 +819,16 @@ export function CallAnalyzer() {
           </CardHeader>
           <CardContent className="pt-0 space-y-2">
             {result.key_phrases_to_improve.map((p, i) => (
-              <div key={i} className="p-2 rounded-lg bg-bg-tertiary">
-                <p className="text-xs text-red-400 line-through italic">&ldquo;{p.phrase}&rdquo;</p>
-                <p className="text-xs text-accent mt-1">&ldquo;{p.suggestion}&rdquo;</p>
+              <div
+                key={i}
+                className="p-3 rounded-xl bg-bg-tertiary border border-border-default/30"
+              >
+                <p className="text-xs text-red-400 line-through italic">
+                  &ldquo;{p.phrase}&rdquo;
+                </p>
+                <p className="text-xs text-accent mt-1.5 font-medium">
+                  &ldquo;{p.suggestion}&rdquo;
+                </p>
               </div>
             ))}
           </CardContent>
@@ -607,24 +844,42 @@ export function CallAnalyzer() {
           </CardTitle>
         </CardHeader>
         <CardContent className="pt-0">
-          <div className="grid md:grid-cols-3 gap-3">
-            <div>
-              <p className="text-xs text-text-muted uppercase mb-1">Signaux d&apos;achat</p>
-              {result.client_signals.buying_signals.map((s, i) => (
-                <Badge key={i} variant="default" className="text-xs mr-1 mb-1">{s}</Badge>
-              ))}
+          <div className="grid md:grid-cols-3 gap-4">
+            <div className="p-3.5 rounded-xl bg-emerald-400/5 border border-emerald-400/10">
+              <p className="text-[10px] text-emerald-400 uppercase tracking-wider font-semibold mb-2">
+                Signaux d&apos;achat
+              </p>
+              <div className="flex flex-wrap gap-1.5">
+                {result.client_signals.buying_signals.map((s, i) => (
+                  <Badge key={i} variant="default" className="text-xs">
+                    {s}
+                  </Badge>
+                ))}
+              </div>
             </div>
-            <div>
-              <p className="text-xs text-text-muted uppercase mb-1">Signaux d&apos;alerte</p>
-              {result.client_signals.warning_signals.map((s, i) => (
-                <Badge key={i} variant="red" className="text-xs mr-1 mb-1">{s}</Badge>
-              ))}
+            <div className="p-3.5 rounded-xl bg-red-400/5 border border-red-400/10">
+              <p className="text-[10px] text-red-400 uppercase tracking-wider font-semibold mb-2">
+                Signaux d&apos;alerte
+              </p>
+              <div className="flex flex-wrap gap-1.5">
+                {result.client_signals.warning_signals.map((s, i) => (
+                  <Badge key={i} variant="red" className="text-xs">
+                    {s}
+                  </Badge>
+                ))}
+              </div>
             </div>
-            <div>
-              <p className="text-xs text-text-muted uppercase mb-1">Déclencheurs émotionnels</p>
-              {result.client_signals.emotional_triggers.map((s, i) => (
-                <Badge key={i} variant="blue" className="text-xs mr-1 mb-1">{s}</Badge>
-              ))}
+            <div className="p-3.5 rounded-xl bg-blue-400/5 border border-blue-400/10">
+              <p className="text-[10px] text-blue-400 uppercase tracking-wider font-semibold mb-2">
+                Déclencheurs émotionnels
+              </p>
+              <div className="flex flex-wrap gap-1.5">
+                {result.client_signals.emotional_triggers.map((s, i) => (
+                  <Badge key={i} variant="blue" className="text-xs">
+                    {s}
+                  </Badge>
+                ))}
+              </div>
             </div>
           </div>
         </CardContent>
@@ -640,10 +895,16 @@ export function CallAnalyzer() {
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-0">
-            <ul className="space-y-1">
+            <ul className="space-y-2">
               {result.next_steps.map((s, i) => (
-                <li key={i} className="text-xs text-text-secondary flex items-start gap-2">
-                  <span className="text-accent">{"\u2192"}</span> {s}
+                <li
+                  key={i}
+                  className="text-xs text-text-secondary flex items-start gap-2 p-2 rounded-lg bg-bg-tertiary/50"
+                >
+                  <span className="text-accent shrink-0 mt-0.5">
+                    {"\u2192"}
+                  </span>
+                  {s}
                 </li>
               ))}
             </ul>
@@ -657,10 +918,16 @@ export function CallAnalyzer() {
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-0">
-            <ul className="space-y-1">
+            <ul className="space-y-2">
               {result.training_focus.map((s, i) => (
-                <li key={i} className="text-xs text-text-secondary flex items-start gap-2">
-                  <span className="text-accent">{"\u2022"}</span> {s}
+                <li
+                  key={i}
+                  className="text-xs text-text-secondary flex items-start gap-2 p-2 rounded-lg bg-bg-tertiary/50"
+                >
+                  <span className="text-accent shrink-0 mt-0.5">
+                    {"\u2022"}
+                  </span>
+                  {s}
                 </li>
               ))}
             </ul>
@@ -669,43 +936,50 @@ export function CallAnalyzer() {
       </div>
 
       {/* Generate Script Button */}
-      <Card className="border-accent/20">
+      <Card className="border-accent/20 bg-gradient-to-r from-accent/5 via-bg-secondary to-bg-secondary">
         <CardContent className="pt-6">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div>
-              <h3 className="text-sm font-semibold text-text-primary flex items-center gap-2">
-                <FileText className="h-4 w-4 text-accent" />
-                Script personnalisé
-              </h3>
-              <p className="text-xs text-text-secondary mt-0.5">
-                Génère un script de vente adapté basé sur les faiblesses identifiées dans ton analyse.
-              </p>
+            <div className="flex items-start gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent/10 shrink-0">
+                <FileText className="h-5 w-5 text-accent" />
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold text-text-primary">
+                  Script personnalisé
+                </h3>
+                <p className="text-xs text-text-secondary mt-0.5">
+                  Génère un script de vente adapté basé sur les faiblesses
+                  identifiées dans ton analyse.
+                </p>
+              </div>
             </div>
             <Button
               onClick={handleGenerateScript}
               disabled={scriptLoading}
-              className="shrink-0"
+              className="shrink-0 rounded-xl"
             >
               {scriptLoading ? (
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
               ) : (
                 <Sparkles className="h-4 w-4 mr-2" />
               )}
-              Générer un script personnalisé
+              Générer le script
             </Button>
           </div>
 
           {/* Generated script */}
           {generatedScript && (
-            <div className="mt-4 p-4 rounded-xl bg-bg-tertiary border border-border-default">
-              <div className="flex items-center justify-between mb-2">
-                <Badge variant="default" className="text-xs">Script généré</Badge>
+            <div className="mt-5 p-5 rounded-xl bg-bg-tertiary border border-border-default/50">
+              <div className="flex items-center justify-between mb-3">
+                <Badge variant="default" className="text-xs">
+                  Script généré
+                </Badge>
                 <button
                   onClick={() => {
                     navigator.clipboard.writeText(generatedScript);
                     toast.success("Script copié !");
                   }}
-                  className="text-xs text-text-muted hover:text-text-primary transition-colors"
+                  className="text-xs text-accent hover:text-accent-hover transition-colors font-medium"
                 >
                   Copier
                 </button>

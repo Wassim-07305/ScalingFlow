@@ -2,7 +2,15 @@
 
 import React, { useEffect, useState } from "react";
 import { cn } from "@/lib/utils/cn";
-import { Magnet, Hammer, Package, TrendingUp, Loader2 } from "lucide-react";
+import {
+  Magnet,
+  Hammer,
+  Package,
+  TrendingUp,
+  Loader2,
+  Check,
+  Lock,
+} from "lucide-react";
 import { useUser } from "@/hooks/use-user";
 import { createClient } from "@/lib/supabase/client";
 
@@ -49,9 +57,56 @@ interface PhaseProgressionProps {
   className?: string;
 }
 
+/* ── Skeleton loader ── */
+
+function PhaseProgressionSkeleton({ className }: { className?: string }) {
+  return (
+    <div className={cn("mb-6", className)}>
+      {/* Desktop */}
+      <div className="hidden md:flex items-start gap-0 animate-pulse">
+        {[1, 2, 3, 4].map((i) => (
+          <React.Fragment key={i}>
+            <div className="flex-1">
+              <div className="flex flex-col items-center p-5 rounded-2xl border border-border-default/30 bg-bg-secondary/30">
+                <div className="h-12 w-12 rounded-xl bg-bg-tertiary mb-3" />
+                <div className="h-4 w-16 rounded-md bg-bg-tertiary mb-2" />
+                <div className="h-3 w-32 rounded-md bg-bg-tertiary mb-3" />
+                <div className="h-1.5 w-full rounded-full bg-bg-tertiary" />
+              </div>
+            </div>
+            {i < 4 && (
+              <div className="flex items-center pt-10 px-1 shrink-0">
+                <div className="w-8 h-0.5 rounded-full bg-border-default/30" />
+              </div>
+            )}
+          </React.Fragment>
+        ))}
+      </div>
+      {/* Mobile */}
+      <div className="md:hidden space-y-3 animate-pulse">
+        {[1, 2, 3, 4].map((i) => (
+          <div
+            key={i}
+            className="flex items-center gap-4 p-3.5 rounded-xl border border-border-default/30 bg-bg-secondary/30"
+          >
+            <div className="h-10 w-10 rounded-lg bg-bg-tertiary shrink-0" />
+            <div className="flex-1 space-y-2">
+              <div className="h-3.5 w-20 rounded-md bg-bg-tertiary" />
+              <div className="h-2.5 w-36 rounded-md bg-bg-tertiary" />
+              <div className="h-1 w-full rounded-full bg-bg-tertiary" />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export function PhaseProgression({ className }: PhaseProgressionProps) {
   const { user, profile } = useUser();
-  const [completedTitles, setCompletedTitles] = useState<Set<string>>(new Set());
+  const [completedTitles, setCompletedTitles] = useState<Set<string>>(
+    new Set()
+  );
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -73,17 +128,27 @@ export function PhaseProgression({ className }: PhaseProgressionProps) {
       ]);
 
       const milestoneMap = new Map<string, string>();
-      ((milestonesRes.data ?? []) as { id: string; title: string }[]).forEach((m) => milestoneMap.set(m.id, m.title));
+      (
+        (milestonesRes.data ?? []) as { id: string; title: string }[]
+      ).forEach((m) => milestoneMap.set(m.id, m.title));
 
       const completed = new Set<string>();
-      ((userMilestonesRes.data ?? []) as { milestone_id: string; completed: boolean }[]).forEach((um) => {
+      (
+        (userMilestonesRes.data ?? []) as {
+          milestone_id: string;
+          completed: boolean;
+        }[]
+      ).forEach((um) => {
         const title = milestoneMap.get(um.milestone_id);
         if (title) completed.add(title);
       });
 
       // Auto-detect from profile
       if (profile?.onboarding_completed) completed.add("Profil complete");
-      if (profile?.market_viability_score && profile.market_viability_score > 70)
+      if (
+        profile?.market_viability_score &&
+        profile.market_viability_score > 70
+      )
         completed.add("Marché validé");
 
       setCompletedTitles(completed);
@@ -91,25 +156,26 @@ export function PhaseProgression({ className }: PhaseProgressionProps) {
     };
 
     fetchMilestones();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, profile?.onboarding_completed, profile?.market_viability_score]);
 
   const getPhaseCompletion = (phase: Phase): number => {
     if (phase.milestoneKeys.length === 0) return 0;
-    const done = phase.milestoneKeys.filter((k) => completedTitles.has(k)).length;
+    const done = phase.milestoneKeys.filter((k) =>
+      completedTitles.has(k)
+    ).length;
     return Math.round((done / phase.milestoneKeys.length) * 100);
   };
 
   // Find current phase (first not 100%)
-  const currentPhaseIndex = PHASES.findIndex((p) => getPhaseCompletion(p) < 100);
-  const activeIndex = currentPhaseIndex === -1 ? PHASES.length - 1 : currentPhaseIndex;
+  const currentPhaseIndex = PHASES.findIndex(
+    (p) => getPhaseCompletion(p) < 100
+  );
+  const activeIndex =
+    currentPhaseIndex === -1 ? PHASES.length - 1 : currentPhaseIndex;
 
   if (loading) {
-    return (
-      <div className={cn("flex items-center justify-center py-8", className)}>
-        <Loader2 className="h-5 w-5 animate-spin text-text-muted" />
-      </div>
-    );
+    return <PhaseProgressionSkeleton className={className} />;
   }
 
   return (
@@ -120,6 +186,7 @@ export function PhaseProgression({ className }: PhaseProgressionProps) {
           const completion = getPhaseCompletion(phase);
           const isActive = index === activeIndex;
           const isCompleted = completion === 100;
+          const isFuture = index > activeIndex;
           const Icon = phase.icon;
 
           return (
@@ -128,18 +195,32 @@ export function PhaseProgression({ className }: PhaseProgressionProps) {
               <div className="flex-1 relative">
                 <div
                   className={cn(
-                    "relative flex flex-col items-center text-center p-4 rounded-2xl border transition-all",
+                    "relative flex flex-col items-center text-center p-5 rounded-2xl border transition-all duration-300",
                     isActive
-                      ? "border-accent/40 bg-accent/5 shadow-lg shadow-accent/10"
+                      ? "border-accent/40 bg-gradient-to-b from-accent/10 to-accent/5 shadow-lg shadow-accent/10"
                       : isCompleted
                         ? "border-accent/20 bg-accent/5"
-                        : "border-border-default bg-bg-secondary/50"
+                        : "border-border-default/50 bg-bg-secondary/30"
                   )}
                 >
+                  {/* Completed checkmark */}
+                  {isCompleted && (
+                    <div className="absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-full bg-accent text-bg-primary ring-2 ring-bg-secondary">
+                      <Check className="h-3.5 w-3.5" strokeWidth={3} />
+                    </div>
+                  )}
+
+                  {/* Locked indicator for future */}
+                  {isFuture && (
+                    <div className="absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-full bg-bg-tertiary border border-border-default text-text-muted ring-2 ring-bg-secondary">
+                      <Lock className="h-3 w-3" />
+                    </div>
+                  )}
+
                   {/* Icon */}
                   <div
                     className={cn(
-                      "flex h-12 w-12 items-center justify-center rounded-xl mb-3 transition-all",
+                      "flex h-12 w-12 items-center justify-center rounded-xl mb-3 transition-all duration-300",
                       isActive
                         ? "bg-accent/20 ring-2 ring-accent/30 shadow-lg shadow-accent/20"
                         : isCompleted
@@ -149,24 +230,45 @@ export function PhaseProgression({ className }: PhaseProgressionProps) {
                   >
                     <Icon
                       className={cn(
-                        "h-6 w-6",
-                        isActive || isCompleted ? "text-accent" : "text-text-muted"
+                        "h-6 w-6 transition-colors",
+                        isActive || isCompleted
+                          ? "text-accent"
+                          : "text-text-muted/60"
                       )}
                     />
                   </div>
 
-                  {/* Title */}
+                  {/* Phase number + title */}
+                  <span
+                    className={cn(
+                      "text-[10px] uppercase tracking-widest font-semibold mb-0.5",
+                      isActive
+                        ? "text-accent"
+                        : isCompleted
+                          ? "text-accent/60"
+                          : "text-text-muted/50"
+                    )}
+                  >
+                    Phase {index + 1}
+                  </span>
                   <h3
                     className={cn(
                       "text-sm font-bold mb-1",
-                      isActive || isCompleted ? "text-text-primary" : "text-text-secondary"
+                      isActive || isCompleted
+                        ? "text-text-primary"
+                        : "text-text-secondary/60"
                     )}
                   >
                     {phase.title}
                   </h3>
 
                   {/* Subtitle */}
-                  <p className="text-[11px] text-text-muted leading-tight mb-3">
+                  <p
+                    className={cn(
+                      "text-[11px] leading-tight mb-3",
+                      isFuture ? "text-text-muted/40" : "text-text-muted"
+                    )}
+                  >
                     {phase.subtitle}
                   </p>
 
@@ -174,8 +276,10 @@ export function PhaseProgression({ className }: PhaseProgressionProps) {
                   <div className="w-full h-1.5 bg-bg-tertiary rounded-full overflow-hidden">
                     <div
                       className={cn(
-                        "h-full rounded-full transition-all duration-500",
-                        isCompleted ? "bg-accent" : isActive ? "bg-accent" : "bg-text-muted/30"
+                        "h-full rounded-full transition-all duration-700 ease-out",
+                        isCompleted || isActive
+                          ? "bg-accent"
+                          : "bg-text-muted/20"
                       )}
                       style={{ width: `${completion}%` }}
                     />
@@ -184,8 +288,12 @@ export function PhaseProgression({ className }: PhaseProgressionProps) {
                   {/* Percentage */}
                   <span
                     className={cn(
-                      "text-xs font-medium mt-2",
-                      isCompleted ? "text-accent" : isActive ? "text-accent" : "text-text-muted"
+                      "text-xs font-semibold mt-2",
+                      isCompleted
+                        ? "text-accent"
+                        : isActive
+                          ? "text-accent"
+                          : "text-text-muted/40"
                     )}
                   >
                     {completion}%
@@ -195,15 +303,18 @@ export function PhaseProgression({ className }: PhaseProgressionProps) {
 
               {/* Connector line */}
               {index < PHASES.length - 1 && (
-                <div className="flex items-center pt-10 px-1 shrink-0">
-                  <div
-                    className={cn(
-                      "w-8 h-0.5 rounded-full transition-all",
-                      getPhaseCompletion(PHASES[index]) === 100
-                        ? "bg-accent"
-                        : "bg-border-default"
-                    )}
-                  />
+                <div className="flex items-center pt-12 px-1 shrink-0">
+                  <div className="relative w-10 h-0.5">
+                    <div className="absolute inset-0 rounded-full bg-border-default/30" />
+                    <div
+                      className={cn(
+                        "absolute inset-y-0 left-0 rounded-full transition-all duration-500",
+                        getPhaseCompletion(PHASES[index]) === 100
+                          ? "bg-accent w-full"
+                          : "bg-border-default/30 w-0"
+                      )}
+                    />
+                  </div>
                 </div>
               )}
             </React.Fragment>
@@ -211,76 +322,131 @@ export function PhaseProgression({ className }: PhaseProgressionProps) {
         })}
       </div>
 
-      {/* Mobile view */}
-      <div className="md:hidden space-y-3">
-        {PHASES.map((phase, index) => {
-          const completion = getPhaseCompletion(phase);
-          const isActive = index === activeIndex;
-          const isCompleted = completion === 100;
-          const Icon = phase.icon;
+      {/* Mobile view — vertical timeline */}
+      <div className="md:hidden relative">
+        {/* Timeline line */}
+        <div className="absolute left-[27px] top-4 bottom-4 w-0.5 bg-border-default/30" />
+        <div
+          className="absolute left-[27px] top-4 w-0.5 bg-accent transition-all duration-700"
+          style={{
+            height: `${Math.max(0, ((activeIndex + (getPhaseCompletion(PHASES[activeIndex]) > 0 ? 0.5 : 0)) / (PHASES.length - 1)) * 100)}%`,
+            maxHeight: "calc(100% - 2rem)",
+          }}
+        />
 
-          return (
-            <div
-              key={phase.key}
-              className={cn(
-                "flex items-center gap-4 p-3 rounded-xl border transition-all",
-                isActive
-                  ? "border-accent/40 bg-accent/5 shadow-lg shadow-accent/10"
-                  : isCompleted
-                    ? "border-accent/20 bg-accent/5"
-                    : "border-border-default bg-bg-secondary/50"
-              )}
-            >
+        <div className="space-y-3 relative">
+          {PHASES.map((phase, index) => {
+            const completion = getPhaseCompletion(phase);
+            const isActive = index === activeIndex;
+            const isCompleted = completion === 100;
+            const isFuture = index > activeIndex;
+            const Icon = phase.icon;
+
+            return (
               <div
+                key={phase.key}
                 className={cn(
-                  "flex h-10 w-10 items-center justify-center rounded-lg shrink-0",
+                  "flex items-center gap-4 p-3.5 rounded-xl border transition-all duration-300 ml-2",
                   isActive
-                    ? "bg-accent/20 ring-2 ring-accent/30"
+                    ? "border-accent/40 bg-gradient-to-r from-accent/10 to-accent/5 shadow-lg shadow-accent/10"
                     : isCompleted
-                      ? "bg-accent/15"
-                      : "bg-bg-tertiary"
+                      ? "border-accent/20 bg-accent/5"
+                      : "border-border-default/30 bg-bg-secondary/30"
                 )}
               >
-                <Icon
-                  className={cn(
-                    "h-5 w-5",
-                    isActive || isCompleted ? "text-accent" : "text-text-muted"
-                  )}
-                />
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between mb-1">
-                  <h3
-                    className={cn(
-                      "text-sm font-bold",
-                      isActive || isCompleted ? "text-text-primary" : "text-text-secondary"
-                    )}
-                  >
-                    {phase.title}
-                  </h3>
-                  <span
-                    className={cn(
-                      "text-xs font-medium",
-                      isCompleted ? "text-accent" : isActive ? "text-accent" : "text-text-muted"
-                    )}
-                  >
-                    {completion}%
-                  </span>
-                </div>
-                <p className="text-[11px] text-text-muted mb-2">{phase.subtitle}</p>
-                <div className="w-full h-1 bg-bg-tertiary rounded-full overflow-hidden">
+                {/* Icon with status indicator */}
+                <div className="relative shrink-0">
                   <div
                     className={cn(
-                      "h-full rounded-full transition-all duration-500",
-                      isCompleted ? "bg-accent" : isActive ? "bg-accent" : "bg-text-muted/30"
+                      "flex h-11 w-11 items-center justify-center rounded-xl transition-all",
+                      isActive
+                        ? "bg-accent/20 ring-2 ring-accent/30"
+                        : isCompleted
+                          ? "bg-accent/15"
+                          : "bg-bg-tertiary"
                     )}
-                    style={{ width: `${completion}%` }}
-                  />
+                  >
+                    {isCompleted ? (
+                      <Check
+                        className="h-5 w-5 text-accent"
+                        strokeWidth={2.5}
+                      />
+                    ) : isFuture ? (
+                      <Lock className="h-4 w-4 text-text-muted/40" />
+                    ) : (
+                      <Icon
+                        className={cn(
+                          "h-5 w-5",
+                          isActive ? "text-accent" : "text-text-muted"
+                        )}
+                      />
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between mb-1">
+                    <div className="flex items-center gap-2">
+                      <span
+                        className={cn(
+                          "text-[10px] uppercase tracking-wider font-semibold",
+                          isActive
+                            ? "text-accent"
+                            : isCompleted
+                              ? "text-accent/60"
+                              : "text-text-muted/40"
+                        )}
+                      >
+                        Phase {index + 1}
+                      </span>
+                      <h3
+                        className={cn(
+                          "text-sm font-bold",
+                          isActive || isCompleted
+                            ? "text-text-primary"
+                            : "text-text-secondary/60"
+                        )}
+                      >
+                        {phase.title}
+                      </h3>
+                    </div>
+                    <span
+                      className={cn(
+                        "text-xs font-semibold",
+                        isCompleted
+                          ? "text-accent"
+                          : isActive
+                            ? "text-accent"
+                            : "text-text-muted/40"
+                      )}
+                    >
+                      {completion}%
+                    </span>
+                  </div>
+                  <p
+                    className={cn(
+                      "text-[11px] mb-2",
+                      isFuture ? "text-text-muted/40" : "text-text-muted"
+                    )}
+                  >
+                    {phase.subtitle}
+                  </p>
+                  <div className="w-full h-1 bg-bg-tertiary rounded-full overflow-hidden">
+                    <div
+                      className={cn(
+                        "h-full rounded-full transition-all duration-700 ease-out",
+                        isCompleted || isActive
+                          ? "bg-accent"
+                          : "bg-text-muted/20"
+                      )}
+                      style={{ width: `${completion}%` }}
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
     </div>
   );
