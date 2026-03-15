@@ -7,7 +7,7 @@ import { AILoading } from "@/components/shared/ai-loading";
 import { createClient } from "@/lib/supabase/client";
 import { useUser } from "@/hooks/use-user";
 import { toast } from "sonner";
-import { Sparkles, Send, CheckCircle, RotateCcw } from "lucide-react";
+import { Sparkles, Send, CheckCircle, RotateCcw, RefreshCw, Key, Eye, EyeOff, Loader2 as Loader2Icon } from "lucide-react";
 
 const EXTRACTION_QUESTIONS = [
   "Quel est le problème principal que tu résous pour tes clients ? Donne un exemple concret.",
@@ -36,6 +36,13 @@ export function VaultExtraction() {
   const [extractionResult, setExtractionResult] = React.useState<string | null>(null);
   const [existingExtraction, setExistingExtraction] = React.useState<string | null>(null);
   const [loading, setLoading] = React.useState(true);
+  const [updating, setUpdating] = React.useState(false);
+
+  // Clé API Claude
+  const [apiKey, setApiKey] = React.useState("");
+  const [showApiKey, setShowApiKey] = React.useState(false);
+  const [savingKey, setSavingKey] = React.useState(false);
+  const [apiKeyLoaded, setApiKeyLoaded] = React.useState(false);
 
   React.useEffect(() => {
     if (!user) return;
@@ -43,7 +50,7 @@ export function VaultExtraction() {
       const supabase = createClient();
       const { data } = await supabase
         .from("profiles")
-        .select("vault_extraction")
+        .select("vault_extraction, claude_api_key")
         .eq("id", user.id)
         .single();
       if (data?.vault_extraction) {
@@ -53,10 +60,65 @@ export function VaultExtraction() {
             : JSON.stringify(data.vault_extraction, null, 2)
         );
       }
+      if (data?.claude_api_key) {
+        setApiKey(data.claude_api_key);
+      }
+      setApiKeyLoaded(true);
       setLoading(false);
     };
     fetchExisting();
   }, [user]);
+
+  const handleSaveApiKey = async () => {
+    if (!user) return;
+    setSavingKey(true);
+    try {
+      const supabase = createClient();
+      const { error } = await supabase
+        .from("profiles")
+        .update({ claude_api_key: apiKey.trim() || null })
+        .eq("id", user.id);
+      if (error) throw error;
+      toast.success("Clé API sauvegardée !");
+    } catch {
+      toast.error("Erreur lors de la sauvegarde de la clé API");
+    } finally {
+      setSavingKey(false);
+    }
+  };
+
+  const handleUpdate = async () => {
+    if (!user) return;
+    setUpdating(true);
+    try {
+      const response = await fetch("/api/ai/vault-extraction", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ update: true }),
+      });
+
+      if (!response.ok) throw new Error("Erreur lors de la mise à jour");
+      const data = await response.json();
+      const result = typeof data.extraction === "string"
+        ? data.extraction
+        : JSON.stringify(data.extraction, null, 2);
+      setExistingExtraction(result);
+      setExtractionResult(result);
+
+      // Update vault_updated_at
+      const supabase = createClient();
+      await supabase
+        .from("profiles")
+        .update({ vault_updated_at: new Date().toISOString() })
+        .eq("id", user.id);
+
+      toast.success("Extraction mise à jour avec les dernières données !");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Erreur");
+    } finally {
+      setUpdating(false);
+    }
+  };
 
   const handleSubmitAnswer = () => {
     if (!currentAnswer.trim()) return;
@@ -116,15 +178,25 @@ export function VaultExtraction() {
   if (existingExtraction && answers.length === 0 && !extractionResult) {
     return (
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between flex-wrap gap-2">
           <h3 className="font-semibold text-text-primary flex items-center gap-2">
             <CheckCircle className="h-5 w-5 text-accent" />
             Extraction d&apos;expertise complétée
           </h3>
-          <Button variant="outline" onClick={handleRestart}>
-            <RotateCcw className="h-4 w-4 mr-2" />
-            Refaire l&apos;extraction
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" onClick={handleUpdate} disabled={updating}>
+              {updating ? (
+                <Loader2Icon className="h-4 w-4 mr-2 animate-spin" />
+              ) : (
+                <RefreshCw className="h-4 w-4 mr-2" />
+              )}
+              Mettre à jour
+            </Button>
+            <Button variant="outline" onClick={handleRestart}>
+              <RotateCcw className="h-4 w-4 mr-2" />
+              Refaire l&apos;extraction
+            </Button>
+          </div>
         </div>
         <Card>
           <CardContent className="pt-6">
@@ -133,6 +205,57 @@ export function VaultExtraction() {
             </pre>
           </CardContent>
         </Card>
+
+        {/* Section clé API Claude */}
+        {apiKeyLoaded && (
+          <Card>
+            <CardContent className="pt-6 space-y-3">
+              <div className="flex items-center gap-2">
+                <Key className="h-4 w-4 text-accent" />
+                <h4 className="text-sm font-semibold text-text-primary">
+                  Clé API Claude personnelle
+                </h4>
+              </div>
+              <p className="text-xs text-text-muted">
+                Ta clé est utilisée uniquement pour l&apos;extraction de mémoire. Elle est stockée de manière sécurisée.
+              </p>
+              <div className="flex items-center gap-2">
+                <div className="relative flex-1">
+                  <input
+                    type={showApiKey ? "text" : "password"}
+                    value={apiKey}
+                    onChange={(e) => setApiKey(e.target.value)}
+                    placeholder="sk-ant-..."
+                    className="w-full px-3 py-2 pr-10 rounded-lg bg-bg-tertiary border border-border-default text-sm text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none font-mono"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowApiKey(!showApiKey)}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded hover:bg-bg-secondary transition-colors"
+                  >
+                    {showApiKey ? (
+                      <EyeOff className="h-4 w-4 text-text-muted" />
+                    ) : (
+                      <Eye className="h-4 w-4 text-text-muted" />
+                    )}
+                  </button>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleSaveApiKey}
+                  disabled={savingKey}
+                >
+                  {savingKey ? (
+                    <Loader2Icon className="h-4 w-4 animate-spin" />
+                  ) : (
+                    "Sauvegarder"
+                  )}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
     );
   }
@@ -174,7 +297,7 @@ export function VaultExtraction() {
           <div
             className="h-full bg-accent rounded-full transition-all"
             style={{
-              width: `${((currentStep + answers.length) / EXTRACTION_QUESTIONS.length) * 100}%`,
+              width: `${((currentStep) / EXTRACTION_QUESTIONS.length) * 100}%`,
             }}
           />
         </div>

@@ -22,8 +22,10 @@ import {
   ChevronDown,
   ChevronUp,
   BarChart3,
+  Mic,
 } from "lucide-react";
 import { SalesMetrics } from "@/components/sales/sales-metrics";
+import { CallAnalyzer } from "@/components/sales/call-analyzer";
 import { exportToPDF } from "@/lib/utils/export-pdf";
 import { cn } from "@/lib/utils/cn";
 import { createClient } from "@/lib/supabase/client";
@@ -36,6 +38,7 @@ type SalesScript = Record<string, any>;
 const TABS = [
   { key: "discovery", label: "Appel Découverte", icon: Phone },
   { key: "closing", label: "Script de Closing", icon: FileText },
+  { key: "analyzer", label: "Analyse de Call", icon: Mic },
   { key: "metrics", label: "Métriques", icon: BarChart3 },
   { key: "history", label: "Historique", icon: History },
 ] as const;
@@ -223,7 +226,9 @@ export default function SalesPage() {
         ))}
       </div>
 
-      {activeTab === "metrics" ? (
+      {activeTab === "analyzer" ? (
+        <CallAnalyzer />
+      ) : activeTab === "metrics" ? (
         <SalesMetrics />
       ) : activeTab === "history" ? (
         <GenerationHistory

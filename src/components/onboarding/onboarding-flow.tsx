@@ -50,6 +50,13 @@ const SITUATION_FIELDS: Record<
   string,
   { key: string; label: string; placeholder: string; type?: string }[]
 > = {
+  zero: [
+    {
+      key: "biggest_challenge",
+      label: "Qu'est-ce qui te bloque pour démarrer ?",
+      placeholder: "Ex : Je ne sais pas quoi vendre, pas d'idée de business...",
+    },
+  ],
   salarie: [
     {
       key: "poste",
@@ -101,6 +108,32 @@ const SITUATION_FIELDS: Record<
       label: "CA mensuel actuel (EUR)",
       placeholder: "Ex : 15000",
       type: "number",
+    },
+    {
+      key: "business_model",
+      label: "Comment fonctionne ton business ?",
+      placeholder: "Ex : Vente de formations en ligne, prestations de service, SaaS...",
+    },
+    {
+      key: "delivery_description",
+      label: "Que délivres-tu exactement ?",
+      placeholder: "Ex : Accompagnement 1-to-1 sur 3 mois, formation vidéo + coaching de groupe...",
+    },
+    {
+      key: "active_clients",
+      label: "Combien de clients actifs ?",
+      placeholder: "Ex : 12",
+      type: "number",
+    },
+    {
+      key: "delivery_process",
+      label: "Quel est ton process de delivery ?",
+      placeholder: "Ex : Onboarding → audit → plan d'action → suivi hebdo → bilan...",
+    },
+    {
+      key: "best_result",
+      label: "Ton meilleur résultat client",
+      placeholder: "Ex : Client passé de 5K à 20K/mois en 3 mois...",
     },
     {
       key: "biggest_challenge",
@@ -632,8 +665,8 @@ export function OnboardingFlow() {
 
       /* ── Multi-field (situation details) ── */
       case "multi-field": {
-        const situation = String(formData.situation || "etudiant");
-        const fields = SITUATION_FIELDS[situation] || SITUATION_FIELDS.etudiant;
+        const situation = String(formData.situation || "zero");
+        const fields = SITUATION_FIELDS[situation] || SITUATION_FIELDS.zero;
         const details = (formData.situationDetails as SituationDetails) || {};
 
         return (

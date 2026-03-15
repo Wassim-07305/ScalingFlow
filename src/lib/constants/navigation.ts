@@ -22,6 +22,10 @@ import {
   Rocket,
   Activity,
   Building2,
+  Kanban,
+  UserCheck,
+  HardDrive,
+  Calendar,
 } from "lucide-react";
 import type { NavItem, NavSection } from "@/lib/types/appshell";
 
@@ -38,7 +42,10 @@ export const NAV_ITEMS: NavItem[] = [
   { label: "Ads", href: "/ads", icon: Megaphone, roles: ["user", "student", "admin", "coach"] },
   { label: "Contenu", href: "/content", icon: PenTool, roles: ["user", "student", "admin", "coach"] },
   { label: "Prospection", href: "/prospection", icon: MessageSquare, roles: ["user", "student", "admin", "coach"] },
+  { label: "Pipeline", href: "/pipeline", icon: Kanban, roles: ["user", "student", "admin", "coach"] },
+  { label: "Clients", href: "/clients", icon: UserCheck, roles: ["user", "student", "admin", "coach"] },
   { label: "Vente", href: "/sales", icon: Handshake, roles: ["user", "student", "admin", "coach"] },
+  { label: "Calendrier", href: "/calendar", icon: Calendar, roles: ["user", "student", "admin", "coach"] },
   { label: "Lancement", href: "/launch", icon: Rocket, roles: ["user", "student", "admin", "coach"] },
   { label: "Analytics", href: "/analytics", icon: BarChart3, roles: ["user", "student", "admin", "coach"] },
   { label: "Academy", href: "/academy", icon: GraduationCap, roles: ["user", "student", "admin", "coach"] },
@@ -47,6 +54,7 @@ export const NAV_ITEMS: NavItem[] = [
   { label: "Leaderboard", href: "/leaderboard", icon: Trophy, roles: ["user", "student", "admin", "coach"] },
   { label: "Communauté", href: "/community", icon: Users, roles: ["user", "student", "admin", "coach"] },
   { label: "Activité", href: "/activity-log", icon: Activity, roles: ["user", "student", "admin", "coach"] },
+  { label: "Drive", href: "/drive", icon: HardDrive, roles: ["user", "student", "admin", "coach"] },
   { label: "Assistant IA", href: "/assistant", icon: Bot, roles: ["user", "student", "admin", "coach"] },
   { label: "Portail", href: "/portal", icon: Building2, roles: ["user", "student", "admin", "coach"] },
   { label: "Admin", href: "/admin", icon: ShieldCheck, roles: ["admin"] },
@@ -68,7 +76,7 @@ export const NAV_SECTIONS: NavSection[] = [
   {
     label: "Acquisition",
     items: NAV_ITEMS.filter((i) =>
-      ["/funnel", "/assets", "/ads", "/content", "/prospection", "/sales"].includes(i.href)
+      ["/funnel", "/assets", "/ads", "/content", "/prospection", "/clients", "/pipeline", "/sales", "/calendar"].includes(i.href)
     ),
   },
   {
@@ -92,7 +100,7 @@ export const NAV_SECTIONS: NavSection[] = [
   {
     label: "Outils",
     items: NAV_ITEMS.filter((i) =>
-      ["/assistant", "/portal", "/admin"].includes(i.href)
+      ["/drive", "/assistant", "/portal", "/admin"].includes(i.href)
     ),
   },
 ];
@@ -110,6 +118,9 @@ export const BREADCRUMB_LABELS: Record<string, string> = {
   ads: "Publicités",
   content: "Contenu",
   prospection: "Prospection",
+  clients: "Clients",
+  pipeline: "Pipeline",
+  calendar: "Calendrier",
   sales: "Vente",
   launch: "Lancement",
   analytics: "Analytics",
@@ -119,6 +130,7 @@ export const BREADCRUMB_LABELS: Record<string, string> = {
   leaderboard: "Leaderboard",
   community: "Communauté",
   "activity-log": "Activité",
+  drive: "Drive",
   assistant: "Assistant IA",
   settings: "Paramètres",
   admin: "Administration",
@@ -137,11 +149,15 @@ export const QUICK_LINKS = [
   { label: "Ads", href: "/ads", icon: Megaphone },
   { label: "Contenu", href: "/content", icon: PenTool },
   { label: "Prospection", href: "/prospection", icon: MessageSquare },
+  { label: "Clients", href: "/clients", icon: UserCheck },
+  { label: "Pipeline", href: "/pipeline", icon: Kanban },
   { label: "Vente", href: "/sales", icon: Handshake },
+  { label: "Calendrier", href: "/calendar", icon: Calendar },
   { label: "Lancement", href: "/launch", icon: Rocket },
   { label: "Analytics", href: "/analytics", icon: BarChart3 },
   { label: "Academy", href: "/academy", icon: GraduationCap },
   { label: "Roadmap", href: "/roadmap", icon: Map },
+  { label: "Drive", href: "/drive", icon: HardDrive },
   { label: "Assistant IA", href: "/assistant", icon: Bot },
   { label: "Communauté", href: "/community", icon: Users },
   { label: "Activité", href: "/activity-log", icon: Activity },

@@ -10,6 +10,10 @@ export interface SituationDetails {
   clients_count?: number;
   tarif_actuel?: string;
   business?: string;
+  business_model?: string;
+  delivery_description?: string;
+  active_clients?: number;
+  delivery_process?: string;
   etudes?: string;
   ancien_poste?: string;
   duree_experience?: string;

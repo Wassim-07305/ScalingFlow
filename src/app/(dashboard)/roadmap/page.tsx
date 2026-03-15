@@ -4,6 +4,7 @@ import React from "react";
 import { PageHeader } from "@/components/layout/page-header";
 import { DailyTasks } from "@/components/roadmap/daily-tasks";
 import { MilestoneTracker } from "@/components/roadmap/milestone-tracker";
+import { PhaseProgression } from "@/components/roadmap/phase-progression";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Sparkles, Loader2, Map, CalendarPlus } from "lucide-react";
@@ -260,6 +261,9 @@ export default function RoadmapPage() {
           </CardContent>
         </Card>
       )}
+
+      {/* Phase progression visuelle */}
+      <PhaseProgression />
 
       <div className="grid gap-6 lg:grid-cols-2">
         <DailyTasks refreshKey={refreshKey} />

@@ -6,9 +6,11 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { AILoading } from "@/components/shared/ai-loading";
-import { Sparkles, LayoutGrid, List, ChevronDown, ChevronUp, CheckCircle2, Clock, Circle, CalendarDays, Send } from "lucide-react";
+import { Sparkles, LayoutGrid, List, ChevronDown, ChevronUp, CheckCircle2, Clock, Circle, CalendarDays, Send, Calendar } from "lucide-react";
 import { toast } from "sonner";
-import type { ContentStrategyResult } from "@/lib/ai/prompts/content-strategy";
+import { format, addDays } from "date-fns";
+import { fr } from "date-fns/locale";
+import type { EditorialCalendarResult } from "@/lib/ai/prompts/editorial-calendar";
 import { UpgradeWall } from "@/components/shared/upgrade-wall";
 import { UnipilePublishDialog } from "@/components/shared/unipile-publish-dialog";
 
@@ -24,7 +26,7 @@ interface EditorialCalendarProps {
   initialData?: any;
 }
 
-type CalendarItem = ContentStrategyResult["calendrier"][number];
+type CalendarItem = EditorialCalendarResult["calendrier"][number];
 
 type ContentStatus = "draft" | "scheduled" | "published";
 
@@ -44,14 +46,12 @@ const PILIER_BADGE: Record<string, "default" | "blue" | "cyan" | "purple" | "yel
   know: "blue",
   like: "purple",
   trust: "default",
-  convert: "yellow",
 };
 
 const PILIER_LABEL: Record<string, string> = {
   know: "Know",
   like: "Like",
   trust: "Trust",
-  convert: "Convert",
 };
 
 export function EditorialCalendar({ className, initialData }: EditorialCalendarProps) {
@@ -70,6 +70,27 @@ export function EditorialCalendar({ className, initialData }: EditorialCalendarP
   const [duration, setDuration] = React.useState("30");
   const [pillars, setPillars] = React.useState("");
   const [showForm, setShowForm] = React.useState(true);
+  const [startDate, setStartDate] = React.useState(() => {
+    const tomorrow = new Date(Date.now() + 86400000);
+    return tomorrow.toISOString().split("T")[0];
+  });
+
+  /** Retourne la date réelle pour un jour du calendrier */
+  const getDateForDay = (jour: number): Date => {
+    return addDays(new Date(startDate), jour - 1);
+  };
+
+  /** Formate la date pour l'affichage */
+  const formatCalendarDate = (jour: number): string => {
+    const date = getDateForDay(jour);
+    return format(date, "d MMM", { locale: fr });
+  };
+
+  /** Formate le jour de la semaine */
+  const formatWeekday = (jour: number): string => {
+    const date = getDateForDay(jour);
+    return format(date, "EEE", { locale: fr });
+  };
 
   const toggleStatus = (jour: number, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -92,7 +113,7 @@ export function EditorialCalendar({ className, initialData }: EditorialCalendarP
 
   React.useEffect(() => {
     if (initialData) {
-      const result = initialData as ContentStrategyResult;
+      const result = initialData as EditorialCalendarResult;
       setItems(result.calendrier || []);
       setShowForm(false);
     }
@@ -103,12 +124,11 @@ export function EditorialCalendar({ className, initialData }: EditorialCalendarP
     setError(null);
 
     try {
-      const tomorrow = new Date(Date.now() + 86400000).toISOString().split("T")[0];
       const response = await fetch("/api/ai/generate-editorial-calendar", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          startDate: tomorrow,
+          startDate,
           duration: parseInt(duration),
           pillars: pillars || undefined,
         }),
@@ -122,7 +142,7 @@ export function EditorialCalendar({ className, initialData }: EditorialCalendarP
         throw new Error("Erreur lors de la génération");
       }
       const data = await response.json();
-      const result = data.result as ContentStrategyResult;
+      const result = data.result as EditorialCalendarResult;
       setItems(result.calendrier || []);
       setShowForm(false);
       toast.success("Plan éditorial généré !");
@@ -157,10 +177,24 @@ export function EditorialCalendar({ className, initialData }: EditorialCalendarP
               Plan éditorial
             </CardTitle>
             <CardDescription>
-              Configurez la durée et les piliers de contenu pour générer un calendrier éditorial complet.
+              Configure la durée et les piliers de contenu pour générer un calendrier éditorial complet.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-5">
+            {/* Start date */}
+            <div>
+              <label className="text-sm font-medium text-text-primary mb-2 block">
+                <Calendar className="h-4 w-4 inline mr-1.5 text-accent" />
+                Date de début
+              </label>
+              <input
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                className="w-full sm:w-auto rounded-lg border border-border-default bg-bg-secondary px-3 py-2 text-sm text-text-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+              />
+            </div>
+
             {/* Duration */}
             <div>
               <label className="text-sm font-medium text-text-primary mb-2 block">Durée du calendrier</label>
@@ -213,6 +247,18 @@ export function EditorialCalendar({ className, initialData }: EditorialCalendarP
 
   return (
     <div className={cn("space-y-4", className)}>
+      {/* Date de début */}
+      <div className="flex items-center gap-3">
+        <Calendar className="h-4 w-4 text-accent shrink-0" />
+        <label className="text-sm text-text-secondary shrink-0">Début :</label>
+        <input
+          type="date"
+          value={startDate}
+          onChange={(e) => setStartDate(e.target.value)}
+          className="rounded-lg border border-border-default bg-bg-secondary px-2 py-1 text-sm text-text-primary focus:border-accent focus:outline-none"
+        />
+      </div>
+
       {/* Toolbar */}
       <div className="flex items-center justify-between">
         <div className="flex gap-2">
@@ -227,7 +273,7 @@ export function EditorialCalendar({ className, initialData }: EditorialCalendarP
           >
             Tous
           </button>
-          {(["know", "like", "trust", "convert"] as const).map((p) => (
+          {(["know", "like", "trust"] as const).map((p) => (
             <button
               key={p}
               onClick={() => setFilter(filter === p ? null : p)}
@@ -284,7 +330,10 @@ export function EditorialCalendar({ className, initialData }: EditorialCalendarP
               <CardContent className="p-3">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-1.5">
-                    <span className="text-xs font-bold text-text-primary">J{item.jour}</span>
+                    <div className="flex flex-col">
+                      <span className="text-xs font-bold text-text-primary">{formatCalendarDate(item.jour)}</span>
+                      <span className="text-[9px] text-text-muted capitalize">{formatWeekday(item.jour)}</span>
+                    </div>
                     <button
                       onClick={(e) => toggleStatus(item.jour, e)}
                       title={STATUS_CONFIG[getStatus(item.jour)].label}
@@ -341,9 +390,10 @@ export function EditorialCalendar({ className, initialData }: EditorialCalendarP
             >
               <CardContent className="py-3">
                 <div className="flex items-center gap-4">
-                  <span className="text-sm font-bold text-text-primary w-8 shrink-0">
-                    J{item.jour}
-                  </span>
+                  <div className="shrink-0 w-16">
+                    <span className="text-sm font-bold text-text-primary block">{formatCalendarDate(item.jour)}</span>
+                    <span className="text-[10px] text-text-muted capitalize">{formatWeekday(item.jour)}</span>
+                  </div>
                   <button
                     onClick={(e) => toggleStatus(item.jour, e)}
                     title={STATUS_CONFIG[getStatus(item.jour)].label}

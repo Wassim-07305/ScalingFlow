@@ -27,7 +27,7 @@ export async function GET() {
       metadata?: Record<string, unknown>;
     }> = {};
 
-    const allProviders = ["meta", "ghl", "stripe_connect", "instagram", "google", "linkedin", "tiktok"];
+    const allProviders = ["meta", "ghl", "stripe_connect", "instagram", "google", "linkedin", "tiktok", "google_calendar"];
 
     for (const provider of allProviders) {
       const conn = connections?.find((c) => c.provider === provider);

@@ -2,7 +2,7 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 export async function updateSession(request: NextRequest) {
-  const publicRoutes = ["/login", "/register", "/welcome", "/forgot-password", "/reset-password"];
+  const publicRoutes = ["/login", "/register", "/welcome", "/forgot-password", "/reset-password", "/diagnostic"];
   const isPublicFunnel = request.nextUrl.pathname.startsWith("/f/");
   const isPublicRoute = publicRoutes.some(
     (route) => request.nextUrl.pathname === route

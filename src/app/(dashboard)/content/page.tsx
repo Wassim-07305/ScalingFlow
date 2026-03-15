@@ -16,6 +16,7 @@ import { WeeklyContentBatch } from "@/components/content/weekly-content-batch";
 import { ObjectionContent } from "@/components/content/objection-content";
 import { SocialPublisher } from "@/components/content/social-publisher";
 import { GenerationHistory } from "@/components/shared/generation-history";
+import { InstagramStats } from "@/components/integrations/instagram-stats";
 import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
 import {
@@ -31,6 +32,7 @@ import {
   Zap,
   MessageSquareWarning,
   Share2,
+  BarChart3,
 } from "lucide-react";
 
 const CONTENT_TYPE_TO_TAB: Record<string, string> = {
@@ -63,6 +65,7 @@ const TABS = [
   { key: "objections_contenu", label: "Objections → Contenu", icon: MessageSquareWarning },
   { key: "content_spy", label: "Content Spy", icon: Search },
   { key: "publication", label: "Publication", icon: Share2 },
+  { key: "instagram_stats", label: "Stats Instagram", icon: BarChart3 },
   { key: "history", label: "Historique", icon: History },
 ] as const;
 
@@ -113,6 +116,7 @@ export default function ContentPage() {
       {activeTab === "objections_contenu" && <div role="tabpanel" id="tabpanel-objections_contenu" aria-labelledby="tab-objections_contenu"><ObjectionContent /></div>}
       {activeTab === "content_spy" && <div role="tabpanel" id="tabpanel-content_spy" aria-labelledby="tab-content_spy"><ContentSpy /></div>}
       {activeTab === "publication" && <div role="tabpanel" id="tabpanel-publication" aria-labelledby="tab-publication"><SocialPublisher /></div>}
+      {activeTab === "instagram_stats" && <div role="tabpanel" id="tabpanel-instagram_stats" aria-labelledby="tab-instagram_stats"><InstagramStats /></div>}
       {activeTab === "history" && (<div role="tabpanel" id="tabpanel-history" aria-labelledby="tab-history">
         <GenerationHistory
           table="content_pieces"

@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useSearchParams } from "next/navigation";
-import { PageHeader } from "@/components/layout/page-header";
 import {
   Card,
   CardHeader,
@@ -38,27 +37,45 @@ import {
   Moon,
   Monitor,
   RotateCcw,
+  Settings,
 } from "lucide-react";
 import { useUIStore, type Theme } from "@/stores/ui-store";
 import { usePushNotifications } from "@/hooks/use-push-notifications";
 import { Smartphone, Building2 } from "lucide-react";
 import { WhitelabelSettings } from "@/components/whitelabel/whitelabel-settings";
 
+// ─── Constants ──────────────────────────────────────────────
 const EXPERIENCE_LABELS: Record<string, string> = {
   beginner: "Débutant",
   intermediate: "Intermédiaire",
   advanced: "Avancé",
 };
 
+const TABS = [
+  { id: "profil" as const, label: "Profil", icon: User },
+  { id: "abonnement" as const, label: "Abonnement", icon: Settings },
+  { id: "notifications" as const, label: "Notifications", icon: Bell },
+  { id: "integrations" as const, label: "Intégrations", icon: Link2 },
+  { id: "apparence" as const, label: "Apparence", icon: Palette },
+  { id: "securite" as const, label: "Sécurité", icon: Shield },
+  { id: "donnees" as const, label: "Données", icon: Download },
+] as const;
+
+type TabId = (typeof TABS)[number]["id"];
+
+// ─── Main Page ──────────────────────────────────────────────
 export default function SettingsPage() {
   const { user, profile } = useUser();
   const searchParams = useSearchParams();
   const supabase = createClient();
 
+  const [activeTab, setActiveTab] = useState<TabId>("profil");
+
   // Handle checkout success redirect
   useEffect(() => {
     if (searchParams.get("checkout") === "success") {
       toast.success("Abonnement activé avec succès ! Bienvenue dans le plan Pro.");
+      setActiveTab("abonnement");
     }
   }, [searchParams]);
 
@@ -295,355 +312,428 @@ export default function SettingsPage() {
   const profileChanged = fullName.trim() !== (profile?.full_name || "");
 
   return (
-    <div>
-      <PageHeader
-        title="Paramètres"
-        description="Gère ton compte et tes intégrations."
-      />
-
-      <div className="space-y-6 max-w-2xl">
-        {/* Avatar */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Camera className="h-5 w-5 text-accent" />
-              Photo de profil
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center gap-6">
-              <div className="relative group">
-                {avatarUrl ? (
-                  <img
-                    src={avatarUrl}
-                    alt="Avatar"
-                    className="h-20 w-20 rounded-full object-cover ring-2 ring-accent/20"
-                  />
-                ) : (
-                  <div className="h-20 w-20 rounded-full bg-accent-muted flex items-center justify-center ring-2 ring-accent/20">
-                    <User className="h-8 w-8 text-accent" />
-                  </div>
-                )}
-                <button
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={uploadingAvatar}
-                  aria-label="Changer la photo de profil"
-                  className="absolute inset-0 rounded-full bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
-                >
-                  {uploadingAvatar ? (
-                    <Loader2 className="h-5 w-5 text-white animate-spin" />
-                  ) : (
-                    <Camera className="h-5 w-5 text-white" />
-                  )}
-                </button>
+    <div className="max-w-4xl mx-auto">
+      {/* Hero header */}
+      <div className="relative mb-8 overflow-hidden rounded-2xl border border-border-default bg-gradient-to-br from-accent/5 via-bg-secondary to-bg-secondary p-6 md:p-8">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-accent/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+        <div className="relative flex items-center gap-4">
+          {/* Avatar preview */}
+          <div className="relative flex-shrink-0">
+            {avatarUrl ? (
+              <img
+                src={avatarUrl}
+                alt="Avatar"
+                className="h-16 w-16 rounded-2xl object-cover ring-2 ring-accent/20"
+              />
+            ) : (
+              <div className="h-16 w-16 rounded-2xl bg-accent-muted flex items-center justify-center ring-2 ring-accent/20">
+                <User className="h-7 w-7 text-accent" />
               </div>
-              <div className="space-y-2">
-                <div className="flex gap-2">
+            )}
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold text-text-primary">
+              Paramètres
+            </h1>
+            <p className="text-sm text-text-secondary">
+              {profile?.full_name || user?.email || "Gère ton compte et tes préférences."}
+            </p>
+            {profile && (
+              <div className="mt-2 flex items-center gap-2">
+                <Badge variant="cyan" className="text-[10px]">
+                  {profile.selected_market || "Marché non défini"}
+                </Badge>
+                <Badge variant="purple" className="text-[10px]">
+                  {EXPERIENCE_LABELS[profile.experience_level || ""] || "Niveau non défini"}
+                </Badge>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Tab navigation */}
+      <div className="flex gap-1 mb-6 rounded-xl bg-bg-secondary/80 border border-border-default p-1 overflow-x-auto scrollbar-hide">
+        {TABS.map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={cn(
+              "flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 whitespace-nowrap flex-shrink-0",
+              activeTab === tab.id
+                ? "bg-accent text-white shadow-lg shadow-accent/20"
+                : "text-text-secondary hover:text-text-primary hover:bg-bg-tertiary"
+            )}
+          >
+            <tab.icon className="h-4 w-4" />
+            <span className="hidden sm:inline">{tab.label}</span>
+          </button>
+        ))}
+      </div>
+
+      {/* Tab content */}
+      <div className="space-y-6 max-w-2xl">
+        {/* ─── Profil ──────────────────────────────────────── */}
+        {activeTab === "profil" && (
+          <>
+            {/* Avatar */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Camera className="h-5 w-5 text-accent" />
+                  Photo de profil
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center gap-6">
+                  <div className="relative group">
+                    {avatarUrl ? (
+                      <img
+                        src={avatarUrl}
+                        alt="Avatar"
+                        className="h-20 w-20 rounded-full object-cover ring-2 ring-accent/20"
+                      />
+                    ) : (
+                      <div className="h-20 w-20 rounded-full bg-accent-muted flex items-center justify-center ring-2 ring-accent/20">
+                        <User className="h-8 w-8 text-accent" />
+                      </div>
+                    )}
+                    <button
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={uploadingAvatar}
+                      aria-label="Changer la photo de profil"
+                      className="absolute inset-0 rounded-full bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
+                    >
+                      {uploadingAvatar ? (
+                        <Loader2 className="h-5 w-5 text-white animate-spin" />
+                      ) : (
+                        <Camera className="h-5 w-5 text-white" />
+                      )}
+                    </button>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={uploadingAvatar}
+                      >
+                        {uploadingAvatar ? (
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        ) : (
+                          <Camera className="h-4 w-4 mr-2" />
+                        )}
+                        Changer
+                      </Button>
+                      {avatarUrl && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={handleRemoveAvatar}
+                          disabled={uploadingAvatar}
+                          className="text-danger hover:text-danger"
+                        >
+                          <Trash2 className="h-4 w-4 mr-2" />
+                          Supprimer
+                        </Button>
+                      )}
+                    </div>
+                    <p className="text-xs text-text-muted">
+                      JPG, PNG ou WebP. Max 2 Mo.
+                    </p>
+                  </div>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleAvatarUpload}
+                    aria-label="Sélectionner une photo de profil"
+                    className="hidden"
+                  />
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Profil info */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <User className="h-5 w-5 text-info" />
+                  Informations
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <Label>Email</Label>
+                  <Input value={user?.email || ""} disabled />
+                </div>
+                <div>
+                  <Label>Nom complet</Label>
+                  <Input
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    placeholder="Ton nom"
+                  />
+                </div>
+                <div>
+                  <Label>Marché cible</Label>
+                  <Input
+                    value={profile?.selected_market || "Non défini"}
+                    disabled
+                  />
+                </div>
+                <div>
+                  <Label>Niveau d&apos;expérience</Label>
+                  <Input
+                    value={
+                      profile?.experience_level
+                        ? EXPERIENCE_LABELS[profile.experience_level] ||
+                          profile.experience_level
+                        : "Non défini"
+                    }
+                    disabled
+                  />
+                </div>
+                <div className="flex items-center gap-3">
+                  <Button
+                    size="sm"
+                    onClick={handleSaveProfile}
+                    disabled={savingProfile || !profileChanged}
+                  >
+                    {savingProfile && (
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    )}
+                    Sauvegarder
+                  </Button>
+
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => fileInputRef.current?.click()}
-                    disabled={uploadingAvatar}
+                    onClick={handleResetOnboarding}
+                    disabled={resettingOnboarding}
                   >
-                    {uploadingAvatar ? (
+                    {resettingOnboarding ? (
                       <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                     ) : (
-                      <Camera className="h-4 w-4 mr-2" />
+                      <RotateCcw className="h-4 w-4 mr-2" />
                     )}
-                    Changer
+                    Relancer l&apos;onboarding
                   </Button>
-                  {avatarUrl && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={handleRemoveAvatar}
-                      disabled={uploadingAvatar}
-                      className="text-danger hover:text-danger"
-                    >
-                      <Trash2 className="h-4 w-4 mr-2" />
-                      Supprimer
-                    </Button>
-                  )}
                 </div>
-                <p className="text-xs text-text-muted">
-                  JPG, PNG ou WebP. Max 2 Mo.
-                </p>
-              </div>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                onChange={handleAvatarUpload}
-                aria-label="Sélectionner une photo de profil"
-                className="hidden"
-              />
-            </div>
-          </CardContent>
-        </Card>
+              </CardContent>
+            </Card>
+          </>
+        )}
 
-        {/* Profil */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <User className="h-5 w-5 text-info" />
-              Profil
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <Label>Email</Label>
-              <Input value={user?.email || ""} disabled />
-            </div>
-            <div>
-              <Label>Nom complet</Label>
-              <Input
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                placeholder="Ton nom"
-              />
-            </div>
-            <div>
-              <Label>Marché cible</Label>
-              <Input
-                value={profile?.selected_market || "Non défini"}
-                disabled
-              />
-            </div>
-            <div>
-              <Label>Niveau d&apos;experience</Label>
-              <Input
-                value={
-                  profile?.experience_level
-                    ? EXPERIENCE_LABELS[profile.experience_level] ||
-                      profile.experience_level
-                    : "Non défini"
-                }
-                disabled
-              />
-            </div>
-            <div className="flex items-center gap-3">
-              <Button
-                size="sm"
-                onClick={handleSaveProfile}
-                disabled={savingProfile || !profileChanged}
-              >
-                {savingProfile && (
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                )}
-                Sauvegarder
-              </Button>
+        {/* ─── Abonnement ──────────────────────────────────── */}
+        {activeTab === "abonnement" && <SubscriptionCard />}
 
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleResetOnboarding}
-                disabled={resettingOnboarding}
-              >
-                {resettingOnboarding ? (
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                ) : (
-                  <RotateCcw className="h-4 w-4 mr-2" />
-                )}
-                Relancer l&apos;onboarding
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+        {/* ─── Notifications ───────────────────────────────── */}
+        {activeTab === "notifications" && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Bell className="h-5 w-5 text-accent" />
+                Notifications
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {/* Push notifications */}
+              <PushNotificationToggle />
 
-        {/* Abonnement */}
-        <SubscriptionCard />
+              <Separator className="my-4" />
 
-        {/* Integrations */}
-        <IntegrationsCard />
-
-        {/* Whitelabel */}
-        <Separator />
-        <div>
-          <h2 className="text-lg font-semibold text-text-primary flex items-center gap-2 mb-4">
-            <Building2 className="h-5 w-5 text-accent" />
-            Whitelabel
-          </h2>
-          <WhitelabelSettings />
-        </div>
-        <Separator />
-
-        {/* Export */}
-        <ExportDataCard />
-
-        {/* Notifications */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Bell className="h-5 w-5 text-accent" />
-              Notifications
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {/* Push notifications */}
-            <PushNotificationToggle />
-
-            <Separator className="my-4" />
-
-            <p className="text-xs text-text-muted mb-3 uppercase font-medium">E-mails</p>
-            <div className="space-y-3">
-              {NOTIF_KEYS.map(({ key, label }) => (
-                <div
-                  key={key}
-                  className="flex items-center justify-between py-2"
-                >
-                  <span className="text-sm text-text-primary">{label}</span>
-                  <button
-                    onClick={() => handleToggleNotif(key)}
-                    role="switch"
-                    aria-checked={notifPrefs[key]}
-                    aria-label={label}
-                    className={cn(
-                      "relative inline-flex h-6 w-11 items-center rounded-full transition-colors",
-                      notifPrefs[key] ? "bg-accent" : "bg-bg-tertiary border border-border-default"
-                    )}
+              <p className="text-xs text-text-muted mb-3 uppercase font-medium">E-mails</p>
+              <div className="space-y-3">
+                {NOTIF_KEYS.map(({ key, label }) => (
+                  <div
+                    key={key}
+                    className="flex items-center justify-between py-2"
                   >
-                    <span
+                    <span className="text-sm text-text-primary">{label}</span>
+                    <button
+                      onClick={() => handleToggleNotif(key)}
+                      role="switch"
+                      aria-checked={notifPrefs[key]}
+                      aria-label={label}
                       className={cn(
-                        "inline-block h-4 w-4 rounded-full bg-white transition-transform",
-                        notifPrefs[key] ? "translate-x-6" : "translate-x-1"
+                        "relative inline-flex h-6 w-11 items-center rounded-full transition-colors",
+                        notifPrefs[key] ? "bg-accent" : "bg-bg-tertiary border border-border-default"
                       )}
-                    />
-                  </button>
-                </div>
-              ))}
-            </div>
-            <Button
-              size="sm"
-              className="mt-4"
-              onClick={handleSaveNotifs}
-              disabled={savingNotifs}
-            >
-              {savingNotifs && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-              Sauvegarder les préférences
-            </Button>
-          </CardContent>
-        </Card>
-
-        {/* Apparence */}
-        <ThemeCard />
-
-        {/* Sécurité */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Shield className="h-5 w-5 text-danger" />
-              Sécurité
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {/* Changement de mot de passe */}
-            <div>
+                    >
+                      <span
+                        className={cn(
+                          "inline-block h-4 w-4 rounded-full bg-white transition-transform",
+                          notifPrefs[key] ? "translate-x-6" : "translate-x-1"
+                        )}
+                      />
+                    </button>
+                  </div>
+                ))}
+              </div>
               <Button
-                variant="outline"
                 size="sm"
-                onClick={() => setShowPasswordSection((prev) => !prev)}
+                className="mt-4"
+                onClick={handleSaveNotifs}
+                disabled={savingNotifs}
               >
-                Changer de mot de passe
-                {showPasswordSection ? (
-                  <ChevronUp className="h-4 w-4 ml-2" />
-                ) : (
-                  <ChevronDown className="h-4 w-4 ml-2" />
-                )}
+                {savingNotifs && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+                Sauvegarder les préférences
               </Button>
+            </CardContent>
+          </Card>
+        )}
 
-              <div
-                className={cn(
-                  "overflow-hidden transition-all duration-300",
-                  showPasswordSection
-                    ? "max-h-80 opacity-100 mt-4"
-                    : "max-h-0 opacity-0"
-                )}
-              >
-                <div className="space-y-3">
-                  <div>
-                    <Label>Nouveau mot de passe</Label>
-                    <div className="relative">
-                      <Input
-                        type={showNewPassword ? "text" : "password"}
-                        value={newPassword}
-                        onChange={(e) => setNewPassword(e.target.value)}
-                        placeholder="Minimum 8 caractères"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowNewPassword((prev) => !prev)}
-                        aria-label={showNewPassword ? "Masquer le mot de passe" : "Afficher le mot de passe"}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-primary transition-colors"
-                      >
-                        {showNewPassword ? (
-                          <EyeOff className="h-4 w-4" />
-                        ) : (
-                          <Eye className="h-4 w-4" />
-                        )}
-                      </button>
+        {/* ─── Intégrations ────────────────────────────────── */}
+        {activeTab === "integrations" && <IntegrationsCard />}
+
+        {/* ─── Apparence ───────────────────────────────────── */}
+        {activeTab === "apparence" && <ThemeCard />}
+
+        {/* ─── Sécurité ────────────────────────────────────── */}
+        {activeTab === "securite" && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Shield className="h-5 w-5 text-danger" />
+                Sécurité
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {/* Changement de mot de passe */}
+              <div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowPasswordSection((prev) => !prev)}
+                >
+                  Changer de mot de passe
+                  {showPasswordSection ? (
+                    <ChevronUp className="h-4 w-4 ml-2" />
+                  ) : (
+                    <ChevronDown className="h-4 w-4 ml-2" />
+                  )}
+                </Button>
+
+                <div
+                  className={cn(
+                    "overflow-hidden transition-all duration-300",
+                    showPasswordSection
+                      ? "max-h-80 opacity-100 mt-4"
+                      : "max-h-0 opacity-0"
+                  )}
+                >
+                  <div className="space-y-3">
+                    <div>
+                      <Label>Nouveau mot de passe</Label>
+                      <div className="relative">
+                        <Input
+                          type={showNewPassword ? "text" : "password"}
+                          value={newPassword}
+                          onChange={(e) => setNewPassword(e.target.value)}
+                          placeholder="Minimum 8 caractères"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowNewPassword((prev) => !prev)}
+                          aria-label={showNewPassword ? "Masquer le mot de passe" : "Afficher le mot de passe"}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-primary transition-colors"
+                        >
+                          {showNewPassword ? (
+                            <EyeOff className="h-4 w-4" />
+                          ) : (
+                            <Eye className="h-4 w-4" />
+                          )}
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                  <div>
-                    <Label>Confirmer le mot de passe</Label>
-                    <div className="relative">
-                      <Input
-                        type={showConfirmPassword ? "text" : "password"}
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                        placeholder="Retape le mot de passe"
-                      />
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setShowConfirmPassword((prev) => !prev)
-                        }
-                        aria-label={showConfirmPassword ? "Masquer la confirmation" : "Afficher la confirmation"}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-primary transition-colors"
-                      >
-                        {showConfirmPassword ? (
-                          <EyeOff className="h-4 w-4" />
-                        ) : (
-                          <Eye className="h-4 w-4" />
-                        )}
-                      </button>
+                    <div>
+                      <Label>Confirmer le mot de passe</Label>
+                      <div className="relative">
+                        <Input
+                          type={showConfirmPassword ? "text" : "password"}
+                          value={confirmPassword}
+                          onChange={(e) => setConfirmPassword(e.target.value)}
+                          placeholder="Retape le mot de passe"
+                        />
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setShowConfirmPassword((prev) => !prev)
+                          }
+                          aria-label={showConfirmPassword ? "Masquer la confirmation" : "Afficher la confirmation"}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-primary transition-colors"
+                        >
+                          {showConfirmPassword ? (
+                            <EyeOff className="h-4 w-4" />
+                          ) : (
+                            <Eye className="h-4 w-4" />
+                          )}
+                        </button>
+                      </div>
                     </div>
+                    {newPassword &&
+                      confirmPassword &&
+                      newPassword !== confirmPassword && (
+                        <p className="text-xs text-danger">
+                          Les mots de passe ne correspondent pas.
+                        </p>
+                      )}
+                    <Button
+                      size="sm"
+                      onClick={handleChangePassword}
+                      disabled={
+                        savingPassword || !newPassword || !confirmPassword
+                      }
+                    >
+                      {savingPassword && (
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      )}
+                      Mettre à jour le mot de passe
+                    </Button>
                   </div>
-                  {newPassword &&
-                    confirmPassword &&
-                    newPassword !== confirmPassword && (
-                      <p className="text-xs text-danger">
-                        Les mots de passe ne correspondent pas.
-                      </p>
-                    )}
-                  <Button
-                    size="sm"
-                    onClick={handleChangePassword}
-                    disabled={
-                      savingPassword || !newPassword || !confirmPassword
-                    }
-                  >
-                    {savingPassword && (
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    )}
-                    Mettre à jour le mot de passe
-                  </Button>
                 </div>
               </div>
-            </div>
 
-            <Separator />
+              <Separator />
 
-            {/* Suppression de compte */}
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={handleDeleteAccount}
-              aria-label="Supprimer mon compte"
-            >
-              Supprimer mon compte
-            </Button>
-          </CardContent>
-        </Card>
+              {/* Suppression de compte */}
+              <div>
+                <p className="text-sm text-text-secondary mb-3">
+                  La suppression de ton compte est irréversible. Toutes tes données seront définitivement effacées.
+                </p>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={handleDeleteAccount}
+                  aria-label="Supprimer mon compte"
+                >
+                  Supprimer mon compte
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* ─── Données ─────────────────────────────────────── */}
+        {activeTab === "donnees" && (
+          <>
+            <ExportDataCard />
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Building2 className="h-5 w-5 text-accent" />
+                  Whitelabel
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <WhitelabelSettings />
+              </CardContent>
+            </Card>
+          </>
+        )}
       </div>
     </div>
   );
@@ -1029,6 +1119,21 @@ function IntegrationsCard() {
               connectUrl="/api/integrations/stripe-connect/connect"
               disconnectUrl="/api/integrations/stripe-connect/disconnect"
               badgeVariant="default"
+            />
+
+            <Separator className="my-3" />
+
+            {/* Productivité */}
+            <p className="text-xs font-semibold text-text-muted uppercase tracking-wider">
+              Productivité
+            </p>
+
+            <ConnectButton
+              provider="google_calendar"
+              label="Google Calendar"
+              connectUrl="/api/integrations/google-calendar/connect"
+              disconnectUrl="/api/integrations/google-calendar/disconnect"
+              badgeVariant="blue"
             />
 
             <Separator className="my-3" />

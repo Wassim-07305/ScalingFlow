@@ -15,7 +15,14 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
     }
 
-    const { transcript, call_type } = await req.json();
+    const {
+      transcript,
+      call_type,
+      recording_url,
+      prospect_origin,
+      analysis_focus,
+      call_result,
+    } = await req.json();
 
     if (!transcript || transcript.trim().length < 50) {
       return NextResponse.json(
@@ -36,9 +43,23 @@ export async function POST(req: NextRequest) {
     const prompt = callAnalysisPrompt(transcript, {
       offer_name: offer?.offer_name || undefined,
       call_type: call_type || "Discovery call",
+      recording_url: recording_url || undefined,
+      prospect_origin: prospect_origin || undefined,
+      analysis_focus: analysis_focus || "global",
+      call_result: call_result || undefined,
     });
 
-    const result = await generateJSON({ prompt, maxTokens: 4096 });
+    const result = await generateJSON({ prompt, maxTokens: 6000 });
+
+    // Build metadata with enriched data
+    const metadata: Record<string, unknown> = {
+      original_type: "call_analysis",
+      call_type: call_type || "discovery",
+    };
+    if (recording_url) metadata.recording_url = recording_url;
+    if (prospect_origin) metadata.prospect_origin = prospect_origin;
+    if (analysis_focus) metadata.analysis_focus = analysis_focus;
+    if (call_result) metadata.call_result = call_result;
 
     // Save to sales_assets for history
     await supabase.from("sales_assets").insert({
@@ -48,7 +69,7 @@ export async function POST(req: NextRequest) {
       title: `Analyse call — ${call_type || "Discovery"} — ${new Date().toLocaleDateString("fr-FR")}`,
       content: JSON.stringify(result),
       ai_raw_response: result,
-      metadata: { original_type: "call_analysis", call_type: call_type || "discovery" },
+      metadata,
       status: "draft",
     });
 

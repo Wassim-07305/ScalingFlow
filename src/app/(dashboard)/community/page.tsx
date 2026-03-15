@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { PostFeed } from "@/components/community/post-feed";
 import { AutoWins } from "@/components/community/auto-wins";
+import { DirectMessages } from "@/components/community/direct-messages";
 import { cn } from "@/lib/utils/cn";
 import {
   MessageSquare,
@@ -11,6 +12,7 @@ import {
   Users,
   Flame,
   Star,
+  Mail,
 } from "lucide-react";
 import { useUser } from "@/hooks/use-user";
 
@@ -18,6 +20,7 @@ import { useUser } from "@/hooks/use-user";
 const TABS = [
   { id: "feed" as const, label: "Fil d'actualité", icon: MessageSquare },
   { id: "wins" as const, label: "Victoires", icon: Trophy },
+  { id: "messages" as const, label: "Messages", icon: Mail },
 ] as const;
 
 type TabId = (typeof TABS)[number]["id"];
@@ -117,6 +120,7 @@ export default function CommunityPage() {
       {/* Tab content */}
       {activeTab === "feed" && <PostFeed />}
       {activeTab === "wins" && <AutoWins />}
+      {activeTab === "messages" && <DirectMessages />}
     </div>
   );
 }

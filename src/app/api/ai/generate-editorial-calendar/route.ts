@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
         buildFullVaultContext(user.id),
         supabase
           .from("offers")
-          .select("offer_name, positioning, unique_mechanism, target_audience")
+          .select("offer_name, positioning, unique_mechanism")
           .eq("user_id", user.id)
           .order("created_at", { ascending: false })
           .limit(1)
@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
         supabase
           .from("market_analyses")
           .select(
-            "market_name, target_audience, pain_points, sophistication_level"
+            "market_name, recommended_positioning, persona, target_avatar"
           )
           .eq("user_id", user.id)
           .order("created_at", { ascending: false })
@@ -58,15 +58,22 @@ export async function POST(req: NextRequest) {
           .single(),
       ]);
 
+    const personaJson = latestMarket?.persona || latestMarket?.target_avatar;
+    const personaSummary = personaJson
+      ? typeof personaJson === "string"
+        ? personaJson
+        : JSON.stringify(personaJson).slice(0, 300)
+      : null;
+
     const marketStr = latestMarket
-      ? `${latestMarket.market_name || "Non défini"} — Audience: ${latestMarket.target_audience || "N/A"} — Douleurs: ${latestMarket.pain_points || "N/A"}`
+      ? `${latestMarket.market_name || "Non défini"} — Positionnement: ${latestMarket.recommended_positioning || "N/A"}`
       : "Marché non encore analysé";
 
     const offerStr = latestOffer
-      ? `${latestOffer.offer_name || "Offre"} — Positionnement: ${latestOffer.positioning || "N/A"} — Mecanisme unique: ${latestOffer.unique_mechanism || "N/A"}`
+      ? `${latestOffer.offer_name || "Offre"} — Positionnement: ${latestOffer.positioning || "N/A"} — Mécanisme unique: ${latestOffer.unique_mechanism || "N/A"}`
       : "Offre non encore créée";
 
-    const personaStr = latestMarket?.target_audience || latestOffer?.target_audience || "Persona non défini";
+    const personaStr = personaSummary || "Persona non défini";
 
     const prompt = buildEditorialCalendarPrompt(
       marketStr,
@@ -88,9 +95,9 @@ export async function POST(req: NextRequest) {
     await supabase.from("content_pieces").insert({
       user_id: user.id,
       content_type: "editorial_calendar",
-      title: `Plan editorial — ${start}`,
-      ai_raw_response: result,
-      platform: "multi",
+      title: `Plan éditorial — ${start}`,
+      content: JSON.stringify(result),
+      ai_raw_response: result as unknown as import("@/types/database").Json,
     });
 
     return NextResponse.json({ result });

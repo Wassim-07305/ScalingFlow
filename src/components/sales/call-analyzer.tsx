@@ -20,6 +20,12 @@ import {
   ChevronDown,
   ChevronUp,
   Upload,
+  Link2,
+  BookOpen,
+  FileText,
+  Loader2,
+  ArrowUpRight,
+  CheckCircle2,
 } from "lucide-react";
 
 interface ScoreSection {
@@ -28,6 +34,12 @@ interface ScoreSection {
   strengths: string[];
   improvements: string[];
   key_moment: string;
+}
+
+interface PlaybookAction {
+  title: string;
+  description: string;
+  priority: "haute" | "moyenne" | "basse";
 }
 
 interface CallAnalysisResult {
@@ -53,6 +65,7 @@ interface CallAnalysisResult {
     warning_signals: string[];
     emotional_triggers: string[];
   };
+  playbook?: PlaybookAction[];
   next_steps: string[];
   training_focus: string[];
 }
@@ -65,12 +78,46 @@ const SCORE_LABELS: Record<string, string> = {
   closing: "Closing",
 };
 
+const PROSPECT_ORIGINS = [
+  { key: "instagram_dm", label: "Instagram DM" },
+  { key: "linkedin", label: "LinkedIn" },
+  { key: "ads_meta", label: "Ads Meta" },
+  { key: "bouche_a_oreille", label: "Bouche à oreille" },
+  { key: "autre", label: "Autre" },
+];
+
+const ANALYSIS_FOCUSES = [
+  { key: "global", label: "Global" },
+  { key: "decouverte", label: "Découverte" },
+  { key: "pitch", label: "Pitch" },
+  { key: "closing", label: "Closing" },
+];
+
+const CALL_RESULTS = [
+  { key: "close", label: "Closé" },
+  { key: "ghoste", label: "Ghosté" },
+  { key: "parti", label: "Parti" },
+  { key: "en_cours", label: "En cours" },
+];
+
+const PRIORITY_CONFIG = {
+  haute: { color: "text-red-400", bg: "bg-red-400/10", border: "border-red-400/20" },
+  moyenne: { color: "text-yellow-400", bg: "bg-yellow-400/10", border: "border-yellow-400/20" },
+  basse: { color: "text-blue-400", bg: "bg-blue-400/10", border: "border-blue-400/20" },
+};
+
 export function CallAnalyzer() {
   const [loading, setLoading] = React.useState(false);
   const [result, setResult] = React.useState<CallAnalysisResult | null>(null);
   const [transcript, setTranscript] = React.useState("");
   const [callType, setCallType] = React.useState("discovery");
+  const [recordingUrl, setRecordingUrl] = React.useState("");
+  const [prospectOrigin, setProspectOrigin] = React.useState("");
+  const [analysisFocus, setAnalysisFocus] = React.useState("global");
+  const [callResult, setCallResult] = React.useState("");
   const [expandedSection, setExpandedSection] = React.useState<string | null>("discovery");
+  const [scriptLoading, setScriptLoading] = React.useState(false);
+  const [generatedScript, setGeneratedScript] = React.useState<string | null>(null);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -102,11 +149,19 @@ export function CallAnalyzer() {
     }
 
     setLoading(true);
+    setGeneratedScript(null);
     try {
       const response = await fetch("/api/ai/analyze-call", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ transcript, call_type: callType }),
+        body: JSON.stringify({
+          transcript,
+          call_type: callType,
+          recording_url: recordingUrl || undefined,
+          prospect_origin: prospectOrigin || undefined,
+          analysis_focus: analysisFocus,
+          call_result: callResult || undefined,
+        }),
       });
 
       if (!response.ok) throw new Error("Erreur lors de l'analyse");
@@ -117,6 +172,41 @@ export function CallAnalyzer() {
       toast.error(err instanceof Error ? err.message : "Erreur");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleGenerateScript = async () => {
+    if (!result) return;
+    setScriptLoading(true);
+    try {
+      const response = await fetch("/api/ai/generate-assets", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "sales_script",
+          scriptType: callType,
+          analysisContext: {
+            overall_score: result.overall_score,
+            weaknesses: Object.entries(result.scores)
+              .filter(([, s]) => s.score < 7)
+              .map(([k, s]) => ({ area: SCORE_LABELS[k], improvements: s.improvements })),
+            training_focus: result.training_focus,
+            playbook: result.playbook,
+          },
+        }),
+      });
+
+      if (!response.ok) throw new Error("Erreur lors de la génération");
+      const data = await response.json();
+      const content = data.ai_raw_response || data;
+      setGeneratedScript(
+        typeof content === "string" ? content : JSON.stringify(content, null, 2)
+      );
+      toast.success("Script personnalisé généré !");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Erreur");
+    } finally {
+      setScriptLoading(false);
     }
   };
 
@@ -137,11 +227,12 @@ export function CallAnalyzer() {
 
         <Card>
           <CardContent className="pt-6 space-y-4">
+            {/* Call type */}
             <div>
               <label className="text-sm font-medium text-text-primary mb-2 block">
                 Type d&apos;appel
               </label>
-              <div className="flex gap-2">
+              <div className="flex gap-2 flex-wrap">
                 {[
                   { key: "discovery", label: "Discovery" },
                   { key: "closing", label: "Closing" },
@@ -164,6 +255,85 @@ export function CallAnalyzer() {
               </div>
             </div>
 
+            {/* Recording URL */}
+            <div>
+              <label className="text-sm font-medium text-text-primary mb-2 block">
+                Lien d&apos;enregistrement (optionnel)
+              </label>
+              <input
+                value={recordingUrl}
+                onChange={(e) => setRecordingUrl(e.target.value)}
+                placeholder="https://fathom.video/... ou Zoom/Loom link"
+                className="w-full px-4 py-2.5 rounded-xl bg-bg-tertiary border border-border-default text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent text-sm"
+              />
+              {recordingUrl && (
+                <p className="text-xs text-text-muted mt-1 flex items-center gap-1">
+                  <Link2 className="h-3 w-3" />
+                  Colle ta transcription ci-dessous ou utilise le lien pour référence
+                </p>
+              )}
+            </div>
+
+            {/* Context fields row */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              {/* Prospect origin */}
+              <div>
+                <label className="text-sm font-medium text-text-primary mb-2 block">
+                  Origine du prospect
+                </label>
+                <select
+                  value={prospectOrigin}
+                  onChange={(e) => setProspectOrigin(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl bg-bg-tertiary border border-border-default text-text-primary text-sm focus:outline-none focus:border-accent appearance-none"
+                >
+                  <option value="">Sélectionner...</option>
+                  {PROSPECT_ORIGINS.map((o) => (
+                    <option key={o.key} value={o.key}>
+                      {o.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Analysis focus */}
+              <div>
+                <label className="text-sm font-medium text-text-primary mb-2 block">
+                  Focus de l&apos;analyse
+                </label>
+                <select
+                  value={analysisFocus}
+                  onChange={(e) => setAnalysisFocus(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl bg-bg-tertiary border border-border-default text-text-primary text-sm focus:outline-none focus:border-accent appearance-none"
+                >
+                  {ANALYSIS_FOCUSES.map((f) => (
+                    <option key={f.key} value={f.key}>
+                      {f.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Call result */}
+              <div>
+                <label className="text-sm font-medium text-text-primary mb-2 block">
+                  Résultat du call
+                </label>
+                <select
+                  value={callResult}
+                  onChange={(e) => setCallResult(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl bg-bg-tertiary border border-border-default text-text-primary text-sm focus:outline-none focus:border-accent appearance-none"
+                >
+                  <option value="">Sélectionner...</option>
+                  {CALL_RESULTS.map((r) => (
+                    <option key={r.key} value={r.key}>
+                      {r.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* Transcript */}
             <div>
               <div className="flex items-center justify-between mb-2">
                 <label className="text-sm font-medium text-text-primary">
@@ -233,9 +403,38 @@ export function CallAnalyzer() {
               </p>
               <p className="text-sm text-text-secondary mt-1">{result.overall_verdict}</p>
             </div>
-            <Button variant="outline" onClick={() => { setResult(null); setTranscript(""); }}>
+            <Button variant="outline" onClick={() => { setResult(null); setTranscript(""); setGeneratedScript(null); }}>
               Nouveau call
             </Button>
+          </div>
+
+          {/* Context badges */}
+          <div className="flex flex-wrap gap-2 mt-3">
+            {prospectOrigin && (
+              <Badge variant="muted" className="text-xs">
+                {PROSPECT_ORIGINS.find((o) => o.key === prospectOrigin)?.label || prospectOrigin}
+              </Badge>
+            )}
+            {callResult && (
+              <Badge
+                variant={callResult === "close" ? "default" : callResult === "ghoste" || callResult === "parti" ? "red" : "yellow"}
+                className="text-xs"
+              >
+                {CALL_RESULTS.find((r) => r.key === callResult)?.label || callResult}
+              </Badge>
+            )}
+            {recordingUrl && (
+              <a
+                href={recordingUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 text-xs text-accent hover:underline"
+              >
+                <Link2 className="h-3 w-3" />
+                Enregistrement
+                <ArrowUpRight className="h-3 w-3" />
+              </a>
+            )}
           </div>
 
           {/* Score breakdown bar */}
@@ -315,6 +514,52 @@ export function CallAnalyzer() {
           )}
         </Card>
       ))}
+
+      {/* Playbook */}
+      {result.playbook && result.playbook.length > 0 && (
+        <Card className="border-accent/20">
+          <CardHeader className="py-3">
+            <CardTitle className="text-sm flex items-center gap-2">
+              <BookOpen className="h-4 w-4 text-accent" />
+              Playbook — Actions concrètes
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-0 space-y-2">
+            {result.playbook.map((action, i) => {
+              const config = PRIORITY_CONFIG[action.priority] || PRIORITY_CONFIG.moyenne;
+              return (
+                <div
+                  key={i}
+                  className={cn(
+                    "p-3 rounded-xl border",
+                    config.bg,
+                    config.border
+                  )}
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-start gap-2 min-w-0">
+                      <CheckCircle2 className={cn("h-4 w-4 mt-0.5 shrink-0", config.color)} />
+                      <div>
+                        <p className="text-sm font-medium text-text-primary">{action.title}</p>
+                        <p className="text-xs text-text-secondary mt-0.5">{action.description}</p>
+                      </div>
+                    </div>
+                    <Badge
+                      variant={
+                        action.priority === "haute" ? "red" :
+                        action.priority === "moyenne" ? "yellow" : "blue"
+                      }
+                      className="text-[10px] shrink-0"
+                    >
+                      {action.priority}
+                    </Badge>
+                  </div>
+                </div>
+              );
+            })}
+          </CardContent>
+        </Card>
+      )}
 
       {/* Key phrases */}
       <div className="grid gap-4 md:grid-cols-2">
@@ -422,6 +667,56 @@ export function CallAnalyzer() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Generate Script Button */}
+      <Card className="border-accent/20">
+        <CardContent className="pt-6">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+              <h3 className="text-sm font-semibold text-text-primary flex items-center gap-2">
+                <FileText className="h-4 w-4 text-accent" />
+                Script personnalisé
+              </h3>
+              <p className="text-xs text-text-secondary mt-0.5">
+                Génère un script de vente adapté basé sur les faiblesses identifiées dans ton analyse.
+              </p>
+            </div>
+            <Button
+              onClick={handleGenerateScript}
+              disabled={scriptLoading}
+              className="shrink-0"
+            >
+              {scriptLoading ? (
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              ) : (
+                <Sparkles className="h-4 w-4 mr-2" />
+              )}
+              Générer un script personnalisé
+            </Button>
+          </div>
+
+          {/* Generated script */}
+          {generatedScript && (
+            <div className="mt-4 p-4 rounded-xl bg-bg-tertiary border border-border-default">
+              <div className="flex items-center justify-between mb-2">
+                <Badge variant="default" className="text-xs">Script généré</Badge>
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(generatedScript);
+                    toast.success("Script copié !");
+                  }}
+                  className="text-xs text-text-muted hover:text-text-primary transition-colors"
+                >
+                  Copier
+                </button>
+              </div>
+              <pre className="text-sm text-text-secondary whitespace-pre-wrap font-sans leading-relaxed max-h-96 overflow-y-auto">
+                {generatedScript}
+              </pre>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }

@@ -1,0 +1,282 @@
+"use client";
+
+import React, { useState, useEffect, useCallback } from "react";
+import {
+  Calendar as CalendarIcon,
+  MapPin,
+  Clock,
+  Loader2,
+  ExternalLink,
+  RefreshCw,
+  Link2,
+} from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils/cn";
+
+interface CalendarEvent {
+  id: string;
+  title: string;
+  start: string;
+  end: string;
+  location: string;
+  description: string;
+}
+
+interface GroupedEvents {
+  date: string;
+  label: string;
+  events: CalendarEvent[];
+}
+
+function formatTime(isoString: string): string {
+  if (!isoString) return "";
+  // Handle all-day events (date only, no time)
+  if (isoString.length === 10) return "Journée entière";
+  const d = new Date(isoString);
+  return d.toLocaleTimeString("fr-FR", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+function formatDateLabel(dateStr: string): string {
+  const d = new Date(dateStr + "T00:00:00");
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+
+  if (d.getTime() === today.getTime()) return "Aujourd'hui";
+  if (d.getTime() === tomorrow.getTime()) return "Demain";
+
+  return d.toLocaleDateString("fr-FR", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+  });
+}
+
+function getDateKey(isoString: string): string {
+  if (!isoString) return "";
+  if (isoString.length === 10) return isoString;
+  return isoString.split("T")[0];
+}
+
+function groupByDay(events: CalendarEvent[]): GroupedEvents[] {
+  const groups: Map<string, CalendarEvent[]> = new Map();
+
+  for (const evt of events) {
+    const dateKey = getDateKey(evt.start);
+    if (!groups.has(dateKey)) {
+      groups.set(dateKey, []);
+    }
+    groups.get(dateKey)!.push(evt);
+  }
+
+  return Array.from(groups.entries())
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([date, evts]) => ({
+      date,
+      label: formatDateLabel(date),
+      events: evts,
+    }));
+}
+
+// ─── Skeleton ───────────────────────────────────────────────
+function EventSkeleton() {
+  return (
+    <div className="space-y-4 animate-pulse">
+      {[1, 2, 3].map((i) => (
+        <div key={i} className="space-y-2">
+          <div className="h-4 w-32 bg-bg-tertiary rounded" />
+          <div className="space-y-2">
+            <div className="h-16 bg-bg-tertiary rounded-xl" />
+            <div className="h-16 bg-bg-tertiary rounded-xl" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ─── Widget ─────────────────────────────────────────────────
+export function GoogleCalendarWidget({ className }: { className?: string }) {
+  const [events, setEvents] = useState<CalendarEvent[]>([]);
+  const [connected, setConnected] = useState<boolean | null>(null); // null = loading
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchEvents = useCallback(async (isRefresh = false) => {
+    if (isRefresh) setRefreshing(true);
+    else setLoading(true);
+    setError(null);
+
+    try {
+      const res = await fetch("/api/integrations/google-calendar/events");
+      const data = await res.json();
+
+      if (data.connected === false) {
+        setConnected(false);
+        setEvents([]);
+        return;
+      }
+
+      if (!res.ok) {
+        setError(data.error || "Erreur inconnue");
+        return;
+      }
+
+      setConnected(true);
+      setEvents(data.events || []);
+    } catch {
+      setError("Impossible de charger les événements.");
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchEvents();
+  }, [fetchEvents]);
+
+  const grouped = groupByDay(events);
+
+  return (
+    <Card className={cn("", className)}>
+      <CardHeader className="flex flex-row items-center justify-between">
+        <CardTitle className="flex items-center gap-2">
+          <CalendarIcon className="h-5 w-5 text-accent" />
+          Google Calendar
+        </CardTitle>
+        {connected && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => fetchEvents(true)}
+            disabled={refreshing}
+            className="h-8 w-8 p-0"
+          >
+            <RefreshCw
+              className={cn(
+                "h-4 w-4 text-text-muted",
+                refreshing && "animate-spin"
+              )}
+            />
+          </Button>
+        )}
+      </CardHeader>
+
+      <CardContent>
+        {/* Loading state */}
+        {loading && connected === null && <EventSkeleton />}
+
+        {/* Not connected */}
+        {!loading && connected === false && (
+          <div className="text-center py-8 space-y-4">
+            <div className="h-12 w-12 rounded-2xl bg-accent/10 flex items-center justify-center mx-auto">
+              <CalendarIcon className="h-6 w-6 text-accent" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-text-primary mb-1">
+                Connecte Google Calendar
+              </p>
+              <p className="text-xs text-text-muted max-w-xs mx-auto">
+                Synchronise tes événements pour voir ton planning directement
+                dans ScalingFlow.
+              </p>
+            </div>
+            <Button
+              size="sm"
+              onClick={() => {
+                window.location.href =
+                  "/api/integrations/google-calendar/connect";
+              }}
+            >
+              <Link2 className="h-4 w-4 mr-2" />
+              Connecter Google Calendar
+            </Button>
+          </div>
+        )}
+
+        {/* Error */}
+        {error && (
+          <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-sm text-red-400 mb-4">
+            {error}
+          </div>
+        )}
+
+        {/* Connected, no events */}
+        {!loading && connected && events.length === 0 && !error && (
+          <div className="text-center py-8 space-y-2">
+            <CalendarIcon className="h-8 w-8 text-text-muted mx-auto" />
+            <p className="text-sm text-text-muted">
+              Aucun événement dans les 30 prochains jours.
+            </p>
+          </div>
+        )}
+
+        {/* Events list */}
+        {!loading && connected && events.length > 0 && (
+          <div className="space-y-6">
+            {grouped.map((group) => (
+              <div key={group.date} className="space-y-2">
+                <p className="text-xs font-semibold text-text-muted uppercase tracking-wider">
+                  {group.label}
+                </p>
+                <div className="space-y-2">
+                  {group.events.map((evt) => (
+                    <div
+                      key={evt.id}
+                      className="p-3 rounded-xl border border-border-default bg-bg-tertiary/50 hover:border-accent/20 transition-colors group"
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-medium text-text-primary truncate">
+                            {evt.title}
+                          </p>
+                          <div className="flex items-center gap-3 mt-1">
+                            <span className="flex items-center gap-1 text-xs text-text-muted">
+                              <Clock className="h-3 w-3" />
+                              {formatTime(evt.start)}
+                              {evt.end &&
+                                evt.start.length > 10 &&
+                                ` — ${formatTime(evt.end)}`}
+                            </span>
+                            {evt.location && (
+                              <span className="flex items-center gap-1 text-xs text-text-muted truncate max-w-[180px]">
+                                <MapPin className="h-3 w-3 shrink-0" />
+                                {evt.location}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        <a
+                          href={`https://calendar.google.com/calendar/event?eid=${btoa(evt.id)}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <ExternalLink className="h-3.5 w-3.5 text-text-muted hover:text-accent" />
+                        </a>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Refreshing indicator */}
+        {refreshing && (
+          <div className="flex items-center justify-center py-2">
+            <Loader2 className="h-4 w-4 animate-spin text-text-muted" />
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}

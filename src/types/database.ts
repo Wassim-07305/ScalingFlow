@@ -59,6 +59,9 @@ export interface Database {
           ghl_webhook_url: string | null;
           organization_id: string | null;
           stripe_connect_account_id: string | null;
+          vault_extraction: Json | null;
+          claude_api_key: string | null;
+          vault_updated_at: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -111,6 +114,9 @@ export interface Database {
           ghl_webhook_url?: string | null;
           organization_id?: string | null;
           stripe_connect_account_id?: string | null;
+          vault_extraction?: Json | null;
+          claude_api_key?: string | null;
+          vault_updated_at?: string | null;
         };
         Update: {
           id?: string;
@@ -161,6 +167,9 @@ export interface Database {
           organization_id?: string | null;
           ghl_webhook_url?: string | null;
           stripe_connect_account_id?: string | null;
+          vault_extraction?: Json | null;
+          claude_api_key?: string | null;
+          vault_updated_at?: string | null;
         };
       };
       market_analyses: {
@@ -479,6 +488,7 @@ export interface Database {
           scheduled_date: string | null;
           published: boolean;
           published_url: string | null;
+          ai_raw_response: Json | null;
           views: number;
           likes: number;
           comments: number;
@@ -496,6 +506,7 @@ export interface Database {
           media_urls?: string[] | null;
           scheduled_date?: string | null;
           published?: boolean;
+          ai_raw_response?: Json | null;
         };
         Update: {
           content_type?: string;
@@ -507,6 +518,7 @@ export interface Database {
           scheduled_date?: string | null;
           published?: boolean;
           published_url?: string | null;
+          ai_raw_response?: Json | null;
           views?: number;
           likes?: number;
           comments?: number;
@@ -1032,6 +1044,97 @@ export interface Database {
           agent_type?: "general" | "offre" | "funnel" | "ads" | "vente" | "contenu" | "strategie" | "recherche";
           title?: string | null;
           messages?: Json;
+        };
+      };
+      direct_messages: {
+        Row: {
+          id: string;
+          sender_id: string;
+          receiver_id: string;
+          content: string;
+          read: boolean;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          sender_id: string;
+          receiver_id: string;
+          content: string;
+          read?: boolean;
+        };
+        Update: {
+          content?: string;
+          read?: boolean;
+        };
+      };
+      connected_accounts: {
+        Row: {
+          id: string;
+          user_id: string;
+          provider: string;
+          provider_username: string | null;
+          access_token: string;
+          refresh_token: string | null;
+          token_expires_at: string | null;
+          metadata: Json | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          provider: string;
+          provider_username?: string | null;
+          access_token: string;
+          refresh_token?: string | null;
+          token_expires_at?: string | null;
+          metadata?: Json | null;
+        };
+        Update: {
+          provider_username?: string | null;
+          access_token?: string;
+          refresh_token?: string | null;
+          token_expires_at?: string | null;
+          metadata?: Json | null;
+        };
+      };
+      roadmap_tasks: {
+        Row: {
+          id: string;
+          user_id: string;
+          title: string;
+          description: string | null;
+          category: string | null;
+          priority: string | null;
+          due_date: string | null;
+          estimated_minutes: number | null;
+          completed: boolean;
+          completed_at: string | null;
+          task_order: number | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          title: string;
+          description?: string | null;
+          category?: string | null;
+          priority?: string | null;
+          due_date?: string | null;
+          estimated_minutes?: number | null;
+          completed?: boolean;
+          task_order?: number | null;
+        };
+        Update: {
+          title?: string;
+          description?: string | null;
+          category?: string | null;
+          priority?: string | null;
+          due_date?: string | null;
+          estimated_minutes?: number | null;
+          completed?: boolean;
+          completed_at?: string | null;
+          task_order?: number | null;
         };
       };
     };
