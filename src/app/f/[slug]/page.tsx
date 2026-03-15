@@ -1,12 +1,15 @@
 import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
-import { exportFunnelToHTML } from "@/lib/utils/export-html";
+import { generateFunnelPageHTML } from "@/lib/utils/export-html";
+import type { BrandTheme } from "@/lib/utils/export-html";
+import type { Metadata } from "next";
 
 interface Props {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ page?: string }>;
 }
 
-export async function generateMetadata({ params }: Props) {
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const supabase = await createClient();
 
@@ -23,12 +26,22 @@ export async function generateMetadata({ params }: Props) {
 
   return {
     title: funnel.funnel_name || "Funnel",
-    description: optin?.subheadline || "",
+    description: optin?.subheadline || optin?.headline || "",
+    openGraph: {
+      title: funnel.funnel_name || "Funnel",
+      description: optin?.subheadline || "",
+      type: "website",
+    },
+    robots: {
+      index: true,
+      follow: true,
+    },
   };
 }
 
-export default async function PublicFunnelPage({ params }: Props) {
+export default async function PublicFunnelPage({ params, searchParams }: Props) {
   const { slug } = await params;
+  const { page: pageParam } = await searchParams;
   const supabase = await createClient();
 
   const { data: funnel } = await supabase
@@ -49,15 +62,45 @@ export default async function PublicFunnelPage({ params }: Props) {
     .eq("id", funnel.user_id)
     .maybeSingle();
 
+  // Get brand identity for theming
+  const { data: brand } = await supabase
+    .from("brand_identities")
+    .select("brand_kit")
+    .eq("user_id", funnel.user_id)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  // Build theme from brand identity
+  const theme: BrandTheme = {};
+  if (brand?.brand_kit && typeof brand.brand_kit === "object") {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const kit = brand.brand_kit as any;
+    if (Array.isArray(kit.colors) && kit.colors.length > 0) {
+      theme.accentColor = kit.colors[0];
+      if (kit.colors[1]) theme.bgColor = kit.colors[1];
+      if (kit.colors[2]) theme.bgCard = kit.colors[2];
+    }
+    if (kit.font_heading) theme.fontHeading = kit.font_heading;
+    if (kit.font_body) theme.fontBody = kit.font_body;
+    if (kit.logo_url) theme.logoUrl = kit.logo_url;
+  }
+
   const funnelData = funnel.ai_raw_response || {
     optin_page: funnel.optin_page,
     vsl_page: funnel.vsl_page,
     thankyou_page: funnel.thankyou_page,
   };
 
-  const html = exportFunnelToHTML(
+  const brandName = funnel.funnel_name || profile?.first_name || "Mon Offre";
+
+  // Determine which page to show (default: optin)
+  const pageType = (pageParam === "vsl" || pageParam === "thankyou") ? pageParam : "optin";
+
+  const html = generateFunnelPageHTML(
     funnelData,
-    funnel.funnel_name || profile?.first_name || "Mon Offre"
+    pageType,
+    { brandName, theme }
   );
 
   return (
