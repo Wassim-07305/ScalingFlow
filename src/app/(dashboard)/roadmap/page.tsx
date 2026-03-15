@@ -3,6 +3,7 @@
 import React from "react";
 import { PageHeader } from "@/components/layout/page-header";
 import { DailyTasks } from "@/components/roadmap/daily-tasks";
+import { DailyActions } from "@/components/roadmap/daily-actions";
 import { MilestoneTracker } from "@/components/roadmap/milestone-tracker";
 import { PhaseProgression } from "@/components/roadmap/phase-progression";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
@@ -261,6 +262,9 @@ export default function RoadmapPage() {
           </CardContent>
         </Card>
       )}
+
+      {/* Actions IA du jour */}
+      <DailyActions className="mb-6" />
 
       {/* Phase progression visuelle */}
       <PhaseProgression />

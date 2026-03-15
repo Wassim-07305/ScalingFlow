@@ -15,6 +15,18 @@
     {
       "path": "/api/gamification/recalculate",
       "schedule": "0 0 * * *"
+    },
+    {
+      "path": "/api/ads/creative-cycle",
+      "schedule": "0 9 * * 1"
+    },
+    {
+      "path": "/api/content/auto-generate",
+      "schedule": "0 7 * * 1"
+    },
+    {
+      "path": "/api/alerts/smart",
+      "schedule": "0 10 * * *"
     }
   ]
 }

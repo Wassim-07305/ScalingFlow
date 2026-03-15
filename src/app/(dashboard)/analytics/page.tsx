@@ -12,6 +12,7 @@ import { MetricsHistory } from "@/components/analytics/metrics-history";
 import { GrowthTiers } from "@/components/analytics/growth-tiers";
 import { RevenueTracker } from "@/components/analytics/revenue-tracker";
 import { RealRoas } from "@/components/analytics/real-roas";
+import { BottleneckDetector } from "@/components/analytics/bottleneck-detector";
 import {
   BarChart3,
   Sparkles,
@@ -22,6 +23,7 @@ import {
   Rocket,
   Receipt,
   Calculator,
+  AlertTriangle,
 } from "lucide-react";
 
 const TABS = [
@@ -33,6 +35,7 @@ const TABS = [
   { key: "ltv_cac", label: "LTV / CAC", icon: TrendingUp },
   { key: "revenue", label: "Revenue & Attribution", icon: Receipt },
   { key: "roas", label: "Vrai ROAS", icon: Calculator },
+  { key: "bottlenecks", label: "Bottlenecks", icon: AlertTriangle },
   { key: "history", label: "Historique", icon: History },
 ] as const;
 
@@ -57,6 +60,8 @@ export default function AnalyticsPage() {
         return <RevenueTracker />;
       case "roas":
         return <RealRoas />;
+      case "bottlenecks":
+        return <BottleneckDetector />;
       case "history":
         return <MetricsHistory />;
       default:
