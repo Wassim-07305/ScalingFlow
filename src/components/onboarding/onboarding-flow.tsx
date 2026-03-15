@@ -16,24 +16,36 @@ import { ChipSelector } from "./chip-selector";
 import { MultiChipSelector } from "./multi-chip-selector";
 import { OnboardingSummary } from "./onboarding-summary";
 import { ParcoursSelector } from "./parcours-selector";
+import { SkillMatrixSelector } from "./skill-matrix-selector";
+import { ParcoursQuestionsForm } from "./parcours-questions-form";
+import { EXPERTISE_PROFONDE_FIELDS } from "./skill-categories";
 import { QUESTIONS } from "./questions";
 import { AILoading } from "@/components/shared/ai-loading";
 import { MarketAnalysis } from "@/components/onboarding/market-analysis";
 import type { MarketAnalysisResult } from "@/types/ai";
 import type { SituationDetails } from "@/stores/onboarding-store";
+import type { SelectedSkill } from "./skill-categories";
 
 /* ─── Initial state ─── */
 
 const INITIAL_FORM_DATA: Record<string, unknown> = {
   firstName: "",
+  country: "",
+  language: "",
   situation: "",
   situationDetails: {},
-  expertise_q1: "",
+  vaultSkills: [],
+  expertiseProfonde: {},
   parcours: "",
+  parcoursAnswers: {},
   targetRevenue: "",
   industries: [],
   objectives: [],
   budgetMonthly: "",
+  hoursPerWeek: "",
+  deadline: "",
+  teamPreference: "",
+  hasPayingClients: "",
 };
 
 /* ─── Animation variants ─── */
@@ -48,7 +60,13 @@ const slideVariants = {
 
 const SITUATION_FIELDS: Record<
   string,
-  { key: string; label: string; placeholder: string; type?: string; multiline?: boolean }[]
+  {
+    key: string;
+    label: string;
+    placeholder: string;
+    type?: string;
+    multiline?: boolean;
+  }[]
 > = {
   zero: [
     {
@@ -112,13 +130,15 @@ const SITUATION_FIELDS: Record<
     {
       key: "business_model",
       label: "Comment fonctionne ton business ?",
-      placeholder: "Ex : Vente de formations en ligne, prestations de service, SaaS...",
+      placeholder:
+        "Ex : Vente de formations en ligne, prestations de service, SaaS...",
       multiline: true,
     },
     {
       key: "delivery_description",
       label: "Que délivres-tu exactement ?",
-      placeholder: "Ex : Accompagnement 1-to-1 sur 3 mois, formation vidéo + coaching de groupe...",
+      placeholder:
+        "Ex : Accompagnement 1-to-1 sur 3 mois, formation vidéo + coaching de groupe...",
       multiline: true,
     },
     {
@@ -130,7 +150,8 @@ const SITUATION_FIELDS: Record<
     {
       key: "delivery_process",
       label: "Quel est ton process de delivery ?",
-      placeholder: "Ex : Onboarding → audit → plan d'action → suivi hebdo → bilan...",
+      placeholder:
+        "Ex : Onboarding → audit → plan d'action → suivi hebdo → bilan...",
       multiline: true,
     },
     {
@@ -198,14 +219,23 @@ function buildExpertiseAnswers(
 function buildProfilePayload(formData: Record<string, unknown>) {
   return {
     first_name: (formData.firstName as string) || null,
+    country: (formData.country as string) || null,
+    language: (formData.language as string) || null,
     situation: (formData.situation as string) || null,
     situation_details: formData.situationDetails || {},
+    vault_skills: formData.vaultSkills || [],
+    expertise_profonde: formData.expertiseProfonde || {},
     expertise_answers: buildExpertiseAnswers(formData),
     parcours: (formData.parcours as string) || null,
+    parcours_answers: formData.parcoursAnswers || {},
     target_revenue: Number(formData.targetRevenue) || 0,
     industries: (formData.industries as string[]) || [],
     objectives: (formData.objectives as string[]) || [],
     budget_monthly: Number(formData.budgetMonthly) || 0,
+    hours_per_week: Number(formData.hoursPerWeek) || 0,
+    deadline: (formData.deadline as string) || null,
+    team_preference: (formData.teamPreference as string) || null,
+    has_paying_clients: (formData.hasPayingClients as string) || null,
     vault_completed: true,
   };
 }
@@ -224,7 +254,9 @@ export function OnboardingFlow() {
     useState<MarketAnalysisResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loaded, setLoaded] = useState(false);
-  const [customWelcomeMessage, setCustomWelcomeMessage] = useState<string | null>(null);
+  const [customWelcomeMessage, setCustomWelcomeMessage] = useState<
+    string | null
+  >(null);
 
   const router = useRouter();
   const { user, profile, loading: userLoading } = useUser();
@@ -260,6 +292,8 @@ export function OnboardingFlow() {
         if (profile) {
           const r: Record<string, unknown> = { ...INITIAL_FORM_DATA };
           if (profile.first_name) r.firstName = profile.first_name;
+          if (profile.country) r.country = profile.country;
+          if (profile.language) r.language = profile.language;
           if (profile.situation) r.situation = profile.situation;
           if (profile.situation_details)
             r.situationDetails = profile.situation_details;
@@ -267,7 +301,13 @@ export function OnboardingFlow() {
             const ea = profile.expertise_answers as Record<string, string>;
             if (ea.q1) r.expertise_q1 = ea.q1;
           }
+          if (Array.isArray(profile.vault_skills))
+            r.vaultSkills = profile.vault_skills;
+          if (profile.expertise_profonde)
+            r.expertiseProfonde = profile.expertise_profonde;
           if (profile.parcours) r.parcours = profile.parcours;
+          if (profile.parcours_answers)
+            r.parcoursAnswers = profile.parcours_answers;
           if (profile.target_revenue)
             r.targetRevenue = String(profile.target_revenue);
           if (Array.isArray(profile.industries))
@@ -276,6 +316,13 @@ export function OnboardingFlow() {
             r.objectives = profile.objectives;
           if (profile.budget_monthly != null)
             r.budgetMonthly = String(profile.budget_monthly);
+          if (profile.hours_per_week)
+            r.hoursPerWeek = String(profile.hours_per_week);
+          if (profile.deadline) r.deadline = profile.deadline;
+          if (profile.team_preference)
+            r.teamPreference = profile.team_preference;
+          if (profile.has_paying_clients)
+            r.hasPayingClients = profile.has_paying_clients;
 
           // Compute visible questions from restored data for correct step
           const restoredVisible = QUESTIONS.filter(
@@ -393,6 +440,10 @@ export function OnboardingFlow() {
         return ((formData[field!] as string[]) || []).length > 0;
       case "multi-field":
         return true;
+      case "skill-matrix":
+        return true; // optional — user can skip
+      case "parcours-questions":
+        return true; // optional — user can skip
       case "summary":
         return true;
       default:
@@ -441,16 +492,24 @@ export function OnboardingFlow() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           firstName: formData.firstName,
+          country: formData.country,
+          language: formData.language,
           situation: formData.situation,
           situationDetails: formData.situationDetails || {},
           skills: [],
-          vaultSkills: [],
+          vaultSkills: formData.vaultSkills || [],
           expertiseAnswers: buildExpertiseAnswers(formData),
           parcours: formData.parcours,
+          parcoursAnswers: formData.parcoursAnswers || {},
+          expertiseProfonde: formData.expertiseProfonde || {},
           targetRevenue: Number(formData.targetRevenue) || 0,
           industries: formData.industries,
           objectives: formData.objectives,
           budgetMonthly: Number(formData.budgetMonthly) || 0,
+          hoursPerWeek: Number(formData.hoursPerWeek) || 0,
+          deadline: formData.deadline,
+          teamPreference: formData.teamPreference,
+          hasPayingClients: formData.hasPayingClients,
         }),
       });
 
@@ -688,8 +747,49 @@ export function OnboardingFlow() {
           </div>
         );
 
-      /* ── Multi-field (situation details) ── */
+      /* ── Multi-field (situation details OR expertise profonde) ── */
       case "multi-field": {
+        // Expertise profonde (CDC Étape 0.3)
+        if (q.field === "expertiseProfonde") {
+          const epData =
+            (formData.expertiseProfonde as Record<string, string>) || {};
+          return (
+            <div className="w-full max-w-lg">
+              <div className="mb-8">
+                <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
+                  {q.title}
+                </h2>
+                {q.subtitle && (
+                  <p className="mt-2 text-base text-white/40">{q.subtitle}</p>
+                )}
+              </div>
+              <div className="space-y-5">
+                {EXPERTISE_PROFONDE_FIELDS.map((f, idx) => (
+                  <div key={f.key}>
+                    <label className="mb-2 block text-sm font-medium text-white/50">
+                      {f.label}
+                    </label>
+                    <input
+                      {...(idx === 0 ? { "data-autofocus": true } : {})}
+                      type="text"
+                      value={epData[f.key] || ""}
+                      onChange={(e) => {
+                        setField("expertiseProfonde", {
+                          ...epData,
+                          [f.key]: e.target.value,
+                        });
+                      }}
+                      placeholder={f.placeholder}
+                      className="w-full rounded-xl border-2 border-white/20 bg-white/5 px-5 py-3.5 text-lg text-white outline-none placeholder:text-white/25 transition-all duration-300 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/20"
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        }
+
+        // Situation details (existing)
         const situation = String(formData.situation || "zero");
         const fields = SITUATION_FIELDS[situation] || SITUATION_FIELDS.zero;
         const details = (formData.situationDetails as SituationDetails) || {};
@@ -754,6 +854,47 @@ export function OnboardingFlow() {
           </div>
         );
       }
+
+      /* ── Skill matrix (CDC Étape 0.2b — 7 catégories) ── */
+      case "skill-matrix":
+        return (
+          <div className="w-full max-w-lg">
+            <div className="mb-8">
+              <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
+                {q.title}
+              </h2>
+              {q.subtitle && (
+                <p className="mt-2 text-base text-white/40">{q.subtitle}</p>
+              )}
+            </div>
+            <SkillMatrixSelector
+              value={(fieldValue as SelectedSkill[]) || []}
+              onChange={(v) => setField(q.field!, v)}
+            />
+          </div>
+        );
+
+      /* ── Parcours-specific questions (CDC Phase 1 branches) ── */
+      case "parcours-questions":
+        return (
+          <div className="w-full max-w-lg">
+            <div className="mb-8">
+              <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
+                {q.title}
+              </h2>
+              {q.subtitle && (
+                <p className="mt-2 text-base text-white/40">{q.subtitle}</p>
+              )}
+            </div>
+            <ParcoursQuestionsForm
+              parcours={String(formData.parcours || "")}
+              value={
+                (formData.parcoursAnswers as Record<string, unknown>) || {}
+              }
+              onChange={(v) => setField("parcoursAnswers", v)}
+            />
+          </div>
+        );
 
       /* ── Parcours selector ── */
       case "parcours-selector":

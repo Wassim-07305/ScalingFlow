@@ -22,7 +22,15 @@ export interface Database {
           role: "student" | "admin" | "coach";
           onboarding_completed: boolean;
           onboarding_step: number;
-          situation: "zero" | "salarie" | "freelance" | "entrepreneur" | "etudiant" | "reconversion" | "sans_emploi" | null;
+          situation:
+            | "zero"
+            | "salarie"
+            | "freelance"
+            | "entrepreneur"
+            | "etudiant"
+            | "reconversion"
+            | "sans_emploi"
+            | null;
           situation_details: Json | null;
           skills: string[] | null;
           vault_skills: Json | null;
@@ -38,6 +46,10 @@ export interface Database {
           hours_per_week: number | null;
           deadline: string | null;
           team_size: number | null;
+          expertise_profonde: Json | null;
+          parcours_answers: Json | null;
+          team_preference: string | null;
+          has_paying_clients: string | null;
           vault_completed: boolean;
           vault_analysis: Json | null;
           selected_market: string | null;
@@ -78,7 +90,15 @@ export interface Database {
           role?: "student" | "admin" | "coach";
           onboarding_completed?: boolean;
           onboarding_step?: number;
-          situation?: "zero" | "salarie" | "freelance" | "entrepreneur" | "etudiant" | "reconversion" | "sans_emploi" | null;
+          situation?:
+            | "zero"
+            | "salarie"
+            | "freelance"
+            | "entrepreneur"
+            | "etudiant"
+            | "reconversion"
+            | "sans_emploi"
+            | null;
           situation_details?: Json | null;
           skills?: string[] | null;
           vault_skills?: Json | null;
@@ -94,6 +114,10 @@ export interface Database {
           hours_per_week?: number | null;
           deadline?: string | null;
           team_size?: number | null;
+          expertise_profonde?: Json | null;
+          parcours_answers?: Json | null;
+          team_preference?: string | null;
+          has_paying_clients?: string | null;
           vault_completed?: boolean;
           vault_analysis?: Json | null;
           selected_market?: string | null;
@@ -132,7 +156,15 @@ export interface Database {
           role?: "student" | "admin" | "coach";
           onboarding_completed?: boolean;
           onboarding_step?: number;
-          situation?: "zero" | "salarie" | "freelance" | "entrepreneur" | "etudiant" | "reconversion" | "sans_emploi" | null;
+          situation?:
+            | "zero"
+            | "salarie"
+            | "freelance"
+            | "entrepreneur"
+            | "etudiant"
+            | "reconversion"
+            | "sans_emploi"
+            | null;
           situation_details?: Json | null;
           skills?: string[] | null;
           vault_skills?: Json | null;
@@ -148,6 +180,10 @@ export interface Database {
           hours_per_week?: number | null;
           deadline?: string | null;
           team_size?: number | null;
+          expertise_profonde?: Json | null;
+          parcours_answers?: Json | null;
+          team_preference?: string | null;
+          has_paying_clients?: string | null;
           vault_completed?: boolean;
           vault_analysis?: Json | null;
           selected_market?: string | null;
@@ -734,7 +770,13 @@ export interface Database {
         Row: {
           id: string;
           user_id: string;
-          category: "general" | "wins" | "questions" | "feedback" | "offers" | "ads";
+          category:
+            | "general"
+            | "wins"
+            | "questions"
+            | "feedback"
+            | "offers"
+            | "ads";
           title: string | null;
           content: string;
           media_urls: string[] | null;
@@ -748,7 +790,13 @@ export interface Database {
         Insert: {
           id?: string;
           user_id: string;
-          category: "general" | "wins" | "questions" | "feedback" | "offers" | "ads";
+          category:
+            | "general"
+            | "wins"
+            | "questions"
+            | "feedback"
+            | "offers"
+            | "ads";
           title?: string | null;
           content: string;
           media_urls?: string[] | null;
@@ -756,7 +804,13 @@ export interface Database {
           auto_generated?: boolean;
         };
         Update: {
-          category?: "general" | "wins" | "questions" | "feedback" | "offers" | "ads";
+          category?:
+            | "general"
+            | "wins"
+            | "questions"
+            | "feedback"
+            | "offers"
+            | "ads";
           title?: string | null;
           content?: string;
           media_urls?: string[] | null;
@@ -881,7 +935,13 @@ export interface Database {
         Row: {
           id: string;
           user_id: string;
-          resource_type: "doc" | "youtube" | "instagram" | "transcript" | "testimonial" | "other";
+          resource_type:
+            | "doc"
+            | "youtube"
+            | "instagram"
+            | "transcript"
+            | "testimonial"
+            | "other";
           url: string | null;
           file_path: string | null;
           title: string;
@@ -893,7 +953,13 @@ export interface Database {
         Insert: {
           id?: string;
           user_id: string;
-          resource_type?: "doc" | "youtube" | "instagram" | "transcript" | "testimonial" | "other";
+          resource_type?:
+            | "doc"
+            | "youtube"
+            | "instagram"
+            | "transcript"
+            | "testimonial"
+            | "other";
           url?: string | null;
           file_path?: string | null;
           title?: string;
@@ -902,7 +968,13 @@ export interface Database {
           content_type?: string | null;
         };
         Update: {
-          resource_type?: "doc" | "youtube" | "instagram" | "transcript" | "testimonial" | "other";
+          resource_type?:
+            | "doc"
+            | "youtube"
+            | "instagram"
+            | "transcript"
+            | "testimonial"
+            | "other";
           url?: string | null;
           file_path?: string | null;
           title?: string;
@@ -1059,7 +1131,15 @@ export interface Database {
         Row: {
           id: string;
           user_id: string;
-          agent_type: "general" | "offre" | "funnel" | "ads" | "vente" | "contenu" | "strategie" | "recherche";
+          agent_type:
+            | "general"
+            | "offre"
+            | "funnel"
+            | "ads"
+            | "vente"
+            | "contenu"
+            | "strategie"
+            | "recherche";
           title: string | null;
           messages: Json;
           created_at: string;
@@ -1068,12 +1148,28 @@ export interface Database {
         Insert: {
           id?: string;
           user_id: string;
-          agent_type?: "general" | "offre" | "funnel" | "ads" | "vente" | "contenu" | "strategie" | "recherche";
+          agent_type?:
+            | "general"
+            | "offre"
+            | "funnel"
+            | "ads"
+            | "vente"
+            | "contenu"
+            | "strategie"
+            | "recherche";
           title?: string | null;
           messages?: Json;
         };
         Update: {
-          agent_type?: "general" | "offre" | "funnel" | "ads" | "vente" | "contenu" | "strategie" | "recherche";
+          agent_type?:
+            | "general"
+            | "offre"
+            | "funnel"
+            | "ads"
+            | "vente"
+            | "contenu"
+            | "strategie"
+            | "recherche";
           title?: string | null;
           messages?: Json;
         };

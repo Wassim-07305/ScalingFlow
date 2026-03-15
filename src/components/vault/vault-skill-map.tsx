@@ -21,26 +21,58 @@ import {
 
 const SKILL_CATEGORIES: Record<string, string[]> = {
   "Acquisition & Prospection": [
-    "LinkedIn prospection", "Instagram DM", "Cold email", "Cold calling",
-    "Setting", "Networking",
+    "LinkedIn prospection",
+    "Instagram DM",
+    "Cold email",
+    "Cold calling",
+    "Setting",
+    "Networking",
   ],
   "Vente & Closing": [
-    "Call closing", "DM closing", "Redaction de propositions",
-    "Négociation", "Upsell/Cross-sell",
+    "Call closing",
+    "DM closing",
+    "Redaction de propositions",
+    "Négociation",
+    "Upsell/Cross-sell",
   ],
   "Création de Contenu": [
-    "Reels/Short", "YouTube", "Copywriting",
-    "Carousels", "Stories", "Podcasts", "Newsletters",
+    "Reels/Short",
+    "YouTube",
+    "Copywriting",
+    "Carousels",
+    "Stories",
+    "Podcasts",
+    "Newsletters",
   ],
   "Marketing & Ads": [
-    "Meta Ads", "Google Ads", "TikTok Ads", "SEO", "Influence/partenariats",
+    "Meta Ads",
+    "Google Ads",
+    "TikTok Ads",
+    "SEO",
+    "Influence/partenariats",
   ],
   "Delivery & Gestion Client": [
-    "Coaching 1-on-1", "Coaching groupe", "Création formation",
-    "Gestion projet", "Consulting", "Done-for-you",
+    "Coaching 1-on-1",
+    "Coaching groupe",
+    "Création formation",
+    "Gestion projet",
+    "Consulting",
+    "Done-for-you",
   ],
   "Automatisation & Outils": [
-    "No-code", "CRM", "IA", "Montage vidéo", "Design", "Développement web",
+    "No-code",
+    "CRM",
+    "IA",
+    "Montage vidéo",
+    "Design",
+    "Développement web",
+  ],
+  "Stratégie & Business": [
+    "Business plan",
+    "Stratégie de pricing",
+    "Personal branding",
+    "Management d'équipe",
+    "Finance / comptabilité",
   ],
 };
 
@@ -52,6 +84,7 @@ const CATEGORY_COLORS = [
   "#A78BFA", // purple
   "#F87171", // red
   "#06B6D4", // cyan
+  "#EC4899", // pink (7th category)
 ];
 
 function SkillMindmap({
@@ -72,7 +105,11 @@ function SkillMindmap({
 
   return (
     <div className="overflow-x-auto">
-      <svg viewBox="0 0 800 600" className="w-full min-w-[600px]" style={{ maxHeight: 500 }}>
+      <svg
+        viewBox="0 0 800 600"
+        className="w-full min-w-[600px]"
+        style={{ maxHeight: 500 }}
+      >
         {/* Lines from center to categories */}
         {entries.map(([catName], catIdx) => {
           const angle = (catIdx / entries.length) * 2 * Math.PI - Math.PI / 2;
@@ -89,7 +126,9 @@ function SkillMindmap({
               y2={catY}
               stroke={color}
               strokeWidth={hoveredCategory === catName ? 3 : 1.5}
-              strokeOpacity={hoveredCategory && hoveredCategory !== catName ? 0.2 : 0.6}
+              strokeOpacity={
+                hoveredCategory && hoveredCategory !== catName ? 0.2 : 0.6
+              }
             />
           );
         })}
@@ -106,7 +145,11 @@ function SkillMindmap({
 
           // Matched skills in this category
           const matchedSkills = catSkills.filter((s) =>
-            skills.some((us) => us.toLowerCase().includes(s.toLowerCase()) || s.toLowerCase().includes(us.toLowerCase()))
+            skills.some(
+              (us) =>
+                us.toLowerCase().includes(s.toLowerCase()) ||
+                s.toLowerCase().includes(us.toLowerCase()),
+            ),
           );
 
           // Position skill nodes around the category
@@ -123,7 +166,9 @@ function SkillMindmap({
             >
               {/* Skill branch lines + nodes */}
               {catSkills.map((skill, sIdx) => {
-                const sAngle = startAngle + (sIdx / Math.max(catSkills.length - 1, 1)) * spreadAngle;
+                const sAngle =
+                  startAngle +
+                  (sIdx / Math.max(catSkills.length - 1, 1)) * spreadAngle;
                 const sX = catX + Math.cos(sAngle) * skillRadius;
                 const sY = catY + Math.sin(sAngle) * skillRadius;
                 const isActive = matchedSkills.includes(skill);
@@ -197,11 +242,32 @@ function SkillMindmap({
         })}
 
         {/* Center node */}
-        <circle cx={cx} cy={cy} r={30} fill="#34D39920" stroke="#34D399" strokeWidth={2} />
-        <text x={cx} y={cy - 4} textAnchor="middle" fontSize={10} fill="#34D399" fontWeight="bold">
+        <circle
+          cx={cx}
+          cy={cy}
+          r={30}
+          fill="#34D39920"
+          stroke="#34D399"
+          strokeWidth={2}
+        />
+        <text
+          x={cx}
+          y={cy - 4}
+          textAnchor="middle"
+          fontSize={10}
+          fill="#34D399"
+          fontWeight="bold"
+        >
           Mes
         </text>
-        <text x={cx} y={cy + 8} textAnchor="middle" fontSize={10} fill="#34D399" fontWeight="bold">
+        <text
+          x={cx}
+          y={cy + 8}
+          textAnchor="middle"
+          fontSize={10}
+          fill="#34D399"
+          fontWeight="bold"
+        >
           Skills
         </text>
       </svg>
@@ -216,7 +282,10 @@ export function VaultSkillMap() {
   const { user } = useUser();
   const [loading, setLoading] = React.useState(true);
   const [skills, setSkills] = React.useState<string[]>([]);
-  const [vaultSkills, setVaultSkills] = React.useState<Record<string, string> | null>(null);
+  const [vaultSkills, setVaultSkills] = React.useState<Record<
+    string,
+    string
+  > | null>(null);
 
   React.useEffect(() => {
     if (!user) return;
@@ -247,32 +316,40 @@ export function VaultSkillMap() {
   }
 
   // Calculate category scores
-  const radarData = Object.entries(SKILL_CATEGORIES).map(([category, categorySkills]) => {
-    let score = 0;
-    let count = 0;
+  const radarData = Object.entries(SKILL_CATEGORIES).map(
+    ([category, categorySkills]) => {
+      let score = 0;
+      let count = 0;
 
-    categorySkills.forEach((skill) => {
-      const hasSkill = skills.some(
-        (s) => s.toLowerCase().includes(skill.toLowerCase()) || skill.toLowerCase().includes(s.toLowerCase())
-      );
-      if (hasSkill) {
-        // Check proficiency level from vault_skills
-        const level = vaultSkills?.[skill];
-        if (level === "avance" || level === "avance") score += 3;
-        else if (level === "intermediaire" || level === "intermediaire") score += 2;
-        else score += 1;
-        count++;
-      }
-    });
+      categorySkills.forEach((skill) => {
+        const hasSkill = skills.some(
+          (s) =>
+            s.toLowerCase().includes(skill.toLowerCase()) ||
+            skill.toLowerCase().includes(s.toLowerCase()),
+        );
+        if (hasSkill) {
+          // Check proficiency level from vault_skills
+          const level = vaultSkills?.[skill];
+          if (level === "avance" || level === "avance") score += 3;
+          else if (level === "intermediaire" || level === "intermediaire")
+            score += 2;
+          else score += 1;
+          count++;
+        }
+      });
 
-    return {
-      category: category.split(" ")[0],
-      fullName: category,
-      score: count > 0 ? Math.round((score / (categorySkills.length * 3)) * 100) : 0,
-      count,
-      total: categorySkills.length,
-    };
-  });
+      return {
+        category: category.split(" ")[0],
+        fullName: category,
+        score:
+          count > 0
+            ? Math.round((score / (categorySkills.length * 3)) * 100)
+            : 0,
+        count,
+        total: categorySkills.length,
+      };
+    },
+  );
 
   return (
     <div className="space-y-6">
@@ -312,7 +389,10 @@ export function VaultSkillMap() {
                   borderRadius: "12px",
                   color: "#E5E7EB",
                 }}
-                formatter={(value: number | undefined) => [`${value ?? 0}%`, "Maîtrise"]}
+                formatter={(value: number | undefined) => [
+                  `${value ?? 0}%`,
+                  "Maîtrise",
+                ]}
               />
             </RadarChart>
           </ResponsiveContainer>
@@ -328,7 +408,11 @@ export function VaultSkillMap() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <SkillMindmap skills={skills} categories={SKILL_CATEGORIES} radarData={radarData} />
+          <SkillMindmap
+            skills={skills}
+            categories={SKILL_CATEGORIES}
+            radarData={radarData}
+          />
         </CardContent>
       </Card>
 
@@ -338,7 +422,9 @@ export function VaultSkillMap() {
           <Card key={cat.fullName}>
             <CardContent className="pt-4">
               <div className="flex items-center justify-between mb-2">
-                <h4 className="text-sm font-medium text-text-primary">{cat.fullName}</h4>
+                <h4 className="text-sm font-medium text-text-primary">
+                  {cat.fullName}
+                </h4>
                 <Badge variant={cat.score >= 50 ? "default" : "muted"}>
                   {cat.score}%
                 </Badge>

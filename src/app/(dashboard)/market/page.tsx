@@ -9,7 +9,11 @@ import { PainIdentifier } from "@/components/market/pain-identifier";
 import { SchwartzDisplay } from "@/components/market/schwartz-display";
 import { InsightsScraper } from "@/components/market/insights-scraper";
 import { BusinessAudit } from "@/components/market/business-audit";
-import { ReviewVerbatims, type ReviewVerbatim, type ReviewSourceData } from "@/components/market/review-verbatims";
+import {
+  ReviewVerbatims,
+  type ReviewVerbatim,
+  type ReviewSourceData,
+} from "@/components/market/review-verbatims";
 import { cn } from "@/lib/utils/cn";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -60,24 +64,41 @@ const TABS = [
 type TabKey = (typeof TABS)[number]["key"];
 
 export default function MarketPage() {
-  const { user } = useUser();
+  const { user, profile } = useUser();
   const supabase = createClient();
 
   const [activeTab, setActiveTab] = useState<TabKey>("analyse");
   const [analyses, setAnalyses] = useState<MarketAnalysis[]>([]);
-  const [selectedAnalysis, setSelectedAnalysis] = useState<MarketAnalysis | null>(null);
+  const [selectedAnalysis, setSelectedAnalysis] =
+    useState<MarketAnalysis | null>(null);
   const [expandedAnalysis, setExpandedAnalysis] = useState<string | null>(null);
   const [competitors, setCompetitors] = useState<Competitor[]>([]);
   const [loadingPersona, setLoadingPersona] = useState(false);
   const [loadingCompetitors, setLoadingCompetitors] = useState(false);
-  const [competitorDataSource, setCompetitorDataSource] = useState<string>("ai_only");
+  const [competitorDataSource, setCompetitorDataSource] =
+    useState<string>("ai_only");
   const [competitorScrapingUsed, setCompetitorScrapingUsed] = useState(false);
-  const [competitorTrendsData, setCompetitorTrendsData] = useState<{ term: string; timelineData: { date: string; value: number }[]; relatedQueries: string[] }[] | undefined>(undefined);
-  const [competitorScreenshots, setCompetitorScreenshots] = useState<{ url: string; screenshotUrl: string }[] | undefined>(undefined);
-  const [competitorTechStacks, setCompetitorTechStacks] = useState<{ url: string; technologies: { name: string; category: string }[] }[] | undefined>(undefined);
+  const [competitorTrendsData, setCompetitorTrendsData] = useState<
+    | {
+        term: string;
+        timelineData: { date: string; value: number }[];
+        relatedQueries: string[];
+      }[]
+    | undefined
+  >(undefined);
+  const [competitorScreenshots, setCompetitorScreenshots] = useState<
+    { url: string; screenshotUrl: string }[] | undefined
+  >(undefined);
+  const [competitorTechStacks, setCompetitorTechStacks] = useState<
+    | { url: string; technologies: { name: string; category: string }[] }[]
+    | undefined
+  >(undefined);
   const [loadingSchwartz, setLoadingSchwartz] = useState(false);
   const [loadingData, setLoadingData] = useState(true);
-  const [usageLimited, setUsageLimited] = useState<{currentUsage: number; limit: number} | null>(null);
+  const [usageLimited, setUsageLimited] = useState<{
+    currentUsage: number;
+    limit: number;
+  } | null>(null);
 
   // Review scraping state
   const [googleMapsUrls, setGoogleMapsUrls] = useState<string[]>([""]);
@@ -150,7 +171,10 @@ export default function MarketPage() {
 
       if (!res.ok) {
         const errData = await res.json().catch(() => ({}));
-        if (res.status === 403 && errData.usage) { setUsageLimited(errData.usage); return; }
+        if (res.status === 403 && errData.usage) {
+          setUsageLimited(errData.usage);
+          return;
+        }
         throw new Error(errData.error || "Erreur lors de la génération");
       }
 
@@ -158,16 +182,14 @@ export default function MarketPage() {
       // Mettre à jour l'analyse locale
       setSelectedAnalysis({ ...selectedAnalysis, persona });
       setAnalyses((prev) =>
-        prev.map((a) =>
-          a.id === selectedAnalysis.id ? { ...a, persona } : a
-        )
+        prev.map((a) => (a.id === selectedAnalysis.id ? { ...a, persona } : a)),
       );
       toast.success("Persona généré avec succès !");
     } catch (error) {
       toast.error(
         error instanceof Error
           ? error.message
-          : "Erreur lors de la génération du persona"
+          : "Erreur lors de la génération du persona",
       );
     } finally {
       setLoadingPersona(false);
@@ -188,7 +210,10 @@ export default function MarketPage() {
 
       if (!res.ok) {
         const errData = await res.json().catch(() => ({}));
-        if (res.status === 403 && errData.usage) { setUsageLimited(errData.usage); return; }
+        if (res.status === 403 && errData.usage) {
+          setUsageLimited(errData.usage);
+          return;
+        }
         throw new Error(errData.error || "Erreur lors de la génération");
       }
 
@@ -201,13 +226,20 @@ export default function MarketPage() {
       setCompetitorTechStacks(resData.tech_stacks || undefined);
       // Recharger les concurrents depuis la DB
       await loadCompetitors();
-      const sourceLabel = resData.data_source === "apify_crawl" ? "Apify" : resData.data_source === "google_trends" ? "Google Trends" : resData.scraping_used ? "données réelles" : "IA";
+      const sourceLabel =
+        resData.data_source === "apify_crawl"
+          ? "Apify"
+          : resData.data_source === "google_trends"
+            ? "Google Trends"
+            : resData.scraping_used
+              ? "données réelles"
+              : "IA";
       toast.success(`Analyse concurrentielle terminée via ${sourceLabel} !`);
     } catch (error) {
       toast.error(
         error instanceof Error
           ? error.message
-          : "Erreur lors de l'analyse concurrentielle"
+          : "Erreur lors de l'analyse concurrentielle",
       );
     } finally {
       setLoadingCompetitors(false);
@@ -230,24 +262,32 @@ export default function MarketPage() {
 
       if (!res.ok) {
         const errData = await res.json().catch(() => ({}));
-        if (res.status === 403 && errData.usage) { setUsageLimited(errData.usage); return; }
+        if (res.status === 403 && errData.usage) {
+          setUsageLimited(errData.usage);
+          return;
+        }
         throw new Error(errData.error || "Erreur lors de l'analyse");
       }
 
       const schwartzAnalysis = await res.json();
       // Mettre à jour l'analyse locale
-      setSelectedAnalysis({ ...selectedAnalysis, schwartz_analysis: schwartzAnalysis });
+      setSelectedAnalysis({
+        ...selectedAnalysis,
+        schwartz_analysis: schwartzAnalysis,
+      });
       setAnalyses((prev) =>
         prev.map((a) =>
-          a.id === selectedAnalysis.id ? { ...a, schwartz_analysis: schwartzAnalysis } : a
-        )
+          a.id === selectedAnalysis.id
+            ? { ...a, schwartz_analysis: schwartzAnalysis }
+            : a,
+        ),
       );
       toast.success("Analyse Schwartz terminée !");
     } catch (error) {
       toast.error(
         error instanceof Error
           ? error.message
-          : "Erreur lors de l'analyse Schwartz"
+          : "Erreur lors de l'analyse Schwartz",
       );
     } finally {
       setLoadingSchwartz(false);
@@ -273,13 +313,19 @@ export default function MarketPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          skills: [],
-          experienceLevel: "intermediaire",
-          currentRevenue: 0,
-          targetRevenue: 0,
+          skills: profile?.vault_skills || [],
+          experienceLevel: profile?.experience_level || "intermediaire",
+          currentRevenue: profile?.current_revenue || 0,
+          targetRevenue: profile?.target_revenue || 0,
           industries: [selectedAnalysis.market_name],
-          objectives: [],
-          budgetMonthly: 0,
+          objectives: profile?.objectives || [],
+          budgetMonthly: profile?.budget_monthly || 0,
+          parcours: profile?.parcours || undefined,
+          situation: profile?.situation || undefined,
+          situationDetails: profile?.situation_details || undefined,
+          parcoursAnswers: profile?.parcours_answers || undefined,
+          expertiseProfonde: profile?.expertise_profonde || undefined,
+          hoursPerWeek: profile?.hours_per_week || undefined,
           competitor_google_maps_urls: validGoogleUrls,
           competitor_trustpilot_urls: validTrustpilotUrls,
         }),
@@ -287,7 +333,10 @@ export default function MarketPage() {
 
       if (!res.ok) {
         const errData = await res.json().catch(() => ({}));
-        if (res.status === 403 && errData.usage) { setUsageLimited(errData.usage); return; }
+        if (res.status === 403 && errData.usage) {
+          setUsageLimited(errData.usage);
+          return;
+        }
         throw new Error(errData.error || "Erreur lors du scraping des avis");
       }
 
@@ -296,7 +345,9 @@ export default function MarketPage() {
       if (data.review_verbatims && data.review_verbatims.length > 0) {
         setReviewVerbatims(data.review_verbatims);
         setReviewsData(data.reviews_data || []);
-        toast.success(`${data.review_verbatims.length} avis clients récupérés !`);
+        toast.success(
+          `${data.review_verbatims.length} avis clients récupérés !`,
+        );
       } else {
         toast.info("Aucun avis trouvé pour les URLs fournies.");
       }
@@ -304,7 +355,7 @@ export default function MarketPage() {
       toast.error(
         error instanceof Error
           ? error.message
-          : "Erreur lors du scraping des avis clients"
+          : "Erreur lors du scraping des avis clients",
       );
     } finally {
       setLoadingReviews(false);
@@ -312,7 +363,12 @@ export default function MarketPage() {
   };
 
   if (usageLimited) {
-    return <UpgradeWall currentUsage={usageLimited.currentUsage} limit={usageLimited.limit} />;
+    return (
+      <UpgradeWall
+        currentUsage={usageLimited.currentUsage}
+        limit={usageLimited.limit}
+      />
+    );
   }
 
   return (
@@ -323,7 +379,11 @@ export default function MarketPage() {
       />
 
       {/* Tabs */}
-      <TabBar tabs={TABS} activeTab={activeTab} onTabChange={(key) => setActiveTab(key as TabKey)} />
+      <TabBar
+        tabs={TABS}
+        activeTab={activeTab}
+        onTabChange={(key) => setActiveTab(key as TabKey)}
+      />
 
       {/* Sélection de l'analyse */}
       {analyses.length > 1 && (
@@ -340,7 +400,7 @@ export default function MarketPage() {
                   "px-3 py-1.5 rounded-lg text-sm font-medium transition-all border",
                   selectedAnalysis?.id === a.id
                     ? "bg-accent/10 border-accent text-accent"
-                    : "bg-bg-tertiary border-border-default text-text-secondary hover:border-border-hover"
+                    : "bg-bg-tertiary border-border-default text-text-secondary hover:border-border-hover",
                 )}
               >
                 {a.market_name}
@@ -390,7 +450,10 @@ export default function MarketPage() {
         <div className="space-y-4">
           {analyses.map((analysis) => {
             const isExpanded = expandedAnalysis === analysis.id;
-            const aiData = analysis.ai_raw_response as Record<string, unknown> | null;
+            const aiData = analysis.ai_raw_response as Record<
+              string,
+              unknown
+            > | null;
 
             return (
               <Card key={analysis.id}>
@@ -482,7 +545,11 @@ export default function MarketPage() {
                         </h4>
                         <div className="flex flex-wrap gap-1.5">
                           {(analysis.demand_signals as string[]).map((s, i) => (
-                            <Badge key={i} variant="default" className="text-xs">
+                            <Badge
+                              key={i}
+                              variant="default"
+                              className="text-xs"
+                            >
                               {s}
                             </Badge>
                           ))}
@@ -491,16 +558,18 @@ export default function MarketPage() {
                     )}
 
                     {/* Why good fit */}
-                    {aiData && typeof aiData === "object" && "why_good_fit" in aiData && (
-                      <div>
-                        <h4 className="text-sm font-medium text-text-muted mb-1">
-                          Pourquoi ce marché est adapté
-                        </h4>
-                        <p className="text-sm text-text-secondary">
-                          {aiData.why_good_fit as string}
-                        </p>
-                      </div>
-                    )}
+                    {aiData &&
+                      typeof aiData === "object" &&
+                      "why_good_fit" in aiData && (
+                        <div>
+                          <h4 className="text-sm font-medium text-text-muted mb-1">
+                            Pourquoi ce marché est adapté
+                          </h4>
+                          <p className="text-sm text-text-secondary">
+                            {aiData.why_good_fit as string}
+                          </p>
+                        </div>
+                      )}
                   </CardContent>
                 )}
               </Card>
@@ -548,15 +617,15 @@ export default function MarketPage() {
       )}
 
       {/* TAB: Audit Business */}
-      {activeTab === "audit" && (
-        <BusinessAudit />
-      )}
+      {activeTab === "audit" && <BusinessAudit />}
 
       {/* TAB: Insights Scraper */}
       {activeTab === "insights" && (
         <InsightsScraper
           marketName={selectedAnalysis?.market_name || ""}
-          targetAvatar={selectedAnalysis?.target_avatar as string || undefined}
+          targetAvatar={
+            (selectedAnalysis?.target_avatar as string) || undefined
+          }
           existingPains={(selectedAnalysis?.problems as string[]) || undefined}
         />
       )}
@@ -582,7 +651,8 @@ export default function MarketPage() {
                 )}
               </div>
               <p className="text-xs text-text-muted mt-1">
-                Ajoute les URLs Google Maps et Trustpilot de tes concurrents pour analyser leurs avis clients.
+                Ajoute les URLs Google Maps et Trustpilot de tes concurrents
+                pour analyser leurs avis clients.
               </p>
             </CardHeader>
 
@@ -591,7 +661,9 @@ export default function MarketPage() {
                 {/* Google Maps URLs */}
                 <div className="space-y-3">
                   <label className="text-sm font-medium text-text-primary flex items-center gap-2">
-                    <span className="h-5 w-5 rounded bg-blue-500/10 flex items-center justify-center text-[10px] text-blue-400 font-bold">G</span>
+                    <span className="h-5 w-5 rounded bg-blue-500/10 flex items-center justify-center text-[10px] text-blue-400 font-bold">
+                      G
+                    </span>
                     URLs Google Maps concurrents
                   </label>
                   {googleMapsUrls.map((url, idx) => (
@@ -609,7 +681,11 @@ export default function MarketPage() {
                       />
                       {googleMapsUrls.length > 1 && (
                         <button
-                          onClick={() => setGoogleMapsUrls(googleMapsUrls.filter((_, i) => i !== idx))}
+                          onClick={() =>
+                            setGoogleMapsUrls(
+                              googleMapsUrls.filter((_, i) => i !== idx),
+                            )
+                          }
                           className="p-2 rounded-lg text-text-muted hover:text-red-400 hover:bg-red-400/10 transition-colors"
                         >
                           <Trash2 className="h-4 w-4" />
@@ -631,7 +707,9 @@ export default function MarketPage() {
                 {/* Trustpilot URLs */}
                 <div className="space-y-3">
                   <label className="text-sm font-medium text-text-primary flex items-center gap-2">
-                    <span className="h-5 w-5 rounded bg-green-500/10 flex items-center justify-center text-[10px] text-green-400 font-bold">T</span>
+                    <span className="h-5 w-5 rounded bg-green-500/10 flex items-center justify-center text-[10px] text-green-400 font-bold">
+                      T
+                    </span>
                     URLs Trustpilot concurrents
                   </label>
                   {trustpilotUrls.map((url, idx) => (
@@ -649,7 +727,11 @@ export default function MarketPage() {
                       />
                       {trustpilotUrls.length > 1 && (
                         <button
-                          onClick={() => setTrustpilotUrls(trustpilotUrls.filter((_, i) => i !== idx))}
+                          onClick={() =>
+                            setTrustpilotUrls(
+                              trustpilotUrls.filter((_, i) => i !== idx),
+                            )
+                          }
                           className="p-2 rounded-lg text-text-muted hover:text-red-400 hover:bg-red-400/10 transition-colors"
                         >
                           <Trash2 className="h-4 w-4" />
@@ -692,7 +774,10 @@ export default function MarketPage() {
 
           {/* Verbatims display */}
           {reviewVerbatims.length > 0 && (
-            <ReviewVerbatims verbatims={reviewVerbatims} reviewsData={reviewsData} />
+            <ReviewVerbatims
+              verbatims={reviewVerbatims}
+              reviewsData={reviewsData}
+            />
           )}
 
           {/* Empty state when no reviews yet */}
@@ -704,8 +789,8 @@ export default function MarketPage() {
                   Aucun avis analysé
                 </h3>
                 <p className="text-sm text-text-secondary text-center max-w-md">
-                  Ajoute les URLs Google Maps ou Trustpilot de tes concurrents ci-dessus
-                  pour collecter et analyser les verbatims clients.
+                  Ajoute les URLs Google Maps ou Trustpilot de tes concurrents
+                  ci-dessus pour collecter et analyser les verbatims clients.
                 </p>
               </CardContent>
             </Card>
@@ -726,7 +811,9 @@ export default function MarketPage() {
         <div>
           {selectedAnalysis.schwartz_analysis ? (
             <SchwartzDisplay
-              analysis={selectedAnalysis.schwartz_analysis as unknown as SchwartzAnalysisResult}
+              analysis={
+                selectedAnalysis.schwartz_analysis as unknown as SchwartzAnalysisResult
+              }
             />
           ) : (
             <Card>
@@ -737,7 +824,8 @@ export default function MarketPage() {
                 </h3>
                 <p className="text-sm text-text-secondary text-center max-w-md mb-6">
                   Détermine le niveau de sophistication de ton marché selon les
-                  5 niveaux d'Eugène Schwartz pour adapter ta stratégie marketing.
+                  5 niveaux d'Eugène Schwartz pour adapter ta stratégie
+                  marketing.
                 </p>
                 <Button
                   onClick={handleGenerateSchwartz}
@@ -767,41 +855,56 @@ export default function MarketPage() {
           {competitors.length > 0 ? (
             (() => {
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              const fullAnalysis = (selectedAnalysis as any)?.competitor_analysis as any;
+              const fullAnalysis = (selectedAnalysis as any)
+                ?.competitor_analysis as any;
               const enriched = fullAnalysis?.competitors;
               const benchmarks = fullAnalysis?.industry_benchmarks;
 
               return (
                 <CompetitorGrid
-                  competitors={enriched
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    ? enriched.map((c: any) => ({
-                        name: c.name,
-                        positioning: c.positioning || "",
-                        pricing_estimate: c.pricing_estimate || "",
-                        strengths: c.strengths || [],
-                        weaknesses: c.weaknesses || [],
-                        differentiation: c.differentiation || "",
-                        ad_insights: c.ad_insights,
-                        content_insights: c.content_insights,
-                        funnel_type: c.funnel_type,
-                        estimated_revenue_range: c.estimated_revenue_range,
-                      }))
-                    : competitors.map((c) => ({
-                        name: c.competitor_name,
-                        positioning: c.positioning || "",
-                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                        pricing_estimate: (c as any).pricing_estimate || (c as any).pricing || "",
-                        strengths: c.strengths || [],
-                        weaknesses: c.weaknesses || [],
-                        differentiation: c.gap_opportunity || "",
-                      }))
+                  competitors={
+                    enriched
+                      ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        enriched.map((c: any) => ({
+                          name: c.name,
+                          positioning: c.positioning || "",
+                          pricing_estimate: c.pricing_estimate || "",
+                          strengths: c.strengths || [],
+                          weaknesses: c.weaknesses || [],
+                          differentiation: c.differentiation || "",
+                          ad_insights: c.ad_insights,
+                          content_insights: c.content_insights,
+                          funnel_type: c.funnel_type,
+                          estimated_revenue_range: c.estimated_revenue_range,
+                        }))
+                      : competitors.map((c) => ({
+                          name: c.competitor_name,
+                          positioning: c.positioning || "",
+                          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                          pricing_estimate:
+                            (c as any).pricing_estimate ||
+                            (c as any).pricing ||
+                            "",
+                          strengths: c.strengths || [],
+                          weaknesses: c.weaknesses || [],
+                          differentiation: c.gap_opportunity || "",
+                        }))
                   }
                   marketGaps={fullAnalysis?.market_gaps}
-                  positioningOpportunities={fullAnalysis?.positioning_opportunities}
-                  recommendedDifferentiation={fullAnalysis?.recommended_differentiation}
+                  positioningOpportunities={
+                    fullAnalysis?.positioning_opportunities
+                  }
+                  recommendedDifferentiation={
+                    fullAnalysis?.recommended_differentiation
+                  }
                   industryBenchmarks={benchmarks}
-                  dataSource={competitorDataSource as "apify_crawl" | "google_trends" | "web_scraping" | "ai_only"}
+                  dataSource={
+                    competitorDataSource as
+                      | "apify_crawl"
+                      | "google_trends"
+                      | "web_scraping"
+                      | "ai_only"
+                  }
                   scrapingUsed={competitorScrapingUsed}
                   trendsData={competitorTrendsData}
                   screenshots={competitorScreenshots}
@@ -817,8 +920,8 @@ export default function MarketPage() {
                   Aucune analyse concurrentielle
                 </h3>
                 <p className="text-sm text-text-secondary text-center max-w-md mb-6">
-                  Lance une analyse IA des concurrents du marché
-                  « {selectedAnalysis.market_name} ».
+                  Lance une analyse IA des concurrents du marché «{" "}
+                  {selectedAnalysis.market_name} ».
                 </p>
                 <Button
                   onClick={handleAnalyzeCompetitors}

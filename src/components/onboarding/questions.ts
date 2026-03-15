@@ -8,6 +8,8 @@ export type QuestionType =
   | "multi-field"
   | "skill-matrix"
   | "parcours-selector"
+  | "parcours-questions"
+  | "slider"
   | "summary"
   | "market-analysis";
 
@@ -44,7 +46,7 @@ export const QUESTIONS: Question[] = [
       "Réponds à quelques questions rapides pour que l'IA personnalise tout pour toi.",
   },
 
-  // 1 — Prénom
+  // 1 — Prénom (CDC Q-0.1.1)
   {
     id: "firstName",
     type: "text",
@@ -52,6 +54,35 @@ export const QUESTIONS: Question[] = [
     subtitle: "Ton prénom",
     field: "firstName",
     placeholder: "Prénom",
+  },
+
+  // 1b — Pays (CDC Q-0.1.3)
+  {
+    id: "country",
+    type: "chips",
+    title: "Dans quel pays tu opères / veux opérer ?",
+    field: "country",
+    chips: [
+      { value: "France", label: "France" },
+      { value: "USA / Canada", label: "USA / Canada" },
+      { value: "UK", label: "UK" },
+      { value: "Europe autre", label: "Europe autre" },
+      { value: "Afrique francophone", label: "Afrique francophone" },
+      { value: "Multiple", label: "Multiple" },
+    ],
+  },
+
+  // 1c — Langue (CDC Q-0.1.4)
+  {
+    id: "language",
+    type: "chips",
+    title: "Quelle langue pour tes clients ?",
+    field: "language",
+    chips: [
+      { value: "fr", label: "Français" },
+      { value: "en", label: "Anglais" },
+      { value: "both", label: "Les deux" },
+    ],
   },
 
   // 2 — Situation (auto-advance)
@@ -105,23 +136,30 @@ export const QUESTIONS: Question[] = [
     title: "Dis-nous en plus sur ta situation",
     subtitle: "Ces infos aident l'IA à personnaliser ton parcours.",
     field: "situationDetails",
-    showWhen: (data) =>
-      data.situation !== "" && data.situation !== undefined,
+    showWhen: (data) => data.situation !== "" && data.situation !== undefined,
   },
 
-  // 4 — Expertise (1 seul textarea qui remplace les 4 questions)
+  // 4 — Compétences par catégories (skill-matrix CDC Étape 0.2b — 7 catégories)
   {
-    id: "expertise",
-    type: "textarea",
-    title: "Décris ton expertise en quelques phrases",
+    id: "skillMatrix",
+    type: "skill-matrix",
+    title: "Tes compétences",
     subtitle:
-      "Qu'est-ce que tu sais faire mieux que les autres ? Dans quel domaine les gens te demandent conseil ? Quel résultat tu as déjà obtenu ?",
-    field: "expertise_q1",
-    placeholder:
-      "Ex : Je suis expert en marketing digital, j'ai aidé 12 clients à doubler leur CA en 6 mois...",
+      "Sélectionne les compétences que tu maîtrises et indique ton niveau.",
+    field: "vaultSkills",
   },
 
-  // 5 — Industries
+  // 5 — Expertise profonde (CDC Étape 0.3)
+  {
+    id: "expertiseProfonde",
+    type: "multi-field",
+    title: "Ton expertise profonde",
+    subtitle:
+      "Ces questions font émerger ce que tu ne sais pas forcément formuler. C'est là où on identifie ton unfair advantage.",
+    field: "expertiseProfonde",
+  },
+
+  // 6 — Industries
   {
     id: "industries",
     type: "chips-multi",
@@ -140,7 +178,12 @@ export const QUESTIONS: Question[] = [
       { value: "Restauration / Food", label: "Restauration / Food" },
       { value: "BTP / Artisanat", label: "BTP / Artisanat" },
       { value: "Medical / Paramedical", label: "Médical / Paramédical" },
-      { value: "Marketing / Communication", label: "Marketing / Communication" },
+      { value: "Juridique / Comptable", label: "Juridique / Comptable" },
+      { value: "RH / Recrutement", label: "RH / Recrutement" },
+      {
+        value: "Marketing / Communication",
+        label: "Marketing / Communication",
+      },
       { value: "Coaching business", label: "Coaching business" },
     ],
     hasOther: true,
@@ -160,7 +203,17 @@ export const QUESTIONS: Question[] = [
     field: "parcours",
   },
 
-  // 7 — Objectif revenus (auto-advance)
+  // 8 — Questions parcours-spécifiques (CDC Phase 1 — TRUTH adapté)
+  {
+    id: "parcoursQuestions",
+    type: "parcours-questions",
+    title: "Approfondissons ton profil",
+    subtitle: "Questions adaptées à ton parcours pour personnaliser l'IA.",
+    field: "parcoursAnswers",
+    showWhen: (data) => !!data.parcours && data.parcours !== "",
+  },
+
+  // 9 — Objectif revenus (auto-advance)
   {
     id: "targetRevenue",
     type: "chips",
@@ -219,11 +272,64 @@ export const QUESTIONS: Question[] = [
     ],
   },
 
+  // 13 — Heures par semaine (CDC Q-0.5.3)
+  {
+    id: "hoursPerWeek",
+    type: "chips",
+    title: "Combien d'heures par semaine peux-tu consacrer à ce projet ?",
+    field: "hoursPerWeek",
+    chips: [
+      { value: "5", label: "5h" },
+      { value: "10", label: "10h" },
+      { value: "20", label: "20h" },
+      { value: "40", label: "40h+" },
+    ],
+  },
+
+  // 14 — Deadline (CDC Q-0.5.4)
+  {
+    id: "deadline",
+    type: "chips",
+    title: "Deadline idéale pour ton premier client ?",
+    field: "deadline",
+    chips: [
+      { value: "1_semaine", label: "1 semaine" },
+      { value: "1_mois", label: "1 mois" },
+      { value: "3_mois", label: "3 mois" },
+      { value: "pas_de_rush", label: "Pas de rush" },
+    ],
+  },
+
+  // 15 — Préférence équipe (CDC Q-0.5.5)
+  {
+    id: "teamPreference",
+    type: "chips",
+    title: "Tu préfères travailler seul ou avec une équipe ?",
+    field: "teamPreference",
+    chips: [
+      { value: "seul", label: "Seul" },
+      { value: "equipe", label: "J'ai déjà une équipe" },
+      { value: "recruter", label: "Je veux recruter" },
+    ],
+  },
+
+  // 16 — Clients payants (CDC Q-0.3.6)
+  {
+    id: "hasPayingClients",
+    type: "chips",
+    title: "As-tu déjà eu des clients payants ?",
+    field: "hasPayingClients",
+    chips: [
+      { value: "oui", label: "Oui" },
+      { value: "non", label: "Non" },
+    ],
+  },
+
   // ═══════════════════════════════════════
   // Résumé
   // ═══════════════════════════════════════
 
-  // 10 — Summary
+  // 17 — Summary
   {
     id: "summary",
     type: "summary",

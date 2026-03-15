@@ -25,7 +25,7 @@ const CHUNK_OVERLAP = 200;
 export function chunkDocument(
   text: string,
   chunkSize = CHUNK_SIZE,
-  overlap = CHUNK_OVERLAP
+  overlap = CHUNK_OVERLAP,
 ): string[] {
   if (!text || text.trim().length === 0) return [];
 
@@ -99,12 +99,17 @@ export async function generateEmbedding(text: string): Promise<number[]> {
   // Fallback: use a deterministic hash-based pseudo-embedding (384 dims)
   // This allows the system to work without an embedding API,
   // but semantic search quality will be limited.
+  console.warn(
+    "[RAG] OPENAI_API_KEY non definie — utilisation du fallback hash-embedding. La qualite de la recherche semantique sera limitee. Definissez OPENAI_API_KEY pour activer les vrais embeddings.",
+  );
   return hashEmbedding(text, 384);
 }
 
 function hashEmbedding(text: string, dims: number): number[] {
   const vec = new Float64Array(dims);
-  const normalized = text.toLowerCase().replace(/[^a-z0-9àâäéèêëïîôùûüÿçœæ\s]/g, "");
+  const normalized = text
+    .toLowerCase()
+    .replace(/[^a-z0-9àâäéèêëïîôùûüÿçœæ\s]/g, "");
   const words = normalized.split(/\s+/).filter(Boolean);
 
   for (const word of words) {
@@ -129,13 +134,13 @@ export async function storeChunks(
   userId: string,
   documentId: string,
   chunks: string[],
-  metadata?: Record<string, unknown>
+  metadata?: Record<string, unknown>,
 ): Promise<void> {
   const supabase = await createClient();
 
   // Generate embeddings for all chunks
   const embeddings = await Promise.all(
-    chunks.map((chunk) => generateEmbedding(chunk))
+    chunks.map((chunk) => generateEmbedding(chunk)),
   );
 
   const rows = chunks.map((content, i) => ({
@@ -165,7 +170,7 @@ export async function searchSimilar(
   userId: string,
   query: string,
   limit = 5,
-  similarityThreshold = 0.3
+  similarityThreshold = 0.3,
 ): Promise<{ content: string; similarity: number; document_id: string }[]> {
   const supabase = await createClient();
   const queryEmbedding = await generateEmbedding(query);
@@ -189,7 +194,7 @@ export async function searchSimilar(
       content: row.content,
       similarity: row.similarity,
       document_id: row.document_id,
-    })
+    }),
   );
 }
 
@@ -197,7 +202,7 @@ async function fallbackSearch(
   supabase: Awaited<ReturnType<typeof createClient>>,
   userId: string,
   queryEmbedding: number[],
-  limit: number
+  limit: number,
 ) {
   const { data: chunks } = await supabase
     .from("document_chunks")
@@ -209,9 +214,10 @@ async function fallbackSearch(
 
   const scored = chunks
     .map((chunk) => {
-      const emb = typeof chunk.embedding === "string"
-        ? JSON.parse(chunk.embedding)
-        : chunk.embedding;
+      const emb =
+        typeof chunk.embedding === "string"
+          ? JSON.parse(chunk.embedding)
+          : chunk.embedding;
       return {
         content: chunk.content as string,
         document_id: chunk.document_id as string,
@@ -226,7 +232,9 @@ async function fallbackSearch(
 
 function cosineSimilarity(a: number[], b: number[]): number {
   if (a.length !== b.length || a.length === 0) return 0;
-  let dot = 0, normA = 0, normB = 0;
+  let dot = 0,
+    normA = 0,
+    normB = 0;
   for (let i = 0; i < a.length; i++) {
     dot += a[i] * b[i];
     normA += a[i] * a[i];
@@ -245,7 +253,7 @@ function cosineSimilarity(a: number[], b: number[]): number {
 export async function buildRAGContext(
   userId: string,
   query: string,
-  maxChars = 4000
+  maxChars = 4000,
 ): Promise<string> {
   const results = await searchSimilar(userId, query, 5);
 
