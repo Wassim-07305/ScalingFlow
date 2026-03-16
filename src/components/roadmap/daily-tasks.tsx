@@ -120,6 +120,18 @@ export function DailyTasks({ className, refreshKey }: DailyTasksProps) {
         ),
       );
       toast.error("Impossible de mettre à jour la tâche");
+    } else if (newCompleted) {
+      // Award XP when task is completed
+      try {
+        await fetch("/api/gamification/award", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ activityType: "streak.daily" }),
+        });
+        toast.success("+15 XP — Tâche complétée !");
+      } catch {
+        // XP award is non-blocking
+      }
     }
   };
 

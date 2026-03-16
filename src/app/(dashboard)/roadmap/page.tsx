@@ -141,7 +141,7 @@ export default function RoadmapPage() {
     try {
       const supabase = createClient();
       const { data: tasks } = await supabase
-        .from("roadmap_tasks")
+        .from("tasks")
         .select("title, description, due_date, estimated_minutes")
         .eq("user_id", user.id)
         .eq("completed", false)

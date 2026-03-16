@@ -41,6 +41,7 @@ export function SmartRecommendations() {
     if (!user || userLoading) return;
 
     const analyze = async () => {
+      try {
       const supabase = createClient();
 
       // Requêtes parallèles pour analyser la progression
@@ -210,7 +211,12 @@ export function SmartRecommendations() {
         (a, b) => priorityOrder[a.priority] - priorityOrder[b.priority],
       );
       setRecommendations(recs.slice(0, 3));
-      setLoading(false);
+      } catch (err) {
+        console.error("SmartRecommendations: erreur de chargement", err);
+        setRecommendations([]);
+      } finally {
+        setLoading(false);
+      }
     };
 
     analyze();

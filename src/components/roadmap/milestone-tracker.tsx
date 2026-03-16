@@ -99,15 +99,17 @@ export function MilestoneTracker({ className }: MilestoneTrackerProps) {
   const { user, profile, loading: userLoading } = useUser();
   const [milestones, setMilestones] = useState<Milestone[]>([]);
   const [userMilestones, setUserMilestones] = useState<UserMilestone[]>([]);
+  const [autoDetectedCounts, setAutoDetectedCounts] = useState({ offers: 0, funnels: 0, leads: 0 });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!user) return;
 
     const fetchData = async () => {
+      try {
       const supabase = createClient();
 
-      const [milestonesRes, userMilestonesRes] = await Promise.all([
+      const [milestonesRes, userMilestonesRes, offersCount, funnelsCount, leadsCount] = await Promise.all([
         supabase
           .from("milestones")
           .select("id, title, description, milestone_order, badge_name, icon")
@@ -116,6 +118,18 @@ export function MilestoneTracker({ className }: MilestoneTrackerProps) {
           .from("user_milestones")
           .select("milestone_id, completed, completed_at")
           .eq("user_id", user.id),
+        supabase
+          .from("offers")
+          .select("id", { count: "exact", head: true })
+          .eq("user_id", user.id),
+        supabase
+          .from("funnels")
+          .select("id", { count: "exact", head: true })
+          .eq("user_id", user.id),
+        supabase
+          .from("funnel_leads")
+          .select("id", { count: "exact", head: true })
+          .eq("user_id", user.id),
       ]);
 
       const dbMilestones = milestonesRes.data ?? [];
@@ -123,7 +137,17 @@ export function MilestoneTracker({ className }: MilestoneTrackerProps) {
         dbMilestones.length > 0 ? dbMilestones : FALLBACK_MILESTONES,
       );
       setUserMilestones((userMilestonesRes.data ?? []) as UserMilestone[]);
-      setLoading(false);
+      // Auto-détection des milestones depuis les données réelles
+      setAutoDetectedCounts({
+        offers: offersCount.count ?? 0,
+        funnels: funnelsCount.count ?? 0,
+        leads: leadsCount.count ?? 0,
+      });
+      } catch (err) {
+        console.error("MilestoneTracker: erreur de chargement", err);
+      } finally {
+        setLoading(false);
+      }
     };
 
     fetchData();
@@ -139,6 +163,9 @@ export function MilestoneTracker({ className }: MilestoneTrackerProps) {
   if (profile?.onboarding_completed) autoCompletedTitles.add("Profil complete");
   if (profile?.market_viability_score && profile.market_viability_score > 70)
     autoCompletedTitles.add("Marché validé");
+  if (autoDetectedCounts.offers > 0) autoCompletedTitles.add("Offre créée");
+  if (autoDetectedCounts.funnels > 0) autoCompletedTitles.add("Funnel construit");
+  if (autoDetectedCounts.leads > 0) autoCompletedTitles.add("1er Lead");
 
   const getStatus = (milestone: Milestone, index: number) => {
     if (completedIds.has(milestone.id)) return "completed";

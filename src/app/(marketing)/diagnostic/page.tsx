@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { toast } from "sonner";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -479,7 +480,8 @@ export default function DiagnosticPage() {
         setFunnelScan(data);
       }
     } catch {
-      // silently fail — scan is optional
+      setFunnelScan(null);
+      toast.error("Impossible de scanner ce funnel. Vérifie l'URL et réessaie.");
     } finally {
       setScanLoading(false);
     }
@@ -1108,6 +1110,7 @@ export default function DiagnosticPage() {
             {step < STEPS.length - 1 ? (
               <button
                 onClick={handleNext}
+                disabled={!canNext}
                 className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-accent text-white text-sm font-medium hover:bg-accent/90 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed shadow-[0_0_20px_rgba(52,211,153,0.15)]"
               >
                 Suivant

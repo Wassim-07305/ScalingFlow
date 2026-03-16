@@ -67,7 +67,7 @@ export async function POST(req: NextRequest) {
     await supabase.from("sales_assets").insert({
       user_id: user.id,
       offer_id: null,
-      asset_type: "sales_script",
+      asset_type: "call_analysis",
       title: `Analyse call — ${call_type || "Discovery"} — ${new Date().toLocaleDateString("fr-FR")}`,
       content: JSON.stringify(result),
       ai_raw_response: result,
@@ -76,7 +76,7 @@ export async function POST(req: NextRequest) {
     });
 
     try {
-      await awardXP(user.id, "generation.ads");
+      await awardXP(user.id, "generation.call_analysis");
     } catch {
       /* ignore XP errors */
     }

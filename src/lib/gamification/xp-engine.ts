@@ -24,6 +24,7 @@ const XP_REWARDS: Record<string, number> = {
   "generation.lead_magnet": 30,
   "generation.vault_analysis": 75,
   "generation.business_audit": 75,
+  "generation.call_analysis": 50,
   "validation.offer": 100,
   "community.post": 25,
   "community.comment": 10,
