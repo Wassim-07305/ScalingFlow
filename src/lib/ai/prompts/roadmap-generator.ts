@@ -5,6 +5,7 @@ export interface RoadmapTask {
   related_module: string;
   estimated_minutes: number;
   task_order: number;
+  phase: "hook" | "build" | "deliver" | "scale";
 }
 
 export interface RoadmapResult {
@@ -55,6 +56,7 @@ IMPORTANT : Réponds UNIQUEMENT en JSON valide.`,
 - Ordonne-les par priorité et dépendance
 - Chaque tâche doit avoir un type : "action" (faire quelque chose), "video" (regarder une formation), "review" (analyser/optimiser), "launch" (mettre en ligne)
 - Chaque tâche doit avoir un related_module parmi : "vault", "market", "offer", "brand", "funnel", "ads", "content", "sales", "launch", "scale"
+- Chaque tâche doit avoir une phase parmi : "hook" (marketer), "build" (créer offre/funnel), "deliver" (livrer aux clients), "scale" (optimiser/scaler)
 - Estime le temps en minutes (15-120 min par tâche)
 - Adapte les tâches au niveau de l'utilisateur et à son avancement
 
@@ -67,7 +69,8 @@ Réponds en JSON :
       "task_type": "action",
       "related_module": "market",
       "estimated_minutes": 30,
-      "task_order": 1
+      "task_order": 1,
+      "phase": "hook"
     }
   ],
   "total_estimated_hours": 20,

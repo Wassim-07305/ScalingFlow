@@ -106,17 +106,32 @@ export async function POST(req: NextRequest) {
     // Delete existing tasks for this user (regenerate fresh)
     await supabase.from("tasks").delete().eq("user_id", user.id);
 
-    // Insert new tasks
-    const tasksToInsert = result.tasks.map((task) => ({
-      user_id: user.id,
-      title: task.title,
-      description: task.description,
-      task_type: task.task_type as "action" | "video" | "review" | "launch",
-      related_module: task.related_module,
-      estimated_minutes: task.estimated_minutes,
-      task_order: task.task_order,
-      completed: false,
-    }));
+    // Calculate due_dates based on user's hours/week and task order
+    const hoursPerWeek = profile?.hours_per_week || 10;
+    const minutesPerWeek = hoursPerWeek * 60;
+    const startDate = new Date();
+    let accumulatedMinutes = 0;
+
+    const tasksToInsert = result.tasks.map((task) => {
+      accumulatedMinutes += task.estimated_minutes;
+      const weeksOffset = accumulatedMinutes / minutesPerWeek;
+      const dueDate = new Date(
+        startDate.getTime() + weeksOffset * 7 * 24 * 60 * 60 * 1000,
+      );
+
+      return {
+        user_id: user.id,
+        title: task.title,
+        description: task.description,
+        task_type: task.task_type as "action" | "video" | "review" | "launch",
+        related_module: task.related_module,
+        estimated_minutes: task.estimated_minutes,
+        task_order: task.task_order,
+        phase: task.phase || null,
+        due_date: dueDate.toISOString().split("T")[0],
+        completed: false,
+      };
+    });
 
     const { error: insertError } = await supabase
       .from("tasks")

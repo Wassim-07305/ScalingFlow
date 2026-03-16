@@ -62,6 +62,7 @@ export default function SalesPage() {
   } | null>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [callAnalysisResult, setCallAnalysisResult] = React.useState<Record<string, any> | null>(null);
+  const [callAnalysisTranscript, setCallAnalysisTranscript] = React.useState<string | null>(null);
 
   const activeType = activeTab === "history" ? "discovery" : activeTab;
 
@@ -139,6 +140,9 @@ export default function SalesPage() {
       if (data.asset_type === "call_analysis") {
         setActiveTab("analyzer");
         setCallAnalysisResult(parsed);
+        // Load transcript from metadata if available
+        const meta = data.metadata as { transcript?: string } | null;
+        setCallAnalysisTranscript(meta?.transcript || null);
         toast.success("Analyse de call chargée depuis l'historique");
         return;
       }
@@ -273,7 +277,14 @@ export default function SalesPage() {
       {activeTab === "closing" ? (
         <ClosingScriptGenerator />
       ) : activeTab === "analyzer" ? (
-        <CallAnalyzer initialResult={callAnalysisResult} onResultClear={() => setCallAnalysisResult(null)} />
+        <CallAnalyzer
+          initialResult={callAnalysisResult}
+          initialTranscript={callAnalysisTranscript}
+          onResultClear={() => {
+            setCallAnalysisResult(null);
+            setCallAnalysisTranscript(null);
+          }}
+        />
       ) : activeTab === "metrics" ? (
         <SalesMetrics />
       ) : activeTab === "history" ? (

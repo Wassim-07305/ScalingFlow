@@ -182,8 +182,8 @@ export function PhaseProgression({ className }: PhaseProgressionProps) {
       )
         completed.add("Marché validé");
 
-      // Auto-detect from data (offers, funnels, leads)
-      const [offersRes, funnelsRes, leadsRes] = await Promise.all([
+      // Auto-detect from data (offers, funnels, leads, sales)
+      const [offersRes, funnelsRes, leadsRes, salesRes] = await Promise.all([
         supabase
           .from("offers")
           .select("id", { count: "exact", head: true })
@@ -196,11 +196,17 @@ export function PhaseProgression({ className }: PhaseProgressionProps) {
           .from("funnel_leads")
           .select("id", { count: "exact", head: true })
           .eq("user_id", user.id),
+        supabase
+          .from("funnel_leads")
+          .select("id", { count: "exact", head: true })
+          .eq("user_id", user.id)
+          .eq("status", "converted"),
       ]);
 
       if ((offersRes.count ?? 0) > 0) completed.add("Offre créée");
       if ((funnelsRes.count ?? 0) > 0) completed.add("Funnel construit");
       if ((leadsRes.count ?? 0) > 0) completed.add("1er Lead");
+      if ((salesRes.count ?? 0) > 0) completed.add("1ere Vente");
 
       setCompletedTitles(completed);
       setLoading(false);

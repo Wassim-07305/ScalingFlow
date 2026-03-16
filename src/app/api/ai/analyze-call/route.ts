@@ -83,10 +83,11 @@ export async function POST(req: NextRequest) {
 
     const result = await generateJSON({ prompt, maxTokens: 6000 });
 
-    // Build metadata with enriched data
+    // Build metadata with enriched data (including transcript for history reload)
     const metadata: Record<string, unknown> = {
       original_type: "call_analysis",
       call_type: call_type || "discovery",
+      transcript: transcript.slice(0, 50_000),
     };
     if (recording_url) metadata.recording_url = recording_url;
     if (prospect_origin) metadata.prospect_origin = prospect_origin;

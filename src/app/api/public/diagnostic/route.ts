@@ -1,24 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { generateJSON } from "@/lib/ai/generate";
+import { rateLimitPublic } from "@/lib/utils/rate-limit-public";
 
 export const maxDuration = 60;
 
-// ─── In-memory IP rate limiter (max 3/hour) ──────────────────
-const ipCounts = new Map<string, { count: number; resetAt: number }>();
-
-function checkIPRate(ip: string, limit = 3, windowMs = 3600_000): boolean {
-  const now = Date.now();
-  const entry = ipCounts.get(ip);
-
-  if (!entry || entry.resetAt <= now) {
-    ipCounts.set(ip, { count: 1, resetAt: now + windowMs });
-    return true;
-  }
-
-  if (entry.count >= limit) return false;
-  entry.count++;
-  return true;
-}
+const MAX_FIELD_LENGTH = 2000;
 
 // ─── Diagnostic scoring prompt ───────────────────────────────
 function diagnosticPrompt(data: DiagnosticInput): string {
@@ -108,13 +94,17 @@ interface DiagnosticResult {
 
 export async function POST(req: NextRequest) {
   try {
-    // Rate limit by IP
+    // Rate limit by IP (persistent, survives serverless cold starts)
     const ip =
       req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
       req.headers.get("x-real-ip") ||
       "unknown";
 
-    if (!checkIPRate(ip)) {
+    const rl = await rateLimitPublic(ip, "diagnostic", {
+      limit: 3,
+      windowSeconds: 3600,
+    });
+    if (!rl.allowed) {
       return NextResponse.json(
         { error: "Limite atteinte. Maximum 3 diagnostics par heure." },
         { status: 429 },
@@ -130,6 +120,21 @@ export async function POST(req: NextRequest) {
         { status: 400 },
       );
     }
+
+    // Truncate all text fields to prevent abuse
+    const truncate = (s?: string) => s?.slice(0, MAX_FIELD_LENGTH);
+    body.offer_name = truncate(body.offer_name);
+    body.offer_description = truncate(body.offer_description);
+    body.offer_price = truncate(body.offer_price);
+    body.offer_guarantee = truncate(body.offer_guarantee);
+    body.acquisition_budget = truncate(body.acquisition_budget);
+    body.acquisition_leads_volume = truncate(body.acquisition_leads_volume);
+    body.delivery_method = truncate(body.delivery_method);
+    body.delivery_nb_clients = truncate(body.delivery_nb_clients);
+    body.delivery_satisfaction = truncate(body.delivery_satisfaction);
+    body.funnel_url = truncate(body.funnel_url);
+    body.funnel_headline = truncate(body.funnel_headline);
+    body.funnel_cta = truncate(body.funnel_cta);
 
     const result = await generateJSON<DiagnosticResult>({
       prompt: diagnosticPrompt(body),

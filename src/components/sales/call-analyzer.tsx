@@ -212,15 +212,16 @@ function ScoreRing({
 
 interface CallAnalyzerProps {
   initialResult?: Record<string, unknown> | null;
+  initialTranscript?: string | null;
   onResultClear?: () => void;
 }
 
-export function CallAnalyzer({ initialResult, onResultClear }: CallAnalyzerProps = {}) {
+export function CallAnalyzer({ initialResult, initialTranscript, onResultClear }: CallAnalyzerProps = {}) {
   const [loading, setLoading] = React.useState(false);
   const [result, setResult] = React.useState<CallAnalysisResult | null>(
     (initialResult as unknown as CallAnalysisResult | null) ?? null,
   );
-  const [transcript, setTranscript] = React.useState("");
+  const [transcript, setTranscript] = React.useState(initialTranscript || "");
   const [callType, setCallType] = React.useState("discovery");
   const [recordingUrl, setRecordingUrl] = React.useState("");
   const [prospectOrigin, setProspectOrigin] = React.useState("");
@@ -229,6 +230,7 @@ export function CallAnalyzer({ initialResult, onResultClear }: CallAnalyzerProps
   const [expandedSection, setExpandedSection] = React.useState<string | null>(
     "discovery",
   );
+  const [showTranscript, setShowTranscript] = React.useState(false);
   const [scriptLoading, setScriptLoading] = React.useState(false);
   const [generatedScript, setGeneratedScript] = React.useState<string | null>(
     null,
@@ -241,6 +243,13 @@ export function CallAnalyzer({ initialResult, onResultClear }: CallAnalyzerProps
       setResult(initialResult as unknown as CallAnalysisResult);
     }
   }, [initialResult]);
+
+  // Load transcript from history
+  React.useEffect(() => {
+    if (initialTranscript) {
+      setTranscript(initialTranscript);
+    }
+  }, [initialTranscript]);
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -681,6 +690,40 @@ export function CallAnalyzer({ initialResult, onResultClear }: CallAnalyzerProps
           </div>
         </CardContent>
       </Card>
+
+      {/* Transcript panel — collapsible */}
+      {transcript && (
+        <Card>
+          <CardHeader
+            className="cursor-pointer py-3"
+            onClick={() => setShowTranscript(!showTranscript)}
+          >
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-sm flex items-center gap-2">
+                <FileText className="h-4 w-4 text-accent" />
+                Transcript du call
+                <Badge variant="muted" className="text-[10px]">
+                  {transcript.length.toLocaleString("fr-FR")} car.
+                </Badge>
+              </CardTitle>
+              {showTranscript ? (
+                <ChevronUp className="h-4 w-4 text-text-muted" />
+              ) : (
+                <ChevronDown className="h-4 w-4 text-text-muted" />
+              )}
+            </div>
+          </CardHeader>
+          {showTranscript && (
+            <CardContent className="pt-0">
+              <div className="rounded-xl bg-bg-tertiary border border-border-default/50 p-4 max-h-80 overflow-y-auto">
+                <pre className="text-xs text-text-secondary whitespace-pre-wrap font-sans leading-relaxed">
+                  {transcript}
+                </pre>
+              </div>
+            </CardContent>
+          )}
+        </Card>
+      )}
 
       {/* Detailed scores */}
       {Object.entries(result.scores).map(([key, section]) => (

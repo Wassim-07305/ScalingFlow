@@ -1,24 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { generateJSON } from "@/lib/ai/generate";
+import { rateLimitPublic } from "@/lib/utils/rate-limit-public";
 
 export const maxDuration = 60;
-
-// ─── In-memory IP rate limiter (max 5/hour) ──────────────────
-const ipCounts = new Map<string, { count: number; resetAt: number }>();
-
-function checkIPRate(ip: string, limit = 5, windowMs = 3600_000): boolean {
-  const now = Date.now();
-  const entry = ipCounts.get(ip);
-
-  if (!entry || entry.resetAt <= now) {
-    ipCounts.set(ip, { count: 1, resetAt: now + windowMs });
-    return true;
-  }
-
-  if (entry.count >= limit) return false;
-  entry.count++;
-  return true;
-}
 
 // ─── Funnel scanning prompt ──────────────────────────────────
 function funnelScanPrompt(html: string, url: string): string {
@@ -96,13 +80,17 @@ interface FunnelScanResult {
 
 export async function POST(req: NextRequest) {
   try {
-    // Rate limit by IP
+    // Rate limit by IP (persistent, survives serverless cold starts)
     const ip =
       req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
       req.headers.get("x-real-ip") ||
       "unknown";
 
-    if (!checkIPRate(ip)) {
+    const rl = await rateLimitPublic(ip, "scan-funnel", {
+      limit: 5,
+      windowSeconds: 3600,
+    });
+    if (!rl.allowed) {
       return NextResponse.json(
         { error: "Limite atteinte. Maximum 5 scans par heure." },
         { status: 429 },
