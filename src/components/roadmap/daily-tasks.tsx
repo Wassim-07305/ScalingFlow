@@ -83,7 +83,8 @@ export function DailyTasks({ className, refreshKey }: DailyTasksProps) {
     const task = tasks.find((t) => t.id === taskId);
     if (!task) return;
 
-    const newCompleted = !task.completed;
+    // Only allow completing, not un-completing (prevents XP farming)
+    if (task.completed) return;
 
     // Mise à jour optimiste
     setTasks((prev) =>
@@ -91,8 +92,8 @@ export function DailyTasks({ className, refreshKey }: DailyTasksProps) {
         t.id === taskId
           ? {
               ...t,
-              completed: newCompleted,
-              completed_at: newCompleted ? new Date().toISOString() : null,
+              completed: true,
+              completed_at: new Date().toISOString(),
             }
           : t,
       ),
@@ -101,8 +102,8 @@ export function DailyTasks({ className, refreshKey }: DailyTasksProps) {
     const { error } = await supabase
       .from("tasks")
       .update({
-        completed: newCompleted,
-        completed_at: newCompleted ? new Date().toISOString() : null,
+        completed: true,
+        completed_at: new Date().toISOString(),
       })
       .eq("id", taskId);
 
@@ -120,15 +121,17 @@ export function DailyTasks({ className, refreshKey }: DailyTasksProps) {
         ),
       );
       toast.error("Impossible de mettre à jour la tâche");
-    } else if (newCompleted) {
+    } else {
       // Award XP when task is completed
       try {
-        await fetch("/api/gamification/award", {
+        const res = await fetch("/api/gamification/award", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ activityType: "streak.daily" }),
+          body: JSON.stringify({ activityType: "task.completed" }),
         });
-        toast.success("+15 XP — Tâche complétée !");
+        if (res.ok) {
+          toast.success("+20 XP — Tâche complétée !");
+        }
       } catch {
         // XP award is non-blocking
       }

@@ -9,6 +9,7 @@ const ALLOWED_ACTIVITIES = [
   "community.comment",
   "onboarding.completed",
   "streak.daily",
+  "task.completed",
   "challenge.completed",
   "quiz.completed",
 ] as const;

@@ -17,6 +17,7 @@ import {
   Rocket,
 } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
+import { toast } from "sonner";
 import Link from "next/link";
 
 interface Task {
@@ -73,8 +74,25 @@ export function NextTasks() {
 
   const toggleTask = async (taskId: string) => {
     const supabase = createClient();
-    await supabase.from("tasks").update({ completed: true }).eq("id", taskId);
+    await supabase
+      .from("tasks")
+      .update({ completed: true, completed_at: new Date().toISOString() })
+      .eq("id", taskId);
     setTasks((prev) => prev.filter((t) => t.id !== taskId));
+
+    // Award XP
+    try {
+      const res = await fetch("/api/gamification/award", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ activityType: "task.completed" }),
+      });
+      if (res.ok) {
+        toast.success("+20 XP — Tâche complétée !");
+      }
+    } catch {
+      // XP award is non-blocking
+    }
   };
 
   return (

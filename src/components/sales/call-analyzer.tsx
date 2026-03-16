@@ -210,9 +210,16 @@ function ScoreRing({
   );
 }
 
-export function CallAnalyzer() {
+interface CallAnalyzerProps {
+  initialResult?: Record<string, unknown> | null;
+  onResultClear?: () => void;
+}
+
+export function CallAnalyzer({ initialResult, onResultClear }: CallAnalyzerProps = {}) {
   const [loading, setLoading] = React.useState(false);
-  const [result, setResult] = React.useState<CallAnalysisResult | null>(null);
+  const [result, setResult] = React.useState<CallAnalysisResult | null>(
+    (initialResult as unknown as CallAnalysisResult | null) ?? null,
+  );
   const [transcript, setTranscript] = React.useState("");
   const [callType, setCallType] = React.useState("discovery");
   const [recordingUrl, setRecordingUrl] = React.useState("");
@@ -227,6 +234,13 @@ export function CallAnalyzer() {
     null,
   );
   const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+  // Load result from history
+  React.useEffect(() => {
+    if (initialResult) {
+      setResult(initialResult as unknown as CallAnalysisResult);
+    }
+  }, [initialResult]);
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -618,6 +632,7 @@ export function CallAnalyzer() {
                 setResult(null);
                 setTranscript("");
                 setGeneratedScript(null);
+                onResultClear?.();
               }}
               className="shrink-0"
             >

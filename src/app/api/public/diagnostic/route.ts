@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { generateJSON } from "@/lib/ai/generate";
 
+export const maxDuration = 60;
+
 // ─── In-memory IP rate limiter (max 3/hour) ──────────────────
 const ipCounts = new Map<string, { count: number; resetAt: number }>();
 

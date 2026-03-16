@@ -60,6 +60,8 @@ export default function SalesPage() {
     currentUsage: number;
     limit: number;
   } | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [callAnalysisResult, setCallAnalysisResult] = React.useState<Record<string, any> | null>(null);
 
   const activeType = activeTab === "history" ? "discovery" : activeTab;
 
@@ -111,7 +113,7 @@ export default function SalesPage() {
         .single();
 
       if (error || !data) {
-        toast.error("Impossible de charger ce script");
+        toast.error("Impossible de charger cet élément");
         return;
       }
 
@@ -129,7 +131,15 @@ export default function SalesPage() {
       }
 
       if (!parsed) {
-        toast.error("Contenu du script introuvable");
+        toast.error("Contenu introuvable");
+        return;
+      }
+
+      // Route vers le bon onglet selon le type
+      if (data.asset_type === "call_analysis") {
+        setActiveTab("analyzer");
+        setCallAnalysisResult(parsed);
+        toast.success("Analyse de call chargée depuis l'historique");
         return;
       }
 
@@ -263,7 +273,7 @@ export default function SalesPage() {
       {activeTab === "closing" ? (
         <ClosingScriptGenerator />
       ) : activeTab === "analyzer" ? (
-        <CallAnalyzer />
+        <CallAnalyzer initialResult={callAnalysisResult} onResultClear={() => setCallAnalysisResult(null)} />
       ) : activeTab === "metrics" ? (
         <SalesMetrics />
       ) : activeTab === "history" ? (
@@ -272,8 +282,8 @@ export default function SalesPage() {
           titleField="title"
           subtitleField="asset_type"
           statusField="status"
-          filters={{ asset_type: "sales_script" }}
-          emptyMessage="Aucun script de vente généré pour le moment."
+          filters={{ asset_type: ["sales_script", "call_analysis"] }}
+          emptyMessage="Aucun script ou analyse généré pour le moment."
           onSelect={handleHistorySelect}
         />
       ) : (

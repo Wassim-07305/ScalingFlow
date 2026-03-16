@@ -11,6 +11,8 @@ import { notifyGeneration } from "@/lib/notifications/create";
 import { buildFullVaultContext } from "@/lib/ai/vault-context";
 import { rateLimit } from "@/lib/utils/rate-limit";
 
+export const maxDuration = 60;
+
 export async function POST(req: NextRequest) {
   try {
     const supabase = await createClient();
@@ -129,10 +131,10 @@ export async function POST(req: NextRequest) {
 
     // Award XP (non-blocking)
     try {
-      await awardXP(user.id, "milestone.completed");
+      await awardXP(user.id, "generation.roadmap");
     } catch {}
     try {
-      await notifyGeneration(user.id, "milestone.completed");
+      await notifyGeneration(user.id, "generation.roadmap");
     } catch {}
 
     return NextResponse.json({

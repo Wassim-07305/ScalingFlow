@@ -184,8 +184,12 @@ export function DailyActions({ className }: { className?: string }) {
     async (actionId: string) => {
       if (!user) return;
 
+      const currentAction = plan.actions.find((a) => a.id === actionId);
+      // Only allow completing, not un-completing (prevents XP farming)
+      if (!currentAction || currentAction.completed) return;
+
       const updatedActions = plan.actions.map((a) =>
-        a.id === actionId ? { ...a, completed: !a.completed } : a,
+        a.id === actionId ? { ...a, completed: true } : a,
       );
       const updatedPlan = { ...plan, actions: updatedActions };
       setPlan(updatedPlan);
@@ -198,9 +202,18 @@ export function DailyActions({ className }: { className?: string }) {
           .eq("id", plan.id);
       }
 
-      const action = updatedActions.find((a) => a.id === actionId);
-      if (action?.completed) {
-        toast.success(`+${action.xp_reward} XP — ${action.title}`);
+      // Award real XP via API
+      try {
+        const res = await fetch("/api/gamification/award", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ activityType: "task.completed" }),
+        });
+        if (res.ok) {
+          toast.success(`+${currentAction.xp_reward} XP — ${currentAction.title}`);
+        }
+      } catch {
+        toast.success(`+${currentAction.xp_reward} XP — ${currentAction.title}`);
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
     },

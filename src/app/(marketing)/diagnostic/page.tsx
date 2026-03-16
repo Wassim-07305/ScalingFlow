@@ -41,6 +41,8 @@ interface DiagnosticForm {
   funnel_url: string;
   funnel_headline: string;
   funnel_cta: string;
+  // Contact
+  email: string;
 }
 
 interface DiagnosticResult {
@@ -418,6 +420,7 @@ export default function DiagnosticPage() {
     funnel_url: "",
     funnel_headline: "",
     funnel_cta: "",
+    email: "",
   });
 
   const updateField = <K extends keyof DiagnosticForm>(
@@ -478,6 +481,9 @@ export default function DiagnosticPage() {
       if (res.ok) {
         const data: FunnelScanResult = await res.json();
         setFunnelScan(data);
+      } else {
+        setFunnelScan(null);
+        toast.error("Impossible de scanner ce funnel. Vérifie l'URL et réessaie.");
       }
     } catch {
       setFunnelScan(null);
@@ -729,7 +735,7 @@ export default function DiagnosticPage() {
                 gratuitement.
               </p>
               <Link
-                href="/register"
+                href={form.email ? `/register?email=${encodeURIComponent(form.email)}` : "/register"}
                 className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl bg-accent text-white font-semibold hover:bg-accent/90 transition-all duration-200 shadow-[0_0_32px_rgba(52,211,153,0.2)] hover:shadow-[0_0_48px_rgba(52,211,153,0.3)] mt-5"
               >
                 Créer mon compte gratuitement
@@ -1068,6 +1074,15 @@ export default function DiagnosticPage() {
                   value={form.funnel_cta}
                   onChange={(e) => updateField("funnel_cta", e.target.value)}
                   placeholder="Ex : Réserve ton appel stratégique"
+                  className="form-input"
+                />
+              </FieldGroup>
+              <FieldGroup label="Ton email (pour recevoir les résultats)">
+                <input
+                  type="email"
+                  value={form.email}
+                  onChange={(e) => updateField("email", e.target.value)}
+                  placeholder="Ex : tim@business.com"
                   className="form-input"
                 />
               </FieldGroup>

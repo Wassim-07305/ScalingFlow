@@ -97,6 +97,21 @@ export default function RoadmapPage() {
   const [priorities, setPriorities] = React.useState("");
 
   const handleGenerate = async () => {
+    // Check if tasks already exist and confirm before regenerating
+    if (user) {
+      const supabase = createClient();
+      const { count } = await supabase
+        .from("tasks")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", user.id);
+
+      if ((count ?? 0) > 0) {
+        const confirmed = window.confirm(
+          "Régénérer la roadmap supprimera toutes tes tâches actuelles (y compris celles complétées). Continuer ?",
+        );
+        if (!confirmed) return;
+      }
+    }
     setGenerating(true);
     try {
       const res = await fetch("/api/ai/generate-roadmap", {
