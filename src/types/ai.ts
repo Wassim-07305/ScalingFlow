@@ -147,4 +147,7 @@ export interface SchwartzAnalysisResult {
   angle_publicitaire: string;
   type_contenu_prioritaire: string;
   niveau_preuve_requis: "faible" | "moyen" | "eleve" | "tres_eleve";
+  schwartz_pricing_reco?: string;
+  social_content_reco?: string;
+  vsl_style_reco?: string;
 }

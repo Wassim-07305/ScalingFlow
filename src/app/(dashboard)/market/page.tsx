@@ -557,10 +557,77 @@ export default function MarketPage() {
                       </div>
                     )}
 
+                    {/* Scoring composite */}
+                    {aiData &&
+                      typeof aiData === "object" &&
+                      "scoring_composite" in aiData &&
+                      aiData.scoring_composite ? (
+                        <div>
+                          <h4 className="text-sm font-medium text-text-muted mb-2 flex items-center gap-1.5">
+                            <BarChart3 className="h-3.5 w-3.5" />
+                            Scoring détaillé
+                          </h4>
+                          <div className="grid grid-cols-3 gap-3">
+                            {(["attractivite", "concurrence", "potentiel"] as const).map((key) => {
+                              const labels: Record<string, string> = {
+                                attractivite: "Attractivité",
+                                concurrence: "Concurrence",
+                                potentiel: "Potentiel",
+                              };
+                              const sc = aiData.scoring_composite as Record<string, number>;
+                              const val = sc[key] ?? 0;
+                              return (
+                                <div key={key} className="space-y-1">
+                                  <div className="flex items-center justify-between">
+                                    <span className="text-xs text-text-muted">{labels[key]}</span>
+                                    <span className="text-xs font-semibold text-text-primary">{val}/100</span>
+                                  </div>
+                                  <div className="h-1.5 rounded-full bg-bg-tertiary overflow-hidden">
+                                    <div
+                                      className={cn(
+                                        "h-full rounded-full transition-all",
+                                        val >= 70 ? "bg-accent" : val >= 50 ? "bg-yellow-500" : "bg-red-500"
+                                      )}
+                                      style={{ width: `${val}%` }}
+                                    />
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      ) : null}
+
+                    {/* Schwartz recommendations */}
+                    {aiData &&
+                      typeof aiData === "object" &&
+                      "schwartz_level" in aiData ? (
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                          {aiData.schwartz_pricing_reco ? (
+                            <div className="p-3 rounded-lg bg-bg-tertiary/50 border border-border-default">
+                              <h5 className="text-xs font-medium text-accent mb-1">Pricing Schwartz</h5>
+                              <p className="text-xs text-text-secondary">{String(aiData.schwartz_pricing_reco)}</p>
+                            </div>
+                          ) : null}
+                          {aiData.social_content_reco ? (
+                            <div className="p-3 rounded-lg bg-bg-tertiary/50 border border-border-default">
+                              <h5 className="text-xs font-medium text-accent mb-1">Contenu social</h5>
+                              <p className="text-xs text-text-secondary">{String(aiData.social_content_reco)}</p>
+                            </div>
+                          ) : null}
+                          {aiData.vsl_style_reco ? (
+                            <div className="p-3 rounded-lg bg-bg-tertiary/50 border border-border-default">
+                              <h5 className="text-xs font-medium text-accent mb-1">Style VSL</h5>
+                              <p className="text-xs text-text-secondary">{String(aiData.vsl_style_reco)}</p>
+                            </div>
+                          ) : null}
+                        </div>
+                      ) : null}
+
                     {/* Why good fit */}
                     {aiData &&
                       typeof aiData === "object" &&
-                      "why_good_fit" in aiData && (
+                      "why_good_fit" in aiData ? (
                         <div>
                           <h4 className="text-sm font-medium text-text-muted mb-1">
                             Pourquoi ce marché est adapté
@@ -569,7 +636,7 @@ export default function MarketPage() {
                             {aiData.why_good_fit as string}
                           </p>
                         </div>
-                      )}
+                      ) : null}
                   </CardContent>
                 )}
               </Card>

@@ -279,9 +279,9 @@ export function CarouselGenerator({ className, initialData }: CarouselGeneratorP
                   <div className="flex items-center gap-2 mb-1">
                     <Zap className="h-4 w-4 text-yellow-400" />
                     <span className="text-sm font-semibold text-text-primary">Pack complet</span>
-                    <Badge variant="default" className="text-[10px] bg-gradient-to-r from-accent to-emerald-400 text-white">40+ carousels</Badge>
+                    <Badge variant="default" className="text-[10px] bg-gradient-to-r from-accent to-emerald-400 text-white">10+ carousels</Badge>
                   </div>
-                  <p className="text-xs text-text-muted">10+ sujets variés = 40+ carousels prêts à poster</p>
+                  <p className="text-xs text-text-muted">10+ sujets variés = 10+ carousels prêts à poster</p>
                 </button>
               </div>
             </div>

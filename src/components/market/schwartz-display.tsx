@@ -150,14 +150,41 @@ export function SchwartzDisplay({ analysis }: SchwartzDisplayProps) {
             {analysis.niveau_preuve_requis === "faible" &&
               "Le prospect est réceptif, une preuve légère suffit."}
             {analysis.niveau_preuve_requis === "moyen" &&
-              "Necessite des témoignages et etudes de cas."}
+              "Nécessite des témoignages et études de cas."}
             {analysis.niveau_preuve_requis === "eleve" &&
-              "Preuve sociale massive, chiffres precis, garanties fortes."}
+              "Preuve sociale massive, chiffres précis, garanties fortes."}
             {analysis.niveau_preuve_requis === "tres_eleve" &&
-              "Preuves extremes, video témoignages, résultats verificables."}
+              "Preuves extrêmes, vidéo témoignages, résultats vérifiables."}
           </p>
         </CardContent>
       </Card>
+
+      {/* Recommandations Schwartz */}
+      {(analysis.schwartz_pricing_reco || analysis.social_content_reco || analysis.vsl_style_reco) && (
+        <div className="grid gap-4 md:grid-cols-3">
+          {analysis.schwartz_pricing_reco && (
+            <InfoCard icon={Target} title="Pricing recommandé">
+              <p className="text-sm text-text-secondary leading-relaxed">
+                {analysis.schwartz_pricing_reco}
+              </p>
+            </InfoCard>
+          )}
+          {analysis.social_content_reco && (
+            <InfoCard icon={FileText} title="Contenu social recommandé">
+              <p className="text-sm text-text-secondary leading-relaxed">
+                {analysis.social_content_reco}
+              </p>
+            </InfoCard>
+          )}
+          {analysis.vsl_style_reco && (
+            <InfoCard icon={Megaphone} title="Style VSL recommandé">
+              <p className="text-sm text-text-secondary leading-relaxed">
+                {analysis.vsl_style_reco}
+              </p>
+            </InfoCard>
+          )}
+        </div>
+      )}
     </div>
   );
 }
