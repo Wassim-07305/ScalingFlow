@@ -88,8 +88,13 @@ export async function sendConversionEvent(
   userData: CAPIUserData,
   customData?: CAPICustomData,
   sourceUrl?: string,
-  eventId?: string
-): Promise<{ success: boolean; events_received?: number; event_id?: string; error?: string }> {
+  eventId?: string,
+): Promise<{
+  success: boolean;
+  events_received?: number;
+  event_id?: string;
+  error?: string;
+}> {
   try {
     // F54 — event_id pour la déduplication pixel/CAPI
     const dedupEventId = eventId || generateEventId();
@@ -111,7 +116,8 @@ export async function sendConversionEvent(
       if (customData.value !== undefined) cd.value = customData.value;
       if (customData.currency) cd.currency = customData.currency;
       if (customData.content_name) cd.content_name = customData.content_name;
-      if (customData.content_category) cd.content_category = customData.content_category;
+      if (customData.content_category)
+        cd.content_category = customData.content_category;
       if (Object.keys(cd).length > 0) {
         eventPayload.custom_data = cd;
       }
@@ -128,7 +134,7 @@ export async function sendConversionEvent(
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
-      }
+      },
     );
 
     const result = await response.json();
@@ -160,7 +166,7 @@ export async function sendConversionEvent(
 export async function getMetaPixelConfig(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   supabase: any,
-  userId: string
+  userId: string,
 ): Promise<{ pixelId: string; accessToken: string } | null> {
   const { data: account } = await supabase
     .from("connected_accounts")
@@ -198,7 +204,7 @@ export async function sendCAPIIfConfigured(
   userData: CAPIUserData,
   customData?: CAPICustomData,
   sourceUrl?: string,
-  eventId?: string
+  eventId?: string,
 ): Promise<void> {
   try {
     const config = await getMetaPixelConfig(supabase, userId);
@@ -211,13 +217,19 @@ export async function sendCAPIIfConfigured(
       userData,
       customData,
       sourceUrl,
-      eventId
+      eventId,
     );
 
     if (!result.success) {
-      console.warn(`[meta-capi] Échec envoi ${eventName} pour user ${userId}:`, result.error);
+      console.warn(
+        `[meta-capi] Échec envoi ${eventName} pour user ${userId}:`,
+        result.error,
+      );
     }
   } catch (error) {
-    console.warn(`[meta-capi] Exception non-bloquante pour ${eventName}:`, error);
+    console.warn(
+      `[meta-capi] Exception non-bloquante pour ${eventName}:`,
+      error,
+    );
   }
 }

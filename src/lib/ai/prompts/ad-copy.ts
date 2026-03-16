@@ -5,20 +5,50 @@ export type MassiveAdBatch =
   | "hooks_controverses"
   | "storytelling";
 
-export const MASSIVE_BATCHES: { key: MassiveAdBatch; label: string; description: string }[] = [
-  { key: "cold_audience", label: "Cold Audience (Intérêt)", description: "15 variations pour audience froide — ciblage par centres d'intérêt" },
-  { key: "warm_audience", label: "Warm Audience (Engagers)", description: "15 variations pour audience tiède — personnes ayant déjà interagi" },
-  { key: "hot_audience", label: "Hot Audience (Opt-ins)", description: "15 variations pour audience chaude — leads et opt-ins existants" },
-  { key: "hooks_controverses", label: "Hooks Controversés", description: "15 variations avec des hooks provocants et pattern interrupt" },
-  { key: "storytelling", label: "Storytelling", description: "15 variations narratives avec des histoires engageantes" },
+export const MASSIVE_BATCHES: {
+  key: MassiveAdBatch;
+  label: string;
+  description: string;
+}[] = [
+  {
+    key: "cold_audience",
+    label: "Cold Audience (Intérêt)",
+    description:
+      "15 variations pour audience froide — ciblage par centres d'intérêt",
+  },
+  {
+    key: "warm_audience",
+    label: "Warm Audience (Engagers)",
+    description:
+      "15 variations pour audience tiède — personnes ayant déjà interagi",
+  },
+  {
+    key: "hot_audience",
+    label: "Hot Audience (Opt-ins)",
+    description:
+      "15 variations pour audience chaude — leads et opt-ins existants",
+  },
+  {
+    key: "hooks_controverses",
+    label: "Hooks Controversés",
+    description: "15 variations avec des hooks provocants et pattern interrupt",
+  },
+  {
+    key: "storytelling",
+    label: "Storytelling",
+    description: "15 variations narratives avec des histoires engageantes",
+  },
 ];
 
-function buildOfferContext(offer: {
-  offer_name: string;
-  positioning: string;
-  unique_mechanism: string;
-  pricing: { real_price: number };
-}, avatar: Record<string, unknown>): string {
+function buildOfferContext(
+  offer: {
+    offer_name: string;
+    positioning: string;
+    unique_mechanism: string;
+    pricing: { real_price: number };
+  },
+  avatar: Record<string, unknown>,
+): string {
   return `## Contexte de l'offre
 - **Nom de l'offre** : ${offer.offer_name}
 - **Positionnement** : ${offer.positioning}
@@ -63,7 +93,7 @@ export function adCopyPrompt(
       real_price: number;
     };
   },
-  avatar: Record<string, unknown>
+  avatar: Record<string, unknown>,
 ): string {
   return `Tu es un expert en publicité digitale (Meta Ads, Google Ads) pour les freelances et consultants dans le domaine de l'IA et de l'automatisation.
 
@@ -104,7 +134,7 @@ export function adCopyMassivePrompt(
     pricing: { real_price: number };
   },
   avatar: Record<string, unknown>,
-  batch: MassiveAdBatch
+  batch: MassiveAdBatch,
 ): string {
   const batchInstructions: Record<MassiveAdBatch, string> = {
     cold_audience: `## Ta mission — COLD AUDIENCE (ciblage par intérêts)

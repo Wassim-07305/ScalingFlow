@@ -63,13 +63,55 @@ interface ComputedMetrics {
 
 // ─── Demo data ───────────────────────────────────────────────
 const DEMO_ENTRIES: LTVCACEntry[] = [
-  { date: "2025-09", avgDealValue: 997, monthlyChurnRate: 0.08, monthlyAdSpend: 3200, newCustomers: 8 },
-  { date: "2025-10", avgDealValue: 997, monthlyChurnRate: 0.07, monthlyAdSpend: 3500, newCustomers: 10 },
-  { date: "2025-11", avgDealValue: 1497, monthlyChurnRate: 0.06, monthlyAdSpend: 4000, newCustomers: 11 },
-  { date: "2025-12", avgDealValue: 1497, monthlyChurnRate: 0.06, monthlyAdSpend: 4200, newCustomers: 13 },
-  { date: "2026-01", avgDealValue: 1997, monthlyChurnRate: 0.05, monthlyAdSpend: 4500, newCustomers: 14 },
-  { date: "2026-02", avgDealValue: 1997, monthlyChurnRate: 0.05, monthlyAdSpend: 5000, newCustomers: 16 },
-  { date: "2026-03", avgDealValue: 2497, monthlyChurnRate: 0.04, monthlyAdSpend: 5500, newCustomers: 18 },
+  {
+    date: "2025-09",
+    avgDealValue: 997,
+    monthlyChurnRate: 0.08,
+    monthlyAdSpend: 3200,
+    newCustomers: 8,
+  },
+  {
+    date: "2025-10",
+    avgDealValue: 997,
+    monthlyChurnRate: 0.07,
+    monthlyAdSpend: 3500,
+    newCustomers: 10,
+  },
+  {
+    date: "2025-11",
+    avgDealValue: 1497,
+    monthlyChurnRate: 0.06,
+    monthlyAdSpend: 4000,
+    newCustomers: 11,
+  },
+  {
+    date: "2025-12",
+    avgDealValue: 1497,
+    monthlyChurnRate: 0.06,
+    monthlyAdSpend: 4200,
+    newCustomers: 13,
+  },
+  {
+    date: "2026-01",
+    avgDealValue: 1997,
+    monthlyChurnRate: 0.05,
+    monthlyAdSpend: 4500,
+    newCustomers: 14,
+  },
+  {
+    date: "2026-02",
+    avgDealValue: 1997,
+    monthlyChurnRate: 0.05,
+    monthlyAdSpend: 5000,
+    newCustomers: 16,
+  },
+  {
+    date: "2026-03",
+    avgDealValue: 2497,
+    monthlyChurnRate: 0.04,
+    monthlyAdSpend: 5500,
+    newCustomers: 18,
+  },
 ];
 
 // ─── Supabase helpers ────────────────────────────────────────
@@ -77,7 +119,9 @@ async function loadEntriesFromDB(userId: string): Promise<LTVCACEntry[]> {
   const supabase = createClient();
   const { data } = await supabase
     .from("ltv_cac_entries")
-    .select("date, avg_deal_value, monthly_churn_rate, monthly_ad_spend, new_customers")
+    .select(
+      "date, avg_deal_value, monthly_churn_rate, monthly_ad_spend, new_customers",
+    )
     .eq("user_id", userId)
     .order("date", { ascending: true });
   if (!data || data.length === 0) return [];
@@ -102,7 +146,7 @@ async function upsertEntryToDB(userId: string, entry: LTVCACEntry) {
       monthly_ad_spend: entry.monthlyAdSpend,
       new_customers: entry.newCustomers,
     },
-    { onConflict: "user_id,date" }
+    { onConflict: "user_id,date" },
   );
 }
 
@@ -113,11 +157,16 @@ async function clearEntriesFromDB(userId: string) {
 
 // ─── Compute metrics ─────────────────────────────────────────
 function computeMetrics(entry: LTVCACEntry): ComputedMetrics {
-  const ltv = entry.monthlyChurnRate > 0 ? entry.avgDealValue / entry.monthlyChurnRate : entry.avgDealValue * 24;
-  const cac = entry.newCustomers > 0 ? entry.monthlyAdSpend / entry.newCustomers : 0;
+  const ltv =
+    entry.monthlyChurnRate > 0
+      ? entry.avgDealValue / entry.monthlyChurnRate
+      : entry.avgDealValue * 24;
+  const cac =
+    entry.newCustomers > 0 ? entry.monthlyAdSpend / entry.newCustomers : 0;
   const ratio = cac > 0 ? ltv / cac : 0;
   const monthlyRevenuePerCustomer = entry.avgDealValue;
-  const paybackMonths = monthlyRevenuePerCustomer > 0 ? cac / monthlyRevenuePerCustomer : 0;
+  const paybackMonths =
+    monthlyRevenuePerCustomer > 0 ? cac / monthlyRevenuePerCustomer : 0;
 
   return { ltv, cac, ratio, paybackMonths, monthlyRevenuePerCustomer };
 }
@@ -194,7 +243,7 @@ function RatioGauge({ ratio }: { ratio: number }) {
         <span
           className={cn(
             "text-3xl font-bold",
-            isGood ? "text-accent" : isOk ? "text-warning" : "text-danger"
+            isGood ? "text-accent" : isOk ? "text-warning" : "text-danger",
           )}
         >
           {ratio.toFixed(1)}:1
@@ -238,8 +287,8 @@ export function LTVCACTracker() {
     if (!user) return;
     const updated = isDemo
       ? [formData]
-      : [...entries.filter((e) => e.date !== formData.date), formData].sort((a, b) =>
-          a.date.localeCompare(b.date)
+      : [...entries.filter((e) => e.date !== formData.date), formData].sort(
+          (a, b) => a.date.localeCompare(b.date),
         );
     setEntries(updated);
     setIsDemo(false);
@@ -322,7 +371,9 @@ export function LTVCACTracker() {
           {/* LTV */}
           <Card className="p-4">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-text-secondary text-xs font-medium">LTV</span>
+              <span className="text-text-secondary text-xs font-medium">
+                LTV
+              </span>
               <DollarSign className="h-4 w-4 text-text-muted" />
             </div>
             <div className="text-xl font-bold text-text-primary">
@@ -340,10 +391,12 @@ export function LTVCACTracker() {
                     "text-xs font-medium",
                     trend(currentMetrics.ltv, previousMetrics.ltv) >= 0
                       ? "text-accent"
-                      : "text-danger"
+                      : "text-danger",
                   )}
                 >
-                  {trend(currentMetrics.ltv, previousMetrics.ltv) >= 0 ? "+" : ""}
+                  {trend(currentMetrics.ltv, previousMetrics.ltv) >= 0
+                    ? "+"
+                    : ""}
                   {trend(currentMetrics.ltv, previousMetrics.ltv).toFixed(1)}%
                 </span>
               </div>
@@ -353,7 +406,9 @@ export function LTVCACTracker() {
           {/* CAC */}
           <Card className="p-4">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-text-secondary text-xs font-medium">CAC</span>
+              <span className="text-text-secondary text-xs font-medium">
+                CAC
+              </span>
               <Target className="h-4 w-4 text-text-muted" />
             </div>
             <div className="text-xl font-bold text-text-primary">
@@ -372,10 +427,12 @@ export function LTVCACTracker() {
                     "text-xs font-medium",
                     trend(currentMetrics.cac, previousMetrics.cac) <= 0
                       ? "text-accent"
-                      : "text-danger"
+                      : "text-danger",
                   )}
                 >
-                  {trend(currentMetrics.cac, previousMetrics.cac) >= 0 ? "+" : ""}
+                  {trend(currentMetrics.cac, previousMetrics.cac) >= 0
+                    ? "+"
+                    : ""}
                   {trend(currentMetrics.cac, previousMetrics.cac).toFixed(1)}%
                 </span>
               </div>
@@ -384,14 +441,18 @@ export function LTVCACTracker() {
 
           {/* LTV:CAC Ratio - center gauge */}
           <Card className="p-4 md:col-span-1 flex flex-col items-center justify-center">
-            <span className="text-text-secondary text-xs font-medium mb-2">Ratio LTV:CAC</span>
+            <span className="text-text-secondary text-xs font-medium mb-2">
+              Ratio LTV:CAC
+            </span>
             <RatioGauge ratio={currentMetrics.ratio} />
           </Card>
 
           {/* Payback Period */}
           <Card className="p-4">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-text-secondary text-xs font-medium">Payback</span>
+              <span className="text-text-secondary text-xs font-medium">
+                Payback
+              </span>
               <Clock className="h-4 w-4 text-text-muted" />
             </div>
             <div className="text-xl font-bold text-text-primary">
@@ -403,15 +464,15 @@ export function LTVCACTracker() {
                   currentMetrics.paybackMonths <= 3
                     ? "default"
                     : currentMetrics.paybackMonths <= 6
-                    ? "yellow"
-                    : "red"
+                      ? "yellow"
+                      : "red"
                 }
               >
                 {currentMetrics.paybackMonths <= 3
                   ? "Rapide"
                   : currentMetrics.paybackMonths <= 6
-                  ? "Moyen"
-                  : "Lent"}
+                    ? "Moyen"
+                    : "Lent"}
               </Badge>
             </div>
           </Card>
@@ -419,7 +480,9 @@ export function LTVCACTracker() {
           {/* Customers */}
           <Card className="p-4">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-text-secondary text-xs font-medium">Nv. clients/mois</span>
+              <span className="text-text-secondary text-xs font-medium">
+                Nv. clients/mois
+              </span>
               <Users className="h-4 w-4 text-text-muted" />
             </div>
             <div className="text-xl font-bold text-text-primary">
@@ -427,7 +490,8 @@ export function LTVCACTracker() {
             </div>
             {previousMetrics && entries.length >= 2 && (
               <div className="flex items-center gap-1 mt-1">
-                {entries[entries.length - 1].newCustomers >= entries[entries.length - 2].newCustomers ? (
+                {entries[entries.length - 1].newCustomers >=
+                entries[entries.length - 2].newCustomers ? (
                   <TrendingUp className="h-3 w-3 text-accent" />
                 ) : (
                   <AlertTriangle className="h-3 w-3 text-danger" />
@@ -435,13 +499,19 @@ export function LTVCACTracker() {
                 <span
                   className={cn(
                     "text-xs font-medium",
-                    entries[entries.length - 1].newCustomers >= entries[entries.length - 2].newCustomers
+                    entries[entries.length - 1].newCustomers >=
+                      entries[entries.length - 2].newCustomers
                       ? "text-accent"
-                      : "text-danger"
+                      : "text-danger",
                   )}
                 >
-                  {entries[entries.length - 1].newCustomers - entries[entries.length - 2].newCustomers >= 0 ? "+" : ""}
-                  {entries[entries.length - 1].newCustomers - entries[entries.length - 2].newCustomers}
+                  {entries[entries.length - 1].newCustomers -
+                    entries[entries.length - 2].newCustomers >=
+                  0
+                    ? "+"
+                    : ""}
+                  {entries[entries.length - 1].newCustomers -
+                    entries[entries.length - 2].newCustomers}
                 </span>
               </div>
             )}
@@ -469,13 +539,15 @@ export function LTVCACTracker() {
                   <AlertTriangle className="h-5 w-5 text-danger shrink-0 mt-0.5" />
                 )}
                 <div>
-                  <h4 className="text-sm font-medium text-text-primary">Ratio LTV:CAC</h4>
+                  <h4 className="text-sm font-medium text-text-primary">
+                    Ratio LTV:CAC
+                  </h4>
                   <p className="text-xs text-text-secondary mt-1">
                     {currentMetrics.ratio >= 3
                       ? "Ton ratio est sain (>3:1). Tu peux investir davantage en acquisition."
                       : currentMetrics.ratio >= 2
-                      ? "Ton ratio est correct mais peut être amélioré. Optimise ton funnel ou augmente ta LTV."
-                      : "Ratio critique (<2:1). Réduis ton CAC ou augmente ta LTV en priorité."}
+                        ? "Ton ratio est correct mais peut être amélioré. Optimise ton funnel ou augmente ta LTV."
+                        : "Ratio critique (<2:1). Réduis ton CAC ou augmente ta LTV en priorité."}
                   </p>
                 </div>
               </div>
@@ -489,33 +561,43 @@ export function LTVCACTracker() {
                   <AlertTriangle className="h-5 w-5 text-danger shrink-0 mt-0.5" />
                 )}
                 <div>
-                  <h4 className="text-sm font-medium text-text-primary">Payback Period</h4>
+                  <h4 className="text-sm font-medium text-text-primary">
+                    Payback Period
+                  </h4>
                   <p className="text-xs text-text-secondary mt-1">
                     {currentMetrics.paybackMonths <= 3
                       ? "Excellent ! Tu récupères ton investissement en moins de 3 mois."
                       : currentMetrics.paybackMonths <= 6
-                      ? "Correct. Essayez de raccourcir le payback en augmentant le panier moyen."
-                      : "Attention, le retour sur investissement est lent. Revois ton pricing ou ton CAC."}
+                        ? "Correct. Essayez de raccourcir le payback en augmentant le panier moyen."
+                        : "Attention, le retour sur investissement est lent. Revois ton pricing ou ton CAC."}
                   </p>
                 </div>
               </div>
 
               <div className="flex items-start gap-3 p-3 rounded-xl bg-bg-tertiary/50">
                 {entries.length >= 2 &&
-                entries[entries.length - 1].monthlyChurnRate < entries[entries.length - 2].monthlyChurnRate ? (
+                entries[entries.length - 1].monthlyChurnRate <
+                  entries[entries.length - 2].monthlyChurnRate ? (
                   <CheckCircle2 className="h-5 w-5 text-accent shrink-0 mt-0.5" />
                 ) : (
                   <AlertTriangle className="h-5 w-5 text-warning shrink-0 mt-0.5" />
                 )}
                 <div>
-                  <h4 className="text-sm font-medium text-text-primary">Churn Rate</h4>
+                  <h4 className="text-sm font-medium text-text-primary">
+                    Churn Rate
+                  </h4>
                   <p className="text-xs text-text-secondary mt-1">
                     Taux de churn actuel :{" "}
                     <strong>
-                      {((entries[entries.length - 1]?.monthlyChurnRate || 0) * 100).toFixed(1)}%
+                      {(
+                        (entries[entries.length - 1]?.monthlyChurnRate || 0) *
+                        100
+                      ).toFixed(1)}
+                      %
                     </strong>
                     /mois.{" "}
-                    {(entries[entries.length - 1]?.monthlyChurnRate || 0) <= 0.05
+                    {(entries[entries.length - 1]?.monthlyChurnRate || 0) <=
+                    0.05
                       ? "Bon taux de retention."
                       : "Travaillez l'onboarding et le succès client pour réduire le churn."}
                   </p>
@@ -546,7 +628,10 @@ export function LTVCACTracker() {
                       <stop offset="95%" stopColor="#F87171" stopOpacity={0} />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    stroke="rgba(255,255,255,0.05)"
+                  />
                   <XAxis
                     dataKey="date"
                     stroke="#6B7280"
@@ -570,17 +655,32 @@ export function LTVCACTracker() {
                       boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
                       padding: "12px 16px",
                     }}
-                    labelStyle={{ color: "#9CA3AF", fontSize: 11, marginBottom: 4 }}
-                    itemStyle={{ fontSize: 13, fontWeight: 600, padding: "2px 0" }}
+                    labelStyle={{
+                      color: "#9CA3AF",
+                      fontSize: 11,
+                      marginBottom: 4,
+                    }}
+                    itemStyle={{
+                      fontSize: 13,
+                      fontWeight: 600,
+                      padding: "2px 0",
+                    }}
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    formatter={(value: any) => [`${Number(value).toLocaleString("fr-FR")} \u20AC`, undefined]}
+                    formatter={(value: any) => [
+                      `${Number(value).toLocaleString("fr-FR")} \u20AC`,
+                      undefined,
+                    ]}
                     cursor={{ stroke: "rgba(52,211,153,0.2)", strokeWidth: 1 }}
                   />
                   <Legend
                     wrapperStyle={{ paddingTop: 8 }}
                     iconType="circle"
                     iconSize={8}
-                    formatter={(value: string) => <span className="text-text-secondary text-xs ml-1">{value}</span>}
+                    formatter={(value: string) => (
+                      <span className="text-text-secondary text-xs ml-1">
+                        {value}
+                      </span>
+                    )}
                   />
                   <Area
                     type="monotone"
@@ -615,13 +715,27 @@ export function LTVCACTracker() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border-default">
-                  <th className="text-left text-text-secondary font-medium py-3 px-2">Mois</th>
-                  <th className="text-right text-text-secondary font-medium py-3 px-2">Panier moy.</th>
-                  <th className="text-right text-text-secondary font-medium py-3 px-2">Churn</th>
-                  <th className="text-right text-text-secondary font-medium py-3 px-2">LTV</th>
-                  <th className="text-right text-text-secondary font-medium py-3 px-2">CAC</th>
-                  <th className="text-right text-text-secondary font-medium py-3 px-2">Ratio</th>
-                  <th className="text-right text-text-secondary font-medium py-3 px-2">Payback</th>
+                  <th className="text-left text-text-secondary font-medium py-3 px-2">
+                    Mois
+                  </th>
+                  <th className="text-right text-text-secondary font-medium py-3 px-2">
+                    Panier moy.
+                  </th>
+                  <th className="text-right text-text-secondary font-medium py-3 px-2">
+                    Churn
+                  </th>
+                  <th className="text-right text-text-secondary font-medium py-3 px-2">
+                    LTV
+                  </th>
+                  <th className="text-right text-text-secondary font-medium py-3 px-2">
+                    CAC
+                  </th>
+                  <th className="text-right text-text-secondary font-medium py-3 px-2">
+                    Ratio
+                  </th>
+                  <th className="text-right text-text-secondary font-medium py-3 px-2">
+                    Payback
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -635,7 +749,9 @@ export function LTVCACTracker() {
                         key={e.date}
                         className="border-b border-border-default/50 hover:bg-bg-tertiary/50 transition-colors"
                       >
-                        <td className="py-3 px-2 font-medium text-text-primary">{e.date}</td>
+                        <td className="py-3 px-2 font-medium text-text-primary">
+                          {e.date}
+                        </td>
                         <td className="py-3 px-2 text-right text-text-secondary">
                           {fmtCurrency(e.avgDealValue)}
                         </td>
@@ -650,7 +766,13 @@ export function LTVCACTracker() {
                         </td>
                         <td className="py-3 px-2 text-right">
                           <Badge
-                            variant={m.ratio >= 3 ? "default" : m.ratio >= 2 ? "yellow" : "red"}
+                            variant={
+                              m.ratio >= 3
+                                ? "default"
+                                : m.ratio >= 2
+                                  ? "yellow"
+                                  : "red"
+                            }
                           >
                             {m.ratio.toFixed(1)}:1
                           </Badge>
@@ -673,7 +795,8 @@ export function LTVCACTracker() {
           <DialogHeader>
             <DialogTitle>Données mensuelles LTV / CAC</DialogTitle>
             <DialogDescription>
-              Saisis tes indicateurs business du mois pour calculer ta LTV, CAC et ratio.
+              Saisis tes indicateurs business du mois pour calculer ta LTV, CAC
+              et ratio.
             </DialogDescription>
           </DialogHeader>
 
@@ -684,11 +807,15 @@ export function LTVCACTracker() {
                 id="ltv-date"
                 type="month"
                 value={formData.date}
-                onChange={(e) => setFormData((p) => ({ ...p, date: e.target.value }))}
+                onChange={(e) =>
+                  setFormData((p) => ({ ...p, date: e.target.value }))
+                }
               />
             </div>
             <div>
-              <Label htmlFor="ltv-deal">Valeur moyenne d&apos;un deal (EUR)</Label>
+              <Label htmlFor="ltv-deal">
+                Valeur moyenne d&apos;un deal (EUR)
+              </Label>
               <Input
                 id="ltv-deal"
                 type="number"
@@ -696,7 +823,10 @@ export function LTVCACTracker() {
                 step={0.01}
                 value={formData.avgDealValue || ""}
                 onChange={(e) =>
-                  setFormData((p) => ({ ...p, avgDealValue: parseFloat(e.target.value) || 0 }))
+                  setFormData((p) => ({
+                    ...p,
+                    avgDealValue: parseFloat(e.target.value) || 0,
+                  }))
                 }
               />
             </div>
@@ -721,7 +851,9 @@ export function LTVCACTracker() {
               </p>
             </div>
             <div>
-              <Label htmlFor="ltv-spend">Dépense publicitaire mensuelle (EUR)</Label>
+              <Label htmlFor="ltv-spend">
+                Dépense publicitaire mensuelle (EUR)
+              </Label>
               <Input
                 id="ltv-spend"
                 type="number"
@@ -729,7 +861,10 @@ export function LTVCACTracker() {
                 step={0.01}
                 value={formData.monthlyAdSpend || ""}
                 onChange={(e) =>
-                  setFormData((p) => ({ ...p, monthlyAdSpend: parseFloat(e.target.value) || 0 }))
+                  setFormData((p) => ({
+                    ...p,
+                    monthlyAdSpend: parseFloat(e.target.value) || 0,
+                  }))
                 }
               />
             </div>
@@ -741,7 +876,10 @@ export function LTVCACTracker() {
                 min={0}
                 value={formData.newCustomers || ""}
                 onChange={(e) =>
-                  setFormData((p) => ({ ...p, newCustomers: parseInt(e.target.value) || 0 }))
+                  setFormData((p) => ({
+                    ...p,
+                    newCustomers: parseInt(e.target.value) || 0,
+                  }))
                 }
               />
             </div>

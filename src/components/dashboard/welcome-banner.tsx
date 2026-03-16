@@ -12,7 +12,8 @@ export function WelcomeBanner() {
   const { usage, loading: usageLoading, isPro } = useUsage();
 
   const isLoading = userLoading || usageLoading;
-  const firstName = profile?.first_name || profile?.full_name?.split(" ")[0] || "Utilisateur";
+  const firstName =
+    profile?.first_name || profile?.full_name?.split(" ")[0] || "Utilisateur";
   const plan = profile?.subscription_plan || "free";
 
   const getGreeting = () => {
@@ -43,18 +44,23 @@ export function WelcomeBanner() {
     },
   };
 
-  const currentPlan = planConfig[plan as keyof typeof planConfig] || planConfig.free;
+  const currentPlan =
+    planConfig[plan as keyof typeof planConfig] || planConfig.free;
   const PlanIcon = currentPlan.icon;
 
-  const usagePercent = usage?.limit ? Math.min((usage.currentUsage / usage.limit) * 100, 100) : 0;
+  const usagePercent = usage?.limit
+    ? Math.min((usage.currentUsage / usage.limit) * 100, 100)
+    : 0;
 
   return (
     <div className="relative overflow-hidden rounded-2xl border border-white/5 bg-bg-secondary backdrop-blur-sm">
       {/* Animated gradient background */}
-      <div className={cn(
-        "absolute inset-0 bg-gradient-to-r opacity-50",
-        currentPlan.gradient
-      )} />
+      <div
+        className={cn(
+          "absolute inset-0 bg-gradient-to-r opacity-50",
+          currentPlan.gradient,
+        )}
+      />
 
       {/* Subtle grid pattern */}
       <div
@@ -109,7 +115,8 @@ export function WelcomeBanner() {
                 <div className="flex items-center gap-2 text-sm text-text-muted">
                   <TrendingUp className="h-3.5 w-3.5" />
                   <span>
-                    {usage.currentUsage}/{usage.limit ?? 5} générations IA ce mois
+                    {usage.currentUsage}/{usage.limit ?? 5} générations IA ce
+                    mois
                   </span>
                   {usage.limit != null && usage.currentUsage >= usage.limit && (
                     <Badge variant="red" className="text-xs">
@@ -126,7 +133,7 @@ export function WelcomeBanner() {
                         ? "bg-red-500"
                         : usagePercent >= 80
                           ? "bg-amber-500"
-                          : "bg-emerald-500"
+                          : "bg-emerald-500",
                     )}
                     initial={{ width: 0 }}
                     animate={{ width: `${usagePercent}%` }}
@@ -148,7 +155,6 @@ export function WelcomeBanner() {
               </motion.p>
             )}
           </div>
-
         </div>
       </div>
     </div>

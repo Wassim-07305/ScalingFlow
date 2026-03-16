@@ -3,7 +3,13 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { LogOut, PanelLeftClose, PanelLeft, Settings, UserCircle } from "lucide-react";
+import {
+  LogOut,
+  PanelLeftClose,
+  PanelLeft,
+  Settings,
+  UserCircle,
+} from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import { Badge } from "@/components/ui/badge";
 import { useUIStore } from "@/stores/ui-store";
@@ -65,8 +71,18 @@ export function Sidebar({
   } = useUIStore();
 
   const subscriptionPlan = userProfile?.subscription_plan || "free";
-  const planLabel = subscriptionPlan === "premium" ? "Premium" : subscriptionPlan === "pro" ? "Pro" : "Free";
-  const planVariant = subscriptionPlan === "premium" ? "purple" : subscriptionPlan === "pro" ? "cyan" : "muted";
+  const planLabel =
+    subscriptionPlan === "premium"
+      ? "Premium"
+      : subscriptionPlan === "pro"
+        ? "Pro"
+        : "Free";
+  const planVariant =
+    subscriptionPlan === "premium"
+      ? "purple"
+      : subscriptionPlan === "pro"
+        ? "cyan"
+        : "muted";
 
   function closeMobile() {
     setMobileSidebarOpen(false);
@@ -98,21 +114,21 @@ export function Sidebar({
           sidebarMobileOpen ? "translate-x-0" : "-translate-x-full",
           "md:translate-x-0",
           "w-64 shrink-0",
-          isCollapsed && "md:w-[72px]"
+          isCollapsed && "md:w-[72px]",
         )}
       >
         {/* Logo */}
         <div
           className={cn(
             "flex h-16 items-center border-b border-sidebar-border px-4",
-            isCollapsed ? "md:justify-center md:px-0" : ""
+            isCollapsed ? "md:justify-center md:px-0" : "",
           )}
         >
           <Link
             href={logoHref}
             className={cn(
               "flex items-center gap-2.5",
-              isCollapsed && "md:justify-center"
+              isCollapsed && "md:justify-center",
             )}
             onClick={closeMobile}
           >
@@ -146,7 +162,7 @@ export function Sidebar({
         <nav className="flex-1 overflow-y-auto px-3 py-4">
           {navSections.map((section, sIdx) => {
             const visibleItems = section.items.filter((item) =>
-              item.roles.includes(role)
+              item.roles.includes(role),
             );
             if (visibleItems.length === 0) return null;
 
@@ -179,7 +195,7 @@ export function Sidebar({
                           isActive
                             ? "bg-sidebar-accent text-accent"
                             : "text-sidebar-foreground/60 hover:bg-sidebar-accent hover:text-sidebar-foreground",
-                          isCollapsed && "md:justify-center md:px-0"
+                          isCollapsed && "md:justify-center md:px-0",
                         )}
                       >
                         {isActive && (
@@ -191,7 +207,7 @@ export function Sidebar({
                             "h-[18px] w-[18px] shrink-0 transition-all duration-200",
                             isCollapsed ? "" : "mr-3",
                             isActive &&
-                              "drop-shadow-[0_0_6px_rgba(52,211,153,0.3)]"
+                              "drop-shadow-[0_0_6px_rgba(52,211,153,0.3)]",
                           )}
                         />
                         <span className={cn(isCollapsed && "md:hidden")}>
@@ -246,7 +262,7 @@ export function Sidebar({
           <div
             className={cn(
               "flex items-center rounded-xl px-3 py-2.5",
-              isCollapsed && "md:justify-center md:px-0"
+              isCollapsed && "md:justify-center md:px-0",
             )}
           >
             <div className="relative">
@@ -264,15 +280,15 @@ export function Sidebar({
               <div className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full bg-emerald-400 ring-2 ring-sidebar" />
             </div>
             <div
-              className={cn(
-                "ml-3 min-w-0 flex-1",
-                isCollapsed && "md:hidden"
-              )}
+              className={cn("ml-3 min-w-0 flex-1", isCollapsed && "md:hidden")}
             >
               <p className="truncate text-sm font-semibold text-text-primary">
                 {userName}
               </p>
-              <Badge variant={planVariant as "cyan" | "purple" | "muted"} className="text-[10px] mt-0.5">
+              <Badge
+                variant={planVariant as "cyan" | "purple" | "muted"}
+                className="text-[10px] mt-0.5"
+              >
                 {planLabel}
               </Badge>
             </div>
@@ -289,13 +305,13 @@ export function Sidebar({
                   pathname.startsWith(settingsHref)
                     ? "bg-sidebar-accent text-accent"
                     : "text-sidebar-foreground/50 hover:bg-sidebar-accent hover:text-sidebar-foreground",
-                  isCollapsed && "md:justify-center md:px-0"
+                  isCollapsed && "md:justify-center md:px-0",
                 )}
               >
                 <Settings
                   className={cn(
                     "h-[18px] w-[18px] shrink-0",
-                    isCollapsed ? "" : "mr-3"
+                    isCollapsed ? "" : "mr-3",
                   )}
                 />
                 <span className={cn(isCollapsed && "md:hidden")}>
@@ -321,13 +337,13 @@ export function Sidebar({
                 aria-label="Se déconnecter"
                 className={cn(
                   "mt-1 flex w-full items-center rounded-xl px-3 py-2 text-sm text-sidebar-foreground/50 transition-all duration-200 hover:bg-red-500/10 hover:text-red-400",
-                  isCollapsed && "md:justify-center md:px-0"
+                  isCollapsed && "md:justify-center md:px-0",
                 )}
               >
                 <LogOut
                   className={cn(
                     "h-[18px] w-[18px] shrink-0",
-                    isCollapsed ? "" : "mr-3"
+                    isCollapsed ? "" : "mr-3",
                   )}
                 />
                 <span className={cn(isCollapsed && "md:hidden")}>

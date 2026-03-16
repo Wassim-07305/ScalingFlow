@@ -20,11 +20,14 @@ export async function POST(req: NextRequest) {
     }
 
     // Rate limiting
-    const rl = await rateLimit(user.id, "generate-offer", { limit: 5, windowSeconds: 60 });
+    const rl = await rateLimit(user.id, "generate-offer", {
+      limit: 5,
+      windowSeconds: 60,
+    });
     if (!rl.allowed) {
       return NextResponse.json(
         { error: "Trop de requêtes. Réessaie dans quelques secondes." },
-        { status: 429 }
+        { status: 429 },
       );
     }
 
@@ -33,10 +36,9 @@ export async function POST(req: NextRequest) {
     if (!usage.allowed) {
       return NextResponse.json(
         { error: "Limite de générations IA atteinte", usage },
-        { status: 403 }
+        { status: 403 },
       );
     }
-
 
     const body = await req.json();
     const { marketAnalysisId, competitor_reviews } = body as {
@@ -47,7 +49,7 @@ export async function POST(req: NextRequest) {
     if (!marketAnalysisId) {
       return NextResponse.json(
         { error: "marketAnalysisId est requis" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -62,7 +64,7 @@ export async function POST(req: NextRequest) {
     if (fetchError || !marketAnalysis) {
       return NextResponse.json(
         { error: "Analyse de marché introuvable" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -84,7 +86,7 @@ export async function POST(req: NextRequest) {
         avatar: (marketAnalysis.target_avatar as Record<string, unknown>) || {},
         positioning: marketAnalysis.recommended_positioning || "",
       },
-      profile?.skills || []
+      profile?.skills || [],
     );
     // Inject competitor review insights if provided
     let reviewsContext = "";
@@ -97,7 +99,9 @@ ${truncatedReviews}
 `;
     }
 
-    const prompt = [basePrompt, reviewsContext, vaultContext].filter(Boolean).join("\n");
+    const prompt = [basePrompt, reviewsContext, vaultContext]
+      .filter(Boolean)
+      .join("\n");
     interface GeneratedOffer {
       packaging?: {
         offer_name?: string;
@@ -112,7 +116,10 @@ ${truncatedReviews}
       delivery?: Record<string, unknown>;
       full_document_markdown?: string;
     }
-    const generatedOffer = await generateJSON<GeneratedOffer>({ prompt, maxTokens: 8192 });
+    const generatedOffer = await generateJSON<GeneratedOffer>({
+      prompt,
+      maxTokens: 8192,
+    });
 
     // Save offer to database
     const { data: offer, error: saveError } = await supabase
@@ -139,19 +146,23 @@ ${truncatedReviews}
     if (saveError) {
       return NextResponse.json(
         { error: "Erreur lors de la sauvegarde de l'offre" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
     // Award XP (non-blocking)
-    try { await awardXP(user.id, "generation.offer"); } catch {}
-    try { await notifyGeneration(user.id, "generation.offer"); } catch {}
+    try {
+      await awardXP(user.id, "generation.offer");
+    } catch {}
+    try {
+      await notifyGeneration(user.id, "generation.offer");
+    } catch {}
 
     return NextResponse.json(offer);
   } catch (error) {
     return NextResponse.json(
       { error: "Erreur lors de la génération de l'offre" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

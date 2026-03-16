@@ -348,7 +348,7 @@ export function CampaignLauncher() {
                         "flex flex-col items-center gap-1.5 p-3 rounded-xl border text-center transition-colors",
                         objective === obj.value
                           ? "bg-accent/10 border-accent text-text-primary"
-                          : "bg-bg-tertiary border-border-default text-text-secondary hover:border-border-hover"
+                          : "bg-bg-tertiary border-border-default text-text-secondary hover:border-border-hover",
                       )}
                     >
                       <obj.icon
@@ -356,7 +356,7 @@ export function CampaignLauncher() {
                           "h-5 w-5",
                           objective === obj.value
                             ? "text-accent"
-                            : "text-text-muted"
+                            : "text-text-muted",
                         )}
                       />
                       <span className="text-sm font-medium">{obj.label}</span>
@@ -399,7 +399,7 @@ export function CampaignLauncher() {
                       {audiences
                         .filter(
                           (a) =>
-                            a.status === "ready" || a.status === "targeting"
+                            a.status === "ready" || a.status === "targeting",
                         )
                         .map((a) => (
                           <SelectItem key={a.id} value={a.id}>
@@ -544,7 +544,7 @@ export function CampaignLauncher() {
                           ? "bg-accent animate-pulse"
                           : isPast
                             ? "bg-accent"
-                            : "bg-bg-tertiary"
+                            : "bg-bg-tertiary",
                       )}
                     />
                     <span
@@ -552,7 +552,7 @@ export function CampaignLauncher() {
                         "text-xs",
                         isActive
                           ? "text-text-primary font-medium"
-                          : "text-text-muted"
+                          : "text-text-muted",
                       )}
                     >
                       {status === "draft"
@@ -563,7 +563,7 @@ export function CampaignLauncher() {
                     </span>
                   </div>
                 );
-              }
+              },
             )}
           </div>
         </div>
@@ -589,9 +589,7 @@ export function CampaignLauncher() {
                       <p className="text-xs font-semibold text-text-primary">
                         Ta Page
                       </p>
-                      <p className="text-[10px] text-text-muted">
-                        Sponsorisé
-                      </p>
+                      <p className="text-[10px] text-text-muted">Sponsorisé</p>
                     </div>
                   </div>
                 </div>
@@ -659,9 +657,7 @@ export function CampaignLauncher() {
                     },
                     {
                       label: "Budget",
-                      value: dailyBudget
-                        ? `${dailyBudget} EUR/jour`
-                        : "—",
+                      value: dailyBudget ? `${dailyBudget} EUR/jour` : "—",
                     },
                     {
                       label: "Audience",
@@ -704,8 +700,9 @@ export function CampaignLauncher() {
               <div className="mt-4 flex items-start gap-2 p-2.5 rounded-lg bg-yellow-500/5 border border-yellow-500/20">
                 <AlertTriangle className="h-3.5 w-3.5 text-yellow-400 mt-0.5 shrink-0" />
                 <p className="text-[10px] text-text-muted">
-                  La campagne sera créée en mode PAUSE. Tu pourras l&apos;activer
-                  depuis l&apos;onglet Campagnes ou Meta Ads Manager.
+                  La campagne sera créée en mode PAUSE. Tu pourras
+                  l&apos;activer depuis l&apos;onglet Campagnes ou Meta Ads
+                  Manager.
                 </p>
               </div>
             </CardContent>

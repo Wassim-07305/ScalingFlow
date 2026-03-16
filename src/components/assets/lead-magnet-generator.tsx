@@ -65,16 +65,22 @@ const LEAD_MAGNET_TYPES: {
   },
 ];
 
-export function LeadMagnetGenerator({ className, initialData }: LeadMagnetGeneratorProps) {
+export function LeadMagnetGenerator({
+  className,
+  initialData,
+}: LeadMagnetGeneratorProps) {
   const [loading, setLoading] = React.useState(false);
   const [leadMagnet, setLeadMagnet] = React.useState<LeadMagnetResult | null>(
-    initialData || null
+    initialData || null,
   );
   const [error, setError] = React.useState<string | null>(null);
   const [selectedType, setSelectedType] = React.useState<LeadMagnetType | null>(
-    null
+    null,
   );
-  const [usageLimited, setUsageLimited] = React.useState<{currentUsage: number; limit: number} | null>(null);
+  const [usageLimited, setUsageLimited] = React.useState<{
+    currentUsage: number;
+    limit: number;
+  } | null>(null);
 
   React.useEffect(() => {
     if (initialData) setLeadMagnet(initialData);
@@ -99,7 +105,10 @@ export function LeadMagnetGenerator({ className, initialData }: LeadMagnetGenera
       if (!response.ok) {
         if (response.status === 403) {
           const errData = await response.json();
-          if (errData.usage) { setUsageLimited(errData.usage); return; }
+          if (errData.usage) {
+            setUsageLimited(errData.usage);
+            return;
+          }
         }
         throw new Error("Erreur lors de la génération");
       }
@@ -114,7 +123,13 @@ export function LeadMagnetGenerator({ className, initialData }: LeadMagnetGenera
   };
 
   if (usageLimited) {
-    return <UpgradeWall currentUsage={usageLimited.currentUsage} limit={usageLimited.limit} className={className} />;
+    return (
+      <UpgradeWall
+        currentUsage={usageLimited.currentUsage}
+        limit={usageLimited.limit}
+        className={className}
+      />
+    );
   }
 
   if (loading) {
@@ -131,9 +146,7 @@ export function LeadMagnetGenerator({ className, initialData }: LeadMagnetGenera
   if (!leadMagnet) {
     return (
       <div className={cn("space-y-6", className)}>
-        {error && (
-          <p className="text-sm text-danger text-center">{error}</p>
-        )}
+        {error && <p className="text-sm text-danger text-center">{error}</p>}
 
         <div className="text-center mb-2">
           <h3 className="text-sm font-medium text-text-primary">
@@ -155,7 +168,7 @@ export function LeadMagnetGenerator({ className, initialData }: LeadMagnetGenera
                   "flex flex-col items-center gap-2 p-4 rounded-xl border transition-all text-center",
                   selectedType === t.key
                     ? "border-accent bg-accent-muted"
-                    : "border-border-default bg-bg-secondary hover:border-border-hover"
+                    : "border-border-default bg-bg-secondary hover:border-border-hover",
                 )}
               >
                 <Icon
@@ -163,7 +176,7 @@ export function LeadMagnetGenerator({ className, initialData }: LeadMagnetGenera
                     "h-6 w-6",
                     selectedType === t.key
                       ? "text-accent"
-                      : "text-text-secondary"
+                      : "text-text-secondary",
                   )}
                 />
                 <span
@@ -171,14 +184,12 @@ export function LeadMagnetGenerator({ className, initialData }: LeadMagnetGenera
                     "text-sm font-medium",
                     selectedType === t.key
                       ? "text-accent"
-                      : "text-text-primary"
+                      : "text-text-primary",
                   )}
                 >
                   {t.label}
                 </span>
-                <span className="text-xs text-text-muted">
-                  {t.description}
-                </span>
+                <span className="text-xs text-text-muted">{t.description}</span>
               </button>
             );
           })}

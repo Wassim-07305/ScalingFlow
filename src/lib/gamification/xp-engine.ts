@@ -80,7 +80,7 @@ export async function awardXP(
   userId: string,
   activityType: string,
   activityData?: Record<string, unknown>,
-  xpOverride?: number
+  xpOverride?: number,
 ): Promise<{ xp_awarded: number; new_level: number; new_badges: string[] }> {
   const supabase = await createClient();
 
@@ -110,22 +110,44 @@ export async function awardXP(
     campaignsRes,
     profileStreakRes,
   ] = await Promise.all([
-    supabase.from("offers").select("*", { count: "exact", head: true }).eq("user_id", userId),
-    supabase.from("sales_assets").select("*", { count: "exact", head: true }).eq("user_id", userId),
-    supabase.from("ad_creatives").select("*", { count: "exact", head: true }).eq("user_id", userId),
-    supabase.from("funnels").select("*", { count: "exact", head: true }).eq("user_id", userId),
-    supabase.from("content_pieces").select("*", { count: "exact", head: true }).eq("user_id", userId),
-    supabase.from("community_posts").select("*", { count: "exact", head: true }).eq("user_id", userId),
+    supabase
+      .from("offers")
+      .select("*", { count: "exact", head: true })
+      .eq("user_id", userId),
+    supabase
+      .from("sales_assets")
+      .select("*", { count: "exact", head: true })
+      .eq("user_id", userId),
+    supabase
+      .from("ad_creatives")
+      .select("*", { count: "exact", head: true })
+      .eq("user_id", userId),
+    supabase
+      .from("funnels")
+      .select("*", { count: "exact", head: true })
+      .eq("user_id", userId),
+    supabase
+      .from("content_pieces")
+      .select("*", { count: "exact", head: true })
+      .eq("user_id", userId),
+    supabase
+      .from("community_posts")
+      .select("*", { count: "exact", head: true })
+      .eq("user_id", userId),
     supabase.from("ad_campaigns").select("roas").eq("user_id", userId),
     supabase.from("profiles").select("streak_days").eq("id", userId).single(),
   ]);
 
   const totalGenerations =
-    (offerCount || 0) + (assetCount || 0) + (adCount || 0) + (funnelCount || 0) + (contentCount || 0);
+    (offerCount || 0) +
+    (assetCount || 0) +
+    (adCount || 0) +
+    (funnelCount || 0) +
+    (contentCount || 0);
 
   const maxRoas = (campaignsRes.data ?? []).reduce(
     (max, c) => Math.max(max, c.roas ?? 0),
-    0
+    0,
   );
 
   const stats: BadgeStats = {
@@ -173,25 +195,37 @@ export async function awardXP(
 
   // Create notifications for new badges and level ups
   if (newLevel > (profile.level || 1)) {
-    const { error: levelNotifError } = await supabase.from("notifications").insert({
-      user_id: userId,
-      type: "badge" as const,
-      title: `Niveau ${newLevel} atteint !`,
-      message: `Bravo ! Tu es passé au niveau ${newLevel}.`,
-    });
-    if (levelNotifError) console.error("awardXP: failed to create level notification", levelNotifError);
+    const { error: levelNotifError } = await supabase
+      .from("notifications")
+      .insert({
+        user_id: userId,
+        type: "badge" as const,
+        title: `Niveau ${newLevel} atteint !`,
+        message: `Bravo ! Tu es passé au niveau ${newLevel}.`,
+      });
+    if (levelNotifError)
+      console.error(
+        "awardXP: failed to create level notification",
+        levelNotifError,
+      );
   }
 
   for (const badge of newBadges) {
     const badgeDef = getBadgeDefinition(badge);
     const badgeName = badgeDef?.name || badge;
-    const { error: badgeNotifError } = await supabase.from("notifications").insert({
-      user_id: userId,
-      type: "badge" as const,
-      title: `Badge "${badgeName}" débloqué !`,
-      message: badgeDef?.description || `Tu as débloqué un nouveau badge.`,
-    });
-    if (badgeNotifError) console.error("awardXP: failed to create badge notification", badgeNotifError);
+    const { error: badgeNotifError } = await supabase
+      .from("notifications")
+      .insert({
+        user_id: userId,
+        type: "badge" as const,
+        title: `Badge "${badgeName}" débloqué !`,
+        message: badgeDef?.description || `Tu as débloqué un nouveau badge.`,
+      });
+    if (badgeNotifError)
+      console.error(
+        "awardXP: failed to create badge notification",
+        badgeNotifError,
+      );
   }
 
   return { xp_awarded: xpAmount, new_level: newLevel, new_badges: newBadges };

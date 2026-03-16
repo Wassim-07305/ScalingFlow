@@ -1,6 +1,6 @@
 export function adHooksPrompt(
   market: string,
-  avatar: Record<string, unknown>
+  avatar: Record<string, unknown>,
 ): string {
   return `Tu es un expert en copywriting publicitaire spécialisé dans les hooks (accroches) pour les freelances et consultants dans le domaine de l'IA et de l'automatisation.
 

@@ -16,7 +16,7 @@ export async function DELETE() {
   // 2. Use service role to delete user data and auth record
   const serviceClient = createServiceClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
   );
 
   try {
@@ -48,14 +48,15 @@ export async function DELETE() {
     await serviceClient.from("profiles").delete().eq("id", user.id);
 
     // 3. Delete the auth user
-    const { error: deleteError } =
-      await serviceClient.auth.admin.deleteUser(user.id);
+    const { error: deleteError } = await serviceClient.auth.admin.deleteUser(
+      user.id,
+    );
 
     if (deleteError) {
       console.error("Erreur suppression auth user:", deleteError);
       return NextResponse.json(
         { error: "Impossible de supprimer le compte" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -64,7 +65,7 @@ export async function DELETE() {
     console.error("Erreur suppression compte:", err);
     return NextResponse.json(
       { error: "Une erreur est survenue lors de la suppression" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

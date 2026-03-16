@@ -102,17 +102,32 @@ export default function AdminPage() {
       // ─── Tous les profils (pour stats agrégées) ─────────────
       const { data: allProfiles } = await supabase
         .from("profiles")
-        .select("id, subscription_plan, subscription_status, xp_points, onboarding_completed, created_at");
+        .select(
+          "id, subscription_plan, subscription_status, xp_points, onboarding_completed, created_at",
+        );
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const profiles = allProfiles as any[] | null;
       const totalUsers = profiles?.length || 0;
-      const proUsers = profiles?.filter((p) => p.subscription_plan === "pro" && p.subscription_status === "active").length || 0;
-      const premiumUsers = profiles?.filter((p) => p.subscription_plan === "premium" && p.subscription_status === "active").length || 0;
+      const proUsers =
+        profiles?.filter(
+          (p) =>
+            p.subscription_plan === "pro" && p.subscription_status === "active",
+        ).length || 0;
+      const premiumUsers =
+        profiles?.filter(
+          (p) =>
+            p.subscription_plan === "premium" &&
+            p.subscription_status === "active",
+        ).length || 0;
       const freeUsers = totalUsers - proUsers - premiumUsers;
-      const onboardingCompleted = profiles?.filter((p) => p.onboarding_completed).length || 0;
-      const totalXP = profiles?.reduce((sum: number, p) => sum + (p.xp_points || 0), 0) || 0;
-      const newUsersThisMonth = profiles?.filter((p) => new Date(p.created_at) >= startOfMonth).length || 0;
+      const onboardingCompleted =
+        profiles?.filter((p) => p.onboarding_completed).length || 0;
+      const totalXP =
+        profiles?.reduce((sum: number, p) => sum + (p.xp_points || 0), 0) || 0;
+      const newUsersThisMonth =
+        profiles?.filter((p) => new Date(p.created_at) >= startOfMonth)
+          .length || 0;
 
       // ─── Utilisateurs actifs (7 derniers jours) ─────────────
       const { data: activeData } = await supabase
@@ -121,7 +136,9 @@ export default function AdminPage() {
         .gte("created_at", sevenDaysAgo.toISOString());
 
       const uniqueActiveUsers = activeData
-        ? new Set((activeData as { user_id: string }[]).map((row) => row.user_id)).size
+        ? new Set(
+            (activeData as { user_id: string }[]).map((row) => row.user_id),
+          ).size
         : 0;
 
       // ─── Total generations (toutes tables) ──────────────────
@@ -133,10 +150,16 @@ export default function AdminPage() {
         { count: contentCount },
       ] = await Promise.all([
         supabase.from("offers").select("*", { count: "exact", head: true }),
-        supabase.from("sales_assets").select("*", { count: "exact", head: true }),
-        supabase.from("ad_creatives").select("*", { count: "exact", head: true }),
+        supabase
+          .from("sales_assets")
+          .select("*", { count: "exact", head: true }),
+        supabase
+          .from("ad_creatives")
+          .select("*", { count: "exact", head: true }),
         supabase.from("funnels").select("*", { count: "exact", head: true }),
-        supabase.from("content_pieces").select("*", { count: "exact", head: true }),
+        supabase
+          .from("content_pieces")
+          .select("*", { count: "exact", head: true }),
       ]);
 
       const totalGenerations =
@@ -169,7 +192,9 @@ export default function AdminPage() {
       // ─── Utilisateurs récents ───────────────────────────────
       const { data: recent } = await supabase
         .from("profiles")
-        .select("id, full_name, avatar_url, created_at, xp_points, level, subscription_plan, onboarding_completed")
+        .select(
+          "id, full_name, avatar_url, created_at, xp_points, level, subscription_plan, onboarding_completed",
+        )
         .order("created_at", { ascending: false })
         .limit(10);
 
@@ -192,13 +217,15 @@ export default function AdminPage() {
           .in("id", userIds);
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const nameMap = new Map((profilesData as any[] || []).map((p) => [p.id, p.full_name]));
+        const nameMap = new Map(
+          ((profilesData as any[]) || []).map((p) => [p.id, p.full_name]),
+        );
 
         setRecentActivity(
           activities.map((a) => ({
             ...a,
             user_name: nameMap.get(a.user_id) || null,
-          }))
+          })),
         );
       }
     } catch {
@@ -250,7 +277,10 @@ export default function AdminPage() {
       "generation.competitors": "Analyse concurrents",
       "generation.score": "Score offre",
     };
-    return labels[type] || type.replace("generation.", "Génération ").replace(".", " ");
+    return (
+      labels[type] ||
+      type.replace("generation.", "Génération ").replace(".", " ")
+    );
   };
 
   const getPlanBadge = (plan: string) => {
@@ -258,7 +288,11 @@ export default function AdminPage() {
       case "pro":
         return <Badge variant="cyan">Pro</Badge>;
       case "premium":
-        return <Badge className="bg-[rgba(139,92,246,0.15)] text-[#A78BFA] border-[rgba(139,92,246,0.3)]">Premium</Badge>;
+        return (
+          <Badge className="bg-[rgba(139,92,246,0.15)] text-[#A78BFA] border-[rgba(139,92,246,0.3)]">
+            Premium
+          </Badge>
+        );
       default:
         return <Badge variant="muted">Free</Badge>;
     }
@@ -269,7 +303,9 @@ export default function AdminPage() {
   const handleRecalculateLeaderboard = async () => {
     setRecalculating(true);
     try {
-      const res = await fetch("/api/gamification/recalculate", { method: "POST" });
+      const res = await fetch("/api/gamification/recalculate", {
+        method: "POST",
+      });
       const data = await res.json();
       if (!res.ok) {
         toast.error(data.error || "Erreur de recalcul");
@@ -287,7 +323,10 @@ export default function AdminPage() {
   if (userLoading) {
     return (
       <div>
-        <PageHeader title="Administration" description="Vue d'ensemble de la plateforme ScalingFlow." />
+        <PageHeader
+          title="Administration"
+          description="Vue d'ensemble de la plateforme ScalingFlow."
+        />
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
           {Array.from({ length: 8 }).map((_, i) => (
             <Card key={i}>
@@ -309,13 +348,17 @@ export default function AdminPage() {
     return null;
   }
 
-  const conversionRate = stats.totalUsers > 0
-    ? Math.round(((stats.proUsers + stats.premiumUsers) / stats.totalUsers) * 100)
-    : 0;
+  const conversionRate =
+    stats.totalUsers > 0
+      ? Math.round(
+          ((stats.proUsers + stats.premiumUsers) / stats.totalUsers) * 100,
+        )
+      : 0;
 
-  const onboardingRate = stats.totalUsers > 0
-    ? Math.round((stats.onboardingCompleted / stats.totalUsers) * 100)
-    : 0;
+  const onboardingRate =
+    stats.totalUsers > 0
+      ? Math.round((stats.onboardingCompleted / stats.totalUsers) * 100)
+      : 0;
 
   return (
     <div>
@@ -330,7 +373,9 @@ export default function AdminPage() {
           disabled={recalculating}
           className="gap-2"
         >
-          <RefreshCw className={`h-4 w-4 ${recalculating ? "animate-spin" : ""}`} />
+          <RefreshCw
+            className={`h-4 w-4 ${recalculating ? "animate-spin" : ""}`}
+          />
           {recalculating ? "Recalcul..." : "Recalculer leaderboard"}
         </Button>
       </PageHeader>
@@ -350,9 +395,10 @@ export default function AdminPage() {
             value: stats.activeUsers,
             icon: Activity,
             color: "text-accent",
-            sub: stats.totalUsers > 0
-              ? `${Math.round((stats.activeUsers / stats.totalUsers) * 100)}% du total`
-              : "—",
+            sub:
+              stats.totalUsers > 0
+                ? `${Math.round((stats.activeUsers / stats.totalUsers) * 100)}% du total`
+                : "—",
           },
           {
             label: "Générations IA",
@@ -366,9 +412,10 @@ export default function AdminPage() {
             value: stats.totalXP,
             icon: TrendingUp,
             color: "text-accent",
-            sub: stats.totalUsers > 0
-              ? `~${Math.round(stats.totalXP / stats.totalUsers)} XP/user`
-              : "—",
+            sub:
+              stats.totalUsers > 0
+                ? `~${Math.round(stats.totalXP / stats.totalUsers)} XP/user`
+                : "—",
           },
         ].map((kpi) => (
           <Card key={kpi.label}>
@@ -402,7 +449,11 @@ export default function AdminPage() {
               <div>
                 <p className="text-xs text-text-muted">Abonnés Pro</p>
                 <p className="text-2xl font-bold text-text-primary">
-                  {loading ? <Loader2 className="h-5 w-5 animate-spin text-text-muted" /> : <AnimatedCounter value={stats.proUsers} />}
+                  {loading ? (
+                    <Loader2 className="h-5 w-5 animate-spin text-text-muted" />
+                  ) : (
+                    <AnimatedCounter value={stats.proUsers} />
+                  )}
                 </p>
               </div>
               <Zap className="h-5 w-5 text-accent" />
@@ -416,7 +467,11 @@ export default function AdminPage() {
               <div>
                 <p className="text-xs text-text-muted">Abonnés Premium</p>
                 <p className="text-2xl font-bold text-text-primary">
-                  {loading ? <Loader2 className="h-5 w-5 animate-spin text-text-muted" /> : <AnimatedCounter value={stats.premiumUsers} />}
+                  {loading ? (
+                    <Loader2 className="h-5 w-5 animate-spin text-text-muted" />
+                  ) : (
+                    <AnimatedCounter value={stats.premiumUsers} />
+                  )}
                 </p>
               </div>
               <Crown className="h-5 w-5 text-[#A78BFA]" />
@@ -430,7 +485,11 @@ export default function AdminPage() {
               <div>
                 <p className="text-xs text-text-muted">Taux conversion</p>
                 <p className="text-2xl font-bold text-text-primary">
-                  {loading ? <Loader2 className="h-5 w-5 animate-spin text-text-muted" /> : `${conversionRate}%`}
+                  {loading ? (
+                    <Loader2 className="h-5 w-5 animate-spin text-text-muted" />
+                  ) : (
+                    `${conversionRate}%`
+                  )}
                 </p>
                 {!loading && (
                   <p className="text-xs text-text-muted mt-1">Free → Payant</p>
@@ -447,10 +506,16 @@ export default function AdminPage() {
               <div>
                 <p className="text-xs text-text-muted">Onboarding complété</p>
                 <p className="text-2xl font-bold text-text-primary">
-                  {loading ? <Loader2 className="h-5 w-5 animate-spin text-text-muted" /> : `${onboardingRate}%`}
+                  {loading ? (
+                    <Loader2 className="h-5 w-5 animate-spin text-text-muted" />
+                  ) : (
+                    `${onboardingRate}%`
+                  )}
                 </p>
                 {!loading && (
-                  <p className="text-xs text-text-muted mt-1">{stats.onboardingCompleted}/{stats.totalUsers} users</p>
+                  <p className="text-xs text-text-muted mt-1">
+                    {stats.onboardingCompleted}/{stats.totalUsers} users
+                  </p>
                 )}
               </div>
               <UserCheck className="h-5 w-5 text-accent" />
@@ -472,16 +537,36 @@ export default function AdminPage() {
           ) : (
             <div className="space-y-4">
               {[
-                { label: "Free", count: stats.freeUsers, color: "bg-text-muted", total: stats.totalUsers },
-                { label: "Pro", count: stats.proUsers, color: "bg-accent", total: stats.totalUsers },
-                { label: "Premium", count: stats.premiumUsers, color: "bg-[#A78BFA]", total: stats.totalUsers },
+                {
+                  label: "Free",
+                  count: stats.freeUsers,
+                  color: "bg-text-muted",
+                  total: stats.totalUsers,
+                },
+                {
+                  label: "Pro",
+                  count: stats.proUsers,
+                  color: "bg-accent",
+                  total: stats.totalUsers,
+                },
+                {
+                  label: "Premium",
+                  count: stats.premiumUsers,
+                  color: "bg-[#A78BFA]",
+                  total: stats.totalUsers,
+                },
               ].map((plan) => {
-                const pct = stats.totalUsers > 0 ? Math.round((plan.count / plan.total) * 100) : 0;
+                const pct =
+                  stats.totalUsers > 0
+                    ? Math.round((plan.count / plan.total) * 100)
+                    : 0;
                 return (
                   <div key={plan.label} className="space-y-1.5">
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-text-secondary">{plan.label}</span>
-                      <span className="text-text-primary font-medium">{plan.count} ({pct}%)</span>
+                      <span className="text-text-primary font-medium">
+                        {plan.count} ({pct}%)
+                      </span>
                     </div>
                     <div className="h-2 rounded-full bg-bg-tertiary overflow-hidden">
                       <div
@@ -543,9 +628,13 @@ export default function AdminPage() {
                         {recentUser.full_name || "Utilisateur"}
                       </p>
                       <p className="text-xs text-text-muted">
-                        Niv. {recentUser.level} &middot; {recentUser.xp_points} XP
+                        Niv. {recentUser.level} &middot; {recentUser.xp_points}{" "}
+                        XP
                         {!recentUser.onboarding_completed && (
-                          <span className="text-warning"> &middot; Onboarding en cours</span>
+                          <span className="text-warning">
+                            {" "}
+                            &middot; Onboarding en cours
+                          </span>
                         )}
                       </p>
                     </div>

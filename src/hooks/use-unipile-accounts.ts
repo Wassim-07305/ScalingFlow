@@ -17,7 +17,14 @@ export function useUnipileAccounts(filter?: "messaging" | "social") {
   const [accounts, setAccounts] = useState<UnipileAccountInfo[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const MESSAGING_PROVIDERS = ["linkedin", "whatsapp", "instagram", "messenger", "telegram", "twitter"];
+  const MESSAGING_PROVIDERS = [
+    "linkedin",
+    "whatsapp",
+    "instagram",
+    "messenger",
+    "telegram",
+    "twitter",
+  ];
   const SOCIAL_PROVIDERS = ["linkedin", "instagram", "twitter"];
 
   const fetchAccounts = useCallback(async () => {
@@ -29,11 +36,11 @@ export function useUnipileAccounts(filter?: "messaging" | "social") {
 
       if (filter === "messaging") {
         list = list.filter((a) =>
-          MESSAGING_PROVIDERS.includes(a.provider.toLowerCase())
+          MESSAGING_PROVIDERS.includes(a.provider.toLowerCase()),
         );
       } else if (filter === "social") {
         list = list.filter((a) =>
-          SOCIAL_PROVIDERS.includes(a.provider.toLowerCase())
+          SOCIAL_PROVIDERS.includes(a.provider.toLowerCase()),
         );
       }
 
@@ -43,7 +50,7 @@ export function useUnipileAccounts(filter?: "messaging" | "social") {
     } finally {
       setLoading(false);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filter]);
 
   useEffect(() => {

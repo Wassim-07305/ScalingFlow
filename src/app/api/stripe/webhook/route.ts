@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
     if (!stripe) {
       return NextResponse.json(
         { error: "Stripe non configuré" },
-        { status: 503 }
+        { status: 503 },
       );
     }
 
@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
     if (!signature) {
       return NextResponse.json(
         { error: "Signature manquante" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
     if (!webhookSecret) {
       return NextResponse.json(
         { error: "Configuration webhook manquante" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -54,16 +54,13 @@ export async function POST(req: NextRequest) {
     } catch {
       return NextResponse.json(
         { error: "Signature invalide" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     const supabase = getAdminClient();
     if (!supabase) {
-      return NextResponse.json(
-        { error: "Erreur serveur" },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
     }
 
     switch (event.type) {
@@ -74,7 +71,8 @@ export async function POST(req: NextRequest) {
 
         if (userId && subscriptionId) {
           // Récupérer les details de l'abonnement
-          const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+          const subscription =
+            await stripe.subscriptions.retrieve(subscriptionId);
           const priceId = subscription.items.data[0]?.price.id;
           const plan = priceId ? getPlanByPriceId(priceId) : null;
 
@@ -96,7 +94,7 @@ export async function POST(req: NextRequest) {
             {
               value: (session.amount_total || 0) / 100,
               currency: (session.currency || "eur").toUpperCase(),
-            }
+            },
           ).catch(() => {});
 
           // Envoyer email de confirmation d'abonnement
@@ -107,15 +105,21 @@ export async function POST(req: NextRequest) {
               .eq("id", userId)
               .single();
 
-            const firstName = profile?.full_name?.split(" ")[0] || "Utilisateur";
-            const emailContent = subscriptionActivatedEmail(firstName, plan?.name || "Pro");
+            const firstName =
+              profile?.full_name?.split(" ")[0] || "Utilisateur";
+            const emailContent = subscriptionActivatedEmail(
+              firstName,
+              plan?.name || "Pro",
+            );
 
-            await resend.emails.send({
-              from: FROM,
-              to: session.customer_email,
-              subject: emailContent.subject,
-              html: emailContent.html,
-            }).catch(() => {});
+            await resend.emails
+              .send({
+                from: FROM,
+                to: session.customer_email,
+                subject: emailContent.subject,
+                html: emailContent.html,
+              })
+              .catch(() => {});
           }
         }
         break;
@@ -125,7 +129,8 @@ export async function POST(req: NextRequest) {
         const subscription = event.data.object as Stripe.Subscription;
         const customerId = subscription.customer as string;
 
-        const status = subscription.status === "active" ? "active" : subscription.status;
+        const status =
+          subscription.status === "active" ? "active" : subscription.status;
 
         const { data: profiles } = await supabase
           .from("profiles")
@@ -138,7 +143,6 @@ export async function POST(req: NextRequest) {
             .from("profiles")
             .update({ subscription_status: status })
             .eq("id", profiles[0].id);
-
         }
         break;
       }
@@ -156,7 +160,10 @@ export async function POST(req: NextRequest) {
         if (profiles && profiles.length > 0) {
           await supabase
             .from("profiles")
-            .update({ subscription_status: "canceled", subscription_plan: "free" })
+            .update({
+              subscription_status: "canceled",
+              subscription_plan: "free",
+            })
             .eq("id", profiles[0].id);
 
           // Envoyer email d'annulation
@@ -168,15 +175,18 @@ export async function POST(req: NextRequest) {
               .single();
 
             if (profile?.email) {
-              const firstName = profile.full_name?.split(" ")[0] || "Utilisateur";
+              const firstName =
+                profile.full_name?.split(" ")[0] || "Utilisateur";
               const emailContent = subscriptionCanceledEmail(firstName);
 
-              await resend.emails.send({
-                from: FROM,
-                to: profile.email,
-                subject: emailContent.subject,
-                html: emailContent.html,
-              }).catch(() => {});
+              await resend.emails
+                .send({
+                  from: FROM,
+                  to: profile.email,
+                  subject: emailContent.subject,
+                  html: emailContent.html,
+                })
+                .catch(() => {});
             }
           }
         }
@@ -202,15 +212,18 @@ export async function POST(req: NextRequest) {
 
           // Envoyer email d'alerte de paiement echoue
           if (resend && profiles[0].email) {
-            const firstName = profiles[0].full_name?.split(" ")[0] || "Utilisateur";
+            const firstName =
+              profiles[0].full_name?.split(" ")[0] || "Utilisateur";
             const emailContent = paymentFailedEmail(firstName);
 
-            await resend.emails.send({
-              from: FROM,
-              to: profiles[0].email,
-              subject: emailContent.subject,
-              html: emailContent.html,
-            }).catch(() => {});
+            await resend.emails
+              .send({
+                from: FROM,
+                to: profiles[0].email,
+                subject: emailContent.subject,
+                html: emailContent.html,
+              })
+              .catch(() => {});
           }
         }
         break;
@@ -224,7 +237,7 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     return NextResponse.json(
       { error: "Erreur interne webhook" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

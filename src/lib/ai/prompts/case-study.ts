@@ -5,7 +5,7 @@ export function caseStudyPrompt(
   result: {
     metric: string;
     value: string;
-  }
+  },
 ): string {
   return `Tu es un expert en rédaction de cas d'études et de témoignages pour les freelances et consultants dans le domaine de l'IA et de l'automatisation.
 

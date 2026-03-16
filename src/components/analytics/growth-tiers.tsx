@@ -42,7 +42,14 @@ interface GrowthTier {
   color: string;
   bgColor: string;
   accentHex: string;
-  badgeVariant: "default" | "blue" | "cyan" | "purple" | "red" | "yellow" | "muted";
+  badgeVariant:
+    | "default"
+    | "blue"
+    | "cyan"
+    | "purple"
+    | "red"
+    | "yellow"
+    | "muted";
   checkpoints: string[];
   nextActions: string[];
 }
@@ -158,8 +165,18 @@ interface GrowthTiersProps {
 // ─── Helpers ────────────────────────────────────────────────
 
 const MONTH_LABELS = [
-  "Jan", "Fév", "Mar", "Avr", "Mai", "Jun",
-  "Jul", "Aoû", "Sep", "Oct", "Nov", "Déc",
+  "Jan",
+  "Fév",
+  "Mar",
+  "Avr",
+  "Mai",
+  "Jun",
+  "Jul",
+  "Aoû",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Déc",
 ];
 
 function formatEur(n: number): string {
@@ -244,7 +261,9 @@ export function GrowthTiers({
 
   const growthRate = useMemo(() => {
     if (previousMonthlyCA <= 0) return null;
-    return Math.round(((currentMonthlyCA - previousMonthlyCA) / previousMonthlyCA) * 100);
+    return Math.round(
+      ((currentMonthlyCA - previousMonthlyCA) / previousMonthlyCA) * 100,
+    );
   }, [currentMonthlyCA, previousMonthlyCA]);
 
   // Determine current tier
@@ -257,10 +276,13 @@ export function GrowthTiers({
     return GROWTH_TIERS[0];
   }, [currentMonthlyCA]);
 
-  const currentTierIndex = GROWTH_TIERS.findIndex((t) => t.id === currentTier.id);
-  const nextTier = currentTierIndex < GROWTH_TIERS.length - 1
-    ? GROWTH_TIERS[currentTierIndex + 1]
-    : null;
+  const currentTierIndex = GROWTH_TIERS.findIndex(
+    (t) => t.id === currentTier.id,
+  );
+  const nextTier =
+    currentTierIndex < GROWTH_TIERS.length - 1
+      ? GROWTH_TIERS[currentTierIndex + 1]
+      : null;
 
   // Progress toward next tier
   const progressToNext = useMemo(() => {
@@ -285,7 +307,9 @@ export function GrowthTiers({
     return (
       <div className={cn("flex items-center justify-center py-16", className)}>
         <Loader2 className="h-5 w-5 animate-spin text-accent mr-3" />
-        <span className="text-text-secondary text-sm">Chargement des données de revenus...</span>
+        <span className="text-text-secondary text-sm">
+          Chargement des données de revenus...
+        </span>
       </div>
     );
   }
@@ -296,9 +320,12 @@ export function GrowthTiers({
       <Card className={className}>
         <CardContent className="flex flex-col items-center justify-center py-16 text-center">
           <AlertCircle className="h-10 w-10 text-text-muted mb-4" />
-          <p className="text-text-secondary font-medium mb-2">Aucune donnée de revenu</p>
+          <p className="text-text-secondary font-medium mb-2">
+            Aucune donnée de revenu
+          </p>
           <p className="text-text-muted text-sm max-w-md mb-5">
-            Ajoute tes revenus dans le suivi de CA pour voir ta progression à travers les paliers de croissance.
+            Ajoute tes revenus dans le suivi de CA pour voir ta progression à
+            travers les paliers de croissance.
           </p>
           <Button
             variant="outline"
@@ -321,16 +348,28 @@ export function GrowthTiers({
       <div className="grid gap-4 grid-cols-1 sm:grid-cols-3">
         <Card>
           <CardContent className="pt-5 pb-4">
-            <p className="text-xs text-text-muted uppercase tracking-wide mb-1">CA mensuel</p>
-            <p className="text-2xl font-bold text-text-primary">{formatEur(currentMonthlyCA)}</p>
+            <p className="text-xs text-text-muted uppercase tracking-wide mb-1">
+              CA mensuel
+            </p>
+            <p className="text-2xl font-bold text-text-primary">
+              {formatEur(currentMonthlyCA)}
+            </p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-5 pb-4">
-            <p className="text-xs text-text-muted uppercase tracking-wide mb-1">Taux de croissance</p>
+            <p className="text-xs text-text-muted uppercase tracking-wide mb-1">
+              Taux de croissance
+            </p>
             {growthRate !== null ? (
-              <p className={cn("text-2xl font-bold", growthRate >= 0 ? "text-emerald-400" : "text-red-400")}>
-                {growthRate >= 0 ? "+" : ""}{growthRate}%
+              <p
+                className={cn(
+                  "text-2xl font-bold",
+                  growthRate >= 0 ? "text-emerald-400" : "text-red-400",
+                )}
+              >
+                {growthRate >= 0 ? "+" : ""}
+                {growthRate}%
               </p>
             ) : (
               <p className="text-lg text-text-muted">—</p>
@@ -339,10 +378,14 @@ export function GrowthTiers({
         </Card>
         <Card>
           <CardContent className="pt-5 pb-4">
-            <p className="text-xs text-text-muted uppercase tracking-wide mb-1">Prochain palier dans</p>
+            <p className="text-xs text-text-muted uppercase tracking-wide mb-1">
+              Prochain palier dans
+            </p>
             {monthsToNextTier !== null && nextTier ? (
               <p className="text-2xl font-bold text-text-primary">
-                {monthsToNextTier === 0 ? "Atteint !" : `~${monthsToNextTier} mois`}
+                {monthsToNextTier === 0
+                  ? "Atteint !"
+                  : `~${monthsToNextTier} mois`}
               </p>
             ) : nextTier ? (
               <p className="text-lg text-text-muted">—</p>
@@ -364,7 +407,10 @@ export function GrowthTiers({
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between text-sm">
             <span className="text-text-secondary">
-              CA mensuel : <strong className="text-text-primary">{formatEur(currentMonthlyCA)}</strong>
+              CA mensuel :{" "}
+              <strong className="text-text-primary">
+                {formatEur(currentMonthlyCA)}
+              </strong>
             </span>
             {nextTier && (
               <span className="text-text-muted">
@@ -378,20 +424,29 @@ export function GrowthTiers({
             <div
               className={cn(
                 "absolute inset-y-0 left-0 rounded-full transition-all duration-500",
-                currentTier.bgColor.replace("/10", "/40")
+                currentTier.bgColor.replace("/10", "/40"),
               )}
               style={{ width: `${progressToNext}%` }}
             />
           </div>
-          <p className="text-xs text-text-muted text-right">{progressToNext}%</p>
+          <p className="text-xs text-text-muted text-right">
+            {progressToNext}%
+          </p>
 
           {/* Next actions */}
           <div>
-            <p className="text-xs text-text-muted uppercase tracking-wide mb-2">Actions recommandées</p>
+            <p className="text-xs text-text-muted uppercase tracking-wide mb-2">
+              Actions recommandées
+            </p>
             <div className="space-y-2">
               {currentTier.nextActions.map((action, i) => (
                 <div key={i} className="flex items-start gap-2">
-                  <ArrowRight className={cn("h-3.5 w-3.5 mt-0.5 shrink-0", currentTier.color)} />
+                  <ArrowRight
+                    className={cn(
+                      "h-3.5 w-3.5 mt-0.5 shrink-0",
+                      currentTier.color,
+                    )}
+                  />
                   <p className="text-sm text-text-secondary">{action}</p>
                 </div>
               ))}
@@ -412,11 +467,28 @@ export function GrowthTiers({
           <CardContent>
             <div className="h-64">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={monthlyData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                <AreaChart
+                  data={monthlyData}
+                  margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
+                >
                   <defs>
-                    <linearGradient id="growthGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor={currentTier.accentHex} stopOpacity={0.3} />
-                      <stop offset="95%" stopColor={currentTier.accentHex} stopOpacity={0} />
+                    <linearGradient
+                      id="growthGradient"
+                      x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="1"
+                    >
+                      <stop
+                        offset="5%"
+                        stopColor={currentTier.accentHex}
+                        stopOpacity={0.3}
+                      />
+                      <stop
+                        offset="95%"
+                        stopColor={currentTier.accentHex}
+                        stopOpacity={0}
+                      />
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke="#1C1F23" />
@@ -440,10 +512,15 @@ export function GrowthTiers({
                       fontSize: 12,
                     }}
                     labelStyle={{ color: "#9CA3AF" }}
-                    formatter={(value?: number) => [formatEur(value ?? 0), "CA"]}
+                    formatter={(value?: number) => [
+                      formatEur(value ?? 0),
+                      "CA",
+                    ]}
                   />
                   {/* Reference lines for tier thresholds */}
-                  {GROWTH_TIERS.filter(t => t.revenueMin > 0 && t.revenueMin < Infinity).map((t) => (
+                  {GROWTH_TIERS.filter(
+                    (t) => t.revenueMin > 0 && t.revenueMin < Infinity,
+                  ).map((t) => (
                     <ReferenceLine
                       key={t.id}
                       y={t.revenueMin}
@@ -485,7 +562,7 @@ export function GrowthTiers({
               className={cn(
                 "transition-all",
                 isActive && "ring-1 ring-accent/30",
-                !isActive && !isPast && "opacity-60"
+                !isActive && !isPast && "opacity-60",
               )}
             >
               <CardHeader>
@@ -518,7 +595,12 @@ export function GrowthTiers({
                         ) : (
                           <Circle className="h-3.5 w-3.5 text-text-muted mt-0.5 shrink-0" />
                         )}
-                        <p className={cn("text-xs", isDone ? "text-text-secondary" : "text-text-muted")}>
+                        <p
+                          className={cn(
+                            "text-xs",
+                            isDone ? "text-text-secondary" : "text-text-muted",
+                          )}
+                        >
                           {cp}
                         </p>
                       </div>
@@ -534,7 +616,9 @@ export function GrowthTiers({
                     </p>
                     {tier.nextActions.map((action, i) => (
                       <div key={i} className="flex items-start gap-2 mb-1.5">
-                        <ArrowRight className={cn("h-3 w-3 mt-0.5 shrink-0", tier.color)} />
+                        <ArrowRight
+                          className={cn("h-3 w-3 mt-0.5 shrink-0", tier.color)}
+                        />
                         <p className="text-xs text-text-secondary">{action}</p>
                       </div>
                     ))}

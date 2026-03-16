@@ -57,10 +57,10 @@ interface FunnelMetrics {
 
 // ─── Benchmarks industrie ────────────────────────────────────
 const BENCHMARKS = {
-  ctr: 2.5,              // % CTR moyen
-  landingConversion: 25,  // % landing → lead
-  leadToCall: 30,         // % lead → call
-  callToSale: 20,         // % call → sale
+  ctr: 2.5, // % CTR moyen
+  landingConversion: 25, // % landing → lead
+  leadToCall: 30, // % lead → call
+  callToSale: 20, // % call → sale
   overallConversion: 0.4, // % impression → sale
 };
 
@@ -83,7 +83,10 @@ function buildFunnelSteps(metrics: FunnelMetrics): FunnelStep[] {
       icon: Eye,
       value: metrics.impressions,
       benchmark: metrics.impressions,
-      conversionToNext: metrics.impressions > 0 ? (metrics.clicks / metrics.impressions) * 100 : 0,
+      conversionToNext:
+        metrics.impressions > 0
+          ? (metrics.clicks / metrics.impressions) * 100
+          : 0,
       benchmarkConversionToNext: BENCHMARKS.ctr,
     },
     {
@@ -91,8 +94,9 @@ function buildFunnelSteps(metrics: FunnelMetrics): FunnelStep[] {
       label: "Clics",
       icon: MousePointer,
       value: metrics.clicks,
-      benchmark: Math.round(metrics.impressions * BENCHMARKS.ctr / 100),
-      conversionToNext: metrics.clicks > 0 ? (metrics.pageViews / metrics.clicks) * 100 : 0,
+      benchmark: Math.round((metrics.impressions * BENCHMARKS.ctr) / 100),
+      conversionToNext:
+        metrics.clicks > 0 ? (metrics.pageViews / metrics.clicks) * 100 : 0,
       benchmarkConversionToNext: 85,
     },
     {
@@ -101,7 +105,8 @@ function buildFunnelSteps(metrics: FunnelMetrics): FunnelStep[] {
       icon: Eye,
       value: metrics.pageViews,
       benchmark: Math.round(metrics.clicks * 0.85),
-      conversionToNext: metrics.pageViews > 0 ? (metrics.leads / metrics.pageViews) * 100 : 0,
+      conversionToNext:
+        metrics.pageViews > 0 ? (metrics.leads / metrics.pageViews) * 100 : 0,
       benchmarkConversionToNext: BENCHMARKS.landingConversion,
     },
     {
@@ -109,8 +114,11 @@ function buildFunnelSteps(metrics: FunnelMetrics): FunnelStep[] {
       label: "Leads",
       icon: UserPlus,
       value: metrics.leads,
-      benchmark: Math.round(metrics.pageViews * BENCHMARKS.landingConversion / 100),
-      conversionToNext: metrics.leads > 0 ? (metrics.calls / metrics.leads) * 100 : 0,
+      benchmark: Math.round(
+        (metrics.pageViews * BENCHMARKS.landingConversion) / 100,
+      ),
+      conversionToNext:
+        metrics.leads > 0 ? (metrics.calls / metrics.leads) * 100 : 0,
       benchmarkConversionToNext: BENCHMARKS.leadToCall,
     },
     {
@@ -118,8 +126,9 @@ function buildFunnelSteps(metrics: FunnelMetrics): FunnelStep[] {
       label: "Appels",
       icon: Phone,
       value: metrics.calls,
-      benchmark: Math.round(metrics.leads * BENCHMARKS.leadToCall / 100),
-      conversionToNext: metrics.calls > 0 ? (metrics.sales / metrics.calls) * 100 : 0,
+      benchmark: Math.round((metrics.leads * BENCHMARKS.leadToCall) / 100),
+      conversionToNext:
+        metrics.calls > 0 ? (metrics.sales / metrics.calls) * 100 : 0,
       benchmarkConversionToNext: BENCHMARKS.callToSale,
     },
     {
@@ -127,7 +136,7 @@ function buildFunnelSteps(metrics: FunnelMetrics): FunnelStep[] {
       label: "Ventes",
       icon: CreditCard,
       value: metrics.sales,
-      benchmark: Math.round(metrics.calls * BENCHMARKS.callToSale / 100),
+      benchmark: Math.round((metrics.calls * BENCHMARKS.callToSale) / 100),
       conversionToNext: 0,
       benchmarkConversionToNext: 0,
     },
@@ -142,11 +151,13 @@ function detectBottlenecks(steps: FunnelStep[]): Bottleneck[] {
   const recommendations: Record<string, { rec: string; impact: string }> = {
     impressions: {
       rec: "Augmente ton budget ads ou diversifie les audiences (lookalikes, centres d'intérêt adjacents).",
-      impact: "Chaque +1% de CTR = plus de trafic qualifié sur ta landing page.",
+      impact:
+        "Chaque +1% de CTR = plus de trafic qualifié sur ta landing page.",
     },
     clicks: {
       rec: "Optimise tes créatives : teste des hooks plus forts, change les visuels, ajoute de la preuve sociale dans l'ad.",
-      impact: "Améliorer le CTR de 1% peut doubler le nombre de leads à budget constant.",
+      impact:
+        "Améliorer le CTR de 1% peut doubler le nombre de leads à budget constant.",
     },
     page_views: {
       rec: "Vérifie la vitesse de ta page (< 3s). Assure-toi que le message de l'ad correspond à la landing page.",
@@ -154,15 +165,18 @@ function detectBottlenecks(steps: FunnelStep[]): Bottleneck[] {
     },
     leads: {
       rec: "Simplifie ton formulaire (prénom + email suffisent). Renforce ta proposition de valeur au-dessus du fold. Ajoute des témoignages.",
-      impact: "Passer de 12% à 25% de conversion landing = 2x plus de leads sans dépenser plus.",
+      impact:
+        "Passer de 12% à 25% de conversion landing = 2x plus de leads sans dépenser plus.",
     },
     calls: {
       rec: "Améliore ta séquence email/SMS nurturing. Ajoute un rappel J+1 et J+3. Propose 2 créneaux au lieu d'un lien Calendly ouvert.",
-      impact: "Passer de 20% à 30% de leads en call = +50% d'opportunités de vente.",
+      impact:
+        "Passer de 20% à 30% de leads en call = +50% d'opportunités de vente.",
     },
     sales: {
       rec: "Travaille ton script de closing : valide mieux les objections, crée plus d'urgence, propose un downsell si blocage prix.",
-      impact: "Passer de 15% à 25% de closing = +67% de revenus sans plus de leads.",
+      impact:
+        "Passer de 15% à 25% de closing = +67% de revenus sans plus de leads.",
     },
   };
 
@@ -173,12 +187,16 @@ function detectBottlenecks(steps: FunnelStep[]): Bottleneck[] {
     if (gap <= 0) continue;
 
     const severity: "critical" | "warning" | "info" =
-      gap > step.benchmarkConversionToNext * 0.5 ? "critical" :
-      gap > step.benchmarkConversionToNext * 0.25 ? "warning" : "info";
+      gap > step.benchmarkConversionToNext * 0.5
+        ? "critical"
+        : gap > step.benchmarkConversionToNext * 0.25
+          ? "warning"
+          : "info";
 
     const recData = recommendations[step.id] || {
       rec: "Analyse cette étape en détail pour identifier les frictions.",
-      impact: "Améliorer cette conversion impacte directement le bas du funnel.",
+      impact:
+        "Améliorer cette conversion impacte directement le bas du funnel.",
     };
 
     bottlenecks.push({
@@ -219,8 +237,10 @@ function detectContextualBottlenecks(ctx: ContextualData): Bottleneck[] {
       benchmarkRate: 0,
       gap: 50,
       severity: "critical",
-      recommendation: "Tes créatives montrent des signes de fatigue (fréquence élevée, CTR en baisse). Génère de nouvelles variations depuis l'onglet Créatives.",
-      impact: "Renouveler les créatives peut relancer le CTR de +50% et réduire le CPL.",
+      recommendation:
+        "Tes créatives montrent des signes de fatigue (fréquence élevée, CTR en baisse). Génère de nouvelles variations depuis l'onglet Créatives.",
+      impact:
+        "Renouveler les créatives peut relancer le CTR de +50% et réduire le CPL.",
     });
   }
 
@@ -233,8 +253,9 @@ function detectContextualBottlenecks(ctx: ContextualData): Bottleneck[] {
       benchmarkRate: 60,
       gap: 60 - ctx.showUpRate,
       severity: ctx.showUpRate < 40 ? "critical" : "warning",
-      recommendation: "Taux de présence aux appels trop bas. Renforce tes rappels SMS/email (J-1, H-1). Ajoute une vidéo de confirmation post-booking.",
-      impact: `Passer de ${ctx.showUpRate}% à 60% de show-up = ${Math.round((60 - ctx.showUpRate) / ctx.showUpRate * 100)}% d'appels en plus sans générer plus de leads.`,
+      recommendation:
+        "Taux de présence aux appels trop bas. Renforce tes rappels SMS/email (J-1, H-1). Ajoute une vidéo de confirmation post-booking.",
+      impact: `Passer de ${ctx.showUpRate}% à 60% de show-up = ${Math.round(((60 - ctx.showUpRate) / ctx.showUpRate) * 100)}% d'appels en plus sans générer plus de leads.`,
     });
   }
 
@@ -248,7 +269,8 @@ function detectContextualBottlenecks(ctx: ContextualData): Bottleneck[] {
       gap: 40,
       severity: ctx.daysSinceContent > 14 ? "critical" : "warning",
       recommendation: `Aucun contenu publié depuis ${ctx.daysSinceContent} jours. L'algorithme pénalise l'inactivité. Publie au minimum 3 contenus cette semaine.`,
-      impact: "L'absence de contenu organique réduit ta portée et ton autorité. Chaque semaine sans contenu = perte d'engagement cumulée.",
+      impact:
+        "L'absence de contenu organique réduit ta portée et ton autorité. Chaque semaine sans contenu = perte d'engagement cumulée.",
     });
   }
 
@@ -262,8 +284,10 @@ function detectContextualBottlenecks(ctx: ContextualData): Bottleneck[] {
       benchmarkRate: lastMonth * 1.2,
       gap: 30,
       severity: "warning",
-      recommendation: "Ton CA stagne depuis 2 mois. Envisage : (1) tester de nouvelles audiences, (2) ajouter une offre complémentaire (OTO/upsell), (3) augmenter les budgets ads sur les winners.",
-      impact: "La stagnation signale un plafond. Sans action, le CA risque de baisser à cause de la fatigue d'audience.",
+      recommendation:
+        "Ton CA stagne depuis 2 mois. Envisage : (1) tester de nouvelles audiences, (2) ajouter une offre complémentaire (OTO/upsell), (3) augmenter les budgets ads sur les winners.",
+      impact:
+        "La stagnation signale un plafond. Sans action, le CA risque de baisser à cause de la fatigue d'audience.",
     });
   }
 
@@ -279,8 +303,13 @@ export function BottleneckDetector() {
   const [loading, setLoading] = useState(true);
   const [analyzing, setAnalyzing] = useState(false);
   const [contextualData, setContextualData] = useState<ContextualData>({
-    creativeFatigue: false, noShows: false, showUpRate: 100,
-    contentGap: false, daysSinceContent: 0, revenueStalled: false, monthlyRevenues: [],
+    creativeFatigue: false,
+    noShows: false,
+    showUpRate: 100,
+    contentGap: false,
+    daysSinceContent: 0,
+    revenueStalled: false,
+    monthlyRevenues: [],
   });
 
   useEffect(() => {
@@ -289,7 +318,15 @@ export function BottleneckDetector() {
       setLoading(true);
 
       // Fetch real metrics from multiple tables
-      const [impressionsRes, leadsRes, callsRes, salesRes, contentRes, revenueRes, decisionsRes] = await Promise.all([
+      const [
+        impressionsRes,
+        leadsRes,
+        callsRes,
+        salesRes,
+        contentRes,
+        revenueRes,
+        decisionsRes,
+      ] = await Promise.all([
         supabase
           .from("ad_campaigns")
           .select("impressions, clicks, daily_budget")
@@ -317,19 +354,31 @@ export function BottleneckDetector() {
           .from("revenue_entries")
           .select("amount, created_at")
           .eq("user_id", user.id)
-          .gte("created_at", new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString()),
+          .gte(
+            "created_at",
+            new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString(),
+          ),
         supabase
           .from("ad_decisions")
           .select("decision_type")
           .eq("user_id", user.id)
           .eq("decision_type", "creative_fatigue")
-          .gte("created_at", new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()),
+          .gte(
+            "created_at",
+            new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+          ),
       ]);
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const campaigns: any[] = impressionsRes.data ?? [];
-      const totalImpressions = campaigns.reduce((s: number, c: any) => s + ((c.impressions as number) ?? 0), 0);
-      const totalClicks = campaigns.reduce((s: number, c: any) => s + ((c.clicks as number) ?? 0), 0);
+      const totalImpressions = campaigns.reduce(
+        (s: number, c: any) => s + ((c.impressions as number) ?? 0),
+        0,
+      );
+      const totalClicks = campaigns.reduce(
+        (s: number, c: any) => s + ((c.clicks as number) ?? 0),
+        0,
+      );
 
       if (totalImpressions > 0 || (leadsRes.count ?? 0) > 0) {
         setMetrics({
@@ -346,23 +395,46 @@ export function BottleneckDetector() {
       // Contextual bottleneck data
       const lastContentDate = contentRes.data?.[0]?.created_at;
       const daysSinceContent = lastContentDate
-        ? Math.floor((Date.now() - new Date(lastContentDate).getTime()) / (1000 * 60 * 60 * 24))
+        ? Math.floor(
+            (Date.now() - new Date(lastContentDate).getTime()) /
+              (1000 * 60 * 60 * 24),
+          )
         : 999;
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const calls = callsRes.data as any[] ?? [];
+      const calls = (callsRes.data as any[]) ?? [];
       const totalCalls = calls.length;
-      const noShowCalls = calls.filter((c) => c.call_result === "no_show").length;
-      const showUpRate = totalCalls > 0 ? ((totalCalls - noShowCalls) / totalCalls) * 100 : 100;
+      const noShowCalls = calls.filter(
+        (c) => c.call_result === "no_show",
+      ).length;
+      const showUpRate =
+        totalCalls > 0 ? ((totalCalls - noShowCalls) / totalCalls) * 100 : 100;
 
       // Revenue stagnation: compare last 2 months
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const revEntries = (revenueRes.data ?? []) as any[];
       const now = new Date();
-      const thisMonthRev = revEntries.filter((r) => new Date(r.created_at).getMonth() === now.getMonth()).reduce((s: number, r: { amount: number }) => s + (r.amount || 0), 0);
-      const lastMonthRev = revEntries.filter((r) => new Date(r.created_at).getMonth() === (now.getMonth() - 1 + 12) % 12).reduce((s: number, r: { amount: number }) => s + (r.amount || 0), 0);
-      const prevMonthRev = revEntries.filter((r) => new Date(r.created_at).getMonth() === (now.getMonth() - 2 + 12) % 12).reduce((s: number, r: { amount: number }) => s + (r.amount || 0), 0);
-      const revenueStalled = lastMonthRev > 0 && prevMonthRev > 0 && Math.abs(lastMonthRev - prevMonthRev) / prevMonthRev < 0.1;
+      const thisMonthRev = revEntries
+        .filter((r) => new Date(r.created_at).getMonth() === now.getMonth())
+        .reduce((s: number, r: { amount: number }) => s + (r.amount || 0), 0);
+      const lastMonthRev = revEntries
+        .filter(
+          (r) =>
+            new Date(r.created_at).getMonth() ===
+            (now.getMonth() - 1 + 12) % 12,
+        )
+        .reduce((s: number, r: { amount: number }) => s + (r.amount || 0), 0);
+      const prevMonthRev = revEntries
+        .filter(
+          (r) =>
+            new Date(r.created_at).getMonth() ===
+            (now.getMonth() - 2 + 12) % 12,
+        )
+        .reduce((s: number, r: { amount: number }) => s + (r.amount || 0), 0);
+      const revenueStalled =
+        lastMonthRev > 0 &&
+        prevMonthRev > 0 &&
+        Math.abs(lastMonthRev - prevMonthRev) / prevMonthRev < 0.1;
 
       setContextualData({
         creativeFatigue: (decisionsRes.data ?? []).length > 0,
@@ -384,8 +456,12 @@ export function BottleneckDetector() {
   const contextualBottlenecks = detectContextualBottlenecks(contextualData);
   const bottlenecks = [...funnelBottlenecks, ...contextualBottlenecks];
 
-  const criticalCount = bottlenecks.filter((b) => b.severity === "critical").length;
-  const warningCount = bottlenecks.filter((b) => b.severity === "warning").length;
+  const criticalCount = bottlenecks.filter(
+    (b) => b.severity === "critical",
+  ).length;
+  const warningCount = bottlenecks.filter(
+    (b) => b.severity === "warning",
+  ).length;
 
   const handleRefresh = async () => {
     setAnalyzing(true);
@@ -402,17 +478,35 @@ export function BottleneckDetector() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          {loading && <Loader2 className="h-4 w-4 animate-spin text-text-muted" />}
-          {isDemo && !loading && <Badge variant="yellow">Données de démonstration</Badge>}
+          {loading && (
+            <Loader2 className="h-4 w-4 animate-spin text-text-muted" />
+          )}
+          {isDemo && !loading && (
+            <Badge variant="yellow">Données de démonstration</Badge>
+          )}
           {!loading && criticalCount > 0 && (
-            <Badge variant="red">{criticalCount} point{criticalCount > 1 ? "s" : ""} critique{criticalCount > 1 ? "s" : ""}</Badge>
+            <Badge variant="red">
+              {criticalCount} point{criticalCount > 1 ? "s" : ""} critique
+              {criticalCount > 1 ? "s" : ""}
+            </Badge>
           )}
           {!loading && warningCount > 0 && (
-            <Badge variant="yellow">{warningCount} avertissement{warningCount > 1 ? "s" : ""}</Badge>
+            <Badge variant="yellow">
+              {warningCount} avertissement{warningCount > 1 ? "s" : ""}
+            </Badge>
           )}
         </div>
-        <Button variant="ghost" size="sm" onClick={handleRefresh} disabled={analyzing}>
-          {analyzing ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : <RefreshCw className="h-4 w-4 mr-1" />}
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={handleRefresh}
+          disabled={analyzing}
+        >
+          {analyzing ? (
+            <Loader2 className="h-4 w-4 animate-spin mr-1" />
+          ) : (
+            <RefreshCw className="h-4 w-4 mr-1" />
+          )}
           Analyser
         </Button>
       </div>
@@ -428,7 +522,8 @@ export function BottleneckDetector() {
         <CardContent>
           <div className="space-y-1">
             {steps.map((step, i) => {
-              const widthPct = maxValue > 0 ? Math.max(8, (step.value / maxValue) * 100) : 8;
+              const widthPct =
+                maxValue > 0 ? Math.max(8, (step.value / maxValue) * 100) : 8;
               const hasBottleneck = bottlenecks.find((b) => b.stepIndex === i);
               const StepIcon = step.icon;
 
@@ -446,8 +541,8 @@ export function BottleneckDetector() {
                           hasBottleneck?.severity === "critical"
                             ? "bg-red-500/20 border border-red-500/30"
                             : hasBottleneck?.severity === "warning"
-                            ? "bg-warning/20 border border-warning/30"
-                            : "bg-accent/15 border border-accent/20"
+                              ? "bg-warning/20 border border-warning/30"
+                              : "bg-accent/15 border border-accent/20",
                         )}
                         style={{ width: `${widthPct}%` }}
                       >
@@ -460,7 +555,9 @@ export function BottleneckDetector() {
                           <AlertTriangle
                             className={cn(
                               "h-4 w-4",
-                              hasBottleneck.severity === "critical" ? "text-red-400" : "text-warning"
+                              hasBottleneck.severity === "critical"
+                                ? "text-red-400"
+                                : "text-warning",
                             )}
                           />
                         </div>
@@ -468,11 +565,17 @@ export function BottleneckDetector() {
                     </div>
                     <div className="w-16 text-right text-xs text-text-muted shrink-0">
                       {i < steps.length - 1 && (
-                        <span className={cn(
-                          step.conversionToNext < step.benchmarkConversionToNext * 0.75 ? "text-red-400 font-semibold" :
-                          step.conversionToNext < step.benchmarkConversionToNext ? "text-warning" :
-                          "text-accent"
-                        )}>
+                        <span
+                          className={cn(
+                            step.conversionToNext <
+                              step.benchmarkConversionToNext * 0.75
+                              ? "text-red-400 font-semibold"
+                              : step.conversionToNext <
+                                  step.benchmarkConversionToNext
+                                ? "text-warning"
+                                : "text-accent",
+                          )}
+                        >
                           {step.conversionToNext.toFixed(1)}%
                         </span>
                       )}
@@ -509,9 +612,11 @@ export function BottleneckDetector() {
               key={i}
               className={cn(
                 "border-l-4",
-                bn.severity === "critical" ? "border-l-red-500" :
-                bn.severity === "warning" ? "border-l-warning" :
-                "border-l-info"
+                bn.severity === "critical"
+                  ? "border-l-red-500"
+                  : bn.severity === "warning"
+                    ? "border-l-warning"
+                    : "border-l-info",
               )}
             >
               <CardContent className="py-4">
@@ -519,18 +624,31 @@ export function BottleneckDetector() {
                   <div className="flex items-center gap-2">
                     <Badge
                       variant={
-                        bn.severity === "critical" ? "red" :
-                        bn.severity === "warning" ? "yellow" : "muted"
+                        bn.severity === "critical"
+                          ? "red"
+                          : bn.severity === "warning"
+                            ? "yellow"
+                            : "muted"
                       }
                     >
-                      {bn.severity === "critical" ? "Critique" : bn.severity === "warning" ? "Attention" : "Info"}
+                      {bn.severity === "critical"
+                        ? "Critique"
+                        : bn.severity === "warning"
+                          ? "Attention"
+                          : "Info"}
                     </Badge>
-                    <span className="text-sm font-medium text-text-primary">{bn.stepLabel}</span>
+                    <span className="text-sm font-medium text-text-primary">
+                      {bn.stepLabel}
+                    </span>
                   </div>
                   <div className="flex items-center gap-2 text-sm">
-                    <span className="text-red-400 font-semibold">{bn.currentRate.toFixed(1)}%</span>
+                    <span className="text-red-400 font-semibold">
+                      {bn.currentRate.toFixed(1)}%
+                    </span>
                     <ArrowRight className="h-3 w-3 text-text-muted" />
-                    <span className="text-accent font-semibold">{bn.benchmarkRate.toFixed(1)}%</span>
+                    <span className="text-accent font-semibold">
+                      {bn.benchmarkRate.toFixed(1)}%
+                    </span>
                     <span className="text-xs text-text-muted">(benchmark)</span>
                   </div>
                 </div>
@@ -538,7 +656,9 @@ export function BottleneckDetector() {
                 <div className="mt-3 p-3 rounded-xl bg-bg-tertiary/50">
                   <div className="flex items-start gap-2 mb-2">
                     <Sparkles className="h-4 w-4 text-accent mt-0.5 shrink-0" />
-                    <p className="text-sm text-text-secondary">{bn.recommendation}</p>
+                    <p className="text-sm text-text-secondary">
+                      {bn.recommendation}
+                    </p>
                   </div>
                   <p className="text-xs text-text-muted pl-6">{bn.impact}</p>
                 </div>
@@ -550,10 +670,15 @@ export function BottleneckDetector() {
                     <div
                       className={cn(
                         "h-full rounded-full transition-all",
-                        bn.severity === "critical" ? "bg-red-500" :
-                        bn.severity === "warning" ? "bg-warning" : "bg-info"
+                        bn.severity === "critical"
+                          ? "bg-red-500"
+                          : bn.severity === "warning"
+                            ? "bg-warning"
+                            : "bg-info",
                       )}
-                      style={{ width: `${Math.min(100, (bn.gap / bn.benchmarkRate) * 100)}%` }}
+                      style={{
+                        width: `${Math.min(100, (bn.gap / bn.benchmarkRate) * 100)}%`,
+                      }}
                     />
                   </div>
                   <span className="text-xs font-medium text-text-secondary">
@@ -574,7 +699,8 @@ export function BottleneckDetector() {
               Funnel optimisé
             </h3>
             <p className="text-sm text-text-secondary max-w-md">
-              Toutes les étapes de ton funnel sont au-dessus des benchmarks. Continue à monitorer !
+              Toutes les étapes de ton funnel sont au-dessus des benchmarks.
+              Continue à monitorer !
             </p>
           </CardContent>
         </Card>

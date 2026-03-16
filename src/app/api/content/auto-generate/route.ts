@@ -19,7 +19,10 @@ async function getAdminClient() {
 async function runContentGeneration() {
   const supabase = await getAdminClient();
   if (!supabase) {
-    return NextResponse.json({ error: "Configuration manquante" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Configuration manquante" },
+      { status: 500 },
+    );
   }
 
   // Récupérer les utilisateurs actifs
@@ -37,14 +40,21 @@ async function runContentGeneration() {
       .from("content_library")
       .select("content_type, engagement_score, views, likes, shares")
       .eq("user_id", profile.id)
-      .gte("created_at", new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString())
+      .gte(
+        "created_at",
+        new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+      )
       .order("engagement_score", { ascending: false });
 
     // Calculer les performances moyennes par type
-    const perfByType: Record<string, { count: number; avgEngagement: number; totalViews: number }> = {};
+    const perfByType: Record<
+      string,
+      { count: number; avgEngagement: number; totalViews: number }
+    > = {};
     for (const item of contentPerf ?? []) {
       const type = (item.content_type as string) || "reel";
-      if (!perfByType[type]) perfByType[type] = { count: 0, avgEngagement: 0, totalViews: 0 };
+      if (!perfByType[type])
+        perfByType[type] = { count: 0, avgEngagement: 0, totalViews: 0 };
       perfByType[type].count++;
       perfByType[type].avgEngagement += (item.engagement_score as number) || 0;
       perfByType[type].totalViews += (item.views as number) || 0;
@@ -62,7 +72,10 @@ async function runContentGeneration() {
       .from("sales_calls")
       .select("objections, key_moments")
       .eq("user_id", profile.id)
-      .gte("created_at", new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString())
+      .gte(
+        "created_at",
+        new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString(),
+      )
       .limit(5);
 
     const objections = (recentCalls ?? [])
@@ -76,9 +89,10 @@ async function runContentGeneration() {
       .sort(([, a], [, b]) => b.avgEngagement - a.avgEngagement)
       .map(([type, data]) => ({ type, ...data }));
 
-    const adaptationContext = topTypes.length > 0
-      ? `Les formats les plus performants sont : ${topTypes.map((t) => `${t.type} (engagement moyen: ${t.avgEngagement.toFixed(1)}, ${t.count} publiés)`).join(", ")}.`
-      : "Pas encore de données de performance. Génère un mix équilibré.";
+    const adaptationContext =
+      topTypes.length > 0
+        ? `Les formats les plus performants sont : ${topTypes.map((t) => `${t.type} (engagement moyen: ${t.avgEngagement.toFixed(1)}, ${t.count} publiés)`).join(", ")}.`
+        : "Pas encore de données de performance. Génère un mix équilibré.";
 
     try {
       const response = await anthropic.messages.create({
@@ -146,7 +160,8 @@ Format JSON :
         ],
       });
 
-      const text = response.content[0].type === "text" ? response.content[0].text : "";
+      const text =
+        response.content[0].type === "text" ? response.content[0].text : "";
       let parsed;
       try {
         parsed = JSON.parse(text);
@@ -170,7 +185,9 @@ Format JSON :
           hashtags: content.hashtags,
           best_posting_time: content.best_posting_time,
           reasoning: content.reasoning,
-          source: content.addresses_objection ? "auto_objection" : "auto_weekly",
+          source: content.addresses_objection
+            ? "auto_objection"
+            : "auto_weekly",
           based_on_performance: content.based_on_performance || false,
           status: "draft",
         });
@@ -222,7 +239,9 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (!user) {
       return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
     }

@@ -16,6 +16,7 @@
 **7 phases du parcours :** VAULT → TRUTH → OFFER → BUILD → ATTENTION → LAUNCH → SCALE
 
 **Profils cibles :**
+
 - A1 : Entrepreneurs sans business (partent de zéro)
 - A2 : Salariés en reconversion
 - A3 : Freelances qui veulent scaler
@@ -46,9 +47,9 @@
 
 ## Comptes de test
 
-| Rôle  | Email                    | Mot de passe |
-|-------|--------------------------|--------------|
-| Admin | admin@scalingflow.com    | Test1234x    |
+| Rôle  | Email                 | Mot de passe |
+| ----- | --------------------- | ------------ |
+| Admin | admin@scalingflow.com | Test1234x    |
 
 ## Commandes utiles
 

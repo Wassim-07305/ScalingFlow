@@ -41,7 +41,9 @@ export default function AnalyticsPage() {
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
 
-  const hasMetaConfig = !!(profile?.meta_access_token && profile?.meta_ad_account_id);
+  const hasMetaConfig = !!(
+    profile?.meta_access_token && profile?.meta_ad_account_id
+  );
 
   const handleSyncMeta = async () => {
     setSyncing(true);
@@ -71,7 +73,9 @@ export default function AnalyticsPage() {
       const [campaignsRes, creativesRes] = await Promise.all([
         supabase
           .from("ad_campaigns")
-          .select("total_spend, total_impressions, total_clicks, total_conversions, roas")
+          .select(
+            "total_spend, total_impressions, total_clicks, total_conversions, roas",
+          )
           .eq("user_id", user.id),
         supabase
           .from("ad_creatives")
@@ -89,17 +93,32 @@ export default function AnalyticsPage() {
         return;
       }
 
-      const totalSpend = campaigns.reduce((s, c) => s + (c.total_spend ?? 0), 0);
-      const totalImpressions = campaigns.reduce((s, c) => s + (c.total_impressions ?? 0), 0);
-      const totalClicks = campaigns.reduce((s, c) => s + (c.total_clicks ?? 0), 0);
-      const totalConversions = campaigns.reduce((s, c) => s + (c.total_conversions ?? 0), 0);
+      const totalSpend = campaigns.reduce(
+        (s, c) => s + (c.total_spend ?? 0),
+        0,
+      );
+      const totalImpressions = campaigns.reduce(
+        (s, c) => s + (c.total_impressions ?? 0),
+        0,
+      );
+      const totalClicks = campaigns.reduce(
+        (s, c) => s + (c.total_clicks ?? 0),
+        0,
+      );
+      const totalConversions = campaigns.reduce(
+        (s, c) => s + (c.total_conversions ?? 0),
+        0,
+      );
 
-      const avgRoas = campaigns.length > 0
-        ? campaigns.reduce((s, c) => s + (c.roas ?? 0), 0) / campaigns.length
-        : 0;
-      const avgCtr = totalImpressions > 0 ? (totalClicks / totalImpressions) * 100 : 0;
+      const avgRoas =
+        campaigns.length > 0
+          ? campaigns.reduce((s, c) => s + (c.roas ?? 0), 0) / campaigns.length
+          : 0;
+      const avgCtr =
+        totalImpressions > 0 ? (totalClicks / totalImpressions) * 100 : 0;
       const avgCpa = totalConversions > 0 ? totalSpend / totalConversions : 0;
-      const avgCpm = totalImpressions > 0 ? (totalSpend / totalImpressions) * 1000 : 0;
+      const avgCpm =
+        totalImpressions > 0 ? (totalSpend / totalImpressions) * 1000 : 0;
 
       setMetrics({
         totalSpend,
@@ -122,7 +141,10 @@ export default function AnalyticsPage() {
   if (loading || userLoading) {
     return (
       <div>
-        <PageHeader title="Analytiques Publicités" description="Analyse les performances de tes publicités." />
+        <PageHeader
+          title="Analytiques Publicités"
+          description="Analyse les performances de tes publicités."
+        />
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
           {Array.from({ length: 4 }).map((_, i) => (
             <Card key={i}>
@@ -163,7 +185,10 @@ export default function AnalyticsPage() {
   if (!metrics) {
     return (
       <div>
-        <PageHeader title="Analytiques Publicités" description="Analyse les performances de tes publicités." />
+        <PageHeader
+          title="Analytiques Publicités"
+          description="Analyse les performances de tes publicités."
+        />
         <EmptyState
           icon={BarChart3}
           title="Aucune donnée publicitaire"
@@ -174,15 +199,46 @@ export default function AnalyticsPage() {
   }
 
   const KPI_CARDS = [
-    { label: "ROAS moyen", value: metrics.avgRoas, decimals: 1, suffix: "x", icon: TrendingUp, color: "text-accent" },
-    { label: "CPA moyen", value: metrics.avgCpa, decimals: 2, suffix: " €", icon: DollarSign, color: "text-accent" },
-    { label: "CTR moyen", value: metrics.avgCtr, decimals: 1, suffix: "%", icon: MousePointer, color: "text-info" },
-    { label: "CPM moyen", value: metrics.avgCpm, decimals: 2, suffix: " €", icon: Eye, color: "text-accent" },
+    {
+      label: "ROAS moyen",
+      value: metrics.avgRoas,
+      decimals: 1,
+      suffix: "x",
+      icon: TrendingUp,
+      color: "text-accent",
+    },
+    {
+      label: "CPA moyen",
+      value: metrics.avgCpa,
+      decimals: 2,
+      suffix: " €",
+      icon: DollarSign,
+      color: "text-accent",
+    },
+    {
+      label: "CTR moyen",
+      value: metrics.avgCtr,
+      decimals: 1,
+      suffix: "%",
+      icon: MousePointer,
+      color: "text-info",
+    },
+    {
+      label: "CPM moyen",
+      value: metrics.avgCpm,
+      decimals: 2,
+      suffix: " €",
+      icon: Eye,
+      color: "text-accent",
+    },
   ];
 
   return (
     <div>
-      <PageHeader title="Analytiques Publicités" description="Analyse les performances de tes publicités.">
+      <PageHeader
+        title="Analytiques Publicités"
+        description="Analyse les performances de tes publicités."
+      >
         {hasMetaConfig && (
           <Button
             size="sm"
@@ -292,7 +348,8 @@ export default function AnalyticsPage() {
           {hasMetaConfig ? (
             <div className="flex items-center justify-between">
               <p className="text-sm text-text-secondary">
-                Ton compte Meta Ads est connecté. Clique sur &ldquo;Sync Meta Ads&rdquo; pour importer tes dernières données.
+                Ton compte Meta Ads est connecté. Clique sur &ldquo;Sync Meta
+                Ads&rdquo; pour importer tes dernières données.
               </p>
               <Button
                 size="sm"
@@ -301,15 +358,20 @@ export default function AnalyticsPage() {
                 aria-label="Synchroniser les données Meta Ads"
                 className="gap-2 shrink-0 ml-4"
               >
-                <RefreshCw className={`h-4 w-4 ${syncing ? "animate-spin" : ""}`} />
+                <RefreshCw
+                  className={`h-4 w-4 ${syncing ? "animate-spin" : ""}`}
+                />
                 Synchroniser
               </Button>
             </div>
           ) : (
             <p className="text-sm text-text-secondary">
               Connecte ton compte Meta Ads dans les{" "}
-              <a href="/settings" className="text-accent hover:underline">paramètres</a>{" "}
-              pour synchroniser tes données publicitaires et voir tes performances réelles.
+              <a href="/settings" className="text-accent hover:underline">
+                paramètres
+              </a>{" "}
+              pour synchroniser tes données publicitaires et voir tes
+              performances réelles.
             </p>
           )}
         </CardContent>

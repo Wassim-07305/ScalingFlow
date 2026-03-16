@@ -2,12 +2,28 @@
 
 import React from "react";
 import { cn } from "@/lib/utils/cn";
-import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  CardDescription,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AILoading } from "@/components/shared/ai-loading";
 import { GlowCard } from "@/components/shared/glow-card";
-import { Copy, Check, Eye, MessageCircle, GraduationCap, Megaphone, Heart, BookOpen, Send } from "lucide-react";
+import {
+  Copy,
+  Check,
+  Eye,
+  MessageCircle,
+  GraduationCap,
+  Megaphone,
+  Heart,
+  BookOpen,
+  Send,
+} from "lucide-react";
 import { toast } from "sonner";
 import type { StoriesResult } from "@/lib/ai/prompts/stories-scripts";
 import { UpgradeWall } from "@/components/shared/upgrade-wall";
@@ -56,12 +72,18 @@ const TYPE_CONFIG = {
   },
 };
 
-export function StoriesGenerator({ className, initialData }: StoriesGeneratorProps) {
+export function StoriesGenerator({
+  className,
+  initialData,
+}: StoriesGeneratorProps) {
   const [loading, setLoading] = React.useState(false);
   const [stories, setStories] = React.useState<StoriesResult["stories"]>([]);
   const [error, setError] = React.useState<string | null>(null);
   const [copiedIndex, setCopiedIndex] = React.useState<number | null>(null);
-  const [usageLimited, setUsageLimited] = React.useState<{currentUsage: number; limit: number} | null>(null);
+  const [usageLimited, setUsageLimited] = React.useState<{
+    currentUsage: number;
+    limit: number;
+  } | null>(null);
   const [publishDialogOpen, setPublishDialogOpen] = React.useState(false);
   const [publishContent, setPublishContent] = React.useState("");
 
@@ -96,7 +118,10 @@ export function StoriesGenerator({ className, initialData }: StoriesGeneratorPro
       if (!response.ok) {
         if (response.status === 403) {
           const errData = await response.json();
-          if (errData.usage) { setUsageLimited(errData.usage); return; }
+          if (errData.usage) {
+            setUsageLimited(errData.usage);
+            return;
+          }
         }
         throw new Error("Erreur lors de la génération");
       }
@@ -114,9 +139,14 @@ export function StoriesGenerator({ className, initialData }: StoriesGeneratorPro
     }
   };
 
-  const copyStory = (story: StoriesResult["stories"][number], index: number) => {
+  const copyStory = (
+    story: StoriesResult["stories"][number],
+    index: number,
+  ) => {
     const text = story.slides
-      .map((s, i) => `Slide ${i + 1}:\n${s.text}\n[Visual: ${s.visual_direction}]`)
+      .map(
+        (s, i) => `Slide ${i + 1}:\n${s.text}\n[Visual: ${s.visual_direction}]`,
+      )
       .join("\n\n");
     navigator.clipboard.writeText(text);
     setCopiedIndex(index);
@@ -125,11 +155,23 @@ export function StoriesGenerator({ className, initialData }: StoriesGeneratorPro
   };
 
   if (usageLimited) {
-    return <UpgradeWall currentUsage={usageLimited.currentUsage} limit={usageLimited.limit} className={className} />;
+    return (
+      <UpgradeWall
+        currentUsage={usageLimited.currentUsage}
+        limit={usageLimited.limit}
+        className={className}
+      />
+    );
   }
 
   if (loading) {
-    return <AILoading variant="immersive" text="Génération des stories" className={className} />;
+    return (
+      <AILoading
+        variant="immersive"
+        text="Génération des stories"
+        className={className}
+      />
+    );
   }
 
   if (stories.length === 0 || showForm) {
@@ -142,13 +184,16 @@ export function StoriesGenerator({ className, initialData }: StoriesGeneratorPro
               Paramètres Stories
             </CardTitle>
             <CardDescription>
-              Configurez le thème et le sujet pour générer des séries de stories engageantes.
+              Configurez le thème et le sujet pour générer des séries de stories
+              engageantes.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-5">
             {/* Story theme */}
             <div>
-              <label className="text-sm font-medium text-text-primary mb-2 block">Thème de la story</label>
+              <label className="text-sm font-medium text-text-primary mb-2 block">
+                Thème de la story
+              </label>
               <div className="flex flex-wrap gap-2">
                 {STORY_THEMES.map((t) => (
                   <button
@@ -158,7 +203,7 @@ export function StoriesGenerator({ className, initialData }: StoriesGeneratorPro
                       "px-3 py-1.5 rounded-lg text-sm font-medium transition-all",
                       storyTheme === t.key
                         ? "bg-accent text-white"
-                        : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
+                        : "bg-bg-tertiary text-text-secondary hover:text-text-primary",
                     )}
                   >
                     {t.label}
@@ -170,7 +215,8 @@ export function StoriesGenerator({ className, initialData }: StoriesGeneratorPro
             {/* Topic */}
             <div>
               <label className="text-sm font-medium text-text-primary mb-1 block">
-                Sujet précis <span className="text-text-muted font-normal">(optionnel)</span>
+                Sujet précis{" "}
+                <span className="text-text-muted font-normal">(optionnel)</span>
               </label>
               <input
                 type="text"
@@ -183,7 +229,11 @@ export function StoriesGenerator({ className, initialData }: StoriesGeneratorPro
 
             {error && <p className="text-sm text-danger">{error}</p>}
 
-            <GenerateButton onClick={handleGenerate} className="w-full" icon={<BookOpen className="h-4 w-4 mr-2" />}>
+            <GenerateButton
+              onClick={handleGenerate}
+              className="w-full"
+              icon={<BookOpen className="h-4 w-4 mr-2" />}
+            >
               Générer 5 séries de Stories
             </GenerateButton>
             <p className="text-xs text-text-muted text-center">
@@ -223,11 +273,21 @@ export function StoriesGenerator({ className, initialData }: StoriesGeneratorPro
                   <Badge variant={config.badge}>{config.label}</Badge>
                 </div>
                 <div className="flex items-center gap-1">
-                  <Button variant="ghost" size="sm" onClick={() => copyStory(story, i)} className={cn(copiedIndex === i && "text-accent")}>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => copyStory(story, i)}
+                    className={cn(copiedIndex === i && "text-accent")}
+                  >
                     {copiedIndex === i ? (
-                      <><Check className="h-3 w-3 mr-1 animate-in zoom-in-50 duration-200" /> Copié !</>
+                      <>
+                        <Check className="h-3 w-3 mr-1 animate-in zoom-in-50 duration-200" />{" "}
+                        Copié !
+                      </>
                     ) : (
-                      <><Copy className="h-3 w-3 mr-1" /> Copier</>
+                      <>
+                        <Copy className="h-3 w-3 mr-1" /> Copier
+                      </>
                     )}
                   </Button>
                   <Button
@@ -259,7 +319,9 @@ export function StoriesGenerator({ className, initialData }: StoriesGeneratorPro
                         Slide {j + 1}
                       </span>
                     </div>
-                    <p className="text-sm font-medium text-text-primary">{slide.text}</p>
+                    <p className="text-sm font-medium text-text-primary">
+                      {slide.text}
+                    </p>
                     <p className="text-xs text-text-muted mt-1 italic">
                       {slide.visual_direction}
                     </p>
@@ -270,7 +332,9 @@ export function StoriesGenerator({ className, initialData }: StoriesGeneratorPro
               {/* Stickers */}
               {story.sticker_suggestions.length > 0 && (
                 <div className="mt-4 pt-3 border-t border-border-default">
-                  <p className="text-xs text-text-muted mb-2">Suggestions de stickers</p>
+                  <p className="text-xs text-text-muted mb-2">
+                    Suggestions de stickers
+                  </p>
                   <div className="space-y-1">
                     {story.sticker_suggestions.map((sticker, j) => (
                       <p key={j} className="text-xs text-info">

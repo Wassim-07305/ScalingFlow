@@ -3,11 +3,7 @@
 import React from "react";
 import { PageHeader } from "@/components/layout/page-header";
 import { cn } from "@/lib/utils/cn";
-import {
-  Code2,
-  ClipboardCheck,
-  CalendarDays,
-} from "lucide-react";
+import { Code2, ClipboardCheck, CalendarDays } from "lucide-react";
 import { PixelCAPIGenerator } from "@/components/launch/pixel-capi-generator";
 import { PreLaunchChecklist } from "@/components/launch/pre-launch-checklist";
 import { TenDayGuide } from "@/components/launch/ten-day-guide";
@@ -52,7 +48,7 @@ export default function LaunchGuidePage() {
               "flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all whitespace-nowrap",
               activeTab === tab.key
                 ? "bg-accent text-white"
-                : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
+                : "bg-bg-tertiary text-text-secondary hover:text-text-primary",
             )}
           >
             {tab.icon}

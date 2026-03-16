@@ -6,7 +6,13 @@ import { DailyTasks } from "@/components/roadmap/daily-tasks";
 import { DailyActions } from "@/components/roadmap/daily-actions";
 import { MilestoneTracker } from "@/components/roadmap/milestone-tracker";
 import { PhaseProgression } from "@/components/roadmap/phase-progression";
-import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  CardDescription,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Sparkles, Loader2, Map, CalendarPlus } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
@@ -29,7 +35,14 @@ const FOCUS_AREAS = [
 ] as const;
 
 // ─── iCal export helper ──────────────────────────────────────
-function generateICS(tasks: { title: string; description: string | null; due_date: string | null; estimated_minutes: number | null }[]): string {
+function generateICS(
+  tasks: {
+    title: string;
+    description: string | null;
+    due_date: string | null;
+    estimated_minutes: number | null;
+  }[],
+): string {
   const lines = [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
@@ -40,10 +53,16 @@ function generateICS(tasks: { title: string; description: string | null; due_dat
 
   for (const task of tasks) {
     const dueDate = task.due_date ? new Date(task.due_date) : new Date();
-    const dtStart = dueDate.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+    const dtStart = dueDate
+      .toISOString()
+      .replace(/[-:]/g, "")
+      .replace(/\.\d{3}/, "");
     const durationMin = task.estimated_minutes || 30;
     const endDate = new Date(dueDate.getTime() + durationMin * 60 * 1000);
-    const dtEnd = endDate.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+    const dtEnd = endDate
+      .toISOString()
+      .replace(/[-:]/g, "")
+      .replace(/\.\d{3}/, "");
     const uid = `${Date.now()}-${Math.random().toString(36).slice(2)}@scalingflow`;
 
     lines.push(
@@ -53,7 +72,7 @@ function generateICS(tasks: { title: string; description: string | null; due_dat
       `DTEND:${dtEnd}`,
       `SUMMARY:${(task.title || "Tâche ScalingFlow").replace(/[,;\\]/g, " ")}`,
       `DESCRIPTION:${(task.description || "").replace(/\n/g, "\\n").replace(/[,;\\]/g, " ")}`,
-      "END:VEVENT"
+      "END:VEVENT",
     );
   }
 
@@ -65,7 +84,10 @@ export default function RoadmapPage() {
   const { user } = useUser();
   const [generating, setGenerating] = React.useState(false);
   const [refreshKey, setRefreshKey] = React.useState(0);
-  const [usageLimited, setUsageLimited] = React.useState<{currentUsage: number; limit: number} | null>(null);
+  const [usageLimited, setUsageLimited] = React.useState<{
+    currentUsage: number;
+    limit: number;
+  } | null>(null);
   const [showConfig, setShowConfig] = React.useState(false);
   const [exporting, setExporting] = React.useState(false);
 
@@ -89,13 +111,16 @@ export default function RoadmapPage() {
 
       if (!res.ok) {
         const errData = await res.json().catch(() => ({}));
-        if (res.status === 403 && errData.usage) { setUsageLimited(errData.usage); return; }
+        if (res.status === 403 && errData.usage) {
+          setUsageLimited(errData.usage);
+          return;
+        }
         throw new Error(errData.error || "Erreur lors de la génération");
       }
 
       const data = await res.json();
       toast.success(
-        `Roadmap générée : ${data.tasks_count} tâches, ~${data.total_estimated_hours}h au total`
+        `Roadmap générée : ${data.tasks_count} tâches, ~${data.total_estimated_hours}h au total`,
       );
       setRefreshKey((k) => k + 1);
       setShowConfig(false);
@@ -103,7 +128,7 @@ export default function RoadmapPage() {
       toast.error(
         error instanceof Error
           ? error.message
-          : "Impossible de générer la roadmap"
+          : "Impossible de générer la roadmap",
       );
     } finally {
       setGenerating(false);
@@ -135,7 +160,9 @@ export default function RoadmapPage() {
       a.download = "scalingflow-roadmap.ics";
       a.click();
       URL.revokeObjectURL(url);
-      toast.success(`${tasks.length} tâches exportées ! Importe le fichier .ics dans Google Calendar, Apple Calendar ou Outlook.`);
+      toast.success(
+        `${tasks.length} tâches exportées ! Importe le fichier .ics dans Google Calendar, Apple Calendar ou Outlook.`,
+      );
     } catch {
       toast.error("Erreur lors de l'export");
     } finally {
@@ -144,7 +171,12 @@ export default function RoadmapPage() {
   };
 
   if (usageLimited) {
-    return <UpgradeWall currentUsage={usageLimited.currentUsage} limit={usageLimited.limit} />;
+    return (
+      <UpgradeWall
+        currentUsage={usageLimited.currentUsage}
+        limit={usageLimited.limit}
+      />
+    );
   }
 
   return (
@@ -177,7 +209,11 @@ export default function RoadmapPage() {
               ) : (
                 <Sparkles className="h-4 w-4" />
               )}
-              {generating ? "Génération en cours..." : showConfig ? "Masquer" : "Générer ma roadmap IA"}
+              {generating
+                ? "Génération en cours..."
+                : showConfig
+                  ? "Masquer"
+                  : "Générer ma roadmap IA"}
             </Button>
           </div>
         }
@@ -192,13 +228,16 @@ export default function RoadmapPage() {
               Paramètres de la roadmap
             </CardTitle>
             <CardDescription>
-              Configure les paramètres pour générer une feuille de route adaptée à ta situation.
+              Configure les paramètres pour générer une feuille de route adaptée
+              à ta situation.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-5">
             {/* Timeframe */}
             <div>
-              <label className="text-sm font-medium text-text-primary mb-2 block">Horizon</label>
+              <label className="text-sm font-medium text-text-primary mb-2 block">
+                Horizon
+              </label>
               <div className="flex gap-2">
                 {TIMEFRAMES.map((t) => (
                   <button
@@ -208,7 +247,7 @@ export default function RoadmapPage() {
                       "px-4 py-2 rounded-lg text-sm font-medium transition-all",
                       timeframe === t.key
                         ? "bg-accent text-white"
-                        : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
+                        : "bg-bg-tertiary text-text-secondary hover:text-text-primary",
                     )}
                   >
                     {t.label}
@@ -219,7 +258,9 @@ export default function RoadmapPage() {
 
             {/* Focus area */}
             <div>
-              <label className="text-sm font-medium text-text-primary mb-2 block">Phase de focus</label>
+              <label className="text-sm font-medium text-text-primary mb-2 block">
+                Phase de focus
+              </label>
               <div className="flex flex-wrap gap-2">
                 {FOCUS_AREAS.map((f) => (
                   <button
@@ -229,7 +270,7 @@ export default function RoadmapPage() {
                       "px-3 py-1.5 rounded-lg text-sm font-medium transition-all",
                       focus === f.key
                         ? "bg-accent text-white"
-                        : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
+                        : "bg-bg-tertiary text-text-secondary hover:text-text-primary",
                     )}
                   >
                     {f.label}
@@ -241,7 +282,8 @@ export default function RoadmapPage() {
             {/* Priorities */}
             <div>
               <label className="text-sm font-medium text-text-primary mb-1 block">
-                Priorités spécifiques <span className="text-text-muted font-normal">(optionnel)</span>
+                Priorités spécifiques{" "}
+                <span className="text-text-muted font-normal">(optionnel)</span>
               </label>
               <textarea
                 value={priorities}
@@ -252,11 +294,21 @@ export default function RoadmapPage() {
               />
             </div>
 
-            <Button size="lg" onClick={handleGenerate} disabled={generating} className="w-full">
+            <Button
+              size="lg"
+              onClick={handleGenerate}
+              disabled={generating}
+              className="w-full"
+            >
               {generating ? (
-                <><Loader2 className="h-4 w-4 animate-spin mr-2" /> Génération en cours...</>
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" /> Génération
+                  en cours...
+                </>
               ) : (
-                <><Sparkles className="h-4 w-4 mr-2" /> Générer ma roadmap</>
+                <>
+                  <Sparkles className="h-4 w-4 mr-2" /> Générer ma roadmap
+                </>
               )}
             </Button>
           </CardContent>

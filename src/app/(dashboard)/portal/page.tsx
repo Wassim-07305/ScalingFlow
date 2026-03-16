@@ -152,7 +152,8 @@ export default function PortalPage() {
               {error || "Tu ne fais pas partie d'une organisation."}
             </p>
             <p className="text-sm text-text-muted mt-2">
-              Demande à ton coach/formateur de t&apos;inviter dans son organisation.
+              Demande à ton coach/formateur de t&apos;inviter dans son
+              organisation.
             </p>
           </CardContent>
         </Card>
@@ -208,7 +209,9 @@ export default function PortalPage() {
           </CardHeader>
           <CardContent>
             {funnels.length === 0 ? (
-              <p className="text-sm text-text-muted text-center py-4">Aucun funnel publié</p>
+              <p className="text-sm text-text-muted text-center py-4">
+                Aucun funnel publié
+              </p>
             ) : (
               <div className="space-y-3">
                 {funnels.map((f) => (
@@ -235,7 +238,9 @@ export default function PortalPage() {
                         </span>
                       </div>
                     </div>
-                    <Badge variant={f.status === "published" ? "default" : "muted"}>
+                    <Badge
+                      variant={f.status === "published" ? "default" : "muted"}
+                    >
                       {f.status === "published" ? "Actif" : f.status}
                     </Badge>
                   </div>
@@ -255,7 +260,9 @@ export default function PortalPage() {
           </CardHeader>
           <CardContent>
             {campaigns.length === 0 ? (
-              <p className="text-sm text-text-muted text-center py-4">Aucune campagne active</p>
+              <p className="text-sm text-text-muted text-center py-4">
+                Aucune campagne active
+              </p>
             ) : (
               <div className="space-y-3">
                 {campaigns.map((c) => (
@@ -279,7 +286,9 @@ export default function PortalPage() {
                         </span>
                       </div>
                     </div>
-                    <Badge variant={c.status === "active" ? "default" : "yellow"}>
+                    <Badge
+                      variant={c.status === "active" ? "default" : "yellow"}
+                    >
                       {c.status === "active" ? "Actif" : "Pause"}
                     </Badge>
                   </div>
@@ -301,7 +310,9 @@ export default function PortalPage() {
           </CardHeader>
           <CardContent>
             {assets.length === 0 ? (
-              <p className="text-sm text-text-muted text-center py-4">Aucun asset validé</p>
+              <p className="text-sm text-text-muted text-center py-4">
+                Aucun asset validé
+              </p>
             ) : (
               <div className="space-y-2">
                 {assets.slice(0, 10).map((a) => (
@@ -342,7 +353,9 @@ export default function PortalPage() {
           </CardHeader>
           <CardContent>
             {content.length === 0 ? (
-              <p className="text-sm text-text-muted text-center py-4">Aucun contenu planifié</p>
+              <p className="text-sm text-text-muted text-center py-4">
+                Aucun contenu planifié
+              </p>
             ) : (
               <div className="space-y-2">
                 {content.slice(0, 10).map((c) => (
@@ -356,14 +369,18 @@ export default function PortalPage() {
                       </p>
                       <div className="flex gap-2 mt-0.5">
                         <span className="text-xs text-text-muted">
-                          {CONTENT_TYPE_LABELS[c.content_type] || c.content_type}
+                          {CONTENT_TYPE_LABELS[c.content_type] ||
+                            c.content_type}
                         </span>
                         {c.scheduled_date && (
                           <span className="text-xs text-text-muted">
-                            {new Date(c.scheduled_date).toLocaleDateString("fr-FR", {
-                              day: "numeric",
-                              month: "short",
-                            })}
+                            {new Date(c.scheduled_date).toLocaleDateString(
+                              "fr-FR",
+                              {
+                                day: "numeric",
+                                month: "short",
+                              },
+                            )}
                           </span>
                         )}
                       </div>
@@ -403,7 +420,9 @@ function StatCard({
             <Icon className={`h-5 w-5 ${color}`} />
           </div>
           <div>
-            <p className="text-xs text-text-muted uppercase tracking-wide">{label}</p>
+            <p className="text-xs text-text-muted uppercase tracking-wide">
+              {label}
+            </p>
             <p className="text-lg font-bold text-text-primary">{value}</p>
           </div>
         </div>

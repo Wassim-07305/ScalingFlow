@@ -80,9 +80,15 @@ interface ChatMessage {
 }
 
 export default function AssistantPage() {
-  const [selectedAgent, setSelectedAgent] = React.useState<AgentType | null>(null);
-  const [conversations, setConversations] = React.useState<ConversationItem[]>([]);
-  const [activeConversationId, setActiveConversationId] = React.useState<string | null>(null);
+  const [selectedAgent, setSelectedAgent] = React.useState<AgentType | null>(
+    null,
+  );
+  const [conversations, setConversations] = React.useState<ConversationItem[]>(
+    [],
+  );
+  const [activeConversationId, setActiveConversationId] = React.useState<
+    string | null
+  >(null);
   const [activeMessages, setActiveMessages] = React.useState<ChatMessage[]>([]);
   const [loadingHistory, setLoadingHistory] = React.useState(false);
   const [showMobileSidebar, setShowMobileSidebar] = React.useState(false);
@@ -95,7 +101,9 @@ export default function AssistantPage() {
   const loadConversations = useCallback(async () => {
     if (!selectedAgent) return;
     try {
-      const res = await fetch(`/api/ai/conversations?agentType=${selectedAgent}`);
+      const res = await fetch(
+        `/api/ai/conversations?agentType=${selectedAgent}`,
+      );
       if (res.ok) {
         const data = await res.json();
         setConversations(data.conversations || []);
@@ -169,7 +177,9 @@ export default function AssistantPage() {
       const existing = prev.find((c) => c.id === id);
       if (existing) {
         return prev.map((c) =>
-          c.id === id ? { ...c, title, updated_at: new Date().toISOString() } : c
+          c.id === id
+            ? { ...c, title, updated_at: new Date().toISOString() }
+            : c,
         );
       }
       return [
@@ -223,14 +233,14 @@ export default function AssistantPage() {
                 className={cn(
                   "group relative flex flex-col items-start gap-3 p-5 rounded-xl border bg-gradient-to-br transition-all duration-200",
                   "hover:scale-[1.02] hover:shadow-lg hover:shadow-black/20",
-                  colorClass
+                  colorClass,
                 )}
               >
                 {/* Icon */}
                 <div
                   className={cn(
                     "flex items-center justify-center h-10 w-10 rounded-lg bg-bg-primary/60 backdrop-blur-sm",
-                    iconColor
+                    iconColor,
                   )}
                 >
                   <Icon className="h-5 w-5" />
@@ -304,7 +314,7 @@ export default function AssistantPage() {
                   "flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium transition-all whitespace-nowrap",
                   isSelected
                     ? cn("text-white", badgeColor, "ring-1 ring-current/30")
-                    : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
+                    : "bg-bg-tertiary text-text-secondary hover:text-text-primary",
                 )}
               >
                 <Icon className="h-3.5 w-3.5" />
@@ -358,7 +368,7 @@ export default function AssistantPage() {
                     "w-full text-left px-3 py-2 rounded-lg text-sm transition-colors",
                     activeConversationId === conv.id
                       ? "bg-accent/15 text-accent"
-                      : "text-text-secondary hover:bg-bg-tertiary"
+                      : "text-text-secondary hover:bg-bg-tertiary",
                   )}
                 >
                   <p className="font-medium truncate text-xs">
@@ -407,7 +417,7 @@ export default function AssistantPage() {
                     "w-full text-left px-3 py-2.5 rounded-lg text-sm transition-colors group",
                     activeConversationId === conv.id
                       ? "bg-accent/15 text-accent"
-                      : "text-text-secondary hover:bg-bg-tertiary hover:text-text-primary"
+                      : "text-text-secondary hover:bg-bg-tertiary hover:text-text-primary",
                   )}
                 >
                   <div className="flex items-start justify-between gap-1">

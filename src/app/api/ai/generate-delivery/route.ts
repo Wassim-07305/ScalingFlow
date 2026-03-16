@@ -18,11 +18,14 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
     }
 
-    const rl = await rateLimit(user.id, "generate-delivery", { limit: 5, windowSeconds: 60 });
+    const rl = await rateLimit(user.id, "generate-delivery", {
+      limit: 5,
+      windowSeconds: 60,
+    });
     if (!rl.allowed) {
       return NextResponse.json(
         { error: "Trop de requêtes. Réessaie dans quelques secondes." },
-        { status: 429 }
+        { status: 429 },
       );
     }
 
@@ -30,7 +33,7 @@ export async function POST(req: NextRequest) {
     if (!usage.allowed) {
       return NextResponse.json(
         { error: "Limite de générations IA atteinte", usage },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -40,7 +43,7 @@ export async function POST(req: NextRequest) {
     if (!offerId) {
       return NextResponse.json(
         { error: "offerId est requis" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -52,10 +55,7 @@ export async function POST(req: NextRequest) {
       .single();
 
     if (offerError || !offer) {
-      return NextResponse.json(
-        { error: "Offre introuvable" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Offre introuvable" }, { status: 404 });
     }
 
     const avatar = offer.market_analyses?.avatar || {};
@@ -67,7 +67,7 @@ export async function POST(req: NextRequest) {
         unique_mechanism: offer.unique_mechanism,
         pricing_strategy: offer.pricing_strategy,
       },
-      avatar
+      avatar,
     );
 
     const vaultContext = await buildFullVaultContext(user.id);
@@ -101,7 +101,7 @@ export async function POST(req: NextRequest) {
     const errMsg = error instanceof Error ? error.message : String(error);
     return NextResponse.json(
       { error: `Erreur lors de la génération du delivery: ${errMsg}` },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

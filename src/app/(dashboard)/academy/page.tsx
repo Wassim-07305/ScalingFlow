@@ -10,17 +10,39 @@ function AcademyStats() {
   return (
     <div className="grid grid-cols-3 gap-4 mb-6">
       {[
-        { icon: GraduationCap, label: "Modules", value: "Disponibles", color: "text-accent" },
-        { icon: Clock, label: "Format", value: "Vidéo + Action", color: "text-info" },
-        { icon: Trophy, label: "Objectif", value: "Scaler ton business", color: "text-warning" },
+        {
+          icon: GraduationCap,
+          label: "Modules",
+          value: "Disponibles",
+          color: "text-accent",
+        },
+        {
+          icon: Clock,
+          label: "Format",
+          value: "Vidéo + Action",
+          color: "text-info",
+        },
+        {
+          icon: Trophy,
+          label: "Objectif",
+          value: "Scaler ton business",
+          color: "text-warning",
+        },
       ].map((stat) => (
-        <div key={stat.label} className="rounded-[12px] border border-border-default bg-bg-secondary p-4 flex items-center gap-3">
-          <div className={`h-10 w-10 rounded-[8px] bg-bg-tertiary flex items-center justify-center ${stat.color}`}>
+        <div
+          key={stat.label}
+          className="rounded-[12px] border border-border-default bg-bg-secondary p-4 flex items-center gap-3"
+        >
+          <div
+            className={`h-10 w-10 rounded-[8px] bg-bg-tertiary flex items-center justify-center ${stat.color}`}
+          >
             <stat.icon className="h-5 w-5" />
           </div>
           <div>
             <p className="text-xs text-text-muted">{stat.label}</p>
-            <p className="text-sm font-medium text-text-primary">{stat.value}</p>
+            <p className="text-sm font-medium text-text-primary">
+              {stat.value}
+            </p>
           </div>
         </div>
       ))}

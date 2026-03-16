@@ -43,9 +43,7 @@ export function FeatureGate({
   const xpNeeded = getXPToNextLevel(userXP, userLevel);
   const progressPct = Math.min(
     100,
-    Math.round(
-      (1 - xpNeeded / Math.max(1, xpNeeded + userXP)) * 100
-    )
+    Math.round((1 - xpNeeded / Math.max(1, xpNeeded + userXP)) * 100),
   );
 
   return (
@@ -130,7 +128,10 @@ interface FeatureLockBadgeProps {
   className?: string;
 }
 
-export function FeatureLockBadge({ feature, className }: FeatureLockBadgeProps) {
+export function FeatureLockBadge({
+  feature,
+  className,
+}: FeatureLockBadgeProps) {
   const { profile } = useUser();
   const userLevel = profile?.level ?? 1;
   const unlocked = isFeatureUnlocked(userLevel, feature);
@@ -143,7 +144,7 @@ export function FeatureLockBadge({ feature, className }: FeatureLockBadgeProps) 
     <span
       className={cn(
         "inline-flex items-center gap-0.5 rounded-md bg-bg-tertiary/80 border border-border-default/30 px-1.5 py-0.5 text-[10px] font-medium text-text-muted",
-        className
+        className,
       )}
       title={`Niveau ${requiredLevel} requis`}
     >

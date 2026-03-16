@@ -30,7 +30,7 @@ export async function GET() {
     if (!account) {
       return NextResponse.json(
         { connected: false, error: "Compte Instagram non connecté" },
-        { status: 200 }
+        { status: 200 },
       );
     }
 
@@ -38,7 +38,7 @@ export async function GET() {
 
     // Fetch profile data
     const profileRes = await fetch(
-      `${INSTAGRAM_GRAPH_URL}/me?fields=id,username,name,followers_count,media_count,profile_picture_url&access_token=${token}`
+      `${INSTAGRAM_GRAPH_URL}/me?fields=id,username,name,followers_count,media_count,profile_picture_url&access_token=${token}`,
     );
 
     if (!profileRes.ok) {
@@ -52,14 +52,17 @@ export async function GET() {
         errBody.includes('"code": 190');
       if (isExpired) {
         return NextResponse.json(
-          { connected: false, error: "Token expiré. Reconnecte ton compte Instagram." },
-          { status: 200 }
+          {
+            connected: false,
+            error: "Token expiré. Reconnecte ton compte Instagram.",
+          },
+          { status: 200 },
         );
       }
 
       return NextResponse.json(
         { error: "Erreur lors de la récupération du profil Instagram" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -67,7 +70,7 @@ export async function GET() {
 
     // Fetch recent media
     const mediaRes = await fetch(
-      `${INSTAGRAM_GRAPH_URL}/me/media?fields=id,caption,timestamp,like_count,comments_count,media_type,thumbnail_url,permalink,media_url&limit=12&access_token=${token}`
+      `${INSTAGRAM_GRAPH_URL}/me/media?fields=id,caption,timestamp,like_count,comments_count,media_type,thumbnail_url,permalink,media_url&limit=12&access_token=${token}`,
     );
 
     let recentPosts: Array<{
@@ -96,29 +99,33 @@ export async function GET() {
           thumbnail_url: post.thumbnail_url || null,
           media_url: post.media_url || null,
           permalink: post.permalink || "",
-        })
+        }),
       );
     }
 
     // Calculate engagement rate
     const totalEngagement = recentPosts.reduce(
       (sum, p) => sum + p.like_count + p.comments_count,
-      0
+      0,
     );
     const engagementRate =
       recentPosts.length > 0 && profile.followers_count > 0
-        ? ((totalEngagement / recentPosts.length / profile.followers_count) * 100).toFixed(2)
+        ? (
+            (totalEngagement / recentPosts.length / profile.followers_count) *
+            100
+          ).toFixed(2)
         : "0";
 
     // Find top performing post
-    const topPost = recentPosts.length > 0
-      ? recentPosts.reduce((best, post) =>
-          post.like_count + post.comments_count >
-          best.like_count + best.comments_count
-            ? post
-            : best
-        )
-      : null;
+    const topPost =
+      recentPosts.length > 0
+        ? recentPosts.reduce((best, post) =>
+            post.like_count + post.comments_count >
+            best.like_count + best.comments_count
+              ? post
+              : best,
+          )
+        : null;
 
     return NextResponse.json({
       connected: true,
@@ -137,7 +144,7 @@ export async function GET() {
     console.error("Instagram stats error:", error);
     return NextResponse.json(
       { error: "Erreur lors de la récupération des stats Instagram" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

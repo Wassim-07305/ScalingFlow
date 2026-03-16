@@ -2,7 +2,14 @@
 
 import React from "react";
 import { cn } from "@/lib/utils/cn";
-import { User, Mail, Phone, DollarSign, Clock, GripVertical } from "lucide-react";
+import {
+  User,
+  Mail,
+  Phone,
+  DollarSign,
+  Clock,
+  GripVertical,
+} from "lucide-react";
 
 export interface PipelineLead {
   id: string;
@@ -58,11 +65,21 @@ export function PipelineCard({ lead, onClick, isDragging }: PipelineCardProps) {
         e.dataTransfer.effectAllowed = "move";
         const target = e.currentTarget;
         requestAnimationFrame(() => {
-          target.classList.add("opacity-30", "scale-[0.95]", "rotate-1", "shadow-2xl");
+          target.classList.add(
+            "opacity-30",
+            "scale-[0.95]",
+            "rotate-1",
+            "shadow-2xl",
+          );
         });
       }}
       onDragEnd={(e) => {
-        e.currentTarget.classList.remove("opacity-30", "scale-[0.95]", "rotate-1", "shadow-2xl");
+        e.currentTarget.classList.remove(
+          "opacity-30",
+          "scale-[0.95]",
+          "rotate-1",
+          "shadow-2xl",
+        );
       }}
       onClick={() => onClick(lead)}
       className={cn(
@@ -70,7 +87,8 @@ export function PipelineCard({ lead, onClick, isDragging }: PipelineCardProps) {
         "transition-all duration-300 ease-out",
         "hover:border-accent/30 hover:bg-bg-secondary hover:shadow-xl hover:shadow-accent/5 hover:-translate-y-1 hover:scale-[1.01]",
         "animate-in fade-in-0 slide-in-from-bottom-2 duration-300",
-        isDragging && "opacity-30 border-accent/50 scale-[0.95] rotate-1 shadow-2xl"
+        isDragging &&
+          "opacity-30 border-accent/50 scale-[0.95] rotate-1 shadow-2xl",
       )}
     >
       {/* Header */}
@@ -83,7 +101,10 @@ export function PipelineCard({ lead, onClick, isDragging }: PipelineCardProps) {
             {lead.name}
           </span>
         </div>
-        <GripVertical className="h-4 w-4 text-text-muted opacity-0 group-hover:opacity-100 transition-opacity shrink-0" aria-hidden="true" />
+        <GripVertical
+          className="h-4 w-4 text-text-muted opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
+          aria-hidden="true"
+        />
       </div>
 
       {/* Info */}

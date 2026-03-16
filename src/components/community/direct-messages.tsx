@@ -1,6 +1,12 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  useMemo,
+} from "react";
 import { cn } from "@/lib/utils/cn";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -153,7 +159,7 @@ export function DirectMessages() {
       avatar_url: string | null;
     };
     const profileMap = new Map<string, ProfileData>(
-      ((profiles ?? []) as ProfileData[]).map((p) => [p.id, p])
+      ((profiles ?? []) as ProfileData[]).map((p) => [p.id, p]),
     );
 
     const convList: Conversation[] = [];
@@ -172,7 +178,7 @@ export function DirectMessages() {
     convList.sort(
       (a, b) =>
         new Date(b.lastMessageAt).getTime() -
-        new Date(a.lastMessageAt).getTime()
+        new Date(a.lastMessageAt).getTime(),
     );
     setConversations(convList);
     setLoading(false);
@@ -217,7 +223,7 @@ export function DirectMessages() {
 
           // Mettre à jour la liste des conversations
           fetchConversations();
-        }
+        },
       )
       .subscribe();
 
@@ -236,7 +242,7 @@ export function DirectMessages() {
         .from("direct_messages")
         .select("*")
         .or(
-          `and(sender_id.eq.${user.id},receiver_id.eq.${otherUserId}),and(sender_id.eq.${otherUserId},receiver_id.eq.${user.id})`
+          `and(sender_id.eq.${user.id},receiver_id.eq.${otherUserId}),and(sender_id.eq.${otherUserId},receiver_id.eq.${user.id})`,
         )
         .order("created_at", { ascending: true });
 
@@ -254,11 +260,11 @@ export function DirectMessages() {
       // Mettre à jour le compteur localement
       setConversations((prev) =>
         prev.map((c) =>
-          c.userId === otherUserId ? { ...c, unreadCount: 0 } : c
-        )
+          c.userId === otherUserId ? { ...c, unreadCount: 0 } : c,
+        ),
       );
     },
-    [user, supabase]
+    [user, supabase],
   );
 
   // Scroll en bas quand les messages changent
@@ -332,12 +338,12 @@ export function DirectMessages() {
                     lastMessage: content,
                     lastMessageAt: optimisticMsg.created_at,
                   }
-                : c
+                : c,
             )
             .sort(
               (a, b) =>
                 new Date(b.lastMessageAt).getTime() -
-                new Date(a.lastMessageAt).getTime()
+                new Date(a.lastMessageAt).getTime(),
             );
         }
         return [
@@ -436,7 +442,7 @@ export function DirectMessages() {
                 className={cn(
                   "flex items-center gap-3 w-full px-3 py-2.5 hover:bg-accent/5 transition-all text-left",
                   i < searchResults.length - 1 &&
-                    "border-b border-border-default/30"
+                    "border-b border-border-default/30",
                 )}
               >
                 <Avatar className="h-8 w-8">
@@ -483,7 +489,7 @@ export function DirectMessages() {
                 "flex items-center gap-3 w-full px-4 py-3.5 transition-all duration-200 text-left border-b border-border-default/30",
                 selectedUserId === conv.userId
                   ? "bg-accent/5 border-l-2 border-l-accent"
-                  : "hover:bg-bg-tertiary/50 active:bg-bg-tertiary/70"
+                  : "hover:bg-bg-tertiary/50 active:bg-bg-tertiary/70",
               )}
             >
               <div className="relative shrink-0">
@@ -493,7 +499,7 @@ export function DirectMessages() {
                       "text-sm font-medium",
                       selectedUserId === conv.userId
                         ? "bg-accent/15 text-accent"
-                        : "bg-bg-tertiary text-text-secondary"
+                        : "bg-bg-tertiary text-text-secondary",
                     )}
                   >
                     {conv.name.slice(0, 2).toUpperCase()}
@@ -512,7 +518,7 @@ export function DirectMessages() {
                       "text-sm truncate",
                       conv.unreadCount > 0
                         ? "font-semibold text-text-primary"
-                        : "font-medium text-text-primary"
+                        : "font-medium text-text-primary",
                     )}
                   >
                     {conv.name}
@@ -529,7 +535,7 @@ export function DirectMessages() {
                     "text-xs truncate mt-0.5",
                     conv.unreadCount > 0
                       ? "text-text-secondary font-medium"
-                      : "text-text-muted"
+                      : "text-text-muted",
                   )}
                 >
                   {conv.lastMessage}
@@ -605,7 +611,9 @@ export function DirectMessages() {
                 const sameSenderAsNext = nextMsg?.sender_id === msg.sender_id;
 
                 // Group timestamps: show date separator when day changes
-                const msgDate = new Date(msg.created_at).toLocaleDateString("fr-FR");
+                const msgDate = new Date(msg.created_at).toLocaleDateString(
+                  "fr-FR",
+                );
                 const prevDate = prevMsg
                   ? new Date(prevMsg.created_at).toLocaleDateString("fr-FR")
                   : null;
@@ -616,11 +624,14 @@ export function DirectMessages() {
                     {showDateSep && (
                       <div className="flex items-center justify-center my-4">
                         <span className="text-[10px] font-medium text-text-muted bg-bg-secondary/80 px-3 py-1 rounded-full backdrop-blur-sm">
-                          {new Date(msg.created_at).toLocaleDateString("fr-FR", {
-                            weekday: "short",
-                            day: "numeric",
-                            month: "short",
-                          })}
+                          {new Date(msg.created_at).toLocaleDateString(
+                            "fr-FR",
+                            {
+                              weekday: "short",
+                              day: "numeric",
+                              month: "short",
+                            },
+                          )}
                         </span>
                       </div>
                     )}
@@ -628,7 +639,7 @@ export function DirectMessages() {
                       className={cn(
                         "flex animate-in slide-in-from-bottom-2 duration-200",
                         isMine ? "justify-end" : "justify-start",
-                        !sameSenderAsPrev ? "mt-3" : "mt-0.5"
+                        !sameSenderAsPrev ? "mt-3" : "mt-0.5",
                       )}
                     >
                       <div
@@ -642,12 +653,16 @@ export function DirectMessages() {
                             ? cn(
                                 "rounded-2xl",
                                 !sameSenderAsNext && "rounded-br-sm",
-                                sameSenderAsPrev && sameSenderAsNext && "rounded-r-lg",
+                                sameSenderAsPrev &&
+                                  sameSenderAsNext &&
+                                  "rounded-r-lg",
                               )
                             : cn(
                                 "rounded-2xl",
                                 !sameSenderAsNext && "rounded-bl-sm",
-                                sameSenderAsPrev && sameSenderAsNext && "rounded-l-lg",
+                                sameSenderAsPrev &&
+                                  sameSenderAsNext &&
+                                  "rounded-l-lg",
                               ),
                         )}
                       >
@@ -657,18 +672,18 @@ export function DirectMessages() {
                         <div
                           className={cn(
                             "flex items-center gap-1 mt-0.5",
-                            isMine ? "justify-end" : "justify-start"
+                            isMine ? "justify-end" : "justify-start",
                           )}
                         >
                           <span
                             className={cn(
                               "text-[9px]",
-                              isMine ? "text-white/40" : "text-text-muted/60"
+                              isMine ? "text-white/40" : "text-text-muted/60",
                             )}
                           >
                             {new Date(msg.created_at).toLocaleTimeString(
                               "fr-FR",
-                              { hour: "2-digit", minute: "2-digit" }
+                              { hour: "2-digit", minute: "2-digit" },
                             )}
                           </span>
                           {isMine &&
@@ -690,9 +705,18 @@ export function DirectMessages() {
               <div className="flex justify-start mt-2">
                 <div className="bg-bg-tertiary border border-border-default/30 rounded-2xl rounded-bl-sm px-4 py-2.5">
                   <div className="flex items-center gap-1">
-                    <span className="h-2 w-2 rounded-full bg-text-muted/40 animate-bounce" style={{ animationDelay: "0ms" }} />
-                    <span className="h-2 w-2 rounded-full bg-text-muted/40 animate-bounce" style={{ animationDelay: "150ms" }} />
-                    <span className="h-2 w-2 rounded-full bg-text-muted/40 animate-bounce" style={{ animationDelay: "300ms" }} />
+                    <span
+                      className="h-2 w-2 rounded-full bg-text-muted/40 animate-bounce"
+                      style={{ animationDelay: "0ms" }}
+                    />
+                    <span
+                      className="h-2 w-2 rounded-full bg-text-muted/40 animate-bounce"
+                      style={{ animationDelay: "150ms" }}
+                    />
+                    <span
+                      className="h-2 w-2 rounded-full bg-text-muted/40 animate-bounce"
+                      style={{ animationDelay: "300ms" }}
+                    />
                   </div>
                 </div>
               </div>
@@ -725,7 +749,7 @@ export function DirectMessages() {
                   "rounded-full h-10 w-10 shrink-0 transition-all duration-200",
                   newMessage.trim()
                     ? "bg-accent hover:bg-accent/90 scale-100"
-                    : "bg-bg-tertiary scale-95 opacity-50"
+                    : "bg-bg-tertiary scale-95 opacity-50",
                 )}
                 aria-label="Envoyer le message"
               >
@@ -758,13 +782,17 @@ export function DirectMessages() {
       <div className="md:hidden h-[calc(100dvh-200px)] min-h-[400px] overflow-hidden relative">
         <div
           className="absolute inset-0 transition-transform duration-300 ease-out"
-          style={{ transform: mobileShowChat ? "translateX(-100%)" : "translateX(0)" }}
+          style={{
+            transform: mobileShowChat ? "translateX(-100%)" : "translateX(0)",
+          }}
         >
           {renderSidebar()}
         </div>
         <div
           className="absolute inset-0 transition-transform duration-300 ease-out"
-          style={{ transform: mobileShowChat ? "translateX(0)" : "translateX(100%)" }}
+          style={{
+            transform: mobileShowChat ? "translateX(0)" : "translateX(100%)",
+          }}
         >
           {renderChatPanel()}
         </div>

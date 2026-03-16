@@ -21,7 +21,7 @@ interface RateLimitResult {
 export async function rateLimit(
   userId: string,
   route: string,
-  options: RateLimitOptions = {}
+  options: RateLimitOptions = {},
 ): Promise<RateLimitResult> {
   const { limit = 10, windowSeconds = 60 } = options;
   const key = `${userId}:${route}`;
@@ -52,7 +52,11 @@ export async function rateLimit(
           .insert({ key, count: 1, reset_at: resetAt.toISOString() });
       }
 
-      return { allowed: true, remaining: limit - 1, resetAt: resetAt.getTime() };
+      return {
+        allowed: true,
+        remaining: limit - 1,
+        resetAt: resetAt.getTime(),
+      };
     }
 
     // Entry exists and is still valid
@@ -79,6 +83,10 @@ export async function rateLimit(
     // SECURITY: Fail-closed — if rate limit DB is unavailable, deny the request
     // This prevents abuse when the rate limit system is down
     console.error("[rate-limit] DB error, failing closed:", error);
-    return { allowed: false, remaining: 0, resetAt: Date.now() + windowSeconds * 1000 };
+    return {
+      allowed: false,
+      remaining: 0,
+      resetAt: Date.now() + windowSeconds * 1000,
+    };
   }
 }

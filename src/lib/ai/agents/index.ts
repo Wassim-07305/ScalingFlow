@@ -477,7 +477,14 @@ export const AGENTS: AgentDefinition[] = [
     description:
       "Expert vision business, paliers de croissance, décisions stratégiques, scaling et automatisation.",
     icon: "Target",
-    contextTables: ["profile", "offer", "market", "competitors", "ads", "funnel"],
+    contextTables: [
+      "profile",
+      "offer",
+      "market",
+      "competitors",
+      "ads",
+      "funnel",
+    ],
     suggestedQuestions: [
       "Je suis à 5K/mois, quel est mon plan pour atteindre 10K ?",
       "Quel est mon bottleneck #1 en ce moment ?",

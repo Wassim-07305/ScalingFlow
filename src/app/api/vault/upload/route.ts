@@ -27,22 +27,30 @@ export async function POST(req: NextRequest) {
     const resourceType = (formData.get("resource_type") as string) || "doc";
 
     if (!file) {
-      return NextResponse.json({ error: "Aucun fichier fourni" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Aucun fichier fourni" },
+        { status: 400 },
+      );
     }
 
     // Validate file size (10MB max)
     if (file.size > 10 * 1024 * 1024) {
       return NextResponse.json(
         { error: "Fichier trop volumineux (max 10 MB)" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     // SECURITY: Validate file type
     const ALLOWED_VAULT_TYPES = [
       "application/pdf",
-      "text/plain", "text/csv", "text/markdown",
-      "image/jpeg", "image/png", "image/gif", "image/webp",
+      "text/plain",
+      "text/csv",
+      "text/markdown",
+      "image/jpeg",
+      "image/png",
+      "image/gif",
+      "image/webp",
       "application/msword",
       "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
     ];
@@ -50,7 +58,7 @@ export async function POST(req: NextRequest) {
     if (file.type && !ALLOWED_VAULT_TYPES.includes(file.type)) {
       return NextResponse.json(
         { error: "Type de fichier non autorisé pour le vault" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -71,7 +79,7 @@ export async function POST(req: NextRequest) {
     if (uploadError) {
       return NextResponse.json(
         { error: "Erreur lors de l'upload" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -98,7 +106,13 @@ export async function POST(req: NextRequest) {
       .from("vault_resources")
       .insert({
         user_id: user.id,
-        resource_type: resourceType as "doc" | "youtube" | "instagram" | "transcript" | "testimonial" | "other",
+        resource_type: resourceType as
+          | "doc"
+          | "youtube"
+          | "instagram"
+          | "transcript"
+          | "testimonial"
+          | "other",
         file_path: storagePath,
         title: title || file.name,
         extracted_text: extractedText,
@@ -111,7 +125,7 @@ export async function POST(req: NextRequest) {
     if (dbError) {
       return NextResponse.json(
         { error: "Erreur lors de la sauvegarde" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -122,7 +136,7 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     return NextResponse.json(
       { error: "Erreur interne lors de l'upload" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

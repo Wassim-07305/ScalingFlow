@@ -12,7 +12,8 @@ export const PLANS: Plan[] = [
   {
     id: "free",
     name: "Gratuit",
-    description: "Pour découvrir ScalingFlow et tester les fonctionnalités de base.",
+    description:
+      "Pour découvrir ScalingFlow et tester les fonctionnalités de base.",
     price: 0,
     features: [
       "5 générations IA / mois",
@@ -26,7 +27,8 @@ export const PLANS: Plan[] = [
   {
     id: "pro",
     name: "Pro",
-    description: "Pour les entrepreneurs sérieux qui veulent scaler rapidement.",
+    description:
+      "Pour les entrepreneurs sérieux qui veulent scaler rapidement.",
     price: 49,
     features: [
       "Générations IA illimitées",
@@ -44,7 +46,8 @@ export const PLANS: Plan[] = [
   {
     id: "premium",
     name: "Premium",
-    description: "Pour les agences et entrepreneurs qui veulent tout automatiser.",
+    description:
+      "Pour les agences et entrepreneurs qui veulent tout automatiser.",
     price: 149,
     features: [
       "Tout le plan Pro",

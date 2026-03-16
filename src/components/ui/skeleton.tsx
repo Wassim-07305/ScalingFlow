@@ -6,20 +6,26 @@ function Skeleton({
 }: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={cn(
-        "rounded-[8px] bg-bg-tertiary animate-pulse",
-        className
-      )}
+      className={cn("rounded-[8px] bg-bg-tertiary animate-pulse", className)}
       {...props}
     />
   );
 }
 
-function SkeletonLine({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
+function SkeletonLine({
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) {
   return <Skeleton className={cn("h-4 w-full", className)} {...props} />;
 }
 
-function SkeletonText({ lines = 3, className }: { lines?: number; className?: string }) {
+function SkeletonText({
+  lines = 3,
+  className,
+}: {
+  lines?: number;
+  className?: string;
+}) {
   return (
     <div className={cn("space-y-2", className)}>
       {Array.from({ length: lines }).map((_, i) => (
@@ -29,13 +35,23 @@ function SkeletonText({ lines = 3, className }: { lines?: number; className?: st
   );
 }
 
-function SkeletonCircle({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
-  return <Skeleton className={cn("h-10 w-10 rounded-full", className)} {...props} />;
+function SkeletonCircle({
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) {
+  return (
+    <Skeleton className={cn("h-10 w-10 rounded-full", className)} {...props} />
+  );
 }
 
 function SkeletonCard({ className }: { className?: string }) {
   return (
-    <div className={cn("rounded-[12px] border border-border-default bg-bg-secondary p-5 space-y-3", className)}>
+    <div
+      className={cn(
+        "rounded-[12px] border border-border-default bg-bg-secondary p-5 space-y-3",
+        className,
+      )}
+    >
       <SkeletonLine className="w-1/3 h-5" />
       <SkeletonText lines={2} />
     </div>
@@ -64,16 +80,29 @@ function SkeletonDashboard() {
   );
 }
 
-function SkeletonTable({ rows = 5, cols = 4 }: { rows?: number; cols?: number }) {
+function SkeletonTable({
+  rows = 5,
+  cols = 4,
+}: {
+  rows?: number;
+  cols?: number;
+}) {
   return (
     <div className="space-y-3">
-      <div className="grid gap-4" style={{ gridTemplateColumns: `repeat(${cols}, 1fr)` }}>
+      <div
+        className="grid gap-4"
+        style={{ gridTemplateColumns: `repeat(${cols}, 1fr)` }}
+      >
         {Array.from({ length: cols }).map((_, i) => (
           <SkeletonLine key={i} className="h-3" />
         ))}
       </div>
       {Array.from({ length: rows }).map((_, i) => (
-        <div key={i} className="grid gap-4 py-3 border-t border-border-default" style={{ gridTemplateColumns: `repeat(${cols}, 1fr)` }}>
+        <div
+          key={i}
+          className="grid gap-4 py-3 border-t border-border-default"
+          style={{ gridTemplateColumns: `repeat(${cols}, 1fr)` }}
+        >
           {Array.from({ length: cols }).map((_, j) => (
             <SkeletonLine key={j} className="h-4" />
           ))}
@@ -83,4 +112,12 @@ function SkeletonTable({ rows = 5, cols = 4 }: { rows?: number; cols?: number })
   );
 }
 
-export { Skeleton, SkeletonLine, SkeletonText, SkeletonCircle, SkeletonCard, SkeletonDashboard, SkeletonTable };
+export {
+  Skeleton,
+  SkeletonLine,
+  SkeletonText,
+  SkeletonCircle,
+  SkeletonCard,
+  SkeletonDashboard,
+  SkeletonTable,
+};

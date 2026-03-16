@@ -50,12 +50,7 @@ export function AnimatedCounter({
   const formatted = displayValue.toFixed(decimals);
 
   return (
-    <span
-      className={cn(
-        "font-mono tabular-nums",
-        className
-      )}
-    >
+    <span className={cn("font-mono tabular-nums", className)}>
       {prefix}
       {formatted}
       {suffix}

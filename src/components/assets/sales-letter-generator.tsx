@@ -4,7 +4,13 @@ import React from "react";
 import { cn } from "@/lib/utils/cn";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { AILoading } from "@/components/shared/ai-loading";
 import { GlowCard } from "@/components/shared/glow-card";
 import {
@@ -24,14 +30,27 @@ interface SalesLetterGeneratorProps {
   initialData?: SalesLetterResult;
 }
 
-const LETTER_STYLES = ["Longue forme", "Courte", "Urgente", "Storytelling"] as const;
+const LETTER_STYLES = [
+  "Longue forme",
+  "Courte",
+  "Urgente",
+  "Storytelling",
+] as const;
 
-export function SalesLetterGenerator({ className, initialData }: SalesLetterGeneratorProps) {
+export function SalesLetterGenerator({
+  className,
+  initialData,
+}: SalesLetterGeneratorProps) {
   const [loading, setLoading] = React.useState(false);
-  const [letter, setLetter] = React.useState<SalesLetterResult | null>(initialData || null);
+  const [letter, setLetter] = React.useState<SalesLetterResult | null>(
+    initialData || null,
+  );
   const [error, setError] = React.useState<string | null>(null);
   const [showFullLetter, setShowFullLetter] = React.useState(false);
-  const [usageLimited, setUsageLimited] = React.useState<{currentUsage: number; limit: number} | null>(null);
+  const [usageLimited, setUsageLimited] = React.useState<{
+    currentUsage: number;
+    limit: number;
+  } | null>(null);
   const [letterStyle, setLetterStyle] = React.useState<string>("Longue forme");
   const [keyArgument, setKeyArgument] = React.useState("");
 
@@ -47,13 +66,20 @@ export function SalesLetterGenerator({ className, initialData }: SalesLetterGene
       const response = await fetch("/api/ai/generate-assets", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type: "sales_letter", letterStyle, keyArgument: keyArgument || undefined }),
+        body: JSON.stringify({
+          type: "sales_letter",
+          letterStyle,
+          keyArgument: keyArgument || undefined,
+        }),
       });
 
       if (!response.ok) {
         if (response.status === 403) {
           const errData = await response.json();
-          if (errData.usage) { setUsageLimited(errData.usage); return; }
+          if (errData.usage) {
+            setUsageLimited(errData.usage);
+            return;
+          }
         }
         throw new Error("Erreur lors de la génération");
       }
@@ -68,7 +94,13 @@ export function SalesLetterGenerator({ className, initialData }: SalesLetterGene
   };
 
   if (usageLimited) {
-    return <UpgradeWall currentUsage={usageLimited.currentUsage} limit={usageLimited.limit} className={className} />;
+    return (
+      <UpgradeWall
+        currentUsage={usageLimited.currentUsage}
+        limit={usageLimited.limit}
+        className={className}
+      />
+    );
   }
 
   if (loading) {
@@ -84,16 +116,22 @@ export function SalesLetterGenerator({ className, initialData }: SalesLetterGene
   if (!letter) {
     return (
       <div className={cn("max-w-xl mx-auto py-8", className)}>
-        {error && <p className="text-sm text-danger mb-4 text-center">{error}</p>}
+        {error && (
+          <p className="text-sm text-danger mb-4 text-center">{error}</p>
+        )}
         <Card>
           <CardHeader>
             <CardTitle>Sales Letter</CardTitle>
-            <CardDescription>Page de vente optimisée pour la conversion</CardDescription>
+            <CardDescription>
+              Page de vente optimisée pour la conversion
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             {/* Letter style */}
             <div>
-              <label className="text-sm font-medium text-text-primary mb-2 block">Style de lettre</label>
+              <label className="text-sm font-medium text-text-primary mb-2 block">
+                Style de lettre
+              </label>
               <div className="flex flex-wrap gap-2">
                 {LETTER_STYLES.map((style) => (
                   <button
@@ -103,7 +141,7 @@ export function SalesLetterGenerator({ className, initialData }: SalesLetterGene
                       "px-3 py-1.5 rounded-lg text-sm font-medium transition-all",
                       letterStyle === style
                         ? "bg-accent text-white"
-                        : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
+                        : "bg-bg-tertiary text-text-secondary hover:text-text-primary",
                     )}
                   >
                     {style}
@@ -114,7 +152,9 @@ export function SalesLetterGenerator({ className, initialData }: SalesLetterGene
 
             {/* Key argument */}
             <div>
-              <label className="text-sm font-medium text-text-primary mb-2 block">Argument clé (optionnel)</label>
+              <label className="text-sm font-medium text-text-primary mb-2 block">
+                Argument clé (optionnel)
+              </label>
               <textarea
                 value={keyArgument}
                 onChange={(e) => setKeyArgument(e.target.value)}
@@ -123,7 +163,11 @@ export function SalesLetterGenerator({ className, initialData }: SalesLetterGene
               />
             </div>
 
-            <GenerateButton onClick={handleGenerate} className="w-full" icon={<FileText className="h-4 w-4 mr-2" />}>
+            <GenerateButton
+              onClick={handleGenerate}
+              className="w-full"
+              icon={<FileText className="h-4 w-4 mr-2" />}
+            >
               Générer la sales letter
             </GenerateButton>
           </CardContent>
@@ -151,8 +195,11 @@ export function SalesLetterGenerator({ className, initialData }: SalesLetterGene
           <CopyExportBar
             copyContent={
               `# ${letter.headline}\n${letter.sub_headline ? `\n${letter.sub_headline}\n` : ""}\n` +
-              sections.map((s) => `## ${s.name}\n\n${s.content}`).join("\n\n---\n\n") +
-              ((letter as SalesLetterResult & { full_letter?: string }).full_letter
+              sections
+                .map((s) => `## ${s.name}\n\n${s.content}`)
+                .join("\n\n---\n\n") +
+              ((letter as SalesLetterResult & { full_letter?: string })
+                .full_letter
                 ? `\n\n---\n\n${(letter as SalesLetterResult & { full_letter?: string }).full_letter}`
                 : "")
             }
@@ -206,7 +253,10 @@ export function SalesLetterGenerator({ className, initialData }: SalesLetterGene
             <Card className="mt-3">
               <CardContent className="py-4">
                 <p className="text-sm text-text-secondary whitespace-pre-wrap">
-                  {(letter as SalesLetterResult & { full_letter?: string }).full_letter}
+                  {
+                    (letter as SalesLetterResult & { full_letter?: string })
+                      .full_letter
+                  }
                 </p>
               </CardContent>
             </Card>
@@ -224,7 +274,7 @@ function SectionCard({ name, content }: { name: string; content: string }) {
     <Card
       className={cn(
         "cursor-pointer transition-all",
-        expanded && "border-accent/30"
+        expanded && "border-accent/30",
       )}
       onClick={() => setExpanded(!expanded)}
     >

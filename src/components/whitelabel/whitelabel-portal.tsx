@@ -67,7 +67,9 @@ export function WhitelabelPortal({ className }: { className?: string }) {
   const [reports, setReports] = useState<WhitelabelReport[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [activeSection, setActiveSection] = useState<"branding" | "reports" | "embed">("branding");
+  const [activeSection, setActiveSection] = useState<
+    "branding" | "reports" | "embed"
+  >("branding");
 
   useEffect(() => {
     if (!user) return;
@@ -113,11 +115,14 @@ export function WhitelabelPortal({ className }: { className?: string }) {
     if (!user) return;
     setSaving(true);
 
-    await supabase.from("whitelabel_config").upsert({
-      user_id: user.id,
-      ...config,
-      updated_at: new Date().toISOString(),
-    }, { onConflict: "user_id" });
+    await supabase.from("whitelabel_config").upsert(
+      {
+        user_id: user.id,
+        ...config,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: "user_id" },
+    );
 
     setSaving(false);
     toast.success("Configuration whitelabel sauvegardée");
@@ -135,7 +140,9 @@ export function WhitelabelPortal({ className }: { className?: string }) {
 
       if (res.ok) {
         const data = await res.json();
-        toast.success(`Rapport ${type === "weekly" ? "hebdomadaire" : "mensuel"} généré`);
+        toast.success(
+          `Rapport ${type === "weekly" ? "hebdomadaire" : "mensuel"} généré`,
+        );
         if (data.report) {
           setReports((prev) => [data.report, ...prev]);
         }
@@ -206,7 +213,12 @@ export function WhitelabelPortal({ className }: { className?: string }) {
                       <Label>Nom de marque</Label>
                       <Input
                         value={config.brand_name}
-                        onChange={(e) => setConfig((c) => ({ ...c, brand_name: e.target.value }))}
+                        onChange={(e) =>
+                          setConfig((c) => ({
+                            ...c,
+                            brand_name: e.target.value,
+                          }))
+                        }
                         placeholder={profile?.full_name || "Ta marque"}
                       />
                     </div>
@@ -214,7 +226,12 @@ export function WhitelabelPortal({ className }: { className?: string }) {
                       <Label>Expéditeur emails</Label>
                       <Input
                         value={config.email_from_name}
-                        onChange={(e) => setConfig((c) => ({ ...c, email_from_name: e.target.value }))}
+                        onChange={(e) =>
+                          setConfig((c) => ({
+                            ...c,
+                            email_from_name: e.target.value,
+                          }))
+                        }
                         placeholder="John de [Ta Marque]"
                       />
                     </div>
@@ -227,12 +244,22 @@ export function WhitelabelPortal({ className }: { className?: string }) {
                         <input
                           type="color"
                           value={config.primary_color}
-                          onChange={(e) => setConfig((c) => ({ ...c, primary_color: e.target.value }))}
+                          onChange={(e) =>
+                            setConfig((c) => ({
+                              ...c,
+                              primary_color: e.target.value,
+                            }))
+                          }
                           className="h-10 w-14 rounded-lg border border-border-default cursor-pointer"
                         />
                         <Input
                           value={config.primary_color}
-                          onChange={(e) => setConfig((c) => ({ ...c, primary_color: e.target.value }))}
+                          onChange={(e) =>
+                            setConfig((c) => ({
+                              ...c,
+                              primary_color: e.target.value,
+                            }))
+                          }
                           className="flex-1"
                         />
                       </div>
@@ -243,12 +270,22 @@ export function WhitelabelPortal({ className }: { className?: string }) {
                         <input
                           type="color"
                           value={config.accent_color}
-                          onChange={(e) => setConfig((c) => ({ ...c, accent_color: e.target.value }))}
+                          onChange={(e) =>
+                            setConfig((c) => ({
+                              ...c,
+                              accent_color: e.target.value,
+                            }))
+                          }
                           className="h-10 w-14 rounded-lg border border-border-default cursor-pointer"
                         />
                         <Input
                           value={config.accent_color}
-                          onChange={(e) => setConfig((c) => ({ ...c, accent_color: e.target.value }))}
+                          onChange={(e) =>
+                            setConfig((c) => ({
+                              ...c,
+                              accent_color: e.target.value,
+                            }))
+                          }
                           className="flex-1"
                         />
                       </div>
@@ -259,10 +296,17 @@ export function WhitelabelPortal({ className }: { className?: string }) {
                     <Label>Domaine personnalisé</Label>
                     <Input
                       value={config.custom_domain || ""}
-                      onChange={(e) => setConfig((c) => ({ ...c, custom_domain: e.target.value }))}
+                      onChange={(e) =>
+                        setConfig((c) => ({
+                          ...c,
+                          custom_domain: e.target.value,
+                        }))
+                      }
                       placeholder="app.tamarque.com"
                     />
-                    <p className="text-xs text-text-muted mt-1">Configure un CNAME vers app.scalingflow.com</p>
+                    <p className="text-xs text-text-muted mt-1">
+                      Configure un CNAME vers app.scalingflow.com
+                    </p>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -270,7 +314,12 @@ export function WhitelabelPortal({ className }: { className?: string }) {
                       <Label>En-tête rapports</Label>
                       <Input
                         value={config.report_header}
-                        onChange={(e) => setConfig((c) => ({ ...c, report_header: e.target.value }))}
+                        onChange={(e) =>
+                          setConfig((c) => ({
+                            ...c,
+                            report_header: e.target.value,
+                          }))
+                        }
                         placeholder="Rapport de performance — [Ta Marque]"
                       />
                     </div>
@@ -278,7 +327,12 @@ export function WhitelabelPortal({ className }: { className?: string }) {
                       <Label>Pied de page rapports</Label>
                       <Input
                         value={config.report_footer}
-                        onChange={(e) => setConfig((c) => ({ ...c, report_footer: e.target.value }))}
+                        onChange={(e) =>
+                          setConfig((c) => ({
+                            ...c,
+                            report_footer: e.target.value,
+                          }))
+                        }
                         placeholder="© 2026 Ta Marque. Tous droits réservés."
                       />
                     </div>
@@ -289,9 +343,15 @@ export function WhitelabelPortal({ className }: { className?: string }) {
                     <p className="text-xs text-text-muted mb-2">Aperçu</p>
                     <div
                       className="p-4 rounded-lg"
-                      style={{ backgroundColor: config.primary_color + "15", borderLeft: `4px solid ${config.primary_color}` }}
+                      style={{
+                        backgroundColor: config.primary_color + "15",
+                        borderLeft: `4px solid ${config.primary_color}`,
+                      }}
                     >
-                      <h3 className="font-semibold" style={{ color: config.primary_color }}>
+                      <h3
+                        className="font-semibold"
+                        style={{ color: config.primary_color }}
+                      >
                         {config.brand_name || "Ta Marque"}
                       </h3>
                       <p className="text-sm text-text-secondary mt-1">
@@ -307,8 +367,16 @@ export function WhitelabelPortal({ className }: { className?: string }) {
                     </div>
                   </div>
 
-                  <Button onClick={handleSave} disabled={saving} className="w-full">
-                    {saving ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : <CheckCircle2 className="h-4 w-4 mr-1" />}
+                  <Button
+                    onClick={handleSave}
+                    disabled={saving}
+                    className="w-full"
+                  >
+                    {saving ? (
+                      <Loader2 className="h-4 w-4 animate-spin mr-1" />
+                    ) : (
+                      <CheckCircle2 className="h-4 w-4 mr-1" />
+                    )}
                     Sauvegarder la configuration
                   </Button>
                 </CardContent>
@@ -324,7 +392,10 @@ export function WhitelabelPortal({ className }: { className?: string }) {
                   <BarChart3 className="h-4 w-4 mr-1" />
                   Rapport hebdomadaire
                 </Button>
-                <Button variant="ghost" onClick={() => handleGenerateReport("monthly")}>
+                <Button
+                  variant="ghost"
+                  onClick={() => handleGenerateReport("monthly")}
+                >
                   <Layers className="h-4 w-4 mr-1" />
                   Rapport mensuel
                 </Button>
@@ -339,13 +410,21 @@ export function WhitelabelPortal({ className }: { className?: string }) {
                           <div className="flex items-center gap-3">
                             <FileText className="h-5 w-5 text-accent" />
                             <div>
-                              <span className="text-sm font-medium text-text-primary">{report.title}</span>
+                              <span className="text-sm font-medium text-text-primary">
+                                {report.title}
+                              </span>
                               <div className="flex items-center gap-2 mt-0.5">
                                 <Badge variant="muted" className="text-[10px]">
-                                  {report.type === "weekly" ? "Hebdomadaire" : report.type === "monthly" ? "Mensuel" : "Campagne"}
+                                  {report.type === "weekly"
+                                    ? "Hebdomadaire"
+                                    : report.type === "monthly"
+                                      ? "Mensuel"
+                                      : "Campagne"}
                                 </Badge>
                                 <span className="text-xs text-text-muted">
-                                  {new Date(report.created_at).toLocaleDateString("fr-FR")}
+                                  {new Date(
+                                    report.created_at,
+                                  ).toLocaleDateString("fr-FR")}
                                 </span>
                               </div>
                             </div>
@@ -354,7 +433,11 @@ export function WhitelabelPortal({ className }: { className?: string }) {
                             <Button variant="ghost" size="icon" title="Voir">
                               <Eye className="h-4 w-4" />
                             </Button>
-                            <Button variant="ghost" size="icon" title="Télécharger">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              title="Télécharger"
+                            >
                               <Download className="h-4 w-4" />
                             </Button>
                           </div>
@@ -388,38 +471,57 @@ export function WhitelabelPortal({ className }: { className?: string }) {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <p className="text-sm text-text-secondary">
-                    Intègre un dashboard de performance sous ta marque directement sur ton site ou portail client.
-                    Tes clients voient leurs métriques sans voir ScalingFlow.
+                    Intègre un dashboard de performance sous ta marque
+                    directement sur ton site ou portail client. Tes clients
+                    voient leurs métriques sans voir ScalingFlow.
                   </p>
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                     <Card className="p-4 text-center">
                       <BarChart3 className="h-6 w-6 text-accent mx-auto mb-2" />
-                      <span className="text-sm font-medium text-text-primary">Dashboard métriques</span>
-                      <p className="text-xs text-text-muted mt-1">KPIs, graphiques, tendances</p>
+                      <span className="text-sm font-medium text-text-primary">
+                        Dashboard métriques
+                      </span>
+                      <p className="text-xs text-text-muted mt-1">
+                        KPIs, graphiques, tendances
+                      </p>
                     </Card>
                     <Card className="p-4 text-center">
                       <Layers className="h-6 w-6 text-accent mx-auto mb-2" />
-                      <span className="text-sm font-medium text-text-primary">Funnel branded</span>
-                      <p className="text-xs text-text-muted mt-1">Pages sous ton domaine</p>
+                      <span className="text-sm font-medium text-text-primary">
+                        Funnel branded
+                      </span>
+                      <p className="text-xs text-text-muted mt-1">
+                        Pages sous ton domaine
+                      </p>
                     </Card>
                     <Card className="p-4 text-center">
                       <Users className="h-6 w-6 text-accent mx-auto mb-2" />
-                      <span className="text-sm font-medium text-text-primary">Portail client</span>
-                      <p className="text-xs text-text-muted mt-1">Accès restreint par client</p>
+                      <span className="text-sm font-medium text-text-primary">
+                        Portail client
+                      </span>
+                      <p className="text-xs text-text-muted mt-1">
+                        Accès restreint par client
+                      </p>
                     </Card>
                   </div>
 
                   <div className="p-4 rounded-xl bg-bg-tertiary border border-border-default">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-medium text-text-primary">Code d&apos;intégration</span>
-                      <Button variant="ghost" size="sm" onClick={handleCopyEmbed}>
+                      <span className="text-sm font-medium text-text-primary">
+                        Code d&apos;intégration
+                      </span>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleCopyEmbed}
+                      >
                         <Copy className="h-4 w-4 mr-1" />
                         Copier
                       </Button>
                     </div>
                     <pre className="text-xs text-text-muted bg-bg-primary p-3 rounded-lg overflow-x-auto">
-{`<iframe
+                      {`<iframe
   src="${config.custom_domain || "app.scalingflow.com"}/embed/dashboard"
   width="100%" height="800"
   style="border-radius: 12px;"
@@ -427,7 +529,13 @@ export function WhitelabelPortal({ className }: { className?: string }) {
                     </pre>
                   </div>
 
-                  <Button variant="ghost" className="w-full" onClick={() => window.open("/embed/dashboard-preview", "_blank")}>
+                  <Button
+                    variant="ghost"
+                    className="w-full"
+                    onClick={() =>
+                      window.open("/embed/dashboard-preview", "_blank")
+                    }
+                  >
                     <ExternalLink className="h-4 w-4 mr-1" />
                     Prévisualiser le dashboard client
                   </Button>

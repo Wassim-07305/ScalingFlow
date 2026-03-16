@@ -2,12 +2,30 @@
 
 import React from "react";
 import { cn } from "@/lib/utils/cn";
-import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  CardDescription,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { AILoading } from "@/components/shared/ai-loading";
 import { GlowCard } from "@/components/shared/glow-card";
-import { Clock, Play, Pencil, Check, Save, Loader2 } from "lucide-react";
+import {
+  Clock,
+  Play,
+  Pencil,
+  Check,
+  Save,
+  Loader2,
+  Film,
+  Type,
+  ArrowRightLeft,
+  Music,
+  Timer,
+} from "lucide-react";
 import { CopyExportBar } from "@/components/shared/copy-export-bar";
 import { UpgradeWall } from "@/components/shared/upgrade-wall";
 import { GenerateButton } from "@/components/shared/generate-button";
@@ -42,7 +60,10 @@ export function VSLGenerator({ className, initialData }: VSLGeneratorProps) {
   const [script, setScript] = React.useState<any>(initialData || null);
   const [error, setError] = React.useState<string | null>(null);
   const [activeSection, setActiveSection] = React.useState(0);
-  const [usageLimited, setUsageLimited] = React.useState<{currentUsage: number; limit: number} | null>(null);
+  const [usageLimited, setUsageLimited] = React.useState<{
+    currentUsage: number;
+    limit: number;
+  } | null>(null);
   const [isEditing, setIsEditing] = React.useState(false);
   const [savedId, setSavedId] = React.useState<string | null>(null);
   const [isDirty, setIsDirty] = React.useState(false);
@@ -75,7 +96,10 @@ export function VSLGenerator({ className, initialData }: VSLGeneratorProps) {
 
       if (!response.ok) {
         const errData = await response.json().catch(() => ({}));
-        if (response.status === 403 && errData.usage) { setUsageLimited(errData.usage); return; }
+        if (response.status === 403 && errData.usage) {
+          setUsageLimited(errData.usage);
+          return;
+        }
         throw new Error(errData.error || "Erreur lors de la génération");
       }
       const data = await response.json();
@@ -136,11 +160,23 @@ export function VSLGenerator({ className, initialData }: VSLGeneratorProps) {
   };
 
   if (usageLimited) {
-    return <UpgradeWall currentUsage={usageLimited.currentUsage} limit={usageLimited.limit} className={className} />;
+    return (
+      <UpgradeWall
+        currentUsage={usageLimited.currentUsage}
+        limit={usageLimited.limit}
+        className={className}
+      />
+    );
   }
 
   if (loading) {
-    return <AILoading variant="immersive" text="Rédaction de ton script VSL" className={className} />;
+    return (
+      <AILoading
+        variant="immersive"
+        text="Rédaction de ton script VSL"
+        className={className}
+      />
+    );
   }
 
   if (!script) {
@@ -159,7 +195,9 @@ export function VSLGenerator({ className, initialData }: VSLGeneratorProps) {
           <CardContent className="space-y-5">
             {/* Style */}
             <div>
-              <label className="text-sm font-medium text-text-primary mb-2 block">Style du VSL</label>
+              <label className="text-sm font-medium text-text-primary mb-2 block">
+                Style du VSL
+              </label>
               <div className="grid grid-cols-2 gap-2">
                 {VSL_STYLES.map((s) => (
                   <button
@@ -169,7 +207,7 @@ export function VSLGenerator({ className, initialData }: VSLGeneratorProps) {
                       "px-3 py-2 rounded-lg text-sm font-medium transition-all text-left",
                       vslStyle === s.key
                         ? "bg-accent text-white"
-                        : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
+                        : "bg-bg-tertiary text-text-secondary hover:text-text-primary",
                     )}
                   >
                     {s.label}
@@ -180,7 +218,9 @@ export function VSLGenerator({ className, initialData }: VSLGeneratorProps) {
 
             {/* Duration */}
             <div>
-              <label className="text-sm font-medium text-text-primary mb-2 block">Durée cible</label>
+              <label className="text-sm font-medium text-text-primary mb-2 block">
+                Durée cible
+              </label>
               <div className="flex gap-2">
                 {VSL_DURATIONS.map((d) => (
                   <button
@@ -190,7 +230,7 @@ export function VSLGenerator({ className, initialData }: VSLGeneratorProps) {
                       "px-4 py-2 rounded-lg text-sm font-medium transition-all",
                       duration === d.key
                         ? "bg-accent text-white"
-                        : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
+                        : "bg-bg-tertiary text-text-secondary hover:text-text-primary",
                     )}
                   >
                     {d.label}
@@ -202,7 +242,8 @@ export function VSLGenerator({ className, initialData }: VSLGeneratorProps) {
             {/* Key message */}
             <div>
               <label className="text-sm font-medium text-text-primary mb-1 block">
-                Message clé <span className="text-text-muted font-normal">(optionnel)</span>
+                Message clé{" "}
+                <span className="text-text-muted font-normal">(optionnel)</span>
               </label>
               <textarea
                 value={keyMessage}
@@ -215,7 +256,11 @@ export function VSLGenerator({ className, initialData }: VSLGeneratorProps) {
 
             {error && <p className="text-sm text-danger">{error}</p>}
 
-            <GenerateButton onClick={handleGenerate} className="w-full" icon={<Play className="h-4 w-4 mr-2" />}>
+            <GenerateButton
+              onClick={handleGenerate}
+              className="w-full"
+              icon={<Play className="h-4 w-4 mr-2" />}
+            >
               Générer le script VSL
             </GenerateButton>
           </CardContent>
@@ -227,8 +272,9 @@ export function VSLGenerator({ className, initialData }: VSLGeneratorProps) {
   const sections = script.sections || [];
 
   const fullScriptText = sections
-    .map((s: { name: string; script: string; speaker_notes?: string }) =>
-      `## ${s.name}\n\n${s.script}${s.speaker_notes ? `\n\nNotes: ${s.speaker_notes}` : ""}`
+    .map(
+      (s: { name: string; script: string; speaker_notes?: string }) =>
+        `## ${s.name}\n\n${s.script}${s.speaker_notes ? `\n\nNotes: ${s.speaker_notes}` : ""}`,
     )
     .join("\n\n---\n\n");
 
@@ -238,8 +284,16 @@ export function VSLGenerator({ className, initialData }: VSLGeneratorProps) {
         <div className="flex items-center gap-4">
           <Badge variant="blue">
             <Clock className="h-3 w-3 mr-1" />
-            {script.total_duration_estimate || "~15 min"}
+            {script.total_duration
+              ? `${Math.round(script.total_duration / 60)} min`
+              : script.total_duration_estimate || "~15 min"}
           </Badge>
+          {script.version && (
+            <Badge variant="muted">
+              <Timer className="h-3 w-3 mr-1" />
+              Version {script.version}
+            </Badge>
+          )}
           <Badge variant="muted">{sections.length} sections</Badge>
         </div>
         <div className="flex items-center gap-2">
@@ -252,9 +306,14 @@ export function VSLGenerator({ className, initialData }: VSLGeneratorProps) {
               className="bg-gradient-to-r from-accent to-emerald-400 hover:from-accent/90 hover:to-emerald-400/90 text-white shadow-md shadow-accent/20"
             >
               {saving ? (
-                <><Loader2 className="h-3 w-3 animate-spin mr-1" /> Sauvegarde...</>
+                <>
+                  <Loader2 className="h-3 w-3 animate-spin mr-1" />{" "}
+                  Sauvegarde...
+                </>
               ) : (
-                <><Save className="h-3 w-3 mr-1" /> Sauvegarder</>
+                <>
+                  <Save className="h-3 w-3 mr-1" /> Sauvegarder
+                </>
               )}
             </Button>
           )}
@@ -266,9 +325,13 @@ export function VSLGenerator({ className, initialData }: VSLGeneratorProps) {
             }}
           >
             {isEditing ? (
-              <><Check className="h-3 w-3 mr-1" /> Terminer</>
+              <>
+                <Check className="h-3 w-3 mr-1" /> Terminer
+              </>
             ) : (
-              <><Pencil className="h-3 w-3 mr-1" /> Modifier</>
+              <>
+                <Pencil className="h-3 w-3 mr-1" /> Modifier
+              </>
             )}
           </Button>
           <CopyExportBar
@@ -290,7 +353,7 @@ export function VSLGenerator({ className, initialData }: VSLGeneratorProps) {
               "px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all",
               activeSection === i
                 ? "bg-accent text-white"
-                : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
+                : "bg-bg-tertiary text-text-secondary hover:text-text-primary",
             )}
           >
             {s.name}
@@ -303,33 +366,143 @@ export function VSLGenerator({ className, initialData }: VSLGeneratorProps) {
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <Play className="h-4 w-4 text-accent" />
-              <h3 className="font-semibold text-text-primary">{sections[activeSection].name}</h3>
+              <h3 className="font-semibold text-text-primary">
+                {sections[activeSection].name}
+              </h3>
             </div>
             <Badge variant="muted">{sections[activeSection].duration}</Badge>
           </div>
           {isEditing ? (
             <textarea
               value={sections[activeSection].script}
-              onChange={(e) => updateSectionScript(activeSection, e.target.value)}
+              onChange={(e) =>
+                updateSectionScript(activeSection, e.target.value)
+              }
               className="w-full rounded-lg border border-border-default bg-bg-secondary px-3 py-2 text-sm text-text-secondary resize-vertical focus:outline-none focus:ring-1 focus:ring-accent min-h-[150px]"
               rows={8}
             />
           ) : (
-            <p className="text-text-secondary text-sm whitespace-pre-wrap">{sections[activeSection].script}</p>
+            <p className="text-text-secondary text-sm whitespace-pre-wrap">
+              {sections[activeSection].script}
+            </p>
           )}
+          {/* Indications de montage */}
+          {(sections[activeSection].b_roll_instructions ||
+            sections[activeSection].title_card ||
+            sections[activeSection].transition ||
+            sections[activeSection].music_cue ||
+            sections[activeSection].duration_seconds) && (
+            <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {/* B-Roll */}
+              {sections[activeSection].b_roll_instructions &&
+                (sections[activeSection].b_roll_instructions as string[])
+                  .length > 0 && (
+                  <div className="p-3 rounded-lg bg-purple-500/10 border border-purple-500/20">
+                    <div className="flex items-center gap-1.5 mb-2">
+                      <Film className="h-3.5 w-3.5 text-purple-400" />
+                      <span className="text-xs font-semibold text-purple-400 uppercase">
+                        B-Roll
+                      </span>
+                    </div>
+                    <ul className="space-y-1">
+                      {(
+                        sections[activeSection].b_roll_instructions as string[]
+                      ).map((instruction: string, idx: number) => (
+                        <li
+                          key={idx}
+                          className="text-xs text-text-secondary flex items-start gap-1.5"
+                        >
+                          <span className="text-purple-400 mt-0.5 shrink-0">
+                            -
+                          </span>
+                          {instruction}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+              {/* Title Card */}
+              {sections[activeSection].title_card && (
+                <div className="p-3 rounded-lg bg-blue-500/10 border border-blue-500/20">
+                  <div className="flex items-center gap-1.5 mb-2">
+                    <Type className="h-3.5 w-3.5 text-blue-400" />
+                    <span className="text-xs font-semibold text-blue-400 uppercase">
+                      Title Card
+                    </span>
+                  </div>
+                  <p className="text-xs text-text-secondary font-medium">
+                    &laquo; {sections[activeSection].title_card} &raquo;
+                  </p>
+                </div>
+              )}
+
+              {/* Transition */}
+              {sections[activeSection].transition && (
+                <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/20">
+                  <div className="flex items-center gap-1.5 mb-2">
+                    <ArrowRightLeft className="h-3.5 w-3.5 text-amber-400" />
+                    <span className="text-xs font-semibold text-amber-400 uppercase">
+                      Transition
+                    </span>
+                  </div>
+                  <p className="text-xs text-text-secondary capitalize">
+                    {sections[activeSection].transition}
+                  </p>
+                </div>
+              )}
+
+              {/* Music Cue */}
+              {sections[activeSection].music_cue && (
+                <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/20">
+                  <div className="flex items-center gap-1.5 mb-2">
+                    <Music className="h-3.5 w-3.5 text-rose-400" />
+                    <span className="text-xs font-semibold text-rose-400 uppercase">
+                      Musique
+                    </span>
+                  </div>
+                  <p className="text-xs text-text-secondary">
+                    {sections[activeSection].music_cue}
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Duration seconds */}
+          {sections[activeSection].duration_seconds && (
+            <div className="mt-3 flex items-center gap-2">
+              <Timer className="h-3.5 w-3.5 text-text-muted" />
+              <span className="text-xs text-text-muted">
+                Durée estimée : {sections[activeSection].duration_seconds}s (
+                {Math.round(
+                  ((sections[activeSection].duration_seconds as number) / 60) *
+                    10,
+                ) / 10}{" "}
+                min)
+              </span>
+            </div>
+          )}
+
           {(sections[activeSection].speaker_notes || isEditing) && (
             <div className="mt-4 p-3 rounded-lg bg-bg-tertiary border border-border-default">
-              <p className="text-xs text-text-muted font-medium mb-1">Notes speaker :</p>
+              <p className="text-xs text-text-muted font-medium mb-1">
+                Notes speaker :
+              </p>
               {isEditing ? (
                 <textarea
                   value={sections[activeSection].speaker_notes || ""}
-                  onChange={(e) => updateSectionNotes(activeSection, e.target.value)}
+                  onChange={(e) =>
+                    updateSectionNotes(activeSection, e.target.value)
+                  }
                   className="w-full bg-transparent text-xs text-text-secondary resize-none focus:outline-none"
                   rows={3}
                   placeholder="Ajoute des notes pour le speaker..."
                 />
               ) : (
-                <p className="text-xs text-text-secondary">{sections[activeSection].speaker_notes}</p>
+                <p className="text-xs text-text-secondary">
+                  {sections[activeSection].speaker_notes}
+                </p>
               )}
             </div>
           )}
@@ -340,7 +513,14 @@ export function VSLGenerator({ className, initialData }: VSLGeneratorProps) {
         <Button variant="ghost" size="sm" onClick={() => setScript(null)}>
           Nouveau brief
         </Button>
-        <Button variant="outline" size="sm" onClick={() => { setScript(null); handleGenerate(); }}>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => {
+            setScript(null);
+            handleGenerate();
+          }}
+        >
           Régénérer
         </Button>
       </div>

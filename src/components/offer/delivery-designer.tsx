@@ -99,9 +99,15 @@ interface DeliveryDesignerProps {
   initialData?: any;
 }
 
-export function DeliveryDesigner({ offerId, className, initialData }: DeliveryDesignerProps) {
+export function DeliveryDesigner({
+  offerId,
+  className,
+  initialData,
+}: DeliveryDesignerProps) {
   const [loading, setLoading] = React.useState(false);
-  const [delivery, setDelivery] = React.useState<DeliveryResult | null>(initialData || null);
+  const [delivery, setDelivery] = React.useState<DeliveryResult | null>(
+    initialData || null,
+  );
   const [expandedPhase, setExpandedPhase] = React.useState<number | null>(0);
 
   React.useEffect(() => {
@@ -134,23 +140,33 @@ export function DeliveryDesigner({ offerId, className, initialData }: DeliveryDe
   };
 
   if (loading) {
-    return <AILoading text="Design de ton système de delivery" className={className} />;
+    return (
+      <AILoading
+        text="Design de ton système de delivery"
+        className={className}
+      />
+    );
   }
 
   if (!delivery) {
     return (
       <div className={cn("text-center py-12", className)}>
         <Settings className="h-12 w-12 text-text-muted mx-auto mb-4" />
-        <h3 className="font-semibold text-text-primary mb-2">Structure de Delivery</h3>
+        <h3 className="font-semibold text-text-primary mb-2">
+          Structure de Delivery
+        </h3>
         <p className="text-sm text-text-secondary mb-6 max-w-md mx-auto">
-          L&apos;IA conçoit ton système de livraison complet : phases, agents IA, automatisations, SOPs et KPIs.
+          L&apos;IA conçoit ton système de livraison complet : phases, agents
+          IA, automatisations, SOPs et KPIs.
         </p>
         <Button size="lg" onClick={handleGenerate} disabled={!offerId}>
           <Sparkles className="h-4 w-4 mr-2" />
           Designer le delivery
         </Button>
         {!offerId && (
-          <p className="text-xs text-text-muted mt-2">Génère d&apos;abord une offre</p>
+          <p className="text-xs text-text-muted mt-2">
+            Génère d&apos;abord une offre
+          </p>
         )}
       </div>
     );
@@ -161,8 +177,12 @@ export function DeliveryDesigner({ offerId, className, initialData }: DeliveryDe
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="font-semibold text-text-primary text-lg">{delivery.delivery_name}</h3>
-          <p className="text-sm text-text-secondary mt-1">{delivery.overview}</p>
+          <h3 className="font-semibold text-text-primary text-lg">
+            {delivery.delivery_name}
+          </h3>
+          <p className="text-sm text-text-secondary mt-1">
+            {delivery.overview}
+          </p>
         </div>
         <Button variant="outline" onClick={handleGenerate}>
           <Sparkles className="h-4 w-4 mr-1" />
@@ -175,19 +195,25 @@ export function DeliveryDesigner({ offerId, className, initialData }: DeliveryDe
         <Card>
           <CardContent className="py-3 text-center">
             <p className="text-xs text-text-muted">Scalabilité</p>
-            <p className="text-2xl font-bold text-accent">{delivery.scalability_score}%</p>
+            <p className="text-2xl font-bold text-accent">
+              {delivery.scalability_score}%
+            </p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="py-3 text-center">
             <p className="text-xs text-text-muted">Automatisation</p>
-            <p className="text-2xl font-bold text-blue-400">{delivery.automation_percentage}%</p>
+            <p className="text-2xl font-bold text-blue-400">
+              {delivery.automation_percentage}%
+            </p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="py-3 text-center">
             <p className="text-xs text-text-muted">Phases</p>
-            <p className="text-2xl font-bold text-text-primary">{delivery.phases.length}</p>
+            <p className="text-2xl font-bold text-text-primary">
+              {delivery.phases.length}
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -199,38 +225,62 @@ export function DeliveryDesigner({ offerId, className, initialData }: DeliveryDe
             <Settings className="h-4 w-4 text-accent" />
             Modèle de delivery
             {delivery.recommended_model && (
-              <Badge variant="default">{delivery.recommended_model} recommandé</Badge>
+              <Badge variant="default">
+                {delivery.recommended_model} recommandé
+              </Badge>
             )}
           </h4>
           <div className="grid gap-3 md:grid-cols-3">
             {(["dfy", "dwy", "diy"] as const).map((key) => {
               const model = delivery.model_comparison![key];
-              const isRecommended = delivery.recommended_model?.toLowerCase() === key;
-              const labels = { dfy: "Done For You", dwy: "Done With You", diy: "Do It Yourself" };
+              const isRecommended =
+                delivery.recommended_model?.toLowerCase() === key;
+              const labels = {
+                dfy: "Done For You",
+                dwy: "Done With You",
+                diy: "Do It Yourself",
+              };
               return (
-                <Card key={key} className={cn(isRecommended && "border-accent/50")}>
+                <Card
+                  key={key}
+                  className={cn(isRecommended && "border-accent/50")}
+                >
                   <CardHeader className="py-3">
                     <CardTitle className="text-sm flex items-center gap-2">
                       {labels[key]}
-                      {isRecommended && <Badge variant="default" className="text-xs">Recommandé</Badge>}
+                      {isRecommended && (
+                        <Badge variant="default" className="text-xs">
+                          Recommandé
+                        </Badge>
+                      )}
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="pt-0 space-y-2">
                     <div className="text-xs">
-                      <span className="text-text-muted">Implication client : </span>
-                      <span className="text-text-secondary">{model.implication_client}</span>
+                      <span className="text-text-muted">
+                        Implication client :{" "}
+                      </span>
+                      <span className="text-text-secondary">
+                        {model.implication_client}
+                      </span>
                     </div>
                     <div className="text-xs">
                       <span className="text-text-muted">Prix : </span>
-                      <span className="text-text-secondary">{model.prix_relatif}</span>
+                      <span className="text-text-secondary">
+                        {model.prix_relatif}
+                      </span>
                     </div>
                     <div className="text-xs">
                       <span className="text-text-muted">Scalabilité : </span>
-                      <span className="text-text-secondary">{model.scalabilite}</span>
+                      <span className="text-text-secondary">
+                        {model.scalabilite}
+                      </span>
                     </div>
                     <div className="flex flex-wrap gap-1 mt-2">
                       {model.inclus.map((item, i) => (
-                        <Badge key={i} variant="muted" className="text-xs">{item}</Badge>
+                        <Badge key={i} variant="muted" className="text-xs">
+                          {item}
+                        </Badge>
                       ))}
                     </div>
                   </CardContent>
@@ -245,29 +295,36 @@ export function DeliveryDesigner({ offerId, className, initialData }: DeliveryDe
       {delivery.piliers && delivery.piliers.length > 0 && (
         <div>
           <h4 className="font-medium text-text-primary flex items-center gap-2 mb-3">
-            <BarChart3 className="h-4 w-4 text-accent" />
-            9 Piliers Business
+            <BarChart3 className="h-4 w-4 text-accent" />9 Piliers Business
           </h4>
           <div className="grid gap-3 md:grid-cols-3">
             {delivery.piliers.map((pilier, i) => (
               <Card key={i}>
                 <CardHeader className="py-3">
-                  <CardTitle className="text-sm">{pilier.pillar_name}</CardTitle>
+                  <CardTitle className="text-sm">
+                    {pilier.pillar_name}
+                  </CardTitle>
                 </CardHeader>
                 <CardContent className="pt-0 space-y-2">
                   {pilier.agents_ia.length > 0 && pilier.agents_ia[0] && (
                     <div className="text-xs">
-                      <span className="text-text-muted block mb-1">Agents IA</span>
+                      <span className="text-text-muted block mb-1">
+                        Agents IA
+                      </span>
                       <div className="flex flex-wrap gap-1">
                         {pilier.agents_ia.map((a, j) => (
-                          <Badge key={j} variant="blue" className="text-xs">{a}</Badge>
+                          <Badge key={j} variant="blue" className="text-xs">
+                            {a}
+                          </Badge>
                         ))}
                       </div>
                     </div>
                   )}
                   <div className="text-xs">
                     <span className="text-text-muted">KPI : </span>
-                    <span className="text-accent font-medium">{pilier.kpi}</span>
+                    <span className="text-accent font-medium">
+                      {pilier.kpi}
+                    </span>
                   </div>
                 </CardContent>
               </Card>
@@ -294,10 +351,16 @@ export function DeliveryDesigner({ offerId, className, initialData }: DeliveryDe
                   {phase.name}
                 </CardTitle>
                 <div className="flex items-center gap-2">
-                  <Badge variant={
-                    phase.automation_level === "Full auto" ? "default" :
-                    phase.automation_level === "Semi-auto" ? "blue" : "yellow"
-                  } className="text-xs">
+                  <Badge
+                    variant={
+                      phase.automation_level === "Full auto"
+                        ? "default"
+                        : phase.automation_level === "Semi-auto"
+                          ? "blue"
+                          : "yellow"
+                    }
+                    className="text-xs"
+                  >
                     {phase.automation_level}
                   </Badge>
                   {expandedPhase === i ? (
@@ -310,31 +373,45 @@ export function DeliveryDesigner({ offerId, className, initialData }: DeliveryDe
             </CardHeader>
             {expandedPhase === i && (
               <CardContent className="pt-0 space-y-3">
-                <p className="text-sm text-text-secondary">{phase.description}</p>
+                <p className="text-sm text-text-secondary">
+                  {phase.description}
+                </p>
                 <div>
-                  <p className="text-xs text-text-muted uppercase mb-1">Livrables</p>
+                  <p className="text-xs text-text-muted uppercase mb-1">
+                    Livrables
+                  </p>
                   <div className="flex flex-wrap gap-1">
                     {phase.deliverables.map((d, j) => (
-                      <Badge key={j} variant="default" className="text-xs">{d}</Badge>
+                      <Badge key={j} variant="default" className="text-xs">
+                        {d}
+                      </Badge>
                     ))}
                   </div>
                 </div>
                 {phase.tools.length > 0 && (
                   <div>
-                    <p className="text-xs text-text-muted uppercase mb-1">Outils</p>
+                    <p className="text-xs text-text-muted uppercase mb-1">
+                      Outils
+                    </p>
                     <div className="flex flex-wrap gap-1">
                       {phase.tools.map((t, j) => (
-                        <Badge key={j} variant="muted" className="text-xs">{t}</Badge>
+                        <Badge key={j} variant="muted" className="text-xs">
+                          {t}
+                        </Badge>
                       ))}
                     </div>
                   </div>
                 )}
                 {phase.ai_agents.length > 0 && phase.ai_agents[0] && (
                   <div>
-                    <p className="text-xs text-text-muted uppercase mb-1">Agents IA</p>
+                    <p className="text-xs text-text-muted uppercase mb-1">
+                      Agents IA
+                    </p>
                     <div className="flex flex-wrap gap-1">
                       {phase.ai_agents.map((a, j) => (
-                        <Badge key={j} variant="blue" className="text-xs">{a}</Badge>
+                        <Badge key={j} variant="blue" className="text-xs">
+                          {a}
+                        </Badge>
                       ))}
                     </div>
                   </div>
@@ -356,12 +433,16 @@ export function DeliveryDesigner({ offerId, className, initialData }: DeliveryDe
             {delivery.ai_agents.map((agent, i) => (
               <Card key={i}>
                 <CardContent className="py-3 space-y-2">
-                  <p className="text-sm font-medium text-text-primary">{agent.name}</p>
+                  <p className="text-sm font-medium text-text-primary">
+                    {agent.name}
+                  </p>
                   <p className="text-xs text-text-secondary">{agent.role}</p>
                   <div className="flex gap-4 text-xs">
                     <div>
                       <span className="text-text-muted">Déclencheur : </span>
-                      <span className="text-text-secondary">{agent.trigger}</span>
+                      <span className="text-text-secondary">
+                        {agent.trigger}
+                      </span>
                     </div>
                   </div>
                   <div className="text-xs">
@@ -387,10 +468,16 @@ export function DeliveryDesigner({ offerId, className, initialData }: DeliveryDe
               {delivery.tech_stack.map((tool, i) => (
                 <div key={i} className="flex items-center justify-between py-2">
                   <div className="flex items-center gap-3">
-                    <span className="text-sm font-medium text-text-primary">{tool.tool}</span>
-                    <span className="text-xs text-text-secondary">{tool.purpose}</span>
+                    <span className="text-sm font-medium text-text-primary">
+                      {tool.tool}
+                    </span>
+                    <span className="text-xs text-text-secondary">
+                      {tool.purpose}
+                    </span>
                   </div>
-                  <Badge variant="muted" className="text-xs">{tool.category}</Badge>
+                  <Badge variant="muted" className="text-xs">
+                    {tool.category}
+                  </Badge>
                 </div>
               ))}
             </div>
@@ -430,7 +517,10 @@ export function DeliveryDesigner({ offerId, className, initialData }: DeliveryDe
             <CardContent className="pt-0">
               <ul className="space-y-1">
                 {delivery.bottlenecks.map((b, i) => (
-                  <li key={i} className="text-xs text-text-secondary flex items-start gap-2">
+                  <li
+                    key={i}
+                    className="text-xs text-text-secondary flex items-start gap-2"
+                  >
                     <span className="text-yellow-400 mt-0.5">&bull;</span>
                     {b}
                   </li>
@@ -451,7 +541,10 @@ export function DeliveryDesigner({ offerId, className, initialData }: DeliveryDe
             <CardContent className="pt-0">
               <ul className="space-y-1">
                 {delivery.recommendations.map((r, i) => (
-                  <li key={i} className="text-xs text-text-secondary flex items-start gap-2">
+                  <li
+                    key={i}
+                    className="text-xs text-text-secondary flex items-start gap-2"
+                  >
                     <span className="text-accent mt-0.5">&bull;</span>
                     {r}
                   </li>

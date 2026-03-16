@@ -30,7 +30,7 @@ export function StepIndicator({
                   isCurrent && "bg-accent text-bg-primary",
                   !isCompleted &&
                     !isCurrent &&
-                    "bg-bg-tertiary text-text-muted border border-border-default"
+                    "bg-bg-tertiary text-text-muted border border-border-default",
                 )}
               >
                 {isCompleted ? (
@@ -44,7 +44,7 @@ export function StepIndicator({
                   "text-sm hidden sm:inline transition-colors duration-150",
                   isCurrent && "text-text-primary font-medium",
                   isCompleted && "text-accent",
-                  !isCompleted && !isCurrent && "text-text-muted"
+                  !isCompleted && !isCurrent && "text-text-muted",
                 )}
               >
                 {step}
@@ -55,7 +55,7 @@ export function StepIndicator({
               <div
                 className={cn(
                   "h-[1px] w-8 transition-colors duration-150",
-                  index < currentStep ? "bg-accent" : "bg-border-default"
+                  index < currentStep ? "bg-accent" : "bg-border-default",
                 )}
               />
             )}

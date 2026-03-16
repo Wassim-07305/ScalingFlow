@@ -40,9 +40,12 @@ export function MultiChipSelector({
                 "group relative rounded-xl border-2 px-5 py-3 text-base font-medium transition-all duration-300 ease-out active:scale-[0.97] animate-in fade-in slide-in-from-bottom-2",
                 selected
                   ? "scale-[1.03] border-emerald-400 bg-emerald-500/20 text-white shadow-lg shadow-emerald-500/20"
-                  : "border-white/10 bg-white/5 text-white/70 hover:border-white/25 hover:bg-white/10 hover:text-white"
+                  : "border-white/10 bg-white/5 text-white/70 hover:border-white/25 hover:bg-white/10 hover:text-white",
               )}
-              style={{ animationDelay: `${i * 40}ms`, animationFillMode: "both" }}
+              style={{
+                animationDelay: `${i * 40}ms`,
+                animationFillMode: "both",
+              }}
             >
               <div className="flex items-center gap-2.5">
                 {/* Selection indicator */}
@@ -51,7 +54,7 @@ export function MultiChipSelector({
                     "flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 transition-all duration-300",
                     selected
                       ? "border-emerald-400 bg-emerald-400"
-                      : "border-white/20 group-hover:border-white/40"
+                      : "border-white/20 group-hover:border-white/40",
                   )}
                 >
                   {selected && <Check className="h-3 w-3 text-black" />}

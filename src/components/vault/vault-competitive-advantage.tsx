@@ -32,7 +32,9 @@ export function VaultCompetitiveAdvantage() {
   const { user } = useUser();
   const [loading, setLoading] = React.useState(true);
   const [generating, setGenerating] = React.useState(false);
-  const [advantage, setAdvantage] = React.useState<CompetitiveAdvantage | null>(null);
+  const [advantage, setAdvantage] = React.useState<CompetitiveAdvantage | null>(
+    null,
+  );
 
   React.useEffect(() => {
     if (!user) return;
@@ -44,7 +46,9 @@ export function VaultCompetitiveAdvantage() {
         .eq("id", user.id)
         .single();
       if (data?.competitive_advantage) {
-        setAdvantage(data.competitive_advantage as unknown as CompetitiveAdvantage);
+        setAdvantage(
+          data.competitive_advantage as unknown as CompetitiveAdvantage,
+        );
       }
       setLoading(false);
     };
@@ -83,7 +87,8 @@ export function VaultCompetitiveAdvantage() {
           Score d&apos;avantage compétitif
         </h3>
         <p className="text-sm text-text-secondary mb-6 max-w-md mx-auto">
-          L&apos;IA analyse tes compétences et ton profil pour calculer ton avantage compétitif dans différentes niches.
+          L&apos;IA analyse tes compétences et ton profil pour calculer ton
+          avantage compétitif dans différentes niches.
         </p>
         <Button size="lg" onClick={handleGenerate}>
           <Sparkles className="h-4 w-4 mr-2" />
@@ -101,9 +106,14 @@ export function VaultCompetitiveAdvantage() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-text-muted">Score global</p>
-              <p className="text-4xl font-bold text-accent">{advantage.overall_score}/100</p>
+              <p className="text-4xl font-bold text-accent">
+                {advantage.overall_score}/100
+              </p>
               <p className="text-sm text-text-secondary mt-1">
-                Meilleure niche : <span className="text-accent font-medium">{advantage.top_niche}</span>
+                Meilleure niche :{" "}
+                <span className="text-accent font-medium">
+                  {advantage.top_niche}
+                </span>
               </p>
             </div>
             <Button variant="outline" onClick={handleGenerate}>
@@ -123,10 +133,14 @@ export function VaultCompetitiveAdvantage() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-text-secondary">{advantage.unique_positioning}</p>
+          <p className="text-sm text-text-secondary">
+            {advantage.unique_positioning}
+          </p>
           <div className="flex flex-wrap gap-2 mt-3">
             {advantage.key_differentiators.map((d, i) => (
-              <Badge key={i} variant="default">{d}</Badge>
+              <Badge key={i} variant="default">
+                {d}
+              </Badge>
             ))}
           </div>
         </CardContent>
@@ -135,16 +149,27 @@ export function VaultCompetitiveAdvantage() {
       {/* Niche scores */}
       <div className="grid gap-4 md:grid-cols-2">
         {advantage.niches.map((niche, i) => (
-          <Card key={i} className={cn(
-            niche.niche === advantage.top_niche && "border-accent/30"
-          )}>
+          <Card
+            key={i}
+            className={cn(
+              niche.niche === advantage.top_niche && "border-accent/30",
+            )}
+          >
             <CardHeader className="pb-2">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-sm flex items-center gap-2">
                   <Target className="h-4 w-4 text-accent" />
                   {niche.niche}
                 </CardTitle>
-                <Badge variant={niche.score >= 70 ? "default" : niche.score >= 40 ? "blue" : "muted"}>
+                <Badge
+                  variant={
+                    niche.score >= 70
+                      ? "default"
+                      : niche.score >= 40
+                        ? "blue"
+                        : "muted"
+                  }
+                >
                   {niche.score}/100
                 </Badge>
               </div>
@@ -161,16 +186,22 @@ export function VaultCompetitiveAdvantage() {
                 <p className="text-xs text-text-muted uppercase mb-1">Forces</p>
                 <div className="flex flex-wrap gap-1">
                   {niche.strengths.map((s, j) => (
-                    <Badge key={j} variant="default" className="text-xs">{s}</Badge>
+                    <Badge key={j} variant="default" className="text-xs">
+                      {s}
+                    </Badge>
                   ))}
                 </div>
               </div>
 
               <div>
-                <p className="text-xs text-text-muted uppercase mb-1">Faiblesses</p>
+                <p className="text-xs text-text-muted uppercase mb-1">
+                  Faiblesses
+                </p>
                 <div className="flex flex-wrap gap-1">
                   {niche.weaknesses.map((w, j) => (
-                    <Badge key={j} variant="muted" className="text-xs">{w}</Badge>
+                    <Badge key={j} variant="muted" className="text-xs">
+                      {w}
+                    </Badge>
                   ))}
                 </div>
               </div>
@@ -180,10 +211,14 @@ export function VaultCompetitiveAdvantage() {
                   <TrendingUp className="h-3 w-3 inline mr-1" />
                   Opportunité
                 </p>
-                <p className="text-xs text-text-secondary">{niche.opportunity}</p>
+                <p className="text-xs text-text-secondary">
+                  {niche.opportunity}
+                </p>
               </div>
 
-              <p className="text-xs text-accent italic">{niche.recommendation}</p>
+              <p className="text-xs text-accent italic">
+                {niche.recommendation}
+              </p>
             </CardContent>
           </Card>
         ))}

@@ -11,7 +11,7 @@ export interface YouTubeScriptResult {
 export function buildYouTubeScriptPrompt(
   market: string,
   offer: string,
-  topic: string
+  topic: string,
 ): string {
   return `Tu es un expert en creation de contenu YouTube pour les freelances et consultants dans le domaine de l'IA et de l'automatisation.
 

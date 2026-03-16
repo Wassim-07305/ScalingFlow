@@ -25,11 +25,14 @@ export async function POST(req: NextRequest) {
     }
 
     // Rate limiting
-    const rl = await rateLimit(user.id, "analyze-schwartz", { limit: 5, windowSeconds: 60 });
+    const rl = await rateLimit(user.id, "analyze-schwartz", {
+      limit: 5,
+      windowSeconds: 60,
+    });
     if (!rl.allowed) {
       return NextResponse.json(
         { error: "Trop de requêtes. Réessaie dans quelques secondes." },
-        { status: 429 }
+        { status: 429 },
       );
     }
 
@@ -38,7 +41,7 @@ export async function POST(req: NextRequest) {
     if (!usage.allowed) {
       return NextResponse.json(
         { error: "Limite de générations IA atteinte", usage },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -48,7 +51,7 @@ export async function POST(req: NextRequest) {
     if (!market_analysis_id) {
       return NextResponse.json(
         { error: "market_analysis_id requis" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -63,7 +66,7 @@ export async function POST(req: NextRequest) {
     if (maError || !marketAnalysis) {
       return NextResponse.json(
         { error: "Analyse de marché introuvable" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -105,7 +108,7 @@ export async function POST(req: NextRequest) {
     const message = error instanceof Error ? error.message : String(error);
     return NextResponse.json(
       { error: `Erreur analyse Schwartz : ${message}` },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

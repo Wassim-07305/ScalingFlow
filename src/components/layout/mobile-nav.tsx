@@ -26,11 +26,16 @@ export function MobileNav({ role, navItems, homeHref = "/" }: MobileNavProps) {
       {/* Overflow menu */}
       {showMore && (
         <div className="fixed inset-0 z-50 md:hidden">
-          <div className="absolute inset-0 bg-black/50" onClick={() => setShowMore(false)} />
+          <div
+            className="absolute inset-0 bg-black/50"
+            onClick={() => setShowMore(false)}
+          />
           <div className="absolute bottom-16 left-0 right-0 bg-bg-primary border-t border-border-default rounded-t-2xl p-4 max-h-[60vh] overflow-y-auto">
             <div className="grid grid-cols-4 gap-3">
               {overflowItems.map((item) => {
-                const isActive = pathname === item.href || (item.href !== homeHref && pathname.startsWith(item.href));
+                const isActive =
+                  pathname === item.href ||
+                  (item.href !== homeHref && pathname.startsWith(item.href));
                 const Icon = item.icon;
                 return (
                   <Link
@@ -39,11 +44,15 @@ export function MobileNav({ role, navItems, homeHref = "/" }: MobileNavProps) {
                     onClick={() => setShowMore(false)}
                     className={cn(
                       "flex flex-col items-center gap-1 p-3 rounded-lg text-[11px] font-medium transition-colors",
-                      isActive ? "text-accent bg-accent-muted" : "text-text-muted hover:bg-bg-tertiary"
+                      isActive
+                        ? "text-accent bg-accent-muted"
+                        : "text-text-muted hover:bg-bg-tertiary",
                     )}
                   >
                     <Icon className="h-5 w-5" />
-                    <span className="truncate w-full text-center">{item.label}</span>
+                    <span className="truncate w-full text-center">
+                      {item.label}
+                    </span>
                   </Link>
                 );
               })}
@@ -66,7 +75,7 @@ export function MobileNav({ role, navItems, homeHref = "/" }: MobileNavProps) {
               href={item.href}
               className={cn(
                 "flex flex-col items-center gap-1 px-2 py-1 text-[10px] font-medium transition-colors",
-                isActive ? "text-accent" : "text-text-muted"
+                isActive ? "text-accent" : "text-text-muted",
               )}
             >
               <Icon className="h-5 w-5" />
@@ -80,10 +89,14 @@ export function MobileNav({ role, navItems, homeHref = "/" }: MobileNavProps) {
             onClick={() => setShowMore(!showMore)}
             className={cn(
               "flex flex-col items-center gap-1 px-2 py-1 text-[10px] font-medium transition-colors",
-              showMore ? "text-accent" : "text-text-muted"
+              showMore ? "text-accent" : "text-text-muted",
             )}
           >
-            {showMore ? <X className="h-5 w-5" /> : <MoreHorizontal className="h-5 w-5" />}
+            {showMore ? (
+              <X className="h-5 w-5" />
+            ) : (
+              <MoreHorizontal className="h-5 w-5" />
+            )}
             <span>Plus</span>
           </button>
         )}

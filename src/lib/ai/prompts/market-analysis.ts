@@ -45,10 +45,13 @@ export interface MarketAnalysisContext {
 import { PARCOURS } from "@/lib/parcours";
 
 const PARCOURS_CONTEXT: Record<string, string> = Object.fromEntries(
-  Object.entries(PARCOURS).map(([key, def]) => [key, def.aiContext])
+  Object.entries(PARCOURS).map(([key, def]) => [key, def.aiContext]),
 );
 
-function buildVaultContext(vaultSkills?: VaultSkill[], expertiseAnswers?: Record<string, string>): string {
+function buildVaultContext(
+  vaultSkills?: VaultSkill[],
+  expertiseAnswers?: Record<string, string>,
+): string {
   let context = "";
 
   if (vaultSkills && vaultSkills.length > 0) {
@@ -57,7 +60,8 @@ function buildVaultContext(vaultSkills?: VaultSkill[], expertiseAnswers?: Record
     for (const skill of vaultSkills) {
       context += `- ${skill.name || skill.category || "Competence"} (niveau : ${skill.level})${skill.details ? ` — ${skill.details}` : ""}\n`;
     }
-    context += "\nUtilise ces competences pour identifier des marches ou il a un avantage competitif naturel.\n";
+    context +=
+      "\nUtilise ces competences pour identifier des marches ou il a un avantage competitif naturel.\n";
   }
 
   if (expertiseAnswers && Object.keys(expertiseAnswers).length > 0) {
@@ -66,29 +70,57 @@ function buildVaultContext(vaultSkills?: VaultSkill[], expertiseAnswers?: Record
     for (const [question, answer] of Object.entries(expertiseAnswers)) {
       context += `- **${question}** : ${answer}\n`;
     }
-    context += "\nCes reponses revelent ses points forts et ses domaines d'expertise. Utilise-les pour affiner le positionnement recommande.\n";
+    context +=
+      "\nCes reponses revelent ses points forts et ses domaines d'expertise. Utilise-les pour affiner le positionnement recommande.\n";
   }
 
   return context;
 }
 
 export function marketAnalysisPrompt(data: MarketAnalysisContext): string {
-  const parcoursContext = data.parcours ? PARCOURS_CONTEXT[data.parcours] || "" : "";
-  const vaultContext = buildVaultContext(data.vaultSkills, data.expertiseAnswers);
-  const countryContext = data.country ? `\n- Pays cible : ${data.country}` : "";
-  const languageContext = data.language ? `\n- Langue du client : ${data.language}` : "";
-  const situationContext = data.situation ? `\n- Situation actuelle : ${data.situation}` : "";
-  const hoursContext = data.hoursPerWeek ? `\n- Heures disponibles : ${data.hoursPerWeek}h/semaine` : "";
-  const deadlineContext = data.deadline ? `\n- Deadline : ${data.deadline}` : "";
-  const teamContext = data.teamSize != null ? `\n- Equipe : ${data.teamSize <= 1 ? "Seul" : data.teamSize + " personnes"}` : "";
-  const formationsContext = data.formations && data.formations.length > 0 ? `\n- Formations : ${data.formations.join(", ")}` : "";
-  const situationDetailsContext = data.situationDetails && Object.keys(data.situationDetails).length > 0
-    ? `\n- Details situation : ${Object.entries(data.situationDetails).filter(([k, v]) => v && k !== "paying_clients").map(([k, v]) => `${k}: ${v}`).join(", ")}`
+  const parcoursContext = data.parcours
+    ? PARCOURS_CONTEXT[data.parcours] || ""
     : "";
+  const vaultContext = buildVaultContext(
+    data.vaultSkills,
+    data.expertiseAnswers,
+  );
+  const countryContext = data.country ? `\n- Pays cible : ${data.country}` : "";
+  const languageContext = data.language
+    ? `\n- Langue du client : ${data.language}`
+    : "";
+  const situationContext = data.situation
+    ? `\n- Situation actuelle : ${data.situation}`
+    : "";
+  const hoursContext = data.hoursPerWeek
+    ? `\n- Heures disponibles : ${data.hoursPerWeek}h/semaine`
+    : "";
+  const deadlineContext = data.deadline
+    ? `\n- Deadline : ${data.deadline}`
+    : "";
+  const teamContext =
+    data.teamSize != null
+      ? `\n- Equipe : ${data.teamSize <= 1 ? "Seul" : data.teamSize + " personnes"}`
+      : "";
+  const formationsContext =
+    data.formations && data.formations.length > 0
+      ? `\n- Formations : ${data.formations.join(", ")}`
+      : "";
+  const situationDetailsContext =
+    data.situationDetails && Object.keys(data.situationDetails).length > 0
+      ? `\n- Details situation : ${Object.entries(data.situationDetails)
+          .filter(([k, v]) => v && k !== "paying_clients")
+          .map(([k, v]) => `${k}: ${v}`)
+          .join(", ")}`
+      : "";
   const payingClientsContext = data.situationDetails?.paying_clients
     ? (() => {
-        const pc = data.situationDetails.paying_clients as Record<string, unknown>;
-        if (!pc.has_paying_clients) return "\n- Clients payants : Non (premier business)";
+        const pc = data.situationDetails.paying_clients as Record<
+          string,
+          unknown
+        >;
+        if (!pc.has_paying_clients)
+          return "\n- Clients payants : Non (premier business)";
         const parts = [`a deja eu des clients payants`];
         if (pc.clients_count) parts.push(`${pc.clients_count} clients`);
         if (pc.client_type) parts.push(`type: ${pc.client_type}`);
@@ -97,11 +129,14 @@ export function marketAnalysisPrompt(data: MarketAnalysisContext): string {
       })()
     : "";
 
-  const phase1Context = data.phase1Answers && Object.keys(data.phase1Answers).length > 0
-    ? "\n## REPONSES PHASE 1 (RECHERCHE DE MARCHE)\n" +
-      Object.entries(data.phase1Answers).map(([label, answer]) => `- **${label}** : ${answer}`).join("\n") +
-      "\n\nCes reponses revelent les motivations profondes, contraintes et vision de l'utilisateur. Utilise-les pour affiner la selection de marche et le positionnement.\n"
-    : "";
+  const phase1Context =
+    data.phase1Answers && Object.keys(data.phase1Answers).length > 0
+      ? "\n## REPONSES PHASE 1 (RECHERCHE DE MARCHE)\n" +
+        Object.entries(data.phase1Answers)
+          .map(([label, answer]) => `- **${label}** : ${answer}`)
+          .join("\n") +
+        "\n\nCes reponses revelent les motivations profondes, contraintes et vision de l'utilisateur. Utilise-les pour affiner la selection de marche et le positionnement.\n"
+      : "";
 
   return `Tu es un expert en strategie marketing et business development specialise dans l'IA et l'automatisation pour les freelances et agences.
 

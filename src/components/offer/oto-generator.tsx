@@ -19,21 +19,38 @@ import {
   RefreshCw,
   FileDown,
   Package,
+  Lock,
+  TrendingUp,
+  Users,
 } from "lucide-react";
 import { exportToPDF } from "@/lib/utils/export-pdf";
+import { useUser } from "@/hooks/use-user";
+import { toast } from "sonner";
 
 interface OtoGeneratorProps {
   offerId?: string;
   className?: string;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   initialData?: any;
+  mainOfferPrice?: number;
 }
 
-export function OtoGenerator({ offerId, className, initialData }: OtoGeneratorProps) {
+export function OtoGenerator({
+  offerId,
+  className,
+  initialData,
+  mainOfferPrice,
+}: OtoGeneratorProps) {
+  const { profile, loading: profileLoading } = useUser();
   const [loading, setLoading] = React.useState(false);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [otoData, setOtoData] = React.useState<any>(null);
   const [error, setError] = React.useState<string | null>(null);
+
+  // Eligibility check: audience > 1000 OR revenue > 5000
+  const audience = profile?.xp_points ?? 0; // xp_points used as audience proxy; could also be instagram followers
+  const revenue = profile?.current_revenue ?? 0;
+  const isEligible = audience >= 1000 || revenue >= 5000;
 
   // Charger les données historiques quand initialData change
   React.useEffect(() => {
@@ -41,6 +58,23 @@ export function OtoGenerator({ offerId, className, initialData }: OtoGeneratorPr
       setOtoData(initialData.oto_data);
     }
   }, [initialData]);
+
+  const validateOtoPrice = (otoPriceStr: string): boolean => {
+    if (!mainOfferPrice || mainOfferPrice <= 0) return true; // can't validate without main price
+    const otoPrice = parseFloat(
+      otoPriceStr.replace(/[^\d.,]/g, "").replace(",", "."),
+    );
+    if (isNaN(otoPrice)) return true; // can't parse, skip validation
+    const minPrice = mainOfferPrice * 0.5;
+    const maxPrice = mainOfferPrice * 1.0;
+    if (otoPrice < minPrice || otoPrice > maxPrice) {
+      toast.error(
+        `Le prix OTO (${otoPrice}€) devrait être entre 50% et 100% du prix de l'offre principale (${minPrice}€ - ${maxPrice}€)`,
+      );
+      return false;
+    }
+    return true;
+  };
 
   const handleGenerate = async () => {
     if (!offerId) {
@@ -64,13 +98,80 @@ export function OtoGenerator({ offerId, className, initialData }: OtoGeneratorPr
       }
 
       const data = await response.json();
-      setOtoData(data.oto_data || data);
+      const oto = data.oto_data || data;
+
+      // Validate OTO price against main offer
+      if (oto.oto_price) {
+        validateOtoPrice(String(oto.oto_price));
+      }
+
+      setOtoData(oto);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Une erreur est survenue");
     } finally {
       setLoading(false);
     }
   };
+
+  // Show loading while profile is being fetched
+  if (profileLoading) {
+    return (
+      <div className={cn("flex items-center justify-center py-12", className)}>
+        <div className="h-6 w-6 animate-spin rounded-full border-2 border-accent border-t-transparent" />
+      </div>
+    );
+  }
+
+  // Eligibility gate: audience > 1000 OR revenue > 5000€
+  if (!isEligible) {
+    return (
+      <div className={cn("space-y-6", className)}>
+        <Card className="border-amber-500/20">
+          <CardContent className="py-8">
+            <div className="flex flex-col items-center text-center gap-4">
+              <div className="p-3 rounded-full bg-amber-500/10">
+                <Lock className="h-8 w-8 text-amber-400" />
+              </div>
+              <h3 className="text-lg font-semibold text-text-primary">
+                OTO pas encore disponible
+              </h3>
+              <p className="text-sm text-text-secondary max-w-md leading-relaxed">
+                L&apos;offre OTO sera disponible quand ton audience dépassera{" "}
+                <span className="font-semibold text-text-primary">
+                  1 000 abonnés
+                </span>{" "}
+                ou ton CA mensuel{" "}
+                <span className="font-semibold text-text-primary">5 000 €</span>
+                .
+              </p>
+              <div className="flex items-center gap-6 mt-2">
+                <div className="flex items-center gap-2 text-sm">
+                  <Users className="h-4 w-4 text-text-muted" />
+                  <span className="text-text-secondary">
+                    Audience :{" "}
+                    <span className="font-medium text-text-primary">
+                      {audience.toLocaleString("fr-FR")}
+                    </span>{" "}
+                    / 1 000
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 text-sm">
+                  <TrendingUp className="h-4 w-4 text-text-muted" />
+                  <span className="text-text-secondary">
+                    CA :{" "}
+                    <span className="font-medium text-text-primary">
+                      {revenue.toLocaleString("fr-FR")} €
+                    </span>{" "}
+                    / 5 000 €
+                  </span>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   if (loading) {
     return <AILoading text="Création de ton offre OTO" className={className} />;
@@ -83,13 +184,17 @@ export function OtoGenerator({ offerId, className, initialData }: OtoGeneratorPr
         <div className="flex items-start justify-between">
           <div>
             {otoData.hook && (
-              <p className="text-sm font-medium text-warning mb-2">{otoData.hook}</p>
+              <p className="text-sm font-medium text-warning mb-2">
+                {otoData.hook}
+              </p>
             )}
             <h2 className="text-2xl font-bold text-text-primary">
               {otoData.headline || otoData.oto_name}
             </h2>
             {otoData.subheadline && (
-              <p className="mt-2 text-text-secondary max-w-2xl">{otoData.subheadline}</p>
+              <p className="mt-2 text-text-secondary max-w-2xl">
+                {otoData.subheadline}
+              </p>
             )}
           </div>
           <div className="flex items-center gap-2">
@@ -108,7 +213,14 @@ export function OtoGenerator({ offerId, className, initialData }: OtoGeneratorPr
               <FileDown className="h-4 w-4 mr-1" />
               PDF
             </Button>
-            <Button variant="outline" size="sm" onClick={() => { setOtoData(null); handleGenerate(); }}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setOtoData(null);
+                handleGenerate();
+              }}
+            >
               <RefreshCw className="h-4 w-4 mr-2" />
               Régénérer
             </Button>
@@ -125,7 +237,9 @@ export function OtoGenerator({ offerId, className, initialData }: OtoGeneratorPr
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-text-secondary text-sm">{otoData.problem_without_oto}</p>
+              <p className="text-text-secondary text-sm">
+                {otoData.problem_without_oto}
+              </p>
             </CardContent>
           </Card>
         )}
@@ -140,7 +254,9 @@ export function OtoGenerator({ offerId, className, initialData }: OtoGeneratorPr
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-text-secondary text-sm">{otoData.oto_description}</p>
+              <p className="text-text-secondary text-sm">
+                {otoData.oto_description}
+              </p>
             </CardContent>
           </Card>
         )}
@@ -148,15 +264,21 @@ export function OtoGenerator({ offerId, className, initialData }: OtoGeneratorPr
         {/* Bénéfices en grille */}
         {otoData.benefits?.length > 0 && (
           <div>
-            <h3 className="text-lg font-semibold text-text-primary mb-4">Benefices</h3>
+            <h3 className="text-lg font-semibold text-text-primary mb-4">
+              Benefices
+            </h3>
             <div className="grid gap-4 sm:grid-cols-2">
               {otoData.benefits.map(
                 (b: { title: string; description: string }, i: number) => (
                   <GlowCard key={i} glowColor="cyan">
-                    <h4 className="font-medium text-text-primary mb-1">{b.title}</h4>
-                    <p className="text-text-secondary text-sm">{b.description}</p>
+                    <h4 className="font-medium text-text-primary mb-1">
+                      {b.title}
+                    </h4>
+                    <p className="text-text-secondary text-sm">
+                      {b.description}
+                    </p>
                   </GlowCard>
-                )
+                ),
               )}
             </div>
           </div>
@@ -179,10 +301,14 @@ export function OtoGenerator({ offerId, className, initialData }: OtoGeneratorPr
                       key={i}
                       className="flex justify-between py-2 border-b border-border-default/50"
                     >
-                      <span className="text-text-primary text-sm">{item.item}</span>
-                      <span className="text-accent font-medium text-sm">{item.value}</span>
+                      <span className="text-text-primary text-sm">
+                        {item.item}
+                      </span>
+                      <span className="text-accent font-medium text-sm">
+                        {item.value}
+                      </span>
                     </div>
-                  )
+                  ),
                 )}
               </div>
             </CardContent>
@@ -204,7 +330,9 @@ export function OtoGenerator({ offerId, className, initialData }: OtoGeneratorPr
               </span>
             )}
             {otoData.discount_percentage && (
-              <Badge variant="red">{otoData.discount_percentage} de reduction</Badge>
+              <Badge variant="red">
+                {otoData.discount_percentage} de reduction
+              </Badge>
             )}
           </div>
         </GlowCard>
@@ -218,7 +346,9 @@ export function OtoGenerator({ offerId, className, initialData }: OtoGeneratorPr
             </h3>
             <div className="flex flex-wrap gap-2">
               {otoData.urgency_elements.map((el: string, i: number) => (
-                <Badge key={i} variant="yellow">{el}</Badge>
+                <Badge key={i} variant="yellow">
+                  {el}
+                </Badge>
               ))}
             </div>
           </div>
@@ -235,7 +365,9 @@ export function OtoGenerator({ offerId, className, initialData }: OtoGeneratorPr
                 </div>
               )}
               {otoData.decline_text && (
-                <p className="text-text-muted text-sm italic">{otoData.decline_text}</p>
+                <p className="text-text-muted text-sm italic">
+                  {otoData.decline_text}
+                </p>
               )}
             </div>
           </CardContent>
@@ -250,20 +382,32 @@ export function OtoGenerator({ offerId, className, initialData }: OtoGeneratorPr
             <CardContent className="space-y-4">
               {otoData.page_copy.opening && (
                 <div>
-                  <p className="text-xs font-medium text-text-muted uppercase mb-1">Ouverture</p>
-                  <p className="text-text-secondary text-sm">{otoData.page_copy.opening}</p>
+                  <p className="text-xs font-medium text-text-muted uppercase mb-1">
+                    Ouverture
+                  </p>
+                  <p className="text-text-secondary text-sm">
+                    {otoData.page_copy.opening}
+                  </p>
                 </div>
               )}
               {otoData.page_copy.body && (
                 <div>
-                  <p className="text-xs font-medium text-text-muted uppercase mb-1">Corps</p>
-                  <p className="text-text-secondary text-sm">{otoData.page_copy.body}</p>
+                  <p className="text-xs font-medium text-text-muted uppercase mb-1">
+                    Corps
+                  </p>
+                  <p className="text-text-secondary text-sm">
+                    {otoData.page_copy.body}
+                  </p>
                 </div>
               )}
               {otoData.page_copy.closing && (
                 <div>
-                  <p className="text-xs font-medium text-text-muted uppercase mb-1">Conclusion</p>
-                  <p className="text-text-secondary text-sm">{otoData.page_copy.closing}</p>
+                  <p className="text-xs font-medium text-text-muted uppercase mb-1">
+                    Conclusion
+                  </p>
+                  <p className="text-text-secondary text-sm">
+                    {otoData.page_copy.closing}
+                  </p>
                 </div>
               )}
             </CardContent>
@@ -275,7 +419,9 @@ export function OtoGenerator({ offerId, className, initialData }: OtoGeneratorPr
           <GlowCard glowColor="blue">
             <div className="flex items-center gap-2 mb-2">
               <ShieldCheck className="h-5 w-5 text-accent" />
-              <h3 className="text-lg font-semibold text-text-primary">Garantie OTO</h3>
+              <h3 className="text-lg font-semibold text-text-primary">
+                Garantie OTO
+              </h3>
             </div>
             <p className="text-text-secondary text-sm">{otoData.guarantee}</p>
           </GlowCard>
@@ -296,8 +442,9 @@ export function OtoGenerator({ offerId, className, initialData }: OtoGeneratorPr
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-text-secondary text-sm">
-              Génère une offre OTO irrésistible qui se présente juste après l&apos;achat
-              de ton offre principale pour maximiser la valeur client.
+              Génère une offre OTO irrésistible qui se présente juste après
+              l&apos;achat de ton offre principale pour maximiser la valeur
+              client.
             </p>
             {error && <p className="text-sm text-danger">{error}</p>}
             <Button size="lg" onClick={handleGenerate}>
@@ -312,7 +459,7 @@ export function OtoGenerator({ offerId, className, initialData }: OtoGeneratorPr
           title="Aucune offre principale"
           description="Génère d'abord une offre principale dans l'onglet Générer pour pouvoir créer une offre OTO."
           actionLabel="Aller à Générer"
-          onAction={() => window.location.href = "/offer"}
+          onAction={() => (window.location.href = "/offer")}
         />
       )}
     </div>

@@ -55,7 +55,7 @@ const PARCOURS = [
 export function ParcoursSelector() {
   const { user } = useUser();
   const [selectedParcours, setSelectedParcours] = React.useState<string | null>(
-    null
+    null,
   );
   const [saving, setSaving] = React.useState(false);
   const [loading, setLoading] = React.useState(true);
@@ -122,7 +122,7 @@ export function ParcoursSelector() {
             className={cn(
               "cursor-pointer transition-all hover:border-accent/30",
               selectedParcours === p.key && "border-accent bg-accent/5",
-              saving && "opacity-50 pointer-events-none"
+              saving && "opacity-50 pointer-events-none",
             )}
             onClick={() => handleSelect(p.key)}
           >
@@ -131,9 +131,7 @@ export function ParcoursSelector() {
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
                     <Badge
-                      variant={
-                        selectedParcours === p.key ? "default" : "muted"
-                      }
+                      variant={selectedParcours === p.key ? "default" : "muted"}
                     >
                       {p.key}
                     </Badge>

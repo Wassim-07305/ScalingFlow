@@ -132,26 +132,226 @@ function saveCallLogs(logs: CallLog[]) {
 
 // ─── Demo data ───────────────────────────────────────────────
 const DEMO_LOGS: CallLog[] = [
-  { id: "c1", date: "2026-03-01", duration: 45, outcome: "closing", revenue: 2497, objection: "", lead_source: "Meta Ads", campaign_name: "Scale Mars 2026", creative_name: "Témoignage client" },
-  { id: "c2", date: "2026-03-01", duration: 30, outcome: "objection", revenue: 0, objection: "Trop cher", lead_source: "Meta Ads", campaign_name: "Scale Mars 2026", creative_name: "Hook douleur" },
-  { id: "c3", date: "2026-03-02", duration: 0, outcome: "no-show", revenue: 0, objection: "", lead_source: "Instagram Organique", campaign_name: "", creative_name: "" },
-  { id: "c4", date: "2026-03-03", duration: 50, outcome: "closing", revenue: 1997, objection: "", lead_source: "YouTube", campaign_name: "", creative_name: "VSL longue" },
-  { id: "c5", date: "2026-03-03", duration: 35, outcome: "objection", revenue: 0, objection: "Besoin de réfléchir", lead_source: "DM Prospection", campaign_name: "", creative_name: "" },
-  { id: "c6", date: "2026-03-04", duration: 25, outcome: "objection", revenue: 0, objection: "Trop cher", lead_source: "Meta Ads", campaign_name: "Scale Mars 2026", creative_name: "Carrousel" },
-  { id: "c7", date: "2026-03-04", duration: 40, outcome: "closing", revenue: 2497, objection: "", lead_source: "Referral", campaign_name: "", creative_name: "" },
-  { id: "c8", date: "2026-03-05", duration: 0, outcome: "no-show", revenue: 0, objection: "", lead_source: "Webinaire", campaign_name: "Webinar Scaling", creative_name: "" },
-  { id: "c9", date: "2026-03-05", duration: 55, outcome: "closing", revenue: 2997, objection: "", lead_source: "Meta Ads", campaign_name: "Retargeting", creative_name: "Urgence" },
-  { id: "c10", date: "2026-03-06", duration: 30, outcome: "objection", revenue: 0, objection: "Pas le bon moment", lead_source: "Instagram Organique", campaign_name: "", creative_name: "" },
-  { id: "c11", date: "2026-03-07", duration: 45, outcome: "closing", revenue: 1997, objection: "", lead_source: "DM Prospection", campaign_name: "", creative_name: "" },
-  { id: "c12", date: "2026-03-07", duration: 35, outcome: "objection", revenue: 0, objection: "Trop cher", lead_source: "Meta Ads", campaign_name: "Scale Mars 2026", creative_name: "Hook douleur" },
-  { id: "c13", date: "2026-03-08", duration: 20, outcome: "rappel", revenue: 0, objection: "Doit en parler à quelqu'un", lead_source: "YouTube", campaign_name: "", creative_name: "" },
-  { id: "c14", date: "2026-03-09", duration: 50, outcome: "closing", revenue: 2497, objection: "", lead_source: "Webinaire", campaign_name: "Webinar Scaling", creative_name: "" },
-  { id: "c15", date: "2026-03-10", duration: 40, outcome: "objection", revenue: 0, objection: "Besoin de réfléchir", lead_source: "Meta Ads", campaign_name: "Retargeting", creative_name: "Témoignage" },
-  { id: "c16", date: "2026-03-10", duration: 45, outcome: "closing", revenue: 1997, objection: "", lead_source: "Referral", campaign_name: "", creative_name: "" },
-  { id: "c17", date: "2026-03-11", duration: 30, outcome: "objection", revenue: 0, objection: "Pas de budget", lead_source: "Instagram Organique", campaign_name: "", creative_name: "" },
-  { id: "c18", date: "2026-03-12", duration: 55, outcome: "closing", revenue: 2997, objection: "", lead_source: "Meta Ads", campaign_name: "Scale Mars 2026", creative_name: "Carrousel" },
-  { id: "c19", date: "2026-03-13", duration: 0, outcome: "no-show", revenue: 0, objection: "", lead_source: "DM Prospection", campaign_name: "", creative_name: "" },
-  { id: "c20", date: "2026-03-14", duration: 45, outcome: "closing", revenue: 2497, objection: "", lead_source: "Meta Ads", campaign_name: "Retargeting", creative_name: "Urgence" },
+  {
+    id: "c1",
+    date: "2026-03-01",
+    duration: 45,
+    outcome: "closing",
+    revenue: 2497,
+    objection: "",
+    lead_source: "Meta Ads",
+    campaign_name: "Scale Mars 2026",
+    creative_name: "Témoignage client",
+  },
+  {
+    id: "c2",
+    date: "2026-03-01",
+    duration: 30,
+    outcome: "objection",
+    revenue: 0,
+    objection: "Trop cher",
+    lead_source: "Meta Ads",
+    campaign_name: "Scale Mars 2026",
+    creative_name: "Hook douleur",
+  },
+  {
+    id: "c3",
+    date: "2026-03-02",
+    duration: 0,
+    outcome: "no-show",
+    revenue: 0,
+    objection: "",
+    lead_source: "Instagram Organique",
+    campaign_name: "",
+    creative_name: "",
+  },
+  {
+    id: "c4",
+    date: "2026-03-03",
+    duration: 50,
+    outcome: "closing",
+    revenue: 1997,
+    objection: "",
+    lead_source: "YouTube",
+    campaign_name: "",
+    creative_name: "VSL longue",
+  },
+  {
+    id: "c5",
+    date: "2026-03-03",
+    duration: 35,
+    outcome: "objection",
+    revenue: 0,
+    objection: "Besoin de réfléchir",
+    lead_source: "DM Prospection",
+    campaign_name: "",
+    creative_name: "",
+  },
+  {
+    id: "c6",
+    date: "2026-03-04",
+    duration: 25,
+    outcome: "objection",
+    revenue: 0,
+    objection: "Trop cher",
+    lead_source: "Meta Ads",
+    campaign_name: "Scale Mars 2026",
+    creative_name: "Carrousel",
+  },
+  {
+    id: "c7",
+    date: "2026-03-04",
+    duration: 40,
+    outcome: "closing",
+    revenue: 2497,
+    objection: "",
+    lead_source: "Referral",
+    campaign_name: "",
+    creative_name: "",
+  },
+  {
+    id: "c8",
+    date: "2026-03-05",
+    duration: 0,
+    outcome: "no-show",
+    revenue: 0,
+    objection: "",
+    lead_source: "Webinaire",
+    campaign_name: "Webinar Scaling",
+    creative_name: "",
+  },
+  {
+    id: "c9",
+    date: "2026-03-05",
+    duration: 55,
+    outcome: "closing",
+    revenue: 2997,
+    objection: "",
+    lead_source: "Meta Ads",
+    campaign_name: "Retargeting",
+    creative_name: "Urgence",
+  },
+  {
+    id: "c10",
+    date: "2026-03-06",
+    duration: 30,
+    outcome: "objection",
+    revenue: 0,
+    objection: "Pas le bon moment",
+    lead_source: "Instagram Organique",
+    campaign_name: "",
+    creative_name: "",
+  },
+  {
+    id: "c11",
+    date: "2026-03-07",
+    duration: 45,
+    outcome: "closing",
+    revenue: 1997,
+    objection: "",
+    lead_source: "DM Prospection",
+    campaign_name: "",
+    creative_name: "",
+  },
+  {
+    id: "c12",
+    date: "2026-03-07",
+    duration: 35,
+    outcome: "objection",
+    revenue: 0,
+    objection: "Trop cher",
+    lead_source: "Meta Ads",
+    campaign_name: "Scale Mars 2026",
+    creative_name: "Hook douleur",
+  },
+  {
+    id: "c13",
+    date: "2026-03-08",
+    duration: 20,
+    outcome: "rappel",
+    revenue: 0,
+    objection: "Doit en parler à quelqu'un",
+    lead_source: "YouTube",
+    campaign_name: "",
+    creative_name: "",
+  },
+  {
+    id: "c14",
+    date: "2026-03-09",
+    duration: 50,
+    outcome: "closing",
+    revenue: 2497,
+    objection: "",
+    lead_source: "Webinaire",
+    campaign_name: "Webinar Scaling",
+    creative_name: "",
+  },
+  {
+    id: "c15",
+    date: "2026-03-10",
+    duration: 40,
+    outcome: "objection",
+    revenue: 0,
+    objection: "Besoin de réfléchir",
+    lead_source: "Meta Ads",
+    campaign_name: "Retargeting",
+    creative_name: "Témoignage",
+  },
+  {
+    id: "c16",
+    date: "2026-03-10",
+    duration: 45,
+    outcome: "closing",
+    revenue: 1997,
+    objection: "",
+    lead_source: "Referral",
+    campaign_name: "",
+    creative_name: "",
+  },
+  {
+    id: "c17",
+    date: "2026-03-11",
+    duration: 30,
+    outcome: "objection",
+    revenue: 0,
+    objection: "Pas de budget",
+    lead_source: "Instagram Organique",
+    campaign_name: "",
+    creative_name: "",
+  },
+  {
+    id: "c18",
+    date: "2026-03-12",
+    duration: 55,
+    outcome: "closing",
+    revenue: 2997,
+    objection: "",
+    lead_source: "Meta Ads",
+    campaign_name: "Scale Mars 2026",
+    creative_name: "Carrousel",
+  },
+  {
+    id: "c19",
+    date: "2026-03-13",
+    duration: 0,
+    outcome: "no-show",
+    revenue: 0,
+    objection: "",
+    lead_source: "DM Prospection",
+    campaign_name: "",
+    creative_name: "",
+  },
+  {
+    id: "c20",
+    date: "2026-03-14",
+    duration: 45,
+    outcome: "closing",
+    revenue: 2497,
+    objection: "",
+    lead_source: "Meta Ads",
+    campaign_name: "Retargeting",
+    creative_name: "Urgence",
+  },
 ];
 
 // ─── Formatting helpers ──────────────────────────────────────
@@ -168,7 +368,9 @@ export function SalesMetrics() {
   const [logs, setLogs] = useState<CallLog[]>([]);
   const [isDemo, setIsDemo] = useState(true);
   const [showForm, setShowForm] = useState(false);
-  const [activeSection, setActiveSection] = useState<"overview" | "sources">("overview");
+  const [activeSection, setActiveSection] = useState<"overview" | "sources">(
+    "overview",
+  );
   const [formData, setFormData] = useState<Omit<CallLog, "id">>({
     date: format(new Date(), "yyyy-MM-dd"),
     duration: 0,
@@ -202,9 +404,11 @@ export function SalesMetrics() {
     const noShowRate = total > 0 ? (noShows.length / total) * 100 : 0;
     const totalRevenue = closings.reduce((s, l) => s + l.revenue, 0);
     const revenuePerCall = total > 0 ? totalRevenue / total : 0;
-    const avgDuration = callsWithDuration.length > 0
-      ? callsWithDuration.reduce((s, l) => s + l.duration, 0) / callsWithDuration.length
-      : 0;
+    const avgDuration =
+      callsWithDuration.length > 0
+        ? callsWithDuration.reduce((s, l) => s + l.duration, 0) /
+          callsWithDuration.length
+        : 0;
 
     // Top objections
     const objectionCounts: Record<string, number> = {};
@@ -234,7 +438,10 @@ export function SalesMetrics() {
 
   // ─── Source attribution analytics ──────────────────────────────
   const sourceAnalytics = useMemo(() => {
-    const sources: Record<string, { calls: number; closings: number; revenue: number }> = {};
+    const sources: Record<
+      string,
+      { calls: number; closings: number; revenue: number }
+    > = {};
 
     logs.forEach((l) => {
       const src = l.lead_source || "Non spécifié";
@@ -280,11 +487,17 @@ export function SalesMetrics() {
 
   // ─── Weekly closing rate trend ─────────────────────────────────
   const weeklyTrend = useMemo(() => {
-    const weeks: Record<string, { total: number; closings: number; revenue: number }> = {};
+    const weeks: Record<
+      string,
+      { total: number; closings: number; revenue: number }
+    > = {};
     logs.forEach((l) => {
       const d = parseISO(l.date);
-      const weekKey = format(startOfWeek(d, { weekStartsOn: 1 }), "dd MMM", { locale: fr });
-      if (!weeks[weekKey]) weeks[weekKey] = { total: 0, closings: 0, revenue: 0 };
+      const weekKey = format(startOfWeek(d, { weekStartsOn: 1 }), "dd MMM", {
+        locale: fr,
+      });
+      if (!weeks[weekKey])
+        weeks[weekKey] = { total: 0, closings: 0, revenue: 0 };
       weeks[weekKey].total += 1;
       if (l.outcome === "closing") {
         weeks[weekKey].closings += 1;
@@ -293,8 +506,12 @@ export function SalesMetrics() {
     });
     return Object.entries(weeks).map(([week, data]) => ({
       semaine: week,
-      "Taux closing": parseFloat((data.total > 0 ? (data.closings / data.total) * 100 : 0).toFixed(1)),
-      "Rev/call": parseFloat((data.total > 0 ? data.revenue / data.total : 0).toFixed(0)),
+      "Taux closing": parseFloat(
+        (data.total > 0 ? (data.closings / data.total) * 100 : 0).toFixed(1),
+      ),
+      "Rev/call": parseFloat(
+        (data.total > 0 ? data.revenue / data.total : 0).toFixed(0),
+      ),
     }));
   }, [logs]);
 
@@ -313,7 +530,9 @@ export function SalesMetrics() {
       ...formData,
     };
 
-    const updated = isDemo ? [newLog] : [...logs, newLog].sort((a, b) => a.date.localeCompare(b.date));
+    const updated = isDemo
+      ? [newLog]
+      : [...logs, newLog].sort((a, b) => a.date.localeCompare(b.date));
     setLogs(updated);
     setIsDemo(false);
     saveCallLogs(updated);
@@ -339,11 +558,17 @@ export function SalesMetrics() {
   }, []);
 
   const handleExportCSV = useCallback(() => {
-    const headers = "Date,Durée (min),Résultat,Revenue,Objection,Source,Campagne,Créative\n";
+    const headers =
+      "Date,Durée (min),Résultat,Revenue,Objection,Source,Campagne,Créative\n";
     const rows = logs
-      .map((l) => `${l.date},${l.duration},${l.outcome},${l.revenue},"${l.objection}","${l.lead_source}","${l.campaign_name}","${l.creative_name}"`)
+      .map(
+        (l) =>
+          `${l.date},${l.duration},${l.outcome},${l.revenue},"${l.objection}","${l.lead_source}","${l.campaign_name}","${l.creative_name}"`,
+      )
       .join("\n");
-    const blob = new Blob([headers + rows], { type: "text/csv;charset=utf-8;" });
+    const blob = new Blob([headers + rows], {
+      type: "text/csv;charset=utf-8;",
+    });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
@@ -359,7 +584,12 @@ export function SalesMetrics() {
       value: `${metrics.closingRate.toFixed(1)}%`,
       sub: `${metrics.closings}/${metrics.total} appels`,
       icon: Target,
-      color: metrics.closingRate >= 30 ? "text-accent" : metrics.closingRate >= 15 ? "text-warning" : "text-danger",
+      color:
+        metrics.closingRate >= 30
+          ? "text-accent"
+          : metrics.closingRate >= 15
+            ? "text-warning"
+            : "text-danger",
     },
     {
       label: "Revenue par call",
@@ -380,7 +610,12 @@ export function SalesMetrics() {
       value: `${metrics.noShowRate.toFixed(1)}%`,
       sub: `${metrics.noShows} no-shows`,
       icon: AlertTriangle,
-      color: metrics.noShowRate <= 10 ? "text-accent" : metrics.noShowRate <= 20 ? "text-warning" : "text-danger",
+      color:
+        metrics.noShowRate <= 10
+          ? "text-accent"
+          : metrics.noShowRate <= 20
+            ? "text-warning"
+            : "text-danger",
     },
   ];
 
@@ -411,7 +646,7 @@ export function SalesMetrics() {
                 "px-3 py-1.5 rounded-md text-xs font-medium transition-all",
                 activeSection === "overview"
                   ? "bg-accent text-white"
-                  : "text-text-secondary hover:text-text-primary"
+                  : "text-text-secondary hover:text-text-primary",
               )}
             >
               Vue d&apos;ensemble
@@ -422,7 +657,7 @@ export function SalesMetrics() {
                 "px-3 py-1.5 rounded-md text-xs font-medium transition-all flex items-center gap-1.5",
                 activeSection === "sources"
                   ? "bg-accent text-white"
-                  : "text-text-secondary hover:text-text-primary"
+                  : "text-text-secondary hover:text-text-primary",
               )}
             >
               <Megaphone className="h-3 w-3" />
@@ -455,10 +690,14 @@ export function SalesMetrics() {
         {kpis.map((kpi) => (
           <Card key={kpi.label} className="p-4">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-text-secondary text-xs font-medium">{kpi.label}</span>
+              <span className="text-text-secondary text-xs font-medium">
+                {kpi.label}
+              </span>
               <kpi.icon className="h-4 w-4 text-text-muted" />
             </div>
-            <div className={cn("text-xl font-bold", kpi.color)}>{kpi.value}</div>
+            <div className={cn("text-xl font-bold", kpi.color)}>
+              {kpi.value}
+            </div>
             <p className="text-xs text-text-muted mt-1">{kpi.sub}</p>
           </Card>
         ))}
@@ -500,7 +739,10 @@ export function SalesMetrics() {
                             borderRadius: "8px",
                             color: "#F9FAFB",
                           }}
-                          formatter={(value?: number) => [`${value ?? 0}%`, "Taux de closing"]}
+                          formatter={(value?: number) => [
+                            `${value ?? 0}%`,
+                            "Taux de closing",
+                          ]}
                         />
                         <Line
                           type="monotone"
@@ -546,7 +788,10 @@ export function SalesMetrics() {
                             borderRadius: "8px",
                             color: "#F9FAFB",
                           }}
-                          formatter={(value?: number) => [`${fmtCurrency(value ?? 0)}`, "Rev/call"]}
+                          formatter={(value?: number) => [
+                            `${fmtCurrency(value ?? 0)}`,
+                            "Rev/call",
+                          ]}
                         />
                         <Line
                           type="monotone"
@@ -574,7 +819,11 @@ export function SalesMetrics() {
                 <div className="h-[250px]">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={objectionsChartData} layout="vertical">
-                      <CartesianGrid strokeDasharray="3 3" stroke="#1C1F23" horizontal={false} />
+                      <CartesianGrid
+                        strokeDasharray="3 3"
+                        stroke="#1C1F23"
+                        horizontal={false}
+                      />
                       <XAxis
                         type="number"
                         stroke="#6B7280"
@@ -598,11 +847,23 @@ export function SalesMetrics() {
                           borderRadius: "8px",
                           color: "#F9FAFB",
                         }}
-                        formatter={(value?: number) => [`${value ?? 0} fois`, "Fréquence"]}
+                        formatter={(value?: number) => [
+                          `${value ?? 0} fois`,
+                          "Fréquence",
+                        ]}
                       />
                       <Bar dataKey="count" radius={[0, 6, 6, 0]} barSize={20}>
                         {objectionsChartData.map((_, idx) => (
-                          <Cell key={idx} fill={idx === 0 ? "#EF4444" : idx === 1 ? "#F59E0B" : "#6B7280"} />
+                          <Cell
+                            key={idx}
+                            fill={
+                              idx === 0
+                                ? "#EF4444"
+                                : idx === 1
+                                  ? "#F59E0B"
+                                  : "#6B7280"
+                            }
+                          />
                         ))}
                       </Bar>
                     </BarChart>
@@ -657,9 +918,16 @@ export function SalesMetrics() {
                             borderRadius: "8px",
                             color: "#F9FAFB",
                           }}
-                          formatter={(value?: number) => [`${value ?? 0}%`, "Taux de closing"]}
+                          formatter={(value?: number) => [
+                            `${value ?? 0}%`,
+                            "Taux de closing",
+                          ]}
                         />
-                        <Bar dataKey="Taux closing" radius={[6, 6, 0, 0]} barSize={32}>
+                        <Bar
+                          dataKey="Taux closing"
+                          radius={[6, 6, 0, 0]}
+                          barSize={32}
+                        >
                           {sourceAnalytics.barChartData.map((entry, idx) => (
                             <Cell key={idx} fill={entry.fill} />
                           ))}
@@ -693,7 +961,13 @@ export function SalesMetrics() {
                           paddingAngle={3}
                           dataKey="value"
                           nameKey="name"
-                          label={({ name, percent }: { name?: string; percent?: number }) =>
+                          label={({
+                            name,
+                            percent,
+                          }: {
+                            name?: string;
+                            percent?: number;
+                          }) =>
                             `${name ?? ""} (${((percent ?? 0) * 100).toFixed(0)}%)`
                           }
                           labelLine={false}
@@ -709,12 +983,17 @@ export function SalesMetrics() {
                   {/* Legend */}
                   <div className="flex flex-wrap gap-3 mt-3 justify-center">
                     {sourceAnalytics.pieChartData.map((entry) => (
-                      <div key={entry.name} className="flex items-center gap-1.5">
+                      <div
+                        key={entry.name}
+                        className="flex items-center gap-1.5"
+                      >
                         <div
                           className="h-2.5 w-2.5 rounded-full"
                           style={{ backgroundColor: entry.fill }}
                         />
-                        <span className="text-[10px] text-text-secondary">{entry.name}</span>
+                        <span className="text-[10px] text-text-secondary">
+                          {entry.name}
+                        </span>
                       </div>
                     ))}
                   </div>
@@ -736,11 +1015,21 @@ export function SalesMetrics() {
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b border-border-default">
-                      <th className="text-left text-text-secondary font-medium py-3 px-2">Source</th>
-                      <th className="text-right text-text-secondary font-medium py-3 px-2">Nb Calls</th>
-                      <th className="text-right text-text-secondary font-medium py-3 px-2">Taux Closing</th>
-                      <th className="text-right text-text-secondary font-medium py-3 px-2">Revenue</th>
-                      <th className="text-right text-text-secondary font-medium py-3 px-2">Revenue/Call</th>
+                      <th className="text-left text-text-secondary font-medium py-3 px-2">
+                        Source
+                      </th>
+                      <th className="text-right text-text-secondary font-medium py-3 px-2">
+                        Nb Calls
+                      </th>
+                      <th className="text-right text-text-secondary font-medium py-3 px-2">
+                        Taux Closing
+                      </th>
+                      <th className="text-right text-text-secondary font-medium py-3 px-2">
+                        Revenue
+                      </th>
+                      <th className="text-right text-text-secondary font-medium py-3 px-2">
+                        Revenue/Call
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
@@ -753,9 +1042,14 @@ export function SalesMetrics() {
                           <div className="flex items-center gap-2">
                             <div
                               className="h-2.5 w-2.5 rounded-full flex-shrink-0"
-                              style={{ backgroundColor: SOURCE_COLORS[row.source] || "#6B7280" }}
+                              style={{
+                                backgroundColor:
+                                  SOURCE_COLORS[row.source] || "#6B7280",
+                              }}
                             />
-                            <span className="text-text-primary font-medium">{row.source}</span>
+                            <span className="text-text-primary font-medium">
+                              {row.source}
+                            </span>
                           </div>
                         </td>
                         <td className="py-3 px-2 text-right text-text-secondary">
@@ -767,8 +1061,8 @@ export function SalesMetrics() {
                               row.closingRate >= 40
                                 ? "default"
                                 : row.closingRate >= 20
-                                ? "yellow"
-                                : "muted"
+                                  ? "yellow"
+                                  : "muted"
                             }
                           >
                             {row.closingRate.toFixed(1)}%
@@ -778,7 +1072,9 @@ export function SalesMetrics() {
                           {row.revenue > 0 ? fmtCurrency(row.revenue) : "-"}
                         </td>
                         <td className="py-3 px-2 text-right text-text-secondary">
-                          {row.revenuePerCall > 0 ? fmtCurrency(row.revenuePerCall) : "-"}
+                          {row.revenuePerCall > 0
+                            ? fmtCurrency(row.revenuePerCall)
+                            : "-"}
                         </td>
                       </tr>
                     ))}
@@ -786,7 +1082,10 @@ export function SalesMetrics() {
                     <tr className="bg-bg-tertiary/30 font-semibold">
                       <td className="py-3 px-2 text-text-primary">Total</td>
                       <td className="py-3 px-2 text-right text-text-primary">
-                        {sourceAnalytics.tableData.reduce((s, r) => s + r.calls, 0)}
+                        {sourceAnalytics.tableData.reduce(
+                          (s, r) => s + r.calls,
+                          0,
+                        )}
                       </td>
                       <td className="py-3 px-2 text-right">
                         <Badge variant="default">
@@ -818,13 +1117,27 @@ export function SalesMetrics() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border-default">
-                  <th className="text-left text-text-secondary font-medium py-3 px-2">Date</th>
-                  <th className="text-right text-text-secondary font-medium py-3 px-2">Durée</th>
-                  <th className="text-left text-text-secondary font-medium py-3 px-2">Résultat</th>
-                  <th className="text-right text-text-secondary font-medium py-3 px-2">Revenue</th>
-                  <th className="text-left text-text-secondary font-medium py-3 px-2">Source</th>
-                  <th className="text-left text-text-secondary font-medium py-3 px-2">Campagne</th>
-                  <th className="text-left text-text-secondary font-medium py-3 px-2">Objection</th>
+                  <th className="text-left text-text-secondary font-medium py-3 px-2">
+                    Date
+                  </th>
+                  <th className="text-right text-text-secondary font-medium py-3 px-2">
+                    Durée
+                  </th>
+                  <th className="text-left text-text-secondary font-medium py-3 px-2">
+                    Résultat
+                  </th>
+                  <th className="text-right text-text-secondary font-medium py-3 px-2">
+                    Revenue
+                  </th>
+                  <th className="text-left text-text-secondary font-medium py-3 px-2">
+                    Source
+                  </th>
+                  <th className="text-left text-text-secondary font-medium py-3 px-2">
+                    Campagne
+                  </th>
+                  <th className="text-left text-text-secondary font-medium py-3 px-2">
+                    Objection
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -838,7 +1151,9 @@ export function SalesMetrics() {
                       className="border-b border-border-default/50 hover:bg-bg-tertiary/50 transition-colors"
                     >
                       <td className="py-3 px-2 text-text-primary">
-                        {format(parseISO(l.date), "dd MMM yyyy", { locale: fr })}
+                        {format(parseISO(l.date), "dd MMM yyyy", {
+                          locale: fr,
+                        })}
                       </td>
                       <td className="py-3 px-2 text-right text-text-secondary">
                         {l.duration > 0 ? `${l.duration} min` : "-"}
@@ -849,19 +1164,19 @@ export function SalesMetrics() {
                             l.outcome === "closing"
                               ? "default"
                               : l.outcome === "no-show"
-                              ? "red"
-                              : l.outcome === "rappel"
-                              ? "yellow"
-                              : "muted"
+                                ? "red"
+                                : l.outcome === "rappel"
+                                  ? "yellow"
+                                  : "muted"
                           }
                         >
                           {l.outcome === "closing"
                             ? "Closing"
                             : l.outcome === "no-show"
-                            ? "No-show"
-                            : l.outcome === "rappel"
-                            ? "Rappel"
-                            : "Objection"}
+                              ? "No-show"
+                              : l.outcome === "rappel"
+                                ? "Rappel"
+                                : "Objection"}
                         </Badge>
                       </td>
                       <td className="py-3 px-2 text-right font-medium text-text-primary">
@@ -872,9 +1187,14 @@ export function SalesMetrics() {
                           <div className="flex items-center gap-1.5">
                             <div
                               className="h-2 w-2 rounded-full flex-shrink-0"
-                              style={{ backgroundColor: SOURCE_COLORS[l.lead_source] || "#6B7280" }}
+                              style={{
+                                backgroundColor:
+                                  SOURCE_COLORS[l.lead_source] || "#6B7280",
+                              }}
                             />
-                            <span className="text-text-secondary text-xs">{l.lead_source}</span>
+                            <span className="text-text-secondary text-xs">
+                              {l.lead_source}
+                            </span>
                           </div>
                         ) : (
                           <span className="text-text-muted text-xs">-</span>
@@ -900,7 +1220,8 @@ export function SalesMetrics() {
           <DialogHeader>
             <DialogTitle>Logger un appel de vente</DialogTitle>
             <DialogDescription>
-              Enregistre chaque appel pour suivre ton taux de closing, revenue par call, objections et sources.
+              Enregistre chaque appel pour suivre ton taux de closing, revenue
+              par call, objections et sources.
             </DialogDescription>
           </DialogHeader>
 
@@ -911,7 +1232,9 @@ export function SalesMetrics() {
                 id="call-date"
                 type="date"
                 value={formData.date}
-                onChange={(e) => setFormData((p) => ({ ...p, date: e.target.value }))}
+                onChange={(e) =>
+                  setFormData((p) => ({ ...p, date: e.target.value }))
+                }
               />
             </div>
             <div>
@@ -921,7 +1244,12 @@ export function SalesMetrics() {
                 type="number"
                 min={0}
                 value={formData.duration || ""}
-                onChange={(e) => setFormData((p) => ({ ...p, duration: parseInt(e.target.value) || 0 }))}
+                onChange={(e) =>
+                  setFormData((p) => ({
+                    ...p,
+                    duration: parseInt(e.target.value) || 0,
+                  }))
+                }
               />
               <p className="text-xs text-text-muted mt-1">0 min = no-show</p>
             </div>
@@ -929,7 +1257,12 @@ export function SalesMetrics() {
               <Label htmlFor="call-outcome">Résultat</Label>
               <Select
                 value={formData.outcome}
-                onValueChange={(v) => setFormData((p) => ({ ...p, outcome: v as CallLog["outcome"] }))}
+                onValueChange={(v) =>
+                  setFormData((p) => ({
+                    ...p,
+                    outcome: v as CallLog["outcome"],
+                  }))
+                }
               >
                 <SelectTrigger id="call-outcome">
                   <SelectValue />
@@ -952,16 +1285,24 @@ export function SalesMetrics() {
                   min={0}
                   step={0.01}
                   value={formData.revenue || ""}
-                  onChange={(e) => setFormData((p) => ({ ...p, revenue: parseFloat(e.target.value) || 0 }))}
+                  onChange={(e) =>
+                    setFormData((p) => ({
+                      ...p,
+                      revenue: parseFloat(e.target.value) || 0,
+                    }))
+                  }
                 />
               </div>
             )}
-            {(formData.outcome === "objection" || formData.outcome === "rappel") && (
+            {(formData.outcome === "objection" ||
+              formData.outcome === "rappel") && (
               <div>
                 <Label htmlFor="call-objection">Objection principale</Label>
                 <Select
                   value={formData.objection || ""}
-                  onValueChange={(v) => setFormData((p) => ({ ...p, objection: v }))}
+                  onValueChange={(v) =>
+                    setFormData((p) => ({ ...p, objection: v }))
+                  }
                 >
                   <SelectTrigger id="call-objection">
                     <SelectValue placeholder="Sélectionner une objection" />
@@ -988,7 +1329,9 @@ export function SalesMetrics() {
                   <Label htmlFor="call-source">Source du lead</Label>
                   <Select
                     value={formData.lead_source}
-                    onValueChange={(v) => setFormData((p) => ({ ...p, lead_source: v }))}
+                    onValueChange={(v) =>
+                      setFormData((p) => ({ ...p, lead_source: v }))
+                    }
                   >
                     <SelectTrigger id="call-source">
                       <SelectValue placeholder="Sélectionner une source" />
@@ -1003,23 +1346,37 @@ export function SalesMetrics() {
                   </Select>
                 </div>
                 <div>
-                  <Label htmlFor="call-campaign">Nom de la campagne (optionnel)</Label>
+                  <Label htmlFor="call-campaign">
+                    Nom de la campagne (optionnel)
+                  </Label>
                   <Input
                     id="call-campaign"
                     type="text"
                     placeholder="Ex: Scale Mars 2026"
                     value={formData.campaign_name}
-                    onChange={(e) => setFormData((p) => ({ ...p, campaign_name: e.target.value }))}
+                    onChange={(e) =>
+                      setFormData((p) => ({
+                        ...p,
+                        campaign_name: e.target.value,
+                      }))
+                    }
                   />
                 </div>
                 <div>
-                  <Label htmlFor="call-creative">Nom de la créative (optionnel)</Label>
+                  <Label htmlFor="call-creative">
+                    Nom de la créative (optionnel)
+                  </Label>
                   <Input
                     id="call-creative"
                     type="text"
                     placeholder="Ex: Témoignage client"
                     value={formData.creative_name}
-                    onChange={(e) => setFormData((p) => ({ ...p, creative_name: e.target.value }))}
+                    onChange={(e) =>
+                      setFormData((p) => ({
+                        ...p,
+                        creative_name: e.target.value,
+                      }))
+                    }
                   />
                 </div>
               </div>
@@ -1030,9 +1387,7 @@ export function SalesMetrics() {
             <Button variant="ghost" onClick={() => setShowForm(false)}>
               Annuler
             </Button>
-            <Button onClick={handleSave}>
-              Enregistrer
-            </Button>
+            <Button onClick={handleSave}>Enregistrer</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

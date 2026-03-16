@@ -27,15 +27,60 @@ const TYPE_CONFIG: Record<
   string,
   { icon: React.ElementType; color: string; bgColor: string; label: string }
 > = {
-  deal_created: { icon: DollarSign, color: "text-accent", bgColor: "bg-accent/10", label: "Deal" },
-  deal_updated: { icon: Edit, color: "text-info", bgColor: "bg-info/10", label: "Deal modifié" },
-  deal_closed: { icon: DollarSign, color: "text-accent", bgColor: "bg-accent/10", label: "Deal closé" },
-  note_added: { icon: FileText, color: "text-yellow-400", bgColor: "bg-yellow-500/15", label: "Note" },
-  call: { icon: Phone, color: "text-purple-400", bgColor: "bg-purple-500/15", label: "Appel" },
-  email: { icon: Mail, color: "text-blue-400", bgColor: "bg-blue-500/15", label: "Email" },
-  message: { icon: MessageSquare, color: "text-cyan-400", bgColor: "bg-cyan-500/15", label: "Message" },
-  status_changed: { icon: Edit, color: "text-warning", bgColor: "bg-warning/10", label: "Statut" },
-  client_created: { icon: UserPlus, color: "text-accent", bgColor: "bg-accent/10", label: "Création" },
+  deal_created: {
+    icon: DollarSign,
+    color: "text-accent",
+    bgColor: "bg-accent/10",
+    label: "Deal",
+  },
+  deal_updated: {
+    icon: Edit,
+    color: "text-info",
+    bgColor: "bg-info/10",
+    label: "Deal modifié",
+  },
+  deal_closed: {
+    icon: DollarSign,
+    color: "text-accent",
+    bgColor: "bg-accent/10",
+    label: "Deal closé",
+  },
+  note_added: {
+    icon: FileText,
+    color: "text-yellow-400",
+    bgColor: "bg-yellow-500/15",
+    label: "Note",
+  },
+  call: {
+    icon: Phone,
+    color: "text-purple-400",
+    bgColor: "bg-purple-500/15",
+    label: "Appel",
+  },
+  email: {
+    icon: Mail,
+    color: "text-blue-400",
+    bgColor: "bg-blue-500/15",
+    label: "Email",
+  },
+  message: {
+    icon: MessageSquare,
+    color: "text-cyan-400",
+    bgColor: "bg-cyan-500/15",
+    label: "Message",
+  },
+  status_changed: {
+    icon: Edit,
+    color: "text-warning",
+    bgColor: "bg-warning/10",
+    label: "Statut",
+  },
+  client_created: {
+    icon: UserPlus,
+    color: "text-accent",
+    bgColor: "bg-accent/10",
+    label: "Création",
+  },
 };
 
 function formatDate(dateStr: string) {
@@ -54,7 +99,10 @@ interface ClientActivityFeedProps {
   loading?: boolean;
 }
 
-export function ClientActivityFeed({ activities, loading }: ClientActivityFeedProps) {
+export function ClientActivityFeed({
+  activities,
+  loading,
+}: ClientActivityFeedProps) {
   if (loading) {
     return (
       <div className="relative space-y-0">
@@ -106,12 +154,15 @@ export function ClientActivityFeed({ activities, loading }: ClientActivityFeedPr
         const Icon = cfg.icon;
 
         return (
-          <div key={activity.id} className="relative flex items-start gap-4 py-3 pl-1 rounded-xl transition-all duration-200 hover:bg-bg-secondary/50 hover:px-2 group/item">
+          <div
+            key={activity.id}
+            className="relative flex items-start gap-4 py-3 pl-1 rounded-xl transition-all duration-200 hover:bg-bg-secondary/50 hover:px-2 group/item"
+          >
             {/* Dot */}
             <div
               className={cn(
                 "relative z-10 flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border-default bg-bg-secondary transition-all",
-                i === 0 && "border-accent/40 shadow-sm shadow-accent/10"
+                i === 0 && "border-accent/40 shadow-sm shadow-accent/10",
               )}
             >
               <Icon className={cn("h-4 w-4", cfg.color)} />
@@ -119,17 +170,22 @@ export function ClientActivityFeed({ activities, loading }: ClientActivityFeedPr
 
             <div className="flex-1 min-w-0 pt-0.5">
               <div className="flex items-center gap-2 flex-wrap">
-                <span className={cn(
-                  "inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium",
-                  cfg.bgColor, cfg.color
-                )}>
+                <span
+                  className={cn(
+                    "inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium",
+                    cfg.bgColor,
+                    cfg.color,
+                  )}
+                >
                   {cfg.label}
                 </span>
                 <span className="text-xs text-text-muted">
                   {formatDate(activity.created_at)}
                 </span>
               </div>
-              <p className="text-sm text-text-primary mt-1">{activity.description}</p>
+              <p className="text-sm text-text-primary mt-1">
+                {activity.description}
+              </p>
             </div>
           </div>
         );

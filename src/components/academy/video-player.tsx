@@ -12,9 +12,7 @@ interface VideoPlayerProps {
 export function VideoPlayer({ videoUrl, title, className }: VideoPlayerProps) {
   const isLoom = videoUrl?.includes("loom.com");
 
-  const embedUrl = isLoom
-    ? videoUrl?.replace("share/", "embed/")
-    : videoUrl;
+  const embedUrl = isLoom ? videoUrl?.replace("share/", "embed/") : videoUrl;
 
   return (
     <Card className={cn(className)}>

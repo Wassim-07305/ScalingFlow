@@ -9,7 +9,7 @@ const META_GRAPH_URL = "https://graph.facebook.com/v21.0";
 
 async function getMetaCredentials(
   supabase: Awaited<ReturnType<typeof createClient>>,
-  userId: string
+  userId: string,
 ) {
   const { data } = await supabase
     .from("connected_accounts")
@@ -61,7 +61,7 @@ export async function POST(req: NextRequest) {
 
     const { token, adAccountId, pageId } = await getMetaCredentials(
       supabase,
-      user.id
+      user.id,
     );
 
     if (!token || !adAccountId) {
@@ -71,7 +71,7 @@ export async function POST(req: NextRequest) {
             "Connecte ton compte Meta Ads dans Paramètres → Intégrations pour lancer des campagnes automatiquement.",
           code: "META_NOT_CONNECTED",
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -96,14 +96,17 @@ export async function POST(req: NextRequest) {
     if (!campaign_name || !daily_budget) {
       return NextResponse.json(
         { error: "Le nom de la campagne et le budget journalier sont requis." },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     if (!landing_page_url && !creative_image_url) {
       return NextResponse.json(
-        { error: "Un lien de destination ou une image est requis pour créer la publicité." },
-        { status: 400 }
+        {
+          error:
+            "Un lien de destination ou une image est requis pour créer la publicité.",
+        },
+        { status: 400 },
       );
     }
 
@@ -116,13 +119,13 @@ export async function POST(req: NextRequest) {
         objective,
         status: "PAUSED",
         special_ad_categories: [],
-      }
+      },
     );
 
     if (campaignRes.error) {
       return NextResponse.json(
         { error: `Erreur campagne : ${campaignRes.error.message}` },
-        { status: 502 }
+        { status: 502 },
       );
     }
 
@@ -141,7 +144,7 @@ export async function POST(req: NextRequest) {
 
     if (excluded_audience_ids && excluded_audience_ids.length > 0) {
       targeting.excluded_custom_audiences = excluded_audience_ids.map(
-        (id: string) => ({ id })
+        (id: string) => ({ id }),
       );
     }
 
@@ -171,13 +174,13 @@ export async function POST(req: NextRequest) {
 
     const adSetRes = await metaPost(
       `${META_GRAPH_URL}/act_${adAccountId}/adsets`,
-      adSetBody
+      adSetBody,
     );
 
     if (adSetRes.error) {
       return NextResponse.json(
         { error: `Erreur ad set : ${adSetRes.error.message}` },
-        { status: 502 }
+        { status: 502 },
       );
     }
 
@@ -204,13 +207,13 @@ export async function POST(req: NextRequest) {
               picture: creative_image_url,
             },
           },
-        }
+        },
       );
 
       if (creativeRes.error) {
         return NextResponse.json(
           { error: `Erreur creative : ${creativeRes.error.message}` },
-          { status: 502 }
+          { status: 502 },
         );
       }
       metaCreativeId = creativeRes.id;
@@ -220,21 +223,18 @@ export async function POST(req: NextRequest) {
     let metaAdId: string | null = null;
 
     if (metaCreativeId) {
-      const adRes = await metaPost(
-        `${META_GRAPH_URL}/act_${adAccountId}/ads`,
-        {
-          access_token: token,
-          name: `${campaign_name} — Ad`,
-          adset_id: metaAdSetId,
-          creative: { creative_id: metaCreativeId },
-          status: "PAUSED",
-        }
-      );
+      const adRes = await metaPost(`${META_GRAPH_URL}/act_${adAccountId}/ads`, {
+        access_token: token,
+        name: `${campaign_name} — Ad`,
+        adset_id: metaAdSetId,
+        creative: { creative_id: metaCreativeId },
+        status: "PAUSED",
+      });
 
       if (adRes.error) {
         return NextResponse.json(
           { error: `Erreur publicité : ${adRes.error.message}` },
-          { status: 502 }
+          { status: 502 },
         );
       }
       metaAdId = adRes.id;
@@ -260,7 +260,7 @@ export async function POST(req: NextRequest) {
           status: "paused",
           start_date: start_date || null,
         },
-        { onConflict: "meta_campaign_id" }
+        { onConflict: "meta_campaign_id" },
       )
       .select()
       .single();
@@ -280,7 +280,7 @@ export async function POST(req: NextRequest) {
   } catch {
     return NextResponse.json(
       { error: "Erreur lors de la création de la campagne" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

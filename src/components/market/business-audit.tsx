@@ -25,6 +25,8 @@ import {
   Zap,
   Calendar,
   Sparkles,
+  Database,
+  Pencil,
 } from "lucide-react";
 
 const ACQUISITION_CHANNELS = [
@@ -46,15 +48,38 @@ const CATEGORY_CONFIG: Record<
   string,
   { icon: React.ElementType; color: string; bgColor: string }
 > = {
-  offre: { icon: ShoppingCart, color: "text-emerald-400", bgColor: "bg-emerald-500/10" },
-  funnel: { icon: TrendingUp, color: "text-blue-400", bgColor: "bg-blue-500/10" },
-  acquisition: { icon: Megaphone, color: "text-purple-400", bgColor: "bg-purple-500/10" },
-  vente: { icon: HandCoins, color: "text-amber-400", bgColor: "bg-amber-500/10" },
+  offre: {
+    icon: ShoppingCart,
+    color: "text-emerald-400",
+    bgColor: "bg-emerald-500/10",
+  },
+  funnel: {
+    icon: TrendingUp,
+    color: "text-blue-400",
+    bgColor: "bg-blue-500/10",
+  },
+  acquisition: {
+    icon: Megaphone,
+    color: "text-purple-400",
+    bgColor: "bg-purple-500/10",
+  },
+  vente: {
+    icon: HandCoins,
+    color: "text-amber-400",
+    bgColor: "bg-amber-500/10",
+  },
   retention: { icon: Users, color: "text-pink-400", bgColor: "bg-pink-500/10" },
-  automatisation: { icon: Cog, color: "text-cyan-400", bgColor: "bg-cyan-500/10" },
+  automatisation: {
+    icon: Cog,
+    color: "text-cyan-400",
+    bgColor: "bg-cyan-500/10",
+  },
 };
 
-const PRIORITY_CONFIG: Record<string, { label: string; variant: "red" | "yellow" | "blue" }> = {
+const PRIORITY_CONFIG: Record<
+  string,
+  { label: string; variant: "red" | "yellow" | "blue" }
+> = {
   urgent: { label: "Urgent", variant: "red" },
   important: { label: "Important", variant: "yellow" },
   "nice-to-have": { label: "Nice-to-have", variant: "blue" },
@@ -101,7 +126,9 @@ function ScoreGauge({ score }: { score: number }) {
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className={cn("text-3xl font-bold", getColor(score))}>{score}</span>
+        <span className={cn("text-3xl font-bold", getColor(score))}>
+          {score}
+        </span>
         <span className="text-xs text-text-muted">/100</span>
       </div>
     </div>
@@ -119,11 +146,16 @@ function CategoryScoreBar({ score }: { score: number }) {
     <div className="flex items-center gap-2 w-full">
       <div className="flex-1 h-2 bg-bg-tertiary rounded-full overflow-hidden">
         <div
-          className={cn("h-full rounded-full transition-all duration-700", getColor(score))}
+          className={cn(
+            "h-full rounded-full transition-all duration-700",
+            getColor(score),
+          )}
           style={{ width: `${score * 10}%` }}
         />
       </div>
-      <span className="text-sm font-bold text-text-primary w-8 text-right">{score}/10</span>
+      <span className="text-sm font-bold text-text-primary w-8 text-right">
+        {score}/10
+      </span>
     </div>
   );
 }
@@ -177,7 +209,8 @@ function CategoryCard({
               Recommandations
             </h4>
             {category.recommendations.map((rec, i) => {
-              const priorityConfig = PRIORITY_CONFIG[rec.priority] || PRIORITY_CONFIG.important;
+              const priorityConfig =
+                PRIORITY_CONFIG[rec.priority] || PRIORITY_CONFIG.important;
               return (
                 <div
                   key={i}
@@ -187,7 +220,10 @@ function CategoryCard({
                     <span className="text-sm font-medium text-text-primary">
                       {rec.title}
                     </span>
-                    <Badge variant={priorityConfig.variant} className="text-[10px] shrink-0">
+                    <Badge
+                      variant={priorityConfig.variant}
+                      className="text-[10px] shrink-0"
+                    >
                       {priorityConfig.label}
                     </Badge>
                   </div>
@@ -204,6 +240,12 @@ function CategoryCard({
   );
 }
 
+const SOURCE_LABELS: Record<string, string> = {
+  meta: "Meta Ads",
+  stripe: "Stripe",
+  ghl: "GoHighLevel",
+};
+
 export function BusinessAudit() {
   const [businessName, setBusinessName] = useState("");
   const [offerDescription, setOfferDescription] = useState("");
@@ -214,14 +256,18 @@ export function BusinessAudit() {
   const [mainChallenges, setMainChallenges] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<BusinessAuditResult | null>(null);
+  const [importedSources, setImportedSources] = useState<string[]>([]);
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
-  const [usageLimited, setUsageLimited] = useState<{ currentUsage: number; limit: number } | null>(null);
+  const [usageLimited, setUsageLimited] = useState<{
+    currentUsage: number;
+    limit: number;
+  } | null>(null);
 
   const toggleChannel = (channel: string) => {
     setSelectedChannels((prev) =>
       prev.includes(channel)
         ? prev.filter((c) => c !== channel)
-        : [...prev, channel]
+        : [...prev, channel],
     );
   };
 
@@ -265,7 +311,9 @@ export function BusinessAudit() {
       }
 
       const data = await response.json();
-      setResult(data);
+      const { _imported_sources, ...auditResult } = data;
+      setResult(auditResult);
+      setImportedSources(_imported_sources || []);
       setExpandedCategory(null);
       toast.success("Audit terminé !");
     } catch (err) {
@@ -305,11 +353,18 @@ export function BusinessAudit() {
   };
 
   if (usageLimited) {
-    return <UpgradeWall currentUsage={usageLimited.currentUsage} limit={usageLimited.limit} />;
+    return (
+      <UpgradeWall
+        currentUsage={usageLimited.currentUsage}
+        limit={usageLimited.limit}
+      />
+    );
   }
 
   if (loading) {
-    return <AILoading text="Audit de ton business en cours... Analyse de l'offre, du funnel, de l'acquisition, de la vente, de la rétention et de l'automatisation." />;
+    return (
+      <AILoading text="Audit de ton business en cours... Analyse de l'offre, du funnel, de l'acquisition, de la vente, de la rétention et de l'automatisation." />
+    );
   }
 
   if (!result) {
@@ -321,7 +376,8 @@ export function BusinessAudit() {
             Audit Business IA
           </h3>
           <p className="text-sm text-text-secondary max-w-md mx-auto">
-            L&apos;IA analyse ton business existant et te donne un score détaillé avec des recommandations actionnables pour scaler.
+            L&apos;IA analyse ton business existant et te donne un score
+            détaillé avec des recommandations actionnables pour scaler.
           </p>
         </div>
 
@@ -379,7 +435,7 @@ export function BusinessAudit() {
                       "px-3 py-1.5 rounded-lg text-xs font-medium transition-all border",
                       selectedChannels.includes(channel)
                         ? "bg-accent/10 border-accent text-accent"
-                        : "bg-bg-tertiary border-border-default text-text-secondary hover:border-border-hover"
+                        : "bg-bg-tertiary border-border-default text-text-secondary hover:border-border-hover",
                     )}
                   >
                     {channel}
@@ -445,7 +501,14 @@ export function BusinessAudit() {
   }
 
   // Results view
-  const categoryKeys = ["offre", "funnel", "acquisition", "vente", "retention", "automatisation"] as const;
+  const categoryKeys = [
+    "offre",
+    "funnel",
+    "acquisition",
+    "vente",
+    "retention",
+    "automatisation",
+  ] as const;
 
   return (
     <div className="space-y-6">
@@ -475,6 +538,30 @@ export function BusinessAudit() {
         </CardContent>
       </Card>
 
+      {/* Data source badges */}
+      <div className="flex flex-wrap items-center gap-2">
+        {importedSources.length > 0 ? (
+          <>
+            <Database className="h-4 w-4 text-accent" />
+            <span className="text-xs text-text-muted mr-1">
+              Données importées depuis :
+            </span>
+            {importedSources.map((src) => (
+              <Badge key={src} variant="default" className="text-xs">
+                {SOURCE_LABELS[src] || src}
+              </Badge>
+            ))}
+          </>
+        ) : (
+          <>
+            <Pencil className="h-4 w-4 text-text-muted" />
+            <span className="text-xs text-text-muted">
+              Audit basé sur la saisie manuelle
+            </span>
+          </>
+        )}
+      </div>
+
       {/* Category scores overview */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
         {categoryKeys.map((key) => {
@@ -491,7 +578,7 @@ export function BusinessAudit() {
                 "p-3 rounded-xl border transition-all text-center",
                 expandedCategory === key
                   ? "border-accent bg-accent/5"
-                  : "border-border-default bg-bg-secondary hover:border-border-hover"
+                  : "border-border-default bg-bg-secondary hover:border-border-hover",
               )}
             >
               <Icon className={cn("h-5 w-5 mx-auto mb-1.5", config.color)} />
@@ -505,7 +592,7 @@ export function BusinessAudit() {
                     ? "text-emerald-400"
                     : cat.score >= 5
                       ? "text-amber-400"
-                      : "text-red-400"
+                      : "text-red-400",
                 )}
               >
                 {cat.score}/10

@@ -2,7 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { checkAIUsage } from "@/lib/stripe/check-usage";
 import { createClient } from "@/lib/supabase/server";
 import { generateJSON } from "@/lib/ai/generate";
-import { buildOfferScoringPrompt, type OfferScoreResult } from "@/lib/ai/prompts/offer-scoring";
+import {
+  buildOfferScoringPrompt,
+  type OfferScoreResult,
+} from "@/lib/ai/prompts/offer-scoring";
 import { awardXP } from "@/lib/gamification/xp-engine";
 import { notifyGeneration } from "@/lib/notifications/create";
 import { buildFullVaultContext } from "@/lib/ai/vault-context";
@@ -20,11 +23,14 @@ export async function POST(req: NextRequest) {
     }
 
     // Rate limiting
-    const rl = await rateLimit(user.id, "score-offer", { limit: 5, windowSeconds: 60 });
+    const rl = await rateLimit(user.id, "score-offer", {
+      limit: 5,
+      windowSeconds: 60,
+    });
     if (!rl.allowed) {
       return NextResponse.json(
         { error: "Trop de requêtes. Réessaie dans quelques secondes." },
-        { status: 429 }
+        { status: 429 },
       );
     }
 
@@ -33,10 +39,9 @@ export async function POST(req: NextRequest) {
     if (!usage.allowed) {
       return NextResponse.json(
         { error: "Limite de générations IA atteinte", usage },
-        { status: 403 }
+        { status: 403 },
       );
     }
-
 
     const body = await req.json();
     const { offerId } = body;
@@ -44,7 +49,7 @@ export async function POST(req: NextRequest) {
     if (!offerId) {
       return NextResponse.json(
         { error: "offerId est requis" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -57,10 +62,7 @@ export async function POST(req: NextRequest) {
       .single();
 
     if (offerError || !offer) {
-      return NextResponse.json(
-        { error: "Offre introuvable" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Offre introuvable" }, { status: 404 });
     }
 
     const vaultContext = await buildFullVaultContext(user.id);
@@ -86,14 +88,18 @@ export async function POST(req: NextRequest) {
     });
 
     // Award XP (non-blocking)
-    try { await awardXP(user.id, "validation.offer"); } catch {}
-    try { await notifyGeneration(user.id, "validation.offer"); } catch {}
+    try {
+      await awardXP(user.id, "validation.offer");
+    } catch {}
+    try {
+      await notifyGeneration(user.id, "validation.offer");
+    } catch {}
 
     return NextResponse.json(score);
   } catch (error) {
     return NextResponse.json(
       { error: "Erreur lors de l'evaluation de l'offre" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

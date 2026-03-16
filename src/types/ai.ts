@@ -143,7 +143,11 @@ export interface SchwartzAnalysisResult {
   niveau: 1 | 2 | 3 | 4 | 5;
   description: string;
   implication_marketing: string;
-  strategie_recommandee: "vsl" | "social_funnel" | "education_first" | "direct_response";
+  strategie_recommandee:
+    | "vsl"
+    | "social_funnel"
+    | "education_first"
+    | "direct_response";
   angle_publicitaire: string;
   type_contenu_prioritaire: string;
   niveau_preuve_requis: "faible" | "moyen" | "eleve" | "tres_eleve";

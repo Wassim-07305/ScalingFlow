@@ -17,7 +17,9 @@ export async function GET() {
 
     const { data, error } = await supabase
       .from("vault_resources")
-      .select("id, resource_type, url, file_path, title, file_size, content_type, created_at, extracted_text")
+      .select(
+        "id, resource_type, url, file_path, title, file_size, content_type, created_at, extracted_text",
+      )
       .eq("user_id", user.id)
       .order("created_at", { ascending: false });
 
@@ -58,7 +60,7 @@ export async function POST(req: NextRequest) {
     if (!url && !title) {
       return NextResponse.json(
         { error: "Titre ou URL requis" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 

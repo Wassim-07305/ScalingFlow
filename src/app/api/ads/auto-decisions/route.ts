@@ -14,7 +14,13 @@ interface DecisionPayload {
   campaign_id: string | null;
   creative_name: string;
   campaign_name: string;
-  decision_type: "pause" | "scale" | "maintain" | "creative_fatigue" | "reallocate" | "rollback";
+  decision_type:
+    | "pause"
+    | "scale"
+    | "maintain"
+    | "creative_fatigue"
+    | "reallocate"
+    | "rollback";
   reason: string;
   details: string;
   metrics_snapshot: Record<string, unknown>;
@@ -25,7 +31,7 @@ interface DecisionPayload {
 
 async function getMetaCredentials(
   supabase: Awaited<ReturnType<typeof createClient>>,
-  userId: string
+  userId: string,
 ) {
   const { data } = await supabase
     .from("connected_accounts")
@@ -86,7 +92,10 @@ export async function POST(req: NextRequest) {
         .eq("user_id", user.id);
 
       if (error) {
-        return NextResponse.json({ error: "Erreur lors de l'annulation" }, { status: 500 });
+        return NextResponse.json(
+          { error: "Erreur lors de l'annulation" },
+          { status: 500 },
+        );
       }
       return NextResponse.json({ success: true });
     }
@@ -96,7 +105,7 @@ export async function POST(req: NextRequest) {
   } catch {
     return NextResponse.json(
       { error: "Erreur lors de l'analyse des décisions" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -135,7 +144,7 @@ export async function GET(req: NextRequest) {
   } catch {
     return NextResponse.json(
       { error: "Erreur lors du CRON des décisions auto" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -158,26 +167,26 @@ export async function PATCH(req: NextRequest) {
       .from("ad_automation_config")
       .upsert(
         { user_id: user.id, enabled: !!enabled },
-        { onConflict: "user_id" }
+        { onConflict: "user_id" },
       );
 
     if (error) {
-      return NextResponse.json({ error: "Erreur lors de la mise à jour" }, { status: 500 });
+      return NextResponse.json(
+        { error: "Erreur lors de la mise à jour" },
+        { status: 500 },
+      );
     }
 
     return NextResponse.json({ success: true, enabled: !!enabled });
   } catch {
-    return NextResponse.json(
-      { error: "Erreur serveur" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }
 }
 
 async function applyDecision(
   supabase: Awaited<ReturnType<typeof createClient>>,
   userId: string,
-  decisionId: string
+  decisionId: string,
 ) {
   const { data: decision } = await supabase
     .from("ad_decisions")
@@ -187,7 +196,10 @@ async function applyDecision(
     .single();
 
   if (!decision) {
-    return NextResponse.json({ error: "Décision introuvable" }, { status: 404 });
+    return NextResponse.json(
+      { error: "Décision introuvable" },
+      { status: 404 },
+    );
   }
 
   const { token } = await getMetaCredentials(supabase, userId);
@@ -196,18 +208,24 @@ async function applyDecision(
   // Exécuter l'action Meta si possible
   if (token && decision.meta_action_payload) {
     try {
-      if (decision.decision_type === "pause" && decision.meta_action_payload.adset_id) {
+      if (
+        decision.decision_type === "pause" &&
+        decision.meta_action_payload.adset_id
+      ) {
         metaResult = await metaPost(
           `${META_GRAPH_URL}/${decision.meta_action_payload.adset_id}`,
-          { access_token: token, status: "PAUSED" }
+          { access_token: token, status: "PAUSED" },
         );
-      } else if (decision.decision_type === "scale" && decision.meta_action_payload.adset_id) {
+      } else if (
+        decision.decision_type === "scale" &&
+        decision.meta_action_payload.adset_id
+      ) {
         metaResult = await metaPost(
           `${META_GRAPH_URL}/${decision.meta_action_payload.adset_id}`,
           {
             access_token: token,
             daily_budget: decision.meta_action_payload.new_budget_cents,
-          }
+          },
         );
       }
     } catch {
@@ -239,7 +257,7 @@ async function applyDecision(
 
 async function runAutoDecisions(
   supabase: Awaited<ReturnType<typeof createClient>>,
-  userId: string
+  userId: string,
 ) {
   // Récupérer la config
   const { data: configData } = await supabase
@@ -258,12 +276,19 @@ async function runAutoDecisions(
   const niche = ((profileData?.niche as string) || "").toLowerCase();
 
   // Marchés compétitifs → seuils plus tolérants (CTR plus bas accepté, ROAS cible plus bas)
-  const isCompetitiveMarket = ["coaching", "formation", "immobilier", "crypto", "finance", "assurance", "ecommerce", "saas"].some(
-    (m) => niche.includes(m)
-  );
+  const isCompetitiveMarket = [
+    "coaching",
+    "formation",
+    "immobilier",
+    "crypto",
+    "finance",
+    "assurance",
+    "ecommerce",
+    "saas",
+  ].some((m) => niche.includes(m));
   // Marchés de niche → seuils plus stricts (CTR attendu plus haut)
   const isNicheMarket = ["santé", "bien-être", "artisan", "local", "b2b"].some(
-    (m) => niche.includes(m)
+    (m) => niche.includes(m),
   );
 
   const marketDefaults = isCompetitiveMarket
@@ -282,12 +307,17 @@ async function runAutoDecisions(
     ctr_pause_min_impressions: configData?.ctr_pause_min_impressions ?? 1000,
     cpl_pause_multiplier: configData?.cpl_pause_multiplier ?? 2.0,
     cpl_target: configData?.cpl_target ?? marketDefaults.cpl_target,
-    fatigue_frequency_max: configData?.fatigue_frequency_max ?? marketDefaults.fatigue_freq,
+    fatigue_frequency_max:
+      configData?.fatigue_frequency_max ?? marketDefaults.fatigue_freq,
     fatigue_ctr_drop_percent: configData?.fatigue_ctr_drop_percent ?? 30.0,
     scale_increment_percent: configData?.scale_increment_percent ?? 20.0,
     global_roas_scale_min: configData?.global_roas_scale_min ?? 3.0,
     enabled: configData?.enabled ?? false,
-    market_type: isCompetitiveMarket ? "competitive" : isNicheMarket ? "niche" : "standard",
+    market_type: isCompetitiveMarket
+      ? "competitive"
+      : isNicheMarket
+        ? "niche"
+        : "standard",
   };
 
   // Récupérer les campagnes actives avec leurs créatives
@@ -329,7 +359,7 @@ async function runAutoDecisions(
               insight.actions?.find(
                 (a: { action_type: string }) =>
                   a.action_type === "offsite_conversion.fb_pixel_purchase" ||
-                  a.action_type === "lead"
+                  a.action_type === "lead",
               )?.value ?? 0;
             const spend = parseFloat(insight.spend || "0");
             creativeMetrics.set(insight.ad_id || insight.adset_id, {
@@ -365,15 +395,26 @@ async function runAutoDecisions(
     const conversions = metaMetrics?.conversions ?? creative.conversions ?? 0;
     const roas = spend > 0 && conversions > 0 ? (conversions * 50) / spend : 0;
     const frequency = metaMetrics?.frequency ?? 0;
-    const cpc = metaMetrics?.cpc ?? (creative.clicks > 0 ? spend / creative.clicks : 0);
+    const cpc =
+      metaMetrics?.cpc ?? (creative.clicks > 0 ? spend / creative.clicks : 0);
 
-    const campaignForCreative = campaigns?.find((c) =>
-      c.id === creative.campaign_id || c.meta_campaign_id
+    const campaignForCreative = campaigns?.find(
+      (c) => c.id === creative.campaign_id || c.meta_campaign_id,
     );
-    const campaignName = campaignForCreative?.campaign_name ?? "Campagne inconnue";
-    const creativeName = creative.headline || `Creative ${creative.id.slice(0, 8)}`;
+    const campaignName =
+      campaignForCreative?.campaign_name ?? "Campagne inconnue";
+    const creativeName =
+      creative.headline || `Creative ${creative.id.slice(0, 8)}`;
 
-    const metrics = { ctr, spend, impressions, conversions, roas, frequency, cpc };
+    const metrics = {
+      ctr,
+      spend,
+      impressions,
+      conversions,
+      roas,
+      frequency,
+      cpc,
+    };
 
     // WINNER: ROAS > 2 + CTR > 2% + spend > 50€
     if (
@@ -382,7 +423,9 @@ async function runAutoDecisions(
       spend > config.winner_spend_min
     ) {
       const currentBudget = campaignForCreative?.daily_budget ?? 0;
-      const newBudget = Math.round(currentBudget * (1 + config.scale_increment_percent / 100));
+      const newBudget = Math.round(
+        currentBudget * (1 + config.scale_increment_percent / 100),
+      );
 
       decisions.push({
         user_id: userId,
@@ -407,7 +450,10 @@ async function runAutoDecisions(
     }
 
     // LOSER: ROAS < 0.5 après 100 impressions
-    if (roas < config.loser_roas_max && impressions > config.loser_min_impressions) {
+    if (
+      roas < config.loser_roas_max &&
+      impressions > config.loser_min_impressions
+    ) {
       decisions.push({
         user_id: userId,
         creative_id: creative.id,
@@ -428,7 +474,10 @@ async function runAutoDecisions(
     }
 
     // CTR <1% après 1000 impressions → Pause (CDC rule)
-    if (ctr < config.ctr_pause_threshold && impressions > config.ctr_pause_min_impressions) {
+    if (
+      ctr < config.ctr_pause_threshold &&
+      impressions > config.ctr_pause_min_impressions
+    ) {
       decisions.push({
         user_id: userId,
         creative_id: creative.id,
@@ -449,7 +498,7 @@ async function runAutoDecisions(
     }
 
     // CPL > 2× seuil → Pause (CDC rule)
-    const cpl = conversions > 0 ? spend / conversions : (spend > 20 ? spend : 0);
+    const cpl = conversions > 0 ? spend / conversions : spend > 20 ? spend : 0;
     if (cpl > config.cpl_target * config.cpl_pause_multiplier && spend > 20) {
       decisions.push({
         user_id: userId,
@@ -511,10 +560,14 @@ async function runAutoDecisions(
   // BATCH RULES (post-loop analysis)
 
   // Toutes les créatives sous-performent → Renouveler (CDC rule)
-  const pauseCount = decisions.filter((d) => d.decision_type === "pause").length;
-  const fatigueCount = decisions.filter((d) => d.decision_type === "creative_fatigue").length;
+  const pauseCount = decisions.filter(
+    (d) => d.decision_type === "pause",
+  ).length;
+  const fatigueCount = decisions.filter(
+    (d) => d.decision_type === "creative_fatigue",
+  ).length;
   const totalActive = (creatives ?? []).length;
-  if (totalActive > 0 && (pauseCount + fatigueCount) >= totalActive * 0.8) {
+  if (totalActive > 0 && pauseCount + fatigueCount >= totalActive * 0.8) {
     decisions.push({
       user_id: userId,
       creative_id: null,
@@ -524,7 +577,11 @@ async function runAutoDecisions(
       decision_type: "reallocate",
       reason: `${pauseCount + fatigueCount}/${totalActive} créatives sous-performent — renouvellement nécessaire`,
       details: `Relancer le cycle créatif Phase 4 pour générer de nouvelles variations. Toutes les créatives actuelles sont en fatigue ou paused.`,
-      metrics_snapshot: { total: totalActive, paused: pauseCount, fatigued: fatigueCount },
+      metrics_snapshot: {
+        total: totalActive,
+        paused: pauseCount,
+        fatigued: fatigueCount,
+      },
       meta_action: null,
       meta_action_payload: null,
       status: "pending",
@@ -533,7 +590,10 @@ async function runAutoDecisions(
 
   // ROAS global > 3× → Scale global +20-30% (CDC rule)
   const totalSpend = (creatives ?? []).reduce((s, c) => s + (c.spend ?? 0), 0);
-  const totalConversions = (creatives ?? []).reduce((s, c) => s + (c.conversions ?? 0), 0);
+  const totalConversions = (creatives ?? []).reduce(
+    (s, c) => s + (c.conversions ?? 0),
+    0,
+  );
   const globalRoas = totalSpend > 0 ? (totalConversions * 50) / totalSpend : 0;
   if (globalRoas > config.global_roas_scale_min && totalSpend > 100) {
     decisions.push({
@@ -545,7 +605,11 @@ async function runAutoDecisions(
       decision_type: "scale",
       reason: `ROAS global ${globalRoas.toFixed(1)}x > ${config.global_roas_scale_min}x — scaling global recommandé`,
       details: `Augmenter le budget global de +${config.scale_increment_percent}% sur toutes les campagnes actives`,
-      metrics_snapshot: { global_roas: globalRoas, total_spend: totalSpend, total_conversions: totalConversions },
+      metrics_snapshot: {
+        global_roas: globalRoas,
+        total_spend: totalSpend,
+        total_conversions: totalConversions,
+      },
       meta_action: null,
       meta_action_payload: null,
       status: "pending",
@@ -554,7 +618,7 @@ async function runAutoDecisions(
 
   // F72 — Horizontal testing : les winners avec ROAS > 3× et spend > 100€ → dupliquer vers nouvelles audiences
   const winnerCreatives = decisions.filter(
-    (d) => d.decision_type === "scale" && d.creative_id !== null
+    (d) => d.decision_type === "scale" && d.creative_id !== null,
   );
   for (const winner of winnerCreatives) {
     const winnerMetrics = winner.metrics_snapshot as Record<string, number>;
@@ -582,9 +646,15 @@ async function runAutoDecisions(
 
     // F71 — Notifier l'utilisateur des nouvelles décisions à approuver
     const pendingCount = decisions.filter((d) => d.status === "pending").length;
-    const scaleCount = decisions.filter((d) => d.decision_type === "scale").length;
-    const pauseCount = decisions.filter((d) => d.decision_type === "pause").length;
-    const fatigueCount = decisions.filter((d) => d.decision_type === "creative_fatigue").length;
+    const scaleCount = decisions.filter(
+      (d) => d.decision_type === "scale",
+    ).length;
+    const pauseCount = decisions.filter(
+      (d) => d.decision_type === "pause",
+    ).length;
+    const fatigueCount = decisions.filter(
+      (d) => d.decision_type === "creative_fatigue",
+    ).length;
 
     if (pendingCount > 0) {
       const parts: string[] = [];
@@ -610,7 +680,8 @@ async function runAutoDecisions(
     summary: {
       scale: decisions.filter((d) => d.decision_type === "scale").length,
       pause: decisions.filter((d) => d.decision_type === "pause").length,
-      fatigue: decisions.filter((d) => d.decision_type === "creative_fatigue").length,
+      fatigue: decisions.filter((d) => d.decision_type === "creative_fatigue")
+        .length,
       maintain: decisions.filter((d) => d.decision_type === "maintain").length,
     },
   });

@@ -11,7 +11,13 @@ interface ExportPDFOptions {
   };
 }
 
-export function exportToPDF({ title, subtitle, content, filename, branding }: ExportPDFOptions) {
+export function exportToPDF({
+  title,
+  subtitle,
+  content,
+  filename,
+  branding,
+}: ExportPDFOptions) {
   const doc = new jsPDF();
   const margin = 20;
   let y = margin;
@@ -40,9 +46,8 @@ export function exportToPDF({ title, subtitle, content, filename, branding }: Ex
   doc.setFont("helvetica", "normal");
   doc.setTextColor(0, 0, 0);
 
-  const text = typeof content === "string"
-    ? content
-    : JSON.stringify(content, null, 2);
+  const text =
+    typeof content === "string" ? content : JSON.stringify(content, null, 2);
 
   const lines = doc.splitTextToSize(text, 170);
 
@@ -66,6 +71,7 @@ export function exportToPDF({ title, subtitle, content, filename, branding }: Ex
     doc.text(`${footerBrand} — ${date} — Page ${i}/${pageCount}`, margin, 290);
   }
 
-  const safeName = filename || `${title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}.pdf`;
+  const safeName =
+    filename || `${title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}.pdf`;
   doc.save(safeName);
 }

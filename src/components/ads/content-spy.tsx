@@ -113,7 +113,13 @@ const PLATFORMS = [
   { value: "linkedin", label: "LinkedIn", icon: Globe },
 ];
 
-type DataSource = "instagram_api" | "tiktok_api" | "youtube_api" | "facebook_api" | "web_scraping" | "ai_only";
+type DataSource =
+  | "instagram_api"
+  | "tiktok_api"
+  | "youtube_api"
+  | "facebook_api"
+  | "web_scraping"
+  | "ai_only";
 
 interface ScrapedPost {
   caption: string;
@@ -142,13 +148,58 @@ interface TranscriptData {
   url: string;
 }
 
-const DATA_SOURCE_CONFIG: Record<DataSource, { label: string; icon: React.ElementType; color: string; bgColor: string; borderColor: string }> = {
-  instagram_api: { label: "Instagram API", icon: Instagram, color: "text-pink-400", bgColor: "bg-pink-500/10", borderColor: "border-pink-500/20" },
-  tiktok_api: { label: "TikTok API", icon: Radio, color: "text-cyan-400", bgColor: "bg-cyan-500/10", borderColor: "border-cyan-500/20" },
-  youtube_api: { label: "YouTube API", icon: Youtube, color: "text-red-400", bgColor: "bg-red-500/10", borderColor: "border-red-500/20" },
-  facebook_api: { label: "Facebook API", icon: Facebook, color: "text-blue-400", bgColor: "bg-blue-500/10", borderColor: "border-blue-500/20" },
-  web_scraping: { label: "Web Scraping", icon: Globe, color: "text-blue-400", bgColor: "bg-blue-500/10", borderColor: "border-blue-500/20" },
-  ai_only: { label: "Analyse IA", icon: Bot, color: "text-purple-400", bgColor: "bg-purple-500/10", borderColor: "border-purple-500/20" },
+const DATA_SOURCE_CONFIG: Record<
+  DataSource,
+  {
+    label: string;
+    icon: React.ElementType;
+    color: string;
+    bgColor: string;
+    borderColor: string;
+  }
+> = {
+  instagram_api: {
+    label: "Instagram API",
+    icon: Instagram,
+    color: "text-pink-400",
+    bgColor: "bg-pink-500/10",
+    borderColor: "border-pink-500/20",
+  },
+  tiktok_api: {
+    label: "TikTok API",
+    icon: Radio,
+    color: "text-cyan-400",
+    bgColor: "bg-cyan-500/10",
+    borderColor: "border-cyan-500/20",
+  },
+  youtube_api: {
+    label: "YouTube API",
+    icon: Youtube,
+    color: "text-red-400",
+    bgColor: "bg-red-500/10",
+    borderColor: "border-red-500/20",
+  },
+  facebook_api: {
+    label: "Facebook API",
+    icon: Facebook,
+    color: "text-blue-400",
+    bgColor: "bg-blue-500/10",
+    borderColor: "border-blue-500/20",
+  },
+  web_scraping: {
+    label: "Web Scraping",
+    icon: Globe,
+    color: "text-blue-400",
+    bgColor: "bg-blue-500/10",
+    borderColor: "border-blue-500/20",
+  },
+  ai_only: {
+    label: "Analyse IA",
+    icon: Bot,
+    color: "text-purple-400",
+    bgColor: "bg-purple-500/10",
+    borderColor: "border-purple-500/20",
+  },
 };
 
 interface ContentSpyProps {
@@ -162,8 +213,11 @@ export function ContentSpy({ className }: ContentSpyProps) {
   const [scrapingUsed, setScrapingUsed] = React.useState(false);
   const [dataSource, setDataSource] = React.useState<DataSource>("ai_only");
   const [scrapedPosts, setScrapedPosts] = React.useState<ScrapedPost[]>([]);
-  const [profileData, setProfileData] = React.useState<ProfileData | null>(null);
-  const [transcriptData, setTranscriptData] = React.useState<TranscriptData | null>(null);
+  const [profileData, setProfileData] = React.useState<ProfileData | null>(
+    null,
+  );
+  const [transcriptData, setTranscriptData] =
+    React.useState<TranscriptData | null>(null);
   const [transcriptExpanded, setTranscriptExpanded] = React.useState(false);
   const [postsExpanded, setPostsExpanded] = React.useState(false);
 
@@ -210,11 +264,15 @@ export function ContentSpy({ className }: ContentSpyProps) {
       setTranscriptData(data.transcript_data || null);
       const source = data.data_source as DataSource;
       const sourceLabel = DATA_SOURCE_CONFIG[source]?.label || "IA";
-      toast.success(data.scraping_used
-        ? `Analyse terminée avec ${sourceLabel} !`
-        : "Analyse terminée !");
+      toast.success(
+        data.scraping_used
+          ? `Analyse terminée avec ${sourceLabel} !`
+          : "Analyse terminée !",
+      );
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Erreur lors de l'analyse");
+      toast.error(
+        err instanceof Error ? err.message : "Erreur lors de l'analyse",
+      );
     } finally {
       setLoading(false);
     }
@@ -226,7 +284,9 @@ export function ContentSpy({ className }: ContentSpyProps) {
   };
 
   if (loading) {
-    return <AILoading text="Analyse du contenu concurrent" className={className} />;
+    return (
+      <AILoading text="Analyse du contenu concurrent" className={className} />
+    );
   }
 
   // Formulaire
@@ -318,7 +378,21 @@ export function ContentSpy({ className }: ContentSpyProps) {
           </h3>
           <Badge variant="default">{result.platform}</Badge>
         </div>
-        <Button variant="outline" size="sm" onClick={() => { setResult(null); setSources([]); setScrapingUsed(false); setDataSource("ai_only"); setScrapedPosts([]); setProfileData(null); setTranscriptData(null); setTranscriptExpanded(false); setPostsExpanded(false); }}>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => {
+            setResult(null);
+            setSources([]);
+            setScrapingUsed(false);
+            setDataSource("ai_only");
+            setScrapedPosts([]);
+            setProfileData(null);
+            setTranscriptData(null);
+            setTranscriptExpanded(false);
+            setPostsExpanded(false);
+          }}
+        >
           Nouvelle analyse
         </Button>
       </div>
@@ -328,13 +402,19 @@ export function ContentSpy({ className }: ContentSpyProps) {
         const config = DATA_SOURCE_CONFIG[dataSource];
         const Icon = config.icon;
         return (
-          <div className={cn("flex items-center gap-2 p-3 rounded-lg", config.bgColor, "border", config.borderColor)}>
+          <div
+            className={cn(
+              "flex items-center gap-2 p-3 rounded-lg",
+              config.bgColor,
+              "border",
+              config.borderColor,
+            )}
+          >
             <Icon className={cn("h-4 w-4 shrink-0", config.color)} />
             <p className={cn("text-sm", config.color)}>
               {scrapingUsed
                 ? `Analyse enrichie via ${config.label} — données réelles`
-                : "Analyse basée sur l'intelligence artificielle"
-              }
+                : "Analyse basée sur l'intelligence artificielle"}
             </p>
             <Badge variant="default" className="ml-auto shrink-0 text-xs">
               {config.label}
@@ -356,19 +436,27 @@ export function ContentSpy({ className }: ContentSpyProps) {
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               <div className="text-center p-2 rounded-lg bg-bg-tertiary">
                 <p className="text-xs text-text-muted">Nom</p>
-                <p className="text-sm font-medium text-text-primary">{profileData.fullName}</p>
+                <p className="text-sm font-medium text-text-primary">
+                  {profileData.fullName}
+                </p>
               </div>
               <div className="text-center p-2 rounded-lg bg-bg-tertiary">
                 <p className="text-xs text-text-muted">Followers</p>
-                <p className="text-sm font-semibold text-text-primary">{profileData.followers.toLocaleString("fr-FR")}</p>
+                <p className="text-sm font-semibold text-text-primary">
+                  {profileData.followers.toLocaleString("fr-FR")}
+                </p>
               </div>
               <div className="text-center p-2 rounded-lg bg-bg-tertiary">
                 <p className="text-xs text-text-muted">Posts</p>
-                <p className="text-sm font-semibold text-text-primary">{profileData.posts.toLocaleString("fr-FR")}</p>
+                <p className="text-sm font-semibold text-text-primary">
+                  {profileData.posts.toLocaleString("fr-FR")}
+                </p>
               </div>
               <div className="col-span-2 sm:col-span-1 p-2 rounded-lg bg-bg-tertiary">
                 <p className="text-xs text-text-muted">Bio</p>
-                <p className="text-xs text-text-secondary line-clamp-2">{profileData.bio}</p>
+                <p className="text-xs text-text-secondary line-clamp-2">
+                  {profileData.bio}
+                </p>
               </div>
             </div>
           </CardContent>
@@ -386,25 +474,43 @@ export function ContentSpy({ className }: ContentSpyProps) {
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="p-3 rounded-lg bg-bg-tertiary border border-border-default">
-              <p className="text-sm font-semibold text-text-primary">{transcriptData.title}</p>
-              <p className="text-xs text-text-muted mt-1">Chaîne : {transcriptData.channelName}</p>
+              <p className="text-sm font-semibold text-text-primary">
+                {transcriptData.title}
+              </p>
+              <p className="text-xs text-text-muted mt-1">
+                Chaîne : {transcriptData.channelName}
+              </p>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               <div className="text-center p-2 rounded-lg bg-bg-tertiary">
-                <p className="text-xs text-text-muted flex items-center justify-center gap-1"><Eye className="h-3 w-3" /> Vues</p>
-                <p className="text-sm font-semibold text-text-primary">{transcriptData.viewCount.toLocaleString("fr-FR")}</p>
+                <p className="text-xs text-text-muted flex items-center justify-center gap-1">
+                  <Eye className="h-3 w-3" /> Vues
+                </p>
+                <p className="text-sm font-semibold text-text-primary">
+                  {transcriptData.viewCount.toLocaleString("fr-FR")}
+                </p>
               </div>
               <div className="text-center p-2 rounded-lg bg-bg-tertiary">
-                <p className="text-xs text-text-muted flex items-center justify-center gap-1"><ThumbsUp className="h-3 w-3" /> Likes</p>
-                <p className="text-sm font-semibold text-text-primary">{transcriptData.likeCount.toLocaleString("fr-FR")}</p>
+                <p className="text-xs text-text-muted flex items-center justify-center gap-1">
+                  <ThumbsUp className="h-3 w-3" /> Likes
+                </p>
+                <p className="text-sm font-semibold text-text-primary">
+                  {transcriptData.likeCount.toLocaleString("fr-FR")}
+                </p>
               </div>
               <div className="text-center p-2 rounded-lg bg-bg-tertiary">
-                <p className="text-xs text-text-muted flex items-center justify-center gap-1"><Play className="h-3 w-3" /> Durée</p>
-                <p className="text-sm font-semibold text-text-primary">{transcriptData.duration}</p>
+                <p className="text-xs text-text-muted flex items-center justify-center gap-1">
+                  <Play className="h-3 w-3" /> Durée
+                </p>
+                <p className="text-sm font-semibold text-text-primary">
+                  {transcriptData.duration}
+                </p>
               </div>
               <div className="text-center p-2 rounded-lg bg-bg-tertiary">
                 <p className="text-xs text-text-muted">Date</p>
-                <p className="text-sm font-semibold text-text-primary">{transcriptData.uploadDate}</p>
+                <p className="text-sm font-semibold text-text-primary">
+                  {transcriptData.uploadDate}
+                </p>
               </div>
             </div>
             {transcriptData.transcript && (
@@ -480,7 +586,9 @@ export function ContentSpy({ className }: ContentSpyProps) {
                     className="p-3 rounded-lg bg-bg-tertiary border border-border-default space-y-2"
                   >
                     {post.ownerUsername && (
-                      <p className="text-xs text-text-muted font-medium">@{post.ownerUsername}</p>
+                      <p className="text-xs text-text-muted font-medium">
+                        @{post.ownerUsername}
+                      </p>
                     )}
                     <p className="text-sm text-text-secondary line-clamp-3">
                       {post.caption || "(Pas de légende)"}
@@ -541,7 +649,9 @@ export function ContentSpy({ className }: ContentSpyProps) {
       <GlowCard glowColor="blue">
         <div className="flex items-center gap-2 mb-3">
           <TrendingUp className="h-4 w-4 text-accent" />
-          <h4 className="font-semibold text-text-primary">Vue d&apos;ensemble</h4>
+          <h4 className="font-semibold text-text-primary">
+            Vue d&apos;ensemble
+          </h4>
         </div>
         <p className="text-sm text-text-secondary">{result.overview}</p>
       </GlowCard>
@@ -562,14 +672,18 @@ export function ContentSpy({ className }: ContentSpyProps) {
                 className="p-3 rounded-lg bg-bg-tertiary border border-border-default space-y-2"
               >
                 <div className="flex items-center justify-between">
-                  <p className="text-sm font-medium text-text-primary">{ct.type}</p>
+                  <p className="text-sm font-medium text-text-primary">
+                    {ct.type}
+                  </p>
                   <Badge
                     variant={
                       ct.estimated_engagement === "Eleve" ||
                       ct.estimated_engagement.toLowerCase().includes("elev")
                         ? "default"
                         : ct.estimated_engagement === "Moyen" ||
-                            ct.estimated_engagement.toLowerCase().includes("moy")
+                            ct.estimated_engagement
+                              .toLowerCase()
+                              .includes("moy")
                           ? "blue"
                           : "cyan"
                     }
@@ -601,7 +715,9 @@ export function ContentSpy({ className }: ContentSpyProps) {
                 className="p-3 rounded-lg bg-bg-tertiary border border-border-default"
               >
                 <div className="flex items-center justify-between mb-2">
-                  <p className="text-sm font-medium text-text-primary">{theme.theme}</p>
+                  <p className="text-sm font-medium text-text-primary">
+                    {theme.theme}
+                  </p>
                   <Badge
                     variant={
                       theme.engagement_level === "Fort"
@@ -655,7 +771,9 @@ export function ContentSpy({ className }: ContentSpyProps) {
                   {hook.effectiveness}
                 </Badge>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-text-primary">{hook.hook_type}</p>
+                  <p className="text-sm font-medium text-text-primary">
+                    {hook.hook_type}
+                  </p>
                   <p className="text-sm text-text-secondary mt-1 italic">
                     &ldquo;{hook.example}&rdquo;
                   </p>
@@ -695,7 +813,9 @@ export function ContentSpy({ className }: ContentSpyProps) {
               <p className="text-xs text-text-muted mb-1">Meilleurs jours</p>
               <div className="flex flex-wrap gap-1.5">
                 {result.posting_patterns.best_days.map((day, i) => (
-                  <Badge key={i} variant="blue">{day}</Badge>
+                  <Badge key={i} variant="blue">
+                    {day}
+                  </Badge>
                 ))}
               </div>
             </div>
@@ -703,13 +823,17 @@ export function ContentSpy({ className }: ContentSpyProps) {
               <p className="text-xs text-text-muted mb-1">Meilleurs horaires</p>
               <div className="flex flex-wrap gap-1.5">
                 {result.posting_patterns.best_times.map((time, i) => (
-                  <Badge key={i} variant="cyan">{time}</Badge>
+                  <Badge key={i} variant="cyan">
+                    {time}
+                  </Badge>
                 ))}
               </div>
             </div>
             <div className="p-3 rounded-lg bg-bg-tertiary border border-border-default">
               <p className="text-xs text-text-muted mb-1">Regularite</p>
-              <p className="text-sm text-text-primary">{result.posting_patterns.consistency}</p>
+              <p className="text-sm text-text-primary">
+                {result.posting_patterns.consistency}
+              </p>
             </div>
           </CardContent>
         </Card>
@@ -724,7 +848,10 @@ export function ContentSpy({ className }: ContentSpyProps) {
           <CardContent>
             <ul className="space-y-2">
               {result.engagement_tactics.map((tactic, i) => (
-                <li key={i} className="flex items-start gap-2 text-sm text-text-secondary">
+                <li
+                  key={i}
+                  className="flex items-start gap-2 text-sm text-text-secondary"
+                >
                   <span className="text-accent mt-0.5 shrink-0">-</span>
                   {tactic}
                 </li>
@@ -738,17 +865,25 @@ export function ContentSpy({ className }: ContentSpyProps) {
       <GlowCard glowColor="orange">
         <div className="flex items-center gap-2 mb-3">
           <Flame className="h-4 w-4 text-orange-400" />
-          <h4 className="font-semibold text-text-primary">Formule de contenu viral</h4>
+          <h4 className="font-semibold text-text-primary">
+            Formule de contenu viral
+          </h4>
         </div>
-        <p className="text-sm text-text-secondary mb-3">{result.viral_formula.pattern}</p>
+        <p className="text-sm text-text-secondary mb-3">
+          {result.viral_formula.pattern}
+        </p>
         <div className="flex flex-wrap gap-1.5 mb-3">
           {result.viral_formula.elements.map((el, i) => (
-            <Badge key={i} variant="default">{el}</Badge>
+            <Badge key={i} variant="default">
+              {el}
+            </Badge>
           ))}
         </div>
         <div className="p-3 rounded-lg bg-accent/5 border border-accent/20">
           <p className="text-xs text-text-muted mb-1">Comment repliquer</p>
-          <p className="text-sm text-accent">{result.viral_formula.replication_guide}</p>
+          <p className="text-sm text-accent">
+            {result.viral_formula.replication_guide}
+          </p>
         </div>
       </GlowCard>
 
@@ -768,7 +903,9 @@ export function ContentSpy({ className }: ContentSpyProps) {
                 className="p-3 rounded-lg bg-bg-tertiary border border-border-default space-y-2"
               >
                 <div className="flex items-center justify-between">
-                  <p className="text-sm font-medium text-text-primary">{gap.gap}</p>
+                  <p className="text-sm font-medium text-text-primary">
+                    {gap.gap}
+                  </p>
                   <Badge
                     variant={
                       gap.difficulty === "Facile"
@@ -803,7 +940,9 @@ export function ContentSpy({ className }: ContentSpyProps) {
                 key={i}
                 className="p-3 rounded-lg bg-accent/5 border border-accent/20 space-y-2"
               >
-                <p className="text-sm font-medium text-text-primary">{insight.insight}</p>
+                <p className="text-sm font-medium text-text-primary">
+                  {insight.insight}
+                </p>
                 <div className="grid gap-2 sm:grid-cols-2">
                   <div>
                     <p className="text-xs text-text-muted">Action</p>
@@ -811,7 +950,9 @@ export function ContentSpy({ className }: ContentSpyProps) {
                   </div>
                   <div>
                     <p className="text-xs text-text-muted">Résultat attendu</p>
-                    <p className="text-sm text-text-secondary">{insight.expected_result}</p>
+                    <p className="text-sm text-text-secondary">
+                      {insight.expected_result}
+                    </p>
                   </div>
                 </div>
               </div>

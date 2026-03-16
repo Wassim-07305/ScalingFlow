@@ -40,7 +40,7 @@ export async function POST() {
     if (!profile?.meta_access_token || !profile?.meta_ad_account_id) {
       return NextResponse.json(
         { error: "Configure ton compte Meta Ads dans les paramètres." },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -56,7 +56,7 @@ export async function POST() {
       const errorMsg = errorData?.error?.message || "Erreur API Meta Ads";
       return NextResponse.json(
         { error: `Erreur Meta Ads : ${errorMsg}` },
-        { status: 502 }
+        { status: 502 },
       );
     }
 
@@ -91,10 +91,11 @@ export async function POST() {
             }
             return sum;
           },
-          0
+          0,
         ) || 0;
 
-      const roas = spend > 0 && conversions > 0 ? (conversions * 50) / spend : 0;
+      const roas =
+        spend > 0 && conversions > 0 ? (conversions * 50) / spend : 0;
 
       // Upsert dans ad_campaigns
       await supabase.from("ad_campaigns").upsert(
@@ -110,7 +111,7 @@ export async function POST() {
           roas,
           meta_campaign_id: campaign.id,
         },
-        { onConflict: "meta_campaign_id" }
+        { onConflict: "meta_campaign_id" },
       );
 
       synced++;
@@ -124,7 +125,7 @@ export async function POST() {
   } catch (error) {
     return NextResponse.json(
       { error: "Erreur interne lors de la synchronisation." },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

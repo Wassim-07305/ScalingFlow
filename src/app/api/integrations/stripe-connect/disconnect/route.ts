@@ -6,7 +6,9 @@ import { createClient } from "@/lib/supabase/server";
 export async function POST() {
   try {
     const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
     if (!user) {
       return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
@@ -27,7 +29,7 @@ export async function POST() {
   } catch {
     return NextResponse.json(
       { error: "Erreur lors de la deconnexion" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -27,7 +27,11 @@ export interface CategoryOSResult {
   differentiation_scoring: {
     alternatives: {
       name: string;
-      type: "concurrent_direct" | "concurrent_indirect" | "substitut" | "statu_quo";
+      type:
+        | "concurrent_direct"
+        | "concurrent_indirect"
+        | "substitut"
+        | "statu_quo";
       score_differenciation: number;
       forces: string[];
       faiblesses: string[];
@@ -69,13 +73,21 @@ export function buildCategoryOSPrompt(data: CategoryOSInput): string {
 ${data.marketAnalysis.competitors ? `- Concurrents : ${JSON.stringify(data.marketAnalysis.competitors)}` : ""}
 ${data.marketAnalysis.target_avatar ? `- Avatar cible : ${JSON.stringify(data.marketAnalysis.target_avatar)}` : ""}
 
-${data.offer ? `### Offre existante
+${
+  data.offer
+    ? `### Offre existante
 - Nom : ${data.offer.offer_name}
 - Positionnement : ${data.offer.positioning}
-- Mecanisme unique : ${data.offer.unique_mechanism}` : ""}
+- Mecanisme unique : ${data.offer.unique_mechanism}`
+    : ""
+}
 
-${data.vaultData?.skills ? `### Competences
-${data.vaultData.skills.join(", ")}` : ""}
+${
+  data.vaultData?.skills
+    ? `### Competences
+${data.vaultData.skills.join(", ")}`
+    : ""
+}
 
 ## MISSION — CATEGORY OS (5 etapes)
 

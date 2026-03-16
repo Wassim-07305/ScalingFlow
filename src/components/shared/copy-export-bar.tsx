@@ -60,7 +60,7 @@ export function CopyExportBar({
         onClick={handleCopy}
         className={cn(
           "gap-2 transition-all duration-200",
-          copied && "border-accent/50 text-accent bg-accent/5"
+          copied && "border-accent/50 text-accent bg-accent/5",
         )}
         title="Copier dans le presse-papiers"
       >
@@ -78,11 +78,13 @@ export function CopyExportBar({
         disabled={exporting}
         className={cn(
           "gap-2 transition-all duration-200",
-          exporting && "border-accent/50 text-accent bg-accent/5"
+          exporting && "border-accent/50 text-accent bg-accent/5",
         )}
         title="Exporter en PDF"
       >
-        <FileDown className={cn("h-3.5 w-3.5", exporting && "animate-bounce")} />
+        <FileDown
+          className={cn("h-3.5 w-3.5", exporting && "animate-bounce")}
+        />
         PDF
       </Button>
     </div>

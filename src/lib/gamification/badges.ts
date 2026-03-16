@@ -139,7 +139,7 @@ export const BADGE_DEFINITIONS: BadgeDefinition[] = [
 
 /** Map pour lookup rapide par ID */
 export const BADGE_MAP = new Map<string, BadgeDefinition>(
-  BADGE_DEFINITIONS.map((b) => [b.id, b])
+  BADGE_DEFINITIONS.map((b) => [b.id, b]),
 );
 
 /** Retourne la définition d'un badge par son ID */

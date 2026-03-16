@@ -33,15 +33,37 @@ interface PixelConfig {
   domain: string;
 }
 
-type EventType = "PageView" | "Lead" | "Purchase" | "ViewContent" | "InitiateCheckout" | "CompleteRegistration";
+type EventType =
+  | "PageView"
+  | "Lead"
+  | "Purchase"
+  | "ViewContent"
+  | "InitiateCheckout"
+  | "CompleteRegistration";
 
 const EVENTS: { key: EventType; label: string; description: string }[] = [
-  { key: "PageView", label: "PageView", description: "Toutes les pages du funnel" },
+  {
+    key: "PageView",
+    label: "PageView",
+    description: "Toutes les pages du funnel",
+  },
   { key: "Lead", label: "Lead", description: "Formulaire opt-in soumis" },
   { key: "Purchase", label: "Purchase", description: "Achat confirmé" },
-  { key: "ViewContent", label: "ViewContent", description: "Page VSL / offre vue" },
-  { key: "InitiateCheckout", label: "InitiateCheckout", description: "Page de paiement ouverte" },
-  { key: "CompleteRegistration", label: "CompleteRegistration", description: "Inscription terminée" },
+  {
+    key: "ViewContent",
+    label: "ViewContent",
+    description: "Page VSL / offre vue",
+  },
+  {
+    key: "InitiateCheckout",
+    label: "InitiateCheckout",
+    description: "Page de paiement ouverte",
+  },
+  {
+    key: "CompleteRegistration",
+    label: "CompleteRegistration",
+    description: "Inscription terminée",
+  },
 ];
 
 // ─── Code generators ────────────────────────────────────────
@@ -173,12 +195,17 @@ export function PixelCAPIGenerator() {
     accessToken: "",
     domain: "",
   });
-  const [expandedSection, setExpandedSection] = useState<string | null>("pixel");
+  const [expandedSection, setExpandedSection] = useState<string | null>(
+    "pixel",
+  );
   const [saving, setSaving] = useState(false);
   const [loadingConfig, setLoadingConfig] = useState(true);
   const [savedConfig, setSavedConfig] = useState(false);
   const [testing, setTesting] = useState(false);
-  const [testResult, setTestResult] = useState<{ success: boolean; message: string } | null>(null);
+  const [testResult, setTestResult] = useState<{
+    success: boolean;
+    message: string;
+  } | null>(null);
   const { copiedKey, copy } = useCopyToClipboard();
 
   const isConfigured = config.pixelId.trim().length > 0;
@@ -257,15 +284,13 @@ export function PixelCAPIGenerator() {
 
         if (error) throw error;
       } else {
-        const { error } = await supabase
-          .from("connected_accounts")
-          .insert({
-            user_id: user.id,
-            provider: "meta",
-            provider_account_id: config.pixelId.trim(),
-            access_token: config.accessToken.trim() || null,
-            metadata,
-          });
+        const { error } = await supabase.from("connected_accounts").insert({
+          user_id: user.id,
+          provider: "meta",
+          provider_account_id: config.pixelId.trim(),
+          access_token: config.accessToken.trim() || null,
+          metadata,
+        });
 
         if (error) throw error;
       }
@@ -335,7 +360,9 @@ export function PixelCAPIGenerator() {
     return (
       <div className="flex items-center justify-center py-12">
         <Loader2 className="h-6 w-6 animate-spin text-accent" />
-        <span className="ml-2 text-sm text-text-secondary">Chargement de la configuration...</span>
+        <span className="ml-2 text-sm text-text-secondary">
+          Chargement de la configuration...
+        </span>
       </div>
     );
   }
@@ -411,13 +438,19 @@ export function PixelCAPIGenerator() {
               ) : (
                 <Save className="h-4 w-4" />
               )}
-              {saving ? "Sauvegarde..." : savedConfig ? "Sauvegardé" : "Sauvegarder"}
+              {saving
+                ? "Sauvegarde..."
+                : savedConfig
+                  ? "Sauvegardé"
+                  : "Sauvegarder"}
             </Button>
 
             <Button
               variant="outline"
               onClick={handleTestPixel}
-              disabled={testing || !config.pixelId.trim() || !config.accessToken.trim()}
+              disabled={
+                testing || !config.pixelId.trim() || !config.accessToken.trim()
+              }
               className="gap-2"
             >
               {testing ? (
@@ -436,7 +469,7 @@ export function PixelCAPIGenerator() {
                 "flex items-start gap-2 p-3 rounded-xl border",
                 testResult.success
                   ? "bg-emerald-500/10 border-emerald-500/20"
-                  : "bg-red-500/10 border-red-500/20"
+                  : "bg-red-500/10 border-red-500/20",
               )}
             >
               {testResult.success ? (
@@ -447,7 +480,7 @@ export function PixelCAPIGenerator() {
               <p
                 className={cn(
                   "text-xs",
-                  testResult.success ? "text-emerald-300" : "text-red-300"
+                  testResult.success ? "text-emerald-300" : "text-red-300",
                 )}
               >
                 {testResult.message}
@@ -490,7 +523,9 @@ export function PixelCAPIGenerator() {
             {expandedSection === "pixel" && (
               <CardContent className="pt-0 space-y-3">
                 <p className="text-xs text-text-secondary">
-                  Colle ce code dans le <code className="text-accent">&lt;head&gt;</code> de toutes les pages de ton funnel.
+                  Colle ce code dans le{" "}
+                  <code className="text-accent">&lt;head&gt;</code> de toutes
+                  les pages de ton funnel.
                 </p>
                 <div className="relative">
                   <pre className="p-4 rounded-xl bg-bg-tertiary text-xs text-text-secondary overflow-x-auto max-h-64">
@@ -500,7 +535,9 @@ export function PixelCAPIGenerator() {
                     size="sm"
                     variant="ghost"
                     className="absolute top-2 right-2"
-                    onClick={() => copy("pixel-base", generatePixelBaseCode(config.pixelId))}
+                    onClick={() =>
+                      copy("pixel-base", generatePixelBaseCode(config.pixelId))
+                    }
                   >
                     {copiedKey === "pixel-base" ? (
                       <Check className="h-3.5 w-3.5 text-accent" />
@@ -534,7 +571,8 @@ export function PixelCAPIGenerator() {
             {expandedSection === "events" && (
               <CardContent className="pt-0 space-y-3">
                 <p className="text-xs text-text-secondary">
-                  Ajoute ces événements aux actions correspondantes de ton funnel.
+                  Ajoute ces événements aux actions correspondantes de ton
+                  funnel.
                 </p>
                 <div className="grid gap-2">
                   {EVENTS.map((evt) => {
@@ -596,7 +634,8 @@ export function PixelCAPIGenerator() {
             {expandedSection === "capi" && (
               <CardContent className="pt-0 space-y-4">
                 <p className="text-xs text-text-secondary">
-                  Le CAPI envoie les événements côté serveur pour un tracking plus fiable (bypass ad blockers).
+                  Le CAPI envoie les événements côté serveur pour un tracking
+                  plus fiable (bypass ad blockers).
                   {!config.accessToken && (
                     <span className="text-yellow-400 ml-1">
                       Entre ton Access Token pour générer le code CAPI.
@@ -612,7 +651,10 @@ export function PixelCAPIGenerator() {
                       </p>
                       <div className="relative">
                         <pre className="p-4 rounded-xl bg-bg-tertiary text-xs text-text-secondary overflow-x-auto max-h-80">
-                          {generateCAPIEndpoint(config.pixelId, config.accessToken)}
+                          {generateCAPIEndpoint(
+                            config.pixelId,
+                            config.accessToken,
+                          )}
                         </pre>
                         <Button
                           size="sm"
@@ -621,7 +663,10 @@ export function PixelCAPIGenerator() {
                           onClick={() =>
                             copy(
                               "capi-route",
-                              generateCAPIEndpoint(config.pixelId, config.accessToken)
+                              generateCAPIEndpoint(
+                                config.pixelId,
+                                config.accessToken,
+                              ),
                             )
                           }
                         >
@@ -646,7 +691,9 @@ export function PixelCAPIGenerator() {
                           size="sm"
                           variant="ghost"
                           className="absolute top-2 right-2"
-                          onClick={() => copy("capi-client", generateCAPIClientCall())}
+                          onClick={() =>
+                            copy("capi-client", generateCAPIClientCall())
+                          }
                         >
                           {copiedKey === "capi-client" ? (
                             <Check className="h-3.5 w-3.5 text-accent" />
@@ -661,7 +708,8 @@ export function PixelCAPIGenerator() {
                   <div className="p-6 text-center rounded-xl bg-bg-tertiary">
                     <Server className="h-8 w-8 text-text-muted mx-auto mb-2" />
                     <p className="text-sm text-text-secondary">
-                      Configure ton Access Token ci-dessus pour générer le code CAPI.
+                      Configure ton Access Token ci-dessus pour générer le code
+                      CAPI.
                     </p>
                   </div>
                 )}

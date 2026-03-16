@@ -98,7 +98,7 @@ export function NotificationsPanel({
             return next;
           });
           toast(newNotif.title, { description: newNotif.body || undefined });
-        }
+        },
       )
       .subscribe();
 
@@ -110,7 +110,7 @@ export function NotificationsPanel({
   async function handleMarkRead(id: string) {
     await markNotificationRead(id);
     setNotifications((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, read: true } : n))
+      prev.map((n) => (n.id === id ? { ...n, read: true } : n)),
     );
     setUnreadCount((prev) => {
       const next = Math.max(0, prev - 1);
@@ -175,7 +175,7 @@ export function NotificationsPanel({
                     "flex w-full items-start gap-3 rounded-xl p-3 text-left transition-colors",
                     !n.read
                       ? "bg-accent-muted hover:bg-accent-muted/60"
-                      : "hover:bg-bg-tertiary"
+                      : "hover:bg-bg-tertiary",
                   )}
                 >
                   <span className="mt-0.5 text-lg shrink-0">
@@ -188,7 +188,7 @@ export function NotificationsPanel({
                           "text-sm",
                           !n.read
                             ? "font-semibold text-text-primary"
-                            : "text-text-primary"
+                            : "text-text-primary",
                         )}
                       >
                         {n.title}

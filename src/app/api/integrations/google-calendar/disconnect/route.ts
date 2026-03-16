@@ -27,7 +27,7 @@ export async function POST() {
       try {
         await fetch(
           `https://oauth2.googleapis.com/revoke?token=${connection.access_token}`,
-          { method: "POST" }
+          { method: "POST" },
         );
       } catch {
         // Revocation failure is non-critical
@@ -45,7 +45,7 @@ export async function POST() {
   } catch {
     return NextResponse.json(
       { error: "Erreur lors de la déconnexion" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

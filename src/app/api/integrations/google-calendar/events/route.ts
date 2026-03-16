@@ -23,7 +23,7 @@ interface CalendarEvent {
 }
 
 async function refreshAccessToken(
-  refreshToken: string
+  refreshToken: string,
 ): Promise<{ access_token: string; expires_in: number } | null> {
   try {
     const clientId = process.env.GOOGLE_CLIENT_ID;
@@ -70,7 +70,7 @@ export async function GET() {
     if (!connection) {
       return NextResponse.json(
         { error: "Google Calendar non connecté", connected: false },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -92,7 +92,7 @@ export async function GET() {
           .update({
             access_token: refreshed.access_token,
             token_expires_at: new Date(
-              Date.now() + refreshed.expires_in * 1000
+              Date.now() + refreshed.expires_in * 1000,
             ).toISOString(),
           })
           .eq("user_id", user.id)
@@ -104,7 +104,7 @@ export async function GET() {
               "Impossible de rafraîchir le token. Reconnecte Google Calendar.",
             connected: false,
           },
-          { status: 401 }
+          { status: 401 },
         );
       }
     }
@@ -114,7 +114,7 @@ export async function GET() {
     const in30Days = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
 
     const calUrl = new URL(
-      "https://www.googleapis.com/calendar/v3/calendars/primary/events"
+      "https://www.googleapis.com/calendar/v3/calendars/primary/events",
     );
     calUrl.searchParams.set("timeMin", now.toISOString());
     calUrl.searchParams.set("timeMax", in30Days.toISOString());
@@ -133,12 +133,12 @@ export async function GET() {
             error: "Token expiré. Reconnecte Google Calendar.",
             connected: false,
           },
-          { status: 401 }
+          { status: 401 },
         );
       }
       return NextResponse.json(
         { error: "Erreur Google Calendar API" },
-        { status: 502 }
+        { status: 502 },
       );
     }
 
@@ -159,7 +159,7 @@ export async function GET() {
     console.error("Google Calendar events error:", error);
     return NextResponse.json(
       { error: "Erreur lors de la récupération des événements" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

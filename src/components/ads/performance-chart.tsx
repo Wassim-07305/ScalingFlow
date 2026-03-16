@@ -34,7 +34,12 @@ interface PerformanceChartProps {
 
 type MetricKey = "spend" | "roas" | "conversions" | "clicks";
 
-const METRICS: { key: MetricKey; label: string; color: string; suffix: string }[] = [
+const METRICS: {
+  key: MetricKey;
+  label: string;
+  color: string;
+  suffix: string;
+}[] = [
   { key: "roas", label: "ROAS", color: "#34D399", suffix: "x" },
   { key: "spend", label: "Dépense", color: "#60A5FA", suffix: " €" },
   { key: "conversions", label: "Conversions", color: "#A78BFA", suffix: "" },
@@ -69,7 +74,7 @@ export function PerformanceChart({ className }: PerformanceChartProps) {
       // Créer un map des données existantes
       const dataMap = new Map(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        ((dailyData ?? []) as any[]).map((d) => [d.date, d])
+        ((dailyData ?? []) as any[]).map((d) => [d.date, d]),
       );
 
       // Générer tous les jours des 30 derniers jours
@@ -95,7 +100,8 @@ export function PerformanceChart({ className }: PerformanceChartProps) {
         const previous = chartData.slice(-14, -7);
 
         const recentAvg = recent.reduce((s, d) => s + d[activeMetric], 0) / 7;
-        const previousAvg = previous.reduce((s, d) => s + d[activeMetric], 0) / 7;
+        const previousAvg =
+          previous.reduce((s, d) => s + d[activeMetric], 0) / 7;
 
         if (previousAvg > 0) {
           const change = ((recentAvg - previousAvg) / previousAvg) * 100;
@@ -167,14 +173,14 @@ export function PerformanceChart({ className }: PerformanceChartProps) {
           <div className="flex items-center gap-2">
             {trend === "up" && (
               <div className="flex items-center gap-1 text-accent text-xs">
-                <TrendingUp className="h-3.5 w-3.5" />
-                +{trendPercent.toFixed(1)}%
+                <TrendingUp className="h-3.5 w-3.5" />+{trendPercent.toFixed(1)}
+                %
               </div>
             )}
             {trend === "down" && (
               <div className="flex items-center gap-1 text-danger text-xs">
-                <TrendingDown className="h-3.5 w-3.5" />
-                -{trendPercent.toFixed(1)}%
+                <TrendingDown className="h-3.5 w-3.5" />-
+                {trendPercent.toFixed(1)}%
               </div>
             )}
             {trend === "stable" && (
@@ -195,7 +201,7 @@ export function PerformanceChart({ className }: PerformanceChartProps) {
                 "px-3 py-1.5 rounded-lg text-xs font-medium transition-all",
                 activeMetric === metric.key
                   ? "text-white"
-                  : "bg-bg-tertiary text-text-muted hover:text-text-primary"
+                  : "bg-bg-tertiary text-text-muted hover:text-text-primary",
               )}
               style={{
                 backgroundColor:

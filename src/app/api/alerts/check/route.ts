@@ -34,13 +34,16 @@ export async function POST() {
 
     // Run all alert rules in parallel
     const results = await Promise.allSettled(
-      ALERT_RULES.map((rule) => rule.check(supabase, user.id))
+      ALERT_RULES.map((rule) => rule.check(supabase, user.id)),
     );
 
     const alerts = results
       .filter(
-        (r): r is PromiseFulfilledResult<NonNullable<Awaited<ReturnType<(typeof ALERT_RULES)[0]["check"]>>>> =>
-          r.status === "fulfilled" && r.value !== null
+        (
+          r,
+        ): r is PromiseFulfilledResult<
+          NonNullable<Awaited<ReturnType<(typeof ALERT_RULES)[0]["check"]>>>
+        > => r.status === "fulfilled" && r.value !== null,
       )
       .map((r) => r.value);
 
@@ -62,7 +65,11 @@ export async function POST() {
     // Send email digest for danger/warning alerts (non-blocking)
     if (created > 0 && resend) {
       const newAlerts = alerts.filter((a) => !recentTitles.has(a.title));
-      if (newAlerts.some((a) => a.severity === "danger" || a.severity === "warning")) {
+      if (
+        newAlerts.some(
+          (a) => a.severity === "danger" || a.severity === "warning",
+        )
+      ) {
         try {
           const { data: profile } = await supabase
             .from("profiles")
@@ -76,7 +83,11 @@ export async function POST() {
           if (email) {
             const { subject, html } = kpiAlertEmail(
               firstName,
-              newAlerts.map((a) => ({ title: a.title, message: a.message, severity: a.severity }))
+              newAlerts.map((a) => ({
+                title: a.title,
+                message: a.message,
+                severity: a.severity,
+              })),
             );
             await resend.emails.send({
               from: "ScalingFlow <alerts@scalingflow.com>",
@@ -105,7 +116,7 @@ export async function POST() {
     console.error("[alerts/check] Error:", error);
     return NextResponse.json(
       { error: "Erreur lors de la vérification des alertes" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

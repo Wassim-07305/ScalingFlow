@@ -42,7 +42,12 @@ interface LeadDetailPanelProps {
   onDelete: (leadId: string) => void;
 }
 
-export function LeadDetailPanel({ lead, onClose, onUpdate, onDelete }: LeadDetailPanelProps) {
+export function LeadDetailPanel({
+  lead,
+  onClose,
+  onUpdate,
+  onDelete,
+}: LeadDetailPanelProps) {
   const supabase = createClient();
   const [activities, setActivities] = useState<PipelineActivity[]>([]);
   const [loadingActivities, setLoadingActivities] = useState(true);
@@ -153,7 +158,10 @@ export function LeadDetailPanel({ lead, onClose, onUpdate, onDelete }: LeadDetai
   return (
     <>
       {/* Backdrop */}
-      <div className="fixed inset-0 z-40 bg-black/60 backdrop-blur-md animate-in fade-in-0 duration-200" onClick={onClose} />
+      <div
+        className="fixed inset-0 z-40 bg-black/60 backdrop-blur-md animate-in fade-in-0 duration-200"
+        onClick={onClose}
+      />
 
       {/* Panel */}
       <div className="fixed right-0 top-0 z-50 h-full w-full max-w-lg border-l border-border-default bg-bg-primary overflow-y-auto shadow-2xl shadow-black/30 animate-in slide-in-from-right-full duration-300 ease-out">
@@ -165,12 +173,17 @@ export function LeadDetailPanel({ lead, onClose, onUpdate, onDelete }: LeadDetai
                 <User className="h-5 w-5 text-accent" />
               </div>
               <div>
-                <h2 className="text-base font-semibold text-text-primary">{lead.name}</h2>
+                <h2 className="text-base font-semibold text-text-primary">
+                  {lead.name}
+                </h2>
                 {statusConfig && (
-                  <span className={cn(
-                    "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium mt-0.5",
-                    statusConfig.bgColor, statusConfig.color
-                  )}>
+                  <span
+                    className={cn(
+                      "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium mt-0.5",
+                      statusConfig.bgColor,
+                      statusConfig.color,
+                    )}
+                  >
                     <span className="h-1.5 w-1.5 rounded-full bg-current" />
                     {statusConfig.label}
                   </span>
@@ -198,7 +211,10 @@ export function LeadDetailPanel({ lead, onClose, onUpdate, onDelete }: LeadDetai
                   <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-bg-tertiary shrink-0">
                     <Mail className="h-3.5 w-3.5 text-text-muted" />
                   </div>
-                  <a href={`mailto:${lead.email}`} className="hover:text-accent transition-colors">
+                  <a
+                    href={`mailto:${lead.email}`}
+                    className="hover:text-accent transition-colors"
+                  >
                     {lead.email}
                   </a>
                 </div>
@@ -208,7 +224,10 @@ export function LeadDetailPanel({ lead, onClose, onUpdate, onDelete }: LeadDetai
                   <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-bg-tertiary shrink-0">
                     <Phone className="h-3.5 w-3.5 text-text-muted" />
                   </div>
-                  <a href={`tel:${lead.phone}`} className="hover:text-accent transition-colors">
+                  <a
+                    href={`tel:${lead.phone}`}
+                    className="hover:text-accent transition-colors"
+                  >
                     {lead.phone}
                   </a>
                 </div>
@@ -245,7 +264,7 @@ export function LeadDetailPanel({ lead, onClose, onUpdate, onDelete }: LeadDetai
               className={cn(
                 "w-full rounded-xl border border-border-default bg-bg-tertiary px-3.5 py-2.5 text-sm text-text-primary",
                 "focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30 focus:shadow-sm focus:shadow-accent/10 transition-colors",
-                "[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                "[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none",
               )}
             />
           </div>
@@ -288,7 +307,10 @@ export function LeadDetailPanel({ lead, onClose, onUpdate, onDelete }: LeadDetai
             {loadingActivities ? (
               <div className="space-y-3">
                 {Array.from({ length: 3 }).map((_, i) => (
-                  <div key={i} className="flex gap-3 rounded-xl border border-border-default bg-bg-secondary/40 p-3">
+                  <div
+                    key={i}
+                    className="flex gap-3 rounded-xl border border-border-default bg-bg-secondary/40 p-3"
+                  >
                     <Skeleton className="h-6 w-6 rounded-full shrink-0" />
                     <div className="flex-1 space-y-1.5">
                       <Skeleton className="h-4 w-3/4" />
@@ -310,11 +332,16 @@ export function LeadDetailPanel({ lead, onClose, onUpdate, onDelete }: LeadDetai
                 <div className="absolute left-[14px] top-3 bottom-3 w-px bg-border-default" />
 
                 {activities.map((activity, i) => (
-                  <div key={activity.id} className="relative flex items-start gap-3 py-2.5 pl-0">
-                    <div className={cn(
-                      "relative z-10 flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-border-default bg-bg-secondary",
-                      i === 0 && "border-accent/40"
-                    )}>
+                  <div
+                    key={activity.id}
+                    className="relative flex items-start gap-3 py-2.5 pl-0"
+                  >
+                    <div
+                      className={cn(
+                        "relative z-10 flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-border-default bg-bg-secondary",
+                        i === 0 && "border-accent/40",
+                      )}
+                    >
                       {activity.old_status && activity.new_status ? (
                         <ArrowRight className="h-3 w-3 text-accent" />
                       ) : (
@@ -322,14 +349,19 @@ export function LeadDetailPanel({ lead, onClose, onUpdate, onDelete }: LeadDetai
                       )}
                     </div>
                     <div className="min-w-0 flex-1 pt-0.5">
-                      <p className="text-sm text-text-primary">{activity.action}</p>
+                      <p className="text-sm text-text-primary">
+                        {activity.action}
+                      </p>
                       {activity.old_status && activity.new_status && (
                         <p className="text-xs text-text-muted mt-0.5">
-                          {getStatusLabel(activity.old_status)} &rarr; {getStatusLabel(activity.new_status)}
+                          {getStatusLabel(activity.old_status)} &rarr;{" "}
+                          {getStatusLabel(activity.new_status)}
                         </p>
                       )}
                       {activity.notes && (
-                        <p className="text-xs text-text-muted mt-1">{activity.notes}</p>
+                        <p className="text-xs text-text-muted mt-1">
+                          {activity.notes}
+                        </p>
                       )}
                       <p className="text-[11px] text-text-muted mt-1">
                         {formatDate(activity.created_at)}

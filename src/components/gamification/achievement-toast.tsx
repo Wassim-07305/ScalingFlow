@@ -86,7 +86,10 @@ function triggerConfetti() {
   });
 }
 
-export function AchievementToast({ achievement, onClose }: AchievementToastProps) {
+export function AchievementToast({
+  achievement,
+  onClose,
+}: AchievementToastProps) {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
@@ -123,14 +126,14 @@ export function AchievementToast({ achievement, onClose }: AchievementToastProps
             className={cn(
               "relative overflow-hidden rounded-2xl border border-white/10",
               "bg-bg-secondary/95 backdrop-blur-xl shadow-2xl",
-              "min-w-[320px] max-w-[400px]"
+              "min-w-[320px] max-w-[400px]",
             )}
           >
             {/* Gradient background effect */}
             <div
               className={cn(
                 "absolute inset-0 opacity-20 bg-gradient-to-r",
-                config.color
+                config.color,
               )}
             />
 
@@ -162,7 +165,7 @@ export function AchievementToast({ achievement, onClose }: AchievementToastProps
                   transition={{ type: "spring", delay: 0.2, damping: 10 }}
                   className={cn(
                     "flex h-14 w-14 items-center justify-center rounded-2xl shrink-0",
-                    config.bgColor
+                    config.bgColor,
                   )}
                 >
                   <Icon className={cn("h-7 w-7 text-white")} />
@@ -177,7 +180,7 @@ export function AchievementToast({ achievement, onClose }: AchievementToastProps
                     className={cn(
                       "text-xs font-semibold uppercase tracking-wider mb-1",
                       "bg-gradient-to-r bg-clip-text text-transparent",
-                      config.color
+                      config.color,
                     )}
                   >
                     {config.label}
@@ -211,8 +214,7 @@ export function AchievementToast({ achievement, onClose }: AchievementToastProps
                       transition={{ delay: 0.4 }}
                       className="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-accent/20 text-accent text-sm font-semibold"
                     >
-                      <Zap className="h-4 w-4" />
-                      +{achievement.xp} XP
+                      <Zap className="h-4 w-4" />+{achievement.xp} XP
                     </motion.div>
                   )}
                 </div>

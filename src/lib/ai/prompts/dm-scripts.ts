@@ -11,10 +11,7 @@ export interface DMScriptsResult {
   }[];
 }
 
-export function buildDMScriptsPrompt(
-  offer: string,
-  avatar: string
-): string {
+export function buildDMScriptsPrompt(offer: string, avatar: string): string {
   return `Tu es un expert en prospection par messages directs (DM) sur Instagram, LinkedIn et Twitter pour les freelances et consultants.
 
 ## Offre

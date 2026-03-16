@@ -38,7 +38,10 @@ interface OfferScoreCardProps {
 export function OfferScoreCard({ offerId, className }: OfferScoreCardProps) {
   const [loading, setLoading] = React.useState(false);
   const [score, setScore] = React.useState<OfferScoreResult | null>(null);
-  const [usageLimited, setUsageLimited] = React.useState<{currentUsage: number; limit: number} | null>(null);
+  const [usageLimited, setUsageLimited] = React.useState<{
+    currentUsage: number;
+    limit: number;
+  } | null>(null);
 
   const handleScore = async () => {
     if (!offerId) {
@@ -58,7 +61,10 @@ export function OfferScoreCard({ offerId, className }: OfferScoreCardProps) {
 
       if (!response.ok) {
         const errData = await response.json().catch(() => ({}));
-        if (response.status === 403 && errData.usage) { setUsageLimited(errData.usage); return; }
+        if (response.status === 403 && errData.usage) {
+          setUsageLimited(errData.usage);
+          return;
+        }
         throw new Error(errData.error || "Erreur lors de la génération");
       }
 
@@ -66,18 +72,31 @@ export function OfferScoreCard({ offerId, className }: OfferScoreCardProps) {
       setScore(data);
       toast.success("Évaluation terminée !");
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Une erreur est survenue");
+      toast.error(
+        err instanceof Error ? err.message : "Une erreur est survenue",
+      );
     } finally {
       setLoading(false);
     }
   };
 
   if (usageLimited) {
-    return <UpgradeWall currentUsage={usageLimited.currentUsage} limit={usageLimited.limit} className={className} />;
+    return (
+      <UpgradeWall
+        currentUsage={usageLimited.currentUsage}
+        limit={usageLimited.limit}
+        className={className}
+      />
+    );
   }
 
   if (loading) {
-    return <AILoading text="Évaluation de ton offre en cours" className={className} />;
+    return (
+      <AILoading
+        text="Évaluation de ton offre en cours"
+        className={className}
+      />
+    );
   }
 
   if (!score) {
@@ -93,7 +112,8 @@ export function OfferScoreCard({ offerId, className }: OfferScoreCardProps) {
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-sm text-text-secondary">
-                L&apos;IA va évaluer ton offre sur 6 critères et te donner un score sur 100 avec des recommandations d&apos;amélioration.
+                L&apos;IA va évaluer ton offre sur 6 critères et te donner un
+                score sur 100 avec des recommandations d&apos;amélioration.
               </p>
               <Button size="lg" onClick={handleScore}>
                 <Sparkles className="h-4 w-4 mr-2" />
@@ -116,19 +136,19 @@ export function OfferScoreCard({ offerId, className }: OfferScoreCardProps) {
     score.score_total >= 80
       ? "text-accent"
       : score.score_total >= 70
-      ? "text-info"
-      : score.score_total >= 50
-      ? "text-warning"
-      : "text-danger";
+        ? "text-info"
+        : score.score_total >= 50
+          ? "text-warning"
+          : "text-danger";
 
   const scoreBgColor =
     score.score_total >= 80
       ? "bg-accent"
       : score.score_total >= 70
-      ? "bg-info"
-      : score.score_total >= 50
-      ? "bg-warning"
-      : "bg-danger";
+        ? "bg-info"
+        : score.score_total >= 50
+          ? "bg-warning"
+          : "bg-danger";
 
   return (
     <div className={cn("space-y-6", className)}>
@@ -168,7 +188,9 @@ export function OfferScoreCard({ offerId, className }: OfferScoreCardProps) {
                 </div>
               </div>
               <div>
-                <p className="text-lg font-semibold text-text-primary">Score global</p>
+                <p className="text-lg font-semibold text-text-primary">
+                  Score global
+                </p>
                 <p className="text-sm text-text-secondary">sur 100 points</p>
               </div>
             </div>
@@ -179,7 +201,7 @@ export function OfferScoreCard({ offerId, className }: OfferScoreCardProps) {
                 "flex items-center gap-2 px-4 py-2 rounded-xl",
                 score.quality_gate_passed
                   ? "bg-accent-muted text-accent"
-                  : "bg-danger/12 text-danger"
+                  : "bg-danger/12 text-danger",
               )}
             >
               {score.quality_gate_passed ? (
@@ -188,7 +210,9 @@ export function OfferScoreCard({ offerId, className }: OfferScoreCardProps) {
                 <XCircle className="h-5 w-5" />
               )}
               <span className="text-sm font-medium">
-                {score.quality_gate_passed ? "Quality Gate passe" : "Quality Gate echoue"}
+                {score.quality_gate_passed
+                  ? "Quality Gate passe"
+                  : "Quality Gate echoue"}
               </span>
             </div>
           </div>
@@ -227,10 +251,10 @@ export function OfferScoreCard({ offerId, className }: OfferScoreCardProps) {
               percent >= 80
                 ? "bg-accent"
                 : percent >= 60
-                ? "bg-info"
-                : percent >= 40
-                ? "bg-warning"
-                : "bg-danger";
+                  ? "bg-info"
+                  : percent >= 40
+                    ? "bg-warning"
+                    : "bg-danger";
 
             return (
               <div key={key} className="space-y-2">
@@ -244,7 +268,10 @@ export function OfferScoreCard({ offerId, className }: OfferScoreCardProps) {
                 </div>
                 <div className="h-2 rounded-full bg-bg-tertiary overflow-hidden">
                   <div
-                    className={cn("h-full rounded-full transition-all duration-500", barColor)}
+                    className={cn(
+                      "h-full rounded-full transition-all duration-500",
+                      barColor,
+                    )}
                     style={{ width: `${percent}%` }}
                   />
                 </div>

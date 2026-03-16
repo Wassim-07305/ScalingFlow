@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
     if (!rl.allowed) {
       return NextResponse.json(
         { error: "Trop de requêtes. Réessaie dans quelques secondes." },
-        { status: 429 }
+        { status: 429 },
       );
     }
 
@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
     if (!usage.allowed) {
       return NextResponse.json(
         { error: "Limite de générations IA atteinte", usage },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
     if (!moduleId || !moduleTitle) {
       return NextResponse.json(
         { error: "moduleId et moduleTitle sont requis" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -95,7 +95,7 @@ Réponds UNIQUEMENT en JSON valide avec cette structure :
     const errMsg = error instanceof Error ? error.message : String(error);
     return NextResponse.json(
       { error: `Erreur lors de la génération du quiz : ${errMsg}` },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

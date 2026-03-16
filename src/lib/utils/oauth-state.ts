@@ -8,7 +8,11 @@ import { createHmac, randomBytes } from "crypto";
 
 function getSecret(): string {
   // Use a dedicated secret or fall back to SUPABASE_SERVICE_ROLE_KEY
-  return process.env.OAUTH_STATE_SECRET || process.env.SUPABASE_SERVICE_ROLE_KEY || "fallback-dev-only";
+  return (
+    process.env.OAUTH_STATE_SECRET ||
+    process.env.SUPABASE_SERVICE_ROLE_KEY ||
+    "fallback-dev-only"
+  );
 }
 
 /**
@@ -19,7 +23,9 @@ export function createOAuthState(userId: string): string {
   const nonce = randomBytes(16).toString("hex");
   const payload = JSON.stringify({ userId, nonce });
   const sig = createHmac("sha256", getSecret()).update(payload).digest("hex");
-  return Buffer.from(JSON.stringify({ userId, nonce, sig })).toString("base64url");
+  return Buffer.from(JSON.stringify({ userId, nonce, sig })).toString(
+    "base64url",
+  );
 }
 
 /**
@@ -34,7 +40,9 @@ export function verifyOAuthState(state: string): string | null {
     if (!userId || !nonce || !sig) return null;
 
     const payload = JSON.stringify({ userId, nonce });
-    const expectedSig = createHmac("sha256", getSecret()).update(payload).digest("hex");
+    const expectedSig = createHmac("sha256", getSecret())
+      .update(payload)
+      .digest("hex");
 
     // Constant-time comparison
     if (sig.length !== expectedSig.length) return null;

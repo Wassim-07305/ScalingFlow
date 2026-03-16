@@ -55,7 +55,11 @@ interface FunnelData {
 type PreviewTab = "optin" | "vsl" | "thankyou";
 type ViewMode = "desktop" | "mobile";
 
-const PREVIEW_TABS: { key: PreviewTab; label: string; icon: React.ElementType }[] = [
+const PREVIEW_TABS: {
+  key: PreviewTab;
+  label: string;
+  icon: React.ElementType;
+}[] = [
   { key: "optin", label: "Opt-in", icon: FileText },
   { key: "vsl", label: "VSL", icon: Video },
   { key: "thankyou", label: "Remerciements", icon: Gift },
@@ -105,7 +109,9 @@ export function FunnelPreview({
         // Fetch latest funnel
         const { data: funnel } = await supabase
           .from("funnels")
-          .select("ai_raw_response, optin_page, vsl_page, thankyou_page, funnel_name")
+          .select(
+            "ai_raw_response, optin_page, vsl_page, thankyou_page, funnel_name",
+          )
           .eq("user_id", user.id)
           .order("created_at", { ascending: false })
           .limit(1)
@@ -160,7 +166,7 @@ export function FunnelPreview({
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       funnelData as any,
       activeTab,
-      { brandName: funnelName, theme }
+      { brandName: funnelName, theme },
     );
   }, [funnelData, activeTab, funnelName, theme]);
 
@@ -183,7 +189,9 @@ export function FunnelPreview({
     return (
       <div className={cn("flex items-center justify-center py-20", className)}>
         <Loader2 className="h-6 w-6 animate-spin text-accent mr-3" />
-        <span className="text-text-secondary">Chargement de la prévisualisation...</span>
+        <span className="text-text-secondary">
+          Chargement de la prévisualisation...
+        </span>
       </div>
     );
   }
@@ -194,9 +202,12 @@ export function FunnelPreview({
       <Card className={className}>
         <CardContent className="flex flex-col items-center justify-center py-16 text-center">
           <AlertCircle className="h-10 w-10 text-text-muted mb-4" />
-          <p className="text-text-secondary font-medium mb-2">Aucun funnel à prévisualiser</p>
+          <p className="text-text-secondary font-medium mb-2">
+            Aucun funnel à prévisualiser
+          </p>
           <p className="text-text-muted text-sm max-w-md">
-            Génère d&apos;abord un funnel depuis l&apos;onglet &quot;Générer&quot; pour voir la prévisualisation ici.
+            Génère d&apos;abord un funnel depuis l&apos;onglet
+            &quot;Générer&quot; pour voir la prévisualisation ici.
           </p>
         </CardContent>
       </Card>
@@ -220,7 +231,7 @@ export function FunnelPreview({
                   "flex items-center gap-2 px-3.5 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap",
                   isActive
                     ? "bg-accent/15 text-accent border border-accent/30"
-                    : "text-text-secondary hover:text-text-primary hover:bg-white/[0.04]"
+                    : "text-text-secondary hover:text-text-primary hover:bg-white/[0.04]",
                 )}
               >
                 <Icon className="h-4 w-4" />
@@ -258,7 +269,7 @@ export function FunnelPreview({
                 "flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium transition-colors",
                 viewMode === "desktop"
                   ? "bg-accent/15 text-accent"
-                  : "text-text-muted hover:text-text-primary"
+                  : "text-text-muted hover:text-text-primary",
               )}
             >
               <Monitor className="h-3.5 w-3.5" />
@@ -270,7 +281,7 @@ export function FunnelPreview({
                 "flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium transition-colors border-l border-border-default",
                 viewMode === "mobile"
                   ? "bg-accent/15 text-accent"
-                  : "text-text-muted hover:text-text-primary"
+                  : "text-text-muted hover:text-text-primary",
               )}
             >
               <Smartphone className="h-3.5 w-3.5" />
@@ -297,9 +308,7 @@ export function FunnelPreview({
         <div
           className={cn(
             "relative rounded-2xl border-2 border-border-default bg-[#0B0E11] overflow-hidden transition-all duration-300",
-            viewMode === "desktop"
-              ? "w-full max-w-5xl"
-              : "w-[390px]"
+            viewMode === "desktop" ? "w-full max-w-5xl" : "w-[390px]",
           )}
           style={{
             height: viewMode === "desktop" ? "680px" : "780px",
@@ -309,7 +318,7 @@ export function FunnelPreview({
           <div
             className={cn(
               "flex items-center gap-2 px-4 border-b border-border-default bg-[#141719]",
-              viewMode === "desktop" ? "h-10" : "h-7 justify-center"
+              viewMode === "desktop" ? "h-10" : "h-7 justify-center",
             )}
           >
             {viewMode === "desktop" ? (
@@ -321,7 +330,8 @@ export function FunnelPreview({
                 </div>
                 <div className="flex-1 mx-8">
                   <div className="bg-white/5 rounded-md px-3 py-0.5 text-[10px] text-text-muted text-center truncate">
-                    https://{funnelName.toLowerCase().replace(/\s+/g, "-")}.scalingflow.com
+                    https://{funnelName.toLowerCase().replace(/\s+/g, "-")}
+                    .scalingflow.com
                   </div>
                 </div>
               </>

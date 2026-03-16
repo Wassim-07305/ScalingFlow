@@ -13,7 +13,7 @@ const FROM = "ScalingFlow <noreply@scalingflow.com>";
 /** Résout le template a partir de son nom + data arbitraire. */
 function resolveTemplate(
   template: string,
-  data: Record<string, unknown>
+  data: Record<string, unknown>,
 ): { subject: string; html: string } | null {
   const firstName = (data.firstName as string) ?? "Utilisateur";
 
@@ -24,21 +24,18 @@ function resolveTemplate(
     case "generation-complete":
       return generationCompleteEmail(
         firstName,
-        (data.generationType as string) ?? "Contenu"
+        (data.generationType as string) ?? "Contenu",
       );
 
     case "milestone":
       return milestoneEmail(
         firstName,
         (data.milestone as string) ?? "Nouveau niveau",
-        (data.xp as number) ?? 0
+        (data.xp as number) ?? 0,
       );
 
     case "streak-reminder":
-      return streakReminderEmail(
-        firstName,
-        (data.streakDays as number) ?? 1
-      );
+      return streakReminderEmail(firstName, (data.streakDays as number) ?? 1);
 
     default:
       return null;
@@ -50,7 +47,7 @@ export async function POST(request: Request) {
   if (!resend) {
     return NextResponse.json(
       { error: "Service email non configuré" },
-      { status: 503 }
+      { status: 503 },
     );
   }
 
@@ -62,10 +59,7 @@ export async function POST(request: Request) {
   } = await supabase.auth.getUser();
 
   if (authError || !user) {
-    return NextResponse.json(
-      { error: "Non authentifié" },
-      { status: 401 }
-    );
+    return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
   }
 
   // Parser le body
@@ -77,7 +71,7 @@ export async function POST(request: Request) {
   if (!body.template) {
     return NextResponse.json(
       { error: "Le champ 'template' est requis" },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -87,7 +81,7 @@ export async function POST(request: Request) {
   if (!emailContent) {
     return NextResponse.json(
       { error: `Template inconnu : ${body.template}` },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -102,7 +96,7 @@ export async function POST(request: Request) {
   if (error) {
     return NextResponse.json(
       { error: "Échec de l'envoi de l'email" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 

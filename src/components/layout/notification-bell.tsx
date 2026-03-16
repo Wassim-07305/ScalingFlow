@@ -27,7 +27,10 @@ export function NotificationBell() {
           )}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-80 max-h-96 overflow-y-auto">
+      <DropdownMenuContent
+        align="end"
+        className="w-80 max-h-96 overflow-y-auto"
+      >
         <div className="flex items-center justify-between px-3 py-2 border-b border-border-default">
           <span className="text-sm font-semibold text-text-primary">
             Notifications
@@ -46,9 +49,7 @@ export function NotificationBell() {
         {notifications.length === 0 ? (
           <div className="py-8 text-center">
             <Bell className="h-8 w-8 text-text-muted mx-auto mb-2" />
-            <p className="text-sm text-text-secondary">
-              Aucune notification
-            </p>
+            <p className="text-sm text-text-secondary">Aucune notification</p>
           </div>
         ) : (
           <div className="py-1">
@@ -58,7 +59,7 @@ export function NotificationBell() {
                 onClick={() => !n.read && markAsRead(n.id)}
                 className={cn(
                   "w-full text-left px-3 py-2.5 hover:bg-bg-tertiary transition-colors",
-                  !n.read && "bg-accent/5"
+                  !n.read && "bg-accent/5",
                 )}
               >
                 <div className="flex items-start gap-2">

@@ -32,31 +32,156 @@ import type { NavItem, NavSection } from "@/lib/types/appshell";
 // ─── Tous les items de navigation ─────────────────────────────
 
 export const NAV_ITEMS: NavItem[] = [
-  { label: "Dashboard", href: "/", icon: LayoutDashboard, roles: ["user", "student", "admin", "coach"] },
-  { label: "Vault", href: "/vault", icon: Archive, roles: ["user", "student", "admin", "coach"] },
-  { label: "Marché", href: "/market", icon: Globe, roles: ["user", "student", "admin", "coach"] },
-  { label: "Offre", href: "/offer", icon: Package, roles: ["user", "student", "admin", "coach"] },
-  { label: "Marque", href: "/brand", icon: Palette, roles: ["user", "student", "admin", "coach"] },
-  { label: "Funnel", href: "/funnel", icon: Filter, roles: ["user", "student", "admin", "coach"] },
-  { label: "Assets", href: "/assets", icon: FileText, roles: ["user", "student", "admin", "coach"] },
-  { label: "Ads", href: "/ads", icon: Megaphone, roles: ["user", "student", "admin", "coach"] },
-  { label: "Contenu", href: "/content", icon: PenTool, roles: ["user", "student", "admin", "coach"] },
-  { label: "Prospection", href: "/prospection", icon: MessageSquare, roles: ["user", "student", "admin", "coach"] },
-  { label: "Pipeline", href: "/pipeline", icon: Kanban, roles: ["user", "student", "admin", "coach"] },
-  { label: "Clients", href: "/clients", icon: UserCheck, roles: ["user", "student", "admin", "coach"] },
-  { label: "Vente", href: "/sales", icon: Handshake, roles: ["user", "student", "admin", "coach"] },
-  { label: "Calendrier", href: "/calendar", icon: Calendar, roles: ["user", "student", "admin", "coach"] },
-  { label: "Lancement", href: "/launch", icon: Rocket, roles: ["user", "student", "admin", "coach"] },
-  { label: "Analytics", href: "/analytics", icon: BarChart3, roles: ["user", "student", "admin", "coach"] },
-  { label: "Academy", href: "/academy", icon: GraduationCap, roles: ["user", "student", "admin", "coach"] },
-  { label: "Roadmap", href: "/roadmap", icon: Map, roles: ["user", "student", "admin", "coach"] },
-  { label: "Progression", href: "/progress", icon: TrendingUp, roles: ["user", "student", "admin", "coach"] },
-  { label: "Leaderboard", href: "/leaderboard", icon: Trophy, roles: ["user", "student", "admin", "coach"] },
-  { label: "Communauté", href: "/community", icon: Users, roles: ["user", "student", "admin", "coach"] },
-  { label: "Activité", href: "/activity-log", icon: Activity, roles: ["user", "student", "admin", "coach"] },
-  { label: "Drive", href: "/drive", icon: HardDrive, roles: ["user", "student", "admin", "coach"] },
-  { label: "Assistant IA", href: "/assistant", icon: Bot, roles: ["user", "student", "admin", "coach"] },
-  { label: "Portail", href: "/portal", icon: Building2, roles: ["user", "student", "admin", "coach"] },
+  {
+    label: "Dashboard",
+    href: "/",
+    icon: LayoutDashboard,
+    roles: ["user", "student", "admin", "coach"],
+  },
+  {
+    label: "Vault",
+    href: "/vault",
+    icon: Archive,
+    roles: ["user", "student", "admin", "coach"],
+  },
+  {
+    label: "Marché",
+    href: "/market",
+    icon: Globe,
+    roles: ["user", "student", "admin", "coach"],
+  },
+  {
+    label: "Offre",
+    href: "/offer",
+    icon: Package,
+    roles: ["user", "student", "admin", "coach"],
+  },
+  {
+    label: "Marque",
+    href: "/brand",
+    icon: Palette,
+    roles: ["user", "student", "admin", "coach"],
+  },
+  {
+    label: "Funnel",
+    href: "/funnel",
+    icon: Filter,
+    roles: ["user", "student", "admin", "coach"],
+  },
+  {
+    label: "Assets",
+    href: "/assets",
+    icon: FileText,
+    roles: ["user", "student", "admin", "coach"],
+  },
+  {
+    label: "Ads",
+    href: "/ads",
+    icon: Megaphone,
+    roles: ["user", "student", "admin", "coach"],
+  },
+  {
+    label: "Contenu",
+    href: "/content",
+    icon: PenTool,
+    roles: ["user", "student", "admin", "coach"],
+  },
+  {
+    label: "Prospection",
+    href: "/prospection",
+    icon: MessageSquare,
+    roles: ["user", "student", "admin", "coach"],
+  },
+  {
+    label: "Pipeline",
+    href: "/pipeline",
+    icon: Kanban,
+    roles: ["user", "student", "admin", "coach"],
+  },
+  {
+    label: "Clients",
+    href: "/clients",
+    icon: UserCheck,
+    roles: ["user", "student", "admin", "coach"],
+  },
+  {
+    label: "Vente",
+    href: "/sales",
+    icon: Handshake,
+    roles: ["user", "student", "admin", "coach"],
+  },
+  {
+    label: "Calendrier",
+    href: "/calendar",
+    icon: Calendar,
+    roles: ["user", "student", "admin", "coach"],
+  },
+  {
+    label: "Lancement",
+    href: "/launch",
+    icon: Rocket,
+    roles: ["user", "student", "admin", "coach"],
+  },
+  {
+    label: "Analytics",
+    href: "/analytics",
+    icon: BarChart3,
+    roles: ["user", "student", "admin", "coach"],
+  },
+  {
+    label: "Academy",
+    href: "/academy",
+    icon: GraduationCap,
+    roles: ["user", "student", "admin", "coach"],
+  },
+  {
+    label: "Roadmap",
+    href: "/roadmap",
+    icon: Map,
+    roles: ["user", "student", "admin", "coach"],
+  },
+  {
+    label: "Progression",
+    href: "/progress",
+    icon: TrendingUp,
+    roles: ["user", "student", "admin", "coach"],
+  },
+  {
+    label: "Leaderboard",
+    href: "/leaderboard",
+    icon: Trophy,
+    roles: ["user", "student", "admin", "coach"],
+  },
+  {
+    label: "Communauté",
+    href: "/community",
+    icon: Users,
+    roles: ["user", "student", "admin", "coach"],
+  },
+  {
+    label: "Activité",
+    href: "/activity-log",
+    icon: Activity,
+    roles: ["user", "student", "admin", "coach"],
+  },
+  {
+    label: "Drive",
+    href: "/drive",
+    icon: HardDrive,
+    roles: ["user", "student", "admin", "coach"],
+  },
+  {
+    label: "Assistant IA",
+    href: "/assistant",
+    icon: Bot,
+    roles: ["user", "student", "admin", "coach"],
+  },
+  {
+    label: "Portail",
+    href: "/portal",
+    icon: Building2,
+    roles: ["user", "student", "admin", "coach"],
+  },
   { label: "Admin", href: "/admin", icon: ShieldCheck, roles: ["admin"] },
 ];
 
@@ -70,37 +195,45 @@ export const NAV_SECTIONS: NavSection[] = [
   {
     label: "Business",
     items: NAV_ITEMS.filter((i) =>
-      ["/vault", "/market", "/offer", "/brand"].includes(i.href)
+      ["/vault", "/market", "/offer", "/brand"].includes(i.href),
     ),
   },
   {
     label: "Acquisition",
     items: NAV_ITEMS.filter((i) =>
-      ["/funnel", "/assets", "/ads", "/content", "/prospection", "/clients", "/pipeline", "/sales", "/calendar"].includes(i.href)
+      [
+        "/funnel",
+        "/assets",
+        "/ads",
+        "/content",
+        "/prospection",
+        "/clients",
+        "/pipeline",
+        "/sales",
+        "/calendar",
+      ].includes(i.href),
     ),
   },
   {
     label: "Performance",
-    items: NAV_ITEMS.filter((i) =>
-      ["/launch", "/analytics"].includes(i.href)
-    ),
+    items: NAV_ITEMS.filter((i) => ["/launch", "/analytics"].includes(i.href)),
   },
   {
     label: "Formation",
-    items: NAV_ITEMS.filter((i) =>
-      ["/academy", "/roadmap"].includes(i.href)
-    ),
+    items: NAV_ITEMS.filter((i) => ["/academy", "/roadmap"].includes(i.href)),
   },
   {
     label: "Gamification",
     items: NAV_ITEMS.filter((i) =>
-      ["/progress", "/leaderboard", "/community", "/activity-log"].includes(i.href)
+      ["/progress", "/leaderboard", "/community", "/activity-log"].includes(
+        i.href,
+      ),
     ),
   },
   {
     label: "Outils",
     items: NAV_ITEMS.filter((i) =>
-      ["/drive", "/assistant", "/portal", "/admin"].includes(i.href)
+      ["/drive", "/assistant", "/portal", "/admin"].includes(i.href),
     ),
   },
 ];

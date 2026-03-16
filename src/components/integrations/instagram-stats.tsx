@@ -155,10 +155,7 @@ export function InstagramStats() {
               {/* Stats skeleton */}
               <div className="grid grid-cols-3 gap-3">
                 {[1, 2, 3].map((i) => (
-                  <div
-                    key={i}
-                    className="h-20 rounded-xl bg-bg-tertiary"
-                  />
+                  <div key={i} className="h-20 rounded-xl bg-bg-tertiary" />
                 ))}
               </div>
             </div>
@@ -295,7 +292,7 @@ export function InstagramStats() {
                   className={cn(
                     "rounded-xl bg-gradient-to-br p-4 text-center border transition-all duration-300 hover:scale-[1.03] hover:shadow-lg",
                     stat.gradient,
-                    stat.borderColor
+                    stat.borderColor,
                   )}
                 >
                   <Icon

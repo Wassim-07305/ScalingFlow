@@ -5,7 +5,7 @@ export function adSpyPrompt(
     industry: string;
     platform: string;
   },
-  scrapedData?: string
+  scrapedData?: string,
 ): string {
   const scrapedSection = scrapedData
     ? `\n## DONNÉES RÉELLES SCRAPÉES DU SITE WEB DU CONCURRENT

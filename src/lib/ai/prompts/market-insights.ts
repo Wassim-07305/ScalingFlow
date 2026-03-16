@@ -21,9 +21,21 @@ export interface MarketInsight {
 }
 
 export interface PainLayer {
-  surface_symptoms: Array<{ symptom: string; frequency: number; exact_quotes: string[] }>;
-  root_causes: Array<{ cause: string; frequency: number; exact_quotes: string[] }>;
-  triggering_events: Array<{ event: string; frequency: number; exact_quotes: string[] }>;
+  surface_symptoms: Array<{
+    symptom: string;
+    frequency: number;
+    exact_quotes: string[];
+  }>;
+  root_causes: Array<{
+    cause: string;
+    frequency: number;
+    exact_quotes: string[];
+  }>;
+  triggering_events: Array<{
+    event: string;
+    frequency: number;
+    exact_quotes: string[];
+  }>;
 }
 
 export interface MarketInsightsResult {

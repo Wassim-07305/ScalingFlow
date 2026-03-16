@@ -24,7 +24,8 @@ export default function RootError({
           Une erreur est survenue
         </h2>
         <p className="max-w-md text-sm text-text-secondary">
-          {error.message || "Une erreur inattendue s'est produite. Veuillez réessayer."}
+          {error.message ||
+            "Une erreur inattendue s'est produite. Veuillez réessayer."}
         </p>
         {error.digest && (
           <p className="text-xs text-text-muted">Ref: {error.digest}</p>

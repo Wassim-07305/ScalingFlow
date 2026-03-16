@@ -24,7 +24,9 @@ export async function GET() {
       : (result as { items?: Array<Record<string, unknown>> }).items || [];
 
     const accounts = items.map((account: Record<string, unknown>) => {
-      const connParams = account.connection_params as Record<string, unknown> | undefined;
+      const connParams = account.connection_params as
+        | Record<string, unknown>
+        | undefined;
       const im = connParams?.im as Record<string, unknown> | undefined;
 
       return {
@@ -42,7 +44,7 @@ export async function GET() {
     console.error("[Unipile Accounts]", error);
     return NextResponse.json(
       { error: "Erreur lors de la récupération des comptes" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

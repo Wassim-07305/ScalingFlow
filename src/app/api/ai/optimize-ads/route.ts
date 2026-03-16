@@ -72,7 +72,7 @@ Génère entre 4 et 8 recommandations, triées par impact décroissant. Sois con
     console.error("Optimize ads error:", error);
     return NextResponse.json(
       { error: "Erreur lors de l'optimisation" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

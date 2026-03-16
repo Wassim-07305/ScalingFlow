@@ -4,7 +4,7 @@ export function funnelCopyPrompt(
     positioning: string;
     unique_mechanism: string;
   },
-  avatar: Record<string, unknown>
+  avatar: Record<string, unknown>,
 ): string {
   return `Tu es un expert en copywriting de funnels de vente pour les freelances et consultants dans le domaine de l'IA et de l'automatisation.
 

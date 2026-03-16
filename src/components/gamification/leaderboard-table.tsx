@@ -6,7 +6,15 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Trophy, Flame, TrendingUp, TrendingDown, Minus, ChevronDown, Star } from "lucide-react";
+import {
+  Trophy,
+  Flame,
+  TrendingUp,
+  TrendingDown,
+  Minus,
+  ChevronDown,
+  Star,
+} from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useUser } from "@/hooks/use-user";
 
@@ -39,7 +47,10 @@ export function LeaderboardTable({ className }: LeaderboardTableProps) {
 
     const { data, error, count } = await supabase
       .from("leaderboard_scores")
-      .select("*, profiles(id, full_name, avatar_url, level, streak_days, xp_points)", { count: "exact" })
+      .select(
+        "*, profiles(id, full_name, avatar_url, level, streak_days, xp_points)",
+        { count: "exact" },
+      )
       .order("composite_score", { ascending: false })
       .range(offset, offset + PAGE_SIZE - 1);
 
@@ -62,8 +73,11 @@ export function LeaderboardTable({ className }: LeaderboardTableProps) {
       const currentRank = offset + index + 1;
       const previousRank = (row.rank_position as number | null) ?? currentRank;
       const change: "up" | "down" | "same" =
-        previousRank > currentRank ? "up" :
-        previousRank < currentRank ? "down" : "same";
+        previousRank > currentRank
+          ? "up"
+          : previousRank < currentRank
+            ? "down"
+            : "same";
 
       return {
         rank: currentRank,
@@ -83,7 +97,10 @@ export function LeaderboardTable({ className }: LeaderboardTableProps) {
 
       const { data, error, count } = await supabase
         .from("leaderboard_scores")
-        .select("*, profiles(id, full_name, avatar_url, level, streak_days, xp_points)", { count: "exact" })
+        .select(
+          "*, profiles(id, full_name, avatar_url, level, streak_days, xp_points)",
+          { count: "exact" },
+        )
         .order("composite_score", { ascending: false })
         .limit(PAGE_SIZE);
 
@@ -92,32 +109,38 @@ export function LeaderboardTable({ className }: LeaderboardTableProps) {
         setHasMore(data.length >= PAGE_SIZE);
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const mapped: LeaderboardEntry[] = (data as any[]).map((row: any, index: number) => {
-          const profile = row.profiles as {
-            id: string;
-            full_name: string | null;
-            avatar_url: string | null;
-            level: number;
-            streak_days: number;
-            xp_points: number;
-          } | null;
+        const mapped: LeaderboardEntry[] = (data as any[]).map(
+          (row: any, index: number) => {
+            const profile = row.profiles as {
+              id: string;
+              full_name: string | null;
+              avatar_url: string | null;
+              level: number;
+              streak_days: number;
+              xp_points: number;
+            } | null;
 
-          const currentRank = index + 1;
-          const previousRank = (row.rank_position as number | null) ?? currentRank;
-          const change: "up" | "down" | "same" =
-            previousRank > currentRank ? "up" :
-            previousRank < currentRank ? "down" : "same";
+            const currentRank = index + 1;
+            const previousRank =
+              (row.rank_position as number | null) ?? currentRank;
+            const change: "up" | "down" | "same" =
+              previousRank > currentRank
+                ? "up"
+                : previousRank < currentRank
+                  ? "down"
+                  : "same";
 
-          return {
-            rank: currentRank,
-            name: profile?.full_name || "Anonyme",
-            userId: profile?.id || row.user_id,
-            xp: profile?.xp_points ?? row.progress_score ?? 0,
-            streak: profile?.streak_days ?? 0,
-            level: profile?.level ?? 1,
-            change,
-          };
-        });
+            return {
+              rank: currentRank,
+              name: profile?.full_name || "Anonyme",
+              userId: profile?.id || row.user_id,
+              xp: profile?.xp_points ?? row.progress_score ?? 0,
+              streak: profile?.streak_days ?? 0,
+              level: profile?.level ?? 1,
+              change,
+            };
+          },
+        );
         setEntries(mapped);
 
         // Update rank_position for next comparison (non-blocking)
@@ -127,8 +150,8 @@ export function LeaderboardTable({ className }: LeaderboardTableProps) {
             supabase
               .from("leaderboard_scores")
               .update({ rank_position: index + 1 })
-              .eq("id", row.id)
-          )
+              .eq("id", row.id),
+          ),
         ).catch(() => {});
       }
 
@@ -179,10 +202,28 @@ export function LeaderboardTable({ className }: LeaderboardTableProps) {
   const top3 = entries.slice(0, 3);
   const rest = entries.slice(3);
 
-  const medalConfig: Record<number, { gradient: string; ring: string; label: string; shadow: string }> = {
-    1: { gradient: "from-yellow-400/20 to-yellow-600/10", ring: "ring-yellow-400/50", label: "Or", shadow: "shadow-yellow-400/20" },
-    2: { gradient: "from-gray-300/20 to-gray-400/10", ring: "ring-gray-300/40", label: "Argent", shadow: "shadow-gray-300/10" },
-    3: { gradient: "from-amber-600/20 to-amber-700/10", ring: "ring-amber-600/40", label: "Bronze", shadow: "shadow-amber-600/10" },
+  const medalConfig: Record<
+    number,
+    { gradient: string; ring: string; label: string; shadow: string }
+  > = {
+    1: {
+      gradient: "from-yellow-400/20 to-yellow-600/10",
+      ring: "ring-yellow-400/50",
+      label: "Or",
+      shadow: "shadow-yellow-400/20",
+    },
+    2: {
+      gradient: "from-gray-300/20 to-gray-400/10",
+      ring: "ring-gray-300/40",
+      label: "Argent",
+      shadow: "shadow-gray-300/10",
+    },
+    3: {
+      gradient: "from-amber-600/20 to-amber-700/10",
+      ring: "ring-amber-600/40",
+      label: "Bronze",
+      shadow: "shadow-amber-600/10",
+    },
   };
 
   return (
@@ -196,14 +237,20 @@ export function LeaderboardTable({ className }: LeaderboardTableProps) {
                 <Star className="h-5 w-5 text-accent" />
               </div>
               <div className="flex-1">
-                <p className="text-sm font-medium text-text-primary">Ta position</p>
+                <p className="text-sm font-medium text-text-primary">
+                  Ta position
+                </p>
                 <p className="text-xs text-text-muted">
                   #{myEntry.rank} sur {totalCount} participants
                 </p>
               </div>
               <div className="text-right">
-                <p className="text-lg font-bold text-accent">{myEntry.xp.toLocaleString("fr-FR")} XP</p>
-                <p className="text-xs text-text-muted">Niveau {myEntry.level}</p>
+                <p className="text-lg font-bold text-accent">
+                  {myEntry.xp.toLocaleString("fr-FR")} XP
+                </p>
+                <p className="text-xs text-text-muted">
+                  Niveau {myEntry.level}
+                </p>
               </div>
             </div>
           </CardContent>
@@ -223,38 +270,57 @@ export function LeaderboardTable({ className }: LeaderboardTableProps) {
                 className={cn(
                   "relative flex flex-col items-center text-center p-4 rounded-2xl border transition-all duration-500",
                   `bg-gradient-to-b ${medal.gradient}`,
-                  isCenter ? "border-yellow-400/30 -mt-2 pb-6" : "border-border-default/30 mt-2",
-                  entry.userId === user?.id && "ring-2 ring-accent/40"
+                  isCenter
+                    ? "border-yellow-400/30 -mt-2 pb-6"
+                    : "border-border-default/30 mt-2",
+                  entry.userId === user?.id && "ring-2 ring-accent/40",
                 )}
                 style={{ animationDelay: `${podiumIdx * 100}ms` }}
               >
                 {/* Medal */}
-                <div className={cn(
-                  "w-12 h-12 rounded-full flex items-center justify-center mb-2 ring-2",
-                  medal.ring,
-                  `shadow-lg ${medal.shadow}`,
-                  isCenter ? "bg-yellow-400/20" : actualRank === 2 ? "bg-gray-300/15" : "bg-amber-600/15"
-                )}>
-                  <span className={cn(
-                    "text-lg font-black",
-                    rankColors[actualRank] || "text-text-muted"
-                  )}>
+                <div
+                  className={cn(
+                    "w-12 h-12 rounded-full flex items-center justify-center mb-2 ring-2",
+                    medal.ring,
+                    `shadow-lg ${medal.shadow}`,
+                    isCenter
+                      ? "bg-yellow-400/20"
+                      : actualRank === 2
+                        ? "bg-gray-300/15"
+                        : "bg-amber-600/15",
+                  )}
+                >
+                  <span
+                    className={cn(
+                      "text-lg font-black",
+                      rankColors[actualRank] || "text-text-muted",
+                    )}
+                  >
                     {actualRank}
                   </span>
                 </div>
                 <Avatar className="h-10 w-10 mb-1.5 ring-2 ring-border-default/30">
                   <AvatarFallback className="bg-bg-tertiary text-text-secondary text-xs font-semibold">
-                    {entry.name.split(" ").map(n => n[0]).join("")}
+                    {entry.name
+                      .split(" ")
+                      .map((n) => n[0])
+                      .join("")}
                   </AvatarFallback>
                 </Avatar>
-                <p className="text-sm font-semibold text-text-primary truncate w-full">{entry.name}</p>
-                <p className="text-[10px] text-text-muted mb-1">Niveau {entry.level}</p>
+                <p className="text-sm font-semibold text-text-primary truncate w-full">
+                  {entry.name}
+                </p>
+                <p className="text-[10px] text-text-muted mb-1">
+                  Niveau {entry.level}
+                </p>
                 <Badge variant="default" className="text-xs">
                   {entry.xp.toLocaleString("fr-FR")} XP
                 </Badge>
                 <div className="flex items-center gap-1 mt-1.5">
                   <Flame className="h-3 w-3 text-danger" />
-                  <span className="text-[10px] text-text-muted">{entry.streak}j</span>
+                  <span className="text-[10px] text-text-muted">
+                    {entry.streak}j
+                  </span>
                 </div>
               </div>
             );
@@ -263,107 +329,123 @@ export function LeaderboardTable({ className }: LeaderboardTableProps) {
       )}
 
       <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Trophy className="h-5 w-5 text-accent" />
-          Classement Global
-          {totalCount > 0 && (
-            <span className="text-sm font-normal text-text-muted ml-auto">
-              {totalCount} participant{totalCount > 1 ? "s" : ""}
-            </span>
-          )}
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-2">
-          {loading ? (
-            Array.from({ length: 5 }).map((_, i) => (
-              <div
-                key={i}
-                className="flex items-center gap-4 p-3 rounded-xl bg-bg-tertiary/50 animate-pulse"
-              >
-                <span className="w-8 h-6 bg-bg-tertiary rounded" />
-                <div className="h-9 w-9 rounded-full bg-bg-tertiary" />
-                <div className="flex-1 space-y-1">
-                  <div className="h-4 w-24 bg-bg-tertiary rounded" />
-                  <div className="h-3 w-16 bg-bg-tertiary rounded" />
-                </div>
-                <div className="h-4 w-12 bg-bg-tertiary rounded" />
-                <div className="h-6 w-20 bg-bg-tertiary rounded" />
-                <div className="h-4 w-4 bg-bg-tertiary rounded" />
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Trophy className="h-5 w-5 text-accent" />
+            Classement Global
+            {totalCount > 0 && (
+              <span className="text-sm font-normal text-text-muted ml-auto">
+                {totalCount} participant{totalCount > 1 ? "s" : ""}
+              </span>
+            )}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-2">
+            {loading
+              ? Array.from({ length: 5 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="flex items-center gap-4 p-3 rounded-xl bg-bg-tertiary/50 animate-pulse"
+                  >
+                    <span className="w-8 h-6 bg-bg-tertiary rounded" />
+                    <div className="h-9 w-9 rounded-full bg-bg-tertiary" />
+                    <div className="flex-1 space-y-1">
+                      <div className="h-4 w-24 bg-bg-tertiary rounded" />
+                      <div className="h-3 w-16 bg-bg-tertiary rounded" />
+                    </div>
+                    <div className="h-4 w-12 bg-bg-tertiary rounded" />
+                    <div className="h-6 w-20 bg-bg-tertiary rounded" />
+                    <div className="h-4 w-4 bg-bg-tertiary rounded" />
+                  </div>
+                ))
+              : (top3.length >= 3 ? rest : entries).map((entry, idx) => (
+                  <div
+                    key={entry.rank}
+                    className={cn(
+                      "flex items-center gap-4 p-3 rounded-xl transition-all duration-300 hover:bg-bg-tertiary/80",
+                      entry.rank <= 3
+                        ? "bg-accent/5 border border-accent/10"
+                        : "bg-bg-tertiary/50",
+                      entry.userId === user?.id && "ring-1 ring-accent/40",
+                    )}
+                    style={{ animationDelay: `${idx * 40}ms` }}
+                  >
+                    {/* Rank */}
+                    <span
+                      className={cn(
+                        "w-8 text-center font-bold text-lg",
+                        rankColors[entry.rank] || "text-text-muted",
+                      )}
+                    >
+                      {entry.rank}
+                    </span>
+
+                    {/* Avatar */}
+                    <Avatar className="h-9 w-9">
+                      <AvatarFallback className="bg-bg-tertiary text-text-secondary text-xs">
+                        {entry.name
+                          .split(" ")
+                          .map((n) => n[0])
+                          .join("")}
+                      </AvatarFallback>
+                    </Avatar>
+
+                    {/* Name + Level */}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-text-primary">
+                        {entry.name}
+                      </p>
+                      <p className="text-xs text-text-muted">
+                        Niveau {entry.level}
+                      </p>
+                    </div>
+
+                    {/* Streak */}
+                    <div className="flex items-center gap-1">
+                      <Flame className="h-3.5 w-3.5 text-danger" />
+                      <span className="text-xs text-text-muted">
+                        {entry.streak}j
+                      </span>
+                    </div>
+
+                    {/* XP */}
+                    <Badge
+                      variant="default"
+                      className="min-w-[80px] justify-center"
+                    >
+                      {entry.xp.toLocaleString("fr-FR")} XP
+                    </Badge>
+
+                    {/* Change */}
+                    {entry.change === "up" ? (
+                      <TrendingUp className="h-4 w-4 text-accent" />
+                    ) : entry.change === "down" ? (
+                      <TrendingDown className="h-4 w-4 text-danger" />
+                    ) : (
+                      <Minus className="h-4 w-4 text-text-muted" />
+                    )}
+                  </div>
+                ))}
+            {hasMore && (
+              <div className="pt-2 text-center">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleLoadMore}
+                  disabled={loadingMore}
+                  className="gap-2"
+                >
+                  <ChevronDown
+                    className={cn("h-4 w-4", loadingMore && "animate-bounce")}
+                  />
+                  {loadingMore ? "Chargement..." : "Voir plus"}
+                </Button>
               </div>
-            ))
-          ) : (
-            (top3.length >= 3 ? rest : entries).map((entry, idx) => (
-              <div
-                key={entry.rank}
-                className={cn(
-                  "flex items-center gap-4 p-3 rounded-xl transition-all duration-300 hover:bg-bg-tertiary/80",
-                  entry.rank <= 3 ? "bg-accent/5 border border-accent/10" : "bg-bg-tertiary/50",
-                  entry.userId === user?.id && "ring-1 ring-accent/40"
-                )}
-                style={{ animationDelay: `${idx * 40}ms` }}
-              >
-                {/* Rank */}
-                <span className={cn(
-                  "w-8 text-center font-bold text-lg",
-                  rankColors[entry.rank] || "text-text-muted"
-                )}>
-                  {entry.rank}
-                </span>
-
-                {/* Avatar */}
-                <Avatar className="h-9 w-9">
-                  <AvatarFallback className="bg-bg-tertiary text-text-secondary text-xs">
-                    {entry.name.split(" ").map(n => n[0]).join("")}
-                  </AvatarFallback>
-                </Avatar>
-
-                {/* Name + Level */}
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-text-primary">{entry.name}</p>
-                  <p className="text-xs text-text-muted">Niveau {entry.level}</p>
-                </div>
-
-                {/* Streak */}
-                <div className="flex items-center gap-1">
-                  <Flame className="h-3.5 w-3.5 text-danger" />
-                  <span className="text-xs text-text-muted">{entry.streak}j</span>
-                </div>
-
-                {/* XP */}
-                <Badge variant="default" className="min-w-[80px] justify-center">
-                  {entry.xp.toLocaleString("fr-FR")} XP
-                </Badge>
-
-                {/* Change */}
-                {entry.change === "up" ? (
-                  <TrendingUp className="h-4 w-4 text-accent" />
-                ) : entry.change === "down" ? (
-                  <TrendingDown className="h-4 w-4 text-danger" />
-                ) : (
-                  <Minus className="h-4 w-4 text-text-muted" />
-                )}
-              </div>
-            ))
-          )}
-          {hasMore && (
-            <div className="pt-2 text-center">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleLoadMore}
-                disabled={loadingMore}
-                className="gap-2"
-              >
-                <ChevronDown className={cn("h-4 w-4", loadingMore && "animate-bounce")} />
-                {loadingMore ? "Chargement..." : "Voir plus"}
-              </Button>
-            </div>
-          )}
-        </div>
-      </CardContent>
-    </Card>
+            )}
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

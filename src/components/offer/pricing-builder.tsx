@@ -27,7 +27,11 @@ export function PricingBuilder({
   onChange,
   className,
 }: PricingBuilderProps) {
-  const updateBreakdown = (index: number, field: "item" | "value", val: string) => {
+  const updateBreakdown = (
+    index: number,
+    field: "item" | "value",
+    val: string,
+  ) => {
     const updated = [...valueBreakdown];
     if (field === "value") {
       updated[index] = { ...updated[index], value: parseInt(val) || 0 };
@@ -67,7 +71,13 @@ export function PricingBuilder({
             <Input
               type="number"
               value={anchorPrice}
-              onChange={(e) => onChange({ anchorPrice: parseInt(e.target.value) || 0, realPrice, valueBreakdown })}
+              onChange={(e) =>
+                onChange({
+                  anchorPrice: parseInt(e.target.value) || 0,
+                  realPrice,
+                  valueBreakdown,
+                })
+              }
               placeholder="5000"
             />
           </div>
@@ -76,7 +86,13 @@ export function PricingBuilder({
             <Input
               type="number"
               value={realPrice}
-              onChange={(e) => onChange({ anchorPrice, realPrice: parseInt(e.target.value) || 0, valueBreakdown })}
+              onChange={(e) =>
+                onChange({
+                  anchorPrice,
+                  realPrice: parseInt(e.target.value) || 0,
+                  valueBreakdown,
+                })
+              }
               placeholder="2997"
             />
           </div>
@@ -95,19 +111,27 @@ export function PricingBuilder({
               <div key={index} className="flex items-center gap-2">
                 <Input
                   value={item.item}
-                  onChange={(e) => updateBreakdown(index, "item", e.target.value)}
+                  onChange={(e) =>
+                    updateBreakdown(index, "item", e.target.value)
+                  }
                   placeholder="Element..."
                   className="flex-1"
                 />
                 <Input
                   type="number"
                   value={item.value}
-                  onChange={(e) => updateBreakdown(index, "value", e.target.value)}
+                  onChange={(e) =>
+                    updateBreakdown(index, "value", e.target.value)
+                  }
                   placeholder="0"
                   className="w-28"
                 />
                 <span className="text-text-muted text-sm">&euro;</span>
-                <Button variant="ghost" size="icon" onClick={() => removeItem(index)}>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => removeItem(index)}
+                >
                   <Trash2 className="h-4 w-4 text-text-muted" />
                 </Button>
               </div>
@@ -115,7 +139,9 @@ export function PricingBuilder({
           </div>
           {valueBreakdown.length > 0 && (
             <div className="flex justify-between mt-3 pt-3 border-t border-border-default">
-              <span className="text-sm font-medium text-text-secondary">Valeur totale</span>
+              <span className="text-sm font-medium text-text-secondary">
+                Valeur totale
+              </span>
               <span className="text-sm font-bold text-accent">
                 {totalValue.toLocaleString("fr-FR")} &euro;
               </span>

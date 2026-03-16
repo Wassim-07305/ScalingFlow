@@ -2,7 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { checkAIUsage } from "@/lib/stripe/check-usage";
 import { createClient } from "@/lib/supabase/server";
 import { generateJSON } from "@/lib/ai/generate";
-import { adCopyPrompt, adCopyMassivePrompt, type MassiveAdBatch } from "@/lib/ai/prompts/ad-copy";
+import {
+  adCopyPrompt,
+  adCopyMassivePrompt,
+  type MassiveAdBatch,
+} from "@/lib/ai/prompts/ad-copy";
 import { adHooksPrompt } from "@/lib/ai/prompts/ad-hooks";
 import {
   buildVideoAdScriptPrompt,
@@ -43,11 +47,14 @@ export async function POST(req: NextRequest) {
     }
 
     // Rate limiting
-    const rl = await rateLimit(user.id, "generate-ads", { limit: 5, windowSeconds: 60 });
+    const rl = await rateLimit(user.id, "generate-ads", {
+      limit: 5,
+      windowSeconds: 60,
+    });
     if (!rl.allowed) {
       return NextResponse.json(
         { error: "Trop de requêtes. Réessaie dans quelques secondes." },
-        { status: 429 }
+        { status: 429 },
       );
     }
 
@@ -56,17 +63,22 @@ export async function POST(req: NextRequest) {
     if (!usage.allowed) {
       return NextResponse.json(
         { error: "Limite de générations IA atteinte", usage },
-        { status: 403 }
+        { status: 403 },
       );
     }
-
 
     const body = await req.json();
     const { offerId, adType } = body;
 
     // Récupérer le profil + vault resources pour le contexte
     const [{ data: profile }, vaultContext] = await Promise.all([
-      supabase.from("profiles").select("id, full_name, skills, target_market, niche, situation, parcours, target_revenue, industries, objectives").eq("id", user.id).single(),
+      supabase
+        .from("profiles")
+        .select(
+          "id, full_name, skills, target_market, niche, situation, parcours, target_revenue, industries, objectives",
+        )
+        .eq("id", user.id)
+        .single(),
       buildFullVaultContext(user.id),
     ]);
 
@@ -83,7 +95,7 @@ export async function POST(req: NextRequest) {
       if (offerError || !data) {
         return NextResponse.json(
           { error: "Offre introuvable" },
-          { status: 404 }
+          { status: 404 },
         );
       }
       offer = data;
@@ -99,20 +111,28 @@ export async function POST(req: NextRequest) {
     }
 
     const avatar = offer?.market_analyses?.avatar || {};
-    const market = offer?.market_analyses?.market || profile?.target_market || "";
+    const market =
+      offer?.market_analyses?.market || profile?.target_market || "";
     const offerContext = offer
       ? `${offer.offer_name} - ${offer.positioning || ""} - ${offer.unique_mechanism || ""}`
       : "Offre de consulting/formation";
     const avatarContext =
-      typeof avatar === "object" ? JSON.stringify(avatar, null, 2) : String(avatar);
+      typeof avatar === "object"
+        ? JSON.stringify(avatar, null, 2)
+        : String(avatar);
 
     // --- Ad Spy (#43) — avec scraping Apify > Firecrawl > AI-only ---
     if (adType === "ad_spy") {
-      const { competitor, url: competitorUrl, industry, platform: adPlatform } = body;
+      const {
+        competitor,
+        url: competitorUrl,
+        industry,
+        platform: adPlatform,
+      } = body;
       if (!competitor || !industry || !adPlatform) {
         return NextResponse.json(
           { error: "competitor, industry et platform sont requis" },
-          { status: 400 }
+          { status: 400 },
         );
       }
 
@@ -146,14 +166,18 @@ export async function POST(req: NextRequest) {
                 if (ad.ctaText) parts.push(`CTA : ${ad.ctaText}`);
                 if (ad.ctaUrl) parts.push(`URL CTA : ${ad.ctaUrl}`);
                 if (ad.format) parts.push(`Format : ${ad.format}`);
-                if (ad.platforms?.length) parts.push(`Plateformes : ${ad.platforms.join(", ")}`);
+                if (ad.platforms?.length)
+                  parts.push(`Plateformes : ${ad.platforms.join(", ")}`);
                 if (ad.startDate) parts.push(`Date de début : ${ad.startDate}`);
                 return parts.join("\n");
               })
               .join("\n\n---\n\n");
           }
         } catch (err) {
-          console.warn("Apify scraping failed for ad_spy, trying Firecrawl fallback:", err);
+          console.warn(
+            "Apify scraping failed for ad_spy, trying Firecrawl fallback:",
+            err,
+          );
         }
       }
 
@@ -173,7 +197,10 @@ export async function POST(req: NextRequest) {
 
           // Rechercher des infos complémentaires sur le concurrent
           const searchQuery = `${competitor} ${industry} ${adPlatform === "meta" ? "Facebook ads" : adPlatform} publicité`;
-          const { results, scrapedContent } = await searchAndScrape(searchQuery, 3);
+          const { results, scrapedContent } = await searchAndScrape(
+            searchQuery,
+            3,
+          );
 
           for (const r of results) {
             if (!sourceUrls.includes(r.url)) sourceUrls.push(r.url);
@@ -189,27 +216,33 @@ export async function POST(req: NextRequest) {
           if (scrapedPages.length > 0) {
             const pages = scrapedPages.slice(0, 5);
             scrapedContext = pages
-              .map((p) => `### Source : ${p.title}\nURL : ${p.url}\n${p.content}`)
+              .map(
+                (p) => `### Source : ${p.title}\nURL : ${p.url}\n${p.content}`,
+              )
               .join("\n\n---\n\n");
             scrapingSource = "firecrawl";
           }
         } catch (err) {
-          console.warn("Firecrawl scraping failed for ad_spy, falling back to AI-only:", err);
+          console.warn(
+            "Firecrawl scraping failed for ad_spy, falling back to AI-only:",
+            err,
+          );
           scrapedContext = "";
           sourceUrls = [];
         }
       }
 
       // Phase finale : Analyse IA (enrichie par les données scrapées si disponibles)
-      const prompt = adSpyPrompt(
-        {
-          name: competitor,
-          url: competitorUrl,
-          industry,
-          platform: adPlatform,
-        },
-        scrapedContext || undefined,
-      ) + (vaultContext ? "\n" + vaultContext : "");
+      const prompt =
+        adSpyPrompt(
+          {
+            name: competitor,
+            url: competitorUrl,
+            industry,
+            platform: adPlatform,
+          },
+          scrapedContext || undefined,
+        ) + (vaultContext ? "\n" + vaultContext : "");
 
       const result = await generateJSON<Record<string, unknown>>({
         prompt,
@@ -217,8 +250,16 @@ export async function POST(req: NextRequest) {
         temperature: 0.8,
       });
 
-      try { await awardXP(user.id, "generation.ads"); } catch (e) { console.warn("XP award failed:", e); }
-      try { await notifyGeneration(user.id, "generation.ads"); } catch (e) { console.warn("Notification failed:", e); }
+      try {
+        await awardXP(user.id, "generation.ads");
+      } catch (e) {
+        console.warn("XP award failed:", e);
+      }
+      try {
+        await notifyGeneration(user.id, "generation.ads");
+      } catch (e) {
+        console.warn("Notification failed:", e);
+      }
 
       return NextResponse.json({
         adType: "ad_spy",
@@ -232,7 +273,9 @@ export async function POST(req: NextRequest) {
 
     // --- Video Ad Scripts ---
     if (adType === "video_ad") {
-      const prompt = buildVideoAdScriptPrompt(offerContext, avatarContext) + (vaultContext ? "\n" + vaultContext : "");
+      const prompt =
+        buildVideoAdScriptPrompt(offerContext, avatarContext) +
+        (vaultContext ? "\n" + vaultContext : "");
       const result = await generateJSON<VideoAdScriptResult>({
         prompt,
         maxTokens: 4096,
@@ -240,29 +283,42 @@ export async function POST(req: NextRequest) {
 
       // Sauvegarder chaque script video
       for (const script of result.scripts || []) {
-        const { error: insertErr } = await supabase.from("ad_creatives").insert({
-          user_id: user.id,
-          creative_type: "video_script",
-          ad_copy: script.corps,
-          headline: `Video Ad ${script.duree}`,
-          hook: script.hook,
-          cta: script.cta,
-          angle: script.angle,
-          status: "draft",
-        });
-        if (insertErr) console.error("generate-ads: failed to save video script", insertErr);
+        const { error: insertErr } = await supabase
+          .from("ad_creatives")
+          .insert({
+            user_id: user.id,
+            creative_type: "video_script",
+            ad_copy: script.corps,
+            headline: `Video Ad ${script.duree}`,
+            hook: script.hook,
+            cta: script.cta,
+            angle: script.angle,
+            status: "draft",
+          });
+        if (insertErr)
+          console.error("generate-ads: failed to save video script", insertErr);
       }
 
       // Award XP (non-blocking)
-      try { await awardXP(user.id, "generation.ads"); } catch (e) { console.warn("XP award failed:", e); }
-      try { await notifyGeneration(user.id, "generation.ads"); } catch (e) { console.warn("Notification failed:", e); }
+      try {
+        await awardXP(user.id, "generation.ads");
+      } catch (e) {
+        console.warn("XP award failed:", e);
+      }
+      try {
+        await notifyGeneration(user.id, "generation.ads");
+      } catch (e) {
+        console.warn("Notification failed:", e);
+      }
 
       return NextResponse.json({ adType: "video_ad", result });
     }
 
     // --- DM Scripts ---
     if (adType === "dm_scripts") {
-      const prompt = buildDMScriptsPrompt(offerContext, avatarContext) + (vaultContext ? "\n" + vaultContext : "");
+      const prompt =
+        buildDMScriptsPrompt(offerContext, avatarContext) +
+        (vaultContext ? "\n" + vaultContext : "");
       const result = await generateJSON<DMScriptsResult>({
         prompt,
         maxTokens: 4096,
@@ -271,21 +327,32 @@ export async function POST(req: NextRequest) {
       // Sauvegarder les sequences de prospection
       for (let i = 0; i < (result.prospection || []).length; i++) {
         const seq = result.prospection[i];
-        const { error: insertErr } = await supabase.from("ad_creatives").insert({
-          user_id: user.id,
-          creative_type: "dm_script",
-          ad_copy: `Opener: ${seq.opener}\n\nFollow-up 1: ${seq.follow_up_1}\n\nFollow-up 2: ${seq.follow_up_2}\n\nClosing: ${seq.closing}`,
-          headline: `Sequence DM #${i + 1}`,
-          hook: seq.opener,
-          cta: seq.closing,
-          status: "draft",
-        });
-        if (insertErr) console.error("generate-ads: failed to save DM script", insertErr);
+        const { error: insertErr } = await supabase
+          .from("ad_creatives")
+          .insert({
+            user_id: user.id,
+            creative_type: "dm_script",
+            ad_copy: `Opener: ${seq.opener}\n\nFollow-up 1: ${seq.follow_up_1}\n\nFollow-up 2: ${seq.follow_up_2}\n\nClosing: ${seq.closing}`,
+            headline: `Sequence DM #${i + 1}`,
+            hook: seq.opener,
+            cta: seq.closing,
+            status: "draft",
+          });
+        if (insertErr)
+          console.error("generate-ads: failed to save DM script", insertErr);
       }
 
       // Award XP (non-blocking)
-      try { await awardXP(user.id, "generation.ads"); } catch (e) { console.warn("XP award failed:", e); }
-      try { await notifyGeneration(user.id, "generation.ads"); } catch (e) { console.warn("Notification failed:", e); }
+      try {
+        await awardXP(user.id, "generation.ads");
+      } catch (e) {
+        console.warn("XP award failed:", e);
+      }
+      try {
+        await notifyGeneration(user.id, "generation.ads");
+      } catch (e) {
+        console.warn("Notification failed:", e);
+      }
 
       return NextResponse.json({ adType: "dm_scripts", result });
     }
@@ -295,27 +362,31 @@ export async function POST(req: NextRequest) {
       const { massiveBatch } = body;
       if (!massiveBatch) {
         return NextResponse.json(
-          { error: "massiveBatch est requis (cold_audience, warm_audience, hot_audience, hooks_controverses, storytelling)" },
-          { status: 400 }
+          {
+            error:
+              "massiveBatch est requis (cold_audience, warm_audience, hot_audience, hooks_controverses, storytelling)",
+          },
+          { status: 400 },
         );
       }
       if (!offer) {
         return NextResponse.json(
           { error: "Aucune offre trouvée. Crée d'abord une offre." },
-          { status: 400 }
+          { status: 400 },
         );
       }
 
-      const prompt = adCopyMassivePrompt(
-        {
-          offer_name: offer.offer_name,
-          positioning: offer.positioning,
-          unique_mechanism: offer.unique_mechanism,
-          pricing: offer.pricing || { real_price: 0 },
-        },
-        avatar,
-        massiveBatch as MassiveAdBatch
-      ) + (vaultContext ? "\n" + vaultContext : "");
+      const prompt =
+        adCopyMassivePrompt(
+          {
+            offer_name: offer.offer_name,
+            positioning: offer.positioning,
+            unique_mechanism: offer.unique_mechanism,
+            pricing: offer.pricing || { real_price: 0 },
+          },
+          avatar,
+          massiveBatch as MassiveAdBatch,
+        ) + (vaultContext ? "\n" + vaultContext : "");
 
       interface AdVariation {
         body?: string;
@@ -356,8 +427,16 @@ export async function POST(req: NextRequest) {
         }
       }
 
-      try { await awardXP(user.id, "generation.ads"); } catch (e) { console.warn("XP award failed:", e); }
-      try { await notifyGeneration(user.id, "generation.ads"); } catch (e) { console.warn("Notification failed:", e); }
+      try {
+        await awardXP(user.id, "generation.ads");
+      } catch (e) {
+        console.warn("XP award failed:", e);
+      }
+      try {
+        await notifyGeneration(user.id, "generation.ads");
+      } catch (e) {
+        console.warn("Notification failed:", e);
+      }
 
       return NextResponse.json({
         adType: "massive_batch",
@@ -371,7 +450,7 @@ export async function POST(req: NextRequest) {
     if (!offer) {
       return NextResponse.json(
         { error: "Aucune offre trouvée. Creez d'abord une offre." },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -383,7 +462,7 @@ export async function POST(req: NextRequest) {
         unique_mechanism: offer.unique_mechanism,
         pricing: offer.pricing || { real_price: 0 },
       },
-      avatar
+      avatar,
     );
     interface AdVariation {
       body?: string;
@@ -433,8 +512,16 @@ export async function POST(req: NextRequest) {
     }
 
     // Award XP (non-blocking)
-    try { await awardXP(user.id, "generation.ads"); } catch (e) { console.warn("XP award failed:", e); }
-    try { await notifyGeneration(user.id, "generation.ads"); } catch (e) { console.warn("Notification failed:", e); }
+    try {
+      await awardXP(user.id, "generation.ads");
+    } catch (e) {
+      console.warn("XP award failed:", e);
+    }
+    try {
+      await notifyGeneration(user.id, "generation.ads");
+    } catch (e) {
+      console.warn("Notification failed:", e);
+    }
 
     return NextResponse.json({
       ad_creatives: adCreatives,
@@ -443,7 +530,7 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     return NextResponse.json(
       { error: "Erreur lors de la génération des publicités" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

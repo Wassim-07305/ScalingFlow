@@ -2,7 +2,7 @@ export function smsSequencePrompt(
   offer: {
     offer_name: string;
   },
-  avatar: Record<string, unknown>
+  avatar: Record<string, unknown>,
 ): string {
   return `Tu es un expert en marketing SMS pour les freelances et consultants dans le domaine de l'IA et de l'automatisation.
 

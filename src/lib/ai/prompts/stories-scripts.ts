@@ -1,15 +1,17 @@
 export interface StoriesResult {
   stories: {
-    type: "behind_the_scenes" | "temoignage" | "education" | "cta" | "engagement";
+    type:
+      | "behind_the_scenes"
+      | "temoignage"
+      | "education"
+      | "cta"
+      | "engagement";
     slides: { text: string; visual_direction: string }[];
     sticker_suggestions: string[];
   }[];
 }
 
-export function buildStoriesPrompt(
-  market: string,
-  offer: string
-): string {
+export function buildStoriesPrompt(market: string, offer: string): string {
   return `Tu es un expert en creation de Stories Instagram pour les freelances et consultants.
 
 ## Marche cible

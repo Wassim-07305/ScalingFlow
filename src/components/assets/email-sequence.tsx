@@ -2,11 +2,26 @@
 
 import React from "react";
 import { cn } from "@/lib/utils/cn";
-import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  CardDescription,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AILoading } from "@/components/shared/ai-loading";
-import { Mail, ChevronDown, ChevronUp, Pencil, Check, Send, Save, Loader2 } from "lucide-react";
+import {
+  Mail,
+  ChevronDown,
+  ChevronUp,
+  Pencil,
+  Check,
+  Send,
+  Save,
+  Loader2,
+} from "lucide-react";
 import { CopyExportBar } from "@/components/shared/copy-export-bar";
 import { UnipileSendDialog } from "@/components/shared/unipile-send-dialog";
 import { UpgradeWall } from "@/components/shared/upgrade-wall";
@@ -35,7 +50,10 @@ export function EmailSequence({ className, initialData }: EmailSequenceProps) {
   const [sequence, setSequence] = React.useState<any>(initialData || null);
   const [error, setError] = React.useState<string | null>(null);
   const [expandedEmail, setExpandedEmail] = React.useState<number | null>(0);
-  const [usageLimited, setUsageLimited] = React.useState<{currentUsage: number; limit: number} | null>(null);
+  const [usageLimited, setUsageLimited] = React.useState<{
+    currentUsage: number;
+    limit: number;
+  } | null>(null);
   const [editingIndex, setEditingIndex] = React.useState<number | null>(null);
   const [sendDialogOpen, setSendDialogOpen] = React.useState(false);
   const [sendMessage, setSendMessage] = React.useState("");
@@ -71,7 +89,10 @@ export function EmailSequence({ className, initialData }: EmailSequenceProps) {
       if (!response.ok) {
         if (response.status === 403) {
           const errData = await response.json();
-          if (errData.usage) { setUsageLimited(errData.usage); return; }
+          if (errData.usage) {
+            setUsageLimited(errData.usage);
+            return;
+          }
         }
         throw new Error("Erreur lors de la génération");
       }
@@ -123,11 +144,23 @@ export function EmailSequence({ className, initialData }: EmailSequenceProps) {
   };
 
   if (usageLimited) {
-    return <UpgradeWall currentUsage={usageLimited.currentUsage} limit={usageLimited.limit} className={className} />;
+    return (
+      <UpgradeWall
+        currentUsage={usageLimited.currentUsage}
+        limit={usageLimited.limit}
+        className={className}
+      />
+    );
   }
 
   if (loading) {
-    return <AILoading variant="immersive" text="Rédaction de ta séquence email" className={className} />;
+    return (
+      <AILoading
+        variant="immersive"
+        text="Rédaction de ta séquence email"
+        className={className}
+      />
+    );
   }
 
   if (!sequence) {
@@ -146,7 +179,9 @@ export function EmailSequence({ className, initialData }: EmailSequenceProps) {
           <CardContent className="space-y-5">
             {/* Email type */}
             <div>
-              <label className="text-sm font-medium text-text-primary mb-2 block">Type de séquence</label>
+              <label className="text-sm font-medium text-text-primary mb-2 block">
+                Type de séquence
+              </label>
               <div className="grid grid-cols-2 gap-2">
                 {EMAIL_TYPES.map((t) => (
                   <button
@@ -156,7 +191,7 @@ export function EmailSequence({ className, initialData }: EmailSequenceProps) {
                       "px-3 py-2 rounded-lg text-sm font-medium transition-all text-left",
                       emailType === t.key
                         ? "bg-accent text-white"
-                        : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
+                        : "bg-bg-tertiary text-text-secondary hover:text-text-primary",
                     )}
                   >
                     {t.label}
@@ -167,7 +202,9 @@ export function EmailSequence({ className, initialData }: EmailSequenceProps) {
 
             {/* Email count */}
             <div>
-              <label className="text-sm font-medium text-text-primary mb-2 block">Nombre d&apos;emails</label>
+              <label className="text-sm font-medium text-text-primary mb-2 block">
+                Nombre d&apos;emails
+              </label>
               <div className="flex gap-2">
                 {["5", "7", "10", "14"].map((n) => (
                   <button
@@ -177,7 +214,7 @@ export function EmailSequence({ className, initialData }: EmailSequenceProps) {
                       "px-4 py-2 rounded-lg text-sm font-medium transition-all",
                       emailCount === n
                         ? "bg-accent text-white"
-                        : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
+                        : "bg-bg-tertiary text-text-secondary hover:text-text-primary",
                     )}
                   >
                     {n} emails
@@ -189,7 +226,8 @@ export function EmailSequence({ className, initialData }: EmailSequenceProps) {
             {/* Goal */}
             <div>
               <label className="text-sm font-medium text-text-primary mb-1 block">
-                Objectif principal <span className="text-text-muted font-normal">(optionnel)</span>
+                Objectif principal{" "}
+                <span className="text-text-muted font-normal">(optionnel)</span>
               </label>
               <input
                 type="text"
@@ -202,7 +240,11 @@ export function EmailSequence({ className, initialData }: EmailSequenceProps) {
 
             {error && <p className="text-sm text-danger">{error}</p>}
 
-            <GenerateButton onClick={handleGenerate} className="w-full" icon={<Mail className="h-4 w-4 mr-2" />}>
+            <GenerateButton
+              onClick={handleGenerate}
+              className="w-full"
+              icon={<Mail className="h-4 w-4 mr-2" />}
+            >
               Générer la séquence email
             </GenerateButton>
           </CardContent>
@@ -214,8 +256,9 @@ export function EmailSequence({ className, initialData }: EmailSequenceProps) {
   const emails = sequence.emails || [];
 
   const fullEmailText = emails
-    .map((e: { day: number; subject: string; body: string; cta_text: string }) =>
-      `## Email Jour ${e.day} — ${e.subject}\n\n${e.body}\n\nCTA: ${e.cta_text}`
+    .map(
+      (e: { day: number; subject: string; body: string; cta_text: string }) =>
+        `## Email Jour ${e.day} — ${e.subject}\n\n${e.body}\n\nCTA: ${e.cta_text}`,
     )
     .join("\n\n---\n\n");
 
@@ -238,9 +281,14 @@ export function EmailSequence({ className, initialData }: EmailSequenceProps) {
               className="bg-gradient-to-r from-accent to-emerald-400 hover:from-accent/90 hover:to-emerald-400/90 text-white shadow-md shadow-accent/20"
             >
               {saving ? (
-                <><Loader2 className="h-3 w-3 animate-spin mr-1" /> Sauvegarde...</>
+                <>
+                  <Loader2 className="h-3 w-3 animate-spin mr-1" />{" "}
+                  Sauvegarde...
+                </>
               ) : (
-                <><Save className="h-3 w-3 mr-1" /> Sauvegarder</>
+                <>
+                  <Save className="h-3 w-3 mr-1" /> Sauvegarder
+                </>
               )}
             </Button>
           )}
@@ -260,136 +308,175 @@ export function EmailSequence({ className, initialData }: EmailSequenceProps) {
       <div className="relative space-y-3">
         <div className="absolute left-5 top-0 bottom-0 w-px bg-border-default" />
 
-        {emails.map((email: {
-          day: number;
-          subject: string;
-          preview_text: string;
-          body: string;
-          cta_text: string;
-          pillar: string;
-        }, i: number) => {
-          const isEditing = editingIndex === i;
-          return (
-            <div key={i} className="relative pl-12">
-              <div className={cn(
-                "absolute left-3.5 top-4 w-3 h-3 rounded-full border-2",
-                expandedEmail === i
-                  ? "bg-accent border-accent"
-                  : "bg-bg-tertiary border-border-default"
-              )} />
+        {emails.map(
+          (
+            email: {
+              day: number;
+              subject: string;
+              preview_text: string;
+              body: string;
+              cta_text: string;
+              pillar: string;
+            },
+            i: number,
+          ) => {
+            const isEditing = editingIndex === i;
+            return (
+              <div key={i} className="relative pl-12">
+                <div
+                  className={cn(
+                    "absolute left-3.5 top-4 w-3 h-3 rounded-full border-2",
+                    expandedEmail === i
+                      ? "bg-accent border-accent"
+                      : "bg-bg-tertiary border-border-default",
+                  )}
+                />
 
-              <Card
-                className={cn(
-                  "transition-all",
-                  expandedEmail === i && "border-accent/30"
-                )}
-              >
-                <CardHeader
-                  className="py-3 cursor-pointer"
-                  onClick={() => setExpandedEmail(expandedEmail === i ? null : i)}
+                <Card
+                  className={cn(
+                    "transition-all",
+                    expandedEmail === i && "border-accent/30",
+                  )}
                 >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <Mail className="h-4 w-4 text-info" />
-                      <div>
-                        <CardTitle className="text-sm">{email.subject}</CardTitle>
-                        <p className="text-xs text-text-muted mt-0.5">Jour {email.day}</p>
+                  <CardHeader
+                    className="py-3 cursor-pointer"
+                    onClick={() =>
+                      setExpandedEmail(expandedEmail === i ? null : i)
+                    }
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <Mail className="h-4 w-4 text-info" />
+                        <div>
+                          <CardTitle className="text-sm">
+                            {email.subject}
+                          </CardTitle>
+                          <p className="text-xs text-text-muted mt-0.5">
+                            Jour {email.day}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      {email.pillar && <Badge variant="muted" className="text-xs">{email.pillar}</Badge>}
-                      {expandedEmail === i ? (
-                        <ChevronUp className="h-4 w-4 text-text-muted" />
-                      ) : (
-                        <ChevronDown className="h-4 w-4 text-text-muted" />
-                      )}
-                    </div>
-                  </div>
-                </CardHeader>
-                {expandedEmail === i && (
-                  <CardContent className="pt-0">
-                    <div className="flex items-center justify-end gap-1 mb-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setSendMessage(`Objet : ${email.subject}\n\n${email.body}\n\n${email.cta_text}`);
-                          setSendDialogOpen(true);
-                        }}
-                      >
-                        <Send className="h-3 w-3 mr-1" /> Envoyer
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          if (isEditing) {
-                            setEditingIndex(null);
-                            toast.success("Modifications sauvegardées");
-                          } else {
-                            setEditingIndex(i);
-                          }
-                        }}
-                      >
-                        {isEditing ? (
-                          <><Check className="h-3 w-3 mr-1" /> OK</>
+                      <div className="flex items-center gap-2">
+                        {email.pillar && (
+                          <Badge variant="muted" className="text-xs">
+                            {email.pillar}
+                          </Badge>
+                        )}
+                        {expandedEmail === i ? (
+                          <ChevronUp className="h-4 w-4 text-text-muted" />
                         ) : (
-                          <><Pencil className="h-3 w-3 mr-1" /> Modifier</>
+                          <ChevronDown className="h-4 w-4 text-text-muted" />
                         )}
-                      </Button>
-                    </div>
-
-                    {isEditing ? (
-                      <div className="space-y-3">
-                        <div>
-                          <label className="text-xs text-text-muted mb-1 block">Objet</label>
-                          <input
-                            type="text"
-                            value={email.subject}
-                            onChange={(e) => updateEmail(i, "subject", e.target.value)}
-                            className="w-full rounded-lg border border-border-default bg-bg-secondary px-2 py-1.5 text-sm font-medium text-text-primary focus:outline-none focus:ring-1 focus:ring-accent"
-                          />
-                        </div>
-                        <div>
-                          <label className="text-xs text-text-muted mb-1 block">Corps</label>
-                          <textarea
-                            value={email.body}
-                            onChange={(e) => updateEmail(i, "body", e.target.value)}
-                            className="w-full rounded-lg border border-border-default bg-bg-secondary px-2 py-1.5 text-sm text-text-secondary resize-vertical focus:outline-none focus:ring-1 focus:ring-accent min-h-[120px]"
-                            rows={6}
-                          />
-                        </div>
-                        <div>
-                          <label className="text-xs text-text-muted mb-1 block">CTA</label>
-                          <input
-                            type="text"
-                            value={email.cta_text}
-                            onChange={(e) => updateEmail(i, "cta_text", e.target.value)}
-                            className="w-full rounded-lg border border-accent/30 bg-bg-secondary px-2 py-1.5 text-sm font-medium text-accent focus:outline-none focus:ring-1 focus:ring-accent"
-                          />
-                        </div>
                       </div>
-                    ) : (
-                      <>
-                        {email.preview_text && (
-                          <p className="text-xs text-text-muted italic mb-3">{email.preview_text}</p>
-                        )}
-                        <div className="text-sm text-text-secondary whitespace-pre-wrap mb-4">
-                          {email.body}
+                    </div>
+                  </CardHeader>
+                  {expandedEmail === i && (
+                    <CardContent className="pt-0">
+                      <div className="flex items-center justify-end gap-1 mb-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSendMessage(
+                              `Objet : ${email.subject}\n\n${email.body}\n\n${email.cta_text}`,
+                            );
+                            setSendDialogOpen(true);
+                          }}
+                        >
+                          <Send className="h-3 w-3 mr-1" /> Envoyer
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (isEditing) {
+                              setEditingIndex(null);
+                              toast.success("Modifications sauvegardées");
+                            } else {
+                              setEditingIndex(i);
+                            }
+                          }}
+                        >
+                          {isEditing ? (
+                            <>
+                              <Check className="h-3 w-3 mr-1" /> OK
+                            </>
+                          ) : (
+                            <>
+                              <Pencil className="h-3 w-3 mr-1" /> Modifier
+                            </>
+                          )}
+                        </Button>
+                      </div>
+
+                      {isEditing ? (
+                        <div className="space-y-3">
+                          <div>
+                            <label className="text-xs text-text-muted mb-1 block">
+                              Objet
+                            </label>
+                            <input
+                              type="text"
+                              value={email.subject}
+                              onChange={(e) =>
+                                updateEmail(i, "subject", e.target.value)
+                              }
+                              className="w-full rounded-lg border border-border-default bg-bg-secondary px-2 py-1.5 text-sm font-medium text-text-primary focus:outline-none focus:ring-1 focus:ring-accent"
+                            />
+                          </div>
+                          <div>
+                            <label className="text-xs text-text-muted mb-1 block">
+                              Corps
+                            </label>
+                            <textarea
+                              value={email.body}
+                              onChange={(e) =>
+                                updateEmail(i, "body", e.target.value)
+                              }
+                              className="w-full rounded-lg border border-border-default bg-bg-secondary px-2 py-1.5 text-sm text-text-secondary resize-vertical focus:outline-none focus:ring-1 focus:ring-accent min-h-[120px]"
+                              rows={6}
+                            />
+                          </div>
+                          <div>
+                            <label className="text-xs text-text-muted mb-1 block">
+                              CTA
+                            </label>
+                            <input
+                              type="text"
+                              value={email.cta_text}
+                              onChange={(e) =>
+                                updateEmail(i, "cta_text", e.target.value)
+                              }
+                              className="w-full rounded-lg border border-accent/30 bg-bg-secondary px-2 py-1.5 text-sm font-medium text-accent focus:outline-none focus:ring-1 focus:ring-accent"
+                            />
+                          </div>
                         </div>
-                        <div className="p-2 rounded-lg bg-accent-muted border border-accent/20 inline-block">
-                          <span className="text-sm font-medium text-accent">{email.cta_text}</span>
-                        </div>
-                      </>
-                    )}
-                  </CardContent>
-                )}
-              </Card>
-            </div>
-          );
-        })}
+                      ) : (
+                        <>
+                          {email.preview_text && (
+                            <p className="text-xs text-text-muted italic mb-3">
+                              {email.preview_text}
+                            </p>
+                          )}
+                          <div className="text-sm text-text-secondary whitespace-pre-wrap mb-4">
+                            {email.body}
+                          </div>
+                          <div className="p-2 rounded-lg bg-accent-muted border border-accent/20 inline-block">
+                            <span className="text-sm font-medium text-accent">
+                              {email.cta_text}
+                            </span>
+                          </div>
+                        </>
+                      )}
+                    </CardContent>
+                  )}
+                </Card>
+              </div>
+            );
+          },
+        )}
       </div>
 
       <UnipileSendDialog

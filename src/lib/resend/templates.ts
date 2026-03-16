@@ -89,7 +89,7 @@ export function welcomeEmail(firstName: string) {
 // ---------------------------------------------------------------------------
 export function generationCompleteEmail(
   firstName: string,
-  generationType: string
+  generationType: string,
 ) {
   const html = layout(`
     <h1 style="margin:0 0 16px;font-size:22px;font-weight:700;color:#FFFFFF;">
@@ -117,7 +117,7 @@ export function generationCompleteEmail(
 export function milestoneEmail(
   firstName: string,
   milestone: string,
-  xp: number
+  xp: number,
 ) {
   const html = layout(`
     <h1 style="margin:0 0 16px;font-size:22px;font-weight:700;color:#FFFFFF;">
@@ -145,7 +145,10 @@ export function milestoneEmail(
 // ---------------------------------------------------------------------------
 // 4. Confirmation d'abonnement
 // ---------------------------------------------------------------------------
-export function subscriptionActivatedEmail(firstName: string, planName: string) {
+export function subscriptionActivatedEmail(
+  firstName: string,
+  planName: string,
+) {
   const html = layout(`
     <h1 style="margin:0 0 16px;font-size:22px;font-weight:700;color:#FFFFFF;">
       Abonnement ${planName} activ&eacute; !
@@ -236,11 +239,16 @@ export function paymentFailedEmail(firstName: string) {
 // ---------------------------------------------------------------------------
 export function kpiAlertEmail(
   firstName: string,
-  alerts: { title: string; message: string; severity: string }[]
+  alerts: { title: string; message: string; severity: string }[],
 ) {
   const alertRows = alerts
     .map((a) => {
-      const color = a.severity === "danger" ? "#EF4444" : a.severity === "warning" ? "#F59E0B" : "#3B82F6";
+      const color =
+        a.severity === "danger"
+          ? "#EF4444"
+          : a.severity === "warning"
+            ? "#F59E0B"
+            : "#3B82F6";
       return `<div style="background-color:#1C1F23;border-left:3px solid ${color};border-radius:6px;padding:14px 16px;margin:8px 0;">
         <p style="margin:0 0 4px;font-size:14px;font-weight:600;color:${color};">${a.title}</p>
         <p style="margin:0;font-size:13px;color:#D1D5DB;">${a.message}</p>

@@ -28,7 +28,10 @@ export async function POST(req: NextRequest) {
       .single();
 
     if (fetchError || !funnel) {
-      return NextResponse.json({ error: "Funnel introuvable" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Funnel introuvable" },
+        { status: 404 },
+      );
     }
 
     // Generate slug if not provided
@@ -51,7 +54,7 @@ export async function POST(req: NextRequest) {
     if (existing) {
       return NextResponse.json(
         { error: "Ce slug est déjà utilisé. Choisis un autre nom." },
-        { status: 409 }
+        { status: 409 },
       );
     }
 
@@ -72,11 +75,12 @@ export async function POST(req: NextRequest) {
       console.error("[funnel/publish] Error:", updateError);
       return NextResponse.json(
         { error: `Erreur : ${updateError.message}` },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://app.scalingflow.com";
+    const appUrl =
+      process.env.NEXT_PUBLIC_APP_URL || "https://app.scalingflow.com";
     const publicUrl = `${appUrl}/f/${finalSlug}`;
 
     return NextResponse.json({

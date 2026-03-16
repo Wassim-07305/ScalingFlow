@@ -5,11 +5,29 @@ import { cn } from "@/lib/utils/cn";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { AnimatedCounter } from "@/components/shared/animated-counter";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Flame, Zap, Trophy, Star, Target, BookOpen, Megaphone, PenTool, Lock } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
+  Flame,
+  Zap,
+  Trophy,
+  Star,
+  Target,
+  BookOpen,
+  Megaphone,
+  PenTool,
+  Lock,
+} from "lucide-react";
 import { useUser } from "@/hooks/use-user";
 import { createClient } from "@/lib/supabase/client";
-import { BADGE_DEFINITIONS, getBadgeDefinition } from "@/lib/gamification/badges";
+import {
+  BADGE_DEFINITIONS,
+  getBadgeDefinition,
+} from "@/lib/gamification/badges";
 
 interface ModuleProgress {
   name: string;
@@ -35,38 +53,45 @@ export function ProgressOverview({ className }: ProgressOverviewProps) {
       const supabase = createClient();
 
       // Requêtes parallèles pour compter les items par module + rang
-      const [offersRes, funnelsRes, adsRes, contentRes, leaderboardRes, videosRes, watchedRes] =
-        await Promise.all([
-          supabase
-            .from("offers")
-            .select("id", { count: "exact", head: true })
-            .eq("user_id", user.id),
-          supabase
-            .from("funnels")
-            .select("id", { count: "exact", head: true })
-            .eq("user_id", user.id),
-          supabase
-            .from("ad_creatives")
-            .select("id", { count: "exact", head: true })
-            .eq("user_id", user.id),
-          supabase
-            .from("content_pieces")
-            .select("id", { count: "exact", head: true })
-            .eq("user_id", user.id),
-          supabase
-            .from("leaderboard_scores")
-            .select("rank_position")
-            .eq("user_id", user.id)
-            .single(),
-          supabase
-            .from("academy_videos")
-            .select("id", { count: "exact", head: true }),
-          supabase
-            .from("video_progress")
-            .select("id", { count: "exact", head: true })
-            .eq("user_id", user.id)
-            .eq("watched", true),
-        ]);
+      const [
+        offersRes,
+        funnelsRes,
+        adsRes,
+        contentRes,
+        leaderboardRes,
+        videosRes,
+        watchedRes,
+      ] = await Promise.all([
+        supabase
+          .from("offers")
+          .select("id", { count: "exact", head: true })
+          .eq("user_id", user.id),
+        supabase
+          .from("funnels")
+          .select("id", { count: "exact", head: true })
+          .eq("user_id", user.id),
+        supabase
+          .from("ad_creatives")
+          .select("id", { count: "exact", head: true })
+          .eq("user_id", user.id),
+        supabase
+          .from("content_pieces")
+          .select("id", { count: "exact", head: true })
+          .eq("user_id", user.id),
+        supabase
+          .from("leaderboard_scores")
+          .select("rank_position")
+          .eq("user_id", user.id)
+          .single(),
+        supabase
+          .from("academy_videos")
+          .select("id", { count: "exact", head: true }),
+        supabase
+          .from("video_progress")
+          .select("id", { count: "exact", head: true })
+          .eq("user_id", user.id)
+          .eq("watched", true),
+      ]);
 
       // Calcul progression onboarding
       const onboardingProgress = profile?.onboarding_completed
@@ -77,17 +102,48 @@ export function ProgressOverview({ className }: ProgressOverviewProps) {
       const funnelProgress = (funnelsRes.count ?? 0) >= 1 ? 100 : 0;
       const totalVideos = videosRes.count ?? 0;
       const watchedVideos = watchedRes.count ?? 0;
-      const academyProgress = totalVideos > 0 ? Math.round((watchedVideos / totalVideos) * 100) : 0;
+      const academyProgress =
+        totalVideos > 0 ? Math.round((watchedVideos / totalVideos) * 100) : 0;
       const adsProgress = (adsRes.count ?? 0) >= 1 ? 100 : 0;
       const contentProgress = (contentRes.count ?? 0) >= 1 ? 100 : 0;
 
       setModules([
-        { name: "Onboarding", icon: Target, progress: onboardingProgress, color: "text-accent" },
-        { name: "Offre", icon: Star, progress: offerProgress, color: "text-accent" },
-        { name: "Funnel", icon: Target, progress: funnelProgress, color: "text-info" },
-        { name: "Academy", icon: BookOpen, progress: academyProgress, color: "text-accent" },
-        { name: "Ads", icon: Megaphone, progress: adsProgress, color: "text-[#A78BFA]" },
-        { name: "Contenu", icon: PenTool, progress: contentProgress, color: "text-accent" },
+        {
+          name: "Onboarding",
+          icon: Target,
+          progress: onboardingProgress,
+          color: "text-accent",
+        },
+        {
+          name: "Offre",
+          icon: Star,
+          progress: offerProgress,
+          color: "text-accent",
+        },
+        {
+          name: "Funnel",
+          icon: Target,
+          progress: funnelProgress,
+          color: "text-info",
+        },
+        {
+          name: "Academy",
+          icon: BookOpen,
+          progress: academyProgress,
+          color: "text-accent",
+        },
+        {
+          name: "Ads",
+          icon: Megaphone,
+          progress: adsProgress,
+          color: "text-[#A78BFA]",
+        },
+        {
+          name: "Contenu",
+          icon: PenTool,
+          progress: contentProgress,
+          color: "text-accent",
+        },
       ]);
 
       // Rang depuis leaderboard_scores
@@ -154,7 +210,9 @@ export function ProgressOverview({ className }: ProgressOverviewProps) {
                   {isLoading ? (
                     <span className="inline-block w-16 h-7 bg-bg-tertiary rounded animate-pulse" />
                   ) : (
-                    <><AnimatedCounter value={streak} /> jours</>
+                    <>
+                      <AnimatedCounter value={streak} /> jours
+                    </>
                   )}
                 </p>
               </div>
@@ -194,40 +252,49 @@ export function ProgressOverview({ className }: ProgressOverviewProps) {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {isLoading ? (
-              Array.from({ length: 6 }).map((_, i) => (
-                <div key={i} className="flex items-center gap-4">
-                  <div className="h-5 w-5 bg-bg-tertiary rounded animate-pulse" />
-                  <div className="flex-1">
-                    <div className="flex justify-between mb-1">
-                      <span className="inline-block w-20 h-4 bg-bg-tertiary rounded animate-pulse" />
-                      <span className="inline-block w-8 h-4 bg-bg-tertiary rounded animate-pulse" />
-                    </div>
-                    <Progress value={0} className="h-2" />
-                  </div>
-                </div>
-              ))
-            ) : (
-              modules.map((mod) => (
-                <div key={mod.name} className="flex items-center gap-4 group">
-                  <div className="h-9 w-9 rounded-lg bg-bg-tertiary/80 flex items-center justify-center ring-1 ring-white/5 group-hover:ring-accent/20 transition-all">
-                    <mod.icon className={cn("h-4.5 w-4.5", mod.color)} />
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex justify-between mb-1.5">
-                      <span className="text-sm font-medium text-text-primary">{mod.name}</span>
-                      <span className={cn("text-sm font-semibold", mod.progress === 100 ? "text-accent" : "text-text-muted")}>{mod.progress}%</span>
-                    </div>
-                    <div className="h-2 bg-bg-tertiary rounded-full overflow-hidden">
-                      <div
-                        className="h-full rounded-full bg-gradient-to-r from-accent/80 to-accent transition-all duration-700 ease-out"
-                        style={{ width: `${mod.progress}%` }}
-                      />
+            {isLoading
+              ? Array.from({ length: 6 }).map((_, i) => (
+                  <div key={i} className="flex items-center gap-4">
+                    <div className="h-5 w-5 bg-bg-tertiary rounded animate-pulse" />
+                    <div className="flex-1">
+                      <div className="flex justify-between mb-1">
+                        <span className="inline-block w-20 h-4 bg-bg-tertiary rounded animate-pulse" />
+                        <span className="inline-block w-8 h-4 bg-bg-tertiary rounded animate-pulse" />
+                      </div>
+                      <Progress value={0} className="h-2" />
                     </div>
                   </div>
-                </div>
-              ))
-            )}
+                ))
+              : modules.map((mod) => (
+                  <div key={mod.name} className="flex items-center gap-4 group">
+                    <div className="h-9 w-9 rounded-lg bg-bg-tertiary/80 flex items-center justify-center ring-1 ring-white/5 group-hover:ring-accent/20 transition-all">
+                      <mod.icon className={cn("h-4.5 w-4.5", mod.color)} />
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex justify-between mb-1.5">
+                        <span className="text-sm font-medium text-text-primary">
+                          {mod.name}
+                        </span>
+                        <span
+                          className={cn(
+                            "text-sm font-semibold",
+                            mod.progress === 100
+                              ? "text-accent"
+                              : "text-text-muted",
+                          )}
+                        >
+                          {mod.progress}%
+                        </span>
+                      </div>
+                      <div className="h-2 bg-bg-tertiary rounded-full overflow-hidden">
+                        <div
+                          className="h-full rounded-full bg-gradient-to-r from-accent/80 to-accent transition-all duration-700 ease-out"
+                          style={{ width: `${mod.progress}%` }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
           </div>
         </CardContent>
       </Card>
@@ -252,20 +319,22 @@ export function ProgressOverview({ className }: ProgressOverviewProps) {
                             "w-14 h-14 rounded-2xl flex items-center justify-center transition-all",
                             unlocked
                               ? "bg-gradient-to-br from-bg-secondary to-bg-tertiary ring-2 ring-accent/30"
-                              : "bg-bg-tertiary opacity-50"
+                              : "bg-bg-tertiary opacity-50",
                           )}
                         >
                           <Icon
                             className={cn(
                               "h-7 w-7 transition-colors",
-                              unlocked ? badgeDef.color : "text-text-muted"
+                              unlocked ? badgeDef.color : "text-text-muted",
                             )}
                           />
                         </div>
                         <span
                           className={cn(
                             "text-[11px] text-center leading-tight",
-                            unlocked ? "text-text-primary font-medium" : "text-text-muted"
+                            unlocked
+                              ? "text-text-primary font-medium"
+                              : "text-text-muted",
                           )}
                         >
                           {badgeDef.name}
@@ -274,9 +343,13 @@ export function ProgressOverview({ className }: ProgressOverviewProps) {
                     </TooltipTrigger>
                     <TooltipContent side="top" className="max-w-[200px]">
                       <p className="font-semibold">{badgeDef.name}</p>
-                      <p className="text-xs text-text-secondary">{badgeDef.description}</p>
+                      <p className="text-xs text-text-secondary">
+                        {badgeDef.description}
+                      </p>
                       {!unlocked && (
-                        <p className="text-xs text-text-muted mt-1 italic">Non débloqué</p>
+                        <p className="text-xs text-text-muted mt-1 italic">
+                          Non débloqué
+                        </p>
                       )}
                     </TooltipContent>
                   </Tooltip>

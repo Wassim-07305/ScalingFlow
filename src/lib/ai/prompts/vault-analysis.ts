@@ -107,7 +107,7 @@ Reponds UNIQUEMENT en JSON valide correspondant exactement a cette structure :
   const skillsFormatted = data.vaultSkills
     .map(
       (s) =>
-        `- ${s.name} (niveau: ${s.level})${s.details ? ` — ${s.details}` : ""}`
+        `- ${s.name} (niveau: ${s.level})${s.details ? ` — ${s.details}` : ""}`,
     )
     .join("\n");
 

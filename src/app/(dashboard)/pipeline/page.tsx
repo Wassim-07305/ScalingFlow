@@ -21,8 +21,9 @@ export default function PipelinePage() {
             Pipeline de vente
           </h2>
           <p className="text-sm text-text-secondary max-w-2xl">
-            Visualise chaque étape de ton processus commercial. Glisse-dépose tes leads entre les colonnes
-            pour suivre leur avancement en temps réel.
+            Visualise chaque étape de ton processus commercial. Glisse-dépose
+            tes leads entre les colonnes pour suivre leur avancement en temps
+            réel.
           </p>
         </div>
       </div>

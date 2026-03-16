@@ -79,7 +79,7 @@ export function GlobalSearch({
         setSearchOpen(!searchOpen);
       }
     },
-    [searchOpen, setSearchOpen]
+    [searchOpen, setSearchOpen],
   );
 
   useEffect(() => {

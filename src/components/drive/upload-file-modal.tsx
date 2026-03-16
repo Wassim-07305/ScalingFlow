@@ -106,14 +106,16 @@ export function UploadFileModal({
       toast.success(
         successCount === 1
           ? "Fichier uploadé avec succès"
-          : `${successCount} fichiers uploadés avec succès`
+          : `${successCount} fichiers uploadés avec succès`,
       );
       onUploadComplete();
       if (failedCount === 0) {
         onOpenChange(false);
       } else {
         // Keep modal open with only the failed files so user can retry
-        toast.error(`${failedCount} fichier${failedCount > 1 ? "s" : ""} en erreur`);
+        toast.error(
+          `${failedCount} fichier${failedCount > 1 ? "s" : ""} en erreur`,
+        );
       }
     }
   };
@@ -127,7 +129,8 @@ export function UploadFileModal({
             Uploader des fichiers
           </DialogTitle>
           <DialogDescription>
-            Glisse tes fichiers ici ou clique pour les sélectionner. Max 50 Mo par fichier.
+            Glisse tes fichiers ici ou clique pour les sélectionner. Max 50 Mo
+            par fichier.
           </DialogDescription>
         </DialogHeader>
 
@@ -137,7 +140,7 @@ export function UploadFileModal({
             "relative border-2 border-dashed rounded-xl p-8 text-center transition-all duration-300 cursor-pointer",
             dragOver
               ? "border-accent bg-accent/5 scale-[1.01] shadow-inner shadow-accent/10"
-              : "border-border-default hover:border-accent/30 hover:bg-accent/[0.02]"
+              : "border-border-default hover:border-accent/30 hover:bg-accent/[0.02]",
           )}
           onDragOver={(e) => {
             e.preventDefault();

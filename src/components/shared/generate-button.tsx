@@ -36,7 +36,7 @@ export function GenerateButton({
         "transition-all duration-300",
         "disabled:opacity-50 disabled:shadow-none",
         !loading && !disabled && "hover:scale-[1.02] active:scale-[0.98]",
-        className
+        className,
       )}
     >
       {loading ? (

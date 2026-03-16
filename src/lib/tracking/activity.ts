@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 export async function logActivity(
   userId: string,
   activityType: string,
-  activityData?: Record<string, unknown>
+  activityData?: Record<string, unknown>,
 ): Promise<void> {
   const supabase = await createClient();
 

@@ -2,7 +2,11 @@ export interface SchwartzAnalysisResult {
   niveau: 1 | 2 | 3 | 4 | 5;
   description: string;
   implication_marketing: string;
-  strategie_recommandee: "vsl" | "social_funnel" | "education_first" | "direct_response";
+  strategie_recommandee:
+    | "vsl"
+    | "social_funnel"
+    | "education_first"
+    | "direct_response";
   angle_publicitaire: string;
   type_contenu_prioritaire: string;
   niveau_preuve_requis: "faible" | "moyen" | "eleve" | "tres_eleve";
@@ -16,7 +20,9 @@ export interface SchwartzAnalysisInput {
   country: string | null;
 }
 
-export function buildSchwartzAnalysisPrompt(data: SchwartzAnalysisInput): string {
+export function buildSchwartzAnalysisPrompt(
+  data: SchwartzAnalysisInput,
+): string {
   return `Tu es un expert en marketing direct et en analyse de sophistication de marche selon les 5 niveaux d'Eugene Schwartz (Breakthrough Advertising).
 
 ## MARCHE A ANALYSER

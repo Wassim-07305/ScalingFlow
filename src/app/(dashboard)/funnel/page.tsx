@@ -28,7 +28,9 @@ export default function FunnelPage() {
     try {
       const { data, error } = await supabase
         .from("funnels")
-        .select("ai_raw_response, optin_page, vsl_page, thankyou_page, funnel_name")
+        .select(
+          "ai_raw_response, optin_page, vsl_page, thankyou_page, funnel_name",
+        )
         .eq("id", item.id)
         .single();
 

@@ -5,7 +5,10 @@ export interface AlertRule {
   name: string;
   description: string;
   category: "ads" | "activity" | "sales" | "content";
-  check: (supabase: SupabaseClient, userId: string) => Promise<AlertResult | null>;
+  check: (
+    supabase: SupabaseClient,
+    userId: string,
+  ) => Promise<AlertResult | null>;
 }
 
 export interface AlertResult {
@@ -25,7 +28,9 @@ function daysAgo(n: number): Date {
 }
 
 function daysBetween(a: Date, b: Date): number {
-  return Math.floor(Math.abs(b.getTime() - a.getTime()) / (1000 * 60 * 60 * 24));
+  return Math.floor(
+    Math.abs(b.getTime() - a.getTime()) / (1000 * 60 * 60 * 24),
+  );
 }
 
 // ─── Alert Rules ─────────────────────────────────────────────
@@ -83,7 +88,8 @@ export const ALERT_RULES: AlertRule[] = [
       if (withConversions.length === 0) return null;
 
       const avgCpa =
-        withConversions.reduce((s, d) => s + (d.cpa || 0), 0) / withConversions.length;
+        withConversions.reduce((s, d) => s + (d.cpa || 0), 0) /
+        withConversions.length;
       if (avgCpa > 50) {
         return {
           ruleId: "cpa_high",
@@ -111,7 +117,10 @@ export const ALERT_RULES: AlertRule[] = [
       if (!data || data.length === 0) return null;
 
       const totalSpend = data.reduce((s, d) => s + (d.spend || 0), 0);
-      const totalConversions = data.reduce((s, d) => s + (d.conversions || 0), 0);
+      const totalConversions = data.reduce(
+        (s, d) => s + (d.conversions || 0),
+        0,
+      );
 
       if (totalSpend > 30 && totalConversions === 0) {
         return {
@@ -247,7 +256,8 @@ export const ALERT_RULES: AlertRule[] = [
 
         return {
           ruleId: "inactivity_week",
-          severity: inactiveDays >= 14 ? ("danger" as const) : ("warning" as const),
+          severity:
+            inactiveDays >= 14 ? ("danger" as const) : ("warning" as const),
           title: "Semaine blanche détectée",
           message:
             inactiveDays >= 14
@@ -364,8 +374,13 @@ export const ALERT_RULES: AlertRule[] = [
 
       const engagementScore = (items: typeof recent) => {
         const total = items.reduce(
-          (sum, c) => sum + (c.views || 0) + (c.likes || 0) * 3 + (c.comments || 0) * 5 + (c.shares || 0) * 4,
-          0
+          (sum, c) =>
+            sum +
+            (c.views || 0) +
+            (c.likes || 0) * 3 +
+            (c.comments || 0) * 5 +
+            (c.shares || 0) * 4,
+          0,
         );
         return total / items.length;
       };

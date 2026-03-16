@@ -10,7 +10,9 @@ const anthropic = new Anthropic();
 export async function POST(req: Request) {
   try {
     const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (!user) {
       return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
     }
@@ -19,22 +21,70 @@ export async function POST(req: Request) {
     const date = body.date || new Date().toISOString().split("T")[0];
 
     // Collecter le contexte utilisateur
-    const [profileRes, offersRes, funnelsRes, campaignsRes, contentRes, callsRes, milestonesRes, alertsRes] = await Promise.all([
-      supabase.from("profiles").select("niche, offer_name, target_audience, xp_points, level, streak_days, onboarding_completed, revenue_target").eq("id", user.id).single(),
-      supabase.from("offers").select("id", { count: "exact", head: true }).eq("user_id", user.id),
-      supabase.from("funnels").select("id, status", { count: "exact" }).eq("user_id", user.id),
-      supabase.from("ad_campaigns").select("id, roas, status", { count: "exact" }).eq("user_id", user.id),
-      supabase.from("content_library").select("id", { count: "exact", head: true }).eq("user_id", user.id).gte("created_at", new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()),
-      supabase.from("sales_calls").select("id", { count: "exact", head: true }).eq("user_id", user.id),
-      supabase.from("user_milestones").select("milestone_id, completed").eq("user_id", user.id),
-      supabase.from("smart_alerts").select("alert_type, title, severity").eq("user_id", user.id).eq("read", false).limit(5),
+    const [
+      profileRes,
+      offersRes,
+      funnelsRes,
+      campaignsRes,
+      contentRes,
+      callsRes,
+      milestonesRes,
+      alertsRes,
+    ] = await Promise.all([
+      supabase
+        .from("profiles")
+        .select(
+          "niche, offer_name, target_audience, xp_points, level, streak_days, onboarding_completed, revenue_target",
+        )
+        .eq("id", user.id)
+        .single(),
+      supabase
+        .from("offers")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", user.id),
+      supabase
+        .from("funnels")
+        .select("id, status", { count: "exact" })
+        .eq("user_id", user.id),
+      supabase
+        .from("ad_campaigns")
+        .select("id, roas, status", { count: "exact" })
+        .eq("user_id", user.id),
+      supabase
+        .from("content_library")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", user.id)
+        .gte(
+          "created_at",
+          new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+        ),
+      supabase
+        .from("sales_calls")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", user.id),
+      supabase
+        .from("user_milestones")
+        .select("milestone_id, completed")
+        .eq("user_id", user.id),
+      supabase
+        .from("smart_alerts")
+        .select("alert_type, title, severity")
+        .eq("user_id", user.id)
+        .eq("read", false)
+        .limit(5),
     ]);
 
     const profile = profileRes.data;
-    const completedMilestones = (milestonesRes.data ?? []).filter((m) => m.completed).length;
+    const completedMilestones = (milestonesRes.data ?? []).filter(
+      (m) => m.completed,
+    ).length;
     const activeAlerts = alertsRes.data ?? [];
-    const publishedFunnels = (funnelsRes.data ?? []).filter((f) => (f as Record<string, unknown>).status === "published").length;
-    const activeCampaigns = (campaignsRes.data ?? []).filter((c) => (c as Record<string, unknown>).status === "active").length;
+    const publishedFunnels = (funnelsRes.data ?? []).filter(
+      (f) => (f as Record<string, unknown>).status === "published",
+    ).length;
+    const activeCampaigns = (campaignsRes.data ?? []).filter(
+      (c) => (c as Record<string, unknown>).status === "active",
+    ).length;
 
     const context = {
       niche: profile?.niche || "Non défini",
@@ -98,7 +148,8 @@ Génère le plan du jour au format JSON :
       ],
     });
 
-    const text = response.content[0].type === "text" ? response.content[0].text : "";
+    const text =
+      response.content[0].type === "text" ? response.content[0].text : "";
     let parsed;
     try {
       parsed = JSON.parse(text);
@@ -106,36 +157,49 @@ Génère le plan du jour au format JSON :
       const jsonMatch = text.match(/\{[\s\S]*\}/);
       if (jsonMatch) parsed = JSON.parse(jsonMatch[0]);
       else {
-        return NextResponse.json({ error: "Erreur de parsing IA" }, { status: 500 });
+        return NextResponse.json(
+          { error: "Erreur de parsing IA" },
+          { status: 500 },
+        );
       }
     }
 
     // Ajouter des IDs aux actions
-    const actions = (parsed.actions || []).map((a: Record<string, unknown>, i: number) => ({
-      ...a,
-      id: `action-${date}-${i}`,
-      completed: false,
-    }));
+    const actions = (parsed.actions || []).map(
+      (a: Record<string, unknown>, i: number) => ({
+        ...a,
+        id: `action-${date}-${i}`,
+        completed: false,
+      }),
+    );
 
     const plan = {
       date,
       motivation_message: parsed.motivation_message || "",
       focus_theme: parsed.focus_theme || "",
       actions,
-      total_xp: parsed.total_xp || actions.reduce((s: number, a: { xp_reward?: number }) => s + (a.xp_reward || 10), 0),
+      total_xp:
+        parsed.total_xp ||
+        actions.reduce(
+          (s: number, a: { xp_reward?: number }) => s + (a.xp_reward || 10),
+          0,
+        ),
     };
 
     // Sauvegarder le plan
     const { data: savedPlan } = await supabase
       .from("daily_plans")
-      .upsert({
-        user_id: user.id,
-        date,
-        motivation_message: plan.motivation_message,
-        focus_theme: plan.focus_theme,
-        actions: plan.actions,
-        total_xp: plan.total_xp,
-      }, { onConflict: "user_id,date" })
+      .upsert(
+        {
+          user_id: user.id,
+          date,
+          motivation_message: plan.motivation_message,
+          focus_theme: plan.focus_theme,
+          actions: plan.actions,
+          total_xp: plan.total_xp,
+        },
+        { onConflict: "user_id,date" },
+      )
       .select()
       .single();
 

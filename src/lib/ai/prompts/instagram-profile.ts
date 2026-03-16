@@ -10,7 +10,7 @@ export interface InstagramProfileResult {
 export function buildInstagramProfilePrompt(
   market: string,
   offer: string,
-  brand: string
+  brand: string,
 ): string {
   return `Tu es un expert en optimisation de profils Instagram pour les freelances et consultants.
 

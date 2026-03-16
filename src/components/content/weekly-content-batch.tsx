@@ -2,7 +2,13 @@
 
 import React from "react";
 import { cn } from "@/lib/utils/cn";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -41,20 +47,29 @@ import {
   Package,
 } from "lucide-react";
 import { toast } from "sonner";
-import type { WeeklyBatchResult, ContentPiece } from "@/lib/ai/prompts/continuous-content";
+import type {
+  WeeklyBatchResult,
+  ContentPiece,
+} from "@/lib/ai/prompts/continuous-content";
 
 interface WeeklyContentBatchProps {
   className?: string;
 }
 
-const TYPE_CONFIG: Record<string, { icon: React.ElementType; label: string; color: string }> = {
+const TYPE_CONFIG: Record<
+  string,
+  { icon: React.ElementType; label: string; color: string }
+> = {
   reel: { icon: Film, label: "Reel / Script", color: "text-orange-400" },
   carousel: { icon: Layers, label: "Carousel", color: "text-blue-400" },
   post: { icon: FileText, label: "Post", color: "text-emerald-400" },
   story: { icon: BookImage, label: "Story", color: "text-purple-400" },
 };
 
-const PILLAR_BADGE: Record<string, "default" | "blue" | "cyan" | "purple" | "yellow"> = {
+const PILLAR_BADGE: Record<
+  string,
+  "default" | "blue" | "cyan" | "purple" | "yellow"
+> = {
   Know: "blue",
   Like: "purple",
   Trust: "default",
@@ -124,8 +139,11 @@ export function WeeklyContentBatch({ className }: WeeklyContentBatchProps) {
 
   // Massive generation state
   const [massiveLoading, setMassiveLoading] = React.useState(false);
-  const [massiveResults, setMassiveResults] = React.useState<ContentPiece[]>([]);
-  const [batchProgress, setBatchProgress] = React.useState<BatchProgress | null>(null);
+  const [massiveResults, setMassiveResults] = React.useState<ContentPiece[]>(
+    [],
+  );
+  const [batchProgress, setBatchProgress] =
+    React.useState<BatchProgress | null>(null);
   const abortRef = React.useRef(false);
 
   // Filters for results grid
@@ -137,8 +155,10 @@ export function WeeklyContentBatch({ className }: WeeklyContentBatchProps) {
   const [activeTab, setActiveTab] = React.useState("generate");
   const [libraryPieces, setLibraryPieces] = React.useState<LibraryPiece[]>([]);
   const [libraryLoading, setLibraryLoading] = React.useState(false);
-  const [libraryPillarFilter, setLibraryPillarFilter] = React.useState<PillarFilter>("all");
-  const [libraryTypeFilter, setLibraryTypeFilter] = React.useState<TypeFilter>("all");
+  const [libraryPillarFilter, setLibraryPillarFilter] =
+    React.useState<PillarFilter>("all");
+  const [libraryTypeFilter, setLibraryTypeFilter] =
+    React.useState<TypeFilter>("all");
   const [librarySearch, setLibrarySearch] = React.useState("");
 
   // ─── Weekly batch generation (original) ──────────────────────────
@@ -160,7 +180,8 @@ export function WeeklyContentBatch({ className }: WeeklyContentBatchProps) {
           performance_data: performanceData
             ? { top_types: performanceData }
             : undefined,
-          objections: parsedObjections.length > 0 ? parsedObjections : undefined,
+          objections:
+            parsedObjections.length > 0 ? parsedObjections : undefined,
           preferences: {},
         }),
       });
@@ -231,7 +252,7 @@ export function WeeklyContentBatch({ className }: WeeklyContentBatchProps) {
         const batchScripts = Math.min(remainingScripts, BATCH_SIZE);
         const batchCarousels = Math.min(
           remainingCarousels,
-          BATCH_SIZE - batchScripts
+          BATCH_SIZE - batchScripts,
         );
         const batchTotal = batchScripts + batchCarousels;
 
@@ -256,7 +277,7 @@ export function WeeklyContentBatch({ className }: WeeklyContentBatchProps) {
                 completedBatches: batchIdx,
                 currentBatchLabel: `Lot ${batchIdx + 1}/${totalBatches} — ${batchScripts} scripts, ${batchCarousels} carousels (${pillars[0]})`,
               }
-            : null
+            : null,
         );
 
         // Build type preference hint for the API
@@ -264,15 +285,17 @@ export function WeeklyContentBatch({ className }: WeeklyContentBatchProps) {
           batchScripts > 0 && batchCarousels > 0
             ? `Génère ${batchScripts} scripts (reels) et ${batchCarousels} carousels. Pilier principal : ${pillars[0]}.`
             : batchScripts > 0
-            ? `Génère ${batchScripts} scripts (reels) uniquement. Pilier principal : ${pillars[0]}.`
-            : `Génère ${batchCarousels} carousels uniquement. Pilier principal : ${pillars[0]}.`;
+              ? `Génère ${batchScripts} scripts (reels) uniquement. Pilier principal : ${pillars[0]}.`
+              : `Génère ${batchCarousels} carousels uniquement. Pilier principal : ${pillars[0]}.`;
 
         const response = await fetch("/api/ai/generate-weekly-content", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             performance_data: performanceData
-              ? { top_types: `${performanceData}\n\n[INSTRUCTION BATCH]: ${typeHint}` }
+              ? {
+                  top_types: `${performanceData}\n\n[INSTRUCTION BATCH]: ${typeHint}`,
+                }
               : { top_types: `[INSTRUCTION BATCH]: ${typeHint}` },
             objections:
               parsedObjections.length > 0 ? parsedObjections : undefined,
@@ -317,7 +340,7 @@ export function WeeklyContentBatch({ className }: WeeklyContentBatchProps) {
                   completedBatches: batchIdx + 1,
                   generatedPieces: allPieces.length,
                 }
-              : null
+              : null,
           );
         }
 
@@ -329,7 +352,7 @@ export function WeeklyContentBatch({ className }: WeeklyContentBatchProps) {
 
       if (allPieces.length > 0) {
         toast.success(
-          `Machine à contenu terminée ! ${allPieces.length} contenus générés.`
+          `Machine à contenu terminée ! ${allPieces.length} contenus générés.`,
         );
       }
     } catch (err) {
@@ -377,11 +400,21 @@ export function WeeklyContentBatch({ className }: WeeklyContentBatchProps) {
     toast.success("Copié !");
   };
 
-  const filterPieces = <T extends ContentPiece>(pieces: T[], pf: PillarFilter, tf: TypeFilter, sq: string): T[] => {
+  const filterPieces = <T extends ContentPiece>(
+    pieces: T[],
+    pf: PillarFilter,
+    tf: TypeFilter,
+    sq: string,
+  ): T[] => {
     return pieces.filter((p) => {
       if (pf !== "all" && p.pillar !== pf) return false;
       if (tf !== "all" && p.type !== tf) return false;
-      if (sq && !p.hook.toLowerCase().includes(sq.toLowerCase()) && !p.script.toLowerCase().includes(sq.toLowerCase())) return false;
+      if (
+        sq &&
+        !p.hook.toLowerCase().includes(sq.toLowerCase()) &&
+        !p.script.toLowerCase().includes(sq.toLowerCase())
+      )
+        return false;
       return true;
     });
   };
@@ -404,17 +437,18 @@ export function WeeklyContentBatch({ className }: WeeklyContentBatchProps) {
     );
   }
 
-  const renderContentCard = (piece: ContentPiece, index: number, keyPrefix: string) => {
+  const renderContentCard = (
+    piece: ContentPiece,
+    index: number,
+    keyPrefix: string,
+  ) => {
     const isExpanded = expandedCard === index;
     const config = TYPE_CONFIG[piece.type] || TYPE_CONFIG.post;
     const Icon = config.icon;
     const copyKey = `${keyPrefix}-${index}`;
 
     return (
-      <GlowCard
-        key={copyKey}
-        glowColor={GLOW_MAP[piece.type] || "emerald"}
-      >
+      <GlowCard key={copyKey} glowColor={GLOW_MAP[piece.type] || "emerald"}>
         {/* Header */}
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
@@ -462,7 +496,7 @@ export function WeeklyContentBatch({ className }: WeeklyContentBatchProps) {
           <p
             className={cn(
               "text-sm text-text-secondary whitespace-pre-wrap",
-              !isExpanded && "line-clamp-3"
+              !isExpanded && "line-clamp-3",
             )}
           >
             {piece.script}
@@ -505,7 +539,7 @@ export function WeeklyContentBatch({ className }: WeeklyContentBatchProps) {
     sq: string,
     setSq: (v: string) => void,
     count: number,
-    totalCount: number
+    totalCount: number,
   ) => (
     <div className="space-y-3">
       <div className="flex flex-wrap items-center gap-3">
@@ -547,7 +581,8 @@ export function WeeklyContentBatch({ className }: WeeklyContentBatchProps) {
         </div>
       </div>
       <p className="text-xs text-text-muted">
-        {count} contenu{count > 1 ? "s" : ""} affiché{count > 1 ? "s" : ""} sur {totalCount}
+        {count} contenu{count > 1 ? "s" : ""} affiché{count > 1 ? "s" : ""} sur{" "}
+        {totalCount}
       </p>
     </div>
   );
@@ -556,7 +591,7 @@ export function WeeklyContentBatch({ className }: WeeklyContentBatchProps) {
   const renderMassiveProgress = () => {
     if (!batchProgress) return null;
     const pct = Math.round(
-      (batchProgress.completedBatches / batchProgress.totalBatches) * 100
+      (batchProgress.completedBatches / batchProgress.totalBatches) * 100,
     );
 
     return (
@@ -629,7 +664,7 @@ export function WeeklyContentBatch({ className }: WeeklyContentBatchProps) {
                       <span
                         className={cn(
                           "text-xs",
-                          TYPE_CONFIG[p.type]?.color || "text-text-secondary"
+                          TYPE_CONFIG[p.type]?.color || "text-text-secondary",
                         )}
                       >
                         {TYPE_CONFIG[p.type]?.label || p.type}
@@ -673,21 +708,26 @@ export function WeeklyContentBatch({ className }: WeeklyContentBatchProps) {
 
   // Show massive results
   if (massiveResults.length > 0 && !showForm) {
-    const filtered = filterPieces(massiveResults, pillarFilter, typeFilter, searchQuery);
+    const filtered = filterPieces(
+      massiveResults,
+      pillarFilter,
+      typeFilter,
+      searchQuery,
+    );
 
     // Compute stats
     const scriptCount = massiveResults.filter(
-      (p) => p.type === "reel" || p.type === "post" || p.type === "story"
+      (p) => p.type === "reel" || p.type === "post" || p.type === "story",
     ).length;
     const carouselCount = massiveResults.filter(
-      (p) => p.type === "carousel"
+      (p) => p.type === "carousel",
     ).length;
     const pillarCounts = massiveResults.reduce(
       (acc, p) => {
         acc[p.pillar] = (acc[p.pillar] || 0) + 1;
         return acc;
       },
-      {} as Record<string, number>
+      {} as Record<string, number>,
     );
 
     return (
@@ -746,17 +786,14 @@ export function WeeklyContentBatch({ className }: WeeklyContentBatchProps) {
                         key={pillar}
                         className="text-center p-3 rounded-lg bg-bg-tertiary"
                       >
-                        <Badge
-                          variant={PILLAR_BADGE[pillar]}
-                          className="mb-1"
-                        >
+                        <Badge variant={PILLAR_BADGE[pillar]} className="mb-1">
                           {pillar}
                         </Badge>
                         <p className="text-lg font-bold text-text-primary">
                           {pillarCounts[pillar] || 0}
                         </p>
                       </div>
-                    )
+                    ),
                   )}
                 </div>
               </CardContent>
@@ -771,13 +808,13 @@ export function WeeklyContentBatch({ className }: WeeklyContentBatchProps) {
               searchQuery,
               setSearchQuery,
               filtered.length,
-              massiveResults.length
+              massiveResults.length,
             )}
 
             {/* Grid */}
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {filtered.map((piece, i) =>
-                renderContentCard(piece, i, "massive")
+                renderContentCard(piece, i, "massive"),
               )}
             </div>
 
@@ -788,9 +825,7 @@ export function WeeklyContentBatch({ className }: WeeklyContentBatchProps) {
             )}
           </TabsContent>
 
-          <TabsContent value="library">
-            {renderLibraryTab()}
-          </TabsContent>
+          <TabsContent value="library">{renderLibraryTab()}</TabsContent>
         </Tabs>
       </div>
     );
@@ -799,7 +834,12 @@ export function WeeklyContentBatch({ className }: WeeklyContentBatchProps) {
   // Show weekly results
   if (result && !showForm) {
     const { adaptation_intelligente, contenus } = result;
-    const filtered = filterPieces(contenus, pillarFilter, typeFilter, searchQuery);
+    const filtered = filterPieces(
+      contenus,
+      pillarFilter,
+      typeFilter,
+      searchQuery,
+    );
 
     return (
       <div className={cn("space-y-6", className)}>
@@ -834,11 +874,7 @@ export function WeeklyContentBatch({ className }: WeeklyContentBatchProps) {
                 >
                   Nouveau batch
                 </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleGenerate}
-                >
+                <Button variant="outline" size="sm" onClick={handleGenerate}>
                   <Sparkles className="h-3 w-3 mr-1" />
                   Régénérer
                 </Button>
@@ -883,10 +919,10 @@ export function WeeklyContentBatch({ className }: WeeklyContentBatchProps) {
                               item.type === "reel"
                                 ? "bg-orange-400"
                                 : item.type === "carousel"
-                                ? "bg-blue-400"
-                                : item.type === "story"
-                                ? "bg-purple-400"
-                                : "bg-emerald-400"
+                                  ? "bg-blue-400"
+                                  : item.type === "story"
+                                    ? "bg-purple-400"
+                                    : "bg-emerald-400",
                             )}
                             style={{ width: `${item.pourcentage}%` }}
                           />
@@ -919,20 +955,18 @@ export function WeeklyContentBatch({ className }: WeeklyContentBatchProps) {
               searchQuery,
               setSearchQuery,
               filtered.length,
-              contenus.length
+              contenus.length,
             )}
 
             {/* Content cards grid */}
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {filtered.map((piece, i) =>
-                renderContentCard(piece, i, "weekly")
+                renderContentCard(piece, i, "weekly"),
               )}
             </div>
           </TabsContent>
 
-          <TabsContent value="library">
-            {renderLibraryTab()}
-          </TabsContent>
+          <TabsContent value="library">{renderLibraryTab()}</TabsContent>
         </Tabs>
       </div>
     );
@@ -975,13 +1009,13 @@ export function WeeklyContentBatch({ className }: WeeklyContentBatchProps) {
                     "flex flex-col items-center gap-2 p-4 rounded-xl border transition-all duration-200",
                     mode === "hebdo"
                       ? "border-accent bg-accent/10 text-text-primary"
-                      : "border-border-default bg-bg-tertiary text-text-secondary hover:border-border-default/80"
+                      : "border-border-default bg-bg-tertiary text-text-secondary hover:border-border-default/80",
                   )}
                 >
                   <Zap
                     className={cn(
                       "h-6 w-6",
-                      mode === "hebdo" ? "text-accent" : "text-text-muted"
+                      mode === "hebdo" ? "text-accent" : "text-text-muted",
                     )}
                   />
                   <span className="text-sm font-medium">Batch hebdo</span>
@@ -993,16 +1027,18 @@ export function WeeklyContentBatch({ className }: WeeklyContentBatchProps) {
                     "flex flex-col items-center gap-2 p-4 rounded-xl border transition-all duration-200",
                     mode === "massive"
                       ? "border-accent bg-accent/10 text-text-primary"
-                      : "border-border-default bg-bg-tertiary text-text-secondary hover:border-border-default/80"
+                      : "border-border-default bg-bg-tertiary text-text-secondary hover:border-border-default/80",
                   )}
                 >
                   <Rocket
                     className={cn(
                       "h-6 w-6",
-                      mode === "massive" ? "text-accent" : "text-text-muted"
+                      mode === "massive" ? "text-accent" : "text-text-muted",
                     )}
                   />
-                  <span className="text-sm font-medium">Génération massive</span>
+                  <span className="text-sm font-medium">
+                    Génération massive
+                  </span>
                   <span className="text-xs text-text-muted">
                     Jusqu&apos;à 100 contenus
                   </span>
@@ -1092,12 +1128,12 @@ export function WeeklyContentBatch({ className }: WeeklyContentBatchProps) {
                               "py-2 px-3 rounded-lg border text-sm font-medium transition-all",
                               massiveConfig.pillar === pillar
                                 ? "border-accent bg-accent/15 text-accent"
-                                : "border-border-default bg-bg-tertiary text-text-secondary hover:bg-bg-secondary"
+                                : "border-border-default bg-bg-tertiary text-text-secondary hover:bg-bg-secondary",
                             )}
                           >
                             {pillar === "Mix" ? "Mix (tous)" : pillar}
                           </button>
-                        )
+                        ),
                       )}
                     </div>
                   </div>
@@ -1107,7 +1143,8 @@ export function WeeklyContentBatch({ className }: WeeklyContentBatchProps) {
                     <p className="text-xs text-text-muted mb-1">Résumé</p>
                     <p className="text-sm text-text-primary">
                       <span className="text-accent font-bold">
-                        {massiveConfig.scriptCount + massiveConfig.carouselCount}
+                        {massiveConfig.scriptCount +
+                          massiveConfig.carouselCount}
                       </span>{" "}
                       contenus au total :{" "}
                       <span className="text-orange-400">
@@ -1123,7 +1160,7 @@ export function WeeklyContentBatch({ className }: WeeklyContentBatchProps) {
                       {Math.ceil(
                         (massiveConfig.scriptCount +
                           massiveConfig.carouselCount) /
-                          5
+                          5,
                       )}{" "}
                       appels API séquentiels (lots de 5)
                     </p>
@@ -1136,7 +1173,9 @@ export function WeeklyContentBatch({ className }: WeeklyContentBatchProps) {
                 <label className="text-sm font-medium text-text-primary mb-1 block">
                   <TrendingUp className="inline h-4 w-4 mr-1 text-accent" />
                   Données de performance{" "}
-                  <span className="text-text-muted font-normal">(optionnel)</span>
+                  <span className="text-text-muted font-normal">
+                    (optionnel)
+                  </span>
                 </label>
                 <p className="text-xs text-text-muted mb-2">
                   Quels types de contenu ont le mieux fonctionné cette semaine ?
@@ -1155,7 +1194,9 @@ export function WeeklyContentBatch({ className }: WeeklyContentBatchProps) {
                 <label className="text-sm font-medium text-text-primary mb-1 block">
                   <Brain className="inline h-4 w-4 mr-1 text-accent" />
                   Objections de vente entendues{" "}
-                  <span className="text-text-muted font-normal">(optionnel)</span>
+                  <span className="text-text-muted font-normal">
+                    (optionnel)
+                  </span>
                 </label>
                 <p className="text-xs text-text-muted mb-2">
                   Une objection par ligne. L&apos;IA créera du contenu qui les
@@ -1194,7 +1235,8 @@ export function WeeklyContentBatch({ className }: WeeklyContentBatchProps) {
                   >
                     <Rocket className="h-4 w-4 mr-2" />
                     Lancer la machine à contenu (
-                    {massiveConfig.scriptCount + massiveConfig.carouselCount}{" "}
+                    {massiveConfig.scriptCount +
+                      massiveConfig.carouselCount}{" "}
                     contenus)
                   </Button>
                   <p className="text-xs text-text-muted text-center">
@@ -1207,9 +1249,7 @@ export function WeeklyContentBatch({ className }: WeeklyContentBatchProps) {
           </Card>
         </TabsContent>
 
-        <TabsContent value="library">
-          {renderLibraryTab()}
-        </TabsContent>
+        <TabsContent value="library">{renderLibraryTab()}</TabsContent>
       </Tabs>
     </div>
   );
@@ -1218,10 +1258,7 @@ export function WeeklyContentBatch({ className }: WeeklyContentBatchProps) {
   function renderLibraryTab() {
     if (libraryLoading) {
       return (
-        <AILoading
-          text="Chargement de la bibliothèque..."
-          variant="minimal"
-        />
+        <AILoading text="Chargement de la bibliothèque..." variant="minimal" />
       );
     }
 
@@ -1230,7 +1267,9 @@ export function WeeklyContentBatch({ className }: WeeklyContentBatchProps) {
       libraryPieces.map((lp) => ({
         id: lp.id,
         created_at: lp.created_at,
-        type: lp.ai_raw_response?.type || mapContentTypeToPieceType(lp.content_type),
+        type:
+          lp.ai_raw_response?.type ||
+          mapContentTypeToPieceType(lp.content_type),
         pillar: lp.ai_raw_response?.pillar || "Know",
         hook: lp.ai_raw_response?.hook || lp.hook || "",
         script: lp.ai_raw_response?.script || lp.content || "",
@@ -1243,7 +1282,7 @@ export function WeeklyContentBatch({ className }: WeeklyContentBatchProps) {
       mappedPieces,
       libraryPillarFilter,
       libraryTypeFilter,
-      librarySearch
+      librarySearch,
     );
 
     return (
@@ -1276,7 +1315,7 @@ export function WeeklyContentBatch({ className }: WeeklyContentBatchProps) {
               librarySearch,
               setLibrarySearch,
               filtered.length,
-              mappedPieces.length
+              mappedPieces.length,
             )}
 
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">

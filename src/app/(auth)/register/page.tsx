@@ -13,9 +13,15 @@ import { Check, X, Loader2, Sparkles } from "lucide-react";
 
 function translateRegisterError(message: string): string {
   const msg = message.toLowerCase();
-  if (msg.includes("already registered") || msg.includes("already been registered"))
+  if (
+    msg.includes("already registered") ||
+    msg.includes("already been registered")
+  )
     return "Un compte existe déjà avec cet email.";
-  if (msg.includes("password") && (msg.includes("short") || msg.includes("least")))
+  if (
+    msg.includes("password") &&
+    (msg.includes("short") || msg.includes("least"))
+  )
     return "Le mot de passe doit avoir au moins 6 caractères.";
   if (msg.includes("valid email") || msg.includes("invalid email"))
     return "Format d'email invalide.";
@@ -37,11 +43,14 @@ export default function RegisterPage() {
   const router = useRouter();
   const supabase = createClient();
 
-  const passwordChecks = useMemo(() => [
-    { label: "6 caractères minimum", met: password.length >= 6 },
-    { label: "Une majuscule", met: /[A-Z]/.test(password) },
-    { label: "Un chiffre", met: /\d/.test(password) },
-  ], [password]);
+  const passwordChecks = useMemo(
+    () => [
+      { label: "6 caractères minimum", met: password.length >= 6 },
+      { label: "Une majuscule", met: /[A-Z]/.test(password) },
+      { label: "Un chiffre", met: /\d/.test(password) },
+    ],
+    [password],
+  );
 
   const passwordStrength = passwordChecks.filter((c) => c.met).length;
 
@@ -89,7 +98,13 @@ export default function RegisterPage() {
       {/* Header */}
       <div className="text-center space-y-3">
         <div className="flex items-center justify-center gap-3">
-          <Image src="/icons/icon-192.png" alt="ScalingFlow" width={44} height={44} className="rounded-xl shadow-lg shadow-accent/10" />
+          <Image
+            src="/icons/icon-192.png"
+            alt="ScalingFlow"
+            width={44}
+            height={44}
+            className="rounded-xl shadow-lg shadow-accent/10"
+          />
           <h1 className="text-3xl font-bold text-text-primary">ScalingFlow</h1>
         </div>
         <p className="text-text-secondary">
@@ -159,7 +174,7 @@ export default function RegisterPage() {
                           : passwordStrength === 2
                             ? "bg-yellow-500 shadow-sm shadow-yellow-500/30"
                             : "bg-danger shadow-sm shadow-danger/30"
-                        : "bg-bg-tertiary"
+                        : "bg-bg-tertiary",
                     )}
                   />
                 ))}
@@ -177,10 +192,12 @@ export default function RegisterPage() {
                         <X className="h-2.5 w-2.5 text-text-muted" />
                       </div>
                     )}
-                    <span className={cn(
-                      "text-[11px] transition-colors",
-                      check.met ? "text-text-secondary" : "text-text-muted"
-                    )}>
+                    <span
+                      className={cn(
+                        "text-[11px] transition-colors",
+                        check.met ? "text-text-secondary" : "text-text-muted",
+                      )}
+                    >
                       {check.label}
                     </span>
                   </div>
@@ -196,7 +213,11 @@ export default function RegisterPage() {
           </div>
         )}
 
-        <Button type="submit" className="w-full h-11 text-base group" disabled={loading}>
+        <Button
+          type="submit"
+          className="w-full h-11 text-base group"
+          disabled={loading}
+        >
           {loading ? (
             <Loader2 className="h-4 w-4 mr-2 animate-spin" />
           ) : (
@@ -218,7 +239,10 @@ export default function RegisterPage() {
           </Link>
         </p>
         <p className="text-xs text-text-muted">
-          <Link href="/welcome" className="hover:text-text-secondary transition-colors">
+          <Link
+            href="/welcome"
+            className="hover:text-text-secondary transition-colors"
+          >
             Retour à l&apos;accueil
           </Link>
         </p>

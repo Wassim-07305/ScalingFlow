@@ -1,5 +1,17 @@
+export interface BrandNameSuggestion {
+  name: string;
+  rationale: string;
+  disponibilite_probable: string;
+  domain_suggestions: string[];
+  availability_hint:
+    | "probablement disponible"
+    | "vérifier"
+    | "probablement pris";
+  hashtags: string[];
+}
+
 export interface BrandIdentityResult {
-  noms: { name: string; rationale: string; disponibilite_probable: string }[];
+  noms: BrandNameSuggestion[];
   direction_artistique: {
     palette: { name: string; hex: string; usage: string }[];
     typographies: { role: string; font_family: string; style: string }[];
@@ -52,15 +64,23 @@ export function buildBrandIdentityPrompt(data: BrandIdentityInput): string {
 - Positionnement : ${data.marketAnalysis.positioning}
 ${data.marketAnalysis.target_avatar ? `- Avatar cible : ${JSON.stringify(data.marketAnalysis.target_avatar)}` : ""}
 
-${data.offer ? `### Offre
+${
+  data.offer
+    ? `### Offre
 - Nom : ${data.offer.offer_name}
 - Positionnement : ${data.offer.positioning}
-- Mecanisme unique : ${data.offer.unique_mechanism}` : ""}
+- Mecanisme unique : ${data.offer.unique_mechanism}`
+    : ""
+}
 
-${data.categoryOS ? `### Category OS
+${
+  data.categoryOS
+    ? `### Category OS
 ${data.categoryOS.category_name ? `- Categorie : ${data.categoryOS.category_name}` : ""}
 ${data.categoryOS.tagline ? `- Tagline : ${data.categoryOS.tagline}` : ""}
-${data.categoryOS.tone_of_voice ? `- Ton de voix : ${data.categoryOS.tone_of_voice}` : ""}` : ""}
+${data.categoryOS.tone_of_voice ? `- Ton de voix : ${data.categoryOS.tone_of_voice}` : ""}`
+    : ""
+}
 
 ## MISSION — IDENTITE DE MARQUE COMPLETE
 
@@ -69,6 +89,9 @@ Genere 10 noms de marque uniques et memorisables. Pour chaque nom :
 - name : le nom (court, 1-3 mots, facile a prononcer en francais et anglais)
 - rationale : pourquoi ce nom est pertinent (etymologie, connotation, phonetique)
 - disponibilite_probable : "haute", "moyenne" ou "basse" (estime si le .com / .fr est probablement disponible)
+- domain_suggestions : array de 2-3 suggestions de domaines (ex: ["monnom.com", "monnom.fr", "monnom.io"]). Propose des variantes realistes (.com, .fr, .io, .co)
+- availability_hint : "probablement disponible", "vérifier" ou "probablement pris" (estime la probabilite que le domaine principal soit libre, base sur la genericite du nom)
+- hashtags : array de 3-5 hashtags Instagram/TikTok pertinents pour la marque (ex: ["#MonNom", "#MonNomOfficiel", "#MonNomFrance"])
 
 Styles de noms a explorer : neologisme, fusion de mots, metaphore, acronyme stylise, mot etranger detourne.
 

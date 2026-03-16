@@ -10,7 +10,7 @@ const GHL_API_URL = "https://services.leadconnectorhq.com";
 async function refreshGHLToken(
   supabase: Awaited<ReturnType<typeof createClient>>,
   userId: string,
-  refreshToken: string
+  refreshToken: string,
 ) {
   const res = await fetch(`${GHL_API_URL}/oauth/token`, {
     method: "POST",
@@ -30,7 +30,9 @@ async function refreshGHLToken(
       .update({
         access_token: data.access_token,
         refresh_token: data.refresh_token || refreshToken,
-        token_expires_at: new Date(Date.now() + (data.expires_in || 86400) * 1000).toISOString(),
+        token_expires_at: new Date(
+          Date.now() + (data.expires_in || 86400) * 1000,
+        ).toISOString(),
       })
       .eq("user_id", userId)
       .eq("provider", "ghl");
@@ -43,7 +45,9 @@ async function refreshGHLToken(
 export async function POST(req: NextRequest) {
   try {
     const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
     if (!user) {
       return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
@@ -73,12 +77,31 @@ export async function POST(req: NextRequest) {
         try {
           const webhookUrl = new URL(profile.ghl_webhook_url);
           const wh = webhookUrl.hostname.toLowerCase();
-          const blocked = [/^localhost$/, /^127\./, /^10\./, /^172\.(1[6-9]|2\d|3[0-1])\./, /^192\.168\./, /^0\./, /^169\.254\./, /\.internal$/, /\.local$/];
-          if (blocked.some((p) => p.test(wh)) || !["http:", "https:"].includes(webhookUrl.protocol)) {
-            return NextResponse.json({ error: "URL webhook non autorisée" }, { status: 400 });
+          const blocked = [
+            /^localhost$/,
+            /^127\./,
+            /^10\./,
+            /^172\.(1[6-9]|2\d|3[0-1])\./,
+            /^192\.168\./,
+            /^0\./,
+            /^169\.254\./,
+            /\.internal$/,
+            /\.local$/,
+          ];
+          if (
+            blocked.some((p) => p.test(wh)) ||
+            !["http:", "https:"].includes(webhookUrl.protocol)
+          ) {
+            return NextResponse.json(
+              { error: "URL webhook non autorisée" },
+              { status: 400 },
+            );
           }
         } catch {
-          return NextResponse.json({ error: "URL webhook invalide" }, { status: 400 });
+          return NextResponse.json(
+            { error: "URL webhook invalide" },
+            { status: 400 },
+          );
         }
 
         // Push via webhook
@@ -91,7 +114,7 @@ export async function POST(req: NextRequest) {
         if (!res.ok) {
           return NextResponse.json(
             { error: "Erreur lors de l'envoi au webhook GHL" },
-            { status: 502 }
+            { status: 502 },
           );
         }
 
@@ -100,34 +123,43 @@ export async function POST(req: NextRequest) {
 
       return NextResponse.json(
         { error: "Connecte GoHighLevel d'abord." },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     // Check if token needs refresh
     let accessToken = connection.access_token;
-    if (connection.token_expires_at && new Date(connection.token_expires_at) < new Date()) {
+    if (
+      connection.token_expires_at &&
+      new Date(connection.token_expires_at) < new Date()
+    ) {
       if (connection.refresh_token) {
-        accessToken = await refreshGHLToken(supabase, user.id, connection.refresh_token);
+        accessToken = await refreshGHLToken(
+          supabase,
+          user.id,
+          connection.refresh_token,
+        );
         if (!accessToken) {
           return NextResponse.json(
             { error: "Token GHL expire. Reconnecte ton compte." },
-            { status: 401 }
+            { status: 401 },
           );
         }
       }
     }
 
-    const { email, phone, name, firstName, lastName, tags, source, notes } = body;
+    const { email, phone, name, firstName, lastName, tags, source, notes } =
+      body;
 
     if (!email && !phone) {
       return NextResponse.json(
         { error: "email ou phone requis" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
-    const locationId = connection.metadata?.locationId || connection.provider_account_id;
+    const locationId =
+      connection.metadata?.locationId || connection.provider_account_id;
 
     // Create or update contact in GHL
     const contactBody: Record<string, unknown> = {
@@ -160,7 +192,7 @@ export async function POST(req: NextRequest) {
     if (!res.ok) {
       return NextResponse.json(
         { error: `GHL API: ${data.message || JSON.stringify(data)}` },
-        { status: 502 }
+        { status: 502 },
       );
     }
 
@@ -172,7 +204,7 @@ export async function POST(req: NextRequest) {
   } catch {
     return NextResponse.json(
       { error: "Erreur lors du push contact GHL" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

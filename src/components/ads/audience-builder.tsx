@@ -102,7 +102,9 @@ export function AudienceBuilder() {
   const [metaConnected, setMetaConnected] = useState<boolean | null>(null);
 
   // Cold form state
-  const [coldMode, setColdMode] = useState<"interests" | "lookalike">("interests");
+  const [coldMode, setColdMode] = useState<"interests" | "lookalike">(
+    "interests",
+  );
   const [coldName, setColdName] = useState("");
   const [coldInterests, setColdInterests] = useState<string[]>([]);
   const [coldInterestSearch, setColdInterestSearch] = useState("");
@@ -110,7 +112,9 @@ export function AudienceBuilder() {
   const [coldLlaPercentage, setColdLlaPercentage] = useState(1);
   const [coldAgeMin, setColdAgeMin] = useState(25);
   const [coldAgeMax, setColdAgeMax] = useState(55);
-  const [coldGender, setColdGender] = useState<"all" | "male" | "female">("all");
+  const [coldGender, setColdGender] = useState<"all" | "male" | "female">(
+    "all",
+  );
   const [coldCountry, setColdCountry] = useState("FR");
 
   // Warm form state
@@ -156,7 +160,7 @@ export function AudienceBuilder() {
   const createAudience = async (
     type: "cold" | "warm" | "hot" | "exclusion",
     name: string,
-    config: Record<string, unknown>
+    config: Record<string, unknown>,
   ) => {
     setCreating(true);
     try {
@@ -270,18 +274,18 @@ export function AudienceBuilder() {
     setColdInterests((prev) =>
       prev.includes(interest)
         ? prev.filter((i) => i !== interest)
-        : [...prev, interest]
+        : [...prev, interest],
     );
   };
 
   const toggleExcludedAudience = (id: string) => {
     setExcludedAudienceIds((prev) =>
-      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
+      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id],
     );
   };
 
   const filteredInterests = PREDEFINED_INTERESTS.filter((i) =>
-    i.toLowerCase().includes(coldInterestSearch.toLowerCase())
+    i.toLowerCase().includes(coldInterestSearch.toLowerCase()),
   );
 
   const getTypeIcon = (type: string) => {
@@ -314,7 +318,9 @@ export function AudienceBuilder() {
     }
   };
 
-  const getTypeBadgeVariant = (type: string): "blue" | "yellow" | "red" | "muted" => {
+  const getTypeBadgeVariant = (
+    type: string,
+  ): "blue" | "yellow" | "red" | "muted" => {
     switch (type) {
       case "cold":
         return "blue";
@@ -404,7 +410,7 @@ export function AudienceBuilder() {
   // ─── Render ────────────────────────────────────────────────
 
   const existingAudiencesForLLA = audiences.filter(
-    (a) => a.meta_audience_id && a.audience_type !== "exclusion"
+    (a) => a.meta_audience_id && a.audience_type !== "exclusion",
   );
 
   return (
@@ -460,7 +466,9 @@ export function AudienceBuilder() {
                   <Label>Type de ciblage</Label>
                   <div className="flex gap-2">
                     <Button
-                      variant={coldMode === "interests" ? "default" : "secondary"}
+                      variant={
+                        coldMode === "interests" ? "default" : "secondary"
+                      }
                       size="sm"
                       onClick={() => setColdMode("interests")}
                     >
@@ -468,7 +476,9 @@ export function AudienceBuilder() {
                       Centres d&apos;intérêt
                     </Button>
                     <Button
-                      variant={coldMode === "lookalike" ? "default" : "secondary"}
+                      variant={
+                        coldMode === "lookalike" ? "default" : "secondary"
+                      }
                       size="sm"
                       onClick={() => setColdMode("lookalike")}
                     >
@@ -488,7 +498,9 @@ export function AudienceBuilder() {
                           placeholder="Rechercher un intérêt..."
                           className="pl-9"
                           value={coldInterestSearch}
-                          onChange={(e) => setColdInterestSearch(e.target.value)}
+                          onChange={(e) =>
+                            setColdInterestSearch(e.target.value)
+                          }
                         />
                       </div>
                       <div className="flex flex-wrap gap-1.5 max-h-40 overflow-y-auto p-2 rounded-lg bg-bg-tertiary border border-border-default">
@@ -500,7 +512,7 @@ export function AudienceBuilder() {
                               "px-2.5 py-1 rounded-full text-xs font-medium transition-colors",
                               coldInterests.includes(interest)
                                 ? "bg-accent text-bg-primary"
-                                : "bg-bg-secondary text-text-secondary hover:bg-bg-tertiary hover:text-text-primary border border-border-default"
+                                : "bg-bg-secondary text-text-secondary hover:bg-bg-tertiary hover:text-text-primary border border-border-default",
                             )}
                           >
                             {interest}
@@ -510,7 +522,11 @@ export function AudienceBuilder() {
                       {coldInterests.length > 0 && (
                         <div className="flex flex-wrap gap-1.5">
                           {coldInterests.map((interest) => (
-                            <Badge key={interest} variant="default" className="gap-1">
+                            <Badge
+                              key={interest}
+                              variant="default"
+                              className="gap-1"
+                            >
                               {interest}
                               <button onClick={() => toggleInterest(interest)}>
                                 <X className="h-3 w-3" />
@@ -527,7 +543,10 @@ export function AudienceBuilder() {
                   <div className="space-y-3">
                     <div className="space-y-2">
                       <Label>Audience source</Label>
-                      <Select value={coldLlaSource} onValueChange={setColdLlaSource}>
+                      <Select
+                        value={coldLlaSource}
+                        onValueChange={setColdLlaSource}
+                      >
                         <SelectTrigger>
                           <SelectValue placeholder="Sélectionne une audience source" />
                         </SelectTrigger>
@@ -538,7 +557,10 @@ export function AudienceBuilder() {
                             </SelectItem>
                           ) : (
                             existingAudiencesForLLA.map((a) => (
-                              <SelectItem key={a.id} value={a.meta_audience_id!}>
+                              <SelectItem
+                                key={a.id}
+                                value={a.meta_audience_id!}
+                              >
                                 {a.name}
                               </SelectItem>
                             ))
@@ -557,7 +579,9 @@ export function AudienceBuilder() {
                         max={10}
                         step={1}
                         value={coldLlaPercentage}
-                        onChange={(e) => setColdLlaPercentage(parseInt(e.target.value))}
+                        onChange={(e) =>
+                          setColdLlaPercentage(parseInt(e.target.value))
+                        }
                         className="w-full accent-emerald-400"
                       />
                       <div className="flex justify-between text-[10px] text-text-muted">
@@ -577,7 +601,9 @@ export function AudienceBuilder() {
                       min={18}
                       max={65}
                       value={coldAgeMin}
-                      onChange={(e) => setColdAgeMin(parseInt(e.target.value) || 18)}
+                      onChange={(e) =>
+                        setColdAgeMin(parseInt(e.target.value) || 18)
+                      }
                     />
                   </div>
                   <div className="space-y-2">
@@ -587,7 +613,9 @@ export function AudienceBuilder() {
                       min={18}
                       max={65}
                       value={coldAgeMax}
-                      onChange={(e) => setColdAgeMax(parseInt(e.target.value) || 65)}
+                      onChange={(e) =>
+                        setColdAgeMax(parseInt(e.target.value) || 65)
+                      }
                     />
                   </div>
                 </div>
@@ -595,7 +623,12 @@ export function AudienceBuilder() {
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-2">
                     <Label>Genre</Label>
-                    <Select value={coldGender} onValueChange={(v) => setColdGender(v as "all" | "male" | "female")}>
+                    <Select
+                      value={coldGender}
+                      onValueChange={(v) =>
+                        setColdGender(v as "all" | "male" | "female")
+                      }
+                    >
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
@@ -785,7 +818,8 @@ export function AudienceBuilder() {
 
                 <div className="space-y-2">
                   <Label>Audiences à exclure</Label>
-                  {audiences.filter((a) => a.audience_type !== "exclusion").length === 0 ? (
+                  {audiences.filter((a) => a.audience_type !== "exclusion")
+                    .length === 0 ? (
                     <p className="text-xs text-text-muted py-4 text-center">
                       Crée d&apos;abord une audience froide, tiède ou chaude.
                     </p>
@@ -801,7 +835,7 @@ export function AudienceBuilder() {
                               "flex items-center justify-between w-full px-3 py-2 rounded-lg text-sm transition-colors",
                               excludedAudienceIds.includes(a.id)
                                 ? "bg-red-500/10 border border-red-500/30 text-text-primary"
-                                : "hover:bg-bg-secondary text-text-secondary"
+                                : "hover:bg-bg-secondary text-text-secondary",
                             )}
                           >
                             <div className="flex items-center gap-2">
@@ -864,7 +898,10 @@ export function AudienceBuilder() {
                   className="flex items-center justify-between p-3 rounded-xl bg-bg-tertiary border border-border-default"
                 >
                   <div className="flex items-center gap-3">
-                    <Badge variant={getTypeBadgeVariant(audience.audience_type)} className="gap-1">
+                    <Badge
+                      variant={getTypeBadgeVariant(audience.audience_type)}
+                      className="gap-1"
+                    >
                       {getTypeIcon(audience.audience_type)}
                       {getTypeLabel(audience.audience_type)}
                     </Badge>
@@ -875,10 +912,7 @@ export function AudienceBuilder() {
                       <p className="text-xs text-text-muted">
                         {audience.subtype}
                         {audience.meta_audience_id && (
-                          <span>
-                            {" "}
-                            &middot; ID: {audience.meta_audience_id}
-                          </span>
+                          <span> &middot; ID: {audience.meta_audience_id}</span>
                         )}
                       </p>
                     </div>

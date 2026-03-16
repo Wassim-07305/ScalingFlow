@@ -23,11 +23,14 @@ export async function POST(req: NextRequest) {
     }
 
     // Rate limiting
-    const rl = await rateLimit(user.id, "optimize-instagram", { limit: 5, windowSeconds: 60 });
+    const rl = await rateLimit(user.id, "optimize-instagram", {
+      limit: 5,
+      windowSeconds: 60,
+    });
     if (!rl.allowed) {
       return NextResponse.json(
         { error: "Trop de requêtes. Réessaie dans quelques secondes." },
-        { status: 429 }
+        { status: 429 },
       );
     }
 
@@ -36,10 +39,9 @@ export async function POST(req: NextRequest) {
     if (!usage.allowed) {
       return NextResponse.json(
         { error: "Limite de générations IA atteinte", usage },
-        { status: 403 }
+        { status: 403 },
       );
     }
-
 
     // Récupérer le profil
     const { data: profile } = await supabase
@@ -76,16 +78,14 @@ export async function POST(req: NextRequest) {
 
     const body = await req.json();
     const brandContext =
-      body.brand ||
-      profile?.full_name ||
-      "Expert en IA et automatisation";
+      body.brand || profile?.full_name || "Expert en IA et automatisation";
 
     const vaultContext = await buildFullVaultContext(user.id);
 
     const basePrompt = buildInstagramProfilePrompt(
       marketContext,
       offerContext,
-      brandContext
+      brandContext,
     );
     const prompt = vaultContext ? basePrompt + "\n" + vaultContext : basePrompt;
 
@@ -95,14 +95,18 @@ export async function POST(req: NextRequest) {
     });
 
     // Award XP (non-blocking)
-    try { await awardXP(user.id, "generation.content_strategy"); } catch {}
-    try { await notifyGeneration(user.id, "generation.content_strategy"); } catch {}
+    try {
+      await awardXP(user.id, "generation.content_strategy");
+    } catch {}
+    try {
+      await notifyGeneration(user.id, "generation.content_strategy");
+    } catch {}
 
     return NextResponse.json({ result });
   } catch (error) {
     return NextResponse.json(
       { error: "Erreur lors de l'optimisation du profil Instagram" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -1,7 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AILoading } from "@/components/shared/ai-loading";
@@ -52,17 +58,60 @@ interface GuaranteeGeneratorProps {
   offerId?: string;
 }
 
-const TYPE_CONFIG: Record<string, { icon: typeof Shield; color: string; badgeVariant: "default" | "blue" | "cyan" | "purple" | "red" | "yellow" | "muted" }> = {
-  "résultat garanti": { icon: Target, color: "text-accent", badgeVariant: "default" },
-  satisfaction: { icon: ShieldCheck, color: "text-blue-400", badgeVariant: "blue" },
-  "anti-risque": { icon: ShieldAlert, color: "text-purple-400", badgeVariant: "purple" },
-  performance: { icon: TrendingUp, color: "text-cyan-400", badgeVariant: "cyan" },
+const TYPE_CONFIG: Record<
+  string,
+  {
+    icon: typeof Shield;
+    color: string;
+    badgeVariant:
+      | "default"
+      | "blue"
+      | "cyan"
+      | "purple"
+      | "red"
+      | "yellow"
+      | "muted";
+  }
+> = {
+  "résultat garanti": {
+    icon: Target,
+    color: "text-accent",
+    badgeVariant: "default",
+  },
+  satisfaction: {
+    icon: ShieldCheck,
+    color: "text-blue-400",
+    badgeVariant: "blue",
+  },
+  "anti-risque": {
+    icon: ShieldAlert,
+    color: "text-purple-400",
+    badgeVariant: "purple",
+  },
+  performance: {
+    icon: TrendingUp,
+    color: "text-cyan-400",
+    badgeVariant: "cyan",
+  },
 };
 
-const RISK_CONFIG: Record<string, { color: string; badgeVariant: "default" | "blue" | "cyan" | "purple" | "red" | "yellow" | "muted" }> = {
+const RISK_CONFIG: Record<
+  string,
+  {
+    color: string;
+    badgeVariant:
+      | "default"
+      | "blue"
+      | "cyan"
+      | "purple"
+      | "red"
+      | "yellow"
+      | "muted";
+  }
+> = {
   faible: { color: "text-accent", badgeVariant: "default" },
   moyen: { color: "text-yellow-400", badgeVariant: "yellow" },
-  "élevé": { color: "text-red-400", badgeVariant: "red" },
+  élevé: { color: "text-red-400", badgeVariant: "red" },
 };
 
 export function GuaranteeGenerator({ offerId }: GuaranteeGeneratorProps) {
@@ -71,7 +120,10 @@ export function GuaranteeGenerator({ offerId }: GuaranteeGeneratorProps) {
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [saving, setSaving] = useState(false);
-  const [usageLimited, setUsageLimited] = useState<{ current: number; limit: number } | null>(null);
+  const [usageLimited, setUsageLimited] = useState<{
+    current: number;
+    limit: number;
+  } | null>(null);
 
   // Form fields
   const [niche, setNiche] = useState("");
@@ -125,7 +177,7 @@ export function GuaranteeGenerator({ offerId }: GuaranteeGeneratorProps) {
         setTargetAvatar(
           typeof market.target_avatar === "string"
             ? market.target_avatar
-            : JSON.stringify(market.target_avatar || "")
+            : JSON.stringify(market.target_avatar || ""),
         );
       }
     };
@@ -177,7 +229,9 @@ export function GuaranteeGenerator({ offerId }: GuaranteeGeneratorProps) {
       setResult(data);
       setExpandedIndex(data.recommended_index);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Erreur lors de la génération");
+      toast.error(
+        err instanceof Error ? err.message : "Erreur lors de la génération",
+      );
     } finally {
       setLoading(false);
     }
@@ -223,13 +277,18 @@ export function GuaranteeGenerator({ offerId }: GuaranteeGeneratorProps) {
           `Métrique : ${g.metrique || g.metric || "—"}\n\n` +
           `Clause de protection : ${g.clause_protection || "—"}\n\n` +
           `Niveau de risque : ${g.risk_level}\n\n` +
-          `Impact psychologique : ${g.psychological_impact}\n`
+          `Impact psychologique : ${g.psychological_impact}\n`,
       )
       .join("\n---\n\n");
   };
 
   if (usageLimited) {
-    return <UpgradeWall currentUsage={usageLimited.current} limit={usageLimited.limit} />;
+    return (
+      <UpgradeWall
+        currentUsage={usageLimited.current}
+        limit={usageLimited.limit}
+      />
+    );
   }
 
   if (loading) {
@@ -247,7 +306,8 @@ export function GuaranteeGenerator({ offerId }: GuaranteeGeneratorProps) {
               Générateur de Garanties
             </CardTitle>
             <CardDescription>
-              Crée des garanties qui éliminent le risque perçu et augmentent tes conversions.
+              Crée des garanties qui éliminent le risque perçu et augmentent tes
+              conversions.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -328,7 +388,9 @@ export function GuaranteeGenerator({ offerId }: GuaranteeGeneratorProps) {
             <h2 className="text-xl font-bold text-text-primary">
               4 garanties générées
             </h2>
-            <p className="text-sm text-text-secondary">{result.recommendation}</p>
+            <p className="text-sm text-text-secondary">
+              {result.recommendation}
+            </p>
           </div>
 
           <div className="space-y-4">
@@ -336,9 +398,13 @@ export function GuaranteeGenerator({ offerId }: GuaranteeGeneratorProps) {
               const isExpanded = expandedIndex === index;
               const isRecommended = index === result.recommended_index;
               const isSelected = selectedIndex === index;
-              const typeConf = TYPE_CONFIG[guarantee.type.toLowerCase()] || TYPE_CONFIG["satisfaction"];
+              const typeConf =
+                TYPE_CONFIG[guarantee.type.toLowerCase()] ||
+                TYPE_CONFIG["satisfaction"];
               const TypeIcon = typeConf.icon;
-              const riskConf = RISK_CONFIG[guarantee.risk_level.toLowerCase()] || RISK_CONFIG["moyen"];
+              const riskConf =
+                RISK_CONFIG[guarantee.risk_level.toLowerCase()] ||
+                RISK_CONFIG["moyen"];
 
               return (
                 <Card
@@ -346,21 +412,30 @@ export function GuaranteeGenerator({ offerId }: GuaranteeGeneratorProps) {
                   className={cn(
                     "cursor-pointer transition-all",
                     isSelected && "border-accent",
-                    isRecommended && !isSelected && "border-accent/40"
+                    isRecommended && !isSelected && "border-accent/40",
                   )}
                   onClick={() => setExpandedIndex(isExpanded ? null : index)}
                 >
                   <CardHeader className="pb-2">
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3">
-                        <div className={cn("h-10 w-10 rounded-xl flex items-center justify-center shrink-0", `bg-${typeConf.color.replace("text-", "")}/10`)}>
+                        <div
+                          className={cn(
+                            "h-10 w-10 rounded-xl flex items-center justify-center shrink-0",
+                            `bg-${typeConf.color.replace("text-", "")}/10`,
+                          )}
+                        >
                           <TypeIcon className={cn("h-5 w-5", typeConf.color)} />
                         </div>
                         <div>
                           <CardTitle className="flex items-center gap-2 text-base flex-wrap">
                             {guarantee.name}
-                            <Badge variant={typeConf.badgeVariant}>{guarantee.type}</Badge>
-                            {isRecommended && <Badge variant="cyan">Recommandée</Badge>}
+                            <Badge variant={typeConf.badgeVariant}>
+                              {guarantee.type}
+                            </Badge>
+                            {isRecommended && (
+                              <Badge variant="cyan">Recommandée</Badge>
+                            )}
                           </CardTitle>
                           <p className="text-sm text-text-secondary mt-1">
                             {guarantee.description}
@@ -383,20 +458,29 @@ export function GuaranteeGenerator({ offerId }: GuaranteeGeneratorProps) {
                           <h4 className="text-xs font-semibold text-text-muted mb-1">
                             Remboursement
                           </h4>
-                          <p className="text-lg font-bold text-accent">{guarantee.pourcentage_remboursement || "—"}</p>
+                          <p className="text-lg font-bold text-accent">
+                            {guarantee.pourcentage_remboursement || "—"}
+                          </p>
                         </div>
                         <div className="rounded-lg bg-bg-tertiary p-3">
                           <h4 className="text-xs font-semibold text-text-muted flex items-center gap-1.5 mb-1">
                             <Clock className="h-3.5 w-3.5" />
                             Durée
                           </h4>
-                          <p className="text-sm text-text-primary">{guarantee.timeframe}</p>
+                          <p className="text-sm text-text-primary">
+                            {guarantee.timeframe}
+                          </p>
                         </div>
                         <div className="rounded-lg bg-bg-tertiary p-3">
                           <h4 className="text-xs font-semibold text-text-muted">
                             Risque vendeur
                           </h4>
-                          <Badge variant={riskConf.badgeVariant} className="mt-1">{guarantee.risk_level}</Badge>
+                          <Badge
+                            variant={riskConf.badgeVariant}
+                            className="mt-1"
+                          >
+                            {guarantee.risk_level}
+                          </Badge>
                         </div>
                       </div>
 
@@ -406,7 +490,9 @@ export function GuaranteeGenerator({ offerId }: GuaranteeGeneratorProps) {
                           <Target className="h-3.5 w-3.5" />
                           Métrique déclencheur
                         </h4>
-                        <p className="text-sm text-text-primary">{guarantee.metrique || guarantee.metric || "—"}</p>
+                        <p className="text-sm text-text-primary">
+                          {guarantee.metrique || guarantee.metric || "—"}
+                        </p>
                       </div>
 
                       {/* Conditions */}
@@ -415,7 +501,9 @@ export function GuaranteeGenerator({ offerId }: GuaranteeGeneratorProps) {
                           <AlertTriangle className="h-4 w-4 text-yellow-400" />
                           Conditions d&apos;application
                         </h4>
-                        <p className="text-sm text-text-secondary">{guarantee.conditions}</p>
+                        <p className="text-sm text-text-secondary">
+                          {guarantee.conditions}
+                        </p>
                       </div>
 
                       {/* Clause de protection */}
@@ -425,7 +513,9 @@ export function GuaranteeGenerator({ offerId }: GuaranteeGeneratorProps) {
                             <Shield className="h-4 w-4 text-yellow-400" />
                             Clause de protection prestataire
                           </h4>
-                          <p className="text-sm text-text-secondary">{guarantee.clause_protection}</p>
+                          <p className="text-sm text-text-secondary">
+                            {guarantee.clause_protection}
+                          </p>
                         </div>
                       )}
 

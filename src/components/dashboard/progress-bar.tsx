@@ -55,10 +55,12 @@ export function ProgressBar() {
   const level = profile?.level ?? 1;
 
   const currentThreshold = LEVEL_THRESHOLDS[level - 1] ?? 0;
-  const nextThreshold = LEVEL_THRESHOLDS[level] ?? LEVEL_THRESHOLDS[LEVEL_THRESHOLDS.length - 1];
+  const nextThreshold =
+    LEVEL_THRESHOLDS[level] ?? LEVEL_THRESHOLDS[LEVEL_THRESHOLDS.length - 1];
   const xpInLevel = xp - currentThreshold;
   const xpNeeded = nextThreshold - currentThreshold;
-  const xpPercent = xpNeeded > 0 ? Math.min((xpInLevel / xpNeeded) * 100, 100) : 100;
+  const xpPercent =
+    xpNeeded > 0 ? Math.min((xpInLevel / xpNeeded) * 100, 100) : 100;
 
   const taskPercent =
     taskProgress.total > 0
@@ -92,9 +94,7 @@ export function ProgressBar() {
                   <p className="text-sm font-medium text-text-primary">
                     Niveau {level}
                   </p>
-                  <p className="text-xs text-text-muted">
-                    {xp} XP total
-                  </p>
+                  <p className="text-xs text-text-muted">{xp} XP total</p>
                 </div>
               </div>
               <div className="h-2 rounded-full bg-bg-tertiary overflow-hidden">

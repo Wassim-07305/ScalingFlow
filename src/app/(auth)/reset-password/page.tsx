@@ -24,23 +24,25 @@ export default function ResetPasswordPage() {
   // Supabase injects the recovery token via URL hash — the client
   // library picks it up automatically when onAuthStateChange fires.
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event: string) => {
-        if (event === "PASSWORD_RECOVERY") {
-          setHasSession(true);
-          setChecking(false);
-        }
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event: string) => {
+      if (event === "PASSWORD_RECOVERY") {
+        setHasSession(true);
+        setChecking(false);
       }
-    );
+    });
 
     // Fallback: if user already has a session (e.g. page refresh)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    supabase.auth.getSession().then(({ data: { session } }: { data: { session: any } }) => {
-      if (session) {
-        setHasSession(true);
-      }
-      setChecking(false);
-    });
+    supabase.auth
+      .getSession()
+      .then(({ data: { session } }: { data: { session: any } }) => {
+        if (session) {
+          setHasSession(true);
+        }
+        setChecking(false);
+      });
 
     return () => subscription.unsubscribe();
   }, [supabase]);
@@ -92,12 +94,16 @@ export default function ResetPasswordPage() {
       {/* Header */}
       <div className="text-center space-y-2">
         <div className="flex items-center justify-center gap-3">
-          <Image src="/icons/icon-192.png" alt="ScalingFlow" width={40} height={40} className="rounded-[8px]" />
+          <Image
+            src="/icons/icon-192.png"
+            alt="ScalingFlow"
+            width={40}
+            height={40}
+            className="rounded-[8px]"
+          />
           <h1 className="text-3xl font-bold text-text-primary">ScalingFlow</h1>
         </div>
-        <p className="text-text-secondary">
-          Choisis ton nouveau mot de passe.
-        </p>
+        <p className="text-text-secondary">Choisis ton nouveau mot de passe.</p>
       </div>
 
       {!hasSession ? (
@@ -172,7 +178,10 @@ export default function ResetPasswordPage() {
       {/* Footer */}
       <div className="text-center">
         <p className="text-xs text-text-muted">
-          <Link href="/login" className="hover:text-text-secondary transition-colors">
+          <Link
+            href="/login"
+            className="hover:text-text-secondary transition-colors"
+          >
             Retour a la connexion
           </Link>
         </p>

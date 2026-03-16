@@ -1,7 +1,13 @@
 "use client";
 
 import React from "react";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AILoading } from "@/components/shared/ai-loading";
@@ -28,9 +34,28 @@ import {
 import { UnipileSendDialog } from "@/components/shared/unipile-send-dialog";
 
 const PLATFORMS = [
-  { key: "linkedin", label: "LinkedIn", icon: Linkedin, color: "bg-blue-500/15 text-blue-400 border-blue-500/20", activeColor: "bg-blue-500 text-white shadow-blue-500/25" },
-  { key: "instagram", label: "Instagram", icon: Instagram, color: "bg-pink-500/15 text-pink-400 border-pink-500/20", activeColor: "bg-gradient-to-r from-pink-500 to-purple-500 text-white shadow-pink-500/25" },
-  { key: "messenger", label: "Messenger", icon: Send, color: "bg-blue-400/15 text-blue-300 border-blue-400/20", activeColor: "bg-blue-400 text-white shadow-blue-400/25" },
+  {
+    key: "linkedin",
+    label: "LinkedIn",
+    icon: Linkedin,
+    color: "bg-blue-500/15 text-blue-400 border-blue-500/20",
+    activeColor: "bg-blue-500 text-white shadow-blue-500/25",
+  },
+  {
+    key: "instagram",
+    label: "Instagram",
+    icon: Instagram,
+    color: "bg-pink-500/15 text-pink-400 border-pink-500/20",
+    activeColor:
+      "bg-gradient-to-r from-pink-500 to-purple-500 text-white shadow-pink-500/25",
+  },
+  {
+    key: "messenger",
+    label: "Messenger",
+    icon: Send,
+    color: "bg-blue-400/15 text-blue-300 border-blue-400/20",
+    activeColor: "bg-blue-400 text-white shadow-blue-400/25",
+  },
 ] as const;
 
 interface DmMessage {
@@ -62,8 +87,11 @@ export function DmScripts() {
   const [result, setResult] = React.useState<DmScriptsResult | null>(null);
   const [error, setError] = React.useState<string | null>(null);
   const [copied, setCopied] = React.useState(false);
-  const [activePlatform, setActivePlatform] = React.useState<string>("linkedin");
-  const [expandedMessage, setExpandedMessage] = React.useState<number | null>(0);
+  const [activePlatform, setActivePlatform] =
+    React.useState<string>("linkedin");
+  const [expandedMessage, setExpandedMessage] = React.useState<number | null>(
+    0,
+  );
   const [sendDialogOpen, setSendDialogOpen] = React.useState(false);
   const [sendMessage, setSendMessage] = React.useState("");
 
@@ -108,7 +136,8 @@ export function DmScripts() {
   };
 
   const copyAll = () => {
-    const text = typeof result === "string" ? result : JSON.stringify(result, null, 2);
+    const text =
+      typeof result === "string" ? result : JSON.stringify(result, null, 2);
     navigator.clipboard.writeText(text);
     setCopied(true);
     toast.success("Copié dans le presse-papiers");
@@ -121,9 +150,10 @@ export function DmScripts() {
   };
 
   // Séquence active filtrée par plateforme
-  const activeSequence = result?.sequences?.find(
-    (s) => s.platform.toLowerCase() === activePlatform
-  ) || result?.sequences?.[0];
+  const activeSequence =
+    result?.sequences?.find(
+      (s) => s.platform.toLowerCase() === activePlatform,
+    ) || result?.sequences?.[0];
 
   if (loading) {
     return <AILoading text="Création de tes scripts de DM" />;
@@ -134,7 +164,9 @@ export function DmScripts() {
       <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
         {/* Actions */}
         <div className="flex items-center justify-between">
-          <Badge variant="default" className="animate-in fade-in duration-300">Scripts générés</Badge>
+          <Badge variant="default" className="animate-in fade-in duration-300">
+            Scripts générés
+          </Badge>
           <div className="flex items-center gap-2">
             <Button
               variant="outline"
@@ -152,7 +184,12 @@ export function DmScripts() {
               <FileDown className="h-4 w-4 mr-1" />
               PDF
             </Button>
-            <Button variant="outline" size="sm" onClick={copyAll} className="transition-all hover:border-accent/40 hover:shadow-sm">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={copyAll}
+              className="transition-all hover:border-accent/40 hover:shadow-sm"
+            >
               <Copy className="h-4 w-4 mr-1" />
               {copied ? "Copié !" : "Copier tout"}
             </Button>
@@ -162,7 +199,9 @@ export function DmScripts() {
         {/* Aperçu */}
         {result.overview && (
           <GlowCard glowColor="purple">
-            <p className="text-sm text-text-secondary leading-relaxed">{result.overview}</p>
+            <p className="text-sm text-text-secondary leading-relaxed">
+              {result.overview}
+            </p>
           </GlowCard>
         )}
 
@@ -182,7 +221,7 @@ export function DmScripts() {
                   "flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 border",
                   isActive
                     ? cn(platform.activeColor, "shadow-lg")
-                    : cn(platform.color, "hover:scale-[1.02]")
+                    : cn(platform.color, "hover:scale-[1.02]"),
                 )}
               >
                 <PlatformIcon className="h-4 w-4" />
@@ -198,8 +237,12 @@ export function DmScripts() {
             {/* Contexte de la séquence */}
             {activeSequence.context && (
               <div className="p-4 rounded-xl bg-bg-tertiary/50 border border-border-default/50 backdrop-blur-sm">
-                <p className="text-xs text-text-muted uppercase tracking-wider mb-1.5">Contexte</p>
-                <p className="text-sm text-text-secondary leading-relaxed">{activeSequence.context}</p>
+                <p className="text-xs text-text-muted uppercase tracking-wider mb-1.5">
+                  Contexte
+                </p>
+                <p className="text-sm text-text-secondary leading-relaxed">
+                  {activeSequence.context}
+                </p>
               </div>
             )}
 
@@ -207,7 +250,10 @@ export function DmScripts() {
               <div className="flex items-center gap-2.5 p-3 rounded-xl bg-accent/5 border border-accent/10">
                 <Target className="h-4 w-4 text-accent shrink-0" />
                 <span className="text-sm text-text-secondary">
-                  Cible : <span className="text-text-primary font-medium">{activeSequence.target_persona}</span>
+                  Cible :{" "}
+                  <span className="text-text-primary font-medium">
+                    {activeSequence.target_persona}
+                  </span>
                 </span>
               </div>
             )}
@@ -220,7 +266,7 @@ export function DmScripts() {
                   key={i}
                   className={cn(
                     "transition-all duration-300 hover:border-border-hover",
-                    isExpanded && "border-accent/30 shadow-lg shadow-accent/5"
+                    isExpanded && "border-accent/30 shadow-lg shadow-accent/5",
                   )}
                 >
                   <CardHeader
@@ -232,7 +278,9 @@ export function DmScripts() {
                         <div className="flex items-center justify-center h-8 w-8 rounded-full bg-accent/20 text-accent text-xs font-bold ring-2 ring-accent/10">
                           {msg.step}
                         </div>
-                        <span className="text-text-primary">Message {msg.step}</span>
+                        <span className="text-text-primary">
+                          Message {msg.step}
+                        </span>
                         {msg.timing && (
                           <Badge variant="muted" className="text-xs">
                             <Clock className="h-3 w-3 mr-1" />
@@ -240,18 +288,24 @@ export function DmScripts() {
                           </Badge>
                         )}
                       </CardTitle>
-                      <div className={cn(
-                        "p-1 rounded-lg transition-transform duration-200",
-                        isExpanded && "rotate-180"
-                      )}>
+                      <div
+                        className={cn(
+                          "p-1 rounded-lg transition-transform duration-200",
+                          isExpanded && "rotate-180",
+                        )}
+                      >
                         <ChevronDown className="h-4 w-4 text-text-muted" />
                       </div>
                     </div>
                   </CardHeader>
-                  <div className={cn(
-                    "grid transition-all duration-300",
-                    isExpanded ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
-                  )}>
+                  <div
+                    className={cn(
+                      "grid transition-all duration-300",
+                      isExpanded
+                        ? "grid-rows-[1fr] opacity-100"
+                        : "grid-rows-[0fr] opacity-0",
+                    )}
+                  >
                     <div className="overflow-hidden">
                       <CardContent className="pt-0 space-y-3 pb-4">
                         {/* Le message */}
@@ -289,8 +343,12 @@ export function DmScripts() {
                           <div className="flex items-start gap-2.5 p-3 rounded-xl bg-accent/5 border border-accent/10">
                             <Target className="h-3.5 w-3.5 text-accent mt-0.5 shrink-0" />
                             <div>
-                              <p className="text-xs text-accent uppercase font-medium mb-0.5">Objectif</p>
-                              <p className="text-xs text-text-secondary leading-relaxed">{msg.purpose}</p>
+                              <p className="text-xs text-accent uppercase font-medium mb-0.5">
+                                Objectif
+                              </p>
+                              <p className="text-xs text-text-secondary leading-relaxed">
+                                {msg.purpose}
+                              </p>
                             </div>
                           </div>
                         )}
@@ -300,8 +358,12 @@ export function DmScripts() {
                           <div className="flex items-start gap-2.5 p-3 rounded-xl bg-bg-tertiary/50 border border-border-default/50">
                             <ArrowRight className="h-3.5 w-3.5 text-accent mt-0.5 shrink-0" />
                             <div>
-                              <p className="text-xs text-text-muted uppercase">Envoyer le suivant si</p>
-                              <p className="text-xs text-text-secondary leading-relaxed">{msg.next_step_trigger}</p>
+                              <p className="text-xs text-text-muted uppercase">
+                                Envoyer le suivant si
+                              </p>
+                              <p className="text-xs text-text-secondary leading-relaxed">
+                                {msg.next_step_trigger}
+                              </p>
                             </div>
                           </div>
                         )}
@@ -313,21 +375,26 @@ export function DmScripts() {
             })}
 
             {/* Do's et Don'ts */}
-            {(activeSequence.dos?.length > 0 || activeSequence.donts?.length > 0) && (
+            {(activeSequence.dos?.length > 0 ||
+              activeSequence.donts?.length > 0) && (
               <div className="grid gap-4 md:grid-cols-2">
                 {activeSequence.dos && activeSequence.dos.length > 0 && (
                   <Card className="border-green-500/10 bg-green-500/[0.02]">
                     <CardHeader className="py-3">
                       <CardTitle className="text-sm text-green-400 flex items-center gap-2">
-                        <CheckCircle2 className="h-4 w-4" />
-                        À faire
+                        <CheckCircle2 className="h-4 w-4" />À faire
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="pt-0">
                       <ul className="space-y-1.5">
                         {activeSequence.dos.map((d, i) => (
-                          <li key={i} className="text-xs text-text-secondary flex items-start gap-2">
-                            <span className="text-green-400 mt-0.5 shrink-0">+</span>
+                          <li
+                            key={i}
+                            className="text-xs text-text-secondary flex items-start gap-2"
+                          >
+                            <span className="text-green-400 mt-0.5 shrink-0">
+                              +
+                            </span>
                             <span className="leading-relaxed">{d}</span>
                           </li>
                         ))}
@@ -339,15 +406,19 @@ export function DmScripts() {
                   <Card className="border-red-500/10 bg-red-500/[0.02]">
                     <CardHeader className="py-3">
                       <CardTitle className="text-sm text-red-400 flex items-center gap-2">
-                        <XCircle className="h-4 w-4" />
-                        À éviter
+                        <XCircle className="h-4 w-4" />À éviter
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="pt-0">
                       <ul className="space-y-1.5">
                         {activeSequence.donts.map((d, i) => (
-                          <li key={i} className="text-xs text-text-secondary flex items-start gap-2">
-                            <span className="text-red-400 mt-0.5 shrink-0">-</span>
+                          <li
+                            key={i}
+                            className="text-xs text-text-secondary flex items-start gap-2"
+                          >
+                            <span className="text-red-400 mt-0.5 shrink-0">
+                              -
+                            </span>
                             <span className="leading-relaxed">{d}</span>
                           </li>
                         ))}
@@ -364,7 +435,12 @@ export function DmScripts() {
             <p className="text-sm text-text-muted">
               Aucune séquence trouvée pour cette plateforme.
             </p>
-            <Button variant="outline" size="sm" className="mt-4" onClick={handleGenerate}>
+            <Button
+              variant="outline"
+              size="sm"
+              className="mt-4"
+              onClick={handleGenerate}
+            >
               <Sparkles className="h-3.5 w-3.5 mr-1.5" />
               Régénérer
             </Button>
@@ -383,8 +459,13 @@ export function DmScripts() {
             <CardContent className="pt-0">
               <ul className="space-y-2">
                 {result.general_tips.map((tip, i) => (
-                  <li key={i} className="text-xs text-text-secondary flex items-start gap-2.5">
-                    <span className="text-accent mt-0.5 shrink-0">{"\u2192"}</span>
+                  <li
+                    key={i}
+                    className="text-xs text-text-secondary flex items-start gap-2.5"
+                  >
+                    <span className="text-accent mt-0.5 shrink-0">
+                      {"\u2192"}
+                    </span>
                     <span className="leading-relaxed">{tip}</span>
                   </li>
                 ))}
@@ -393,7 +474,11 @@ export function DmScripts() {
           </Card>
         )}
 
-        <Button variant="outline" onClick={() => setResult(null)} className="transition-all hover:border-accent/40">
+        <Button
+          variant="outline"
+          onClick={() => setResult(null)}
+          className="transition-all hover:border-accent/40"
+        >
           <Sparkles className="h-4 w-4 mr-2" />
           Régénérer les scripts
         </Button>
@@ -415,9 +500,12 @@ export function DmScripts() {
         <div className="inline-flex items-center justify-center h-14 w-14 rounded-2xl bg-accent/10 border border-accent/20 mb-4">
           <MessageSquare className="h-7 w-7 text-accent" />
         </div>
-        <h3 className="font-semibold text-text-primary text-lg mb-1.5">Scripts de DM</h3>
+        <h3 className="font-semibold text-text-primary text-lg mb-1.5">
+          Scripts de DM
+        </h3>
         <p className="text-sm text-text-secondary max-w-md mx-auto leading-relaxed">
-          L&apos;IA va créer des séquences de messages pour prospecter sur LinkedIn, Instagram et Messenger.
+          L&apos;IA va créer des séquences de messages pour prospecter sur
+          LinkedIn, Instagram et Messenger.
         </p>
       </div>
 
@@ -449,7 +537,7 @@ export function DmScripts() {
                       "flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 border",
                       isActive
                         ? cn(platform.activeColor, "shadow-lg")
-                        : cn(platform.color, "hover:scale-[1.02]")
+                        : cn(platform.color, "hover:scale-[1.02]"),
                     )}
                   >
                     <PlatformIcon className="h-4 w-4" />

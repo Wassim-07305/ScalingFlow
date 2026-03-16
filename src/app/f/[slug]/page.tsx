@@ -41,7 +41,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function PublicFunnelPage({ params, searchParams }: Props) {
+export default async function PublicFunnelPage({
+  params,
+  searchParams,
+}: Props) {
   const { slug } = await params;
   const { page: pageParam } = await searchParams;
   const supabase = await createClient();
@@ -100,13 +103,13 @@ export default async function PublicFunnelPage({ params, searchParams }: Props) 
   const brandName = funnel.funnel_name || profile?.first_name || "Mon Offre";
 
   // Determine which page to show (default: optin)
-  const pageType = (pageParam === "vsl" || pageParam === "thankyou") ? pageParam : "optin";
+  const pageType =
+    pageParam === "vsl" || pageParam === "thankyou" ? pageParam : "optin";
 
-  const html = generateFunnelPageHTML(
-    funnelData,
-    pageType,
-    { brandName, theme }
-  );
+  const html = generateFunnelPageHTML(funnelData, pageType, {
+    brandName,
+    theme,
+  });
 
   return (
     <>

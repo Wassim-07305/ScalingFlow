@@ -70,12 +70,54 @@ function saveEntries(entries: ROASEntry[]) {
 
 // ─── Demo data ───────────────────────────────────────────────
 const DEMO_ENTRIES: ROASEntry[] = [
-  { id: "r1", week: "S06", adSpend: 1200, revenue: 2994, metaROAS: 4.2, campaign: "Scaling Mars" },
-  { id: "r2", week: "S07", adSpend: 1400, revenue: 3991, metaROAS: 4.8, campaign: "Scaling Mars" },
-  { id: "r3", week: "S08", adSpend: 1350, revenue: 2997, metaROAS: 3.9, campaign: "Retargeting" },
-  { id: "r4", week: "S09", adSpend: 1600, revenue: 5488, metaROAS: 5.5, campaign: "Scaling Mars" },
-  { id: "r5", week: "S10", adSpend: 1500, revenue: 3994, metaROAS: 4.5, campaign: "Scaling Mars" },
-  { id: "r6", week: "S11", adSpend: 1800, revenue: 5985, metaROAS: 5.8, campaign: "Retargeting" },
+  {
+    id: "r1",
+    week: "S06",
+    adSpend: 1200,
+    revenue: 2994,
+    metaROAS: 4.2,
+    campaign: "Scaling Mars",
+  },
+  {
+    id: "r2",
+    week: "S07",
+    adSpend: 1400,
+    revenue: 3991,
+    metaROAS: 4.8,
+    campaign: "Scaling Mars",
+  },
+  {
+    id: "r3",
+    week: "S08",
+    adSpend: 1350,
+    revenue: 2997,
+    metaROAS: 3.9,
+    campaign: "Retargeting",
+  },
+  {
+    id: "r4",
+    week: "S09",
+    adSpend: 1600,
+    revenue: 5488,
+    metaROAS: 5.5,
+    campaign: "Scaling Mars",
+  },
+  {
+    id: "r5",
+    week: "S10",
+    adSpend: 1500,
+    revenue: 3994,
+    metaROAS: 4.5,
+    campaign: "Scaling Mars",
+  },
+  {
+    id: "r6",
+    week: "S11",
+    adSpend: 1800,
+    revenue: 5985,
+    metaROAS: 5.8,
+    campaign: "Retargeting",
+  },
 ];
 
 // ─── Formatting helpers ──────────────────────────────────────
@@ -134,9 +176,13 @@ export function RealRoas() {
     const totalSpend = entries.reduce((s, e) => s + e.adSpend, 0);
     const totalRevenue = entries.reduce((s, e) => s + e.revenue, 0);
     const realROAS = totalSpend > 0 ? totalRevenue / totalSpend : 0;
-    const avgMetaROAS = entries.length > 0 ? entries.reduce((s, e) => s + e.metaROAS, 0) / entries.length : 0;
+    const avgMetaROAS =
+      entries.length > 0
+        ? entries.reduce((s, e) => s + e.metaROAS, 0) / entries.length
+        : 0;
     const gap = avgMetaROAS - realROAS;
-    const gapPct = avgMetaROAS > 0 ? ((avgMetaROAS - realROAS) / avgMetaROAS) * 100 : 0;
+    const gapPct =
+      avgMetaROAS > 0 ? ((avgMetaROAS - realROAS) / avgMetaROAS) * 100 : 0;
 
     return { totalSpend, totalRevenue, realROAS, avgMetaROAS, gap, gapPct };
   }, [entries]);
@@ -155,10 +201,14 @@ export function RealRoas() {
 
   // ─── Campaign breakdown ────────────────────────────────────────
   const campaignBreakdown = useMemo(() => {
-    const groups: Record<string, { spend: number; revenue: number; metaROAS: number; count: number }> = {};
+    const groups: Record<
+      string,
+      { spend: number; revenue: number; metaROAS: number; count: number }
+    > = {};
     entries.forEach((e) => {
       const key = e.campaign || "Sans campagne";
-      if (!groups[key]) groups[key] = { spend: 0, revenue: 0, metaROAS: 0, count: 0 };
+      if (!groups[key])
+        groups[key] = { spend: 0, revenue: 0, metaROAS: 0, count: 0 };
       groups[key].spend += e.adSpend;
       groups[key].revenue += e.revenue;
       groups[key].metaROAS += e.metaROAS;
@@ -185,17 +235,31 @@ export function RealRoas() {
   const recommendations = useMemo(() => {
     const tips: string[] = [];
     if (stats.realROAS < 1.5) {
-      tips.push("Ton ROAS réel est critique (<1.5x). Réduis tes dépenses publicitaires ou améliore ton offre et ton taux de closing.");
-      tips.push("Concentre-toi sur les campagnes avec le meilleur ROAS et coupe celles qui sous-performent.");
+      tips.push(
+        "Ton ROAS réel est critique (<1.5x). Réduis tes dépenses publicitaires ou améliore ton offre et ton taux de closing.",
+      );
+      tips.push(
+        "Concentre-toi sur les campagnes avec le meilleur ROAS et coupe celles qui sous-performent.",
+      );
     } else if (stats.realROAS < 3) {
-      tips.push("Ton ROAS réel est correct mais peut être amélioré. Teste de nouvelles créatives et audiences.");
-      tips.push("Analyse tes campagnes les plus rentables et alloue plus de budget dessus.");
+      tips.push(
+        "Ton ROAS réel est correct mais peut être amélioré. Teste de nouvelles créatives et audiences.",
+      );
+      tips.push(
+        "Analyse tes campagnes les plus rentables et alloue plus de budget dessus.",
+      );
     } else {
-      tips.push("Excellent ROAS ! Envisage d'augmenter ton budget publicitaire progressivement pour scaler.");
-      tips.push("Diversifie tes canaux d'acquisition pour ne pas dépendre d'une seule source.");
+      tips.push(
+        "Excellent ROAS ! Envisage d'augmenter ton budget publicitaire progressivement pour scaler.",
+      );
+      tips.push(
+        "Diversifie tes canaux d'acquisition pour ne pas dépendre d'une seule source.",
+      );
     }
     if (stats.gapPct > 30) {
-      tips.push(`Attention : l'écart entre le ROAS Meta et ton ROAS réel est de ${stats.gapPct.toFixed(0)}%. Meta surestime probablement tes conversions.`);
+      tips.push(
+        `Attention : l'écart entre le ROAS Meta et ton ROAS réel est de ${stats.gapPct.toFixed(0)}%. Meta surestime probablement tes conversions.`,
+      );
     }
     return tips;
   }, [stats]);
@@ -217,7 +281,13 @@ export function RealRoas() {
     saveEntries(updated);
     setShowForm(false);
     toast.success("Données ROAS enregistrées");
-    setFormData({ week: "", adSpend: 0, revenue: 0, metaROAS: 0, campaign: "" });
+    setFormData({
+      week: "",
+      adSpend: 0,
+      revenue: 0,
+      metaROAS: 0,
+      campaign: "",
+    });
   }, [entries, formData, isDemo]);
 
   const handleClear = useCallback(() => {
@@ -265,7 +335,8 @@ export function RealRoas() {
             {roasLabel(stats.realROAS)}
           </Badge>
           <p className="text-xs text-text-muted mt-2">
-            {fmtCurrency(stats.totalRevenue)} revenue / {fmtCurrency(stats.totalSpend)} dépensé
+            {fmtCurrency(stats.totalRevenue)} revenue /{" "}
+            {fmtCurrency(stats.totalSpend)} dépensé
           </p>
         </Card>
 
@@ -296,15 +367,25 @@ export function RealRoas() {
             </span>
             <AlertTriangle className="h-4 w-4 text-warning" />
           </div>
-          <div className={cn("text-3xl font-bold", stats.gapPct > 30 ? "text-danger" : stats.gapPct > 15 ? "text-warning" : "text-accent")}>
-            {stats.gapPct > 0 ? "+" : ""}{stats.gapPct.toFixed(0)}%
+          <div
+            className={cn(
+              "text-3xl font-bold",
+              stats.gapPct > 30
+                ? "text-danger"
+                : stats.gapPct > 15
+                  ? "text-warning"
+                  : "text-accent",
+            )}
+          >
+            {stats.gapPct > 0 ? "+" : ""}
+            {stats.gapPct.toFixed(0)}%
           </div>
           <p className="text-xs text-text-muted mt-2">
             {stats.gapPct > 30
               ? "Meta surestime significativement tes conversions"
               : stats.gapPct > 15
-              ? "Écart modéré entre Meta et la réalité"
-              : "Écart faible — tes données sont cohérentes"}
+                ? "Écart modéré entre Meta et la réalité"
+                : "Écart faible — tes données sont cohérentes"}
           </p>
         </Card>
       </div>
@@ -341,11 +422,25 @@ export function RealRoas() {
                       borderRadius: "8px",
                       color: "#F9FAFB",
                     }}
-                    formatter={(value?: number, name?: string) => [`${(value ?? 0).toFixed(2)}x`, name ?? ""]}
+                    formatter={(value?: number, name?: string) => [
+                      `${(value ?? 0).toFixed(2)}x`,
+                      name ?? "",
+                    ]}
                   />
                   <Legend />
-                  <Bar dataKey="ROAS Réel" fill="#34D399" radius={[4, 4, 0, 0]} barSize={24} />
-                  <Bar dataKey="ROAS Meta" fill="#6B7280" radius={[4, 4, 0, 0]} barSize={24} opacity={0.5} />
+                  <Bar
+                    dataKey="ROAS Réel"
+                    fill="#34D399"
+                    radius={[4, 4, 0, 0]}
+                    barSize={24}
+                  />
+                  <Bar
+                    dataKey="ROAS Meta"
+                    fill="#6B7280"
+                    radius={[4, 4, 0, 0]}
+                    barSize={24}
+                    opacity={0.5}
+                  />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -385,7 +480,10 @@ export function RealRoas() {
                       borderRadius: "8px",
                       color: "#F9FAFB",
                     }}
-                    formatter={(value?: number) => [`${(value ?? 0).toFixed(2)}x`, "ROAS Réel"]}
+                    formatter={(value?: number) => [
+                      `${(value ?? 0).toFixed(2)}x`,
+                      "ROAS Réel",
+                    ]}
                   />
                   <Line
                     type="monotone"
@@ -413,12 +511,24 @@ export function RealRoas() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-border-default">
-                    <th className="text-left text-text-secondary font-medium py-3 px-2">Campagne</th>
-                    <th className="text-right text-text-secondary font-medium py-3 px-2">Dépense</th>
-                    <th className="text-right text-text-secondary font-medium py-3 px-2">Revenue</th>
-                    <th className="text-right text-text-secondary font-medium py-3 px-2">ROAS Réel</th>
-                    <th className="text-right text-text-secondary font-medium py-3 px-2">ROAS Meta</th>
-                    <th className="text-right text-text-secondary font-medium py-3 px-2">Écart</th>
+                    <th className="text-left text-text-secondary font-medium py-3 px-2">
+                      Campagne
+                    </th>
+                    <th className="text-right text-text-secondary font-medium py-3 px-2">
+                      Dépense
+                    </th>
+                    <th className="text-right text-text-secondary font-medium py-3 px-2">
+                      Revenue
+                    </th>
+                    <th className="text-right text-text-secondary font-medium py-3 px-2">
+                      ROAS Réel
+                    </th>
+                    <th className="text-right text-text-secondary font-medium py-3 px-2">
+                      ROAS Meta
+                    </th>
+                    <th className="text-right text-text-secondary font-medium py-3 px-2">
+                      Écart
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -429,17 +539,31 @@ export function RealRoas() {
                         key={c.name}
                         className="border-b border-border-default/50 hover:bg-bg-tertiary/50 transition-colors"
                       >
-                        <td className="py-3 px-2 font-medium text-text-primary">{c.name}</td>
-                        <td className="py-3 px-2 text-right text-text-secondary">{fmtCurrency(c.spend)}</td>
-                        <td className="py-3 px-2 text-right font-medium text-text-primary">{fmtCurrency(c.revenue)}</td>
+                        <td className="py-3 px-2 font-medium text-text-primary">
+                          {c.name}
+                        </td>
+                        <td className="py-3 px-2 text-right text-text-secondary">
+                          {fmtCurrency(c.spend)}
+                        </td>
+                        <td className="py-3 px-2 text-right font-medium text-text-primary">
+                          {fmtCurrency(c.revenue)}
+                        </td>
                         <td className="py-3 px-2 text-right">
                           <Badge variant={roasBadge(c.realROAS)}>
                             {c.realROAS.toFixed(2)}x
                           </Badge>
                         </td>
-                        <td className="py-3 px-2 text-right text-text-secondary">{c.metaROAS.toFixed(2)}x</td>
-                        <td className={cn("py-3 px-2 text-right text-xs font-medium", gap > 1 ? "text-danger" : "text-text-muted")}>
-                          {gap > 0 ? "+" : ""}{gap.toFixed(2)}x
+                        <td className="py-3 px-2 text-right text-text-secondary">
+                          {c.metaROAS.toFixed(2)}x
+                        </td>
+                        <td
+                          className={cn(
+                            "py-3 px-2 text-right text-xs font-medium",
+                            gap > 1 ? "text-danger" : "text-text-muted",
+                          )}
+                        >
+                          {gap > 0 ? "+" : ""}
+                          {gap.toFixed(2)}x
                         </td>
                       </tr>
                     );
@@ -484,7 +608,8 @@ export function RealRoas() {
           <DialogHeader>
             <DialogTitle>Données ROAS hebdomadaires</DialogTitle>
             <DialogDescription>
-              Compare ton ROAS réel (basé sur tes vraies ventes) avec le ROAS estimé par Meta.
+              Compare ton ROAS réel (basé sur tes vraies ventes) avec le ROAS
+              estimé par Meta.
             </DialogDescription>
           </DialogHeader>
 
@@ -495,7 +620,9 @@ export function RealRoas() {
                 id="roas-week"
                 placeholder={`S${format(new Date(), "ww")}`}
                 value={formData.week}
-                onChange={(e) => setFormData((p) => ({ ...p, week: e.target.value }))}
+                onChange={(e) =>
+                  setFormData((p) => ({ ...p, week: e.target.value }))
+                }
               />
             </div>
             <div>
@@ -506,7 +633,12 @@ export function RealRoas() {
                 min={0}
                 step={0.01}
                 value={formData.adSpend || ""}
-                onChange={(e) => setFormData((p) => ({ ...p, adSpend: parseFloat(e.target.value) || 0 }))}
+                onChange={(e) =>
+                  setFormData((p) => ({
+                    ...p,
+                    adSpend: parseFloat(e.target.value) || 0,
+                  }))
+                }
               />
             </div>
             <div>
@@ -517,7 +649,12 @@ export function RealRoas() {
                 min={0}
                 step={0.01}
                 value={formData.revenue || ""}
-                onChange={(e) => setFormData((p) => ({ ...p, revenue: parseFloat(e.target.value) || 0 }))}
+                onChange={(e) =>
+                  setFormData((p) => ({
+                    ...p,
+                    revenue: parseFloat(e.target.value) || 0,
+                  }))
+                }
               />
             </div>
             <div>
@@ -528,7 +665,12 @@ export function RealRoas() {
                 min={0}
                 step={0.01}
                 value={formData.metaROAS || ""}
-                onChange={(e) => setFormData((p) => ({ ...p, metaROAS: parseFloat(e.target.value) || 0 }))}
+                onChange={(e) =>
+                  setFormData((p) => ({
+                    ...p,
+                    metaROAS: parseFloat(e.target.value) || 0,
+                  }))
+                }
               />
             </div>
             <div>
@@ -537,7 +679,9 @@ export function RealRoas() {
                 id="roas-campaign"
                 placeholder="Ex : Scaling Mars"
                 value={formData.campaign}
-                onChange={(e) => setFormData((p) => ({ ...p, campaign: e.target.value }))}
+                onChange={(e) =>
+                  setFormData((p) => ({ ...p, campaign: e.target.value }))
+                }
               />
             </div>
 
@@ -550,7 +694,12 @@ export function RealRoas() {
                 <div className="grid grid-cols-2 gap-2 text-sm">
                   <div>
                     <span className="text-text-muted">ROAS Réel :</span>{" "}
-                    <span className={cn("font-medium", roasColor(formData.revenue / formData.adSpend))}>
+                    <span
+                      className={cn(
+                        "font-medium",
+                        roasColor(formData.revenue / formData.adSpend),
+                      )}
+                    >
                       {(formData.revenue / formData.adSpend).toFixed(2)}x
                     </span>
                   </div>
@@ -569,7 +718,10 @@ export function RealRoas() {
             <Button variant="ghost" onClick={() => setShowForm(false)}>
               Annuler
             </Button>
-            <Button onClick={handleSave} disabled={formData.adSpend <= 0 || formData.revenue <= 0}>
+            <Button
+              onClick={handleSave}
+              disabled={formData.adSpend <= 0 || formData.revenue <= 0}
+            >
               Enregistrer
             </Button>
           </DialogFooter>

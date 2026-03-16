@@ -8,7 +8,9 @@ import Stripe from "stripe";
 export async function GET() {
   try {
     const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
     if (!user) {
       return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
@@ -29,7 +31,9 @@ export async function GET() {
       apiVersion: "2025-02-24.acacia" as Stripe.LatestApiVersion,
     });
 
-    const account = await stripe.accounts.retrieve(connection.provider_account_id);
+    const account = await stripe.accounts.retrieve(
+      connection.provider_account_id,
+    );
 
     const isComplete = account.details_submitted && account.charges_enabled;
 
@@ -58,7 +62,7 @@ export async function GET() {
   } catch {
     return NextResponse.json(
       { error: "Erreur lors de la vérification" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

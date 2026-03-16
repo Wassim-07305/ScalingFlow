@@ -2,7 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { checkAIUsage } from "@/lib/stripe/check-usage";
 import { createClient } from "@/lib/supabase/server";
 import { generateJSON } from "@/lib/ai/generate";
-import { marketAnalysisPrompt, type MarketAnalysisContext } from "@/lib/ai/prompts/market-analysis";
+import {
+  marketAnalysisPrompt,
+  type MarketAnalysisContext,
+} from "@/lib/ai/prompts/market-analysis";
 import type { MarketAnalysisResult } from "@/types/ai";
 import { awardXP } from "@/lib/gamification/xp-engine";
 import { notifyGeneration } from "@/lib/notifications/create";
@@ -30,11 +33,14 @@ export async function POST(req: NextRequest) {
     }
 
     // Rate limiting
-    const rl = await rateLimit(user.id, "analyze-market", { limit: 5, windowSeconds: 60 });
+    const rl = await rateLimit(user.id, "analyze-market", {
+      limit: 5,
+      windowSeconds: 60,
+    });
     if (!rl.allowed) {
       return NextResponse.json(
         { error: "Trop de requêtes. Réessaie dans quelques secondes." },
-        { status: 429 }
+        { status: 429 },
       );
     }
 
@@ -50,11 +56,10 @@ export async function POST(req: NextRequest) {
       if (!usage.allowed) {
         return NextResponse.json(
           { error: "Limite de générations IA atteinte", usage },
-          { status: 403 }
+          { status: 403 },
         );
       }
     }
-
 
     const body = await req.json();
     const {
@@ -70,16 +75,25 @@ export async function POST(req: NextRequest) {
     // Scrape real customer reviews if Apify configured AND URLs provided
     // -----------------------------------------------------------------------
     let reviewsContext = "";
-    const reviewsData: { source: string; count: number; averageRating: number }[] = [];
+    const reviewsData: {
+      source: string;
+      count: number;
+      averageRating: number;
+    }[] = [];
     const allGoogleReviews: GoogleMapsReview[] = [];
     const allTrustpilotReviews: TrustpilotReview[] = [];
 
     if (isApifyConfigured()) {
       // Google Maps reviews
-      if (competitor_google_maps_urls && competitor_google_maps_urls.length > 0) {
+      if (
+        competitor_google_maps_urls &&
+        competitor_google_maps_urls.length > 0
+      ) {
         const googlePromises = competitor_google_maps_urls
           .filter((u) => u && u.trim())
-          .map((url) => scrapeGoogleMapsReviews({ googleMapsUrl: url, limit: 30 }));
+          .map((url) =>
+            scrapeGoogleMapsReviews({ googleMapsUrl: url, limit: 30 }),
+          );
         const googleResults = await Promise.allSettled(googlePromises);
 
         for (const r of googleResults) {
@@ -104,7 +118,9 @@ export async function POST(req: NextRequest) {
       if (competitor_trustpilot_urls && competitor_trustpilot_urls.length > 0) {
         const tpPromises = competitor_trustpilot_urls
           .filter((u) => u && u.trim())
-          .map((url) => scrapeTrustpilotReviews({ trustpilotUrl: url, limit: 30 }));
+          .map((url) =>
+            scrapeTrustpilotReviews({ trustpilotUrl: url, limit: 30 }),
+          );
         const tpResults = await Promise.allSettled(tpPromises);
 
         for (const r of tpResults) {
@@ -154,7 +170,9 @@ export async function POST(req: NextRequest) {
     const vaultContext = await buildFullVaultContext(user.id);
     const basePrompt = marketAnalysisPrompt(marketContext);
 
-    const fullPrompt = [basePrompt, reviewsContext, vaultContext].filter(Boolean).join("\n");
+    const fullPrompt = [basePrompt, reviewsContext, vaultContext]
+      .filter(Boolean)
+      .join("\n");
 
     const result = await generateJSON<MarketAnalysisResult>({
       prompt: fullPrompt,
@@ -182,13 +200,20 @@ export async function POST(req: NextRequest) {
           language: body.language || null,
         });
       } catch (insertErr) {
-        console.error(`[analyze-market] Failed to save market ${i} (${market.name}):`, insertErr);
+        console.error(
+          `[analyze-market] Failed to save market ${i} (${market.name}):`,
+          insertErr,
+        );
       }
     }
 
     // Award XP (non-blocking)
-    try { await awardXP(user.id, "generation.market_analysis"); } catch {}
-    try { await notifyGeneration(user.id, "generation.market_analysis"); } catch {}
+    try {
+      await awardXP(user.id, "generation.market_analysis");
+    } catch {}
+    try {
+      await notifyGeneration(user.id, "generation.market_analysis");
+    } catch {}
 
     // Build review verbatims for the UI (grouped by sentiment)
     const reviewVerbatims = [
@@ -198,7 +223,12 @@ export async function POST(req: NextRequest) {
         text: r.text,
         rating: r.stars,
         date: r.publishedAtDate,
-        sentiment: r.stars >= 4 ? ("positif" as const) : r.stars <= 2 ? ("négatif" as const) : ("neutre" as const),
+        sentiment:
+          r.stars >= 4
+            ? ("positif" as const)
+            : r.stars <= 2
+              ? ("négatif" as const)
+              : ("neutre" as const),
       })),
       ...allTrustpilotReviews.map((r) => ({
         source: "trustpilot" as const,
@@ -206,20 +236,26 @@ export async function POST(req: NextRequest) {
         text: r.text,
         rating: r.rating,
         date: r.date,
-        sentiment: r.rating >= 4 ? ("positif" as const) : r.rating <= 2 ? ("négatif" as const) : ("neutre" as const),
+        sentiment:
+          r.rating >= 4
+            ? ("positif" as const)
+            : r.rating <= 2
+              ? ("négatif" as const)
+              : ("neutre" as const),
       })),
     ];
 
     return NextResponse.json({
       ...result,
       reviews_data: reviewsData.length > 0 ? reviewsData : undefined,
-      review_verbatims: reviewVerbatims.length > 0 ? reviewVerbatims : undefined,
+      review_verbatims:
+        reviewVerbatims.length > 0 ? reviewVerbatims : undefined,
     });
   } catch (error) {
     console.error("[analyze-market] Error:", error);
     return NextResponse.json(
       { error: "Erreur lors de l'analyse de marché" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

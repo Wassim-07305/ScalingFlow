@@ -17,7 +17,9 @@ async function verifyAccountExists(accountId: string) {
     if (!res.ok) return false;
     const data = await res.json();
     const items = data.items || [];
-    return items.some((a: Record<string, unknown>) => String(a.id) === accountId);
+    return items.some(
+      (a: Record<string, unknown>) => String(a.id) === accountId,
+    );
   } catch {
     return false;
   }
@@ -44,14 +46,14 @@ export async function POST(request: NextRequest) {
     if (!account_id) {
       return NextResponse.json(
         { error: "Le champ account_id est requis" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     if (!text || text.trim().length === 0) {
       return NextResponse.json(
         { error: "Le champ text est requis" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -60,7 +62,7 @@ export async function POST(request: NextRequest) {
     if (!isValid) {
       return NextResponse.json(
         { error: "Compte non trouvé ou accès non autorisé" },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -71,7 +73,7 @@ export async function POST(request: NextRequest) {
     if (!apiUrl || !accessToken) {
       return NextResponse.json(
         { error: "Configuration Unipile manquante" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -95,10 +97,14 @@ export async function POST(request: NextRequest) {
 
     if (!response.ok) {
       const errorData = await response.text();
-      console.error("[Unipile Publish] Erreur API :", response.status, errorData);
+      console.error(
+        "[Unipile Publish] Erreur API :",
+        response.status,
+        errorData,
+      );
       return NextResponse.json(
         { error: "Erreur lors de la publication du contenu" },
-        { status: response.status >= 500 ? 502 : response.status }
+        { status: response.status >= 500 ? 502 : response.status },
       );
     }
 
@@ -108,7 +114,7 @@ export async function POST(request: NextRequest) {
     console.error("[Unipile Publish]", error);
     return NextResponse.json(
       { error: "Erreur lors de la publication" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

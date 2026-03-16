@@ -19,7 +19,12 @@ interface PipelineColumnProps {
   onDrop: (leadId: string, newStatus: string) => void;
 }
 
-export function PipelineColumn({ config, leads, onCardClick, onDrop }: PipelineColumnProps) {
+export function PipelineColumn({
+  config,
+  leads,
+  onCardClick,
+  onDrop,
+}: PipelineColumnProps) {
   const [dragOver, setDragOver] = useState(false);
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -45,7 +50,8 @@ export function PipelineColumn({ config, leads, onCardClick, onDrop }: PipelineC
     <div
       className={cn(
         "flex flex-col min-w-[280px] w-[280px] shrink-0 snap-center rounded-2xl border border-border-default bg-bg-primary/50 transition-all duration-300",
-        dragOver && "border-accent/50 bg-accent/5 shadow-xl shadow-accent/10 scale-[1.02] ring-1 ring-accent/20"
+        dragOver &&
+          "border-accent/50 bg-accent/5 shadow-xl shadow-accent/10 scale-[1.02] ring-1 ring-accent/20",
       )}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
@@ -55,12 +61,17 @@ export function PipelineColumn({ config, leads, onCardClick, onDrop }: PipelineC
       <div className="flex items-center justify-between px-3 py-3">
         <div className="flex items-center gap-2">
           <div className={cn("h-2.5 w-2.5 rounded-full", config.bgColor)} />
-          <span className="text-sm font-semibold text-text-primary">{config.label}</span>
+          <span className="text-sm font-semibold text-text-primary">
+            {config.label}
+          </span>
         </div>
-        <span className={cn(
-          "flex h-5 min-w-[20px] items-center justify-center rounded-full px-1.5 text-[11px] font-medium",
-          config.bgColor, config.color
-        )}>
+        <span
+          className={cn(
+            "flex h-5 min-w-[20px] items-center justify-center rounded-full px-1.5 text-[11px] font-medium",
+            config.bgColor,
+            config.color,
+          )}
+        >
           {leads.length}
         </span>
       </div>
@@ -71,12 +82,17 @@ export function PipelineColumn({ config, leads, onCardClick, onDrop }: PipelineC
       {/* Cards */}
       <div className="flex flex-col gap-2 p-2 overflow-y-auto max-h-[calc(100vh-320px)] min-h-[100px]">
         {leads.length === 0 ? (
-          <div className={cn(
-            "flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border-default p-8 text-center transition-all duration-300",
-            dragOver && "border-accent/50 bg-accent/5 scale-[1.02] shadow-inner shadow-accent/5"
-          )}>
+          <div
+            className={cn(
+              "flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border-default p-8 text-center transition-all duration-300",
+              dragOver &&
+                "border-accent/50 bg-accent/5 scale-[1.02] shadow-inner shadow-accent/5",
+            )}
+          >
             {dragOver ? (
-              <span className="text-xs font-semibold text-accent animate-pulse">Relâcher ici</span>
+              <span className="text-xs font-semibold text-accent animate-pulse">
+                Relâcher ici
+              </span>
             ) : (
               <>
                 <Inbox className="h-5 w-5 text-text-muted/30" />

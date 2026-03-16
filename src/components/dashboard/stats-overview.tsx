@@ -2,7 +2,17 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Package, FileText, GitBranch, Flame, PenTool, Megaphone, Target, TrendingUp, DollarSign } from "lucide-react";
+import {
+  Package,
+  FileText,
+  GitBranch,
+  Flame,
+  PenTool,
+  Megaphone,
+  Target,
+  TrendingUp,
+  DollarSign,
+} from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { AnimatedCounter } from "@/components/shared/animated-counter";
 import { cn } from "@/lib/utils/cn";
@@ -85,7 +95,15 @@ export function StatsOverview() {
       try {
         const supabase = createClient();
 
-        const [offersRes, assetsRes, funnelsRes, adsRes, contentRes, campaignsRes, milestonesRes] = await Promise.all([
+        const [
+          offersRes,
+          assetsRes,
+          funnelsRes,
+          adsRes,
+          contentRes,
+          campaignsRes,
+          milestonesRes,
+        ] = await Promise.all([
           supabase
             .from("offers")
             .select("id", { count: "exact", head: true })
@@ -119,10 +137,15 @@ export function StatsOverview() {
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const campaigns = (campaignsRes.data ?? []) as any[];
-        const adSpend = campaigns.reduce((s: number, c: any) => s + (c.total_spend ?? 0), 0);
-        const avgRoas = campaigns.length > 0
-          ? campaigns.reduce((s: number, c: any) => s + (c.roas ?? 0), 0) / campaigns.length
-          : 0;
+        const adSpend = campaigns.reduce(
+          (s: number, c: any) => s + (c.total_spend ?? 0),
+          0,
+        );
+        const avgRoas =
+          campaigns.length > 0
+            ? campaigns.reduce((s: number, c: any) => s + (c.roas ?? 0), 0) /
+              campaigns.length
+            : 0;
 
         setCounts({
           offers: offersRes.count ?? 0,
@@ -226,20 +249,24 @@ export function StatsOverview() {
               "group relative overflow-hidden rounded-2xl border border-white/5 bg-bg-secondary p-3 sm:p-4 cursor-pointer transition-all duration-300 text-left w-full",
               "hover:border-transparent hover:translate-y-[-2px]",
               "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 focus-visible:ring-offset-1 focus-visible:ring-offset-bg-primary",
-              colors.glow
+              colors.glow,
             )}
             onClick={() => stat.href && router.push(stat.href)}
             aria-label={`${stat.label}: ${stat.value}${stat.suffix || ""}`}
           >
             {/* Gradient background on hover */}
-            <div className={cn(
-              "absolute inset-0 bg-gradient-to-br opacity-0 transition-opacity duration-300 group-hover:opacity-100",
-              colors.gradient
-            )} />
+            <div
+              className={cn(
+                "absolute inset-0 bg-gradient-to-br opacity-0 transition-opacity duration-300 group-hover:opacity-100",
+                colors.gradient,
+              )}
+            />
 
             <div className="relative flex items-start justify-between gap-2">
               <div className="min-w-0">
-                <p className="text-xs sm:text-sm text-text-secondary font-medium truncate">{stat.label}</p>
+                <p className="text-xs sm:text-sm text-text-secondary font-medium truncate">
+                  {stat.label}
+                </p>
                 <div className="mt-1.5 text-lg sm:text-2xl font-bold text-text-primary">
                   {isLoading ? (
                     <span className="inline-block h-7 w-14 animate-pulse rounded bg-white/10" />
@@ -256,10 +283,12 @@ export function StatsOverview() {
                 className={cn(
                   "flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-lg sm:rounded-xl transition-all duration-300 shrink-0",
                   colors.bg,
-                  "group-hover:scale-110"
+                  "group-hover:scale-110",
                 )}
               >
-                <stat.icon className={cn("h-4 w-4 sm:h-5 sm:w-5", colors.icon)} />
+                <stat.icon
+                  className={cn("h-4 w-4 sm:h-5 sm:w-5", colors.icon)}
+                />
               </div>
             </div>
 

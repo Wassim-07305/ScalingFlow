@@ -1,7 +1,4 @@
-export function contentIdeasPrompt(
-  market: string,
-  platform: string
-): string {
+export function contentIdeasPrompt(market: string, platform: string): string {
   return `Tu es un expert en stratégie de contenu pour les freelances et consultants dans le domaine de l'IA et de l'automatisation.
 
 ## Marché cible

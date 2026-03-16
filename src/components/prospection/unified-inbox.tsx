@@ -59,22 +59,62 @@ interface Message {
 
 // ─── Provider config ──────────────────────────────────────────
 
-const PROVIDER_CONFIG: Record<string, { label: string; icon: React.ElementType; color: string; badgeVariant: "blue" | "cyan" | "default" }> = {
-  LINKEDIN: { label: "LinkedIn", icon: Linkedin, color: "text-blue-400", badgeVariant: "blue" },
-  WHATSAPP: { label: "WhatsApp", icon: Phone, color: "text-green-400", badgeVariant: "cyan" },
-  INSTAGRAM: { label: "Instagram", icon: Instagram, color: "text-pink-400", badgeVariant: "default" },
-  MESSENGER: { label: "Messenger", icon: MessageSquare, color: "text-blue-300", badgeVariant: "blue" },
-  TELEGRAM: { label: "Telegram", icon: Send, color: "text-cyan-400", badgeVariant: "cyan" },
-  TWITTER: { label: "Twitter/X", icon: Twitter, color: "text-sky-400", badgeVariant: "default" },
+const PROVIDER_CONFIG: Record<
+  string,
+  {
+    label: string;
+    icon: React.ElementType;
+    color: string;
+    badgeVariant: "blue" | "cyan" | "default";
+  }
+> = {
+  LINKEDIN: {
+    label: "LinkedIn",
+    icon: Linkedin,
+    color: "text-blue-400",
+    badgeVariant: "blue",
+  },
+  WHATSAPP: {
+    label: "WhatsApp",
+    icon: Phone,
+    color: "text-green-400",
+    badgeVariant: "cyan",
+  },
+  INSTAGRAM: {
+    label: "Instagram",
+    icon: Instagram,
+    color: "text-pink-400",
+    badgeVariant: "default",
+  },
+  MESSENGER: {
+    label: "Messenger",
+    icon: MessageSquare,
+    color: "text-blue-300",
+    badgeVariant: "blue",
+  },
+  TELEGRAM: {
+    label: "Telegram",
+    icon: Send,
+    color: "text-cyan-400",
+    badgeVariant: "cyan",
+  },
+  TWITTER: {
+    label: "Twitter/X",
+    icon: Twitter,
+    color: "text-sky-400",
+    badgeVariant: "default",
+  },
 };
 
 function getProviderInfo(provider: string) {
-  return PROVIDER_CONFIG[provider.toUpperCase()] || {
-    label: provider,
-    icon: MessageCircle,
-    color: "text-text-muted",
-    badgeVariant: "default" as const,
-  };
+  return (
+    PROVIDER_CONFIG[provider.toUpperCase()] || {
+      label: provider,
+      icon: MessageCircle,
+      color: "text-text-muted",
+      badgeVariant: "default" as const,
+    }
+  );
 }
 
 function formatRelativeTime(dateStr?: string): string {
@@ -136,7 +176,7 @@ export function UnifiedInbox() {
       const allChats: Chat[] = [];
       for (const account of accounts) {
         const res = await fetch(
-          `/api/integrations/unipile/messages?account_id=${account.id}`
+          `/api/integrations/unipile/messages?account_id=${account.id}`,
         );
         if (!res.ok) continue;
         const data = await res.json();
@@ -149,8 +189,12 @@ export function UnifiedInbox() {
       }
       // Sort by latest message
       allChats.sort((a, b) => {
-        const dateA = a.last_message_at ? new Date(a.last_message_at).getTime() : 0;
-        const dateB = b.last_message_at ? new Date(b.last_message_at).getTime() : 0;
+        const dateA = a.last_message_at
+          ? new Date(a.last_message_at).getTime()
+          : 0;
+        const dateB = b.last_message_at
+          ? new Date(b.last_message_at).getTime()
+          : 0;
         return dateB - dateA;
       });
       setChats(allChats);
@@ -167,7 +211,7 @@ export function UnifiedInbox() {
     setLoadingMessages(true);
     try {
       const res = await fetch(
-        `/api/integrations/unipile/messages?account_id=${chat.account_id}&chat_id=${chat.id}`
+        `/api/integrations/unipile/messages?account_id=${chat.account_id}&chat_id=${chat.id}`,
       );
       if (!res.ok) throw new Error();
       const data = await res.json();
@@ -246,13 +290,16 @@ export function UnifiedInbox() {
 
   const filteredChats = chats.filter((chat) => {
     const matchesProvider =
-      filterProvider === "all" || chat.provider.toUpperCase() === filterProvider;
+      filterProvider === "all" ||
+      chat.provider.toUpperCase() === filterProvider;
     const matchesSearch =
       !searchQuery ||
       chat.participants.some((p) =>
-        p.name.toLowerCase().includes(searchQuery.toLowerCase())
+        p.name.toLowerCase().includes(searchQuery.toLowerCase()),
       ) ||
-      (chat.last_message || "").toLowerCase().includes(searchQuery.toLowerCase());
+      (chat.last_message || "")
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase());
     return matchesProvider && matchesSearch;
   });
 
@@ -269,13 +316,11 @@ export function UnifiedInbox() {
             Aucun compte connecté
           </h3>
           <p className="text-sm text-text-secondary max-w-md mb-6 leading-relaxed">
-            Connecte tes comptes de messagerie depuis les paramètres
-            pour accéder à ta messagerie unifiée.
+            Connecte tes comptes de messagerie depuis les paramètres pour
+            accéder à ta messagerie unifiée.
           </p>
           <Button asChild className="rounded-xl">
-            <a href="/settings">
-              Aller dans les paramètres
-            </a>
+            <a href="/settings">Aller dans les paramètres</a>
           </Button>
         </CardContent>
       </Card>
@@ -287,7 +332,12 @@ export function UnifiedInbox() {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-[380px_1fr] gap-4 h-[calc(100vh-280px)] min-h-[500px] animate-in fade-in duration-500">
       {/* ── Left panel: Conversations list ── */}
-      <Card className={cn("flex flex-col overflow-hidden border-border-default/50 bg-bg-secondary/30 backdrop-blur-sm", selectedChat && "hidden lg:flex")}>
+      <Card
+        className={cn(
+          "flex flex-col overflow-hidden border-border-default/50 bg-bg-secondary/30 backdrop-blur-sm",
+          selectedChat && "hidden lg:flex",
+        )}
+      >
         {/* Top bar: search + filter */}
         <div className="p-3 border-b border-border-default space-y-2">
           <div className="relative">
@@ -306,14 +356,14 @@ export function UnifiedInbox() {
                 "px-3 py-1.5 rounded-lg text-xs font-medium transition-colors whitespace-nowrap",
                 filterProvider === "all"
                   ? "bg-accent text-white"
-                  : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
+                  : "bg-bg-tertiary text-text-secondary hover:text-text-primary",
               )}
             >
               Tous
             </button>
             {Object.entries(PROVIDER_CONFIG).map(([key, cfg]) => {
               const hasAccount = accounts.some(
-                (a) => a.provider.toUpperCase() === key
+                (a) => a.provider.toUpperCase() === key,
               );
               if (!hasAccount) return null;
               const Icon = cfg.icon;
@@ -325,7 +375,7 @@ export function UnifiedInbox() {
                     "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors whitespace-nowrap",
                     filterProvider === key
                       ? "bg-accent text-white"
-                      : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
+                      : "bg-bg-tertiary text-text-secondary hover:text-text-primary",
                   )}
                 >
                   <Icon className="h-3.5 w-3.5" />
@@ -347,8 +397,12 @@ export function UnifiedInbox() {
               <div className="h-12 w-12 rounded-2xl bg-bg-tertiary flex items-center justify-center mb-3">
                 <Inbox className="h-6 w-6 text-text-muted" />
               </div>
-              <p className="text-sm font-medium text-text-primary mb-1">Aucune conversation</p>
-              <p className="text-xs text-text-muted">Les conversations apparaîtront ici.</p>
+              <p className="text-sm font-medium text-text-primary mb-1">
+                Aucune conversation
+              </p>
+              <p className="text-xs text-text-muted">
+                Les conversations apparaîtront ici.
+              </p>
             </div>
           ) : (
             filteredChats.map((chat) => {
@@ -363,9 +417,7 @@ export function UnifiedInbox() {
                   onClick={() => handleSelectChat(chat)}
                   className={cn(
                     "w-full flex items-start gap-3 p-3 text-left transition-colors border-b border-border-default",
-                    isSelected
-                      ? "bg-accent/10"
-                      : "hover:bg-white/[0.03]"
+                    isSelected ? "bg-accent/10" : "hover:bg-white/[0.03]",
                   )}
                 >
                   {/* Avatar */}
@@ -375,10 +427,12 @@ export function UnifiedInbox() {
                     </div>
                     <div
                       className={cn(
-                        "absolute -bottom-0.5 -right-0.5 h-4 w-4 rounded-full bg-bg-secondary flex items-center justify-center"
+                        "absolute -bottom-0.5 -right-0.5 h-4 w-4 rounded-full bg-bg-secondary flex items-center justify-center",
                       )}
                     >
-                      <ProviderIcon className={cn("h-2.5 w-2.5", providerInfo.color)} />
+                      <ProviderIcon
+                        className={cn("h-2.5 w-2.5", providerInfo.color)}
+                      />
                     </div>
                   </div>
 
@@ -418,14 +472,21 @@ export function UnifiedInbox() {
             onClick={() => fetchChats()}
             disabled={loadingChats}
           >
-            <RefreshCw className={cn("h-3.5 w-3.5 mr-2", loadingChats && "animate-spin")} />
+            <RefreshCw
+              className={cn("h-3.5 w-3.5 mr-2", loadingChats && "animate-spin")}
+            />
             Rafraîchir
           </Button>
         </div>
       </Card>
 
       {/* ── Right panel: Message thread ── */}
-      <Card className={cn("flex flex-col overflow-hidden border-border-default/50 bg-bg-secondary/30 backdrop-blur-sm", !selectedChat && "hidden lg:flex")}>
+      <Card
+        className={cn(
+          "flex flex-col overflow-hidden border-border-default/50 bg-bg-secondary/30 backdrop-blur-sm",
+          !selectedChat && "hidden lg:flex",
+        )}
+      >
         {!selectedChat ? (
           <CardContent className="flex-1 flex flex-col items-center justify-center text-center py-16">
             <MessageCircle className="h-12 w-12 text-text-muted mb-4" />
@@ -457,7 +518,9 @@ export function UnifiedInbox() {
                     return (
                       <>
                         <Icon className={cn("h-3 w-3", info.color)} />
-                        <span className="text-xs text-text-muted">{info.label}</span>
+                        <span className="text-xs text-text-muted">
+                          {info.label}
+                        </span>
                       </>
                     );
                   })()}
@@ -469,7 +532,12 @@ export function UnifiedInbox() {
                 onClick={() => fetchMessages(selectedChat)}
                 disabled={loadingMessages}
               >
-                <RefreshCw className={cn("h-3.5 w-3.5", loadingMessages && "animate-spin")} />
+                <RefreshCw
+                  className={cn(
+                    "h-3.5 w-3.5",
+                    loadingMessages && "animate-spin",
+                  )}
+                />
               </Button>
             </div>
 
@@ -489,7 +557,7 @@ export function UnifiedInbox() {
                     key={msg.id}
                     className={cn(
                       "flex",
-                      msg.is_me ? "justify-end" : "justify-start"
+                      msg.is_me ? "justify-end" : "justify-start",
                     )}
                   >
                     <div
@@ -497,7 +565,7 @@ export function UnifiedInbox() {
                         "max-w-[75%] rounded-2xl px-4 py-2.5",
                         msg.is_me
                           ? "bg-accent text-white rounded-br-md"
-                          : "bg-bg-tertiary text-text-primary rounded-bl-md"
+                          : "bg-bg-tertiary text-text-primary rounded-bl-md",
                       )}
                     >
                       {!msg.is_me && (
@@ -509,7 +577,7 @@ export function UnifiedInbox() {
                       <p
                         className={cn(
                           "text-[10px] mt-1",
-                          msg.is_me ? "text-white/60" : "text-text-muted"
+                          msg.is_me ? "text-white/60" : "text-text-muted",
                         )}
                       >
                         {new Date(msg.created_at).toLocaleTimeString("fr-FR", {

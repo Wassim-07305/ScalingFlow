@@ -86,20 +86,132 @@ function saveEntries(entries: SaleEntry[]) {
 
 // ─── Demo data ───────────────────────────────────────────────
 const DEMO_ENTRIES: SaleEntry[] = [
-  { id: "d1", date: "2026-03-01", amount: 997, source: "Meta Ads", campaign: "Scaling Mars", creative: "VSL Témoignage", audience: "Lookalike 1%" },
-  { id: "d2", date: "2026-03-02", amount: 1497, source: "Meta Ads", campaign: "Scaling Mars", creative: "Carrousel Résultat", audience: "Intérêt Business" },
-  { id: "d3", date: "2026-03-03", amount: 997, source: "Instagram", campaign: "DM Outreach", creative: "Story CTA", audience: "Followers engagés" },
-  { id: "d4", date: "2026-03-04", amount: 2497, source: "YouTube", campaign: "Vidéo longue", creative: "Tuto Scaling", audience: "Abonnés" },
-  { id: "d5", date: "2026-03-05", amount: 997, source: "Meta Ads", campaign: "Retargeting", creative: "Vidéo Objection", audience: "Visiteurs site" },
-  { id: "d6", date: "2026-03-06", amount: 1497, source: "Referral", campaign: "Parrainage", creative: "-", audience: "Clients existants" },
-  { id: "d7", date: "2026-03-07", amount: 997, source: "Meta Ads", campaign: "Scaling Mars", creative: "VSL Témoignage", audience: "Lookalike 1%" },
-  { id: "d8", date: "2026-03-08", amount: 2497, source: "Meta Ads", campaign: "Scaling Mars", creative: "Carrousel Résultat", audience: "Intérêt Business" },
-  { id: "d9", date: "2026-03-09", amount: 997, source: "Organique", campaign: "-", creative: "-", audience: "-" },
-  { id: "d10", date: "2026-03-10", amount: 1497, source: "Meta Ads", campaign: "Retargeting", creative: "Vidéo Objection", audience: "Visiteurs site" },
-  { id: "d11", date: "2026-03-11", amount: 997, source: "Instagram", campaign: "DM Outreach", creative: "Reel Hook", audience: "Followers engagés" },
-  { id: "d12", date: "2026-03-12", amount: 2497, source: "Meta Ads", campaign: "Scaling Mars", creative: "VSL Témoignage", audience: "Lookalike 1%" },
-  { id: "d13", date: "2026-03-13", amount: 997, source: "Meta Ads", campaign: "Scaling Mars", creative: "Carrousel Résultat", audience: "Lookalike 1%" },
-  { id: "d14", date: "2026-03-14", amount: 1497, source: "YouTube", campaign: "Vidéo longue", creative: "Tuto Scaling", audience: "Abonnés" },
+  {
+    id: "d1",
+    date: "2026-03-01",
+    amount: 997,
+    source: "Meta Ads",
+    campaign: "Scaling Mars",
+    creative: "VSL Témoignage",
+    audience: "Lookalike 1%",
+  },
+  {
+    id: "d2",
+    date: "2026-03-02",
+    amount: 1497,
+    source: "Meta Ads",
+    campaign: "Scaling Mars",
+    creative: "Carrousel Résultat",
+    audience: "Intérêt Business",
+  },
+  {
+    id: "d3",
+    date: "2026-03-03",
+    amount: 997,
+    source: "Instagram",
+    campaign: "DM Outreach",
+    creative: "Story CTA",
+    audience: "Followers engagés",
+  },
+  {
+    id: "d4",
+    date: "2026-03-04",
+    amount: 2497,
+    source: "YouTube",
+    campaign: "Vidéo longue",
+    creative: "Tuto Scaling",
+    audience: "Abonnés",
+  },
+  {
+    id: "d5",
+    date: "2026-03-05",
+    amount: 997,
+    source: "Meta Ads",
+    campaign: "Retargeting",
+    creative: "Vidéo Objection",
+    audience: "Visiteurs site",
+  },
+  {
+    id: "d6",
+    date: "2026-03-06",
+    amount: 1497,
+    source: "Referral",
+    campaign: "Parrainage",
+    creative: "-",
+    audience: "Clients existants",
+  },
+  {
+    id: "d7",
+    date: "2026-03-07",
+    amount: 997,
+    source: "Meta Ads",
+    campaign: "Scaling Mars",
+    creative: "VSL Témoignage",
+    audience: "Lookalike 1%",
+  },
+  {
+    id: "d8",
+    date: "2026-03-08",
+    amount: 2497,
+    source: "Meta Ads",
+    campaign: "Scaling Mars",
+    creative: "Carrousel Résultat",
+    audience: "Intérêt Business",
+  },
+  {
+    id: "d9",
+    date: "2026-03-09",
+    amount: 997,
+    source: "Organique",
+    campaign: "-",
+    creative: "-",
+    audience: "-",
+  },
+  {
+    id: "d10",
+    date: "2026-03-10",
+    amount: 1497,
+    source: "Meta Ads",
+    campaign: "Retargeting",
+    creative: "Vidéo Objection",
+    audience: "Visiteurs site",
+  },
+  {
+    id: "d11",
+    date: "2026-03-11",
+    amount: 997,
+    source: "Instagram",
+    campaign: "DM Outreach",
+    creative: "Reel Hook",
+    audience: "Followers engagés",
+  },
+  {
+    id: "d12",
+    date: "2026-03-12",
+    amount: 2497,
+    source: "Meta Ads",
+    campaign: "Scaling Mars",
+    creative: "VSL Témoignage",
+    audience: "Lookalike 1%",
+  },
+  {
+    id: "d13",
+    date: "2026-03-13",
+    amount: 997,
+    source: "Meta Ads",
+    campaign: "Scaling Mars",
+    creative: "Carrousel Résultat",
+    audience: "Lookalike 1%",
+  },
+  {
+    id: "d14",
+    date: "2026-03-14",
+    amount: 1497,
+    source: "YouTube",
+    campaign: "Vidéo longue",
+    creative: "Tuto Scaling",
+    audience: "Abonnés",
+  },
 ];
 
 // ─── Formatting helpers ──────────────────────────────────────
@@ -177,7 +289,14 @@ export function RevenueTracker() {
   const tableData = useMemo(() => {
     const groups: Record<
       string,
-      { source: string; campaign: string; creative: string; audience: string; revenue: number; count: number }
+      {
+        source: string;
+        campaign: string;
+        creative: string;
+        audience: string;
+        revenue: number;
+        count: number;
+      }
     > = {};
     filteredEntries.forEach((e) => {
       const key = `${e.source}|${e.campaign}|${e.creative}|${e.audience}`;
@@ -209,7 +328,9 @@ export function RevenueTracker() {
       audience: formData.audience || "-",
     };
 
-    const updated = isDemo ? [newEntry] : [...entries, newEntry].sort((a, b) => a.date.localeCompare(b.date));
+    const updated = isDemo
+      ? [newEntry]
+      : [...entries, newEntry].sort((a, b) => a.date.localeCompare(b.date));
     setEntries(updated);
     setIsDemo(false);
     saveEntries(updated);
@@ -235,9 +356,14 @@ export function RevenueTracker() {
   const handleExportCSV = useCallback(() => {
     const headers = "Date,Montant,Source,Campagne,Créative,Audience\n";
     const rows = filteredEntries
-      .map((e) => `${e.date},${e.amount},${e.source},"${e.campaign}","${e.creative}","${e.audience}"`)
+      .map(
+        (e) =>
+          `${e.date},${e.amount},${e.source},"${e.campaign}","${e.creative}","${e.audience}"`,
+      )
       .join("\n");
-    const blob = new Blob([headers + rows], { type: "text/csv;charset=utf-8;" });
+    const blob = new Blob([headers + rows], {
+      type: "text/csv;charset=utf-8;",
+    });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
@@ -248,10 +374,22 @@ export function RevenueTracker() {
   }, [filteredEntries]);
 
   const kpis = [
-    { label: "Revenue Total", value: fmtCurrency(summary.totalRevenue), icon: DollarSign },
+    {
+      label: "Revenue Total",
+      value: fmtCurrency(summary.totalRevenue),
+      icon: DollarSign,
+    },
     { label: "Nb Ventes", value: String(summary.nbVentes), icon: ShoppingCart },
-    { label: "Panier Moyen", value: fmtCurrency(summary.panierMoyen), icon: TrendingUp },
-    { label: "Revenue / Jour", value: fmtCurrency(summary.revenueParJour), icon: CalendarDays },
+    {
+      label: "Panier Moyen",
+      value: fmtCurrency(summary.panierMoyen),
+      icon: TrendingUp,
+    },
+    {
+      label: "Revenue / Jour",
+      value: fmtCurrency(summary.revenueParJour),
+      icon: CalendarDays,
+    },
   ];
 
   return (
@@ -270,7 +408,7 @@ export function RevenueTracker() {
                   "px-3 py-1.5 rounded-lg text-xs font-medium transition-colors",
                   dateRange === range
                     ? "bg-accent text-white"
-                    : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
+                    : "bg-bg-tertiary text-text-secondary hover:text-text-primary",
                 )}
               >
                 {range}j
@@ -303,10 +441,14 @@ export function RevenueTracker() {
         {kpis.map((kpi) => (
           <Card key={kpi.label} className="p-4">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-text-secondary text-xs font-medium">{kpi.label}</span>
+              <span className="text-text-secondary text-xs font-medium">
+                {kpi.label}
+              </span>
               <kpi.icon className="h-4 w-4 text-text-muted" />
             </div>
-            <div className="text-xl font-bold text-text-primary">{kpi.value}</div>
+            <div className="text-xl font-bold text-text-primary">
+              {kpi.value}
+            </div>
           </Card>
         ))}
       </div>
@@ -343,7 +485,10 @@ export function RevenueTracker() {
                       borderRadius: "8px",
                       color: "#F9FAFB",
                     }}
-                    formatter={(value?: number) => [`${fmtCurrency(value ?? 0)}`, "Revenue"]}
+                    formatter={(value?: number) => [
+                      `${fmtCurrency(value ?? 0)}`,
+                      "Revenue",
+                    ]}
                   />
                   <Line
                     type="monotone"
@@ -363,20 +508,36 @@ export function RevenueTracker() {
       {/* Attribution table */}
       <Card>
         <CardHeader>
-          <CardTitle>Détail par source, campagne, créative et audience</CardTitle>
+          <CardTitle>
+            Détail par source, campagne, créative et audience
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border-default">
-                  <th className="text-left text-text-secondary font-medium py-3 px-2">Source</th>
-                  <th className="text-left text-text-secondary font-medium py-3 px-2">Campagne</th>
-                  <th className="text-left text-text-secondary font-medium py-3 px-2">Créative</th>
-                  <th className="text-left text-text-secondary font-medium py-3 px-2">Audience</th>
-                  <th className="text-right text-text-secondary font-medium py-3 px-2">Revenue</th>
-                  <th className="text-right text-text-secondary font-medium py-3 px-2">Nb Ventes</th>
-                  <th className="text-right text-text-secondary font-medium py-3 px-2">Panier Moyen</th>
+                  <th className="text-left text-text-secondary font-medium py-3 px-2">
+                    Source
+                  </th>
+                  <th className="text-left text-text-secondary font-medium py-3 px-2">
+                    Campagne
+                  </th>
+                  <th className="text-left text-text-secondary font-medium py-3 px-2">
+                    Créative
+                  </th>
+                  <th className="text-left text-text-secondary font-medium py-3 px-2">
+                    Audience
+                  </th>
+                  <th className="text-right text-text-secondary font-medium py-3 px-2">
+                    Revenue
+                  </th>
+                  <th className="text-right text-text-secondary font-medium py-3 px-2">
+                    Nb Ventes
+                  </th>
+                  <th className="text-right text-text-secondary font-medium py-3 px-2">
+                    Panier Moyen
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -385,14 +546,24 @@ export function RevenueTracker() {
                     key={idx}
                     className="border-b border-border-default/50 hover:bg-bg-tertiary/50 transition-colors"
                   >
-                    <td className="py-3 px-2 font-medium text-text-primary">{row.source}</td>
-                    <td className="py-3 px-2 text-text-secondary">{row.campaign}</td>
-                    <td className="py-3 px-2 text-text-secondary">{row.creative}</td>
-                    <td className="py-3 px-2 text-text-secondary">{row.audience}</td>
+                    <td className="py-3 px-2 font-medium text-text-primary">
+                      {row.source}
+                    </td>
+                    <td className="py-3 px-2 text-text-secondary">
+                      {row.campaign}
+                    </td>
+                    <td className="py-3 px-2 text-text-secondary">
+                      {row.creative}
+                    </td>
+                    <td className="py-3 px-2 text-text-secondary">
+                      {row.audience}
+                    </td>
                     <td className="py-3 px-2 text-right font-medium text-text-primary">
                       {fmtCurrency(row.revenue)}
                     </td>
-                    <td className="py-3 px-2 text-right text-text-secondary">{row.count}</td>
+                    <td className="py-3 px-2 text-right text-text-secondary">
+                      {row.count}
+                    </td>
                     <td className="py-3 px-2 text-right text-text-secondary">
                       {fmtCurrency(row.count > 0 ? row.revenue / row.count : 0)}
                     </td>
@@ -400,7 +571,10 @@ export function RevenueTracker() {
                 ))}
                 {tableData.length === 0 && (
                   <tr>
-                    <td colSpan={7} className="py-8 text-center text-text-muted">
+                    <td
+                      colSpan={7}
+                      className="py-8 text-center text-text-muted"
+                    >
                       Aucune vente sur cette période.
                     </td>
                   </tr>
@@ -417,7 +591,8 @@ export function RevenueTracker() {
           <DialogHeader>
             <DialogTitle>Enregistrer une vente</DialogTitle>
             <DialogDescription>
-              Ajoute une vente avec son attribution (source, campagne, créative, audience) pour suivre ton revenue réel.
+              Ajoute une vente avec son attribution (source, campagne, créative,
+              audience) pour suivre ton revenue réel.
             </DialogDescription>
           </DialogHeader>
 
@@ -428,7 +603,9 @@ export function RevenueTracker() {
                 id="sale-date"
                 type="date"
                 value={formData.date}
-                onChange={(e) => setFormData((p) => ({ ...p, date: e.target.value }))}
+                onChange={(e) =>
+                  setFormData((p) => ({ ...p, date: e.target.value }))
+                }
               />
             </div>
             <div>
@@ -439,7 +616,12 @@ export function RevenueTracker() {
                 min={0}
                 step={0.01}
                 value={formData.amount || ""}
-                onChange={(e) => setFormData((p) => ({ ...p, amount: parseFloat(e.target.value) || 0 }))}
+                onChange={(e) =>
+                  setFormData((p) => ({
+                    ...p,
+                    amount: parseFloat(e.target.value) || 0,
+                  }))
+                }
               />
             </div>
             <div className="col-span-2">
@@ -466,7 +648,9 @@ export function RevenueTracker() {
                 id="sale-campaign"
                 placeholder="Ex : Scaling Mars"
                 value={formData.campaign}
-                onChange={(e) => setFormData((p) => ({ ...p, campaign: e.target.value }))}
+                onChange={(e) =>
+                  setFormData((p) => ({ ...p, campaign: e.target.value }))
+                }
               />
             </div>
             <div>
@@ -475,7 +659,9 @@ export function RevenueTracker() {
                 id="sale-creative"
                 placeholder="Ex : VSL Témoignage"
                 value={formData.creative}
-                onChange={(e) => setFormData((p) => ({ ...p, creative: e.target.value }))}
+                onChange={(e) =>
+                  setFormData((p) => ({ ...p, creative: e.target.value }))
+                }
               />
             </div>
             <div>
@@ -484,7 +670,9 @@ export function RevenueTracker() {
                 id="sale-audience"
                 placeholder="Ex : Lookalike 1%"
                 value={formData.audience}
-                onChange={(e) => setFormData((p) => ({ ...p, audience: e.target.value }))}
+                onChange={(e) =>
+                  setFormData((p) => ({ ...p, audience: e.target.value }))
+                }
               />
             </div>
           </div>

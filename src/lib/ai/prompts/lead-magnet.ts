@@ -15,7 +15,12 @@ export interface LeadMagnetResult {
 export function leadMagnetPrompt(
   offer: Record<string, unknown>,
   avatar: Record<string, unknown>,
-  type: "checklist" | "mini_cours" | "template" | "quiz" | "guide" = "checklist"
+  type:
+    | "checklist"
+    | "mini_cours"
+    | "template"
+    | "quiz"
+    | "guide" = "checklist",
 ): string {
   const typeInstructions = getTypeInstructions(type);
 

@@ -22,7 +22,7 @@ export function BreadcrumbNav({ path, onNavigate }: BreadcrumbNavProps) {
           "flex items-center gap-1.5 px-2.5 py-1 rounded-lg transition-all duration-200 whitespace-nowrap",
           path.length === 0
             ? "text-accent font-medium bg-accent/10"
-            : "text-text-muted hover:text-text-primary hover:bg-bg-tertiary"
+            : "text-text-muted hover:text-text-primary hover:bg-bg-tertiary",
         )}
       >
         <HardDrive className="h-3.5 w-3.5" />
@@ -40,7 +40,7 @@ export function BreadcrumbNav({ path, onNavigate }: BreadcrumbNavProps) {
                 "px-2.5 py-1 rounded-lg transition-all duration-200 whitespace-nowrap",
                 isLast
                   ? "text-accent font-medium bg-accent/10"
-                  : "text-text-muted hover:text-text-primary hover:bg-bg-tertiary"
+                  : "text-text-muted hover:text-text-primary hover:bg-bg-tertiary",
               )}
             >
               {folder.name}

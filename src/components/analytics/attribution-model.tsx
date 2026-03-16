@@ -167,11 +167,41 @@ const DEMO_JOURNEYS: CustomerJourney[] = [
     converted: true,
     conversionDate: "2026-03-10",
     touchpoints: [
-      { id: "t1", channel: "paid", label: "Meta Ads", date: "2026-02-15", detail: "Campagne Scaling Mars" },
-      { id: "t2", channel: "organic", label: "Reel Instagram", date: "2026-02-20", detail: "Reel t\u00e9moignage client" },
-      { id: "t3", channel: "email", label: "S\u00e9quence email", date: "2026-02-28", detail: "Email #3 - \u00c9tude de cas" },
-      { id: "t4", channel: "dm", label: "DM Instagram", date: "2026-03-05", detail: "R\u00e9ponse story" },
-      { id: "t5", channel: "direct", label: "Appel d\u00e9couverte", date: "2026-03-10", detail: "Closing t\u00e9l\u00e9phonique" },
+      {
+        id: "t1",
+        channel: "paid",
+        label: "Meta Ads",
+        date: "2026-02-15",
+        detail: "Campagne Scaling Mars",
+      },
+      {
+        id: "t2",
+        channel: "organic",
+        label: "Reel Instagram",
+        date: "2026-02-20",
+        detail: "Reel t\u00e9moignage client",
+      },
+      {
+        id: "t3",
+        channel: "email",
+        label: "S\u00e9quence email",
+        date: "2026-02-28",
+        detail: "Email #3 - \u00c9tude de cas",
+      },
+      {
+        id: "t4",
+        channel: "dm",
+        label: "DM Instagram",
+        date: "2026-03-05",
+        detail: "R\u00e9ponse story",
+      },
+      {
+        id: "t5",
+        channel: "direct",
+        label: "Appel d\u00e9couverte",
+        date: "2026-03-10",
+        detail: "Closing t\u00e9l\u00e9phonique",
+      },
     ],
   },
   {
@@ -181,10 +211,34 @@ const DEMO_JOURNEYS: CustomerJourney[] = [
     converted: true,
     conversionDate: "2026-03-08",
     touchpoints: [
-      { id: "t6", channel: "youtube", label: "Vid\u00e9o YouTube", date: "2026-02-10", detail: "Tuto scaling \u00e0 10K/mois" },
-      { id: "t7", channel: "organic", label: "Post Instagram", date: "2026-02-18", detail: "Carrousel r\u00e9sultats" },
-      { id: "t8", channel: "referral", label: "Parrainage", date: "2026-03-01", detail: "Recommand\u00e9 par Client A" },
-      { id: "t9", channel: "email", label: "Email nurture", date: "2026-03-05", detail: "Email #5 - Offre limit\u00e9e" },
+      {
+        id: "t6",
+        channel: "youtube",
+        label: "Vid\u00e9o YouTube",
+        date: "2026-02-10",
+        detail: "Tuto scaling \u00e0 10K/mois",
+      },
+      {
+        id: "t7",
+        channel: "organic",
+        label: "Post Instagram",
+        date: "2026-02-18",
+        detail: "Carrousel r\u00e9sultats",
+      },
+      {
+        id: "t8",
+        channel: "referral",
+        label: "Parrainage",
+        date: "2026-03-01",
+        detail: "Recommand\u00e9 par Client A",
+      },
+      {
+        id: "t9",
+        channel: "email",
+        label: "Email nurture",
+        date: "2026-03-05",
+        detail: "Email #5 - Offre limit\u00e9e",
+      },
     ],
   },
   {
@@ -194,8 +248,20 @@ const DEMO_JOURNEYS: CustomerJourney[] = [
     converted: true,
     conversionDate: "2026-03-12",
     touchpoints: [
-      { id: "t10", channel: "paid", label: "Meta Ads", date: "2026-03-01", detail: "Retargeting VSL" },
-      { id: "t11", channel: "dm", label: "DM Instagram", date: "2026-03-08", detail: "Script DM froid" },
+      {
+        id: "t10",
+        channel: "paid",
+        label: "Meta Ads",
+        date: "2026-03-01",
+        detail: "Retargeting VSL",
+      },
+      {
+        id: "t11",
+        channel: "dm",
+        label: "DM Instagram",
+        date: "2026-03-08",
+        detail: "Script DM froid",
+      },
     ],
   },
   {
@@ -205,13 +271,55 @@ const DEMO_JOURNEYS: CustomerJourney[] = [
     converted: true,
     conversionDate: "2026-03-14",
     touchpoints: [
-      { id: "t12", channel: "paid", label: "Meta Ads", date: "2026-01-20", detail: "Campagne awareness" },
-      { id: "t13", channel: "organic", label: "Reel Instagram", date: "2026-02-05", detail: "Reel behind the scenes" },
-      { id: "t14", channel: "paid", label: "Meta Ads", date: "2026-02-15", detail: "Retargeting carrousel" },
-      { id: "t15", channel: "youtube", label: "Vid\u00e9o YouTube", date: "2026-02-25", detail: "Interview expert" },
-      { id: "t16", channel: "email", label: "S\u00e9quence email", date: "2026-03-05", detail: "Email #7 - T\u00e9moignage" },
-      { id: "t17", channel: "sms", label: "SMS promo", date: "2026-03-12", detail: "Offre flash 48h" },
-      { id: "t18", channel: "direct", label: "Appel closing", date: "2026-03-14", detail: "Appel strat\u00e9gique" },
+      {
+        id: "t12",
+        channel: "paid",
+        label: "Meta Ads",
+        date: "2026-01-20",
+        detail: "Campagne awareness",
+      },
+      {
+        id: "t13",
+        channel: "organic",
+        label: "Reel Instagram",
+        date: "2026-02-05",
+        detail: "Reel behind the scenes",
+      },
+      {
+        id: "t14",
+        channel: "paid",
+        label: "Meta Ads",
+        date: "2026-02-15",
+        detail: "Retargeting carrousel",
+      },
+      {
+        id: "t15",
+        channel: "youtube",
+        label: "Vid\u00e9o YouTube",
+        date: "2026-02-25",
+        detail: "Interview expert",
+      },
+      {
+        id: "t16",
+        channel: "email",
+        label: "S\u00e9quence email",
+        date: "2026-03-05",
+        detail: "Email #7 - T\u00e9moignage",
+      },
+      {
+        id: "t17",
+        channel: "sms",
+        label: "SMS promo",
+        date: "2026-03-12",
+        detail: "Offre flash 48h",
+      },
+      {
+        id: "t18",
+        channel: "direct",
+        label: "Appel closing",
+        date: "2026-03-14",
+        detail: "Appel strat\u00e9gique",
+      },
     ],
   },
   {
@@ -221,10 +329,34 @@ const DEMO_JOURNEYS: CustomerJourney[] = [
     converted: true,
     conversionDate: "2026-03-11",
     touchpoints: [
-      { id: "t19", channel: "referral", label: "Parrainage", date: "2026-02-28", detail: "Recommand\u00e9 par Marc B." },
-      { id: "t20", channel: "organic", label: "Story Instagram", date: "2026-03-02", detail: "Story Q&A" },
-      { id: "t21", channel: "email", label: "Email bienvenue", date: "2026-03-04", detail: "S\u00e9quence onboarding" },
-      { id: "t22", channel: "dm", label: "DM Instagram", date: "2026-03-09", detail: "Relance personnalis\u00e9e" },
+      {
+        id: "t19",
+        channel: "referral",
+        label: "Parrainage",
+        date: "2026-02-28",
+        detail: "Recommand\u00e9 par Marc B.",
+      },
+      {
+        id: "t20",
+        channel: "organic",
+        label: "Story Instagram",
+        date: "2026-03-02",
+        detail: "Story Q&A",
+      },
+      {
+        id: "t21",
+        channel: "email",
+        label: "Email bienvenue",
+        date: "2026-03-04",
+        detail: "S\u00e9quence onboarding",
+      },
+      {
+        id: "t22",
+        channel: "dm",
+        label: "DM Instagram",
+        date: "2026-03-09",
+        detail: "Relance personnalis\u00e9e",
+      },
     ],
   },
   {
@@ -234,11 +366,41 @@ const DEMO_JOURNEYS: CustomerJourney[] = [
     converted: true,
     conversionDate: "2026-03-13",
     touchpoints: [
-      { id: "t23", channel: "organic", label: "Post LinkedIn", date: "2026-02-10", detail: "Article strat\u00e9gie" },
-      { id: "t24", channel: "paid", label: "Meta Ads", date: "2026-02-20", detail: "Campagne conversion" },
-      { id: "t25", channel: "email", label: "S\u00e9quence email", date: "2026-03-01", detail: "Email #4 - Social proof" },
-      { id: "t26", channel: "direct", label: "Appel d\u00e9couverte", date: "2026-03-10", detail: "D\u00e9mo produit" },
-      { id: "t27", channel: "direct", label: "Appel closing", date: "2026-03-13", detail: "Closing final" },
+      {
+        id: "t23",
+        channel: "organic",
+        label: "Post LinkedIn",
+        date: "2026-02-10",
+        detail: "Article strat\u00e9gie",
+      },
+      {
+        id: "t24",
+        channel: "paid",
+        label: "Meta Ads",
+        date: "2026-02-20",
+        detail: "Campagne conversion",
+      },
+      {
+        id: "t25",
+        channel: "email",
+        label: "S\u00e9quence email",
+        date: "2026-03-01",
+        detail: "Email #4 - Social proof",
+      },
+      {
+        id: "t26",
+        channel: "direct",
+        label: "Appel d\u00e9couverte",
+        date: "2026-03-10",
+        detail: "D\u00e9mo produit",
+      },
+      {
+        id: "t27",
+        channel: "direct",
+        label: "Appel closing",
+        date: "2026-03-13",
+        detail: "Closing final",
+      },
     ],
   },
 ];
@@ -246,12 +408,14 @@ const DEMO_JOURNEYS: CustomerJourney[] = [
 // ─── Attribution Calculations ─────────────────────────────────
 function calculateAttribution(
   journeys: CustomerJourney[],
-  model: AttributionModel
+  model: AttributionModel,
 ): Map<Channel, number> {
   const credits = new Map<Channel, number>();
   CHANNELS.forEach((ch) => credits.set(ch, 0));
 
-  const convertedJourneys = journeys.filter((j) => j.converted && j.touchpoints.length > 0);
+  const convertedJourneys = journeys.filter(
+    (j) => j.converted && j.touchpoints.length > 0,
+  );
 
   for (const journey of convertedJourneys) {
     const tps = journey.touchpoints;
@@ -285,23 +449,44 @@ function calculateAttribution(
         const totalWeight = weights.reduce((a, b) => a + b, 0);
         for (let i = 0; i < n; i++) {
           const share = (weights[i] / totalWeight) * revenue;
-          credits.set(tps[i].channel, (credits.get(tps[i].channel) || 0) + share);
+          credits.set(
+            tps[i].channel,
+            (credits.get(tps[i].channel) || 0) + share,
+          );
         }
         break;
       }
       case "positionBased": {
         // 40% first, 40% last, 20% distributed among middle
         if (n === 1) {
-          credits.set(tps[0].channel, (credits.get(tps[0].channel) || 0) + revenue);
+          credits.set(
+            tps[0].channel,
+            (credits.get(tps[0].channel) || 0) + revenue,
+          );
         } else if (n === 2) {
-          credits.set(tps[0].channel, (credits.get(tps[0].channel) || 0) + revenue * 0.5);
-          credits.set(tps[1].channel, (credits.get(tps[1].channel) || 0) + revenue * 0.5);
+          credits.set(
+            tps[0].channel,
+            (credits.get(tps[0].channel) || 0) + revenue * 0.5,
+          );
+          credits.set(
+            tps[1].channel,
+            (credits.get(tps[1].channel) || 0) + revenue * 0.5,
+          );
         } else {
-          credits.set(tps[0].channel, (credits.get(tps[0].channel) || 0) + revenue * 0.4);
-          credits.set(tps[n - 1].channel, (credits.get(tps[n - 1].channel) || 0) + revenue * 0.4);
+          credits.set(
+            tps[0].channel,
+            (credits.get(tps[0].channel) || 0) + revenue * 0.4,
+          );
+          credits.set(
+            tps[n - 1].channel,
+            (credits.get(tps[n - 1].channel) || 0) + revenue * 0.4,
+          );
           const middleShare = (revenue * 0.2) / (n - 2);
           for (let i = 1; i < n - 1; i++) {
-            credits.set(tps[i].channel, (credits.get(tps[i].channel) || 0) + middleShare);
+            credits.set(
+              tps[i].channel,
+              (credits.get(tps[i].channel) || 0) + middleShare,
+            );
           }
         }
         break;
@@ -318,7 +503,10 @@ function getConversionPaths(journeys: CustomerJourney[]): {
   count: number;
   totalRevenue: number;
 }[] {
-  const pathMap = new Map<string, { channels: Channel[]; count: number; totalRevenue: number }>();
+  const pathMap = new Map<
+    string,
+    { channels: Channel[]; count: number; totalRevenue: number }
+  >();
 
   for (const journey of journeys.filter((j) => j.converted)) {
     const channels = journey.touchpoints.map((tp) => tp.channel);
@@ -335,7 +523,11 @@ function getConversionPaths(journeys: CustomerJourney[]): {
       existing.count++;
       existing.totalRevenue += journey.revenue;
     } else {
-      pathMap.set(key, { channels: deduped, count: 1, totalRevenue: journey.revenue });
+      pathMap.set(key, {
+        channels: deduped,
+        count: 1,
+        totalRevenue: journey.revenue,
+      });
     }
   }
 
@@ -420,7 +612,9 @@ export function AttributionModel() {
         .order("created_at", { ascending: true }),
       supabase
         .from("ad_creatives")
-        .select("id, creative_type, headline, created_at, impressions, clicks, conversions")
+        .select(
+          "id, creative_type, headline, created_at, impressions, clicks, conversions",
+        )
         .eq("user_id", user.id)
         .order("created_at", { ascending: true }),
     ])
@@ -436,7 +630,9 @@ export function AttributionModel() {
             setJourneys(autoJourneys);
             setIsDemo(false);
             saveJourneys(autoJourneys);
-            toast.success("Donn\u00e9es d\u2019attribution charg\u00e9es depuis Supabase");
+            toast.success(
+              "Donn\u00e9es d\u2019attribution charg\u00e9es depuis Supabase",
+            );
           }
         }
       })
@@ -450,7 +646,7 @@ export function AttributionModel() {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     content: any[],
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ads: any[]
+    ads: any[],
   ): CustomerJourney[] {
     const built: CustomerJourney[] = [];
     let journeyIdx = 0;
@@ -460,12 +656,15 @@ export function AttributionModel() {
 
     for (const day of conversionDays) {
       journeyIdx++;
-      const dateStr = typeof day.date === "string" ? day.date : format(new Date(day.date), "yyyy-MM-dd");
+      const dateStr =
+        typeof day.date === "string"
+          ? day.date
+          : format(new Date(day.date), "yyyy-MM-dd");
       const touchpoints: Touchpoint[] = [];
 
       // Find content created before this conversion
       const priorContent = content.filter(
-        (c) => new Date(c.created_at) <= new Date(dateStr)
+        (c) => new Date(c.created_at) <= new Date(dateStr),
       );
       if (priorContent.length > 0) {
         const latest = priorContent[priorContent.length - 1];
@@ -481,7 +680,9 @@ export function AttributionModel() {
 
       // Find ads running before this conversion
       const priorAds = ads.filter(
-        (a) => new Date(a.created_at) <= new Date(dateStr) && (a.impressions > 0 || a.clicks > 0)
+        (a) =>
+          new Date(a.created_at) <= new Date(dateStr) &&
+          (a.impressions > 0 || a.clicks > 0),
       );
       if (priorAds.length > 0) {
         const latest = priorAds[priorAds.length - 1];
@@ -504,7 +705,9 @@ export function AttributionModel() {
       });
 
       // Sort touchpoints by date
-      touchpoints.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+      touchpoints.sort(
+        (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
+      );
 
       built.push({
         id: generateId(),
@@ -521,7 +724,8 @@ export function AttributionModel() {
 
   function mapContentTypeToChannel(contentType: string): Channel {
     if (contentType?.includes("youtube")) return "youtube";
-    if (contentType?.includes("instagram") || contentType?.includes("tiktok")) return "organic";
+    if (contentType?.includes("instagram") || contentType?.includes("tiktok"))
+      return "organic";
     if (contentType?.includes("linkedin")) return "organic";
     return "organic";
   }
@@ -546,7 +750,12 @@ export function AttributionModel() {
     setIsDemo(false);
     setShowAddJourney(false);
     setEditingJourneyId(journey.id);
-    setNewJourney({ clientName: "", revenue: 0, converted: true, conversionDate: format(new Date(), "yyyy-MM-dd") });
+    setNewJourney({
+      clientName: "",
+      revenue: 0,
+      converted: true,
+      conversionDate: format(new Date(), "yyyy-MM-dd"),
+    });
     toast.success("Parcours client ajout\u00e9");
   }, [newJourney, journeys, isDemo]);
 
@@ -562,7 +771,7 @@ export function AttributionModel() {
       if (editingJourneyId === journeyId) setEditingJourneyId(null);
       toast.success("Parcours supprim\u00e9");
     },
-    [journeys, editingJourneyId]
+    [journeys, editingJourneyId],
   );
 
   const handleAddTouchpoint = useCallback(() => {
@@ -580,14 +789,19 @@ export function AttributionModel() {
     const updated = journeys.map((j) => {
       if (j.id !== editingJourneyId) return j;
       const tps = [...j.touchpoints, tp].sort(
-        (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+        (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
       );
       return { ...j, touchpoints: tps };
     });
     setJourneys(updated);
     saveJourneys(updated);
     setShowAddTouchpoint(false);
-    setNewTouchpoint({ channel: "organic", label: "", date: format(new Date(), "yyyy-MM-dd"), detail: "" });
+    setNewTouchpoint({
+      channel: "organic",
+      label: "",
+      date: format(new Date(), "yyyy-MM-dd"),
+      detail: "",
+    });
     toast.success("Point de contact ajout\u00e9");
   }, [editingJourneyId, newTouchpoint, journeys]);
 
@@ -595,12 +809,15 @@ export function AttributionModel() {
     (journeyId: string, touchpointId: string) => {
       const updated = journeys.map((j) => {
         if (j.id !== journeyId) return j;
-        return { ...j, touchpoints: j.touchpoints.filter((tp) => tp.id !== touchpointId) };
+        return {
+          ...j,
+          touchpoints: j.touchpoints.filter((tp) => tp.id !== touchpointId),
+        };
       });
       setJourneys(updated);
       saveJourneys(updated);
     },
-    [journeys]
+    [journeys],
   );
 
   // ─── Computed data ─────────────────────────────────────────
@@ -612,13 +829,13 @@ export function AttributionModel() {
       ? Math.round(
           (convertedJourneys.reduce((s, j) => s + j.touchpoints.length, 0) /
             convertedJourneys.length) *
-            10
+            10,
         ) / 10
       : 0;
 
   const attributionMap = useMemo(
     () => calculateAttribution(activeJourneys, model),
-    [activeJourneys, model]
+    [activeJourneys, model],
   );
 
   const chartData = useMemo(() => {
@@ -637,12 +854,24 @@ export function AttributionModel() {
       .sort((a, b) => b.revenu - a.revenu);
   }, [attributionMap, totalRevenue]);
 
-  const conversionPaths = useMemo(() => getConversionPaths(activeJourneys), [activeJourneys]);
+  const conversionPaths = useMemo(
+    () => getConversionPaths(activeJourneys),
+    [activeJourneys],
+  );
 
   // Compare all models for the comparison table
   const allModelsData = useMemo(() => {
-    const models: AttributionModel[] = ["firstTouch", "lastTouch", "linear", "timeDecay", "positionBased"];
-    const result: Record<Channel, Record<AttributionModel, number>> = {} as Record<Channel, Record<AttributionModel, number>>;
+    const models: AttributionModel[] = [
+      "firstTouch",
+      "lastTouch",
+      "linear",
+      "timeDecay",
+      "positionBased",
+    ];
+    const result: Record<
+      Channel,
+      Record<AttributionModel, number>
+    > = {} as Record<Channel, Record<AttributionModel, number>>;
     CHANNELS.forEach((ch) => {
       result[ch] = {} as Record<AttributionModel, number>;
     });
@@ -650,7 +879,8 @@ export function AttributionModel() {
       const map = calculateAttribution(activeJourneys, m);
       for (const ch of CHANNELS) {
         const val = map.get(ch) || 0;
-        result[ch][m] = totalRevenue > 0 ? Math.round((val / totalRevenue) * 1000) / 10 : 0;
+        result[ch][m] =
+          totalRevenue > 0 ? Math.round((val / totalRevenue) * 1000) / 10 : 0;
       }
     }
     return result;
@@ -692,10 +922,15 @@ export function AttributionModel() {
         })),
       })),
       all_models_comparison: Object.fromEntries(
-        activeChannels.map((ch) => [CHANNEL_CONFIG[ch].label, allModelsData[ch]])
+        activeChannels.map((ch) => [
+          CHANNEL_CONFIG[ch].label,
+          allModelsData[ch],
+        ]),
       ),
     };
-    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json" });
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], {
+      type: "application/json",
+    });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
@@ -716,8 +951,12 @@ export function AttributionModel() {
               <TrendingUp className="h-5 w-5 text-accent" />
             </div>
             <div>
-              <div className="text-xs text-text-muted">Revenu total attribu\u00e9</div>
-              <div className="text-xl font-bold text-text-primary">{fmtCurrency(totalRevenue)}</div>
+              <div className="text-xs text-text-muted">
+                Revenu total attribu\u00e9
+              </div>
+              <div className="text-xl font-bold text-text-primary">
+                {fmtCurrency(totalRevenue)}
+              </div>
             </div>
           </div>
         </Card>
@@ -728,7 +967,9 @@ export function AttributionModel() {
             </div>
             <div>
               <div className="text-xs text-text-muted">Conversions</div>
-              <div className="text-xl font-bold text-text-primary">{convertedJourneys.length}</div>
+              <div className="text-xl font-bold text-text-primary">
+                {convertedJourneys.length}
+              </div>
             </div>
           </div>
         </Card>
@@ -738,8 +979,12 @@ export function AttributionModel() {
               <Route className="h-5 w-5 text-[#F59E0B]" />
             </div>
             <div>
-              <div className="text-xs text-text-muted">Points de contact moyens</div>
-              <div className="text-xl font-bold text-text-primary">{avgTouchpoints}</div>
+              <div className="text-xs text-text-muted">
+                Points de contact moyens
+              </div>
+              <div className="text-xl font-bold text-text-primary">
+                {avgTouchpoints}
+              </div>
             </div>
           </div>
         </Card>
@@ -750,7 +995,9 @@ export function AttributionModel() {
             </div>
             <div>
               <div className="text-xs text-text-muted">Canaux actifs</div>
-              <div className="text-xl font-bold text-text-primary">{activeChannels.length}</div>
+              <div className="text-xl font-bold text-text-primary">
+                {activeChannels.length}
+              </div>
             </div>
           </div>
         </Card>
@@ -765,14 +1012,19 @@ export function AttributionModel() {
                 Attribution multi-touch
               </h3>
               <p className="text-xs text-text-secondary">
-                Suis le parcours complet de chaque client, de la d\u00e9couverte \u00e0 la conversion.
-                Compare 5 mod\u00e8les d&apos;attribution pour comprendre la contribution r\u00e9elle de chaque canal.
+                Suis le parcours complet de chaque client, de la d\u00e9couverte
+                \u00e0 la conversion. Compare 5 mod\u00e8les d&apos;attribution
+                pour comprendre la contribution r\u00e9elle de chaque canal.
                 {loadingSupabase && " Chargement des donn\u00e9es Supabase..."}
               </p>
             </div>
             <div className="flex flex-col gap-1 items-end">
-              {isDemo && <Badge variant="yellow">Donn\u00e9es de d\u00e9mo</Badge>}
-              {!isDemo && <Badge variant="default">Donn\u00e9es r\u00e9elles</Badge>}
+              {isDemo && (
+                <Badge variant="yellow">Donn\u00e9es de d\u00e9mo</Badge>
+              )}
+              {!isDemo && (
+                <Badge variant="default">Donn\u00e9es r\u00e9elles</Badge>
+              )}
             </div>
           </div>
         </CardContent>
@@ -805,23 +1057,30 @@ export function AttributionModel() {
             {/* Model selector */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
               <div className="w-full sm:w-64">
-                <Select value={model} onValueChange={(v) => setModel(v as AttributionModel)}>
+                <Select
+                  value={model}
+                  onValueChange={(v) => setModel(v as AttributionModel)}
+                >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {(Object.keys(MODEL_LABELS) as AttributionModel[]).map((m) => (
-                      <SelectItem key={m} value={m}>
-                        <span className="flex items-center gap-2">
-                          {MODEL_ICONS[m]}
-                          {MODEL_LABELS[m]}
-                        </span>
-                      </SelectItem>
-                    ))}
+                    {(Object.keys(MODEL_LABELS) as AttributionModel[]).map(
+                      (m) => (
+                        <SelectItem key={m} value={m}>
+                          <span className="flex items-center gap-2">
+                            {MODEL_ICONS[m]}
+                            {MODEL_LABELS[m]}
+                          </span>
+                        </SelectItem>
+                      ),
+                    )}
                   </SelectContent>
                 </Select>
               </div>
-              <p className="text-xs text-text-secondary flex-1">{MODEL_DESCRIPTIONS[model]}</p>
+              <p className="text-xs text-text-secondary flex-1">
+                {MODEL_DESCRIPTIONS[model]}
+              </p>
             </div>
 
             {/* Attribution chart */}
@@ -836,7 +1095,11 @@ export function AttributionModel() {
                   <div className="h-[300px]">
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart data={chartData} layout="vertical">
-                        <CartesianGrid strokeDasharray="3 3" stroke="#1C1F23" horizontal={false} />
+                        <CartesianGrid
+                          strokeDasharray="3 3"
+                          stroke="#1C1F23"
+                          horizontal={false}
+                        />
                         <XAxis
                           type="number"
                           stroke="#6B7280"
@@ -877,7 +1140,11 @@ export function AttributionModel() {
                             ];
                           }}
                         />
-                        <Bar dataKey="revenu" radius={[0, 6, 6, 0]} barSize={24}>
+                        <Bar
+                          dataKey="revenu"
+                          radius={[0, 6, 6, 0]}
+                          barSize={24}
+                        >
                           {chartData.map((entry, idx) => (
                             <Cell key={idx} fill={entry.color} />
                           ))}
@@ -887,7 +1154,8 @@ export function AttributionModel() {
                   </div>
                 ) : (
                   <p className="text-sm text-text-muted text-center py-12">
-                    Aucune donn\u00e9e d&apos;attribution. Ajoutez des parcours clients pour commencer.
+                    Aucune donn\u00e9e d&apos;attribution. Ajoutez des parcours
+                    clients pour commencer.
                   </p>
                 )}
               </CardContent>
@@ -902,13 +1170,17 @@ export function AttributionModel() {
                       className="w-3 h-3 rounded-full shrink-0"
                       style={{ backgroundColor: ch.color }}
                     />
-                    <span className="text-sm font-medium text-text-primary">{ch.name}</span>
+                    <span className="text-sm font-medium text-text-primary">
+                      {ch.name}
+                    </span>
                     <Badge variant="muted" className="ml-auto">
                       {ch.pourcentage}%
                     </Badge>
                   </div>
                   <div className="flex items-end justify-between">
-                    <div className="text-2xl font-bold text-text-primary">{fmtCurrency(ch.revenu)}</div>
+                    <div className="text-2xl font-bold text-text-primary">
+                      {fmtCurrency(ch.revenu)}
+                    </div>
                     <div className="text-xs text-text-muted">attribu\u00e9</div>
                   </div>
                   <div className="mt-3 h-1.5 bg-bg-tertiary rounded-full overflow-hidden">
@@ -964,13 +1236,18 @@ export function AttributionModel() {
                     </div>
                     <div className="flex-1 grid grid-cols-2 gap-3">
                       {chartData.map((ch) => (
-                        <div key={ch.channel} className="flex items-center gap-2">
+                        <div
+                          key={ch.channel}
+                          className="flex items-center gap-2"
+                        >
                           <div
                             className="w-3 h-3 rounded-full shrink-0"
                             style={{ backgroundColor: ch.color }}
                           />
                           <div>
-                            <div className="text-sm font-medium text-text-primary">{ch.name}</div>
+                            <div className="text-sm font-medium text-text-primary">
+                              {ch.name}
+                            </div>
                             <div className="text-xs text-text-muted">
                               {ch.pourcentage}% \u2014 {fmtCurrency(ch.revenu)}
                             </div>
@@ -998,7 +1275,9 @@ export function AttributionModel() {
                         {journey.clientName}
                       </span>
                       <Badge variant={journey.converted ? "default" : "muted"}>
-                        {journey.converted ? fmtCurrency(journey.revenue) : "En cours"}
+                        {journey.converted
+                          ? fmtCurrency(journey.revenue)
+                          : "En cours"}
                       </Badge>
                       {journey.converted && journey.conversionDate && (
                         <span className="text-xs text-text-muted">
@@ -1014,11 +1293,15 @@ export function AttributionModel() {
                             size="sm"
                             onClick={() => {
                               setEditingJourneyId(
-                                editingJourneyId === journey.id ? null : journey.id
+                                editingJourneyId === journey.id
+                                  ? null
+                                  : journey.id,
                               );
                             }}
                           >
-                            {editingJourneyId === journey.id ? "Fermer" : "\u00c9diter"}
+                            {editingJourneyId === journey.id
+                              ? "Fermer"
+                              : "\u00c9diter"}
                           </Button>
                           <Button
                             variant="ghost"
@@ -1041,20 +1324,27 @@ export function AttributionModel() {
                         {journey.touchpoints.map((tp, tIdx) => {
                           const channelCfg = CHANNEL_CONFIG[tp.channel];
                           const isFirst = tIdx === 0;
-                          const isLast = tIdx === journey.touchpoints.length - 1;
+                          const isLast =
+                            tIdx === journey.touchpoints.length - 1;
                           return (
-                            <div key={tp.id} className="relative flex items-start gap-4 pl-6">
+                            <div
+                              key={tp.id}
+                              className="relative flex items-start gap-4 pl-6"
+                            >
                               {/* Dot */}
                               <div
                                 className={cn(
                                   "absolute left-0 top-1 w-[15px] h-[15px] rounded-full border-2 z-10",
                                   isFirst || isLast
                                     ? "border-accent bg-accent/20"
-                                    : "border-border-default bg-bg-secondary"
+                                    : "border-border-default bg-bg-secondary",
                                 )}
                                 style={
                                   !isFirst && !isLast
-                                    ? { borderColor: channelCfg.color, backgroundColor: `${channelCfg.color}20` }
+                                    ? {
+                                        borderColor: channelCfg.color,
+                                        backgroundColor: `${channelCfg.color}20`,
+                                      }
                                     : undefined
                                 }
                               />
@@ -1074,12 +1364,18 @@ export function AttributionModel() {
                                     {tp.label}
                                   </span>
                                   {isFirst && (
-                                    <Badge variant="default" className="text-[10px] px-1.5 py-0">
+                                    <Badge
+                                      variant="default"
+                                      className="text-[10px] px-1.5 py-0"
+                                    >
                                       Premier contact
                                     </Badge>
                                   )}
                                   {isLast && journey.converted && (
-                                    <Badge variant="default" className="text-[10px] px-1.5 py-0">
+                                    <Badge
+                                      variant="default"
+                                      className="text-[10px] px-1.5 py-0"
+                                    >
                                       Dernier contact
                                     </Badge>
                                   )}
@@ -1090,8 +1386,12 @@ export function AttributionModel() {
                                   </span>
                                   {tp.detail && (
                                     <>
-                                      <span className="text-text-muted">\u00b7</span>
-                                      <span className="text-xs text-text-secondary">{tp.detail}</span>
+                                      <span className="text-text-muted">
+                                        \u00b7
+                                      </span>
+                                      <span className="text-xs text-text-secondary">
+                                        {tp.detail}
+                                      </span>
                                     </>
                                   )}
                                 </div>
@@ -1102,7 +1402,9 @@ export function AttributionModel() {
                                   variant="ghost"
                                   size="sm"
                                   className="shrink-0"
-                                  onClick={() => handleDeleteTouchpoint(journey.id, tp.id)}
+                                  onClick={() =>
+                                    handleDeleteTouchpoint(journey.id, tp.id)
+                                  }
                                 >
                                   <Trash2 className="h-3 w-3 text-danger" />
                                 </Button>
@@ -1114,7 +1416,8 @@ export function AttributionModel() {
                     </div>
                   ) : (
                     <p className="text-xs text-text-muted ml-4">
-                      Aucun point de contact. Cliquez sur \u00ab\u00a0\u00c9diter\u00a0\u00bb pour en ajouter.
+                      Aucun point de contact. Cliquez sur
+                      \u00ab\u00a0\u00c9diter\u00a0\u00bb pour en ajouter.
                     </p>
                   )}
 
@@ -1143,7 +1446,9 @@ export function AttributionModel() {
           <div className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>Chemins de conversion les plus fr\u00e9quents</CardTitle>
+                <CardTitle>
+                  Chemins de conversion les plus fr\u00e9quents
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 {conversionPaths.length > 0 ? (
@@ -1179,16 +1484,21 @@ export function AttributionModel() {
                             {/* Stats */}
                             <div className="flex items-center gap-3 shrink-0">
                               <span className="text-sm font-semibold text-text-primary">
-                                {pathData.count} conversion{pathData.count > 1 ? "s" : ""}
+                                {pathData.count} conversion
+                                {pathData.count > 1 ? "s" : ""}
                               </span>
-                              <Badge variant="default">{fmtCurrency(pathData.totalRevenue)}</Badge>
+                              <Badge variant="default">
+                                {fmtCurrency(pathData.totalRevenue)}
+                              </Badge>
                             </div>
                           </div>
                           {/* Bar indicator */}
                           <div className="h-1.5 bg-bg-tertiary rounded-full overflow-hidden">
                             <div
                               className="h-full rounded-full bg-accent transition-all"
-                              style={{ width: `${(pathData.count / maxCount) * 100}%` }}
+                              style={{
+                                width: `${(pathData.count / maxCount) * 100}%`,
+                              }}
                             />
                           </div>
                         </div>
@@ -1221,7 +1531,9 @@ export function AttributionModel() {
         <TabsContent value="compare">
           <Card>
             <CardHeader>
-              <CardTitle>Comparaison des 5 mod\u00e8les d&apos;attribution</CardTitle>
+              <CardTitle>
+                Comparaison des 5 mod\u00e8les d&apos;attribution
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="overflow-x-auto">
@@ -1263,11 +1575,19 @@ export function AttributionModel() {
                                 className="w-2.5 h-2.5 rounded-full"
                                 style={{ backgroundColor: cfg.color }}
                               />
-                              <span className="font-medium text-text-primary">{cfg.label}</span>
+                              <span className="font-medium text-text-primary">
+                                {cfg.label}
+                              </span>
                             </div>
                           </td>
                           {(
-                            ["firstTouch", "lastTouch", "linear", "timeDecay", "positionBased"] as AttributionModel[]
+                            [
+                              "firstTouch",
+                              "lastTouch",
+                              "linear",
+                              "timeDecay",
+                              "positionBased",
+                            ] as AttributionModel[]
                           ).map((m) => (
                             <td
                               key={m}
@@ -1275,7 +1595,7 @@ export function AttributionModel() {
                                 "py-3 px-2 text-right tabular-nums",
                                 model === m
                                   ? "font-semibold text-accent"
-                                  : "text-text-secondary"
+                                  : "text-text-secondary",
                               )}
                             >
                               {data[m] > 0 ? `${data[m]}%` : "\u2014"}
@@ -1286,20 +1606,28 @@ export function AttributionModel() {
                     })}
                     {/* Total row */}
                     <tr className="border-t-2 border-border-default">
-                      <td className="py-3 px-2 font-semibold text-text-primary">Total</td>
+                      <td className="py-3 px-2 font-semibold text-text-primary">
+                        Total
+                      </td>
                       {(
-                        ["firstTouch", "lastTouch", "linear", "timeDecay", "positionBased"] as AttributionModel[]
+                        [
+                          "firstTouch",
+                          "lastTouch",
+                          "linear",
+                          "timeDecay",
+                          "positionBased",
+                        ] as AttributionModel[]
                       ).map((m) => {
                         const total = activeChannels.reduce(
                           (s, ch) => s + (allModelsData[ch][m] || 0),
-                          0
+                          0,
                         );
                         return (
                           <td
                             key={m}
                             className={cn(
                               "py-3 px-2 text-right tabular-nums font-semibold",
-                              model === m ? "text-accent" : "text-text-primary"
+                              model === m ? "text-accent" : "text-text-primary",
                             )}
                           >
                             {Math.round(total * 10) / 10}%
@@ -1357,11 +1685,31 @@ export function AttributionModel() {
                           // eslint-disable-next-line @typescript-eslint/no-explicit-any
                           formatter={(value: any) => [`${value}%`]}
                         />
-                        <Bar dataKey="Premier contact" fill="#34D399" radius={[2, 2, 0, 0]} />
-                        <Bar dataKey="Dernier contact" fill="#3B82F6" radius={[2, 2, 0, 0]} />
-                        <Bar dataKey="Lin\u00e9aire" fill="#F59E0B" radius={[2, 2, 0, 0]} />
-                        <Bar dataKey="D\u00e9croissance" fill="#8B5CF6" radius={[2, 2, 0, 0]} />
-                        <Bar dataKey="Position" fill="#EC4899" radius={[2, 2, 0, 0]} />
+                        <Bar
+                          dataKey="Premier contact"
+                          fill="#34D399"
+                          radius={[2, 2, 0, 0]}
+                        />
+                        <Bar
+                          dataKey="Dernier contact"
+                          fill="#3B82F6"
+                          radius={[2, 2, 0, 0]}
+                        />
+                        <Bar
+                          dataKey="Lin\u00e9aire"
+                          fill="#F59E0B"
+                          radius={[2, 2, 0, 0]}
+                        />
+                        <Bar
+                          dataKey="D\u00e9croissance"
+                          fill="#8B5CF6"
+                          radius={[2, 2, 0, 0]}
+                        />
+                        <Bar
+                          dataKey="Position"
+                          fill="#EC4899"
+                          radius={[2, 2, 0, 0]}
+                        />
                       </BarChart>
                     </ResponsiveContainer>
                   </div>
@@ -1373,12 +1721,17 @@ export function AttributionModel() {
                       { label: "D\u00e9croissance", color: "#8B5CF6" },
                       { label: "Position", color: "#EC4899" },
                     ].map((item) => (
-                      <div key={item.label} className="flex items-center gap-1.5">
+                      <div
+                        key={item.label}
+                        className="flex items-center gap-1.5"
+                      >
                         <div
                           className="w-3 h-3 rounded-sm"
                           style={{ backgroundColor: item.color }}
                         />
-                        <span className="text-xs text-text-secondary">{item.label}</span>
+                        <span className="text-xs text-text-secondary">
+                          {item.label}
+                        </span>
                       </div>
                     ))}
                   </div>
@@ -1395,7 +1748,8 @@ export function AttributionModel() {
           <DialogHeader>
             <DialogTitle>Nouveau parcours client</DialogTitle>
             <DialogDescription>
-              Cr\u00e9ez un parcours pour suivre les points de contact d&apos;un client.
+              Cr\u00e9ez un parcours pour suivre les points de contact d&apos;un
+              client.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
@@ -1404,7 +1758,9 @@ export function AttributionModel() {
               <Input
                 placeholder="ex. Sophie M."
                 value={newJourney.clientName}
-                onChange={(e) => setNewJourney((p) => ({ ...p, clientName: e.target.value }))}
+                onChange={(e) =>
+                  setNewJourney((p) => ({ ...p, clientName: e.target.value }))
+                }
               />
             </div>
             <div>
@@ -1414,7 +1770,10 @@ export function AttributionModel() {
                 placeholder="0"
                 value={newJourney.revenue || ""}
                 onChange={(e) =>
-                  setNewJourney((p) => ({ ...p, revenue: parseFloat(e.target.value) || 0 }))
+                  setNewJourney((p) => ({
+                    ...p,
+                    revenue: parseFloat(e.target.value) || 0,
+                  }))
                 }
               />
             </div>
@@ -1422,7 +1781,9 @@ export function AttributionModel() {
               <Label>Converti</Label>
               <Select
                 value={newJourney.converted ? "oui" : "non"}
-                onValueChange={(v) => setNewJourney((p) => ({ ...p, converted: v === "oui" }))}
+                onValueChange={(v) =>
+                  setNewJourney((p) => ({ ...p, converted: v === "oui" }))
+                }
               >
                 <SelectTrigger className="w-24">
                   <SelectValue />
@@ -1440,7 +1801,10 @@ export function AttributionModel() {
                   type="date"
                   value={newJourney.conversionDate}
                   onChange={(e) =>
-                    setNewJourney((p) => ({ ...p, conversionDate: e.target.value }))
+                    setNewJourney((p) => ({
+                      ...p,
+                      conversionDate: e.target.value,
+                    }))
                   }
                 />
               </div>
@@ -1496,7 +1860,9 @@ export function AttributionModel() {
               <Input
                 placeholder="ex. Reel Instagram, Email #3, Appel d\u00e9couverte..."
                 value={newTouchpoint.label}
-                onChange={(e) => setNewTouchpoint((p) => ({ ...p, label: e.target.value }))}
+                onChange={(e) =>
+                  setNewTouchpoint((p) => ({ ...p, label: e.target.value }))
+                }
               />
             </div>
             <div>
@@ -1504,7 +1870,9 @@ export function AttributionModel() {
               <Input
                 type="date"
                 value={newTouchpoint.date}
-                onChange={(e) => setNewTouchpoint((p) => ({ ...p, date: e.target.value }))}
+                onChange={(e) =>
+                  setNewTouchpoint((p) => ({ ...p, date: e.target.value }))
+                }
               />
             </div>
             <div>
@@ -1512,7 +1880,9 @@ export function AttributionModel() {
               <Input
                 placeholder="ex. Campagne Scaling Mars, T\u00e9moignage client..."
                 value={newTouchpoint.detail}
-                onChange={(e) => setNewTouchpoint((p) => ({ ...p, detail: e.target.value }))}
+                onChange={(e) =>
+                  setNewTouchpoint((p) => ({ ...p, detail: e.target.value }))
+                }
               />
             </div>
           </div>
@@ -1568,7 +1938,8 @@ function ChannelFlowViz({ journeys }: { journeys: CustomerJourney[] }) {
   return (
     <div className="space-y-3">
       <p className="text-xs text-text-secondary mb-4">
-        Les transitions les plus fr\u00e9quentes entre canaux dans les parcours de conversion.
+        Les transitions les plus fr\u00e9quentes entre canaux dans les parcours
+        de conversion.
       </p>
       {transitions.map((t, idx) => {
         const fromCfg = CHANNEL_CONFIG[t.from];

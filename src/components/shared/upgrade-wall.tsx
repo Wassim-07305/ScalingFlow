@@ -12,7 +12,11 @@ interface UpgradeWallProps {
   className?: string;
 }
 
-export function UpgradeWall({ currentUsage, limit, className }: UpgradeWallProps) {
+export function UpgradeWall({
+  currentUsage,
+  limit,
+  className,
+}: UpgradeWallProps) {
   const percent = Math.round((currentUsage / limit) * 100);
 
   return (
@@ -40,8 +44,8 @@ export function UpgradeWall({ currentUsage, limit, className }: UpgradeWallProps
               Limite de générations atteinte
             </h3>
             <p className="text-sm text-text-secondary max-w-md mx-auto leading-relaxed">
-              Tu as utilisé toutes tes générations IA pour ce mois-ci.
-              Passe au plan supérieur pour débloquer plus de générations.
+              Tu as utilisé toutes tes générations IA pour ce mois-ci. Passe au
+              plan supérieur pour débloquer plus de générations.
             </p>
           </div>
 
@@ -49,7 +53,9 @@ export function UpgradeWall({ currentUsage, limit, className }: UpgradeWallProps
           <div className="max-w-xs mx-auto space-y-2">
             <div className="flex items-center justify-between text-xs">
               <span className="text-text-muted">Utilisation</span>
-              <Badge variant="muted">{currentUsage}/{limit}</Badge>
+              <Badge variant="muted">
+                {currentUsage}/{limit}
+              </Badge>
             </div>
             <div className="h-2 rounded-full bg-bg-tertiary overflow-hidden">
               <div
@@ -57,14 +63,16 @@ export function UpgradeWall({ currentUsage, limit, className }: UpgradeWallProps
                 style={{ width: `${Math.min(percent, 100)}%` }}
               />
             </div>
-            <p className="text-[10px] text-text-muted">{percent}% de ton quota mensuel utilisé</p>
+            <p className="text-[10px] text-text-muted">
+              {percent}% de ton quota mensuel utilisé
+            </p>
           </div>
 
           {/* CTA */}
           <Button
             size="lg"
             className="bg-gradient-to-r from-accent to-emerald-400 hover:from-accent/90 hover:to-emerald-400/90 text-white font-semibold shadow-lg shadow-accent/25 hover:shadow-accent/40 transition-all duration-300"
-            onClick={() => window.location.href = "/settings"}
+            onClick={() => (window.location.href = "/settings")}
           >
             <Sparkles className="h-4 w-4 mr-2" />
             Voir les plans

@@ -15,7 +15,7 @@ export function buildReelsScriptsPrompt(
   market: string,
   offer: string,
   persona: string,
-  batchNumber: number
+  batchNumber: number,
 ): string {
   return `Tu es un expert en creation de contenu video court (Reels Instagram, TikTok, YouTube Shorts) pour les freelances et consultants.
 

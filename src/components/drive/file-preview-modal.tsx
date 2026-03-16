@@ -113,7 +113,9 @@ export function FilePreviewModal({
         return (
           <div className="flex flex-col items-center justify-center h-40 gap-3">
             <div className="h-8 w-8 animate-spin rounded-full border-2 border-text-muted/30 border-t-accent" />
-            <p className="text-xs text-text-muted animate-pulse">Chargement...</p>
+            <p className="text-xs text-text-muted animate-pulse">
+              Chargement...
+            </p>
           </div>
         );
       }

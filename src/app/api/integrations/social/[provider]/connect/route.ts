@@ -16,13 +16,15 @@ type ProviderConfig = {
 const PROVIDERS: Record<string, ProviderConfig> = {
   instagram: {
     authUrl: "https://www.facebook.com/v21.0/dialog/oauth",
-    scopes: "instagram_basic,instagram_content_publish,instagram_manage_insights,pages_show_list,pages_read_engagement",
+    scopes:
+      "instagram_basic,instagram_content_publish,instagram_manage_insights,pages_show_list,pages_read_engagement",
     clientIdEnv: "META_APP_ID",
     extraParams: {},
   },
   google: {
     authUrl: "https://accounts.google.com/o/oauth2/v2/auth",
-    scopes: "https://www.googleapis.com/auth/youtube.readonly https://www.googleapis.com/auth/youtube.upload https://www.googleapis.com/auth/yt-analytics.readonly",
+    scopes:
+      "https://www.googleapis.com/auth/youtube.readonly https://www.googleapis.com/auth/youtube.upload https://www.googleapis.com/auth/yt-analytics.readonly",
     clientIdEnv: "GOOGLE_CLIENT_ID",
     extraParams: { access_type: "offline", prompt: "consent" },
   },
@@ -42,7 +44,7 @@ const PROVIDERS: Record<string, ProviderConfig> = {
 
 export async function GET(
   _req: NextRequest,
-  { params }: { params: Promise<{ provider: string }> }
+  { params }: { params: Promise<{ provider: string }> },
 ) {
   try {
     const { provider } = await params;
@@ -50,13 +52,17 @@ export async function GET(
 
     if (!config) {
       return NextResponse.json(
-        { error: `Provider "${provider}" non supporte. Utilise: ${Object.keys(PROVIDERS).join(", ")}` },
-        { status: 400 }
+        {
+          error: `Provider "${provider}" non supporte. Utilise: ${Object.keys(PROVIDERS).join(", ")}`,
+        },
+        { status: 400 },
       );
     }
 
     const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
     if (!user) {
       return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
@@ -66,7 +72,7 @@ export async function GET(
     if (!clientId) {
       return NextResponse.json(
         { error: `${config.clientIdEnv} non configure` },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -105,7 +111,7 @@ export async function GET(
   } catch {
     return NextResponse.json(
       { error: "Erreur lors de la connexion" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

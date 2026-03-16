@@ -14,7 +14,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ClientCard, type ClientRow } from "@/components/clients/client-card";
-import { ClientForm, type ClientFormData } from "@/components/clients/client-form";
+import {
+  ClientForm,
+  type ClientFormData,
+} from "@/components/clients/client-form";
 import { SkeletonCard } from "@/components/ui/skeleton";
 import { createClient } from "@/lib/supabase/client";
 import { useUser } from "@/hooks/use-user";
@@ -96,10 +99,8 @@ export default function ClientsPage() {
         .order("created_at", { ascending: false });
 
       // Aggregate deals per client
-      const dealsByClient: Record<
-        string,
-        { total: number; count: number }
-      > = {};
+      const dealsByClient: Record<string, { total: number; count: number }> =
+        {};
       let caClosé = 0;
       let dealsEnCours = 0;
 
@@ -273,7 +274,9 @@ export default function ClientsPage() {
               <stat.icon className={cn("h-4 w-4", stat.color)} />
             </div>
             <div>
-              <p className="text-lg font-bold text-text-primary">{stat.value}</p>
+              <p className="text-lg font-bold text-text-primary">
+                {stat.value}
+              </p>
               <p className="text-[11px] text-text-muted">{stat.label}</p>
             </div>
           </div>
@@ -346,7 +349,11 @@ export default function ClientsPage() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
             {filtered.map((client, index) => (
-              <div key={client.id} style={{ animationDelay: `${index * 50}ms` }} className="animate-in fade-in-0 slide-in-from-bottom-3 duration-300 fill-mode-both">
+              <div
+                key={client.id}
+                style={{ animationDelay: `${index * 50}ms` }}
+                className="animate-in fade-in-0 slide-in-from-bottom-3 duration-300 fill-mode-both"
+              >
                 <ClientCard
                   client={client}
                   onClick={() => router.push(`/clients/${client.id}`)}

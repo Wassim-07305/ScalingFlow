@@ -5,7 +5,13 @@ import { Sparkles, Package } from "lucide-react";
 import { GenerateButton } from "@/components/shared/generate-button";
 import { cn } from "@/lib/utils/cn";
 import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { AILoading } from "@/components/shared/ai-loading";
 import { EmptyState } from "@/components/shared/empty-state";
@@ -20,12 +26,20 @@ interface OfferGeneratorProps {
   initialData?: any;
 }
 
-export function OfferGenerator({ className, marketAnalysisId, marketName, initialData }: OfferGeneratorProps) {
+export function OfferGenerator({
+  className,
+  marketAnalysisId,
+  marketName,
+  initialData,
+}: OfferGeneratorProps) {
   const [loading, setLoading] = React.useState(false);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [generatedOffer, setGeneratedOffer] = React.useState<any>(null);
   const [error, setError] = React.useState<string | null>(null);
-  const [usageLimited, setUsageLimited] = React.useState<{currentUsage: number; limit: number} | null>(null);
+  const [usageLimited, setUsageLimited] = React.useState<{
+    currentUsage: number;
+    limit: number;
+  } | null>(null);
 
   // Charger les données historiques quand initialData change
   React.useEffect(() => {
@@ -54,7 +68,10 @@ export function OfferGenerator({ className, marketAnalysisId, marketName, initia
       if (!response.ok) {
         if (response.status === 403) {
           const errData = await response.json();
-          if (errData.usage) { setUsageLimited(errData.usage); return; }
+          if (errData.usage) {
+            setUsageLimited(errData.usage);
+            return;
+          }
         }
         throw new Error("Erreur lors de la génération");
       }
@@ -82,11 +99,23 @@ export function OfferGenerator({ className, marketAnalysisId, marketName, initia
   }
 
   if (usageLimited) {
-    return <UpgradeWall currentUsage={usageLimited.currentUsage} limit={usageLimited.limit} className={className} />;
+    return (
+      <UpgradeWall
+        currentUsage={usageLimited.currentUsage}
+        limit={usageLimited.limit}
+        className={className}
+      />
+    );
   }
 
   if (loading) {
-    return <AILoading variant="immersive" text="Génération de ton offre irrésistible" className={className} />;
+    return (
+      <AILoading
+        variant="immersive"
+        text="Génération de ton offre irrésistible"
+        className={className}
+      />
+    );
   }
 
   return (
@@ -99,7 +128,8 @@ export function OfferGenerator({ className, marketAnalysisId, marketName, initia
               Générer une offre
             </CardTitle>
             <CardDescription>
-              L&apos;IA va créer une offre irrésistible basée sur ton analyse de marché
+              L&apos;IA va créer une offre irrésistible basée sur ton analyse de
+              marché
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">

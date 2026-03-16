@@ -57,8 +57,16 @@ const DEMO_TESTS: ABTest[] = [
   {
     id: "demo-1",
     name: "Hook video vs Hook texte",
-    variantA: { description: "Hook video 3 secondes avec témoignage", conversions: 47, traffic: 520 },
-    variantB: { description: "Hook texte avec promesse forte", conversions: 38, traffic: 510 },
+    variantA: {
+      description: "Hook video 3 secondes avec témoignage",
+      conversions: 47,
+      traffic: 520,
+    },
+    variantB: {
+      description: "Hook texte avec promesse forte",
+      conversions: 38,
+      traffic: 510,
+    },
     metric: "CTR",
     targetSampleSize: 1000,
     status: "active",
@@ -68,8 +76,16 @@ const DEMO_TESTS: ABTest[] = [
   {
     id: "demo-2",
     name: "Page de vente longue vs courte",
-    variantA: { description: "Page longue avec 12 témoignages + VSL", conversions: 23, traffic: 300 },
-    variantB: { description: "Page courte avec 3 témoignages + CTA direct", conversions: 31, traffic: 305 },
+    variantA: {
+      description: "Page longue avec 12 témoignages + VSL",
+      conversions: 23,
+      traffic: 300,
+    },
+    variantB: {
+      description: "Page courte avec 3 témoignages + CTA direct",
+      conversions: 31,
+      traffic: 305,
+    },
     metric: "Taux de conversion",
     targetSampleSize: 600,
     status: "completed",
@@ -79,8 +95,16 @@ const DEMO_TESTS: ABTest[] = [
   {
     id: "demo-3",
     name: "CTA 'Réserver un appel' vs 'Découvrir l'offre'",
-    variantA: { description: "CTA : Réserver un appel strategique gratuit", conversions: 15, traffic: 200 },
-    variantB: { description: "CTA : Découvrir l'offre maintenant", conversions: 12, traffic: 195 },
+    variantA: {
+      description: "CTA : Réserver un appel strategique gratuit",
+      conversions: 15,
+      traffic: 200,
+    },
+    variantB: {
+      description: "CTA : Découvrir l'offre maintenant",
+      conversions: 12,
+      traffic: 195,
+    },
     metric: "Taux de clic CTA",
     targetSampleSize: 500,
     status: "active",
@@ -121,17 +145,22 @@ function calcConfidence(
   convA: number,
   trafficA: number,
   convB: number,
-  trafficB: number
+  trafficB: number,
 ): number {
   // Simplified Z-test approximation
   const pA = trafficA > 0 ? convA / trafficA : 0;
   const pB = trafficB > 0 ? convB / trafficB : 0;
   const p = (convA + convB) / (trafficA + trafficB || 1);
-  const se = Math.sqrt(p * (1 - p) * (1 / (trafficA || 1) + 1 / (trafficB || 1)));
+  const se = Math.sqrt(
+    p * (1 - p) * (1 / (trafficA || 1) + 1 / (trafficB || 1)),
+  );
   if (se === 0) return 0;
   const z = Math.abs(pA - pB) / se;
   // Approximate p-value from z-score (one-sided)
-  const confidence = Math.min(99.9, (1 - Math.exp(-0.717 * z - 0.416 * z * z)) * 100);
+  const confidence = Math.min(
+    99.9,
+    (1 - Math.exp(-0.717 * z - 0.416 * z * z)) * 100,
+  );
   return Math.max(0, confidence);
 }
 
@@ -185,24 +214,27 @@ export function ABTestManager() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
-  const saveToSupabase = useCallback(async (test: ABTest) => {
-    await supabase.from("ab_tests").upsert({
-      id: test.id,
-      user_id: user!.id,
-      name: test.name,
-      metric: test.metric,
-      target_sample_size: test.targetSampleSize,
-      status: test.status,
-      winner: test.winner,
-      variant_a_description: test.variantA.description,
-      variant_a_conversions: test.variantA.conversions,
-      variant_a_traffic: test.variantA.traffic,
-      variant_b_description: test.variantB.description,
-      variant_b_conversions: test.variantB.conversions,
-      variant_b_traffic: test.variantB.traffic,
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user]);
+  const saveToSupabase = useCallback(
+    async (test: ABTest) => {
+      await supabase.from("ab_tests").upsert({
+        id: test.id,
+        user_id: user!.id,
+        name: test.name,
+        metric: test.metric,
+        target_sample_size: test.targetSampleSize,
+        status: test.status,
+        winner: test.winner,
+        variant_a_description: test.variantA.description,
+        variant_a_conversions: test.variantA.conversions,
+        variant_a_traffic: test.variantA.traffic,
+        variant_b_description: test.variantB.description,
+        variant_b_conversions: test.variantB.conversions,
+        variant_b_traffic: test.variantB.traffic,
+      });
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    },
+    [user],
+  );
 
   const handleCreate = useCallback(async () => {
     if (!user || !newTest.name.trim()) return;
@@ -210,8 +242,16 @@ export function ABTestManager() {
     const test: ABTest = {
       id: crypto.randomUUID(),
       name: newTest.name.trim(),
-      variantA: { description: newTest.variantADesc.trim(), conversions: 0, traffic: 0 },
-      variantB: { description: newTest.variantBDesc.trim(), conversions: 0, traffic: 0 },
+      variantA: {
+        description: newTest.variantADesc.trim(),
+        conversions: 0,
+        traffic: 0,
+      },
+      variantB: {
+        description: newTest.variantBDesc.trim(),
+        conversions: 0,
+        traffic: 0,
+      },
       metric: newTest.metric,
       targetSampleSize: newTest.targetSampleSize,
       status: "active",
@@ -224,7 +264,13 @@ export function ABTestManager() {
     setIsDemo(false);
     await saveToSupabase(test);
     setShowCreateForm(false);
-    setNewTest({ name: "", variantADesc: "", variantBDesc: "", metric: "Taux de conversion", targetSampleSize: 500 });
+    setNewTest({
+      name: "",
+      variantADesc: "",
+      variantBDesc: "",
+      metric: "Taux de conversion",
+      targetSampleSize: 500,
+    });
     toast.success("Test A/B créé !");
   }, [user, newTest, tests, isDemo, saveToSupabase]);
 
@@ -246,15 +292,37 @@ export function ABTestManager() {
         };
 
         // Auto-declare winner when both variants reach 100+ visits and confidence >= 90%
-        if (t.status === "active" && newA.traffic >= 100 && newB.traffic >= 100) {
-          const conf = calcConfidence(newA.conversions, newA.traffic, newB.conversions, newB.traffic);
+        if (
+          t.status === "active" &&
+          newA.traffic >= 100 &&
+          newB.traffic >= 100
+        ) {
+          const conf = calcConfidence(
+            newA.conversions,
+            newA.traffic,
+            newB.conversions,
+            newB.traffic,
+          );
           if (conf >= 90) {
             const rateA = calcConversionRate(newA.conversions, newA.traffic);
             const rateB = calcConversionRate(newB.conversions, newB.traffic);
-            const winner = rateA > rateB ? "A" as const : rateB > rateA ? "B" as const : null;
+            const winner =
+              rateA > rateB
+                ? ("A" as const)
+                : rateB > rateA
+                  ? ("B" as const)
+                  : null;
             if (winner) {
-              toast.success(`Terminé automatiquement : Variante ${winner} gagnante (${(newA.traffic + newB.traffic)} visites, confiance ${conf.toFixed(0)}%)`);
-              updatedTest = { ...t, variantA: newA, variantB: newB, status: "completed" as const, winner };
+              toast.success(
+                `Terminé automatiquement : Variante ${winner} gagnante (${newA.traffic + newB.traffic} visites, confiance ${conf.toFixed(0)}%)`,
+              );
+              updatedTest = {
+                ...t,
+                variantA: newA,
+                variantB: newB,
+                status: "completed" as const,
+                winner,
+              };
               return updatedTest;
             }
           }
@@ -266,10 +334,15 @@ export function ABTestManager() {
       setTests(updated);
       if (updatedTest && !isDemo) await saveToSupabase(updatedTest);
       setShowUpdateForm(null);
-      setUpdateData({ variantAConversions: 0, variantATraffic: 0, variantBConversions: 0, variantBTraffic: 0 });
+      setUpdateData({
+        variantAConversions: 0,
+        variantATraffic: 0,
+        variantBConversions: 0,
+        variantBTraffic: 0,
+      });
       toast.success("Statistiques mises à jour");
     },
-    [user, tests, updateData, isDemo, saveToSupabase]
+    [user, tests, updateData, isDemo, saveToSupabase],
   );
 
   const handleToggleStatus = useCallback(
@@ -277,13 +350,17 @@ export function ABTestManager() {
       if (!user) return;
       const updated = tests.map((t) => {
         if (t.id !== testId) return t;
-        return { ...t, status: t.status === "active" ? "paused" as const : "active" as const };
+        return {
+          ...t,
+          status:
+            t.status === "active" ? ("paused" as const) : ("active" as const),
+        };
       });
       setTests(updated);
       const toggled = updated.find((t) => t.id === testId);
       if (!isDemo && toggled) await saveToSupabase(toggled);
     },
-    [user, tests, isDemo, saveToSupabase]
+    [user, tests, isDemo, saveToSupabase],
   );
 
   const handleComplete = useCallback(
@@ -291,9 +368,20 @@ export function ABTestManager() {
       if (!user) return;
       const updated = tests.map((t) => {
         if (t.id !== testId) return t;
-        const rateA = calcConversionRate(t.variantA.conversions, t.variantA.traffic);
-        const rateB = calcConversionRate(t.variantB.conversions, t.variantB.traffic);
-        const winner = rateA > rateB ? "A" as const : rateB > rateA ? "B" as const : null;
+        const rateA = calcConversionRate(
+          t.variantA.conversions,
+          t.variantA.traffic,
+        );
+        const rateB = calcConversionRate(
+          t.variantB.conversions,
+          t.variantB.traffic,
+        );
+        const winner =
+          rateA > rateB
+            ? ("A" as const)
+            : rateB > rateA
+              ? ("B" as const)
+              : null;
         return { ...t, status: "completed" as const, winner };
       });
       setTests(updated);
@@ -301,7 +389,7 @@ export function ABTestManager() {
       if (!isDemo && completed) await saveToSupabase(completed);
       toast.success("Test terminé !");
     },
-    [user, tests, isDemo, saveToSupabase]
+    [user, tests, isDemo, saveToSupabase],
   );
 
   const handleDelete = useCallback(
@@ -315,7 +403,7 @@ export function ABTestManager() {
       toast.success("Test supprimé");
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [user, tests, isDemo]
+    [user, tests, isDemo],
   );
 
   const activeTests = tests.filter((t) => t.status !== "completed");
@@ -326,8 +414,12 @@ export function ABTestManager() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          {loading && <Loader2 className="h-4 w-4 animate-spin text-text-muted" />}
-          {isDemo && !loading && <Badge variant="yellow">Données de démonstration</Badge>}
+          {loading && (
+            <Loader2 className="h-4 w-4 animate-spin text-text-muted" />
+          )}
+          {isDemo && !loading && (
+            <Badge variant="yellow">Données de démonstration</Badge>
+          )}
         </div>
         <Button onClick={() => setShowCreateForm(true)}>
           <Plus className="h-4 w-4 mr-1" />
@@ -342,13 +434,19 @@ export function ABTestManager() {
             Tests actifs ({activeTests.length})
           </h3>
           {activeTests.map((test) => {
-            const rateA = calcConversionRate(test.variantA.conversions, test.variantA.traffic);
-            const rateB = calcConversionRate(test.variantB.conversions, test.variantB.traffic);
+            const rateA = calcConversionRate(
+              test.variantA.conversions,
+              test.variantA.traffic,
+            );
+            const rateB = calcConversionRate(
+              test.variantB.conversions,
+              test.variantB.traffic,
+            );
             const confidence = calcConfidence(
               test.variantA.conversions,
               test.variantA.traffic,
               test.variantB.conversions,
-              test.variantB.traffic
+              test.variantB.traffic,
             );
             const progress = getProgressPct(test);
 
@@ -359,7 +457,11 @@ export function ABTestManager() {
                     <div className="flex items-center gap-2">
                       <FlaskConical className="h-5 w-5 text-accent" />
                       <CardTitle className="text-sm">{test.name}</CardTitle>
-                      <Badge variant={test.status === "active" ? "default" : "yellow"}>
+                      <Badge
+                        variant={
+                          test.status === "active" ? "default" : "yellow"
+                        }
+                      >
                         {test.status === "active" ? "Actif" : "En pause"}
                       </Badge>
                     </div>
@@ -368,7 +470,11 @@ export function ABTestManager() {
                         variant="ghost"
                         size="icon"
                         onClick={() => handleToggleStatus(test.id)}
-                        title={test.status === "active" ? "Mettre en pause" : "Reprendre"}
+                        title={
+                          test.status === "active"
+                            ? "Mettre en pause"
+                            : "Reprendre"
+                        }
                       >
                         {test.status === "active" ? (
                           <Pause className="h-4 w-4" />
@@ -404,16 +510,25 @@ export function ABTestManager() {
                         <span className="w-6 h-6 rounded-lg bg-info/20 text-info text-xs font-bold flex items-center justify-center ring-1 ring-info/30">
                           A
                         </span>
-                        <span className="text-sm font-medium text-text-primary">Variante A</span>
+                        <span className="text-sm font-medium text-text-primary">
+                          Variante A
+                        </span>
                       </div>
-                      <p className="text-xs text-text-secondary mb-3">{test.variantA.description}</p>
+                      <p className="text-xs text-text-secondary mb-3">
+                        {test.variantA.description}
+                      </p>
                       <div className="flex items-center gap-4">
                         <div>
-                          <span className="text-xl font-bold text-text-primary">{rateA.toFixed(1)}%</span>
-                          <span className="text-xs text-text-muted ml-1">conv.</span>
+                          <span className="text-xl font-bold text-text-primary">
+                            {rateA.toFixed(1)}%
+                          </span>
+                          <span className="text-xs text-text-muted ml-1">
+                            conv.
+                          </span>
                         </div>
                         <div className="text-xs text-text-muted">
-                          {test.variantA.conversions}/{test.variantA.traffic} visiteurs
+                          {test.variantA.conversions}/{test.variantA.traffic}{" "}
+                          visiteurs
                         </div>
                       </div>
                       {/* Visual bar */}
@@ -431,16 +546,25 @@ export function ABTestManager() {
                         <span className="w-6 h-6 rounded-lg bg-accent/20 text-accent text-xs font-bold flex items-center justify-center ring-1 ring-accent/30">
                           B
                         </span>
-                        <span className="text-sm font-medium text-text-primary">Variante B</span>
+                        <span className="text-sm font-medium text-text-primary">
+                          Variante B
+                        </span>
                       </div>
-                      <p className="text-xs text-text-secondary mb-3">{test.variantB.description}</p>
+                      <p className="text-xs text-text-secondary mb-3">
+                        {test.variantB.description}
+                      </p>
                       <div className="flex items-center gap-4">
                         <div>
-                          <span className="text-xl font-bold text-text-primary">{rateB.toFixed(1)}%</span>
-                          <span className="text-xs text-text-muted ml-1">conv.</span>
+                          <span className="text-xl font-bold text-text-primary">
+                            {rateB.toFixed(1)}%
+                          </span>
+                          <span className="text-xs text-text-muted ml-1">
+                            conv.
+                          </span>
                         </div>
                         <div className="text-xs text-text-muted">
-                          {test.variantB.conversions}/{test.variantB.traffic} visiteurs
+                          {test.variantB.conversions}/{test.variantB.traffic}{" "}
+                          visiteurs
                         </div>
                       </div>
                       <div className="mt-2 h-2 bg-bg-tertiary rounded-full overflow-hidden">
@@ -462,8 +586,8 @@ export function ABTestManager() {
                             confidence >= 95
                               ? "default"
                               : confidence >= 80
-                              ? "yellow"
-                              : "muted"
+                                ? "yellow"
+                                : "muted"
                           }
                         >
                           {confidence.toFixed(1)}%
@@ -471,7 +595,9 @@ export function ABTestManager() {
                       </div>
                       <div className="flex items-center gap-1">
                         <span className="text-text-muted">Métrique :</span>
-                        <span className="text-text-secondary">{test.metric}</span>
+                        <span className="text-text-secondary">
+                          {test.metric}
+                        </span>
                       </div>
                     </div>
                     <Button
@@ -493,17 +619,32 @@ export function ABTestManager() {
                   </div>
 
                   {/* Auto-complete info */}
-                  {test.variantA.traffic >= 100 && test.variantB.traffic >= 100 && confidence >= 90 && (
-                    <div className="mt-2 p-2 rounded-lg bg-accent/10 border border-accent/20 text-xs text-accent">
-                      Ce test sera automatiquement complété à la prochaine mise à jour (100+ visites par variante atteint, confiance {">"}90%)
-                    </div>
-                  )}
+                  {test.variantA.traffic >= 100 &&
+                    test.variantB.traffic >= 100 &&
+                    confidence >= 90 && (
+                      <div className="mt-2 p-2 rounded-lg bg-accent/10 border border-accent/20 text-xs text-accent">
+                        Ce test sera automatiquement complété à la prochaine
+                        mise à jour (100+ visites par variante atteint,
+                        confiance {">"}90%)
+                      </div>
+                    )}
 
                   {/* Progress bar */}
                   <div className="mt-3">
                     <div className="flex justify-between text-xs text-text-muted mb-1">
-                      <span>Progression {test.variantA.traffic + test.variantB.traffic >= 200 ? "(seuil 100+/variante atteint)" : `(seuil: 100 visites/variante)`}</span>
-                      <span className={cn(progress >= 100 ? "text-accent font-semibold" : "")}>{progress.toFixed(0)}%</span>
+                      <span>
+                        Progression{" "}
+                        {test.variantA.traffic + test.variantB.traffic >= 200
+                          ? "(seuil 100+/variante atteint)"
+                          : `(seuil: 100 visites/variante)`}
+                      </span>
+                      <span
+                        className={cn(
+                          progress >= 100 ? "text-accent font-semibold" : "",
+                        )}
+                      >
+                        {progress.toFixed(0)}%
+                      </span>
                     </div>
                     <div className="h-1.5 bg-bg-tertiary rounded-full overflow-hidden">
                       <div
@@ -526,8 +667,14 @@ export function ABTestManager() {
             Tests terminés ({completedTests.length})
           </h3>
           {completedTests.map((test) => {
-            const rateA = calcConversionRate(test.variantA.conversions, test.variantA.traffic);
-            const rateB = calcConversionRate(test.variantB.conversions, test.variantB.traffic);
+            const rateA = calcConversionRate(
+              test.variantA.conversions,
+              test.variantA.traffic,
+            );
+            const rateB = calcConversionRate(
+              test.variantB.conversions,
+              test.variantB.traffic,
+            );
 
             return (
               <Card key={test.id} className="opacity-80">
@@ -536,7 +683,9 @@ export function ABTestManager() {
                     <div className="flex items-center gap-3">
                       <Trophy className="h-5 w-5 text-warning" />
                       <div>
-                        <span className="text-sm font-medium text-text-primary">{test.name}</span>
+                        <span className="text-sm font-medium text-text-primary">
+                          {test.name}
+                        </span>
                         <div className="flex items-center gap-2 mt-1">
                           <span className="text-xs text-text-muted">
                             Variante A : {rateA.toFixed(1)}%
@@ -581,7 +730,8 @@ export function ABTestManager() {
               Aucun test A/B en cours
             </h3>
             <p className="text-sm text-text-secondary max-w-md mb-4">
-              Crée ton premier test A/B pour comparer deux variantes et optimiser tes conversions.
+              Crée ton premier test A/B pour comparer deux variantes et
+              optimiser tes conversions.
             </p>
             <Button onClick={() => setShowCreateForm(true)}>
               <Plus className="h-4 w-4 mr-1" />
@@ -608,7 +758,9 @@ export function ABTestManager() {
                 id="test-name"
                 placeholder="Ex: Hook video vs Hook texte"
                 value={newTest.name}
-                onChange={(e) => setNewTest((p) => ({ ...p, name: e.target.value }))}
+                onChange={(e) =>
+                  setNewTest((p) => ({ ...p, name: e.target.value }))
+                }
               />
             </div>
             <div>
@@ -617,7 +769,9 @@ export function ABTestManager() {
                 id="variant-a"
                 placeholder="Description de la variante A"
                 value={newTest.variantADesc}
-                onChange={(e) => setNewTest((p) => ({ ...p, variantADesc: e.target.value }))}
+                onChange={(e) =>
+                  setNewTest((p) => ({ ...p, variantADesc: e.target.value }))
+                }
               />
             </div>
             <div>
@@ -626,7 +780,9 @@ export function ABTestManager() {
                 id="variant-b"
                 placeholder="Description de la variante B"
                 value={newTest.variantBDesc}
-                onChange={(e) => setNewTest((p) => ({ ...p, variantBDesc: e.target.value }))}
+                onChange={(e) =>
+                  setNewTest((p) => ({ ...p, variantBDesc: e.target.value }))
+                }
               />
             </div>
             <div>
@@ -639,24 +795,35 @@ export function ABTestManager() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Taux de conversion">Taux de conversion</SelectItem>
+                  <SelectItem value="Taux de conversion">
+                    Taux de conversion
+                  </SelectItem>
                   <SelectItem value="CTR">CTR</SelectItem>
-                  <SelectItem value="Taux de clic CTA">Taux de clic CTA</SelectItem>
+                  <SelectItem value="Taux de clic CTA">
+                    Taux de clic CTA
+                  </SelectItem>
                   <SelectItem value="CPL">CPL</SelectItem>
                   <SelectItem value="ROAS">ROAS</SelectItem>
-                  <SelectItem value="Taux d'ouverture">Taux d&apos;ouverture</SelectItem>
+                  <SelectItem value="Taux d'ouverture">
+                    Taux d&apos;ouverture
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div>
-              <Label htmlFor="sample-size">Taille d&apos;échantillon cible (par variante)</Label>
+              <Label htmlFor="sample-size">
+                Taille d&apos;échantillon cible (par variante)
+              </Label>
               <Input
                 id="sample-size"
                 type="number"
                 min={50}
                 value={newTest.targetSampleSize}
                 onChange={(e) =>
-                  setNewTest((p) => ({ ...p, targetSampleSize: parseInt(e.target.value) || 500 }))
+                  setNewTest((p) => ({
+                    ...p,
+                    targetSampleSize: parseInt(e.target.value) || 500,
+                  }))
                 }
               />
             </div>
@@ -674,7 +841,10 @@ export function ABTestManager() {
       </Dialog>
 
       {/* Update Stats Dialog */}
-      <Dialog open={!!showUpdateForm} onOpenChange={() => setShowUpdateForm(null)}>
+      <Dialog
+        open={!!showUpdateForm}
+        onOpenChange={() => setShowUpdateForm(null)}
+      >
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>Mettre à jour les statistiques</DialogTitle>
@@ -719,7 +889,9 @@ export function ABTestManager() {
             </div>
 
             <div className="p-3 rounded-xl bg-accent/8 border border-accent/20">
-              <h4 className="text-sm font-medium text-accent mb-2">Variante B</h4>
+              <h4 className="text-sm font-medium text-accent mb-2">
+                Variante B
+              </h4>
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <Label className="text-xs">Nouveaux visiteurs</Label>
@@ -757,7 +929,11 @@ export function ABTestManager() {
             <Button variant="ghost" onClick={() => setShowUpdateForm(null)}>
               Annuler
             </Button>
-            <Button onClick={() => showUpdateForm && handleUpdateStats(showUpdateForm)}>
+            <Button
+              onClick={() =>
+                showUpdateForm && handleUpdateStats(showUpdateForm)
+              }
+            >
               Enregistrer
             </Button>
           </DialogFooter>

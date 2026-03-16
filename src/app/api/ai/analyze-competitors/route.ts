@@ -42,11 +42,14 @@ export async function POST(req: NextRequest) {
     }
 
     // Rate limiting
-    const rl = await rateLimit(user.id, "analyze-competitors", { limit: 5, windowSeconds: 60 });
+    const rl = await rateLimit(user.id, "analyze-competitors", {
+      limit: 5,
+      windowSeconds: 60,
+    });
     if (!rl.allowed) {
       return NextResponse.json(
         { error: "Trop de requêtes. Réessaie dans quelques secondes." },
-        { status: 429 }
+        { status: 429 },
       );
     }
 
@@ -55,10 +58,9 @@ export async function POST(req: NextRequest) {
     if (!usage.allowed) {
       return NextResponse.json(
         { error: "Limite de générations IA atteinte", usage },
-        { status: 403 }
+        { status: 403 },
       );
     }
-
 
     const { market_analysis_id, competitor_urls } = (await req.json()) as {
       market_analysis_id: string;
@@ -68,7 +70,7 @@ export async function POST(req: NextRequest) {
     if (!market_analysis_id) {
       return NextResponse.json(
         { error: "market_analysis_id requis" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -83,7 +85,7 @@ export async function POST(req: NextRequest) {
     if (maError || !marketAnalysis) {
       return NextResponse.json(
         { error: "Analyse de marché introuvable" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -97,7 +99,11 @@ export async function POST(req: NextRequest) {
     // Phase 1 : Scraping réel via Apify (prioritaire) puis Firecrawl (fallback)
     let scrapedContext = "";
     let sourceUrls: string[] = [];
-    let dataSource: "apify_crawl" | "google_trends" | "web_scraping" | "ai_only" = "ai_only";
+    let dataSource:
+      | "apify_crawl"
+      | "google_trends"
+      | "web_scraping"
+      | "ai_only" = "ai_only";
     let trendsData: GoogleTrendsResult[] = [];
 
     const apifyReady = isApifyConfigured();
@@ -109,14 +115,17 @@ export async function POST(req: NextRequest) {
         const apifyPromises: Promise<unknown>[] = [];
 
         // Crawl des URLs de concurrents (max 3 en parallèle)
-        const urlsToCrawl = (competitor_urls || []).filter((u) => u.startsWith("http")).slice(0, 3);
+        const urlsToCrawl = (competitor_urls || [])
+          .filter((u) => u.startsWith("http"))
+          .slice(0, 3);
         if (urlsToCrawl.length > 0) {
           for (const url of urlsToCrawl) {
             apifyPromises.push(
               crawlWebsite(url).then((result: WebCrawlResult | null) => {
                 if (result) {
                   scrapedContext += `### Source Apify : ${result.title}\nURL : ${result.url}\n${result.markdown.slice(0, 4000)}\n\n---\n\n`;
-                  if (!sourceUrls.includes(result.url)) sourceUrls.push(result.url);
+                  if (!sourceUrls.includes(result.url))
+                    sourceUrls.push(result.url);
                   dataSource = "apify_crawl";
                 }
               }),
@@ -128,7 +137,9 @@ export async function POST(req: NextRequest) {
         const competitorNames = (competitor_urls || [])
           .map((u) => {
             try {
-              const hostname = new URL(u).hostname.replace("www.", "").split(".")[0];
+              const hostname = new URL(u).hostname
+                .replace("www.", "")
+                .split(".")[0];
               return hostname.charAt(0).toUpperCase() + hostname.slice(1);
             } catch {
               return "";
@@ -138,22 +149,30 @@ export async function POST(req: NextRequest) {
           .slice(0, 5);
 
         // Ajouter le nom du marché comme terme de tendance
-        const trendsTerms = competitorNames.length > 0
-          ? [marketAnalysis.market_name, ...competitorNames].slice(0, 5)
-          : [marketAnalysis.market_name];
+        const trendsTerms =
+          competitorNames.length > 0
+            ? [marketAnalysis.market_name, ...competitorNames].slice(0, 5)
+            : [marketAnalysis.market_name];
 
         apifyPromises.push(
           scrapeGoogleTrends({
             terms: trendsTerms,
-            geo: marketAnalysis.country === "France" ? "FR" : marketAnalysis.country || "FR",
+            geo:
+              marketAnalysis.country === "France"
+                ? "FR"
+                : marketAnalysis.country || "FR",
           }).then((results: GoogleTrendsResult[]) => {
             if (results.length > 0) {
               trendsData = results;
               scrapedContext += `\n## TENDANCES GOOGLE TRENDS (données réelles)\n`;
               for (const trend of results) {
-                const avgValue = trend.timelineData.length > 0
-                  ? Math.round(trend.timelineData.reduce((s, d) => s + d.value, 0) / trend.timelineData.length)
-                  : 0;
+                const avgValue =
+                  trend.timelineData.length > 0
+                    ? Math.round(
+                        trend.timelineData.reduce((s, d) => s + d.value, 0) /
+                          trend.timelineData.length,
+                      )
+                    : 0;
                 scrapedContext += `- **${trend.term}** : intérêt moyen ${avgValue}/100`;
                 if (trend.relatedQueries.length > 0) {
                   scrapedContext += ` | Requêtes liées : ${trend.relatedQueries.slice(0, 5).join(", ")}`;
@@ -179,7 +198,9 @@ export async function POST(req: NextRequest) {
 
         // Scraper les URLs de concurrents fournies par l'utilisateur
         if (competitor_urls && competitor_urls.length > 0) {
-          const scrapePromises = competitor_urls.slice(0, 5).map((url) => scrapeUrl(url));
+          const scrapePromises = competitor_urls
+            .slice(0, 5)
+            .map((url) => scrapeUrl(url));
           const scrapeResults = await Promise.all(scrapePromises);
           for (const scraped of scrapeResults) {
             if (scraped) {
@@ -191,7 +212,10 @@ export async function POST(req: NextRequest) {
 
         // Recherche complémentaire sur le marché
         const searchQuery = `${marketAnalysis.market_name} concurrents avis ${marketAnalysis.country || "France"}`;
-        const { results, scrapedContent } = await searchAndScrape(searchQuery, 3);
+        const { results, scrapedContent } = await searchAndScrape(
+          searchQuery,
+          3,
+        );
 
         for (const r of results) {
           if (!sourceUrls.includes(r.url)) sourceUrls.push(r.url);
@@ -212,7 +236,10 @@ export async function POST(req: NextRequest) {
           dataSource = "web_scraping";
         }
       } catch (err) {
-        console.warn("Firecrawl scraping failed for analyze-competitors, falling back to AI-only:", err);
+        console.warn(
+          "Firecrawl scraping failed for analyze-competitors, falling back to AI-only:",
+          err,
+        );
         scrapedContext = "";
         sourceUrls = [];
       }
@@ -220,22 +247,31 @@ export async function POST(req: NextRequest) {
 
     // Phase 2 : Screenshots & Tech Stack (bonus, non-blocking)
     let screenshots: { url: string; screenshotUrl: string }[] = [];
-    let techStacks: { url: string; technologies: { name: string; category: string }[] }[] = [];
+    let techStacks: {
+      url: string;
+      technologies: { name: string; category: string }[];
+    }[] = [];
 
     if (apifyReady) {
-      const urlsForBonus = (competitor_urls || []).filter((u) => u.startsWith("http")).slice(0, 3);
+      const urlsForBonus = (competitor_urls || [])
+        .filter((u) => u.startsWith("http"))
+        .slice(0, 3);
       if (urlsForBonus.length > 0) {
         try {
-          const [screenshotResults, techStackResults] = await Promise.allSettled([
-            Promise.allSettled(urlsForBonus.map((u) => screenshotWebsite(u))),
-            Promise.allSettled(urlsForBonus.map((u) => detectTechStack(u))),
-          ]);
+          const [screenshotResults, techStackResults] =
+            await Promise.allSettled([
+              Promise.allSettled(urlsForBonus.map((u) => screenshotWebsite(u))),
+              Promise.allSettled(urlsForBonus.map((u) => detectTechStack(u))),
+            ]);
 
           // Collect screenshot results
           if (screenshotResults.status === "fulfilled") {
             for (const r of screenshotResults.value) {
               if (r.status === "fulfilled" && r.value) {
-                screenshots.push({ url: r.value.url, screenshotUrl: r.value.screenshotUrl });
+                screenshots.push({
+                  url: r.value.url,
+                  screenshotUrl: r.value.screenshotUrl,
+                });
               }
             }
           }
@@ -243,29 +279,41 @@ export async function POST(req: NextRequest) {
           // Collect tech stack results
           if (techStackResults.status === "fulfilled") {
             for (const r of techStackResults.value) {
-              if (r.status === "fulfilled" && r.value && r.value.technologies.length > 0) {
-                techStacks.push({ url: r.value.url, technologies: r.value.technologies });
+              if (
+                r.status === "fulfilled" &&
+                r.value &&
+                r.value.technologies.length > 0
+              ) {
+                techStacks.push({
+                  url: r.value.url,
+                  technologies: r.value.technologies,
+                });
               }
             }
           }
         } catch (err) {
-          console.warn("Screenshot/TechStack bonus phase failed (non-blocking):", err);
+          console.warn(
+            "Screenshot/TechStack bonus phase failed (non-blocking):",
+            err,
+          );
         }
       }
     }
 
     const [basePrompt, vaultContext] = await Promise.all([
-      Promise.resolve(buildCompetitorAnalysisPrompt(
-        {
-          market_name: marketAnalysis.market_name,
-          market_description: marketAnalysis.market_description,
-          recommended_positioning: marketAnalysis.recommended_positioning,
-          country: marketAnalysis.country,
-          language: marketAnalysis.language,
-          user_skills: profile?.skills ?? undefined,
-        },
-        scrapedContext || undefined,
-      )),
+      Promise.resolve(
+        buildCompetitorAnalysisPrompt(
+          {
+            market_name: marketAnalysis.market_name,
+            market_description: marketAnalysis.market_description,
+            recommended_positioning: marketAnalysis.recommended_positioning,
+            country: marketAnalysis.country,
+            language: marketAnalysis.language,
+            user_skills: profile?.skills ?? undefined,
+          },
+          scrapedContext || undefined,
+        ),
+      ),
       buildFullVaultContext(user.id),
     ]);
     const prompt = vaultContext ? basePrompt + "\n" + vaultContext : basePrompt;
@@ -306,8 +354,16 @@ export async function POST(req: NextRequest) {
     }
 
     // Award XP (non-blocking)
-    try { await awardXP(user.id, "generation.competitors"); } catch (e) { console.warn("XP award failed", e); }
-    try { await notifyGeneration(user.id, "generation.competitors"); } catch (e) { console.warn("Notification failed", e); }
+    try {
+      await awardXP(user.id, "generation.competitors");
+    } catch (e) {
+      console.warn("XP award failed", e);
+    }
+    try {
+      await notifyGeneration(user.id, "generation.competitors");
+    } catch (e) {
+      console.warn("Notification failed", e);
+    }
 
     return NextResponse.json({
       ...result,
@@ -322,7 +378,7 @@ export async function POST(req: NextRequest) {
     console.error("[analyze-competitors] Error:", error);
     return NextResponse.json(
       { error: "Erreur lors de l'analyse concurrentielle" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

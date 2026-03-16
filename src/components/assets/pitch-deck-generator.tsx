@@ -4,7 +4,13 @@ import React from "react";
 import { cn } from "@/lib/utils/cn";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { AILoading } from "@/components/shared/ai-loading";
 import { GlowCard } from "@/components/shared/glow-card";
 import {
@@ -27,12 +33,20 @@ interface PitchDeckGeneratorProps {
 const AUDIENCES = ["Investisseurs", "Clients", "Partenaires"] as const;
 const SLIDE_COUNTS = [5, 8, 10, 15] as const;
 
-export function PitchDeckGenerator({ className, initialData }: PitchDeckGeneratorProps) {
+export function PitchDeckGenerator({
+  className,
+  initialData,
+}: PitchDeckGeneratorProps) {
   const [loading, setLoading] = React.useState(false);
-  const [deck, setDeck] = React.useState<PitchDeckResult | null>(initialData || null);
+  const [deck, setDeck] = React.useState<PitchDeckResult | null>(
+    initialData || null,
+  );
   const [error, setError] = React.useState<string | null>(null);
   const [activeSlide, setActiveSlide] = React.useState(0);
-  const [usageLimited, setUsageLimited] = React.useState<{currentUsage: number; limit: number} | null>(null);
+  const [usageLimited, setUsageLimited] = React.useState<{
+    currentUsage: number;
+    limit: number;
+  } | null>(null);
   const [audience, setAudience] = React.useState<string>("Investisseurs");
   const [slideCount, setSlideCount] = React.useState<number>(10);
 
@@ -54,7 +68,10 @@ export function PitchDeckGenerator({ className, initialData }: PitchDeckGenerato
       if (!response.ok) {
         if (response.status === 403) {
           const errData = await response.json();
-          if (errData.usage) { setUsageLimited(errData.usage); return; }
+          if (errData.usage) {
+            setUsageLimited(errData.usage);
+            return;
+          }
         }
         throw new Error("Erreur lors de la génération");
       }
@@ -69,7 +86,13 @@ export function PitchDeckGenerator({ className, initialData }: PitchDeckGenerato
   };
 
   if (usageLimited) {
-    return <UpgradeWall currentUsage={usageLimited.currentUsage} limit={usageLimited.limit} className={className} />;
+    return (
+      <UpgradeWall
+        currentUsage={usageLimited.currentUsage}
+        limit={usageLimited.limit}
+        className={className}
+      />
+    );
   }
 
   if (loading) {
@@ -81,16 +104,22 @@ export function PitchDeckGenerator({ className, initialData }: PitchDeckGenerato
   if (!deck) {
     return (
       <div className={cn("max-w-xl mx-auto py-8", className)}>
-        {error && <p className="text-sm text-danger mb-4 text-center">{error}</p>}
+        {error && (
+          <p className="text-sm text-danger mb-4 text-center">{error}</p>
+        )}
         <Card>
           <CardHeader>
             <CardTitle>Pitch Deck</CardTitle>
-            <CardDescription>Slides professionnelles avec notes speaker</CardDescription>
+            <CardDescription>
+              Slides professionnelles avec notes speaker
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             {/* Audience */}
             <div>
-              <label className="text-sm font-medium text-text-primary mb-2 block">Audience</label>
+              <label className="text-sm font-medium text-text-primary mb-2 block">
+                Audience
+              </label>
               <div className="flex flex-wrap gap-2">
                 {AUDIENCES.map((a) => (
                   <button
@@ -100,7 +129,7 @@ export function PitchDeckGenerator({ className, initialData }: PitchDeckGenerato
                       "px-3 py-1.5 rounded-lg text-sm font-medium transition-all",
                       audience === a
                         ? "bg-accent text-white"
-                        : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
+                        : "bg-bg-tertiary text-text-secondary hover:text-text-primary",
                     )}
                   >
                     {a}
@@ -111,7 +140,9 @@ export function PitchDeckGenerator({ className, initialData }: PitchDeckGenerato
 
             {/* Slide count */}
             <div>
-              <label className="text-sm font-medium text-text-primary mb-2 block">Nombre de slides</label>
+              <label className="text-sm font-medium text-text-primary mb-2 block">
+                Nombre de slides
+              </label>
               <div className="flex flex-wrap gap-2">
                 {SLIDE_COUNTS.map((count) => (
                   <button
@@ -121,7 +152,7 @@ export function PitchDeckGenerator({ className, initialData }: PitchDeckGenerato
                       "px-3 py-1.5 rounded-lg text-sm font-medium transition-all",
                       slideCount === count
                         ? "bg-accent text-white"
-                        : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
+                        : "bg-bg-tertiary text-text-secondary hover:text-text-primary",
                     )}
                   >
                     {count}
@@ -172,7 +203,7 @@ export function PitchDeckGenerator({ className, initialData }: PitchDeckGenerato
               "flex-shrink-0 w-8 h-8 rounded-lg text-xs font-semibold transition-all",
               activeSlide === i
                 ? "bg-accent text-white"
-                : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
+                : "bg-bg-tertiary text-text-secondary hover:text-text-primary",
             )}
           >
             {s.slide_number || i + 1}

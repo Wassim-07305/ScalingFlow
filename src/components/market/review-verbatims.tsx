@@ -55,7 +55,7 @@ function StarRating({ rating, max = 5 }: { rating: number; max?: number }) {
             "h-3.5 w-3.5",
             i < Math.round(rating)
               ? "text-yellow-400 fill-yellow-400"
-              : "text-text-muted"
+              : "text-text-muted",
           )}
         />
       ))}
@@ -64,9 +64,24 @@ function StarRating({ rating, max = 5 }: { rating: number; max?: number }) {
 }
 
 const SENTIMENT_CONFIG = {
-  positif: { icon: ThumbsUp, color: "text-emerald-400", bg: "bg-emerald-400/10", label: "Positif" },
-  négatif: { icon: ThumbsDown, color: "text-red-400", bg: "bg-red-400/10", label: "Négatif" },
-  neutre: { icon: Minus, color: "text-text-muted", bg: "bg-bg-tertiary", label: "Neutre" },
+  positif: {
+    icon: ThumbsUp,
+    color: "text-emerald-400",
+    bg: "bg-emerald-400/10",
+    label: "Positif",
+  },
+  négatif: {
+    icon: ThumbsDown,
+    color: "text-red-400",
+    bg: "bg-red-400/10",
+    label: "Négatif",
+  },
+  neutre: {
+    icon: Minus,
+    color: "text-text-muted",
+    bg: "bg-bg-tertiary",
+    label: "Neutre",
+  },
 } as const;
 
 const SOURCE_CONFIG = {
@@ -78,8 +93,13 @@ const SOURCE_CONFIG = {
 // Component
 // ---------------------------------------------------------------------------
 
-export function ReviewVerbatims({ verbatims, reviewsData }: ReviewVerbatimsProps) {
-  const [activeSentiment, setActiveSentiment] = useState<"all" | "positif" | "négatif" | "neutre">("all");
+export function ReviewVerbatims({
+  verbatims,
+  reviewsData,
+}: ReviewVerbatimsProps) {
+  const [activeSentiment, setActiveSentiment] = useState<
+    "all" | "positif" | "négatif" | "neutre"
+  >("all");
   const [expanded, setExpanded] = useState(false);
 
   if (!verbatims || verbatims.length === 0) return null;
@@ -95,7 +115,9 @@ export function ReviewVerbatims({ verbatims, reviewsData }: ReviewVerbatimsProps
     neutre: verbatims.filter((v) => v.sentiment === "neutre").length,
   };
 
-  const displayedVerbatims = expanded ? filteredVerbatims : filteredVerbatims.slice(0, 6);
+  const displayedVerbatims = expanded
+    ? filteredVerbatims
+    : filteredVerbatims.slice(0, 6);
 
   return (
     <div className="space-y-4">
@@ -109,7 +131,9 @@ export function ReviewVerbatims({ verbatims, reviewsData }: ReviewVerbatimsProps
                 <MessageSquareQuote className="h-5 w-5 text-accent" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-text-primary">{verbatims.length}</p>
+                <p className="text-2xl font-bold text-text-primary">
+                  {verbatims.length}
+                </p>
                 <p className="text-xs text-text-muted">Avis analysés</p>
               </div>
             </div>
@@ -119,7 +143,11 @@ export function ReviewVerbatims({ verbatims, reviewsData }: ReviewVerbatimsProps
         {/* Per-source stats */}
         {reviewsData.map((rd) => {
           const srcKey = rd.source as keyof typeof SOURCE_CONFIG;
-          const srcConfig = SOURCE_CONFIG[srcKey] || { icon: Star, label: rd.source, color: "text-text-muted" };
+          const srcConfig = SOURCE_CONFIG[srcKey] || {
+            icon: Star,
+            label: rd.source,
+            color: "text-text-muted",
+          };
           const SrcIcon = srcConfig.icon;
 
           return (
@@ -131,7 +159,9 @@ export function ReviewVerbatims({ verbatims, reviewsData }: ReviewVerbatimsProps
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <p className="text-lg font-bold text-text-primary">{rd.count}</p>
+                      <p className="text-lg font-bold text-text-primary">
+                        {rd.count}
+                      </p>
                       <StarRating rating={rd.averageRating} />
                     </div>
                     <p className="text-xs text-text-muted">
@@ -163,7 +193,9 @@ export function ReviewVerbatims({ verbatims, reviewsData }: ReviewVerbatimsProps
                 </span>
               </div>
             </div>
-            <p className="text-xs text-text-muted mt-1">Répartition sentiments</p>
+            <p className="text-xs text-text-muted mt-1">
+              Répartition sentiments
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -185,7 +217,7 @@ export function ReviewVerbatims({ verbatims, reviewsData }: ReviewVerbatimsProps
                 "px-3 py-1.5 rounded-lg text-xs font-medium transition-all border",
                 isActive
                   ? "bg-accent/10 border-accent text-accent"
-                  : "bg-bg-tertiary border-border-default text-text-secondary hover:border-border-hover"
+                  : "bg-bg-tertiary border-border-default text-text-secondary hover:border-border-hover",
               )}
             >
               {label}
@@ -200,18 +232,33 @@ export function ReviewVerbatims({ verbatims, reviewsData }: ReviewVerbatimsProps
           const sentConfig = SENTIMENT_CONFIG[v.sentiment];
           const SentIcon = sentConfig.icon;
           const srcKey = v.source as keyof typeof SOURCE_CONFIG;
-          const srcConfig = SOURCE_CONFIG[srcKey] || { icon: Star, label: v.source, color: "text-text-muted" };
+          const srcConfig = SOURCE_CONFIG[srcKey] || {
+            icon: Star,
+            label: v.source,
+            color: "text-text-muted",
+          };
 
           return (
-            <Card key={idx} className={cn("border-l-2", sentConfig.color.replace("text-", "border-"))}>
+            <Card
+              key={idx}
+              className={cn(
+                "border-l-2",
+                sentConfig.color.replace("text-", "border-"),
+              )}
+            >
               <CardHeader className="pb-2">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <SentIcon className={cn("h-4 w-4", sentConfig.color)} />
-                    <span className="text-sm font-medium text-text-primary">{v.name || "Anonyme"}</span>
+                    <span className="text-sm font-medium text-text-primary">
+                      {v.name || "Anonyme"}
+                    </span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Badge variant="default" className="text-[10px] px-1.5 py-0">
+                    <Badge
+                      variant="default"
+                      className="text-[10px] px-1.5 py-0"
+                    >
                       {srcConfig.label}
                     </Badge>
                     <StarRating rating={v.rating} />

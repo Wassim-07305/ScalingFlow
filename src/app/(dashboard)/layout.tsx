@@ -44,7 +44,9 @@ export default async function DashboardLayout({
     id: user.id,
     email: user.email || "",
     full_name:
-      user.user_metadata?.full_name || user.email?.split("@")[0] || "Utilisateur",
+      user.user_metadata?.full_name ||
+      user.email?.split("@")[0] ||
+      "Utilisateur",
     avatar_url: null,
     role: "user",
     organization_id: null,

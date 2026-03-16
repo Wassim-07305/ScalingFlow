@@ -176,7 +176,12 @@ function ScoreRing({
         : "text-red-400";
 
   return (
-    <div className={cn("relative inline-flex items-center justify-center", className)}>
+    <div
+      className={cn(
+        "relative inline-flex items-center justify-center",
+        className,
+      )}
+    >
       <svg width={size} height={size} className="-rotate-90">
         <circle
           cx={size / 2}
@@ -215,11 +220,11 @@ export function CallAnalyzer() {
   const [analysisFocus, setAnalysisFocus] = React.useState("global");
   const [callResult, setCallResult] = React.useState("");
   const [expandedSection, setExpandedSection] = React.useState<string | null>(
-    "discovery"
+    "discovery",
   );
   const [scriptLoading, setScriptLoading] = React.useState(false);
   const [generatedScript, setGeneratedScript] = React.useState<string | null>(
-    null
+    null,
   );
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
@@ -242,7 +247,9 @@ export function CallAnalyzer() {
     reader.onload = () => {
       const text = reader.result as string;
       setTranscript(text);
-      toast.success(`Fichier "${file.name}" chargé (${text.length} caractères)`);
+      toast.success(
+        `Fichier "${file.name}" chargé (${text.length} caractères)`,
+      );
     };
     reader.onerror = () => toast.error("Erreur de lecture du fichier");
     reader.readAsText(file);
@@ -310,7 +317,9 @@ export function CallAnalyzer() {
       const data = await response.json();
       const content = data.ai_raw_response || data;
       setGeneratedScript(
-        typeof content === "string" ? content : JSON.stringify(content, null, 2)
+        typeof content === "string"
+          ? content
+          : JSON.stringify(content, null, 2),
       );
       toast.success("Script personnalisé généré !");
     } catch (err) {
@@ -366,7 +375,7 @@ export function CallAnalyzer() {
                       "px-4 py-2 rounded-xl text-sm font-medium transition-all border",
                       callType === t.key
                         ? "bg-accent/10 text-accent border-accent/30"
-                        : "bg-bg-tertiary text-text-secondary border-border-default/50 hover:text-text-primary hover:border-border-default"
+                        : "bg-bg-tertiary text-text-secondary border-border-default/50 hover:text-text-primary hover:border-border-default",
                     )}
                   >
                     {t.label}
@@ -488,7 +497,9 @@ export function CallAnalyzer() {
                   if (e.target.value.length <= 500_000) {
                     setTranscript(e.target.value);
                   } else {
-                    toast.error("Le transcript ne peut pas dépasser 500 000 caractères");
+                    toast.error(
+                      "Le transcript ne peut pas dépasser 500 000 caractères",
+                    );
                   }
                 }}
                 placeholder={`Colle ici le transcript ou importe un fichier (.txt, .srt, .vtt)...\n\nVendeur : Bonjour, merci d'avoir pris le temps...\nProspect : Oui, j'ai vu votre publicité et...\n...`}
@@ -498,7 +509,8 @@ export function CallAnalyzer() {
               />
               <div className="flex items-center justify-between mt-1.5">
                 <p className="text-xs text-text-muted">
-                  {transcript.length.toLocaleString("fr-FR")} / 500 000 caractères
+                  {transcript.length.toLocaleString("fr-FR")} / 500 000
+                  caractères
                 </p>
                 <p className="text-xs text-text-muted">Minimum 50 caractères</p>
               </div>
@@ -626,14 +638,14 @@ export function CallAnalyzer() {
                   "flex flex-col items-center gap-1.5 p-2 rounded-xl transition-all",
                   expandedSection === key
                     ? "bg-accent/5 ring-1 ring-accent/20"
-                    : "hover:bg-bg-tertiary"
+                    : "hover:bg-bg-tertiary",
                 )}
               >
                 <span className="text-base">{SCORE_ICONS[key]}</span>
                 <span
                   className={cn(
                     "text-lg font-bold",
-                    getScoreColor(section.score, section.max)
+                    getScoreColor(section.score, section.max),
                   )}
                 >
                   {section.score}
@@ -661,7 +673,7 @@ export function CallAnalyzer() {
           key={key}
           className={cn(
             "transition-all",
-            expandedSection === key && "border-accent/20"
+            expandedSection === key && "border-accent/20",
           )}
         >
           <CardHeader
@@ -676,7 +688,7 @@ export function CallAnalyzer() {
                   className={cn(
                     "inline-flex items-center justify-center h-8 w-8 rounded-lg text-sm font-bold border",
                     getScoreBg(section.score, section.max),
-                    getScoreColor(section.score, section.max)
+                    getScoreColor(section.score, section.max),
                   )}
                 >
                   {section.score}
@@ -769,16 +781,13 @@ export function CallAnalyzer() {
                   className={cn(
                     "p-4 rounded-xl border transition-all",
                     config.bg,
-                    config.border
+                    config.border,
                   )}
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex items-start gap-2.5 min-w-0">
                       <CheckCircle2
-                        className={cn(
-                          "h-4 w-4 mt-0.5 shrink-0",
-                          config.color
-                        )}
+                        className={cn("h-4 w-4 mt-0.5 shrink-0", config.color)}
                       />
                       <div>
                         <p className="text-sm font-medium text-text-primary">
@@ -921,31 +930,47 @@ export function CallAnalyzer() {
             <div className="grid gap-3 sm:grid-cols-3">
               <div className="rounded-lg bg-bg-tertiary p-3 text-center">
                 <p className="text-xs text-text-muted">Vendeur</p>
-                <p className="text-2xl font-bold text-blue-400">{result.speaker_analysis.seller_talk_ratio}%</p>
+                <p className="text-2xl font-bold text-blue-400">
+                  {result.speaker_analysis.seller_talk_ratio}%
+                </p>
               </div>
               <div className="rounded-lg bg-bg-tertiary p-3 text-center">
                 <p className="text-xs text-text-muted">Prospect</p>
-                <p className="text-2xl font-bold text-accent">{result.speaker_analysis.prospect_talk_ratio}%</p>
+                <p className="text-2xl font-bold text-accent">
+                  {result.speaker_analysis.prospect_talk_ratio}%
+                </p>
               </div>
               <div className="rounded-lg bg-bg-tertiary p-3 text-center">
                 <p className="text-xs text-text-muted">Interruptions</p>
-                <p className={cn("text-2xl font-bold", result.speaker_analysis.interruptions <= 2 ? "text-accent" : "text-yellow-400")}>
+                <p
+                  className={cn(
+                    "text-2xl font-bold",
+                    result.speaker_analysis.interruptions <= 2
+                      ? "text-accent"
+                      : "text-yellow-400",
+                  )}
+                >
                   {result.speaker_analysis.interruptions}
                 </p>
               </div>
             </div>
-            <div className={cn(
-              "rounded-lg p-3 border text-xs",
-              result.speaker_analysis.ideal_ratio_met
-                ? "bg-accent/5 border-accent/20 text-accent"
-                : "bg-yellow-500/5 border-yellow-500/20 text-yellow-400"
-            )}>
+            <div
+              className={cn(
+                "rounded-lg p-3 border text-xs",
+                result.speaker_analysis.ideal_ratio_met
+                  ? "bg-accent/5 border-accent/20 text-accent"
+                  : "bg-yellow-500/5 border-yellow-500/20 text-yellow-400",
+              )}
+            >
               {result.speaker_analysis.ideal_ratio_met
                 ? "Ratio de parole idéal respecté"
                 : "Ratio de parole à améliorer — le prospect devrait parler plus"}
             </div>
             <div className="text-xs text-text-secondary space-y-1">
-              <p><span className="text-text-muted">Gestion des silences :</span> {result.speaker_analysis.silence_management}</p>
+              <p>
+                <span className="text-text-muted">Gestion des silences :</span>{" "}
+                {result.speaker_analysis.silence_management}
+              </p>
             </div>
           </CardContent>
         </Card>

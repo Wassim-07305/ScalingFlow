@@ -8,7 +8,7 @@ const META_GRAPH_URL = "https://graph.facebook.com/v21.0";
 
 async function getMetaCredentials(
   supabase: Awaited<ReturnType<typeof createClient>>,
-  userId: string
+  userId: string,
 ) {
   const { data } = await supabase
     .from("connected_accounts")
@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
     if (!campaign_id) {
       return NextResponse.json(
         { error: "campaign_id est requis" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -72,7 +72,7 @@ export async function POST(req: NextRequest) {
     if (!campaign) {
       return NextResponse.json(
         { error: "Campagne introuvable" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -90,14 +90,16 @@ export async function POST(req: NextRequest) {
     const maxBudget = configData?.scale_max_budget ?? 1000;
 
     const currentBudget = campaign.daily_budget ?? 0;
-    const newBudget = Math.round(currentBudget * (1 + effectiveScalePercent / 100));
+    const newBudget = Math.round(
+      currentBudget * (1 + effectiveScalePercent / 100),
+    );
 
     if (newBudget > maxBudget) {
       return NextResponse.json(
         {
           error: `Le nouveau budget (${newBudget}€) dépasse le plafond configuré (${maxBudget}€)`,
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -117,23 +119,20 @@ export async function POST(req: NextRequest) {
 
     if (token && campaign.meta_adset_id) {
       try {
-        const res = await fetch(
-          `${META_GRAPH_URL}/${campaign.meta_adset_id}`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              access_token: token,
-              daily_budget: newBudget * 100, // Meta utilise les centimes
-            }),
-          }
-        );
+        const res = await fetch(`${META_GRAPH_URL}/${campaign.meta_adset_id}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            access_token: token,
+            daily_budget: newBudget * 100, // Meta utilise les centimes
+          }),
+        });
         metaResult = await res.json();
 
         if (metaResult.error) {
           return NextResponse.json(
             { error: `Meta: ${metaResult.error.message}` },
-            { status: 502 }
+            { status: 502 },
           );
         }
       } catch {
@@ -186,7 +185,7 @@ export async function POST(req: NextRequest) {
   } catch {
     return NextResponse.json(
       { error: "Erreur lors du scaling" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -229,7 +228,7 @@ export async function GET(req: NextRequest) {
               data.data[0].actions?.find(
                 (a: { action_type: string }) =>
                   a.action_type === "offsite_conversion.fb_pixel_purchase" ||
-                  a.action_type === "lead"
+                  a.action_type === "lead",
               )?.value ?? 0;
             currentRoas = spend > 0 ? (conversions * 50) / spend : 0;
           }
@@ -267,7 +266,12 @@ export async function GET(req: NextRequest) {
         });
       } else {
         // ROLLBACK: le ROAS a chuté
-        await rollbackScaling(supabase, scaling.user_id, scaling.id, currentRoas);
+        await rollbackScaling(
+          supabase,
+          scaling.user_id,
+          scaling.id,
+          currentRoas,
+        );
         results.push({
           id: scaling.id,
           status: "rollback",
@@ -284,7 +288,7 @@ export async function GET(req: NextRequest) {
   } catch {
     return NextResponse.json(
       { error: "Erreur lors du CRON de scaling" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -293,7 +297,7 @@ async function rollbackScaling(
   supabase: Awaited<ReturnType<typeof createClient>>,
   userId: string,
   scalingId: string,
-  currentRoas?: number
+  currentRoas?: number,
 ) {
   const { data: scaling } = await supabase
     .from("ad_scaling_history")
@@ -305,7 +309,7 @@ async function rollbackScaling(
   if (!scaling) {
     return NextResponse.json(
       { error: "Entrée de scaling introuvable" },
-      { status: 404 }
+      { status: 404 },
     );
   }
 
@@ -315,17 +319,14 @@ async function rollbackScaling(
   // Rollback sur Meta
   if (token && scaling.adset_id) {
     try {
-      const res = await fetch(
-        `${META_GRAPH_URL}/${scaling.adset_id}`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            access_token: token,
-            daily_budget: Math.round(scaling.previous_budget * 100),
-          }),
-        }
-      );
+      const res = await fetch(`${META_GRAPH_URL}/${scaling.adset_id}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          access_token: token,
+          daily_budget: Math.round(scaling.previous_budget * 100),
+        }),
+      });
       metaResult = await res.json();
     } catch {
       // Continue sans Meta
@@ -360,7 +361,10 @@ async function rollbackScaling(
     decision_type: "rollback",
     reason: `ROAS ${(currentRoas ?? 0).toFixed(2)}x < seuil ${scaling.roas_threshold}x après scaling`,
     details: `Budget rollback de ${scaling.new_budget}€ à ${scaling.previous_budget}€/jour`,
-    metrics_snapshot: { roas_at_scale: scaling.roas_at_scale, roas_after_24h: currentRoas },
+    metrics_snapshot: {
+      roas_at_scale: scaling.roas_at_scale,
+      roas_after_24h: currentRoas,
+    },
     status: "applied",
     applied_at: new Date().toISOString(),
   });

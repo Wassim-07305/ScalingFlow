@@ -76,7 +76,14 @@ export function ClientForm({
         notes: initialData.notes ?? "",
       });
     } else {
-      setForm({ name: "", email: "", phone: "", company: "", status: "prospect", notes: "" });
+      setForm({
+        name: "",
+        email: "",
+        phone: "",
+        company: "",
+        status: "prospect",
+        notes: "",
+      });
     }
   }, [initialData, mode]);
 
@@ -87,7 +94,14 @@ export function ClientForm({
     try {
       await onSubmit(form);
       if (mode === "create") {
-        setForm({ name: "", email: "", phone: "", company: "", status: "prospect", notes: "" });
+        setForm({
+          name: "",
+          email: "",
+          phone: "",
+          company: "",
+          status: "prospect",
+          notes: "",
+        });
       }
     } finally {
       setSaving(false);

@@ -46,7 +46,7 @@ export function UnipilePublishDialog({
 
   const toggleAccount = (id: string) => {
     setSelectedIds((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
     );
   };
 
@@ -93,12 +93,12 @@ export function UnipilePublishDialog({
     const successCount = newResults.filter((r) => r.success).length;
     if (successCount > 0) {
       toast.success(
-        `Publié sur ${successCount} compte${successCount > 1 ? "s" : ""} !`
+        `Publié sur ${successCount} compte${successCount > 1 ? "s" : ""} !`,
       );
     }
     if (successCount < newResults.length) {
       toast.error(
-        `Échec sur ${newResults.length - successCount} compte${newResults.length - successCount > 1 ? "s" : ""}.`
+        `Échec sur ${newResults.length - successCount} compte${newResults.length - successCount > 1 ? "s" : ""}.`,
       );
     }
   };
@@ -156,7 +156,9 @@ export function UnipilePublishDialog({
             </p>
             <div className="flex flex-wrap gap-2">
               {accounts.map((account) => {
-                const info = PROVIDER_LABELS[account.provider.toLowerCase()] || {
+                const info = PROVIDER_LABELS[
+                  account.provider.toLowerCase()
+                ] || {
                   label: account.provider,
                   color: "bg-gray-600",
                 };
@@ -172,12 +174,10 @@ export function UnipilePublishDialog({
                       "flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all border",
                       isSelected
                         ? "border-accent bg-accent/10 text-accent"
-                        : "border-border-default bg-bg-tertiary text-text-secondary hover:text-text-primary"
+                        : "border-border-default bg-bg-tertiary text-text-secondary hover:text-text-primary",
                     )}
                   >
-                    <span
-                      className={cn("h-2 w-2 rounded-full", info.color)}
-                    />
+                    <span className={cn("h-2 w-2 rounded-full", info.color)} />
                     {info.label}
                     {account.username && (
                       <span className="text-text-muted text-xs">

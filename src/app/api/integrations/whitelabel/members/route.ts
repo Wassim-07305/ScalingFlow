@@ -8,7 +8,9 @@ import { createClient } from "@/lib/supabase/server";
 export async function POST(req: NextRequest) {
   try {
     const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
     if (!user) {
       return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
@@ -40,8 +42,11 @@ export async function POST(req: NextRequest) {
 
     if (!targetProfile) {
       return NextResponse.json(
-        { error: "Utilisateur non trouve. Il doit d'abord créer un compte ScalingFlow." },
-        { status: 404 }
+        {
+          error:
+            "Utilisateur non trouve. Il doit d'abord créer un compte ScalingFlow.",
+        },
+        { status: 404 },
       );
     }
 
@@ -56,7 +61,7 @@ export async function POST(req: NextRequest) {
       if (error.code === "23505") {
         return NextResponse.json(
           { error: "Cet utilisateur est deja membre" },
-          { status: 409 }
+          { status: 409 },
         );
       }
       return NextResponse.json({ error: error.message }, { status: 500 });
@@ -72,7 +77,7 @@ export async function POST(req: NextRequest) {
   } catch {
     return NextResponse.json(
       { error: "Erreur lors de l'ajout du membre" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -80,7 +85,9 @@ export async function POST(req: NextRequest) {
 export async function DELETE(req: NextRequest) {
   try {
     const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
     if (!user) {
       return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
@@ -105,7 +112,7 @@ export async function DELETE(req: NextRequest) {
     if (user_id === user.id) {
       return NextResponse.json(
         { error: "Tu ne peux pas te retirer toi-meme" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -125,7 +132,7 @@ export async function DELETE(req: NextRequest) {
   } catch {
     return NextResponse.json(
       { error: "Erreur lors de la suppression" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

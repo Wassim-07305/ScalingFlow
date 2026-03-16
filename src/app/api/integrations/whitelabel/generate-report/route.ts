@@ -20,19 +20,23 @@ export async function POST(req: NextRequest) {
     if (!type || !["weekly", "monthly", "campaign"].includes(type)) {
       return NextResponse.json(
         { error: "Type de rapport invalide (weekly, monthly, campaign)" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     // Déterminer la période
     const now = new Date();
     const periodDays = type === "weekly" ? 7 : type === "monthly" ? 30 : 14;
-    const periodStart = new Date(now.getTime() - periodDays * 24 * 60 * 60 * 1000).toISOString();
+    const periodStart = new Date(
+      now.getTime() - periodDays * 24 * 60 * 60 * 1000,
+    ).toISOString();
 
     // Récupérer le branding de l'org (si whitelabel)
     const { data: orgMember } = await supabase
       .from("organization_members")
-      .select("organization_id, organizations(name, brand_name, logo_url, primary_color)")
+      .select(
+        "organization_id, organizations(name, brand_name, logo_url, primary_color)",
+      )
       .eq("user_id", user.id)
       .single();
 
@@ -46,43 +50,38 @@ export async function POST(req: NextRequest) {
     const brandName = org?.brand_name || org?.name || "ScalingFlow";
 
     // Agréger les métriques de la période
-    const [
-      revenueResult,
-      leadsResult,
-      callsResult,
-      contentResult,
-      adsResult,
-    ] = await Promise.all([
-      // Revenus
-      supabase
-        .from("revenue_entries")
-        .select("amount, source, created_at")
-        .eq("user_id", user.id)
-        .gte("created_at", periodStart),
-      // Leads
-      supabase
-        .from("leads")
-        .select("id, source, status, created_at")
-        .eq("user_id", user.id)
-        .gte("created_at", periodStart),
-      // Appels de vente
-      supabase
-        .from("sales_calls")
-        .select("id, call_result, revenue_generated, created_at")
-        .eq("user_id", user.id)
-        .gte("created_at", periodStart),
-      // Contenu généré
-      supabase
-        .from("content_library")
-        .select("id, content_type, engagement_score, created_at")
-        .eq("user_id", user.id)
-        .gte("created_at", periodStart),
-      // Ads performance
-      supabase
-        .from("ad_creatives")
-        .select("id, impressions, clicks, spend, conversions, ctr, status")
-        .eq("user_id", user.id),
-    ]);
+    const [revenueResult, leadsResult, callsResult, contentResult, adsResult] =
+      await Promise.all([
+        // Revenus
+        supabase
+          .from("revenue_entries")
+          .select("amount, source, created_at")
+          .eq("user_id", user.id)
+          .gte("created_at", periodStart),
+        // Leads
+        supabase
+          .from("leads")
+          .select("id, source, status, created_at")
+          .eq("user_id", user.id)
+          .gte("created_at", periodStart),
+        // Appels de vente
+        supabase
+          .from("sales_calls")
+          .select("id, call_result, revenue_generated, created_at")
+          .eq("user_id", user.id)
+          .gte("created_at", periodStart),
+        // Contenu généré
+        supabase
+          .from("content_library")
+          .select("id, content_type, engagement_score, created_at")
+          .eq("user_id", user.id)
+          .gte("created_at", periodStart),
+        // Ads performance
+        supabase
+          .from("ad_creatives")
+          .select("id, impressions, clicks, spend, conversions, ctr, status")
+          .eq("user_id", user.id),
+      ]);
 
     const revenues = revenueResult.data ?? [];
     const leads = leadsResult.data ?? [];
@@ -90,20 +89,38 @@ export async function POST(req: NextRequest) {
     const contents = contentResult.data ?? [];
     const ads = adsResult.data ?? [];
 
-    const totalRevenue = revenues.reduce((s, r) => s + ((r.amount as number) || 0), 0);
+    const totalRevenue = revenues.reduce(
+      (s, r) => s + ((r.amount as number) || 0),
+      0,
+    );
     const totalLeads = leads.length;
     const totalCalls = calls.length;
     const closedCalls = calls.filter((c) => c.call_result === "closing").length;
-    const callRevenue = calls.reduce((s, c) => s + ((c.revenue_generated as number) || 0), 0);
-    const conversionRate = totalCalls > 0 ? Math.round((closedCalls / totalCalls) * 100) : 0;
+    const callRevenue = calls.reduce(
+      (s, c) => s + ((c.revenue_generated as number) || 0),
+      0,
+    );
+    const conversionRate =
+      totalCalls > 0 ? Math.round((closedCalls / totalCalls) * 100) : 0;
     const totalContent = contents.length;
-    const avgEngagement = contents.length > 0
-      ? contents.reduce((s, c) => s + ((c.engagement_score as number) || 0), 0) / contents.length
-      : 0;
+    const avgEngagement =
+      contents.length > 0
+        ? contents.reduce(
+            (s, c) => s + ((c.engagement_score as number) || 0),
+            0,
+          ) / contents.length
+        : 0;
     const totalSpend = ads.reduce((s, a) => s + ((a.spend as number) || 0), 0);
-    const totalImpressions = ads.reduce((s, a) => s + ((a.impressions as number) || 0), 0);
-    const totalClicks = ads.reduce((s, a) => s + ((a.clicks as number) || 0), 0);
-    const avgCTR = totalImpressions > 0 ? (totalClicks / totalImpressions) * 100 : 0;
+    const totalImpressions = ads.reduce(
+      (s, a) => s + ((a.impressions as number) || 0),
+      0,
+    );
+    const totalClicks = ads.reduce(
+      (s, a) => s + ((a.clicks as number) || 0),
+      0,
+    );
+    const avgCTR =
+      totalImpressions > 0 ? (totalClicks / totalImpressions) * 100 : 0;
 
     const reportData = {
       period: {
@@ -136,15 +153,19 @@ export async function POST(req: NextRequest) {
       content_breakdown: {
         reels: contents.filter((c) => c.content_type === "reel").length,
         carousels: contents.filter((c) => c.content_type === "carousel").length,
-        stories: contents.filter((c) => c.content_type === "story_sequence").length,
+        stories: contents.filter((c) => c.content_type === "story_sequence")
+          .length,
         youtube: contents.filter((c) => c.content_type === "youtube").length,
         posts: contents.filter((c) => c.content_type === "post").length,
       },
-      revenue_sources: revenues.reduce((acc, r) => {
-        const source = (r.source as string) || "other";
-        acc[source] = (acc[source] || 0) + ((r.amount as number) || 0);
-        return acc;
-      }, {} as Record<string, number>),
+      revenue_sources: revenues.reduce(
+        (acc, r) => {
+          const source = (r.source as string) || "other";
+          acc[source] = (acc[source] || 0) + ((r.amount as number) || 0);
+          return acc;
+        },
+        {} as Record<string, number>,
+      ),
     };
 
     // Sauvegarder le rapport
@@ -164,7 +185,7 @@ export async function POST(req: NextRequest) {
     console.error("[whitelabel/generate-report] Error:", error);
     return NextResponse.json(
       { error: "Erreur lors de la génération du rapport" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

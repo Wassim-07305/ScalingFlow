@@ -10,17 +10,20 @@ const LOGO_TYPES = [
   {
     type: "principal",
     label: "Logo principal",
-    instruction: "Logo complet avec le nom de la marque intégré. Design typographique ou combiné (symbole + texte). Utilise les couleurs de la palette.",
+    instruction:
+      "Logo complet avec le nom de la marque intégré. Design typographique ou combiné (symbole + texte). Utilise les couleurs de la palette.",
   },
   {
     type: "icone",
     label: "Logo icône",
-    instruction: "Version icône carrée, minimaliste, sans texte. Doit fonctionner comme favicon ou icône d'app. Symbole pur, géométrique.",
+    instruction:
+      "Version icône carrée, minimaliste, sans texte. Doit fonctionner comme favicon ou icône d'app. Symbole pur, géométrique.",
   },
   {
     type: "monochrome",
     label: "Logo monochrome",
-    instruction: "Version noir et blanc uniquement (#000 sur fond transparent). Pas de couleurs. Silhouette épurée adaptée à l'impression.",
+    instruction:
+      "Version noir et blanc uniquement (#000 sur fond transparent). Pas de couleurs. Silhouette épurée adaptée à l'impression.",
   },
 ] as const;
 
@@ -35,11 +38,14 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
     }
 
-    const rl = await rateLimit(user.id, "generate-logo", { limit: 3, windowSeconds: 120 });
+    const rl = await rateLimit(user.id, "generate-logo", {
+      limit: 3,
+      windowSeconds: 120,
+    });
     if (!rl.allowed) {
       return NextResponse.json(
         { error: "Trop de requêtes. Réessaie dans 2 minutes." },
-        { status: 429 }
+        { status: 429 },
       );
     }
 
@@ -47,7 +53,7 @@ export async function POST(req: NextRequest) {
     if (!usage.allowed) {
       return NextResponse.json(
         { error: "Limite de générations IA atteinte", usage },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -62,7 +68,7 @@ export async function POST(req: NextRequest) {
     if (!brandName || !concept) {
       return NextResponse.json(
         { error: "brandName et concept sont requis" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -71,7 +77,13 @@ export async function POST(req: NextRequest) {
     for (const logoType of LOGO_TYPES) {
       try {
         const svgCode = await generateText({
-          prompt: buildSVGPrompt(brandName, concept, style, colors, logoType.instruction),
+          prompt: buildSVGPrompt(
+            brandName,
+            concept,
+            style,
+            colors,
+            logoType.instruction,
+          ),
           maxTokens: 4096,
           temperature: 0.8,
         });
@@ -82,7 +94,11 @@ export async function POST(req: NextRequest) {
 
         const svg = svgMatch[0];
         const dataUrl = `data:image/svg+xml;base64,${Buffer.from(svg).toString("base64")}`;
-        results.push({ type: logoType.type, label: logoType.label, url: dataUrl });
+        results.push({
+          type: logoType.type,
+          label: logoType.label,
+          url: dataUrl,
+        });
       } catch (err) {
         console.error(`[generate-logo] Erreur pour ${logoType.type}:`, err);
       }
@@ -91,7 +107,7 @@ export async function POST(req: NextRequest) {
     if (results.length === 0) {
       return NextResponse.json(
         { error: "La génération des logos a échoué" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -104,7 +120,7 @@ export async function POST(req: NextRequest) {
     console.error("[generate-logo] Error:", error);
     return NextResponse.json(
       { error: "Erreur lors de la génération du logo" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -114,11 +130,12 @@ function buildSVGPrompt(
   concept: string,
   style?: string,
   colors?: string[],
-  typeInstruction?: string
+  typeInstruction?: string,
 ): string {
-  const colorInfo = colors && colors.length > 0
-    ? `Palette de couleurs à utiliser : ${colors.join(", ")}.`
-    : "Utilise des couleurs modernes et professionnelles.";
+  const colorInfo =
+    colors && colors.length > 0
+      ? `Palette de couleurs à utiliser : ${colors.join(", ")}.`
+      : "Utilise des couleurs modernes et professionnelles.";
 
   return `Tu es un designer de logos expert. Génère un logo SVG professionnel.
 

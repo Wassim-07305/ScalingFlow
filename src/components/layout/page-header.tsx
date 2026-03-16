@@ -8,7 +8,13 @@ interface PageHeaderProps {
   badge?: string;
 }
 
-export function PageHeader({ title, description, children, actions, badge }: PageHeaderProps) {
+export function PageHeader({
+  title,
+  description,
+  children,
+  actions,
+  badge,
+}: PageHeaderProps) {
   const rightContent = children || actions;
   return (
     <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between mb-6 sm:mb-8">

@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
     if (!apiKey || apiKey.length < 10) {
       return NextResponse.json(
         { error: "Missing or invalid x-api-key header" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -28,10 +28,7 @@ export async function POST(req: NextRequest) {
       .single();
 
     if (!profile) {
-      return NextResponse.json(
-        { error: "Invalid API key" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Invalid API key" }, { status: 401 });
     }
 
     const body = await req.json();
@@ -39,7 +36,7 @@ export async function POST(req: NextRequest) {
     if (!body.email && !body.phone) {
       return NextResponse.json(
         { error: "email or phone is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -66,7 +63,7 @@ export async function POST(req: NextRequest) {
       profile.id,
       "Lead",
       { email: body.email, phone: body.phone },
-      body.value ? { value: Number(body.value), currency: "EUR" } : undefined
+      body.value ? { value: Number(body.value), currency: "EUR" } : undefined,
     ).catch(() => {});
 
     return NextResponse.json({
@@ -77,7 +74,7 @@ export async function POST(req: NextRequest) {
     console.error("Webhook error:", error);
     return NextResponse.json(
       { error: "Erreur interne du webhook" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

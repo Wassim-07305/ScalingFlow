@@ -10,7 +10,7 @@ export interface SalesLetterResult {
 
 export function salesLetterPrompt(
   offer: Record<string, unknown>,
-  avatar: Record<string, unknown>
+  avatar: Record<string, unknown>,
 ): string {
   return `Tu es un expert en copywriting et en rédaction de sales letters longues (long-form sales letters) pour les freelances et consultants spécialisés en IA et automatisation.
 

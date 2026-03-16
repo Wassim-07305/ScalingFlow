@@ -9,7 +9,9 @@ export const maxDuration = 60;
 export async function POST(req: NextRequest) {
   try {
     const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
     if (!user) {
       return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
@@ -27,7 +29,7 @@ export async function POST(req: NextRequest) {
     if (!transcript || transcript.trim().length < 50) {
       return NextResponse.json(
         { error: "Le transcript doit contenir au moins 50 caractères" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -73,14 +75,18 @@ export async function POST(req: NextRequest) {
       status: "draft",
     });
 
-    try { await awardXP(user.id, "generation.ads"); } catch { /* ignore XP errors */ }
+    try {
+      await awardXP(user.id, "generation.ads");
+    } catch {
+      /* ignore XP errors */
+    }
 
     return NextResponse.json(result);
   } catch (error) {
     console.error("Call analysis error:", error);
     return NextResponse.json(
       { error: "Erreur lors de l'analyse" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -48,7 +48,7 @@ const SITUATION_LABELS: Record<string, string> = {
 import { PARCOURS } from "@/lib/parcours";
 
 const PARCOURS_LABELS: Record<string, string> = Object.fromEntries(
-  Object.entries(PARCOURS).map(([key, def]) => [key, def.label])
+  Object.entries(PARCOURS).map(([key, def]) => [key, def.label]),
 );
 
 export function OnboardingSummary({ data }: OnboardingSummaryProps) {
@@ -66,7 +66,10 @@ export function OnboardingSummary({ data }: OnboardingSummaryProps) {
           label="Situation"
           value={SITUATION_LABELS[String(data.situation || "")] || ""}
         />
-        <Row label="Parcours" value={PARCOURS_LABELS[String(data.parcours || "")] || ""} />
+        <Row
+          label="Parcours"
+          value={PARCOURS_LABELS[String(data.parcours || "")] || ""}
+        />
       </Section>
 
       {/* Objectifs */}

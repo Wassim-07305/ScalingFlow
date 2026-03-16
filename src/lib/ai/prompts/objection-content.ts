@@ -17,7 +17,11 @@ export interface ObjectionContentPiece {
   };
   carousel: {
     hook_cover: string;
-    slides: { numero: number; texte_principal: string; texte_secondaire: string }[];
+    slides: {
+      numero: number;
+      texte_principal: string;
+      texte_secondaire: string;
+    }[];
     cta_final: string;
     caption: string;
     hashtags: string[];

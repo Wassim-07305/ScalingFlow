@@ -17,4 +17,5 @@ export function AnimatedBackground() {
 }
 
 /** Rivia-style gradient background class for onboarding screens */
-export const onboardingBg = "bg-gradient-to-br from-slate-950 via-emerald-950 to-slate-900";
+export const onboardingBg =
+  "bg-gradient-to-br from-slate-950 via-emerald-950 to-slate-900";

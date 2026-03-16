@@ -1,7 +1,13 @@
 "use client";
 
 import React from "react";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -83,7 +89,7 @@ export function AcquisitionStrategy() {
     setSelectedChannels((prev) =>
       prev.includes(channelId)
         ? prev.filter((c) => c !== channelId)
-        : [...prev, channelId]
+        : [...prev, channelId],
     );
   };
 
@@ -126,7 +132,11 @@ export function AcquisitionStrategy() {
             summary: parsed,
             channel_allocations: [],
             weekly_plan: [],
-            cost_breakdown: { total_monthly: "-", per_lead_estimate: "-", roi_estimate: "-" },
+            cost_breakdown: {
+              total_monthly: "-",
+              per_lead_estimate: "-",
+              roi_estimate: "-",
+            },
             tips: [],
             expected_results: { month_1: "-", month_3: "-", month_6: "-" },
           });
@@ -142,7 +152,8 @@ export function AcquisitionStrategy() {
   };
 
   const copyAll = () => {
-    const text = typeof result === "string" ? result : JSON.stringify(result, null, 2);
+    const text =
+      typeof result === "string" ? result : JSON.stringify(result, null, 2);
     navigator.clipboard.writeText(text);
     setCopied(true);
     toast.success("Copié dans le presse-papiers");
@@ -176,7 +187,12 @@ export function AcquisitionStrategy() {
               <FileDown className="h-4 w-4 mr-1" />
               PDF
             </Button>
-            <Button variant="outline" size="sm" onClick={copyAll} className="transition-all hover:border-accent/40 hover:shadow-sm">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={copyAll}
+              className="transition-all hover:border-accent/40 hover:shadow-sm"
+            >
               <Copy className="h-4 w-4 mr-1" />
               {copied ? "Copié !" : "Copier tout"}
             </Button>
@@ -186,47 +202,64 @@ export function AcquisitionStrategy() {
         {/* Résumé */}
         {result.summary && (
           <GlowCard glowColor="cyan">
-            <p className="text-sm text-text-secondary leading-relaxed">{result.summary}</p>
+            <p className="text-sm text-text-secondary leading-relaxed">
+              {result.summary}
+            </p>
           </GlowCard>
         )}
 
         {/* Allocation des canaux */}
-        {result.channel_allocations && result.channel_allocations.length > 0 && (
-          <Card className="border-border-default/50 bg-bg-secondary/30 backdrop-blur-sm">
-            <CardHeader className="py-3">
-              <CardTitle className="text-sm flex items-center gap-2">
-                <BarChart3 className="h-4 w-4 text-accent" />
-                Allocation des canaux
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pt-0 space-y-4">
-              {result.channel_allocations.map((ch, i) => (
-                <div key={i} className="space-y-2 p-3 rounded-xl bg-bg-tertiary/30 border border-border-default/30 hover:border-border-hover/50 transition-all">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2.5">
-                      <Badge variant={i === 0 ? "default" : "muted"} className="text-xs font-bold">
-                        #{ch.priority}
-                      </Badge>
-                      <span className="text-sm font-medium text-text-primary">{ch.channel}</span>
+        {result.channel_allocations &&
+          result.channel_allocations.length > 0 && (
+            <Card className="border-border-default/50 bg-bg-secondary/30 backdrop-blur-sm">
+              <CardHeader className="py-3">
+                <CardTitle className="text-sm flex items-center gap-2">
+                  <BarChart3 className="h-4 w-4 text-accent" />
+                  Allocation des canaux
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-0 space-y-4">
+                {result.channel_allocations.map((ch, i) => (
+                  <div
+                    key={i}
+                    className="space-y-2 p-3 rounded-xl bg-bg-tertiary/30 border border-border-default/30 hover:border-border-hover/50 transition-all"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2.5">
+                        <Badge
+                          variant={i === 0 ? "default" : "muted"}
+                          className="text-xs font-bold"
+                        >
+                          #{ch.priority}
+                        </Badge>
+                        <span className="text-sm font-medium text-text-primary">
+                          {ch.channel}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-3 text-xs text-text-muted">
+                        <span className="hidden sm:inline">
+                          {ch.actions_per_week}/sem
+                        </span>
+                        <span>{ch.estimated_leads} leads/mois</span>
+                        <span className="hidden sm:inline">
+                          {ch.cost_estimate}
+                        </span>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-3 text-xs text-text-muted">
-                      <span className="hidden sm:inline">{ch.actions_per_week}/sem</span>
-                      <span>{ch.estimated_leads} leads/mois</span>
-                      <span className="hidden sm:inline">{ch.cost_estimate}</span>
+                    <div className="h-2.5 bg-bg-tertiary rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-gradient-to-r from-accent to-accent/70 rounded-full transition-all duration-700 ease-out"
+                        style={{ width: `${Math.min(ch.percentage, 100)}%` }}
+                      />
                     </div>
+                    <p className="text-xs text-text-muted text-right font-medium">
+                      {ch.percentage}%
+                    </p>
                   </div>
-                  <div className="h-2.5 bg-bg-tertiary rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-gradient-to-r from-accent to-accent/70 rounded-full transition-all duration-700 ease-out"
-                      style={{ width: `${Math.min(ch.percentage, 100)}%` }}
-                    />
-                  </div>
-                  <p className="text-xs text-text-muted text-right font-medium">{ch.percentage}%</p>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-        )}
+                ))}
+              </CardContent>
+            </Card>
+          )}
 
         {/* Plan d'action hebdo */}
         {result.weekly_plan && result.weekly_plan.length > 0 && (
@@ -244,14 +277,21 @@ export function AcquisitionStrategy() {
                     key={i}
                     className="flex items-center gap-3 p-3 rounded-xl bg-bg-tertiary/30 border border-border-default/30 hover:border-accent/20 transition-all duration-200"
                   >
-                    <Badge variant="muted" className="text-xs min-w-[70px] justify-center font-medium">
+                    <Badge
+                      variant="muted"
+                      className="text-xs min-w-[70px] justify-center font-medium"
+                    >
                       {action.day}
                     </Badge>
                     <Badge variant="cyan" className="text-xs">
                       {action.channel}
                     </Badge>
-                    <span className="text-sm text-text-secondary flex-1">{action.action}</span>
-                    <span className="text-xs text-text-muted shrink-0">{action.duration}</span>
+                    <span className="text-sm text-text-secondary flex-1">
+                      {action.action}
+                    </span>
+                    <span className="text-xs text-text-muted shrink-0">
+                      {action.duration}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -267,8 +307,12 @@ export function AcquisitionStrategy() {
                 <div className="inline-flex items-center justify-center h-10 w-10 rounded-xl bg-accent/10 mb-3 group-hover:bg-accent/15 transition-colors">
                   <DollarSign className="h-5 w-5 text-accent" />
                 </div>
-                <p className="text-xs text-text-muted uppercase tracking-wider">Budget mensuel</p>
-                <p className="text-xl font-bold text-text-primary mt-1">{result.cost_breakdown.total_monthly}</p>
+                <p className="text-xs text-text-muted uppercase tracking-wider">
+                  Budget mensuel
+                </p>
+                <p className="text-xl font-bold text-text-primary mt-1">
+                  {result.cost_breakdown.total_monthly}
+                </p>
               </CardContent>
             </Card>
             <Card className="group hover:border-accent/20 transition-all duration-300 hover:shadow-lg hover:shadow-accent/5">
@@ -276,8 +320,12 @@ export function AcquisitionStrategy() {
                 <div className="inline-flex items-center justify-center h-10 w-10 rounded-xl bg-accent/10 mb-3 group-hover:bg-accent/15 transition-colors">
                   <Target className="h-5 w-5 text-accent" />
                 </div>
-                <p className="text-xs text-text-muted uppercase tracking-wider">Coût par lead</p>
-                <p className="text-xl font-bold text-text-primary mt-1">{result.cost_breakdown.per_lead_estimate}</p>
+                <p className="text-xs text-text-muted uppercase tracking-wider">
+                  Coût par lead
+                </p>
+                <p className="text-xl font-bold text-text-primary mt-1">
+                  {result.cost_breakdown.per_lead_estimate}
+                </p>
               </CardContent>
             </Card>
             <Card className="group hover:border-accent/20 transition-all duration-300 hover:shadow-lg hover:shadow-accent/5">
@@ -285,8 +333,12 @@ export function AcquisitionStrategy() {
                 <div className="inline-flex items-center justify-center h-10 w-10 rounded-xl bg-accent/10 mb-3 group-hover:bg-accent/15 transition-colors">
                   <TrendingUp className="h-5 w-5 text-accent" />
                 </div>
-                <p className="text-xs text-text-muted uppercase tracking-wider">ROI estimé</p>
-                <p className="text-xl font-bold text-text-primary mt-1">{result.cost_breakdown.roi_estimate}</p>
+                <p className="text-xs text-text-muted uppercase tracking-wider">
+                  ROI estimé
+                </p>
+                <p className="text-xl font-bold text-text-primary mt-1">
+                  {result.cost_breakdown.roi_estimate}
+                </p>
               </CardContent>
             </Card>
           </div>
@@ -304,13 +356,35 @@ export function AcquisitionStrategy() {
             <CardContent className="pt-0">
               <div className="grid gap-3 md:grid-cols-3">
                 {[
-                  { label: "Mois 1", value: result.expected_results.month_1, opacity: "opacity-70" },
-                  { label: "Mois 3", value: result.expected_results.month_3, opacity: "opacity-85" },
-                  { label: "Mois 6", value: result.expected_results.month_6, opacity: "" },
+                  {
+                    label: "Mois 1",
+                    value: result.expected_results.month_1,
+                    opacity: "opacity-70",
+                  },
+                  {
+                    label: "Mois 3",
+                    value: result.expected_results.month_3,
+                    opacity: "opacity-85",
+                  },
+                  {
+                    label: "Mois 6",
+                    value: result.expected_results.month_6,
+                    opacity: "",
+                  },
                 ].map((period) => (
-                  <div key={period.label} className={cn("p-4 rounded-xl bg-bg-tertiary/50 border border-border-default/30 hover:border-accent/20 transition-all", period.opacity)}>
-                    <p className="text-xs text-text-muted uppercase tracking-wider mb-1.5">{period.label}</p>
-                    <p className="text-sm text-text-secondary leading-relaxed">{period.value}</p>
+                  <div
+                    key={period.label}
+                    className={cn(
+                      "p-4 rounded-xl bg-bg-tertiary/50 border border-border-default/30 hover:border-accent/20 transition-all",
+                      period.opacity,
+                    )}
+                  >
+                    <p className="text-xs text-text-muted uppercase tracking-wider mb-1.5">
+                      {period.label}
+                    </p>
+                    <p className="text-sm text-text-secondary leading-relaxed">
+                      {period.value}
+                    </p>
                   </div>
                 ))}
               </div>
@@ -330,8 +404,13 @@ export function AcquisitionStrategy() {
             <CardContent className="pt-0">
               <ul className="space-y-2">
                 {result.tips.map((tip, i) => (
-                  <li key={i} className="text-xs text-text-secondary flex items-start gap-2.5">
-                    <span className="text-accent mt-0.5 shrink-0">{"\u2192"}</span>
+                  <li
+                    key={i}
+                    className="text-xs text-text-secondary flex items-start gap-2.5"
+                  >
+                    <span className="text-accent mt-0.5 shrink-0">
+                      {"\u2192"}
+                    </span>
                     <span className="leading-relaxed">{tip}</span>
                   </li>
                 ))}
@@ -340,7 +419,11 @@ export function AcquisitionStrategy() {
           </Card>
         )}
 
-        <Button variant="outline" onClick={() => setResult(null)} className="transition-all hover:border-accent/40">
+        <Button
+          variant="outline"
+          onClick={() => setResult(null)}
+          className="transition-all hover:border-accent/40"
+        >
           <Sparkles className="h-4 w-4 mr-2" />
           Régénérer une stratégie
         </Button>
@@ -359,7 +442,8 @@ export function AcquisitionStrategy() {
           Stratégie d&apos;Acquisition
         </h3>
         <p className="text-sm text-text-secondary max-w-md mx-auto leading-relaxed">
-          L&apos;IA va créer une stratégie d&apos;acquisition personnalisée avec allocation des canaux, plan d&apos;action et estimations.
+          L&apos;IA va créer une stratégie d&apos;acquisition personnalisée avec
+          allocation des canaux, plan d&apos;action et estimations.
         </p>
       </div>
 
@@ -413,14 +497,16 @@ export function AcquisitionStrategy() {
                     "flex items-center gap-2.5 p-3.5 rounded-xl border cursor-pointer transition-all duration-200",
                     selectedChannels.includes(channel.id)
                       ? "border-accent bg-accent/10 shadow-sm shadow-accent/10"
-                      : "border-border-default bg-bg-tertiary hover:border-border-hover"
+                      : "border-border-default bg-bg-tertiary hover:border-border-hover",
                   )}
                 >
                   <Checkbox
                     checked={selectedChannels.includes(channel.id)}
                     onCheckedChange={() => toggleChannel(channel.id)}
                   />
-                  <span className="text-sm text-text-primary">{channel.label}</span>
+                  <span className="text-sm text-text-primary">
+                    {channel.label}
+                  </span>
                 </label>
               ))}
             </div>

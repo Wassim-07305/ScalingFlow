@@ -105,13 +105,21 @@ export function recommendParcours(data: {
   {
     let score = 0;
     let reason = "";
-    if (situation === "zero" || situation === "etudiant" || situation === "sans_emploi") {
+    if (
+      situation === "zero" ||
+      situation === "etudiant" ||
+      situation === "sans_emploi"
+    ) {
       score += 60;
       reason = "Tu pars de zéro — ce parcours est fait pour toi.";
     }
     if (level === "beginner") score += 20;
     if (revenue === 0) score += 20;
-    scores.push({ id: "A1", score, reason: reason || "Tu débutes, ce parcours peut t'aider." });
+    scores.push({
+      id: "A1",
+      score,
+      reason: reason || "Tu débutes, ce parcours peut t'aider.",
+    });
   }
 
   // A2 — Reconversion (salarie or reconversion)
@@ -125,7 +133,11 @@ export function recommendParcours(data: {
     if (level === "beginner" || level === "intermediate") score += 15;
     if (revenue === 0) score += 15;
     if (objectives.some((o) => o.toLowerCase().includes("niche"))) score += 10;
-    scores.push({ id: "A2", score, reason: reason || "Parcours reconversion." });
+    scores.push({
+      id: "A2",
+      score,
+      reason: reason || "Parcours reconversion.",
+    });
   }
 
   // A3 — Freelance
@@ -165,9 +177,16 @@ export function recommendParcours(data: {
     if (situation === "entrepreneur" && revenue > 0) {
       score += 30;
     }
-    if (objectives.some((o) => o.toLowerCase().includes("niche") || o.toLowerCase().includes("pivot"))) {
+    if (
+      objectives.some(
+        (o) =>
+          o.toLowerCase().includes("niche") ||
+          o.toLowerCase().includes("pivot"),
+      )
+    ) {
       score += 40;
-      reason = "Tes objectifs suggèrent un repositionnement — ce parcours est adapté.";
+      reason =
+        "Tes objectifs suggèrent un repositionnement — ce parcours est adapté.";
     }
     if (level === "intermediate" || level === "advanced") score += 15;
     if (hasClients) score += 10;

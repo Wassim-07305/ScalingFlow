@@ -8,7 +8,17 @@ import { Button } from "@/components/ui/button";
 import { ViabilityScore } from "@/components/onboarding/viability-score";
 import { cn } from "@/lib/utils/cn";
 import type { MarketAnalysisResult } from "@/types/ai";
-import { Target, Users, TrendingUp, Check, ChevronDown, ChevronUp, DollarSign, BarChart3, Loader2 } from "lucide-react";
+import {
+  Target,
+  Users,
+  TrendingUp,
+  Check,
+  ChevronDown,
+  ChevronUp,
+  DollarSign,
+  BarChart3,
+  Loader2,
+} from "lucide-react";
 
 interface MarketAnalysisProps {
   result: MarketAnalysisResult;
@@ -17,7 +27,7 @@ interface MarketAnalysisProps {
 
 export function MarketAnalysis({ result, onSelect }: MarketAnalysisProps) {
   const [expandedIndex, setExpandedIndex] = useState<number | null>(
-    result.recommended_market_index
+    result.recommended_market_index,
   );
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [validating, setValidating] = useState(false);
@@ -68,14 +78,17 @@ export function MarketAnalysis({ result, onSelect }: MarketAnalysisProps) {
                 className={cn(
                   "cursor-pointer transition-all duration-300",
                   isSelected && "border-accent",
-                  isRecommended && !isSelected && "border-accent/50"
+                  isRecommended && !isSelected && "border-accent/50",
                 )}
                 onClick={() => setExpandedIndex(isExpanded ? null : index)}
               >
                 <CardHeader className="pb-2">
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
-                      <ViabilityScore score={market.viability_score} size="sm" />
+                      <ViabilityScore
+                        score={market.viability_score}
+                        size="sm"
+                      />
                       <div>
                         <CardTitle className="flex items-center gap-2">
                           {market.name}
@@ -143,15 +156,37 @@ export function MarketAnalysis({ result, onSelect }: MarketAnalysisProps) {
                         </h4>
                         <div className="grid grid-cols-3 gap-2">
                           {[
-                            { label: "Attractivité", value: market.scoring_composite.attractivite, color: "bg-blue-500" },
-                            { label: "Concurrence", value: market.scoring_composite.concurrence, color: "bg-amber-500" },
-                            { label: "Potentiel", value: market.scoring_composite.potentiel, color: "bg-emerald-500" },
+                            {
+                              label: "Attractivité",
+                              value: market.scoring_composite.attractivite,
+                              color: "bg-blue-500",
+                            },
+                            {
+                              label: "Concurrence",
+                              value: market.scoring_composite.concurrence,
+                              color: "bg-amber-500",
+                            },
+                            {
+                              label: "Potentiel",
+                              value: market.scoring_composite.potentiel,
+                              color: "bg-emerald-500",
+                            },
                           ].map((s) => (
-                            <div key={s.label} className="text-center p-2 rounded-lg bg-bg-tertiary">
-                              <p className="text-xs text-text-muted mb-1">{s.label}</p>
-                              <p className="text-lg font-bold text-text-primary">{s.value}</p>
+                            <div
+                              key={s.label}
+                              className="text-center p-2 rounded-lg bg-bg-tertiary"
+                            >
+                              <p className="text-xs text-text-muted mb-1">
+                                {s.label}
+                              </p>
+                              <p className="text-lg font-bold text-text-primary">
+                                {s.value}
+                              </p>
                               <div className="h-1.5 bg-bg-primary rounded-full mt-1 overflow-hidden">
-                                <div className={cn("h-full rounded-full", s.color)} style={{ width: `${s.value}%` }} />
+                                <div
+                                  className={cn("h-full rounded-full", s.color)}
+                                  style={{ width: `${s.value}%` }}
+                                />
                               </div>
                             </div>
                           ))}
@@ -164,8 +199,12 @@ export function MarketAnalysis({ result, onSelect }: MarketAnalysisProps) {
                       <div className="flex items-center gap-2 p-3 rounded-lg bg-accent/5 border border-accent/20">
                         <DollarSign className="h-4 w-4 text-accent shrink-0" />
                         <div>
-                          <p className="text-xs text-text-muted">Budget client potentiel</p>
-                          <p className="text-sm font-semibold text-text-primary">{market.estimated_client_budget}</p>
+                          <p className="text-xs text-text-muted">
+                            Budget client potentiel
+                          </p>
+                          <p className="text-sm font-semibold text-text-primary">
+                            {market.estimated_client_budget}
+                          </p>
                         </div>
                       </div>
                     )}
@@ -188,7 +227,9 @@ export function MarketAnalysis({ result, onSelect }: MarketAnalysisProps) {
                     {/* Why good fit */}
                     <div className="rounded-[8px] bg-bg-tertiary p-3">
                       <p className="text-sm text-text-secondary">
-                        <span className="text-accent font-semibold">Pourquoi ce marché : </span>
+                        <span className="text-accent font-semibold">
+                          Pourquoi ce marché :{" "}
+                        </span>
                         {market.why_good_fit}
                       </p>
                     </div>

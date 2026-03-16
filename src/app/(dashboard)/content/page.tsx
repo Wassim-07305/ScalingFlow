@@ -62,7 +62,11 @@ const TABS = [
   { key: "instagram", label: "Instagram", icon: Instagram },
   { key: "editorial", label: "Plan Éditorial", icon: CalendarDays },
   { key: "batch_hebdo", label: "Batch Hebdo", icon: Zap },
-  { key: "objections_contenu", label: "Objections → Contenu", icon: MessageSquareWarning },
+  {
+    key: "objections_contenu",
+    label: "Objections → Contenu",
+    icon: MessageSquareWarning,
+  },
   { key: "content_spy", label: "Content Spy", icon: Search },
   { key: "publication", label: "Publication", icon: Share2 },
   { key: "instagram_stats", label: "Stats Instagram", icon: BarChart3 },
@@ -105,27 +109,125 @@ export default function ContentPage() {
 
       <TabBar tabs={TABS} activeTab={activeTab} onTabChange={setActiveTab} />
 
-      {activeTab === "strategy" && <div role="tabpanel" id="tabpanel-strategy" aria-labelledby="tab-strategy"><StrategyOverview initialData={loadedData.strategy} /></div>}
-      {activeTab === "reels" && <div role="tabpanel" id="tabpanel-reels" aria-labelledby="tab-reels"><ReelsGenerator initialData={loadedData.reels} /></div>}
-      {activeTab === "youtube" && <div role="tabpanel" id="tabpanel-youtube" aria-labelledby="tab-youtube"><YouTubeGenerator initialData={loadedData.youtube} /></div>}
-      {activeTab === "stories" && <div role="tabpanel" id="tabpanel-stories" aria-labelledby="tab-stories"><StoriesGenerator initialData={loadedData.stories} /></div>}
-      {activeTab === "carousels" && <div role="tabpanel" id="tabpanel-carousels" aria-labelledby="tab-carousels"><CarouselGenerator initialData={loadedData.carousels} /></div>}
-      {activeTab === "instagram" && <div role="tabpanel" id="tabpanel-instagram" aria-labelledby="tab-instagram"><InstagramOptimizer initialData={loadedData.instagram} /></div>}
-      {activeTab === "editorial" && <div role="tabpanel" id="tabpanel-editorial" aria-labelledby="tab-editorial"><EditorialCalendar initialData={loadedData.editorial} /></div>}
-      {activeTab === "batch_hebdo" && <div role="tabpanel" id="tabpanel-batch_hebdo" aria-labelledby="tab-batch_hebdo"><WeeklyContentBatch /></div>}
-      {activeTab === "objections_contenu" && <div role="tabpanel" id="tabpanel-objections_contenu" aria-labelledby="tab-objections_contenu"><ObjectionContent /></div>}
-      {activeTab === "content_spy" && <div role="tabpanel" id="tabpanel-content_spy" aria-labelledby="tab-content_spy"><ContentSpy /></div>}
-      {activeTab === "publication" && <div role="tabpanel" id="tabpanel-publication" aria-labelledby="tab-publication"><SocialPublisher /></div>}
-      {activeTab === "instagram_stats" && <div role="tabpanel" id="tabpanel-instagram_stats" aria-labelledby="tab-instagram_stats"><InstagramStats /></div>}
-      {activeTab === "history" && (<div role="tabpanel" id="tabpanel-history" aria-labelledby="tab-history">
-        <GenerationHistory
-          table="content_pieces"
-          titleField="title"
-          subtitleField="content_type"
-          emptyMessage="Aucun contenu généré pour le moment."
-          onSelect={handleHistorySelect}
-        />
-      </div>)}
+      {activeTab === "strategy" && (
+        <div
+          role="tabpanel"
+          id="tabpanel-strategy"
+          aria-labelledby="tab-strategy"
+        >
+          <StrategyOverview initialData={loadedData.strategy} />
+        </div>
+      )}
+      {activeTab === "reels" && (
+        <div role="tabpanel" id="tabpanel-reels" aria-labelledby="tab-reels">
+          <ReelsGenerator initialData={loadedData.reels} />
+        </div>
+      )}
+      {activeTab === "youtube" && (
+        <div
+          role="tabpanel"
+          id="tabpanel-youtube"
+          aria-labelledby="tab-youtube"
+        >
+          <YouTubeGenerator initialData={loadedData.youtube} />
+        </div>
+      )}
+      {activeTab === "stories" && (
+        <div
+          role="tabpanel"
+          id="tabpanel-stories"
+          aria-labelledby="tab-stories"
+        >
+          <StoriesGenerator initialData={loadedData.stories} />
+        </div>
+      )}
+      {activeTab === "carousels" && (
+        <div
+          role="tabpanel"
+          id="tabpanel-carousels"
+          aria-labelledby="tab-carousels"
+        >
+          <CarouselGenerator initialData={loadedData.carousels} />
+        </div>
+      )}
+      {activeTab === "instagram" && (
+        <div
+          role="tabpanel"
+          id="tabpanel-instagram"
+          aria-labelledby="tab-instagram"
+        >
+          <InstagramOptimizer initialData={loadedData.instagram} />
+        </div>
+      )}
+      {activeTab === "editorial" && (
+        <div
+          role="tabpanel"
+          id="tabpanel-editorial"
+          aria-labelledby="tab-editorial"
+        >
+          <EditorialCalendar initialData={loadedData.editorial} />
+        </div>
+      )}
+      {activeTab === "batch_hebdo" && (
+        <div
+          role="tabpanel"
+          id="tabpanel-batch_hebdo"
+          aria-labelledby="tab-batch_hebdo"
+        >
+          <WeeklyContentBatch />
+        </div>
+      )}
+      {activeTab === "objections_contenu" && (
+        <div
+          role="tabpanel"
+          id="tabpanel-objections_contenu"
+          aria-labelledby="tab-objections_contenu"
+        >
+          <ObjectionContent />
+        </div>
+      )}
+      {activeTab === "content_spy" && (
+        <div
+          role="tabpanel"
+          id="tabpanel-content_spy"
+          aria-labelledby="tab-content_spy"
+        >
+          <ContentSpy />
+        </div>
+      )}
+      {activeTab === "publication" && (
+        <div
+          role="tabpanel"
+          id="tabpanel-publication"
+          aria-labelledby="tab-publication"
+        >
+          <SocialPublisher />
+        </div>
+      )}
+      {activeTab === "instagram_stats" && (
+        <div
+          role="tabpanel"
+          id="tabpanel-instagram_stats"
+          aria-labelledby="tab-instagram_stats"
+        >
+          <InstagramStats />
+        </div>
+      )}
+      {activeTab === "history" && (
+        <div
+          role="tabpanel"
+          id="tabpanel-history"
+          aria-labelledby="tab-history"
+        >
+          <GenerationHistory
+            table="content_pieces"
+            titleField="title"
+            subtitleField="content_type"
+            emptyMessage="Aucun contenu généré pour le moment."
+            onSelect={handleHistorySelect}
+          />
+        </div>
+      )}
     </div>
   );
 }

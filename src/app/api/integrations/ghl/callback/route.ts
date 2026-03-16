@@ -13,34 +13,45 @@ export async function GET(req: NextRequest) {
     const state = req.nextUrl.searchParams.get("state");
 
     if (!code || !state) {
-      return NextResponse.redirect(`${appUrl}/settings?error=ghl_missing_params`);
+      return NextResponse.redirect(
+        `${appUrl}/settings?error=ghl_missing_params`,
+      );
     }
 
     // SECURITY: Verify HMAC-signed state to prevent CSRF
     const stateUserId = verifyOAuthState(state);
     if (!stateUserId) {
-      return NextResponse.redirect(`${appUrl}/settings?error=ghl_invalid_state`);
+      return NextResponse.redirect(
+        `${appUrl}/settings?error=ghl_invalid_state`,
+      );
     }
 
     const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
     if (!user || user.id !== stateUserId) {
-      return NextResponse.redirect(`${appUrl}/settings?error=ghl_auth_mismatch`);
+      return NextResponse.redirect(
+        `${appUrl}/settings?error=ghl_auth_mismatch`,
+      );
     }
 
     // Exchange code for tokens
-    const tokenRes = await fetch("https://services.leadconnectorhq.com/oauth/token", {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: new URLSearchParams({
-        client_id: process.env.GHL_CLIENT_ID!,
-        client_secret: process.env.GHL_CLIENT_SECRET!,
-        grant_type: "authorization_code",
-        code,
-        redirect_uri: `${appUrl}/api/integrations/ghl/callback`,
-      }),
-    });
+    const tokenRes = await fetch(
+      "https://services.leadconnectorhq.com/oauth/token",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({
+          client_id: process.env.GHL_CLIENT_ID!,
+          client_secret: process.env.GHL_CLIENT_SECRET!,
+          grant_type: "authorization_code",
+          code,
+          redirect_uri: `${appUrl}/api/integrations/ghl/callback`,
+        }),
+      },
+    );
 
     const tokenData = await tokenRes.json();
 
@@ -55,8 +66,11 @@ export async function GET(req: NextRequest) {
         provider: "ghl",
         access_token: tokenData.access_token,
         refresh_token: tokenData.refresh_token,
-        token_expires_at: new Date(Date.now() + (tokenData.expires_in || 86400) * 1000).toISOString(),
-        provider_account_id: tokenData.locationId || tokenData.companyId || null,
+        token_expires_at: new Date(
+          Date.now() + (tokenData.expires_in || 86400) * 1000,
+        ).toISOString(),
+        provider_account_id:
+          tokenData.locationId || tokenData.companyId || null,
         provider_user_id: tokenData.userId || null,
         scopes: tokenData.scope?.split(" ") || [],
         metadata: {
@@ -65,7 +79,7 @@ export async function GET(req: NextRequest) {
           userType: tokenData.userType,
         },
       },
-      { onConflict: "user_id,provider" }
+      { onConflict: "user_id,provider" },
     );
 
     return NextResponse.redirect(`${appUrl}/settings?success=ghl_connected`);

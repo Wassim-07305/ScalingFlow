@@ -7,7 +7,9 @@ import { createClient } from "@/lib/supabase/server";
 export async function GET() {
   try {
     const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
     if (!user) {
       return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
@@ -21,7 +23,10 @@ export async function GET() {
       .single();
 
     if (!membership) {
-      return NextResponse.json({ error: "Pas membre d'une organisation" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Pas membre d'une organisation" },
+        { status: 404 },
+      );
     }
 
     // Get org info
@@ -32,7 +37,10 @@ export async function GET() {
       .single();
 
     if (!org) {
-      return NextResponse.json({ error: "Organisation introuvable" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Organisation introuvable" },
+        { status: 404 },
+      );
     }
 
     // Get owner's data to share with members
@@ -41,7 +49,9 @@ export async function GET() {
     // Fetch published funnels
     const { data: funnels } = await supabase
       .from("funnels")
-      .select("id, funnel_name, status, total_visits, total_optins, conversion_rate, created_at")
+      .select(
+        "id, funnel_name, status, total_visits, total_optins, conversion_rate, created_at",
+      )
       .eq("user_id", ownerId)
       .in("status", ["published", "active"])
       .order("created_at", { ascending: false })
@@ -70,7 +80,9 @@ export async function GET() {
     // Fetch active ad campaigns
     const { data: campaigns } = await supabase
       .from("ad_campaigns")
-      .select("id, campaign_name, status, total_spend, total_clicks, total_conversions, roas, created_at")
+      .select(
+        "id, campaign_name, status, total_spend, total_clicks, total_conversions, roas, created_at",
+      )
       .eq("user_id", ownerId)
       .in("status", ["active", "paused"])
       .order("created_at", { ascending: false })
@@ -97,8 +109,10 @@ export async function GET() {
     // Aggregate metrics for summary
     const totalSpend = metrics?.reduce((s, m) => s + (m.spend || 0), 0) || 0;
     const totalLeads = metrics?.reduce((s, m) => s + (m.leads || 0), 0) || 0;
-    const totalRevenue = metrics?.reduce((s, m) => s + (m.revenue || 0), 0) || 0;
-    const totalClients = metrics?.reduce((s, m) => s + (m.clients || 0), 0) || 0;
+    const totalRevenue =
+      metrics?.reduce((s, m) => s + (m.revenue || 0), 0) || 0;
+    const totalClients =
+      metrics?.reduce((s, m) => s + (m.clients || 0), 0) || 0;
 
     return NextResponse.json({
       organization: {
@@ -113,9 +127,11 @@ export async function GET() {
         total_leads: totalLeads,
         total_revenue: totalRevenue,
         total_clients: totalClients,
-        active_funnels: funnels?.filter((f) => f.status === "published").length || 0,
+        active_funnels:
+          funnels?.filter((f) => f.status === "published").length || 0,
         total_assets: assets?.length || 0,
-        active_campaigns: campaigns?.filter((c) => c.status === "active").length || 0,
+        active_campaigns:
+          campaigns?.filter((c) => c.status === "active").length || 0,
       },
       funnels: funnels || [],
       assets: assets || [],
@@ -128,7 +144,7 @@ export async function GET() {
     console.error("[whitelabel/portal] Error:", err);
     return NextResponse.json(
       { error: "Erreur lors du chargement du portail" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

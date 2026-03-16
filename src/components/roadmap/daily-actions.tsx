@@ -47,13 +47,15 @@ interface DailyPlan {
 // ─── Demo data ───────────────────────────────────────────────
 const DEMO_PLAN: DailyPlan = {
   date: new Date().toISOString().split("T")[0],
-  motivation_message: "Tu es à 70% de ton objectif mensuel. 3 actions ciblées aujourd'hui et tu finis la semaine en avance !",
+  motivation_message:
+    "Tu es à 70% de ton objectif mensuel. 3 actions ciblées aujourd'hui et tu finis la semaine en avance !",
   focus_theme: "Optimisation du funnel",
   actions: [
     {
       id: "1",
       title: "Analyse les bottlenecks du funnel",
-      description: "Vérifie les taux de conversion à chaque étape et identifie le point de blocage principal.",
+      description:
+        "Vérifie les taux de conversion à chaque étape et identifie le point de blocage principal.",
       duration_minutes: 15,
       priority: "high",
       category: "Analytics",
@@ -64,7 +66,8 @@ const DEMO_PLAN: DailyPlan = {
     {
       id: "2",
       title: "Génère 2 nouvelles variantes de hook",
-      description: "Base-toi sur le hook gagnant de la semaine et crée 2 angles différents.",
+      description:
+        "Base-toi sur le hook gagnant de la semaine et crée 2 angles différents.",
       duration_minutes: 10,
       priority: "high",
       category: "Créatives",
@@ -75,7 +78,8 @@ const DEMO_PLAN: DailyPlan = {
     {
       id: "3",
       title: "Publie un contenu Know",
-      description: "Partage un insight éducatif sur ton expertise. Format recommandé : Reel 30s.",
+      description:
+        "Partage un insight éducatif sur ton expertise. Format recommandé : Reel 30s.",
       duration_minutes: 20,
       priority: "medium",
       category: "Contenu",
@@ -86,7 +90,8 @@ const DEMO_PLAN: DailyPlan = {
     {
       id: "4",
       title: "Réponds aux DMs en attente",
-      description: "Tu as 3 conversations en cours. Qualifie et propose un appel si pertinent.",
+      description:
+        "Tu as 3 conversations en cours. Qualifie et propose un appel si pertinent.",
       duration_minutes: 10,
       priority: "medium",
       category: "Prospection",
@@ -97,7 +102,8 @@ const DEMO_PLAN: DailyPlan = {
     {
       id: "5",
       title: "Revois tes métriques de la veille",
-      description: "CPL, ROAS, taux de closing — 5 min pour savoir où tu en es.",
+      description:
+        "CPL, ROAS, taux de closing — 5 min pour savoir où tu en es.",
       duration_minutes: 5,
       priority: "low",
       category: "Analytics",
@@ -174,43 +180,49 @@ export function DailyActions({ className }: { className?: string }) {
     }
   }, [user, today]);
 
-  const handleToggleAction = useCallback(async (actionId: string) => {
-    if (!user) return;
+  const handleToggleAction = useCallback(
+    async (actionId: string) => {
+      if (!user) return;
 
-    const updatedActions = plan.actions.map((a) =>
-      a.id === actionId ? { ...a, completed: !a.completed } : a
-    );
-    const updatedPlan = { ...plan, actions: updatedActions };
-    setPlan(updatedPlan);
+      const updatedActions = plan.actions.map((a) =>
+        a.id === actionId ? { ...a, completed: !a.completed } : a,
+      );
+      const updatedPlan = { ...plan, actions: updatedActions };
+      setPlan(updatedPlan);
 
-    // Persist if not demo
-    if (!isDemo && plan.id) {
-      await supabase
-        .from("daily_plans")
-        .update({ actions: updatedActions })
-        .eq("id", plan.id);
-    }
+      // Persist if not demo
+      if (!isDemo && plan.id) {
+        await supabase
+          .from("daily_plans")
+          .update({ actions: updatedActions })
+          .eq("id", plan.id);
+      }
 
-    const action = updatedActions.find((a) => a.id === actionId);
-    if (action?.completed) {
-      toast.success(`+${action.xp_reward} XP — ${action.title}`);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, plan, isDemo]);
+      const action = updatedActions.find((a) => a.id === actionId);
+      if (action?.completed) {
+        toast.success(`+${action.xp_reward} XP — ${action.title}`);
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    },
+    [user, plan, isDemo],
+  );
 
   const handleSyncCalendar = useCallback(async () => {
     if (!user) return;
     setSyncing(true);
 
     try {
-      const res = await fetch("/api/integrations/google-calendar/sync-daily-plan", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          date: today,
-          actions: plan.actions.filter((a) => !a.completed),
-        }),
-      });
+      const res = await fetch(
+        "/api/integrations/google-calendar/sync-daily-plan",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            date: today,
+            actions: plan.actions.filter((a) => !a.completed),
+          }),
+        },
+      );
 
       if (res.ok) {
         toast.success("Plan synchronisé avec Google Agenda !");
@@ -226,8 +238,12 @@ export function DailyActions({ className }: { className?: string }) {
 
   const completedCount = plan.actions.filter((a) => a.completed).length;
   const totalCount = plan.actions.length;
-  const earnedXp = plan.actions.filter((a) => a.completed).reduce((s, a) => s + a.xp_reward, 0);
-  const totalMinutes = plan.actions.filter((a) => !a.completed).reduce((s, a) => s + a.duration_minutes, 0);
+  const earnedXp = plan.actions
+    .filter((a) => a.completed)
+    .reduce((s, a) => s + a.xp_reward, 0);
+  const totalMinutes = plan.actions
+    .filter((a) => !a.completed)
+    .reduce((s, a) => s + a.duration_minutes, 0);
 
   const priorityColors = {
     high: "text-red-400",
@@ -305,21 +321,27 @@ export function DailyActions({ className }: { className?: string }) {
                     {earnedXp}/{plan.total_xp} XP
                   </span>
                   {plan.focus_theme && (
-                    <Badge variant="muted" className="text-[10px]">{plan.focus_theme}</Badge>
+                    <Badge variant="muted" className="text-[10px]">
+                      {plan.focus_theme}
+                    </Badge>
                   )}
                 </div>
               </div>
             )}
 
             {isDemo && (
-              <Badge variant="yellow" className="mb-2">Données de démonstration</Badge>
+              <Badge variant="yellow" className="mb-2">
+                Données de démonstration
+              </Badge>
             )}
 
             {/* Progress bar */}
             <div className="h-2 bg-bg-tertiary rounded-full overflow-hidden">
               <div
                 className="h-full bg-gradient-to-r from-accent/70 to-accent rounded-full transition-all duration-500"
-                style={{ width: `${totalCount > 0 ? (completedCount / totalCount) * 100 : 0}%` }}
+                style={{
+                  width: `${totalCount > 0 ? (completedCount / totalCount) * 100 : 0}%`,
+                }}
               />
             </div>
 
@@ -334,7 +356,7 @@ export function DailyActions({ className }: { className?: string }) {
                       "flex items-start gap-3 p-3 rounded-xl transition-all cursor-pointer",
                       action.completed
                         ? "bg-accent/5 border border-accent/15 opacity-70"
-                        : "bg-bg-tertiary/50 border border-border-default hover:border-accent/30"
+                        : "bg-bg-tertiary/50 border border-border-default hover:border-accent/30",
                     )}
                     onClick={() => handleToggleAction(action.id)}
                   >
@@ -347,22 +369,37 @@ export function DailyActions({ className }: { className?: string }) {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        <span className={cn(
-                          "text-sm font-medium",
-                          action.completed ? "line-through text-text-muted" : "text-text-primary"
-                        )}>
+                        <span
+                          className={cn(
+                            "text-sm font-medium",
+                            action.completed
+                              ? "line-through text-text-muted"
+                              : "text-text-primary",
+                          )}
+                        >
                           {action.title}
                         </span>
-                        <PriorityIcon className={cn("h-3.5 w-3.5 shrink-0", priorityColors[action.priority])} />
+                        <PriorityIcon
+                          className={cn(
+                            "h-3.5 w-3.5 shrink-0",
+                            priorityColors[action.priority],
+                          )}
+                        />
                       </div>
-                      <p className="text-xs text-text-muted mt-0.5">{action.description}</p>
+                      <p className="text-xs text-text-muted mt-0.5">
+                        {action.description}
+                      </p>
                       <div className="flex items-center gap-3 mt-1.5">
                         <span className="text-[10px] text-text-muted flex items-center gap-1">
                           <Clock className="h-2.5 w-2.5" />
                           {action.duration_minutes} min
                         </span>
-                        <Badge variant="muted" className="text-[10px]">{action.category}</Badge>
-                        <span className="text-[10px] text-accent">+{action.xp_reward} XP</span>
+                        <Badge variant="muted" className="text-[10px]">
+                          {action.category}
+                        </Badge>
+                        <span className="text-[10px] text-accent">
+                          +{action.xp_reward} XP
+                        </span>
                       </div>
                     </div>
                     <Button

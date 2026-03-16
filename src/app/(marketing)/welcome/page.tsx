@@ -69,32 +69,38 @@ const FEATURES = [
   {
     icon: Target,
     title: "Analyse de marché",
-    description: "Identifie ton marché idéal, crée ton avatar client et analyse tes concurrents avec l'IA.",
+    description:
+      "Identifie ton marché idéal, crée ton avatar client et analyse tes concurrents avec l'IA.",
   },
   {
     icon: Sparkles,
     title: "Offre irrésistible",
-    description: "Génère une offre complète : positionnement, pricing, garanties, mécanisme unique.",
+    description:
+      "Génère une offre complète : positionnement, pricing, garanties, mécanisme unique.",
   },
   {
     icon: Filter,
     title: "Funnel de vente",
-    description: "Construis ton funnel de A à Z : landing page, page de vente, upsells, emails.",
+    description:
+      "Construis ton funnel de A à Z : landing page, page de vente, upsells, emails.",
   },
   {
     icon: Megaphone,
     title: "Ads & Créatives",
-    description: "Crée des publicités qui convertissent : hooks, copy, scripts vidéo, DM automatisés.",
+    description:
+      "Crée des publicités qui convertissent : hooks, copy, scripts vidéo, DM automatisés.",
   },
   {
     icon: FileText,
     title: "Assets marketing",
-    description: "VSL, emails, SMS, sales letters, pitch decks — tout ce qu'il te faut pour closer.",
+    description:
+      "VSL, emails, SMS, sales letters, pitch decks — tout ce qu'il te faut pour closer.",
   },
   {
     icon: Bot,
     title: "Assistant IA",
-    description: "Un coach IA disponible 24/7 qui connaît ton business et t'accompagne à chaque étape.",
+    description:
+      "Un coach IA disponible 24/7 qui connaît ton business et t'accompagne à chaque étape.",
   },
 ];
 
@@ -102,17 +108,20 @@ const STEPS = [
   {
     step: "01",
     title: "Remplis ton Vault",
-    description: "Décris ton expertise, tes compétences et tes objectifs en 5 minutes.",
+    description:
+      "Décris ton expertise, tes compétences et tes objectifs en 5 minutes.",
   },
   {
     step: "02",
     title: "L'IA analyse ton marché",
-    description: "ScalingFlow identifie tes opportunités, ton avatar client et tes concurrents.",
+    description:
+      "ScalingFlow identifie tes opportunités, ton avatar client et tes concurrents.",
   },
   {
     step: "03",
     title: "Génère tes assets",
-    description: "Offre, funnel, ads, contenu — tout est créé automatiquement, prêt à déployer.",
+    description:
+      "Offre, funnel, ads, contenu — tout est créé automatiquement, prêt à déployer.",
   },
 ];
 
@@ -150,8 +159,16 @@ export default function WelcomePage() {
       <nav className="sticky top-0 z-50 border-b border-border-default/50 bg-bg-primary/80 backdrop-blur-xl">
         <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Image src="/icons/icon-192.png" alt="ScalingFlow" width={32} height={32} className="rounded-lg" />
-            <span className="text-lg font-bold text-text-primary">ScalingFlow</span>
+            <Image
+              src="/icons/icon-192.png"
+              alt="ScalingFlow"
+              width={32}
+              height={32}
+              className="rounded-lg"
+            />
+            <span className="text-lg font-bold text-text-primary">
+              ScalingFlow
+            </span>
           </div>
           <div className="flex items-center gap-3">
             <Link
@@ -195,7 +212,9 @@ export default function WelcomePage() {
           <p className="text-lg sm:text-xl text-text-secondary max-w-2xl mx-auto mb-12 leading-relaxed">
             Offre, funnel, ads, contenu, emails — tout ce dont tu as besoin pour
             lancer et scaler, généré par l&apos;IA en quelques clics.{" "}
-            <span className="text-text-primary font-medium">Gratuit pour commencer.</span>
+            <span className="text-text-primary font-medium">
+              Gratuit pour commencer.
+            </span>
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -225,15 +244,26 @@ export default function WelcomePage() {
         <div className="max-w-4xl mx-auto px-4 py-6 flex flex-wrap items-center justify-center gap-8 text-sm text-text-muted">
           <div className="flex items-center gap-2">
             <BarChart3 className="h-4 w-4 text-accent" />
-            <span><span className="text-text-primary font-semibold">11</span> agents IA spécialisés</span>
+            <span>
+              <span className="text-text-primary font-semibold">11</span> agents
+              IA spécialisés
+            </span>
           </div>
           <div className="flex items-center gap-2">
             <FileText className="h-4 w-4 text-accent" />
-            <span><span className="text-text-primary font-semibold">15+</span> types d&apos;assets générés</span>
+            <span>
+              <span className="text-text-primary font-semibold">15+</span> types
+              d&apos;assets générés
+            </span>
           </div>
           <div className="flex items-center gap-2">
             <Zap className="h-4 w-4 text-accent" />
-            <span>Résultats en <span className="text-text-primary font-semibold">30 secondes</span></span>
+            <span>
+              Résultats en{" "}
+              <span className="text-text-primary font-semibold">
+                30 secondes
+              </span>
+            </span>
           </div>
         </div>
       </section>
@@ -245,8 +275,8 @@ export default function WelcomePage() {
             Tout pour scaler, en un seul endroit
           </h2>
           <p className="text-text-secondary max-w-xl mx-auto text-lg">
-            De l&apos;analyse de marché au closing, ScalingFlow génère tous les assets
-            dont tu as besoin pour lancer et scaler ton business.
+            De l&apos;analyse de marché au closing, ScalingFlow génère tous les
+            assets dont tu as besoin pour lancer et scaler ton business.
           </p>
         </div>
 
@@ -259,8 +289,12 @@ export default function WelcomePage() {
               <div className="h-12 w-12 rounded-xl bg-accent/10 flex items-center justify-center mb-5 group-hover:bg-accent/15 group-hover:scale-110 transition-all duration-300">
                 <feature.icon className="h-6 w-6 text-accent" />
               </div>
-              <h3 className="font-semibold text-text-primary mb-2 text-lg">{feature.title}</h3>
-              <p className="text-sm text-text-secondary leading-relaxed">{feature.description}</p>
+              <h3 className="font-semibold text-text-primary mb-2 text-lg">
+                {feature.title}
+              </h3>
+              <p className="text-sm text-text-secondary leading-relaxed">
+                {feature.description}
+              </p>
             </div>
           ))}
         </div>
@@ -282,11 +316,17 @@ export default function WelcomePage() {
             {STEPS.map((step, i) => (
               <div key={i} className="flex gap-6 items-start group">
                 <div className="shrink-0 h-14 w-14 rounded-2xl bg-accent/10 border border-accent/20 flex items-center justify-center group-hover:bg-accent/15 group-hover:scale-105 transition-all duration-300">
-                  <span className="text-base font-bold text-accent">{step.step}</span>
+                  <span className="text-base font-bold text-accent">
+                    {step.step}
+                  </span>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-text-primary text-xl mb-2">{step.title}</h3>
-                  <p className="text-text-secondary leading-relaxed text-lg">{step.description}</p>
+                  <h3 className="font-semibold text-text-primary text-xl mb-2">
+                    {step.title}
+                  </h3>
+                  <p className="text-text-secondary leading-relaxed text-lg">
+                    {step.description}
+                  </p>
                 </div>
               </div>
             ))}
@@ -311,7 +351,10 @@ export default function WelcomePage() {
               {/* Stars */}
               <div className="flex gap-1 mb-4">
                 {Array.from({ length: t.stars }).map((_, si) => (
-                  <Star key={si} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                  <Star
+                    key={si}
+                    className="h-4 w-4 fill-yellow-400 text-yellow-400"
+                  />
                 ))}
               </div>
               <p className="text-sm text-text-secondary leading-relaxed mb-5">
@@ -322,7 +365,9 @@ export default function WelcomePage() {
                   {t.name[0]}
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-text-primary">{t.name}</p>
+                  <p className="text-sm font-semibold text-text-primary">
+                    {t.name}
+                  </p>
                   <p className="text-xs text-text-muted">{t.role}</p>
                 </div>
               </div>
@@ -332,7 +377,10 @@ export default function WelcomePage() {
       </section>
 
       {/* ─── Pricing ─── */}
-      <section id="pricing" className="bg-bg-secondary/30 border-y border-border-default/50">
+      <section
+        id="pricing"
+        className="bg-bg-secondary/30 border-y border-border-default/50"
+      >
         <div className="max-w-5xl mx-auto px-4 py-28">
           <div className="text-center mb-16">
             <h2 className="text-3xl sm:text-4xl font-bold text-text-primary mb-4">
@@ -369,30 +417,41 @@ export default function WelcomePage() {
                         plan.id === "free"
                           ? "bg-bg-tertiary text-text-secondary"
                           : plan.id === "pro"
-                          ? "bg-accent/10 text-accent"
-                          : "bg-[rgba(139,92,246,0.12)] text-[#A78BFA]"
+                            ? "bg-accent/10 text-accent"
+                            : "bg-[rgba(139,92,246,0.12)] text-[#A78BFA]"
                       }`}
                     >
                       <Icon className="h-5 w-5" />
                     </div>
-                    <h3 className="font-semibold text-text-primary text-lg">{plan.name}</h3>
+                    <h3 className="font-semibold text-text-primary text-lg">
+                      {plan.name}
+                    </h3>
                   </div>
 
                   <div className="flex items-baseline gap-1 mb-5">
-                    <span className="text-4xl font-bold text-text-primary">{plan.price}</span>
+                    <span className="text-4xl font-bold text-text-primary">
+                      {plan.price}
+                    </span>
                     <span className="text-sm text-text-muted">
                       {plan.price === 0 ? "EUR" : "EUR/mois"}
                     </span>
                   </div>
 
-                  <p className="text-xs text-text-muted mb-5">{plan.description}</p>
+                  <p className="text-xs text-text-muted mb-5">
+                    {plan.description}
+                  </p>
 
                   <div className="space-y-2.5 mb-6">
                     {plan.features.map((f) => (
-                      <div key={f} className="flex items-start gap-2.5 text-sm text-text-secondary">
+                      <div
+                        key={f}
+                        className="flex items-start gap-2.5 text-sm text-text-secondary"
+                      >
                         <Check
                           className={`h-4 w-4 mt-0.5 shrink-0 ${
-                            plan.id === "premium" ? "text-[#A78BFA]" : "text-accent"
+                            plan.id === "premium"
+                              ? "text-[#A78BFA]"
+                              : "text-accent"
                           }`}
                         />
                         <span className="leading-relaxed">{f}</span>
@@ -458,7 +517,9 @@ export default function WelcomePage() {
             >
               <summary className="flex cursor-pointer items-center justify-between px-6 py-5 text-sm font-medium text-text-primary list-none [&::-webkit-details-marker]:hidden">
                 {faq.q}
-                <span className="ml-4 shrink-0 text-text-muted transition-transform duration-300 group-open:rotate-45 text-lg">+</span>
+                <span className="ml-4 shrink-0 text-text-muted transition-transform duration-300 group-open:rotate-45 text-lg">
+                  +
+                </span>
               </summary>
               <div className="px-6 pb-5 text-sm text-text-secondary leading-relaxed">
                 {faq.a}
@@ -476,7 +537,8 @@ export default function WelcomePage() {
             Prêt à scaler ?
           </h2>
           <p className="text-text-secondary text-lg mb-10 max-w-lg mx-auto">
-            Rejoins ScalingFlow et lance ton business structuré par l&apos;IA en moins de 30 minutes.
+            Rejoins ScalingFlow et lance ton business structuré par l&apos;IA en
+            moins de 30 minutes.
           </p>
           <Link
             href="/register"
@@ -492,12 +554,30 @@ export default function WelcomePage() {
       <footer className="border-t border-border-default/50">
         <div className="max-w-6xl mx-auto px-4 py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <Image src="/icons/icon-192.png" alt="ScalingFlow" width={24} height={24} className="rounded-md" />
-            <span className="text-sm font-medium text-text-secondary">ScalingFlow</span>
+            <Image
+              src="/icons/icon-192.png"
+              alt="ScalingFlow"
+              width={24}
+              height={24}
+              className="rounded-md"
+            />
+            <span className="text-sm font-medium text-text-secondary">
+              ScalingFlow
+            </span>
           </div>
           <div className="flex items-center gap-6 text-xs text-text-muted">
-            <Link href="/login" className="hover:text-text-secondary transition-colors">Connexion</Link>
-            <Link href="/register" className="hover:text-text-secondary transition-colors">Inscription</Link>
+            <Link
+              href="/login"
+              className="hover:text-text-secondary transition-colors"
+            >
+              Connexion
+            </Link>
+            <Link
+              href="/register"
+              className="hover:text-text-secondary transition-colors"
+            >
+              Inscription
+            </Link>
             <div className="flex items-center gap-1">
               <Shield className="h-3 w-3" />
               Paiements sécurisés via Stripe

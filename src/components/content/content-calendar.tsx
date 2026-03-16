@@ -17,7 +17,10 @@ interface CalendarEvent {
   platform: string;
 }
 
-const typeToColor: Record<string, "default" | "blue" | "cyan" | "purple" | "muted"> = {
+const typeToColor: Record<
+  string,
+  "default" | "blue" | "cyan" | "purple" | "muted"
+> = {
   instagram_reel: "purple",
   instagram_story: "purple",
   instagram_carousel: "purple",
@@ -90,7 +93,10 @@ export function ContentCalendar({ className }: ContentCalendarProps) {
   const startOffset = (firstDay.getDay() + 6) % 7;
   const daysInMonth = lastDay.getDate();
 
-  const monthName = currentMonth.toLocaleDateString("fr-FR", { month: "long", year: "numeric" });
+  const monthName = currentMonth.toLocaleDateString("fr-FR", {
+    month: "long",
+    year: "numeric",
+  });
 
   const cells: (number | null)[] = [];
   for (let i = 0; i < startOffset; i++) cells.push(null);
@@ -127,29 +133,39 @@ export function ContentCalendar({ className }: ContentCalendarProps) {
         ) : (
           <div className="grid grid-cols-7 gap-1">
             {DAYS.map((d) => (
-              <div key={d} className="text-center text-xs text-text-muted py-2 font-medium">
+              <div
+                key={d}
+                className="text-center text-xs text-text-muted py-2 font-medium"
+              >
                 {d}
               </div>
             ))}
             {cells.map((day, i) => {
               const dayEvents = day ? events[String(day)] : undefined;
-              const isToday = day === new Date().getDate() && month === new Date().getMonth() && year === new Date().getFullYear();
+              const isToday =
+                day === new Date().getDate() &&
+                month === new Date().getMonth() &&
+                year === new Date().getFullYear();
 
               return (
                 <div
                   key={i}
                   className={cn(
                     "min-h-[80px] p-1.5 rounded-lg border transition-all",
-                    day ? "border-border-default bg-bg-secondary hover:border-border-hover" : "border-transparent",
-                    isToday && "border-accent/50 bg-accent/5"
+                    day
+                      ? "border-border-default bg-bg-secondary hover:border-border-hover"
+                      : "border-transparent",
+                    isToday && "border-accent/50 bg-accent/5",
                   )}
                 >
                   {day && (
                     <>
-                      <span className={cn(
-                        "text-xs font-medium",
-                        isToday ? "text-accent" : "text-text-muted"
-                      )}>
+                      <span
+                        className={cn(
+                          "text-xs font-medium",
+                          isToday ? "text-accent" : "text-text-muted",
+                        )}
+                      >
                         {day}
                       </span>
                       {dayEvents && (

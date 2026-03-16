@@ -30,15 +30,12 @@ export async function POST(req: NextRequest) {
     if (!leadId || !newStatus) {
       return NextResponse.json(
         { error: "leadId et newStatus sont requis" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     if (!VALID_STATUSES.includes(newStatus)) {
-      return NextResponse.json(
-        { error: "Statut invalide" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Statut invalide" }, { status: 400 });
     }
 
     // Verify lead belongs to user
@@ -50,10 +47,7 @@ export async function POST(req: NextRequest) {
       .single();
 
     if (leadError || !lead) {
-      return NextResponse.json(
-        { error: "Lead introuvable" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Lead introuvable" }, { status: 404 });
     }
 
     // Update status
@@ -66,7 +60,7 @@ export async function POST(req: NextRequest) {
     if (updateError) {
       return NextResponse.json(
         { error: "Erreur lors de la mise à jour" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -113,9 +107,6 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ success: true });
   } catch {
-    return NextResponse.json(
-      { error: "Erreur interne" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Erreur interne" }, { status: 500 });
   }
 }

@@ -10,7 +10,7 @@ if (VAPID_PUBLIC_KEY && VAPID_PRIVATE_KEY) {
   webpush.setVapidDetails(
     "mailto:support@scalingflow.com",
     VAPID_PUBLIC_KEY,
-    VAPID_PRIVATE_KEY
+    VAPID_PRIVATE_KEY,
   );
 }
 
@@ -19,7 +19,7 @@ if (VAPID_PUBLIC_KEY && VAPID_PRIVATE_KEY) {
 function getServiceClient() {
   return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
   );
 }
 
@@ -54,24 +54,23 @@ export async function sendPushToUser(userId: string, payload: PushPayload) {
             endpoint: sub.endpoint,
             keys: { p256dh: sub.p256dh, auth: sub.auth },
           },
-          jsonPayload
+          jsonPayload,
         );
       } catch (err: unknown) {
         const statusCode = (err as { statusCode?: number }).statusCode;
         // 410 Gone or 404 = subscription expired, clean it up
         if (statusCode === 410 || statusCode === 404) {
-          await supabase
-            .from("push_subscriptions")
-            .delete()
-            .eq("id", sub.id);
+          await supabase.from("push_subscriptions").delete().eq("id", sub.id);
         }
         throw err;
       }
-    })
+    }),
   );
 
   const failed = results.filter((r) => r.status === "rejected").length;
   if (failed > 0) {
-    console.warn(`Push: ${failed}/${subscriptions.length} failed for user ${userId}`);
+    console.warn(
+      `Push: ${failed}/${subscriptions.length} failed for user ${userId}`,
+    );
   }
 }

@@ -8,30 +8,50 @@ const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50 MB
 
 const ALLOWED_MIME_TYPES = [
   "application/pdf",
-  "image/jpeg", "image/png", "image/gif", "image/webp", "image/svg+xml",
-  "text/plain", "text/csv", "text/markdown",
+  "image/jpeg",
+  "image/png",
+  "image/gif",
+  "image/webp",
+  "image/svg+xml",
+  "text/plain",
+  "text/csv",
+  "text/markdown",
   "application/msword",
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
   "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
   "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-  "video/mp4", "video/quicktime", "video/webm",
-  "audio/mpeg", "audio/wav", "audio/ogg",
+  "video/mp4",
+  "video/quicktime",
+  "video/webm",
+  "audio/mpeg",
+  "audio/wav",
+  "audio/ogg",
 ];
 
 // Infer MIME type from extension when browser doesn't provide one
 function inferMimeType(filename: string): string {
   const ext = filename.split(".").pop()?.toLowerCase();
   const map: Record<string, string> = {
-    jpg: "image/jpeg", jpeg: "image/jpeg", png: "image/png", gif: "image/gif",
-    webp: "image/webp", svg: "image/svg+xml",
+    jpg: "image/jpeg",
+    jpeg: "image/jpeg",
+    png: "image/png",
+    gif: "image/gif",
+    webp: "image/webp",
+    svg: "image/svg+xml",
     pdf: "application/pdf",
-    txt: "text/plain", csv: "text/csv", md: "text/markdown",
+    txt: "text/plain",
+    csv: "text/csv",
+    md: "text/markdown",
     doc: "application/msword",
     docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
     xlsx: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     pptx: "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-    mp4: "video/mp4", mov: "video/quicktime", webm: "video/webm",
-    mp3: "audio/mpeg", wav: "audio/wav", ogg: "audio/ogg",
+    mp4: "video/mp4",
+    mov: "video/quicktime",
+    webm: "video/webm",
+    mp3: "audio/mpeg",
+    wav: "audio/wav",
+    ogg: "audio/ogg",
   };
   return ext && map[ext] ? map[ext] : "application/octet-stream";
 }
@@ -41,7 +61,7 @@ async function ensureBucket() {
   if (!process.env.SUPABASE_SERVICE_ROLE_KEY) return;
   const admin = createServiceClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY
+    process.env.SUPABASE_SERVICE_ROLE_KEY,
   );
   const { data: buckets } = await admin.storage.listBuckets();
   const exists = buckets?.some((b) => b.id === "drive");
@@ -71,14 +91,14 @@ export async function POST(req: NextRequest) {
     if (!file) {
       return NextResponse.json(
         { error: "Aucun fichier fourni" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     if (file.size > MAX_FILE_SIZE) {
       return NextResponse.json(
         { error: "Le fichier dépasse la limite de 50 Mo" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -89,7 +109,7 @@ export async function POST(req: NextRequest) {
     if (!ALLOWED_MIME_TYPES.includes(mimeType)) {
       return NextResponse.json(
         { error: `Type de fichier non autorisé (${mimeType})` },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -105,7 +125,7 @@ export async function POST(req: NextRequest) {
     const admin = process.env.SUPABASE_SERVICE_ROLE_KEY
       ? createServiceClient(
           process.env.NEXT_PUBLIC_SUPABASE_URL!,
-          process.env.SUPABASE_SERVICE_ROLE_KEY
+          process.env.SUPABASE_SERVICE_ROLE_KEY,
         )
       : null;
 
@@ -122,20 +142,21 @@ export async function POST(req: NextRequest) {
       console.error("Storage upload error:", uploadError);
       return NextResponse.json(
         { error: `Erreur Storage: ${uploadError.message}` },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
     // Get signed URL (bucket is private)
-    const { data: signedUrlData, error: signedUrlError } = await storageClient.storage
-      .from("drive")
-      .createSignedUrl(storagePath, 60 * 60 * 24 * 365); // 1 year
+    const { data: signedUrlData, error: signedUrlError } =
+      await storageClient.storage
+        .from("drive")
+        .createSignedUrl(storagePath, 60 * 60 * 24 * 365); // 1 year
 
     if (signedUrlError || !signedUrlData?.signedUrl) {
       console.error("Signed URL error:", signedUrlError);
       return NextResponse.json(
         { error: "Erreur lors de la génération de l'URL du fichier" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -157,7 +178,7 @@ export async function POST(req: NextRequest) {
       console.error("DB insert error:", dbError);
       return NextResponse.json(
         { error: `Erreur de sauvegarde: ${dbError.message}` },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -166,7 +187,7 @@ export async function POST(req: NextRequest) {
     console.error("Upload error:", error);
     return NextResponse.json(
       { error: "Erreur lors de l'upload" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

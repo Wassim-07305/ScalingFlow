@@ -25,7 +25,10 @@ interface CaseStudyGeneratorProps {
   initialData?: any;
 }
 
-export function CaseStudyGenerator({ className, initialData }: CaseStudyGeneratorProps) {
+export function CaseStudyGenerator({
+  className,
+  initialData,
+}: CaseStudyGeneratorProps) {
   const [loading, setLoading] = React.useState(false);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [caseStudy, setCaseStudy] = React.useState<any>(initialData || null);
@@ -61,7 +64,9 @@ export function CaseStudyGenerator({ className, initialData }: CaseStudyGenerato
   };
 
   if (loading) {
-    return <AILoading text="Rédaction de ton étude de cas" className={className} />;
+    return (
+      <AILoading text="Rédaction de ton étude de cas" className={className} />
+    );
   }
 
   if (!caseStudy) {
@@ -134,11 +139,14 @@ export function CaseStudyGenerator({ className, initialData }: CaseStudyGenerato
             const text = [
               caseStudy.title,
               problem.client_profile && `Profil : ${problem.client_profile}`,
-              problem.initial_situation && `Situation : ${problem.initial_situation}`,
+              problem.initial_situation &&
+                `Situation : ${problem.initial_situation}`,
               solution.approach && `Solution : ${solution.approach}`,
               results.roi && `ROI : ${results.roi}`,
               testimonial.quote && `"${testimonial.quote}"`,
-            ].filter(Boolean).join("\n\n");
+            ]
+              .filter(Boolean)
+              .join("\n\n");
             setPublishContent(text);
             setPublishDialogOpen(true);
           }}
@@ -159,14 +167,22 @@ export function CaseStudyGenerator({ className, initialData }: CaseStudyGenerato
         <CardContent className="space-y-4">
           {problem.client_profile && (
             <div>
-              <p className="text-xs text-text-muted font-medium mb-1">Profil client</p>
-              <p className="text-sm text-text-secondary">{problem.client_profile}</p>
+              <p className="text-xs text-text-muted font-medium mb-1">
+                Profil client
+              </p>
+              <p className="text-sm text-text-secondary">
+                {problem.client_profile}
+              </p>
             </div>
           )}
           {problem.initial_situation && (
             <div>
-              <p className="text-xs text-text-muted font-medium mb-1">Situation initiale</p>
-              <p className="text-sm text-text-secondary">{problem.initial_situation}</p>
+              <p className="text-xs text-text-muted font-medium mb-1">
+                Situation initiale
+              </p>
+              <p className="text-sm text-text-secondary">
+                {problem.initial_situation}
+              </p>
             </div>
           )}
           {problem.challenges && problem.challenges.length > 0 && (
@@ -174,7 +190,10 @@ export function CaseStudyGenerator({ className, initialData }: CaseStudyGenerato
               <p className="text-xs text-text-muted font-medium mb-1">Défis</p>
               <ul className="space-y-1">
                 {problem.challenges.map((challenge: string, i: number) => (
-                  <li key={i} className="text-sm text-text-secondary flex items-start gap-2">
+                  <li
+                    key={i}
+                    className="text-sm text-text-secondary flex items-start gap-2"
+                  >
                     <span className="text-danger mt-0.5">--</span>
                     {challenge}
                   </li>
@@ -184,14 +203,22 @@ export function CaseStudyGenerator({ className, initialData }: CaseStudyGenerato
           )}
           {problem.previous_attempts && (
             <div>
-              <p className="text-xs text-text-muted font-medium mb-1">Tentatives précédentes</p>
-              <p className="text-sm text-text-secondary">{problem.previous_attempts}</p>
+              <p className="text-xs text-text-muted font-medium mb-1">
+                Tentatives précédentes
+              </p>
+              <p className="text-sm text-text-secondary">
+                {problem.previous_attempts}
+              </p>
             </div>
           )}
           {problem.financial_impact && (
             <div>
-              <p className="text-xs text-text-muted font-medium mb-1">Impact financier</p>
-              <p className="text-sm text-text-secondary">{problem.financial_impact}</p>
+              <p className="text-xs text-text-muted font-medium mb-1">
+                Impact financier
+              </p>
+              <p className="text-sm text-text-secondary">
+                {problem.financial_impact}
+              </p>
             </div>
           )}
         </CardContent>
@@ -208,33 +235,54 @@ export function CaseStudyGenerator({ className, initialData }: CaseStudyGenerato
         <CardContent className="space-y-4">
           {solution.approach && (
             <div>
-              <p className="text-xs text-text-muted font-medium mb-1">Approche</p>
+              <p className="text-xs text-text-muted font-medium mb-1">
+                Approche
+              </p>
               <p className="text-sm text-text-secondary">{solution.approach}</p>
             </div>
           )}
-          {solution.implementation_steps && solution.implementation_steps.length > 0 && (
-            <div>
-              <p className="text-xs text-text-muted font-medium mb-1">Étapes de mise en oeuvre</p>
-              <ol className="space-y-1">
-                {solution.implementation_steps.map((step: string, i: number) => (
-                  <li key={i} className="text-sm text-text-secondary flex items-start gap-2">
-                    <Badge variant="muted" className="text-xs mt-0.5 shrink-0">{i + 1}</Badge>
-                    {step}
-                  </li>
-                ))}
-              </ol>
-            </div>
-          )}
+          {solution.implementation_steps &&
+            solution.implementation_steps.length > 0 && (
+              <div>
+                <p className="text-xs text-text-muted font-medium mb-1">
+                  Étapes de mise en oeuvre
+                </p>
+                <ol className="space-y-1">
+                  {solution.implementation_steps.map(
+                    (step: string, i: number) => (
+                      <li
+                        key={i}
+                        className="text-sm text-text-secondary flex items-start gap-2"
+                      >
+                        <Badge
+                          variant="muted"
+                          className="text-xs mt-0.5 shrink-0"
+                        >
+                          {i + 1}
+                        </Badge>
+                        {step}
+                      </li>
+                    ),
+                  )}
+                </ol>
+              </div>
+            )}
           {solution.timeline && (
             <div>
-              <p className="text-xs text-text-muted font-medium mb-1">Timeline</p>
+              <p className="text-xs text-text-muted font-medium mb-1">
+                Timeline
+              </p>
               <p className="text-sm text-text-secondary">{solution.timeline}</p>
             </div>
           )}
           {solution.customizations && (
             <div>
-              <p className="text-xs text-text-muted font-medium mb-1">Personnalisations</p>
-              <p className="text-sm text-text-secondary">{solution.customizations}</p>
+              <p className="text-xs text-text-muted font-medium mb-1">
+                Personnalisations
+              </p>
+              <p className="text-sm text-text-secondary">
+                {solution.customizations}
+              </p>
             </div>
           )}
         </CardContent>
@@ -251,24 +299,43 @@ export function CaseStudyGenerator({ className, initialData }: CaseStudyGenerato
         <CardContent className="space-y-4">
           {quantitative.length > 0 && (
             <div>
-              <p className="text-xs text-text-muted font-medium mb-2">Métriques quantitatives</p>
+              <p className="text-xs text-text-muted font-medium mb-2">
+                Métriques quantitatives
+              </p>
               <div className="rounded-lg border border-border-default overflow-hidden">
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="bg-bg-tertiary">
-                      <th className="text-left px-3 py-2 text-text-muted font-medium">Métrique</th>
-                      <th className="text-left px-3 py-2 text-text-muted font-medium">Avant</th>
-                      <th className="text-left px-3 py-2 text-text-muted font-medium">Après</th>
+                      <th className="text-left px-3 py-2 text-text-muted font-medium">
+                        Métrique
+                      </th>
+                      <th className="text-left px-3 py-2 text-text-muted font-medium">
+                        Avant
+                      </th>
+                      <th className="text-left px-3 py-2 text-text-muted font-medium">
+                        Après
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
-                    {quantitative.map((row: { metric: string; before: string; after: string }, i: number) => (
-                      <tr key={i} className="border-t border-border-default">
-                        <td className="px-3 py-2 text-text-primary font-medium">{row.metric}</td>
-                        <td className="px-3 py-2 text-text-secondary">{row.before}</td>
-                        <td className="px-3 py-2 text-accent font-medium">{row.after}</td>
-                      </tr>
-                    ))}
+                    {quantitative.map(
+                      (
+                        row: { metric: string; before: string; after: string },
+                        i: number,
+                      ) => (
+                        <tr key={i} className="border-t border-border-default">
+                          <td className="px-3 py-2 text-text-primary font-medium">
+                            {row.metric}
+                          </td>
+                          <td className="px-3 py-2 text-text-secondary">
+                            {row.before}
+                          </td>
+                          <td className="px-3 py-2 text-accent font-medium">
+                            {row.after}
+                          </td>
+                        </tr>
+                      ),
+                    )}
                   </tbody>
                 </table>
               </div>
@@ -276,10 +343,15 @@ export function CaseStudyGenerator({ className, initialData }: CaseStudyGenerato
           )}
           {qualitative.length > 0 && (
             <div>
-              <p className="text-xs text-text-muted font-medium mb-1">Résultats qualitatifs</p>
+              <p className="text-xs text-text-muted font-medium mb-1">
+                Résultats qualitatifs
+              </p>
               <ul className="space-y-1">
                 {qualitative.map((item: string, i: number) => (
-                  <li key={i} className="text-sm text-text-secondary flex items-start gap-2">
+                  <li
+                    key={i}
+                    className="text-sm text-text-secondary flex items-start gap-2"
+                  >
                     <span className="text-accent mt-0.5">--</span>
                     {item}
                   </li>
@@ -295,8 +367,12 @@ export function CaseStudyGenerator({ className, initialData }: CaseStudyGenerato
           )}
           {results.timeline_to_results && (
             <div>
-              <p className="text-xs text-text-muted font-medium mb-1">Délai d&apos;obtention</p>
-              <p className="text-sm text-text-secondary">{results.timeline_to_results}</p>
+              <p className="text-xs text-text-muted font-medium mb-1">
+                Délai d&apos;obtention
+              </p>
+              <p className="text-sm text-text-secondary">
+                {results.timeline_to_results}
+              </p>
             </div>
           )}
         </CardContent>
@@ -331,7 +407,7 @@ export function CaseStudyGenerator({ className, initialData }: CaseStudyGenerato
                       "h-4 w-4",
                       i < testimonial.rating
                         ? "text-warning fill-warning"
-                        : "text-border-default"
+                        : "text-border-default",
                     )}
                   />
                 ))}

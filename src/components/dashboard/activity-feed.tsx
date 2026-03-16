@@ -204,7 +204,7 @@ export function ActivityFeed() {
                   <div
                     className={cn(
                       "flex h-8 w-8 items-center justify-center rounded-lg bg-bg-tertiary shrink-0",
-                      meta.color
+                      meta.color,
                     )}
                   >
                     <Icon className="h-4 w-4" />

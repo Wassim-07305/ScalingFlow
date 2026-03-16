@@ -34,7 +34,15 @@ export interface OnboardingFormData {
   country: string;
   language: string;
   // Step 1: Situation
-  situation: "" | "zero" | "salarie" | "freelance" | "entrepreneur" | "etudiant" | "reconversion" | "sans_emploi";
+  situation:
+    | ""
+    | "zero"
+    | "salarie"
+    | "freelance"
+    | "entrepreneur"
+    | "etudiant"
+    | "reconversion"
+    | "sans_emploi";
   situationDetails: SituationDetails;
   // Step 2: Skills (legacy, kept for backward compat)
   skills: string[];
@@ -71,7 +79,7 @@ export interface OnboardingState extends OnboardingFormData {
   prevStep: () => void;
   setField: <K extends keyof OnboardingFormData>(
     key: K,
-    value: OnboardingFormData[K]
+    value: OnboardingFormData[K],
   ) => void;
   reset: () => void;
 }

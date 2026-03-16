@@ -80,15 +80,32 @@ const TEN_DAY_GUIDE: DayGuide[] = [
     objectif:
       "Mettre en ligne les premières publicités avec un budget test pour valider le marché et récolter les premières données.",
     actions: [
-      { id: "d1-1", text: "Lancer 3 à 5 créatives différentes (angles variés)" },
+      {
+        id: "d1-1",
+        text: "Lancer 3 à 5 créatives différentes (angles variés)",
+      },
       { id: "d1-2", text: "Budget test : 10-20€/jour maximum" },
-      { id: "d1-3", text: "Vérifier que le pixel fire correctement sur chaque page" },
-      { id: "d1-4", text: "Tester le funnel end-to-end (ad → landing → opt-in → merci)" },
+      {
+        id: "d1-3",
+        text: "Vérifier que le pixel fire correctement sur chaque page",
+      },
+      {
+        id: "d1-4",
+        text: "Tester le funnel end-to-end (ad → landing → opt-in → merci)",
+      },
       { id: "d1-5", text: "Vérifier les emails et SMS automatiques" },
     ],
     kpis: [
-      { name: "CPM", target: "< 15€", alert: "> 25€ → audience trop petite ou contenu faible" },
-      { name: "CTR", target: "> 1%", alert: "< 0.5% → changer le hook ou la créative" },
+      {
+        name: "CPM",
+        target: "< 15€",
+        alert: "> 25€ → audience trop petite ou contenu faible",
+      },
+      {
+        name: "CTR",
+        target: "> 1%",
+        alert: "< 0.5% → changer le hook ou la créative",
+      },
       { name: "CPC", target: "< 3€", alert: "> 5€ → revoir le ciblage" },
     ],
     category: "launch",
@@ -99,11 +116,20 @@ const TEN_DAY_GUIDE: DayGuide[] = [
     objectif:
       "Identifier les créatives gagnantes et couper celles qui ne performent pas. Commencer à optimiser.",
     actions: [
-      { id: "d3-1", text: "Analyser le CTR par créative (après 1000+ impressions)" },
+      {
+        id: "d3-1",
+        text: "Analyser le CTR par créative (après 1000+ impressions)",
+      },
       { id: "d3-2", text: "Pauser les créatives avec CTR < 0.8%" },
-      { id: "d3-3", text: "Dupliquer la meilleure créative avec un nouvel angle" },
+      {
+        id: "d3-3",
+        text: "Dupliquer la meilleure créative avec un nouvel angle",
+      },
       { id: "d3-4", text: "Vérifier le taux de conversion de la landing page" },
-      { id: "d3-5", text: "Ajuster les textes si le CTR est bon mais la conversion faible" },
+      {
+        id: "d3-5",
+        text: "Ajuster les textes si le CTR est bon mais la conversion faible",
+      },
     ],
     kpis: [
       {
@@ -111,7 +137,11 @@ const TEN_DAY_GUIDE: DayGuide[] = [
         target: "> 20%",
         alert: "< 10% → problème de message match ou d'UX",
       },
-      { name: "CPL", target: "< 10€", alert: "> 15€ → revoir offre ou ciblage" },
+      {
+        name: "CPL",
+        target: "< 10€",
+        alert: "> 15€ → revoir offre ou ciblage",
+      },
       {
         name: "Taux d'ouverture emails",
         target: "> 30%",
@@ -129,7 +159,10 @@ const TEN_DAY_GUIDE: DayGuide[] = [
       { id: "d5-1", text: "A/B tester le headline de la landing page" },
       { id: "d5-2", text: "Optimiser le CTA (couleur, texte, placement)" },
       { id: "d5-3", text: "Envoyer un DM personnalisé aux leads chauds" },
-      { id: "d5-4", text: "Tester une nouvelle audience (LAL ou intérêts différents)" },
+      {
+        id: "d5-4",
+        text: "Tester une nouvelle audience (LAL ou intérêts différents)",
+      },
       { id: "d5-5", text: "Vérifier les séquences de relance SMS" },
     ],
     kpis: [
@@ -157,14 +190,27 @@ const TEN_DAY_GUIDE: DayGuide[] = [
     objectif:
       "Analyser le ROAS, compiler les learnings et prendre une décision : continuer, ajuster ou pivoter.",
     actions: [
-      { id: "d7-1", text: "Compiler tous les KPIs : dépense, leads, CPL, ROAS" },
-      { id: "d7-2", text: "Identifier le meilleur angle / créative / audience" },
+      {
+        id: "d7-1",
+        text: "Compiler tous les KPIs : dépense, leads, CPL, ROAS",
+      },
+      {
+        id: "d7-2",
+        text: "Identifier le meilleur angle / créative / audience",
+      },
       { id: "d7-3", text: "Comparer les résultats aux benchmarks du secteur" },
       { id: "d7-4", text: "Couper les ads perdantes (ROAS < 0.5x)" },
-      { id: "d7-5", text: "Décider : scaler les gagnantes ou pivoter la stratégie" },
+      {
+        id: "d7-5",
+        text: "Décider : scaler les gagnantes ou pivoter la stratégie",
+      },
     ],
     kpis: [
-      { name: "ROAS", target: "> 1x", alert: "< 0.5x → pivoter l'offre ou l'angle" },
+      {
+        name: "ROAS",
+        target: "> 1x",
+        alert: "< 0.5x → pivoter l'offre ou l'angle",
+      },
       {
         name: "CAC",
         target: "< 50% du panier moyen",
@@ -185,10 +231,16 @@ const TEN_DAY_GUIDE: DayGuide[] = [
       "Augmenter progressivement le budget sur les créatives gagnantes et ajouter de nouvelles variations.",
     actions: [
       { id: "d8-1", text: "Augmenter le budget de +20% sur les ads gagnantes" },
-      { id: "d8-2", text: "Créer 2-3 nouvelles créatives basées sur les learnings" },
+      {
+        id: "d8-2",
+        text: "Créer 2-3 nouvelles créatives basées sur les learnings",
+      },
       { id: "d8-3", text: "Tester de nouvelles audiences lookalike" },
       { id: "d8-4", text: "Lancer du retargeting sur les visiteurs du funnel" },
-      { id: "d8-5", text: "Optimiser la séquence email (changer les mails faibles)" },
+      {
+        id: "d8-5",
+        text: "Optimiser la séquence email (changer les mails faibles)",
+      },
     ],
     kpis: [
       {
@@ -216,10 +268,19 @@ const TEN_DAY_GUIDE: DayGuide[] = [
       "Documenter tous les résultats, valider la stratégie et planifier la phase 2 de scaling.",
     actions: [
       { id: "d10-1", text: "Rapport complet des 10 jours (tous les KPIs)" },
-      { id: "d10-2", text: "Identifier les 3 winners (créative, audience, angle)" },
+      {
+        id: "d10-2",
+        text: "Identifier les 3 winners (créative, audience, angle)",
+      },
       { id: "d10-3", text: "Calculer le ROI global de la phase test" },
-      { id: "d10-4", text: "Planifier le budget semaine 2 et les nouvelles créatives" },
-      { id: "d10-5", text: "Mettre à jour le dashboard ScalingFlow avec les résultats" },
+      {
+        id: "d10-4",
+        text: "Planifier le budget semaine 2 et les nouvelles créatives",
+      },
+      {
+        id: "d10-5",
+        text: "Mettre à jour le dashboard ScalingFlow avec les résultats",
+      },
     ],
     kpis: [
       {
@@ -248,7 +309,7 @@ const STORAGE_KEY = "scalingflow-ten-day-guide";
 export function TenDayGuide() {
   const { user } = useUser();
   const [completedActions, setCompletedActions] = useState<Set<string>>(
-    new Set()
+    new Set(),
   );
   const [activeDayIndex, setActiveDayIndex] = useState(0);
   const [ready, setReady] = useState(false);
@@ -279,7 +340,7 @@ export function TenDayGuide() {
       if (user) {
         localStorage.setItem(
           `${STORAGE_KEY}-${user.id}`,
-          JSON.stringify([...next])
+          JSON.stringify([...next]),
         );
       }
       return next;
@@ -288,7 +349,7 @@ export function TenDayGuide() {
 
   const totalActions = TEN_DAY_GUIDE.reduce(
     (acc, d) => acc + d.actions.length,
-    0
+    0,
   );
   const completedCount = completedActions.size;
   const progressPct = Math.round((completedCount / totalActions) * 100);
@@ -372,11 +433,9 @@ export function TenDayGuide() {
       {/* Timeline selector */}
       <div className="flex gap-2 overflow-x-auto pb-2">
         {TEN_DAY_GUIDE.map((day, idx) => {
-          const dayDone = day.actions.every((a) =>
-            completedActions.has(a.id)
-          );
+          const dayDone = day.actions.every((a) => completedActions.has(a.id));
           const dayPartial = day.actions.some((a) =>
-            completedActions.has(a.id)
+            completedActions.has(a.id),
           );
           const cat = CATEGORY_CONFIG[day.category];
 
@@ -392,7 +451,7 @@ export function TenDayGuide() {
                     ? "bg-accent/20 text-accent"
                     : dayPartial
                       ? "bg-bg-tertiary text-text-primary"
-                      : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
+                      : "bg-bg-tertiary text-text-secondary hover:text-text-primary",
               )}
             >
               {dayDone ? (
@@ -402,9 +461,7 @@ export function TenDayGuide() {
               )}
               <span>J{day.day}</span>
               {activeDayIndex !== idx && (
-                <span className={cn("text-xs", cat.color)}>
-                  {cat.label}
-                </span>
+                <span className={cn("text-xs", cat.color)}>{cat.label}</span>
               )}
             </button>
           );
@@ -420,7 +477,7 @@ export function TenDayGuide() {
               <div
                 className={cn(
                   "flex items-center justify-center w-12 h-12 rounded-xl shrink-0",
-                  "bg-accent/10"
+                  "bg-accent/10",
                 )}
               >
                 {activeCat.icon}
@@ -431,7 +488,10 @@ export function TenDayGuide() {
                   <h3 className="text-lg font-semibold text-text-primary">
                     Jour {activeDay.day} — {activeDay.title}
                   </h3>
-                  <Badge variant="muted" className={cn("text-xs", activeCat.color)}>
+                  <Badge
+                    variant="muted"
+                    className={cn("text-xs", activeCat.color)}
+                  >
                     {activeCat.label}
                   </Badge>
                 </div>
@@ -458,7 +518,7 @@ export function TenDayGuide() {
                   key={action.id}
                   className={cn(
                     "cursor-pointer transition-all hover:border-accent/20",
-                    done && "border-accent/30 bg-accent/5"
+                    done && "border-accent/30 bg-accent/5",
                   )}
                   onClick={() => toggleAction(action.id)}
                 >
@@ -474,7 +534,7 @@ export function TenDayGuide() {
                           "text-sm",
                           done
                             ? "text-accent line-through"
-                            : "text-text-primary"
+                            : "text-text-primary",
                         )}
                       >
                         {action.text}

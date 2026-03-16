@@ -8,7 +8,9 @@ import Stripe from "stripe";
 export async function GET() {
   try {
     const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
     if (!user) {
       return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
@@ -58,7 +60,7 @@ export async function GET() {
           provider_user_id: accountId,
           metadata: { type: "express" },
         },
-        { onConflict: "user_id,provider" }
+        { onConflict: "user_id,provider" },
       );
 
       // Also update legacy field
@@ -81,7 +83,7 @@ export async function GET() {
     console.error("[stripe-connect] Error:", error);
     return NextResponse.json(
       { error: "Erreur lors de la connexion Stripe" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

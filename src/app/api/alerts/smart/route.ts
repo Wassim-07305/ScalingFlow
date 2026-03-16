@@ -25,7 +25,10 @@ interface SmartAlert {
 async function runSmartAlerts() {
   const supabase = await getAdminClient();
   if (!supabase) {
-    return NextResponse.json({ error: "Configuration manquante" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Configuration manquante" },
+      { status: 500 },
+    );
   }
 
   const alerts: SmartAlert[] = [];
@@ -33,7 +36,9 @@ async function runSmartAlerts() {
   // Récupérer tous les utilisateurs actifs
   const { data: profiles } = await supabase
     .from("profiles")
-    .select("id, xp_points, streak_days, last_activity_at, onboarding_completed")
+    .select(
+      "id, xp_points, streak_days, last_activity_at, onboarding_completed",
+    )
     .eq("onboarding_completed", true);
 
   const now = new Date();
@@ -48,7 +53,9 @@ async function runSmartAlerts() {
       : null;
 
     if (lastActivity) {
-      const daysSinceActivity = Math.floor((now.getTime() - lastActivity.getTime()) / (1000 * 60 * 60 * 24));
+      const daysSinceActivity = Math.floor(
+        (now.getTime() - lastActivity.getTime()) / (1000 * 60 * 60 * 24),
+      );
 
       if (daysSinceActivity >= 7) {
         alerts.push({
@@ -92,9 +99,13 @@ async function runSmartAlerts() {
         alert_type: "blank_week",
         severity: "warning",
         title: "Semaine blanche détectée",
-        message: "Aucun contenu ni créative générés cette semaine. La régularité est la clé du scaling. Lance une génération de contenu hebdomadaire maintenant.",
+        message:
+          "Aucun contenu ni créative générés cette semaine. La régularité est la clé du scaling. Lance une génération de contenu hebdomadaire maintenant.",
         action_url: "/content",
-        data: { weeklyContentCount: weeklyContentCount ?? 0, weeklyAdsCount: weeklyAdsCount ?? 0 },
+        data: {
+          weeklyContentCount: weeklyContentCount ?? 0,
+          weeklyAdsCount: weeklyAdsCount ?? 0,
+        },
       });
     }
 
@@ -109,7 +120,10 @@ async function runSmartAlerts() {
       .gt("spend", 50);
 
     if (lowRoasCampaigns && lowRoasCampaigns.length > 0) {
-      const totalWasted = lowRoasCampaigns.reduce((s, c) => s + ((c.spend as number) ?? 0), 0);
+      const totalWasted = lowRoasCampaigns.reduce(
+        (s, c) => s + ((c.spend as number) ?? 0),
+        0,
+      );
       alerts.push({
         user_id: userId,
         alert_type: "budget_no_roas",
@@ -128,13 +142,17 @@ async function runSmartAlerts() {
     }
 
     // ─── 4. Streak cassé ─────────────────────────────────
-    if ((profile.streak_days as number) === 0 && (profile.xp_points as number) > 100) {
+    if (
+      (profile.streak_days as number) === 0 &&
+      (profile.xp_points as number) > 100
+    ) {
       alerts.push({
         user_id: userId,
         alert_type: "streak_broken",
         severity: "info",
         title: "Streak perdu !",
-        message: "Ta série de jours consécutifs est retombée à 0. Reconnecte-toi aujourd'hui pour relancer ta série et garder tes bonus XP.",
+        message:
+          "Ta série de jours consécutifs est retombée à 0. Reconnecte-toi aujourd'hui pour relancer ta série et garder tes bonus XP.",
         action_url: "/progress",
       });
     }
@@ -157,7 +175,8 @@ async function runSmartAlerts() {
         alert_type: "funnel_missing",
         severity: "warning",
         title: "Offre sans funnel",
-        message: "Tu as créé une offre mais aucun funnel n'est publié. Sans funnel, tes leads n'ont nulle part où aller. Déploie ton funnel maintenant.",
+        message:
+          "Tu as créé une offre mais aucun funnel n'est publié. Sans funnel, tes leads n'ont nulle part où aller. Déploie ton funnel maintenant.",
         action_url: "/funnel",
       });
     }
@@ -176,7 +195,7 @@ async function runSmartAlerts() {
         data: a.data || {},
         read: false,
         created_at: new Date().toISOString(),
-      }))
+      })),
     );
   }
 
@@ -185,11 +204,15 @@ async function runSmartAlerts() {
     message: `${alerts.length} alerte(s) intelligente(s) générée(s) pour ${(profiles ?? []).length} utilisateur(s).`,
     alertCount: alerts.length,
     breakdown: {
-      procrastination: alerts.filter((a) => a.alert_type === "procrastination").length,
+      procrastination: alerts.filter((a) => a.alert_type === "procrastination")
+        .length,
       blank_week: alerts.filter((a) => a.alert_type === "blank_week").length,
-      budget_no_roas: alerts.filter((a) => a.alert_type === "budget_no_roas").length,
-      streak_broken: alerts.filter((a) => a.alert_type === "streak_broken").length,
-      funnel_missing: alerts.filter((a) => a.alert_type === "funnel_missing").length,
+      budget_no_roas: alerts.filter((a) => a.alert_type === "budget_no_roas")
+        .length,
+      streak_broken: alerts.filter((a) => a.alert_type === "streak_broken")
+        .length,
+      funnel_missing: alerts.filter((a) => a.alert_type === "funnel_missing")
+        .length,
     },
   });
 }
@@ -213,9 +236,12 @@ export async function GET(req: NextRequest) {
 // POST: Manuel
 export async function POST(req: NextRequest) {
   try {
-    const { createClient: createServerClient } = await import("@/lib/supabase/server");
+    const { createClient: createServerClient } =
+      await import("@/lib/supabase/server");
     const supabase = await createServerClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (!user) {
       return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
     }

@@ -115,7 +115,7 @@ export async function POST(req: NextRequest) {
     if (!checkIPRate(ip)) {
       return NextResponse.json(
         { error: "Limite atteinte. Maximum 3 diagnostics par heure." },
-        { status: 429 }
+        { status: 429 },
       );
     }
 
@@ -125,7 +125,7 @@ export async function POST(req: NextRequest) {
     if (!body.offer_name && !body.offer_description) {
       return NextResponse.json(
         { error: "Veuillez décrire votre offre." },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -148,7 +148,7 @@ export async function POST(req: NextRequest) {
     console.error("Diagnostic error:", error);
     return NextResponse.json(
       { error: "Erreur lors de l'analyse. Veuillez réessayer." },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

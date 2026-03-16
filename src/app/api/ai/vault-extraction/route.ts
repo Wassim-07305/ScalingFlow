@@ -8,7 +8,9 @@ export const maxDuration = 60;
 export async function POST(req: NextRequest) {
   try {
     const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
     if (!user) {
       return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
@@ -63,14 +65,18 @@ Redige en francais, de maniere claire et structuree. Utilise des bullet points e
       .update({ vault_extraction: extraction })
       .eq("id", user.id);
 
-    try { await awardXP(user.id, "generation.vault_analysis"); } catch { /* ignore xp errors */ }
+    try {
+      await awardXP(user.id, "generation.vault_analysis");
+    } catch {
+      /* ignore xp errors */
+    }
 
     return NextResponse.json({ extraction });
   } catch (error) {
     console.error("Vault extraction error:", error);
     return NextResponse.json(
       { error: "Erreur lors de l'extraction" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

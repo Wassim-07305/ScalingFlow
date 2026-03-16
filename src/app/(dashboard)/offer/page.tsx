@@ -10,7 +10,18 @@ import { GenerationHistory } from "@/components/shared/generation-history";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
 import { useUser } from "@/hooks/use-user";
-import { Sparkles, Crosshair, BarChart3, History, DollarSign, Settings, Gift, Fingerprint, Calculator, Shield } from "lucide-react";
+import {
+  Sparkles,
+  Crosshair,
+  BarChart3,
+  History,
+  DollarSign,
+  Settings,
+  Gift,
+  Fingerprint,
+  Calculator,
+  Shield,
+} from "lucide-react";
 import { toast } from "sonner";
 import { PricingBuilder } from "@/components/offer/pricing-builder";
 import { PricingCalculator } from "@/components/offer/pricing-calculator";
@@ -36,7 +47,9 @@ export default function OfferPage() {
   const { user } = useUser();
   const [activeTab, setActiveTab] = React.useState<string>("generate");
   const [latestOfferId, setLatestOfferId] = React.useState<string | null>(null);
-  const [marketAnalysisId, setMarketAnalysisId] = React.useState<string | null>(null);
+  const [marketAnalysisId, setMarketAnalysisId] = React.useState<string | null>(
+    null,
+  );
   const [marketName, setMarketName] = React.useState<string | null>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [loadedData, setLoadedData] = React.useState<any>(null);
@@ -76,7 +89,11 @@ export default function OfferPage() {
 
       if (offers && offers.length > 0) {
         setLatestOfferId(offers[0].id);
-        const ps = offers[0].pricing_strategy as { anchor_price?: number; real_price?: number; value_breakdown?: { item: string; value: number }[] } | null;
+        const ps = offers[0].pricing_strategy as {
+          anchor_price?: number;
+          real_price?: number;
+          value_breakdown?: { item: string; value: number }[];
+        } | null;
         if (ps) {
           setPricingData({
             anchorPrice: ps.anchor_price || 0,
@@ -94,7 +111,9 @@ export default function OfferPage() {
     try {
       const { data, error } = await supabase
         .from("offers")
-        .select("ai_raw_response, offer_name, positioning, unique_mechanism, pricing_strategy, guarantees, risk_reversal, delivery_structure, oto_offer, full_document")
+        .select(
+          "ai_raw_response, offer_name, positioning, unique_mechanism, pricing_strategy, guarantees, risk_reversal, delivery_structure, oto_offer, full_document",
+        )
         .eq("id", item.id)
         .single();
 
@@ -167,14 +186,15 @@ export default function OfferPage() {
             valueBreakdown={pricingData.valueBreakdown}
             onChange={setPricingData}
           />
-          <Button onClick={handleSavePricing} disabled={savingPricing || !latestOfferId}>
+          <Button
+            onClick={handleSavePricing}
+            disabled={savingPricing || !latestOfferId}
+          >
             {savingPricing ? "Sauvegarde..." : "Sauvegarder le pricing"}
           </Button>
         </div>
       )}
-      {activeTab === "pricing-calc" && (
-        <PricingCalculator />
-      )}
+      {activeTab === "pricing-calc" && <PricingCalculator />}
       {activeTab === "guarantee" && (
         <GuaranteeGenerator offerId={latestOfferId || undefined} />
       )}

@@ -79,7 +79,8 @@ const colorStyles = {
   orange: {
     bg: "bg-accent/10",
     text: "text-accent",
-    hover: "hover:border-accent/30 hover:shadow-[0_0_20px_rgba(52,211,153,0.06)]",
+    hover:
+      "hover:border-accent/30 hover:shadow-[0_0_20px_rgba(52,211,153,0.06)]",
   },
   blue: {
     bg: "bg-info/10",
@@ -89,12 +90,14 @@ const colorStyles = {
   cyan: {
     bg: "bg-accent/10",
     text: "text-accent",
-    hover: "hover:border-accent/30 hover:shadow-[0_0_20px_rgba(52,211,153,0.06)]",
+    hover:
+      "hover:border-accent/30 hover:shadow-[0_0_20px_rgba(52,211,153,0.06)]",
   },
   purple: {
     bg: "bg-[rgba(139,92,246,0.10)]",
     text: "text-[#A78BFA]",
-    hover: "hover:border-[#A78BFA]/30 hover:shadow-[0_0_20px_rgba(139,92,246,0.06)]",
+    hover:
+      "hover:border-[#A78BFA]/30 hover:shadow-[0_0_20px_rgba(139,92,246,0.06)]",
   },
 };
 
@@ -114,13 +117,13 @@ export function QuickActions() {
                 href={action.href}
                 className={cn(
                   "group flex items-start gap-3 rounded-2xl border border-white/5 bg-bg-secondary p-4 transition-all duration-300 hover:translate-y-[-1px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50",
-                  colors.hover
+                  colors.hover,
                 )}
               >
                 <div
                   className={cn(
                     "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-transform duration-300 group-hover:scale-110",
-                    colors.bg
+                    colors.bg,
                   )}
                 >
                   <action.icon className={cn("h-5 w-5", colors.text)} />

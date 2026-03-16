@@ -1,7 +1,13 @@
 "use client";
 
 import React from "react";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AILoading } from "@/components/shared/ai-loading";
@@ -22,10 +28,30 @@ import {
 
 const SCRIPT_STEPS = [
   { key: "opening", number: 1, title: "Ouverture & Accroche", icon: Phone },
-  { key: "discovery", number: 2, title: "Découverte des besoins", icon: MessageCircle },
-  { key: "reframing", number: 3, title: "Recadrage du problème", icon: Volume2 },
-  { key: "solution", number: 4, title: "Présentation de la solution", icon: Sparkles },
-  { key: "objections", number: 5, title: "Gestion des objections", icon: ChevronDown },
+  {
+    key: "discovery",
+    number: 2,
+    title: "Découverte des besoins",
+    icon: MessageCircle,
+  },
+  {
+    key: "reframing",
+    number: 3,
+    title: "Recadrage du problème",
+    icon: Volume2,
+  },
+  {
+    key: "solution",
+    number: 4,
+    title: "Présentation de la solution",
+    icon: Sparkles,
+  },
+  {
+    key: "objections",
+    number: 5,
+    title: "Gestion des objections",
+    icon: ChevronDown,
+  },
   { key: "cta", number: 6, title: "CTA / Prochaine étape", icon: ArrowRight },
 ] as const;
 
@@ -62,7 +88,9 @@ export function WarmCallScript() {
   const [result, setResult] = React.useState<WarmCallResult | null>(null);
   const [error, setError] = React.useState<string | null>(null);
   const [copied, setCopied] = React.useState(false);
-  const [expandedStep, setExpandedStep] = React.useState<string | null>("opening");
+  const [expandedStep, setExpandedStep] = React.useState<string | null>(
+    "opening",
+  );
 
   const handleGenerate = async () => {
     setLoading(true);
@@ -91,12 +119,54 @@ export function WarmCallScript() {
             context: parsed,
             duration_estimate: "-",
             steps: {
-              opening: { title: "Ouverture", objective: "", script_lines: [parsed], tonality: "", transition: "", tips: [] },
-              discovery: { title: "Découverte", objective: "", script_lines: [], tonality: "", transition: "", tips: [] },
-              reframing: { title: "Recadrage", objective: "", script_lines: [], tonality: "", transition: "", tips: [] },
-              solution: { title: "Solution", objective: "", script_lines: [], tonality: "", transition: "", tips: [] },
-              objections: { title: "Objections", objective: "", script_lines: [], tonality: "", transition: "", tips: [] },
-              cta: { title: "CTA", objective: "", script_lines: [], tonality: "", transition: "", tips: [] },
+              opening: {
+                title: "Ouverture",
+                objective: "",
+                script_lines: [parsed],
+                tonality: "",
+                transition: "",
+                tips: [],
+              },
+              discovery: {
+                title: "Découverte",
+                objective: "",
+                script_lines: [],
+                tonality: "",
+                transition: "",
+                tips: [],
+              },
+              reframing: {
+                title: "Recadrage",
+                objective: "",
+                script_lines: [],
+                tonality: "",
+                transition: "",
+                tips: [],
+              },
+              solution: {
+                title: "Solution",
+                objective: "",
+                script_lines: [],
+                tonality: "",
+                transition: "",
+                tips: [],
+              },
+              objections: {
+                title: "Objections",
+                objective: "",
+                script_lines: [],
+                tonality: "",
+                transition: "",
+                tips: [],
+              },
+              cta: {
+                title: "CTA",
+                objective: "",
+                script_lines: [],
+                tonality: "",
+                transition: "",
+                tips: [],
+              },
             },
             key_objections: [],
             closing_tips: [],
@@ -113,7 +183,8 @@ export function WarmCallScript() {
   };
 
   const copyAll = () => {
-    const text = typeof result === "string" ? result : JSON.stringify(result, null, 2);
+    const text =
+      typeof result === "string" ? result : JSON.stringify(result, null, 2);
     navigator.clipboard.writeText(text);
     setCopied(true);
     toast.success("Copié dans le presse-papiers");
@@ -154,7 +225,12 @@ export function WarmCallScript() {
               <FileDown className="h-4 w-4 mr-1" />
               PDF
             </Button>
-            <Button variant="outline" size="sm" onClick={copyAll} className="transition-all hover:border-accent/40 hover:shadow-sm">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={copyAll}
+              className="transition-all hover:border-accent/40 hover:shadow-sm"
+            >
               <Copy className="h-4 w-4 mr-1" />
               {copied ? "Copié !" : "Copier tout"}
             </Button>
@@ -164,13 +240,16 @@ export function WarmCallScript() {
         {/* Contexte */}
         {result.context && (
           <GlowCard glowColor="orange">
-            <p className="text-sm text-text-secondary leading-relaxed">{result.context}</p>
+            <p className="text-sm text-text-secondary leading-relaxed">
+              {result.context}
+            </p>
           </GlowCard>
         )}
 
         {/* 6 étapes du script */}
         {SCRIPT_STEPS.map((step) => {
-          const stepData = result.steps?.[step.key as keyof typeof result.steps];
+          const stepData =
+            result.steps?.[step.key as keyof typeof result.steps];
           if (!stepData) return null;
           const isExpanded = expandedStep === step.key;
           const StepIcon = step.icon;
@@ -180,7 +259,7 @@ export function WarmCallScript() {
               key={step.key}
               className={cn(
                 "transition-all duration-300 hover:border-border-hover",
-                isExpanded && "border-accent/30 shadow-lg shadow-accent/5"
+                isExpanded && "border-accent/30 shadow-lg shadow-accent/5",
               )}
             >
               <CardHeader
@@ -195,47 +274,69 @@ export function WarmCallScript() {
                     <StepIcon className="h-4 w-4 text-accent" />
                     <span className="text-text-primary">{step.title}</span>
                   </CardTitle>
-                  <div className={cn(
-                    "p-1 rounded-lg transition-transform duration-200",
-                    isExpanded && "rotate-180"
-                  )}>
+                  <div
+                    className={cn(
+                      "p-1 rounded-lg transition-transform duration-200",
+                      isExpanded && "rotate-180",
+                    )}
+                  >
                     <ChevronDown className="h-4 w-4 text-text-muted" />
                   </div>
                 </div>
               </CardHeader>
-              <div className={cn(
-                "grid transition-all duration-300",
-                isExpanded ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
-              )}>
+              <div
+                className={cn(
+                  "grid transition-all duration-300",
+                  isExpanded
+                    ? "grid-rows-[1fr] opacity-100"
+                    : "grid-rows-[0fr] opacity-0",
+                )}
+              >
                 <div className="overflow-hidden">
                   <CardContent className="pt-0 space-y-4 pb-4">
                     {/* Objectif */}
                     {stepData.objective && (
                       <div className="p-3.5 rounded-xl bg-accent/5 border border-accent/15">
-                        <p className="text-xs text-accent uppercase font-medium mb-1">Objectif</p>
-                        <p className="text-sm text-text-secondary leading-relaxed">{stepData.objective}</p>
+                        <p className="text-xs text-accent uppercase font-medium mb-1">
+                          Objectif
+                        </p>
+                        <p className="text-sm text-text-secondary leading-relaxed">
+                          {stepData.objective}
+                        </p>
                       </div>
                     )}
 
                     {/* Phrases du script */}
-                    {stepData.script_lines && stepData.script_lines.length > 0 && (
-                      <div className="space-y-2.5">
-                        <p className="text-xs text-text-muted uppercase tracking-wider">Phrases clés</p>
-                        {stepData.script_lines.map((line, i) => (
-                          <div key={i} className="p-3.5 rounded-xl bg-bg-tertiary/50 border-l-3 border-accent backdrop-blur-sm">
-                            <p className="text-sm text-text-primary italic leading-relaxed">&laquo; {line} &raquo;</p>
-                          </div>
-                        ))}
-                      </div>
-                    )}
+                    {stepData.script_lines &&
+                      stepData.script_lines.length > 0 && (
+                        <div className="space-y-2.5">
+                          <p className="text-xs text-text-muted uppercase tracking-wider">
+                            Phrases clés
+                          </p>
+                          {stepData.script_lines.map((line, i) => (
+                            <div
+                              key={i}
+                              className="p-3.5 rounded-xl bg-bg-tertiary/50 border-l-3 border-accent backdrop-blur-sm"
+                            >
+                              <p className="text-sm text-text-primary italic leading-relaxed">
+                                &laquo; {line} &raquo;
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      )}
 
                     {/* Tonalité */}
                     {stepData.tonality && (
                       <div className="flex items-start gap-2.5 p-3.5 rounded-xl bg-bg-tertiary/50 border border-border-default/30">
                         <Volume2 className="h-3.5 w-3.5 text-accent mt-0.5 shrink-0" />
                         <div>
-                          <p className="text-xs text-text-muted uppercase mb-0.5">Tonalité</p>
-                          <p className="text-sm text-text-secondary leading-relaxed">{stepData.tonality}</p>
+                          <p className="text-xs text-text-muted uppercase mb-0.5">
+                            Tonalité
+                          </p>
+                          <p className="text-sm text-text-secondary leading-relaxed">
+                            {stepData.tonality}
+                          </p>
                         </div>
                       </div>
                     )}
@@ -245,8 +346,12 @@ export function WarmCallScript() {
                       <div className="flex items-start gap-2.5 p-3.5 rounded-xl bg-bg-tertiary/50 border border-border-default/30">
                         <ArrowRight className="h-3.5 w-3.5 text-accent mt-0.5 shrink-0" />
                         <div>
-                          <p className="text-xs text-text-muted uppercase mb-0.5">Transition</p>
-                          <p className="text-sm text-text-secondary italic leading-relaxed">&laquo; {stepData.transition} &raquo;</p>
+                          <p className="text-xs text-text-muted uppercase mb-0.5">
+                            Transition
+                          </p>
+                          <p className="text-sm text-text-secondary italic leading-relaxed">
+                            &laquo; {stepData.transition} &raquo;
+                          </p>
                         </div>
                       </div>
                     )}
@@ -254,11 +359,18 @@ export function WarmCallScript() {
                     {/* Tips */}
                     {stepData.tips && stepData.tips.length > 0 && (
                       <div>
-                        <p className="text-xs text-text-muted uppercase mb-2 tracking-wider">Conseils</p>
+                        <p className="text-xs text-text-muted uppercase mb-2 tracking-wider">
+                          Conseils
+                        </p>
                         <ul className="space-y-1.5">
                           {stepData.tips.map((tip, i) => (
-                            <li key={i} className="text-xs text-text-secondary flex items-start gap-2">
-                              <span className="text-accent mt-0.5 shrink-0">{"\u2192"}</span>
+                            <li
+                              key={i}
+                              className="text-xs text-text-secondary flex items-start gap-2"
+                            >
+                              <span className="text-accent mt-0.5 shrink-0">
+                                {"\u2192"}
+                              </span>
                               <span className="leading-relaxed">{tip}</span>
                             </li>
                           ))}
@@ -283,14 +395,25 @@ export function WarmCallScript() {
             </CardHeader>
             <CardContent className="pt-0 space-y-3">
               {result.key_objections.map((obj, i) => (
-                <div key={i} className="p-4 rounded-xl bg-bg-tertiary/50 space-y-2.5 border border-border-default/30 hover:border-border-hover/50 transition-all">
+                <div
+                  key={i}
+                  className="p-4 rounded-xl bg-bg-tertiary/50 space-y-2.5 border border-border-default/30 hover:border-border-hover/50 transition-all"
+                >
                   <div className="flex items-start gap-2.5">
-                    <Badge variant="red" className="text-xs shrink-0">Objection</Badge>
-                    <p className="text-sm text-text-secondary italic leading-relaxed">&laquo; {obj.objection} &raquo;</p>
+                    <Badge variant="red" className="text-xs shrink-0">
+                      Objection
+                    </Badge>
+                    <p className="text-sm text-text-secondary italic leading-relaxed">
+                      &laquo; {obj.objection} &raquo;
+                    </p>
                   </div>
                   <div className="flex items-start gap-2.5">
-                    <Badge variant="default" className="text-xs shrink-0">Réponse</Badge>
-                    <p className="text-sm text-text-primary leading-relaxed">&laquo; {obj.response} &raquo;</p>
+                    <Badge variant="default" className="text-xs shrink-0">
+                      Réponse
+                    </Badge>
+                    <p className="text-sm text-text-primary leading-relaxed">
+                      &laquo; {obj.response} &raquo;
+                    </p>
                   </div>
                 </div>
               ))}
@@ -310,8 +433,13 @@ export function WarmCallScript() {
             <CardContent className="pt-0">
               <ul className="space-y-2">
                 {result.closing_tips.map((tip, i) => (
-                  <li key={i} className="text-xs text-text-secondary flex items-start gap-2.5">
-                    <span className="text-accent mt-0.5 shrink-0">{"\u2192"}</span>
+                  <li
+                    key={i}
+                    className="text-xs text-text-secondary flex items-start gap-2.5"
+                  >
+                    <span className="text-accent mt-0.5 shrink-0">
+                      {"\u2192"}
+                    </span>
                     <span className="leading-relaxed">{tip}</span>
                   </li>
                 ))}
@@ -320,7 +448,11 @@ export function WarmCallScript() {
           </Card>
         )}
 
-        <Button variant="outline" onClick={() => setResult(null)} className="transition-all hover:border-accent/40">
+        <Button
+          variant="outline"
+          onClick={() => setResult(null)}
+          className="transition-all hover:border-accent/40"
+        >
           <Sparkles className="h-4 w-4 mr-2" />
           Régénérer le script
         </Button>
@@ -335,9 +467,12 @@ export function WarmCallScript() {
         <div className="inline-flex items-center justify-center h-14 w-14 rounded-2xl bg-accent/10 border border-accent/20 mb-4">
           <Phone className="h-7 w-7 text-accent" />
         </div>
-        <h3 className="font-semibold text-text-primary text-lg mb-1.5">Script d&apos;Appel Tiède</h3>
+        <h3 className="font-semibold text-text-primary text-lg mb-1.5">
+          Script d&apos;Appel Tiède
+        </h3>
         <p className="text-sm text-text-secondary max-w-md mx-auto leading-relaxed">
-          L&apos;IA va créer un script d&apos;appel structuré en 6 étapes : ouverture, découverte, recadrage, solution, objections et CTA.
+          L&apos;IA va créer un script d&apos;appel structuré en 6 étapes :
+          ouverture, découverte, recadrage, solution, objections et CTA.
         </p>
       </div>
 
@@ -348,7 +483,8 @@ export function WarmCallScript() {
             Générateur de script d&apos;appel tiède
           </CardTitle>
           <CardDescription>
-            Un script adapté à ton offre pour des appels avec des prospects semi-qualifiés.
+            Un script adapté à ton offre pour des appels avec des prospects
+            semi-qualifiés.
           </CardDescription>
         </CardHeader>
         <CardContent>

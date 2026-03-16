@@ -1,66 +1,74 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hors connexion | ScalingFlow</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background-color: #0B0E11;
-      color: #E5E7EB;
-      font-family: Inter, system-ui, -apple-system, sans-serif;
-    }
-    .container {
-      max-width: 480px;
-      padding: 32px;
-      text-align: center;
-    }
-    .icon {
-      font-size: 56px;
-      margin-bottom: 16px;
-    }
-    h1 {
-      font-size: 24px;
-      font-weight: 700;
-      margin-bottom: 12px;
-    }
-    p {
-      font-size: 14px;
-      color: #9CA3AF;
-      line-height: 1.6;
-      margin-bottom: 32px;
-    }
-    .btn {
-      display: inline-block;
-      padding: 10px 24px;
-      background-color: #34D399;
-      color: #0B0E11;
-      border: none;
-      border-radius: 8px;
-      font-weight: 600;
-      font-size: 14px;
-      text-decoration: none;
-      cursor: pointer;
-    }
-    .btn:hover { opacity: 0.9; }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <div class="icon">&#x1F4F6;</div>
-    <h1>Pas de connexion internet</h1>
-    <p>
-      ScalingFlow necessite une connexion internet pour fonctionner.
-      Verifie ta connexion et reessaie.
-    </p>
-    <button class="btn" onclick="window.location.reload()">
-      Reessayer
-    </button>
-  </div>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hors connexion | ScalingFlow</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #0b0e11;
+        color: #e5e7eb;
+        font-family:
+          Inter,
+          system-ui,
+          -apple-system,
+          sans-serif;
+      }
+      .container {
+        max-width: 480px;
+        padding: 32px;
+        text-align: center;
+      }
+      .icon {
+        font-size: 56px;
+        margin-bottom: 16px;
+      }
+      h1 {
+        font-size: 24px;
+        font-weight: 700;
+        margin-bottom: 12px;
+      }
+      p {
+        font-size: 14px;
+        color: #9ca3af;
+        line-height: 1.6;
+        margin-bottom: 32px;
+      }
+      .btn {
+        display: inline-block;
+        padding: 10px 24px;
+        background-color: #34d399;
+        color: #0b0e11;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 14px;
+        text-decoration: none;
+        cursor: pointer;
+      }
+      .btn:hover {
+        opacity: 0.9;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="icon">&#x1F4F6;</div>
+      <h1>Pas de connexion internet</h1>
+      <p>
+        ScalingFlow necessite une connexion internet pour fonctionner. Verifie
+        ta connexion et reessaie.
+      </p>
+      <button class="btn" onclick="window.location.reload()">Reessayer</button>
+    </div>
+  </body>
 </html>

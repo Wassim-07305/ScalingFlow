@@ -43,7 +43,7 @@ function CreateOrgForm({ onCreated }: { onCreated: () => void }) {
         .normalize("NFD")
         .replace(/[\u0300-\u036f]/g, "")
         .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-|-$/g, "")
+        .replace(/^-|-$/g, ""),
     );
   };
 
@@ -86,8 +86,8 @@ function CreateOrgForm({ onCreated }: { onCreated: () => void }) {
       </CardHeader>
       <CardContent className="space-y-4">
         <p className="text-sm text-text-secondary">
-          Crée ton organisation pour offrir une expérience brandée à tes clients.
-          Ils verront ton logo, tes couleurs et ton nom de marque.
+          Crée ton organisation pour offrir une expérience brandée à tes
+          clients. Ils verront ton logo, tes couleurs et ton nom de marque.
         </p>
 
         <div>
@@ -102,17 +102,24 @@ function CreateOrgForm({ onCreated }: { onCreated: () => void }) {
         <div>
           <Label>Slug (URL)</Label>
           <div className="flex items-center gap-2">
-            <span className="text-sm text-text-muted">app.scalingflow.com/</span>
+            <span className="text-sm text-text-muted">
+              app.scalingflow.com/
+            </span>
             <Input
               value={slug}
-              onChange={(e) => setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""))}
+              onChange={(e) =>
+                setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""))
+              }
               placeholder="mon-agence"
               className="flex-1"
             />
           </div>
         </div>
 
-        <Button onClick={handleCreate} disabled={creating || !name.trim() || !slug.trim()}>
+        <Button
+          onClick={handleCreate}
+          disabled={creating || !name.trim() || !slug.trim()}
+        >
           {creating ? (
             <Loader2 className="h-4 w-4 mr-2 animate-spin" />
           ) : (
@@ -135,53 +142,62 @@ function BrandingSection({
   onUpdated: () => void;
 }) {
   const [brandName, setBrandName] = useState(organization.brand_name || "");
-  const [primaryColor, setPrimaryColor] = useState(organization.primary_color || "#34D399");
-  const [accentColor, setAccentColor] = useState(organization.accent_color || "#10B981");
-  const [customDomain, setCustomDomain] = useState(organization.custom_domain || "");
+  const [primaryColor, setPrimaryColor] = useState(
+    organization.primary_color || "#34D399",
+  );
+  const [accentColor, setAccentColor] = useState(
+    organization.accent_color || "#10B981",
+  );
+  const [customDomain, setCustomDomain] = useState(
+    organization.custom_domain || "",
+  );
   const [logoUrl, setLogoUrl] = useState(organization.logo_url || "");
   const [saving, setSaving] = useState(false);
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const supabase = createClient();
 
-  const handleLogoUpload = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  const handleLogoUpload = useCallback(
+    async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
 
-    if (!file.type.startsWith("image/")) {
-      toast.error("Seules les images sont acceptées.");
-      return;
-    }
-    if (file.size > 2 * 1024 * 1024) {
-      toast.error("L'image ne doit pas dépasser 2 Mo.");
-      return;
-    }
+      if (!file.type.startsWith("image/")) {
+        toast.error("Seules les images sont acceptées.");
+        return;
+      }
+      if (file.size > 2 * 1024 * 1024) {
+        toast.error("L'image ne doit pas dépasser 2 Mo.");
+        return;
+      }
 
-    setUploadingLogo(true);
-    try {
-      const ext = file.name.split(".").pop() || "png";
-      const fileName = `orgs/${organization.id}/logo.${ext}`;
+      setUploadingLogo(true);
+      try {
+        const ext = file.name.split(".").pop() || "png";
+        const fileName = `orgs/${organization.id}/logo.${ext}`;
 
-      const { error: uploadError } = await supabase.storage
-        .from("avatars")
-        .upload(fileName, file, { upsert: true });
+        const { error: uploadError } = await supabase.storage
+          .from("avatars")
+          .upload(fileName, file, { upsert: true });
 
-      if (uploadError) throw uploadError;
+        if (uploadError) throw uploadError;
 
-      const { data: urlData } = supabase.storage
-        .from("avatars")
-        .getPublicUrl(fileName);
+        const { data: urlData } = supabase.storage
+          .from("avatars")
+          .getPublicUrl(fileName);
 
-      const publicUrl = `${urlData.publicUrl}?t=${Date.now()}`;
-      setLogoUrl(publicUrl);
-      toast.success("Logo uploadé !");
-    } catch {
-      toast.error("Erreur lors de l'upload du logo.");
-    } finally {
-      setUploadingLogo(false);
-      if (fileInputRef.current) fileInputRef.current.value = "";
-    }
-  }, [organization.id, supabase]);
+        const publicUrl = `${urlData.publicUrl}?t=${Date.now()}`;
+        setLogoUrl(publicUrl);
+        toast.success("Logo uploadé !");
+      } catch {
+        toast.error("Erreur lors de l'upload du logo.");
+      } finally {
+        setUploadingLogo(false);
+        if (fileInputRef.current) fileInputRef.current.value = "";
+      }
+    },
+    [organization.id, supabase],
+  );
 
   const handleSave = async () => {
     setSaving(true);
@@ -265,7 +281,9 @@ function BrandingSection({
                 )}
                 {logoUrl ? "Changer" : "Uploader"}
               </Button>
-              <p className="text-xs text-text-muted mt-1">PNG, SVG ou JPG. Max 2 Mo.</p>
+              <p className="text-xs text-text-muted mt-1">
+                PNG, SVG ou JPG. Max 2 Mo.
+              </p>
             </div>
           </div>
           <input
@@ -330,17 +348,26 @@ function BrandingSection({
 
         {/* Preview */}
         <div className="p-4 rounded-xl bg-bg-tertiary border border-border-default">
-          <p className="text-xs text-text-muted uppercase tracking-wide mb-2">Aperçu</p>
+          <p className="text-xs text-text-muted uppercase tracking-wide mb-2">
+            Aperçu
+          </p>
           <div className="flex items-center gap-3">
             {logoUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={logoUrl} alt="" className="h-8 w-8 rounded-md object-contain" />
+              <img
+                src={logoUrl}
+                alt=""
+                className="h-8 w-8 rounded-md object-contain"
+              />
             ) : (
               <div
                 className="h-8 w-8 rounded-md flex items-center justify-center"
                 style={{ backgroundColor: primaryColor + "20" }}
               >
-                <Building2 className="h-4 w-4" style={{ color: primaryColor }} />
+                <Building2
+                  className="h-4 w-4"
+                  style={{ color: primaryColor }}
+                />
               </div>
             )}
             <span className="font-bold text-text-primary">
@@ -348,8 +375,14 @@ function BrandingSection({
             </span>
           </div>
           <div className="flex gap-2 mt-3">
-            <div className="h-8 flex-1 rounded-lg" style={{ backgroundColor: primaryColor }} />
-            <div className="h-8 flex-1 rounded-lg" style={{ backgroundColor: accentColor }} />
+            <div
+              className="h-8 flex-1 rounded-lg"
+              style={{ backgroundColor: primaryColor }}
+            />
+            <div
+              className="h-8 flex-1 rounded-lg"
+              style={{ backgroundColor: accentColor }}
+            />
           </div>
         </div>
 
@@ -367,7 +400,8 @@ function BrandingSection({
             placeholder="app.monbusiness.com"
           />
           <p className="text-xs text-text-muted mt-1">
-            Configure un CNAME vers cname.scalingflow.com pour activer ton domaine.
+            Configure un CNAME vers cname.scalingflow.com pour activer ton
+            domaine.
           </p>
         </div>
 
@@ -421,7 +455,9 @@ function MembersSection({
         return;
       }
 
-      toast.success(`${trimmed} ajouté comme ${role === "admin" ? "administrateur" : "membre"} !`);
+      toast.success(
+        `${trimmed} ajouté comme ${role === "admin" ? "administrateur" : "membre"} !`,
+      );
       setEmail("");
       onUpdated();
     } catch {
@@ -498,8 +534,8 @@ function MembersSection({
       </CardHeader>
       <CardContent className="space-y-4">
         <p className="text-sm text-text-secondary">
-          Invite tes clients pour qu&apos;ils accèdent à la plateforme sous ta marque.
-          Ils doivent avoir un compte ScalingFlow.
+          Invite tes clients pour qu&apos;ils accèdent à la plateforme sous ta
+          marque. Ils doivent avoir un compte ScalingFlow.
         </p>
 
         {/* Invite form */}
@@ -561,7 +597,11 @@ function MembersSection({
                 </div>
               </div>
               <div className="flex items-center gap-2 ml-3 shrink-0">
-                <Badge variant={roleBadgeVariant(member.role) as "purple" | "cyan" | "muted"}>
+                <Badge
+                  variant={
+                    roleBadgeVariant(member.role) as "purple" | "cyan" | "muted"
+                  }
+                >
                   <span className="flex items-center gap-1">
                     {roleIcon(member.role)}
                     {roleLabel(member.role)}
@@ -594,7 +634,8 @@ function MembersSection({
 // ─── Main Whitelabel Settings ──────────────────────────────────
 
 export function WhitelabelSettings() {
-  const { organization, role, members, loading, isOwner, isAdmin, refetch } = useOrganization();
+  const { organization, role, members, loading, isOwner, isAdmin, refetch } =
+    useOrganization();
 
   if (loading) {
     return (
@@ -671,7 +712,8 @@ export function WhitelabelSettings() {
             </div>
           </div>
           <p className="text-sm text-text-secondary">
-            Tu fais partie de cette organisation. Contacte un administrateur pour modifier les paramètres.
+            Tu fais partie de cette organisation. Contacte un administrateur
+            pour modifier les paramètres.
           </p>
         </CardContent>
       </Card>
@@ -692,15 +734,25 @@ export function WhitelabelSettings() {
         <CardContent>
           <div className="grid gap-3 sm:grid-cols-3">
             <div className="p-3 rounded-xl bg-bg-tertiary border border-border-default">
-              <p className="text-xs text-text-muted uppercase tracking-wide mb-1">Slug</p>
-              <p className="text-sm font-mono text-text-primary">{organization.slug}</p>
+              <p className="text-xs text-text-muted uppercase tracking-wide mb-1">
+                Slug
+              </p>
+              <p className="text-sm font-mono text-text-primary">
+                {organization.slug}
+              </p>
             </div>
             <div className="p-3 rounded-xl bg-bg-tertiary border border-border-default">
-              <p className="text-xs text-text-muted uppercase tracking-wide mb-1">Membres</p>
-              <p className="text-sm font-semibold text-text-primary">{members.length}</p>
+              <p className="text-xs text-text-muted uppercase tracking-wide mb-1">
+                Membres
+              </p>
+              <p className="text-sm font-semibold text-text-primary">
+                {members.length}
+              </p>
             </div>
             <div className="p-3 rounded-xl bg-bg-tertiary border border-border-default">
-              <p className="text-xs text-text-muted uppercase tracking-wide mb-1">Ton rôle</p>
+              <p className="text-xs text-text-muted uppercase tracking-wide mb-1">
+                Ton rôle
+              </p>
               <Badge variant={role === "owner" ? "purple" : "cyan"}>
                 {role === "owner" ? "Propriétaire" : "Admin"}
               </Badge>

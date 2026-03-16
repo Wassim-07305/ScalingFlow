@@ -49,7 +49,7 @@ const funnelLabels: Record<string, string> = {
 };
 
 const parcoursLabels: Record<string, string> = Object.fromEntries(
-  Object.entries(PARCOURS).map(([key, def]) => [key, def.label])
+  Object.entries(PARCOURS).map(([key, def]) => [key, def.label]),
 );
 
 const potentielVariant: Record<string, "default" | "yellow" | "red"> = {
@@ -66,11 +66,13 @@ const potentielLabel: Record<string, string> = {
 
 export function VaultResults({ analysis, onContinue }: VaultResultsProps) {
   // Formater les données pour le RadarChart
-  const radarData = Object.entries(analysis.radar ?? {}).map(([key, value]) => ({
-    dimension: radarLabels[key] ?? key,
-    value,
-    fullMark: 100,
-  }));
+  const radarData = Object.entries(analysis.radar ?? {}).map(
+    ([key, value]) => ({
+      dimension: radarLabels[key] ?? key,
+      value,
+      fullMark: 100,
+    }),
+  );
 
   return (
     <div className="mx-auto max-w-4xl space-y-6">
@@ -228,24 +230,26 @@ export function VaultResults({ analysis, onContinue }: VaultResultsProps) {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {(analysis.suggestions_productisation ?? []).map((suggestion, i) => (
-              <div
-                key={i}
-                className="rounded-[8px] border border-border-default bg-bg-tertiary p-4 transition-colors hover:border-border-hover"
-              >
-                <div className="mb-2 flex items-center justify-between">
-                  <h4 className="text-sm font-semibold text-text-primary">
-                    {suggestion.titre}
-                  </h4>
-                  <Badge variant={potentielVariant[suggestion.potentiel]}>
-                    {potentielLabel[suggestion.potentiel]}
-                  </Badge>
+            {(analysis.suggestions_productisation ?? []).map(
+              (suggestion, i) => (
+                <div
+                  key={i}
+                  className="rounded-[8px] border border-border-default bg-bg-tertiary p-4 transition-colors hover:border-border-hover"
+                >
+                  <div className="mb-2 flex items-center justify-between">
+                    <h4 className="text-sm font-semibold text-text-primary">
+                      {suggestion.titre}
+                    </h4>
+                    <Badge variant={potentielVariant[suggestion.potentiel]}>
+                      {potentielLabel[suggestion.potentiel]}
+                    </Badge>
+                  </div>
+                  <p className="text-xs leading-relaxed text-text-secondary">
+                    {suggestion.description}
+                  </p>
                 </div>
-                <p className="text-xs leading-relaxed text-text-secondary">
-                  {suggestion.description}
-                </p>
-              </div>
-            ))}
+              ),
+            )}
           </div>
         </CardContent>
       </Card>
@@ -263,7 +267,9 @@ export function VaultResults({ analysis, onContinue }: VaultResultsProps) {
           <CardContent className="space-y-3">
             <div className="flex items-center gap-3">
               <Badge variant="default" className="text-sm">
-                {funnelLabels[analysis.recommandation_funnel] ?? analysis.recommandation_funnel ?? "Non defini"}
+                {funnelLabels[analysis.recommandation_funnel] ??
+                  analysis.recommandation_funnel ??
+                  "Non defini"}
               </Badge>
             </div>
             <p className="text-sm leading-relaxed text-text-secondary">
@@ -311,7 +317,7 @@ export function VaultResults({ analysis, onContinue }: VaultResultsProps) {
                 <span
                   className={cn(
                     "mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold",
-                    "bg-accent-muted text-accent"
+                    "bg-accent-muted text-accent",
                   )}
                 >
                   {i + 1}

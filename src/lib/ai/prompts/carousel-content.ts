@@ -15,7 +15,7 @@ export interface CarouselResult {
 export function buildCarouselPrompt(
   market: string,
   offer: string,
-  topic: string
+  topic: string,
 ): string {
   return `Tu es un expert en creation de carousels Instagram/LinkedIn pour les freelances et consultants.
 

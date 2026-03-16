@@ -10,12 +10,13 @@ export async function POST(request: NextRequest) {
     // SECURITY: Verify webhook authenticity via shared secret
     const webhookSecret = process.env.UNIPILE_WEBHOOK_SECRET;
     if (webhookSecret) {
-      const providedSecret = request.headers.get("x-webhook-secret") ||
+      const providedSecret =
+        request.headers.get("x-webhook-secret") ||
         request.headers.get("authorization")?.replace("Bearer ", "");
       if (providedSecret !== webhookSecret) {
         return NextResponse.json(
           { error: "Webhook non autorisé" },
-          { status: 401 }
+          { status: 401 },
         );
       }
     }
@@ -32,10 +33,7 @@ export async function POST(request: NextRequest) {
     };
 
     if (!event || !data) {
-      return NextResponse.json(
-        { error: "Payload invalide" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Payload invalide" }, { status: 400 });
     }
 
     // Only handle account.created events
@@ -48,7 +46,7 @@ export async function POST(request: NextRequest) {
     if (!account_id || !userId || !provider) {
       return NextResponse.json(
         { error: "Données manquantes dans le payload" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -56,37 +54,35 @@ export async function POST(request: NextRequest) {
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!,
-      { cookies: { getAll: () => [], setAll: () => {} } }
+      { cookies: { getAll: () => [], setAll: () => {} } },
     );
 
     const providerKey = `unipile_${provider.toLowerCase()}`;
 
     // Upsert connected account
-    const { error } = await supabase
-      .from("connected_accounts")
-      .upsert(
-        {
-          user_id: userId,
-          provider: providerKey,
-          provider_account_id: account_id,
-          access_token: "managed_by_unipile",
-          provider_username: provider.toLowerCase(),
-          metadata: {
-            unipile_account_id: account_id,
-            unipile_provider: provider,
-            connected_via: "hosted_auth",
-          },
-          connected_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
+    const { error } = await supabase.from("connected_accounts").upsert(
+      {
+        user_id: userId,
+        provider: providerKey,
+        provider_account_id: account_id,
+        access_token: "managed_by_unipile",
+        provider_username: provider.toLowerCase(),
+        metadata: {
+          unipile_account_id: account_id,
+          unipile_provider: provider,
+          connected_via: "hosted_auth",
         },
-        { onConflict: "user_id,provider" }
-      );
+        connected_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: "user_id,provider" },
+    );
 
     if (error) {
       console.error("[Unipile Webhook] Erreur Supabase :", error);
       return NextResponse.json(
         { error: "Erreur lors de la sauvegarde du compte" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -95,7 +91,7 @@ export async function POST(request: NextRequest) {
     console.error("[Unipile Webhook]", error);
     return NextResponse.json(
       { error: "Erreur interne du webhook" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

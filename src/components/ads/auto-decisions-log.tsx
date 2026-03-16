@@ -31,7 +31,13 @@ interface Decision {
   id: string;
   creative_name: string;
   campaign_name: string;
-  decision_type: "pause" | "scale" | "maintain" | "creative_fatigue" | "reallocate" | "rollback";
+  decision_type:
+    | "pause"
+    | "scale"
+    | "maintain"
+    | "creative_fatigue"
+    | "reallocate"
+    | "rollback";
   reason: string;
   details: string | null;
   metrics_snapshot: Record<string, number> | null;
@@ -44,69 +50,110 @@ interface Decision {
 
 function getActionIcon(type: Decision["decision_type"]) {
   switch (type) {
-    case "pause": return Scissors;
-    case "scale": return TrendingUp;
-    case "reallocate": return ArrowUpRight;
-    case "creative_fatigue": return RefreshCw;
-    case "rollback": return RotateCcw;
-    case "maintain": return Settings2;
+    case "pause":
+      return Scissors;
+    case "scale":
+      return TrendingUp;
+    case "reallocate":
+      return ArrowUpRight;
+    case "creative_fatigue":
+      return RefreshCw;
+    case "rollback":
+      return RotateCcw;
+    case "maintain":
+      return Settings2;
   }
 }
 
 function getActionLabel(type: Decision["decision_type"]) {
   switch (type) {
-    case "pause": return "Couper";
-    case "scale": return "Scaler";
-    case "reallocate": return "Réalloquer";
-    case "creative_fatigue": return "Fatigue";
-    case "rollback": return "Rollback";
-    case "maintain": return "Maintenir";
+    case "pause":
+      return "Couper";
+    case "scale":
+      return "Scaler";
+    case "reallocate":
+      return "Réalloquer";
+    case "creative_fatigue":
+      return "Fatigue";
+    case "rollback":
+      return "Rollback";
+    case "maintain":
+      return "Maintenir";
   }
 }
 
-function getActionBadgeVariant(type: Decision["decision_type"]): "red" | "default" | "blue" | "yellow" | "purple" | "muted" {
+function getActionBadgeVariant(
+  type: Decision["decision_type"],
+): "red" | "default" | "blue" | "yellow" | "purple" | "muted" {
   switch (type) {
-    case "pause": return "red";
-    case "scale": return "default";
-    case "reallocate": return "blue";
-    case "creative_fatigue": return "yellow";
-    case "rollback": return "purple";
-    case "maintain": return "muted";
+    case "pause":
+      return "red";
+    case "scale":
+      return "default";
+    case "reallocate":
+      return "blue";
+    case "creative_fatigue":
+      return "yellow";
+    case "rollback":
+      return "purple";
+    case "maintain":
+      return "muted";
   }
 }
 
 function getActionColor(type: Decision["decision_type"]) {
   switch (type) {
-    case "pause": return { icon: "text-red-400", bg: "bg-red-500/10" };
-    case "scale": return { icon: "text-emerald-400", bg: "bg-emerald-500/10" };
-    case "reallocate": return { icon: "text-blue-400", bg: "bg-blue-500/10" };
-    case "creative_fatigue": return { icon: "text-yellow-400", bg: "bg-yellow-500/10" };
-    case "rollback": return { icon: "text-purple-400", bg: "bg-purple-500/10" };
-    case "maintain": return { icon: "text-text-muted", bg: "bg-bg-tertiary" };
+    case "pause":
+      return { icon: "text-red-400", bg: "bg-red-500/10" };
+    case "scale":
+      return { icon: "text-emerald-400", bg: "bg-emerald-500/10" };
+    case "reallocate":
+      return { icon: "text-blue-400", bg: "bg-blue-500/10" };
+    case "creative_fatigue":
+      return { icon: "text-yellow-400", bg: "bg-yellow-500/10" };
+    case "rollback":
+      return { icon: "text-purple-400", bg: "bg-purple-500/10" };
+    case "maintain":
+      return { icon: "text-text-muted", bg: "bg-bg-tertiary" };
   }
 }
 
 function getStatusLabel(status: Decision["status"]) {
   switch (status) {
-    case "pending": return "En attente";
-    case "applied": return "Appliqué";
-    case "cancelled": return "Annulé";
-    case "failed": return "Échoué";
+    case "pending":
+      return "En attente";
+    case "applied":
+      return "Appliqué";
+    case "cancelled":
+      return "Annulé";
+    case "failed":
+      return "Échoué";
   }
 }
 
-function getStatusBadge(status: Decision["status"]): "yellow" | "default" | "muted" | "red" {
+function getStatusBadge(
+  status: Decision["status"],
+): "yellow" | "default" | "muted" | "red" {
   switch (status) {
-    case "pending": return "yellow";
-    case "applied": return "default";
-    case "cancelled": return "muted";
-    case "failed": return "red";
+    case "pending":
+      return "yellow";
+    case "applied":
+      return "default";
+    case "cancelled":
+      return "muted";
+    case "failed":
+      return "red";
   }
 }
 
 function formatTimestamp(ts: string): string {
   const d = new Date(ts);
-  return d.toLocaleString("fr-FR", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" });
+  return d.toLocaleString("fr-FR", {
+    day: "2-digit",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 }
 
 // ─── Skeleton Loader ────────────────────────────────────────
@@ -183,7 +230,7 @@ export function AutoDecisionsLog() {
         toast.success(
           data.decisionsCount > 0
             ? `${data.decisionsCount} décision${data.decisionsCount > 1 ? "s" : ""} générée${data.decisionsCount > 1 ? "s" : ""}`
-            : "Aucune décision nécessaire"
+            : "Aucune décision nécessaire",
         );
         await fetchDecisions();
       } else {
@@ -207,7 +254,15 @@ export function AutoDecisionsLog() {
 
       if (data.success) {
         setDecisions((prev) =>
-          prev.map((d) => (d.id === decisionId ? { ...d, status: "applied" as const, applied_at: new Date().toISOString() } : d))
+          prev.map((d) =>
+            d.id === decisionId
+              ? {
+                  ...d,
+                  status: "applied" as const,
+                  applied_at: new Date().toISOString(),
+                }
+              : d,
+          ),
         );
         toast.success("Décision appliquée");
       } else {
@@ -229,7 +284,9 @@ export function AutoDecisionsLog() {
 
       if (data.success) {
         setDecisions((prev) =>
-          prev.map((d) => (d.id === decisionId ? { ...d, status: "cancelled" as const } : d))
+          prev.map((d) =>
+            d.id === decisionId ? { ...d, status: "cancelled" as const } : d,
+          ),
         );
         toast.success("Décision annulée");
       } else {
@@ -241,7 +298,9 @@ export function AutoDecisionsLog() {
   };
 
   const handleApplyAll = async () => {
-    const pendingIds = decisions.filter((d) => d.status === "pending").map((d) => d.id);
+    const pendingIds = decisions
+      .filter((d) => d.status === "pending")
+      .map((d) => d.id);
     for (const id of pendingIds) {
       await handleApplyDecision(id);
     }
@@ -262,7 +321,7 @@ export function AutoDecisionsLog() {
         toast.success(
           data.enabled
             ? "Automatisation activée — les décisions seront appliquées automatiquement"
-            : "Automatisation désactivée — mode recommandations uniquement"
+            : "Automatisation désactivée — mode recommandations uniquement",
         );
       }
     } catch {
@@ -278,7 +337,9 @@ export function AutoDecisionsLog() {
 
   const pendingDecisions = decisions.filter((d) => d.status === "pending");
   const appliedDecisions = decisions.filter((d) => d.status === "applied");
-  const otherDecisions = decisions.filter((d) => d.status === "cancelled" || d.status === "failed");
+  const otherDecisions = decisions.filter(
+    (d) => d.status === "cancelled" || d.status === "failed",
+  );
 
   return (
     <div className="space-y-6">
@@ -286,15 +347,24 @@ export function AutoDecisionsLog() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2 text-sm">
-            <div className={cn("w-2 h-2 rounded-full", pendingDecisions.length > 0 ? "bg-yellow-400 animate-pulse" : "bg-emerald-400")} />
+            <div
+              className={cn(
+                "w-2 h-2 rounded-full",
+                pendingDecisions.length > 0
+                  ? "bg-yellow-400 animate-pulse"
+                  : "bg-emerald-400",
+              )}
+            />
             <span className="text-text-secondary">
-              {pendingDecisions.length} décision{pendingDecisions.length !== 1 ? "s" : ""} en attente
+              {pendingDecisions.length} décision
+              {pendingDecisions.length !== 1 ? "s" : ""} en attente
             </span>
           </div>
           <div className="flex items-center gap-2 text-sm">
             <div className="w-2 h-2 rounded-full bg-emerald-400" />
             <span className="text-text-secondary">
-              {appliedDecisions.length} appliquée{appliedDecisions.length !== 1 ? "s" : ""}
+              {appliedDecisions.length} appliquée
+              {appliedDecisions.length !== 1 ? "s" : ""}
             </span>
           </div>
         </div>
@@ -308,7 +378,7 @@ export function AutoDecisionsLog() {
             className={cn(
               automationEnabled
                 ? "text-emerald-400 hover:text-emerald-300"
-                : "text-text-muted hover:text-text-secondary"
+                : "text-text-muted hover:text-text-secondary",
             )}
           >
             {togglingAutomation ? (
@@ -336,7 +406,11 @@ export function AutoDecisionsLog() {
           </Button>
 
           {pendingDecisions.length > 0 && (
-            <Button size="sm" onClick={handleApplyAll} className="bg-accent hover:bg-accent/90">
+            <Button
+              size="sm"
+              onClick={handleApplyAll}
+              className="bg-accent hover:bg-accent/90"
+            >
               <Zap className="h-3.5 w-3.5 mr-1.5" />
               Tout appliquer ({pendingDecisions.length})
             </Button>
@@ -350,10 +424,15 @@ export function AutoDecisionsLog() {
           "flex items-center gap-3 p-3 rounded-xl border transition-all",
           automationEnabled
             ? "border-emerald-500/30 bg-emerald-500/5"
-            : "border-border-default bg-bg-tertiary"
+            : "border-border-default bg-bg-tertiary",
         )}
       >
-        <div className={cn("p-2 rounded-lg", automationEnabled ? "bg-emerald-500/10" : "bg-bg-secondary")}>
+        <div
+          className={cn(
+            "p-2 rounded-lg",
+            automationEnabled ? "bg-emerald-500/10" : "bg-bg-secondary",
+          )}
+        >
           {automationEnabled ? (
             <Zap className="h-4 w-4 text-emerald-400" />
           ) : (
@@ -398,7 +477,7 @@ export function AutoDecisionsLog() {
                         ? "border-yellow-500/30 bg-yellow-500/5"
                         : decision.status === "applied"
                           ? "border-emerald-500/20 bg-emerald-500/5"
-                          : "border-border-default bg-bg-tertiary opacity-60"
+                          : "border-border-default bg-bg-tertiary opacity-60",
                     )}
                   >
                     <div className="flex items-start justify-between gap-3">
@@ -408,7 +487,11 @@ export function AutoDecisionsLog() {
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1 flex-wrap">
-                            <Badge variant={getActionBadgeVariant(decision.decision_type)}>
+                            <Badge
+                              variant={getActionBadgeVariant(
+                                decision.decision_type,
+                              )}
+                            >
                               {getActionLabel(decision.decision_type)}
                             </Badge>
                             <span className="text-sm font-semibold text-text-primary truncate">
@@ -418,42 +501,75 @@ export function AutoDecisionsLog() {
                               {getStatusLabel(decision.status)}
                             </Badge>
                           </div>
-                          <p className="text-xs text-text-secondary">{decision.reason}</p>
+                          <p className="text-xs text-text-secondary">
+                            {decision.reason}
+                          </p>
                           {decision.details && (
-                            <p className="text-[10px] text-text-muted mt-1">{decision.details}</p>
+                            <p className="text-[10px] text-text-muted mt-1">
+                              {decision.details}
+                            </p>
                           )}
 
                           {/* Metrics snapshot */}
-                          {decision.metrics_snapshot && decision.decision_type !== "maintain" && (
-                            <div className="flex flex-wrap gap-3 mt-2">
-                              {[
-                                { key: "roas", label: "ROAS", suffix: "x" },
-                                { key: "ctr", label: "CTR", suffix: "%" },
-                                { key: "spend", label: "Dépense", suffix: "€" },
-                                { key: "frequency", label: "Fréq.", suffix: "" },
-                              ]
-                                .filter((m) => decision.metrics_snapshot![m.key] !== undefined)
-                                .map((m) => (
-                                  <div key={m.key} className="text-center">
-                                    <p className="text-[9px] text-text-muted uppercase">{m.label}</p>
-                                    <p className="text-xs font-semibold text-text-primary">
-                                      {typeof decision.metrics_snapshot![m.key] === "number"
-                                        ? (decision.metrics_snapshot![m.key] as number).toFixed(
-                                            m.key === "spend" ? 0 : m.key === "frequency" ? 1 : 2
-                                          )
-                                        : decision.metrics_snapshot![m.key]}
-                                      {m.suffix}
-                                    </p>
-                                  </div>
-                                ))}
-                            </div>
-                          )}
+                          {decision.metrics_snapshot &&
+                            decision.decision_type !== "maintain" && (
+                              <div className="flex flex-wrap gap-3 mt-2">
+                                {[
+                                  { key: "roas", label: "ROAS", suffix: "x" },
+                                  { key: "ctr", label: "CTR", suffix: "%" },
+                                  {
+                                    key: "spend",
+                                    label: "Dépense",
+                                    suffix: "€",
+                                  },
+                                  {
+                                    key: "frequency",
+                                    label: "Fréq.",
+                                    suffix: "",
+                                  },
+                                ]
+                                  .filter(
+                                    (m) =>
+                                      decision.metrics_snapshot![m.key] !==
+                                      undefined,
+                                  )
+                                  .map((m) => (
+                                    <div key={m.key} className="text-center">
+                                      <p className="text-[9px] text-text-muted uppercase">
+                                        {m.label}
+                                      </p>
+                                      <p className="text-xs font-semibold text-text-primary">
+                                        {typeof decision.metrics_snapshot![
+                                          m.key
+                                        ] === "number"
+                                          ? (
+                                              decision.metrics_snapshot![
+                                                m.key
+                                              ] as number
+                                            ).toFixed(
+                                              m.key === "spend"
+                                                ? 0
+                                                : m.key === "frequency"
+                                                  ? 1
+                                                  : 2,
+                                            )
+                                          : decision.metrics_snapshot![m.key]}
+                                        {m.suffix}
+                                      </p>
+                                    </div>
+                                  ))}
+                              </div>
+                            )}
 
                           <p className="text-[10px] text-text-muted mt-2 flex items-center gap-1">
                             <Clock className="h-2.5 w-2.5" />
                             {formatTimestamp(decision.created_at)}
                             {decision.applied_at && (
-                              <> · Appliqué {formatTimestamp(decision.applied_at)}</>
+                              <>
+                                {" "}
+                                · Appliqué{" "}
+                                {formatTimestamp(decision.applied_at)}
+                              </>
                             )}
                           </p>
                         </div>
@@ -492,9 +608,12 @@ export function AutoDecisionsLog() {
               <div className="p-3 rounded-full bg-accent/10 mb-4">
                 <Zap className="h-8 w-8 text-accent" />
               </div>
-              <p className="text-sm font-medium text-text-primary mb-1">Aucune décision pour le moment</p>
+              <p className="text-sm font-medium text-text-primary mb-1">
+                Aucune décision pour le moment
+              </p>
               <p className="text-xs text-text-muted mb-4">
-                Lance une analyse pour générer des recommandations basées sur les performances de tes créatives.
+                Lance une analyse pour générer des recommandations basées sur
+                les performances de tes créatives.
               </p>
               <Button onClick={handleAnalyze} disabled={analyzing}>
                 {analyzing ? (
@@ -514,14 +633,23 @@ export function AutoDecisionsLog() {
         <details className="group">
           <summary className="cursor-pointer text-xs text-text-muted hover:text-text-secondary transition-colors flex items-center gap-2 mb-3">
             <XCircle className="h-3.5 w-3.5" />
-            {otherDecisions.length} décision{otherDecisions.length !== 1 ? "s" : ""} annulée{otherDecisions.length !== 1 ? "s" : ""}
+            {otherDecisions.length} décision
+            {otherDecisions.length !== 1 ? "s" : ""} annulée
+            {otherDecisions.length !== 1 ? "s" : ""}
           </summary>
           <div className="space-y-2">
             {otherDecisions.map((d) => (
-              <div key={d.id} className="flex items-center justify-between p-3 rounded-xl bg-bg-tertiary border border-border-default opacity-50">
+              <div
+                key={d.id}
+                className="flex items-center justify-between p-3 rounded-xl bg-bg-tertiary border border-border-default opacity-50"
+              >
                 <div className="flex items-center gap-2">
-                  <Badge variant={getActionBadgeVariant(d.decision_type)}>{getActionLabel(d.decision_type)}</Badge>
-                  <span className="text-xs text-text-primary">{d.creative_name}</span>
+                  <Badge variant={getActionBadgeVariant(d.decision_type)}>
+                    {getActionLabel(d.decision_type)}
+                  </Badge>
+                  <span className="text-xs text-text-primary">
+                    {d.creative_name}
+                  </span>
                 </div>
                 <Badge variant="muted">{getStatusLabel(d.status)}</Badge>
               </div>

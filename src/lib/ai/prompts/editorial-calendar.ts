@@ -27,7 +27,7 @@ export function buildEditorialCalendarPrompt(
   offer: string,
   persona: string,
   startDate: string,
-  vaultContext: string
+  vaultContext: string,
 ): string {
   return `Tu es un expert en strategie de contenu et en planification editoriale pour les freelances et consultants francophones.
 

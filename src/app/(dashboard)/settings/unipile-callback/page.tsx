@@ -17,7 +17,7 @@ export default function UnipileCallbackPage() {
     if (window.opener) {
       window.opener.postMessage(
         { type: "unipile-auth", status: isSuccess ? "success" : "error" },
-        window.location.origin
+        window.location.origin,
       );
     }
 

@@ -12,7 +12,7 @@ export function getUnipileClient(): UnipileClient {
 
   if (!apiUrl || !accessToken) {
     throw new Error(
-      "Variables d'environnement UNIPILE_API_URL et UNIPILE_ACCESS_TOKEN requises"
+      "Variables d'environnement UNIPILE_API_URL et UNIPILE_ACCESS_TOKEN requises",
     );
   }
 

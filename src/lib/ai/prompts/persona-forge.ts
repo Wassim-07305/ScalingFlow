@@ -1,9 +1,27 @@
+export interface YouTubeTranscriptData {
+  competitor: string;
+  title: string;
+  channelName: string;
+  viewCount: number;
+  transcript: string;
+  url: string;
+}
+
 export interface PersonaForgeResult {
   avatar_name: string;
   avatar_role: string;
   bio_fictive: string;
   journee_type: string;
   canaux_medias: string[];
+  based_on_real_data: boolean;
+  verbatims_reels: string[];
+  niveau_schwartz: string;
+  raisons_achat: string[];
+  desirs_par_profondeur: {
+    surface: string[];
+    intermediaire: string[];
+    profond: string[];
+  };
   niveau_1_demo: {
     age_range: string;
     genre: string;
@@ -50,7 +68,12 @@ export interface MarketAnalysisData {
 
 export interface VaultContextData {
   skills?: string[];
-  vaultSkills?: { name?: string; category?: string; level: string; details?: string }[];
+  vaultSkills?: {
+    name?: string;
+    category?: string;
+    level: string;
+    details?: string;
+  }[];
   expertiseAnswers?: Record<string, string>;
   situation?: string;
   parcours?: string;
@@ -59,8 +82,9 @@ export interface VaultContextData {
 export function buildPersonaForgePrompt(data: {
   marketAnalysis: MarketAnalysisData;
   vaultData: VaultContextData;
+  youtubeTranscripts?: YouTubeTranscriptData[];
 }): string {
-  const { marketAnalysis, vaultData } = data;
+  const { marketAnalysis, vaultData, youtubeTranscripts } = data;
 
   let userContext = "";
   if (vaultData.skills && vaultData.skills.length > 0) {
@@ -82,7 +106,10 @@ export function buildPersonaForgePrompt(data: {
   }
 
   let expertiseContext = "";
-  if (vaultData.expertiseAnswers && Object.keys(vaultData.expertiseAnswers).length > 0) {
+  if (
+    vaultData.expertiseAnswers &&
+    Object.keys(vaultData.expertiseAnswers).length > 0
+  ) {
     expertiseContext = "\n\n## EXPERTISE UTILISATEUR\n";
     for (const [q, a] of Object.entries(vaultData.expertiseAnswers)) {
       expertiseContext += `- ${q} : ${a}\n`;
@@ -93,6 +120,39 @@ export function buildPersonaForgePrompt(data: {
     ? `\n\n## AVATAR INITIAL (à approfondir)\n${JSON.stringify(marketAnalysis.target_avatar, null, 2)}`
     : "";
 
+  // Construire la section YouTube si des transcripts sont disponibles
+  let youtubeSection = "";
+  const hasYoutubeData = youtubeTranscripts && youtubeTranscripts.length > 0;
+
+  if (hasYoutubeData) {
+    youtubeSection = `\n\n## DONNÉES YOUTUBE RÉELLES (PRIORITÉ MAXIMALE)
+Ces données proviennent de vraies vidéos YouTube de concurrents (interviews clients, études de cas, témoignages). Tu DOIS t'appuyer en priorité sur ces données réelles pour construire l'avatar.
+
+Extrais de ces transcripts :
+- Le LANGAGE NATUREL exact utilisé par les vrais clients (expressions, mots, tournures)
+- Les DOULEURS réelles exprimées (pas des suppositions)
+- Les DÉSIRS et OBJECTIFS mentionnés par les vrais clients
+- Les OBJECTIONS et HÉSITATIONS évoquées
+- Le CONTEXTE de vie réel (situation, parcours, frustrations quotidiennes)
+- Les RAISONS D'ACHAT concrètes mentionnées
+
+`;
+    for (const t of youtubeTranscripts) {
+      // Limiter chaque transcript à ~2000 caractères pour éviter de dépasser les tokens
+      const truncatedTranscript =
+        t.transcript.length > 2000
+          ? t.transcript.slice(0, 2000) + "..."
+          : t.transcript;
+      youtubeSection += `### Vidéo : "${t.title}" — ${t.channelName} (${t.viewCount.toLocaleString("fr-FR")} vues)
+Concurrent : ${t.competitor}
+URL : ${t.url}
+Transcript :
+${truncatedTranscript}
+
+`;
+    }
+  }
+
   return `Tu es un expert en psychologie consommateur et en marketing, spécialisé dans la création d'avatars clients ultra-détaillés. Tu maîtrises les frameworks de personas avancés (Jobs-to-be-Done, Empathy Map, Buyer Journey).
 
 ## MARCHÉ ANALYSÉ
@@ -101,10 +161,10 @@ export function buildPersonaForgePrompt(data: {
 - Problèmes identifiés : ${marketAnalysis.problems?.join(", ") || "Non fournis"}
 - Positionnement recommandé : ${marketAnalysis.recommended_positioning || "Non fourni"}
 - Pays cible : ${marketAnalysis.country || "Non spécifié"}
-- Langue : ${marketAnalysis.language || "Français"}${userContext}${vaultSkillsContext}${expertiseContext}${avatarContext}
+- Langue : ${marketAnalysis.language || "Français"}${userContext}${vaultSkillsContext}${expertiseContext}${avatarContext}${youtubeSection}
 
 ## TA MISSION
-Crée un avatar client ultra-détaillé sur 4 niveaux de profondeur pour le marché "${marketAnalysis.market_name}". Cet avatar doit être tellement précis que l'utilisateur pourra écrire du copy qui parle directement à cette personne.
+Crée un avatar client ultra-détaillé sur 4 niveaux de profondeur pour le marché "${marketAnalysis.market_name}". Cet avatar doit être tellement précis que l'utilisateur pourra écrire du copy qui parle directement à cette personne.${hasYoutubeData ? "\n\nATTENTION : Tu disposes de données YouTube RÉELLES. Base-toi EN PRIORITÉ sur ces transcripts pour extraire le langage naturel, les douleurs, désirs et objections des vrais clients. Cite des verbatims réels dans le champ 'verbatims_reels'." : ""}
 
 ### BIO FICTIVE
 Écris une bio fictive ultra-détaillée de 3-5 phrases : prénom, nom, âge, situation, parcours pro, situation actuelle, personnalité. Comme si tu décrivais un vrai être humain.
@@ -115,10 +175,16 @@ Décris une journée type de cet avatar : du réveil au coucher, ses habitudes, 
 ### CANAUX MÉDIAS CONSOMMÉS
 Liste les 5-8 canaux médias qu'il consomme : réseaux sociaux spécifiques, podcasts, newsletters, YouTube, blogs, groupes Facebook, forums, etc. Sois précis sur les types de contenu consommés.
 
+### COMPLÉMENTS AVANCÉS
+- **Verbatims réels** : Si tu disposes de données YouTube, extrais 5-10 citations mot-pour-mot des vrais clients (langage naturel, expressions familières, mots exacts). Sinon, génère des verbatims réalistes basés sur ton analyse.
+- **Niveau Schwartz** : Identifie le niveau de conscience de l'avatar selon Eugene Schwartz (Unaware, Problem-Aware, Solution-Aware, Product-Aware, Most-Aware). Explique pourquoi.
+- **Raisons d'achat** : Liste les 5-8 raisons concrètes qui poussent cet avatar à acheter (pas des généralités, des motivations spécifiques à ce marché).
+- **Désirs par profondeur** : 3 niveaux — désirs de surface (ce qu'il dit vouloir), désirs intermédiaires (ce qu'il veut vraiment), désirs profonds (le besoin fondamental caché).
+
 ### NIVEAU 1 — Démographique
 Âge, sexe, localisation, revenus, situation professionnelle. Donne les caractéristiques démographiques précises : tranche d'âge, genre prédominant, situation familiale, revenu annuel, localisation type, situation professionnelle, niveau d'éducation.
 
-### NIVEAU 2 — Psychographique
+### NIVEAU 2 — Psychographique (Problématique + Émotionnel)
 Peurs, frustrations, désirs, croyances limitantes, déclencheurs d'achat. Va en profondeur dans la psychologie : peurs réelles, frustrations quotidiennes, désirs profonds (pas juste de surface), croyances limitantes qui les empêchent d'agir, déclencheurs émotionnels qui les font passer à l'action.
 
 ### NIVEAU 3 — Comportemental
@@ -135,6 +201,15 @@ Réponds en JSON structuré :
   "bio_fictive": "Bio narrative détaillée de 3-5 phrases...",
   "journee_type": "Description de la journée type de l'avatar...",
   "canaux_medias": ["Instagram (Reels business)", "YouTube (formations)", "Podcast X", "Newsletter Y", "LinkedIn"],
+  "based_on_real_data": ${hasYoutubeData ? "true" : "false"},
+  "verbatims_reels": ["Citation exacte d'un vrai client...", "Autre citation mot-pour-mot..."],
+  "niveau_schwartz": "Problem-Aware — Explication de pourquoi ce niveau...",
+  "raisons_achat": ["Raison concrète 1", "Raison concrète 2", "..."],
+  "desirs_par_profondeur": {
+    "surface": ["Ce qu'il dit vouloir ouvertement..."],
+    "intermediaire": ["Ce qu'il veut vraiment en creusant..."],
+    "profond": ["Le besoin fondamental caché..."]
+  },
   "niveau_1_demo": {
     "age_range": "35-45 ans",
     "genre": "...",

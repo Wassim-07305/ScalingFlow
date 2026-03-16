@@ -14,9 +14,7 @@ export default function RoadmapLoading() {
             {/* Timeline line + dot */}
             <div className="flex flex-col items-center">
               <div className="h-5 w-5 bg-bg-secondary rounded-full shrink-0" />
-              {i < 4 && (
-                <div className="w-0.5 flex-1 bg-bg-secondary mt-1" />
-              )}
+              {i < 4 && <div className="w-0.5 flex-1 bg-bg-secondary mt-1" />}
             </div>
             {/* Milestone card */}
             <div className="flex-1 rounded-xl border border-border-default bg-bg-secondary p-5 space-y-3 mb-2">

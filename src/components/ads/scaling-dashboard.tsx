@@ -71,25 +71,55 @@ interface Campaign {
 function getStatusConfig(status: ScalingEntry["status"]) {
   switch (status) {
     case "pending":
-      return { label: "En attente", color: "text-yellow-400", bg: "bg-yellow-500/10", border: "border-yellow-500/30" };
+      return {
+        label: "En attente",
+        color: "text-yellow-400",
+        bg: "bg-yellow-500/10",
+        border: "border-yellow-500/30",
+      };
     case "active":
-      return { label: "En cours", color: "text-blue-400", bg: "bg-blue-500/10", border: "border-blue-500/30" };
+      return {
+        label: "En cours",
+        color: "text-blue-400",
+        bg: "bg-blue-500/10",
+        border: "border-blue-500/30",
+      };
     case "validated":
-      return { label: "Validé", color: "text-emerald-400", bg: "bg-emerald-500/10", border: "border-emerald-500/30" };
+      return {
+        label: "Validé",
+        color: "text-emerald-400",
+        bg: "bg-emerald-500/10",
+        border: "border-emerald-500/30",
+      };
     case "rollback":
-      return { label: "Rollback", color: "text-purple-400", bg: "bg-purple-500/10", border: "border-purple-500/30" };
+      return {
+        label: "Rollback",
+        color: "text-purple-400",
+        bg: "bg-purple-500/10",
+        border: "border-purple-500/30",
+      };
     case "failed":
-      return { label: "Échoué", color: "text-red-400", bg: "bg-red-500/10", border: "border-red-500/30" };
+      return {
+        label: "Échoué",
+        color: "text-red-400",
+        bg: "bg-red-500/10",
+        border: "border-red-500/30",
+      };
   }
 }
 
 function getTierLabel(level: number) {
   switch (level) {
-    case 1: return "Palier 1 — Démarrage";
-    case 2: return "Palier 2 — Croissance";
-    case 3: return "Palier 3 — Accélération";
-    case 4: return "Palier 4 — Volume";
-    default: return `Palier ${level}`;
+    case 1:
+      return "Palier 1 — Démarrage";
+    case 2:
+      return "Palier 2 — Croissance";
+    case 3:
+      return "Palier 3 — Accélération";
+    case 4:
+      return "Palier 4 — Volume";
+    default:
+      return `Palier ${level}`;
   }
 }
 
@@ -102,7 +132,12 @@ function getTierConfig(budget: number) {
 
 function formatTimestamp(ts: string): string {
   const d = new Date(ts);
-  return d.toLocaleString("fr-FR", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" });
+  return d.toLocaleString("fr-FR", {
+    day: "2-digit",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 }
 
 function formatDate(ts: string): string {
@@ -161,7 +196,8 @@ export function ScalingDashboard() {
         .order("created_at", { ascending: false }),
     ]);
 
-    if (entriesRes.error) toast.error("Impossible de charger l'historique de scaling");
+    if (entriesRes.error)
+      toast.error("Impossible de charger l'historique de scaling");
     if (campaignsRes.error) toast.error("Impossible de charger les campagnes");
 
     setEntries(entriesRes.data ?? []);
@@ -238,18 +274,19 @@ export function ScalingDashboard() {
   const rollbackScalings = entries.filter((e) => e.status === "rollback");
 
   // Build chart data from entries
-  const chartData = [...entries]
-    .reverse()
-    .map((e) => ({
-      date: formatDate(e.created_at),
-      budget: e.new_budget,
-      roas: e.roas_after_24h ?? e.roas_at_scale,
-      tier: e.tier_level,
-      status: e.status,
-    }));
+  const chartData = [...entries].reverse().map((e) => ({
+    date: formatDate(e.created_at),
+    budget: e.new_budget,
+    roas: e.roas_after_24h ?? e.roas_at_scale,
+    tier: e.tier_level,
+    status: e.status,
+  }));
 
   // Current highest budget among active campaigns
-  const currentMaxBudget = campaigns.reduce((max, c) => Math.max(max, c.daily_budget ?? 0), 0);
+  const currentMaxBudget = campaigns.reduce(
+    (max, c) => Math.max(max, c.daily_budget ?? 0),
+    0,
+  );
   const currentTier = getTierConfig(currentMaxBudget);
 
   return (
@@ -286,14 +323,21 @@ export function ScalingDashboard() {
             icon: RotateCcw,
           },
         ].map((item) => (
-          <div key={item.label} className="p-4 rounded-xl border border-border-default bg-bg-tertiary">
+          <div
+            key={item.label}
+            className="p-4 rounded-xl border border-border-default bg-bg-tertiary"
+          >
             <div className="flex items-center justify-between mb-1">
-              <p className="text-[10px] text-text-muted uppercase tracking-wider">{item.label}</p>
+              <p className="text-[10px] text-text-muted uppercase tracking-wider">
+                {item.label}
+              </p>
               <item.icon className={cn("h-4 w-4", item.color)} />
             </div>
             <p className={cn("text-lg font-bold", item.color)}>
               {item.value}
-              {item.suffix && <span className="text-xs text-text-muted">{item.suffix}</span>}
+              {item.suffix && (
+                <span className="text-xs text-text-muted">{item.suffix}</span>
+              )}
             </p>
           </div>
         ))}
@@ -339,13 +383,16 @@ export function ScalingDashboard() {
                   <option value="">Sélectionner une campagne</option>
                   {campaigns.map((c) => (
                     <option key={c.id} value={c.id}>
-                      {c.campaign_name} — {c.daily_budget ?? 0}€/jour (ROAS {c.roas ?? 0}x)
+                      {c.campaign_name} — {c.daily_budget ?? 0}€/jour (ROAS{" "}
+                      {c.roas ?? 0}x)
                     </option>
                   ))}
                 </select>
               </div>
               <div>
-                <Label className="text-xs text-text-muted">Augmentation (%)</Label>
+                <Label className="text-xs text-text-muted">
+                  Augmentation (%)
+                </Label>
                 <Input
                   type="number"
                   value={scalePercent}
@@ -367,23 +414,34 @@ export function ScalingDashboard() {
               </div>
             </div>
 
-            {selectedCampaignId && (() => {
-              const selected = campaigns.find((c) => c.id === selectedCampaignId);
-              if (!selected) return null;
-              const newBudget = Math.round((selected.daily_budget ?? 0) * (1 + (parseFloat(scalePercent) || 20) / 100));
-              return (
-                <div className="p-3 rounded-xl bg-accent/5 border border-accent/20 mb-4">
-                  <p className="text-xs text-accent flex items-center gap-1.5">
-                    <ArrowUpRight className="h-3.5 w-3.5" />
-                    Budget passera de {selected.daily_budget ?? 0}€ à {newBudget}€/jour (+{scalePercent}%)
-                    — Vérification du ROAS après 24h (seuil: {roasThreshold}x)
-                  </p>
-                </div>
-              );
-            })()}
+            {selectedCampaignId &&
+              (() => {
+                const selected = campaigns.find(
+                  (c) => c.id === selectedCampaignId,
+                );
+                if (!selected) return null;
+                const newBudget = Math.round(
+                  (selected.daily_budget ?? 0) *
+                    (1 + (parseFloat(scalePercent) || 20) / 100),
+                );
+                return (
+                  <div className="p-3 rounded-xl bg-accent/5 border border-accent/20 mb-4">
+                    <p className="text-xs text-accent flex items-center gap-1.5">
+                      <ArrowUpRight className="h-3.5 w-3.5" />
+                      Budget passera de {selected.daily_budget ?? 0}€ à{" "}
+                      {newBudget}€/jour (+{scalePercent}%) — Vérification du
+                      ROAS après 24h (seuil: {roasThreshold}x)
+                    </p>
+                  </div>
+                );
+              })()}
 
             <div className="flex gap-2">
-              <Button onClick={handleScale} disabled={scaling || !selectedCampaignId} size="sm">
+              <Button
+                onClick={handleScale}
+                disabled={scaling || !selectedCampaignId}
+                size="sm"
+              >
                 {scaling ? (
                   <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />
                 ) : (
@@ -391,7 +449,11 @@ export function ScalingDashboard() {
                 )}
                 Lancer le scaling
               </Button>
-              <Button variant="ghost" size="sm" onClick={() => setShowScaleForm(false)}>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowScaleForm(false)}
+              >
                 Annuler
               </Button>
             </div>
@@ -410,14 +472,40 @@ export function ScalingDashboard() {
         <CardContent>
           <div className="space-y-3">
             {[
-              { id: 1, label: "Palier 1 — Démarrage", budgetRange: "0€ — 50€", scalePercent: 20, roasRequired: 2.0 },
-              { id: 2, label: "Palier 2 — Croissance", budgetRange: "50€ — 200€", scalePercent: 15, roasRequired: 2.5 },
-              { id: 3, label: "Palier 3 — Accélération", budgetRange: "200€ — 500€", scalePercent: 10, roasRequired: 3.0 },
-              { id: 4, label: "Palier 4 — Volume", budgetRange: "500€+", scalePercent: 5, roasRequired: 3.5 },
+              {
+                id: 1,
+                label: "Palier 1 — Démarrage",
+                budgetRange: "0€ — 50€",
+                scalePercent: 20,
+                roasRequired: 2.0,
+              },
+              {
+                id: 2,
+                label: "Palier 2 — Croissance",
+                budgetRange: "50€ — 200€",
+                scalePercent: 15,
+                roasRequired: 2.5,
+              },
+              {
+                id: 3,
+                label: "Palier 3 — Accélération",
+                budgetRange: "200€ — 500€",
+                scalePercent: 10,
+                roasRequired: 3.0,
+              },
+              {
+                id: 4,
+                label: "Palier 4 — Volume",
+                budgetRange: "500€+",
+                scalePercent: 5,
+                roasRequired: 3.5,
+              },
             ].map((tier) => {
               const isCurrent = tier.id === currentTier.level;
               const isPassed = currentTier.level > tier.id;
-              const meetsRoas = campaigns.some((c) => (c.roas ?? 0) >= tier.roasRequired);
+              const meetsRoas = campaigns.some(
+                (c) => (c.roas ?? 0) >= tier.roasRequired,
+              );
 
               return (
                 <div
@@ -428,7 +516,7 @@ export function ScalingDashboard() {
                       ? "border-accent bg-accent/10"
                       : isPassed
                         ? "border-emerald-500/20 bg-emerald-500/5"
-                        : "border-border-default bg-bg-tertiary"
+                        : "border-border-default bg-bg-tertiary",
                   )}
                 >
                   <div className="flex items-center justify-between flex-wrap gap-3">
@@ -440,29 +528,42 @@ export function ScalingDashboard() {
                             ? "bg-accent text-white"
                             : isPassed
                               ? "bg-emerald-500/20 text-emerald-400"
-                              : "bg-bg-secondary text-text-muted"
+                              : "bg-bg-secondary text-text-muted",
                         )}
                       >
                         {tier.id}
                       </div>
                       <div>
-                        <p className={cn("text-sm font-semibold", isCurrent ? "text-accent" : "text-text-primary")}>
+                        <p
+                          className={cn(
+                            "text-sm font-semibold",
+                            isCurrent ? "text-accent" : "text-text-primary",
+                          )}
+                        >
                           {tier.label}
                         </p>
-                        <p className="text-[10px] text-text-muted">Budget : {tier.budgetRange}/jour</p>
+                        <p className="text-[10px] text-text-muted">
+                          Budget : {tier.budgetRange}/jour
+                        </p>
                       </div>
                     </div>
                     <div className="flex items-center gap-4 text-right">
                       <div>
                         <p className="text-xs text-text-muted">Scale</p>
-                        <p className="text-sm font-semibold text-text-primary">+{tier.scalePercent}%</p>
+                        <p className="text-sm font-semibold text-text-primary">
+                          +{tier.scalePercent}%
+                        </p>
                       </div>
                       <div>
                         <p className="text-xs text-text-muted">ROAS requis</p>
                         <p
                           className={cn(
                             "text-sm font-semibold",
-                            isCurrent && meetsRoas ? "text-emerald-400" : isCurrent ? "text-red-400" : "text-text-primary"
+                            isCurrent && meetsRoas
+                              ? "text-emerald-400"
+                              : isCurrent
+                                ? "text-red-400"
+                                : "text-text-primary",
                           )}
                         >
                           {tier.roasRequired}x
@@ -502,13 +603,25 @@ export function ScalingDashboard() {
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={chartData}>
                   <defs>
-                    <linearGradient id="scalingBudgetGradient" x1="0" y1="0" x2="0" y2="1">
+                    <linearGradient
+                      id="scalingBudgetGradient"
+                      x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="1"
+                    >
                       <stop offset="5%" stopColor="#34D399" stopOpacity={0.3} />
                       <stop offset="95%" stopColor="#34D399" stopOpacity={0} />
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke="#2A2D32" />
-                  <XAxis dataKey="date" stroke="#6B7280" fontSize={11} tickLine={false} axisLine={false} />
+                  <XAxis
+                    dataKey="date"
+                    stroke="#6B7280"
+                    fontSize={11}
+                    tickLine={false}
+                    axisLine={false}
+                  />
                   <YAxis
                     yAxisId="budget"
                     stroke="#6B7280"
@@ -542,7 +655,12 @@ export function ScalingDashboard() {
                     y={parseFloat(roasThreshold) || 1.5}
                     stroke="#A78BFA"
                     strokeDasharray="3 3"
-                    label={{ value: "ROAS min", position: "right", fill: "#A78BFA", fontSize: 10 }}
+                    label={{
+                      value: "ROAS min",
+                      position: "right",
+                      fill: "#A78BFA",
+                      fontSize: 10,
+                    }}
                   />
                   <Area
                     yAxisId="budget"
@@ -567,13 +685,15 @@ export function ScalingDashboard() {
             </div>
             <div className="flex items-center justify-center gap-6 mt-3 text-xs text-text-muted">
               <span className="flex items-center gap-1.5">
-                <span className="w-3 h-0.5 bg-emerald-400 rounded" /> Budget (\u20AC/jour)
+                <span className="w-3 h-0.5 bg-emerald-400 rounded" /> Budget
+                (\u20AC/jour)
               </span>
               <span className="flex items-center gap-1.5">
                 <span className="w-3 h-0.5 bg-blue-400 rounded" /> ROAS
               </span>
               <span className="flex items-center gap-1.5">
-                <span className="w-3 h-0.5 bg-purple-400 rounded" /> ROAS minimum
+                <span className="w-3 h-0.5 bg-purple-400 rounded" /> ROAS
+                minimum
               </span>
             </div>
           </CardContent>
@@ -597,7 +717,11 @@ export function ScalingDashboard() {
                 return (
                   <div
                     key={entry.id}
-                    className={cn("rounded-xl border p-4 transition-all", cfg.border, cfg.bg)}
+                    className={cn(
+                      "rounded-xl border p-4 transition-all",
+                      cfg.border,
+                      cfg.bg,
+                    )}
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex items-start gap-3 flex-1">
@@ -607,9 +731,13 @@ export function ScalingDashboard() {
                           ) : entry.status === "rollback" ? (
                             <RotateCcw className={cn("h-4 w-4", cfg.color)} />
                           ) : entry.status === "active" ? (
-                            <Loader2 className={cn("h-4 w-4 animate-spin", cfg.color)} />
+                            <Loader2
+                              className={cn("h-4 w-4 animate-spin", cfg.color)}
+                            />
                           ) : (
-                            <ArrowUpRight className={cn("h-4 w-4", cfg.color)} />
+                            <ArrowUpRight
+                              className={cn("h-4 w-4", cfg.color)}
+                            />
                           )}
                         </div>
                         <div className="flex-1 min-w-0">
@@ -617,40 +745,80 @@ export function ScalingDashboard() {
                             <span className="text-sm font-semibold text-text-primary truncate">
                               {entry.campaign_name}
                             </span>
-                            <Badge variant={cfg.color.includes("emerald") ? "default" : cfg.color.includes("purple") ? "purple" : cfg.color.includes("yellow") ? "yellow" : cfg.color.includes("blue") ? "blue" : "red"}>
+                            <Badge
+                              variant={
+                                cfg.color.includes("emerald")
+                                  ? "default"
+                                  : cfg.color.includes("purple")
+                                    ? "purple"
+                                    : cfg.color.includes("yellow")
+                                      ? "yellow"
+                                      : cfg.color.includes("blue")
+                                        ? "blue"
+                                        : "red"
+                              }
+                            >
                               {cfg.label}
                             </Badge>
-                            <Badge variant="muted">{getTierLabel(entry.tier_level)}</Badge>
+                            <Badge variant="muted">
+                              {getTierLabel(entry.tier_level)}
+                            </Badge>
                           </div>
                           <p className="text-xs text-text-secondary">
-                            Budget : {entry.previous_budget}€ → {entry.new_budget}€/jour (+{entry.scale_percent}%)
+                            Budget : {entry.previous_budget}€ →{" "}
+                            {entry.new_budget}€/jour (+{entry.scale_percent}%)
                           </p>
                           <div className="flex flex-wrap gap-4 mt-2 text-[10px]">
                             <span className="text-text-muted">
-                              ROAS au scaling : <span className="text-text-primary font-semibold">{entry.roas_at_scale?.toFixed(2) ?? "—"}x</span>
+                              ROAS au scaling :{" "}
+                              <span className="text-text-primary font-semibold">
+                                {entry.roas_at_scale?.toFixed(2) ?? "—"}x
+                              </span>
                             </span>
                             {entry.roas_after_24h !== null && (
                               <span className="text-text-muted">
-                                ROAS après 24h : <span className={cn("font-semibold", (entry.roas_after_24h ?? 0) >= entry.roas_threshold ? "text-emerald-400" : "text-red-400")}>
+                                ROAS après 24h :{" "}
+                                <span
+                                  className={cn(
+                                    "font-semibold",
+                                    (entry.roas_after_24h ?? 0) >=
+                                      entry.roas_threshold
+                                      ? "text-emerald-400"
+                                      : "text-red-400",
+                                  )}
+                                >
                                   {entry.roas_after_24h?.toFixed(2) ?? "—"}x
                                 </span>
                               </span>
                             )}
                             <span className="text-text-muted">
-                              Seuil : <span className="text-text-primary font-semibold">{entry.roas_threshold}x</span>
+                              Seuil :{" "}
+                              <span className="text-text-primary font-semibold">
+                                {entry.roas_threshold}x
+                              </span>
                             </span>
                           </div>
                           <p className="text-[10px] text-text-muted mt-2 flex items-center gap-1">
                             <Clock className="h-2.5 w-2.5" />
                             {formatTimestamp(entry.created_at)}
                             {entry.check_at && entry.status === "active" && (
-                              <> · Vérification prévue {formatTimestamp(entry.check_at)}</>
+                              <>
+                                {" "}
+                                · Vérification prévue{" "}
+                                {formatTimestamp(entry.check_at)}
+                              </>
                             )}
                             {entry.validated_at && (
-                              <> · Validé {formatTimestamp(entry.validated_at)}</>
+                              <>
+                                {" "}
+                                · Validé {formatTimestamp(entry.validated_at)}
+                              </>
                             )}
                             {entry.rollback_at && (
-                              <> · Rollback {formatTimestamp(entry.rollback_at)}</>
+                              <>
+                                {" "}
+                                · Rollback {formatTimestamp(entry.rollback_at)}
+                              </>
                             )}
                           </p>
                         </div>
@@ -680,9 +848,12 @@ export function ScalingDashboard() {
               <div className="p-3 rounded-full bg-accent/10 mb-4">
                 <Rocket className="h-8 w-8 text-accent" />
               </div>
-              <p className="text-sm font-medium text-text-primary mb-1">Aucun scaling lancé</p>
+              <p className="text-sm font-medium text-text-primary mb-1">
+                Aucun scaling lancé
+              </p>
               <p className="text-xs text-text-muted">
-                Sélectionne une campagne performante et lance un scaling progressif pour augmenter ton budget par paliers.
+                Sélectionne une campagne performante et lance un scaling
+                progressif pour augmenter ton budget par paliers.
               </p>
             </div>
           </CardContent>
@@ -700,21 +871,46 @@ export function ScalingDashboard() {
         <CardContent>
           <div className="space-y-3">
             {[
-              { rule: "Si le ROAS passe sous le seuil après 24h", action: "Rollback au budget précédent", severity: "red" },
-              { rule: "Si le ROAS baisse de plus de 30% en 48h", action: "Rollback immédiat + alerte", severity: "red" },
-              { rule: "Si le CPA dépasse 2x le seuil pendant 24h", action: "Réduction de 25% du budget", severity: "yellow" },
-              { rule: "Si les dépenses dépassent le plafond de 10%", action: "Cap automatique + notification", severity: "blue" },
+              {
+                rule: "Si le ROAS passe sous le seuil après 24h",
+                action: "Rollback au budget précédent",
+                severity: "red",
+              },
+              {
+                rule: "Si le ROAS baisse de plus de 30% en 48h",
+                action: "Rollback immédiat + alerte",
+                severity: "red",
+              },
+              {
+                rule: "Si le CPA dépasse 2x le seuil pendant 24h",
+                action: "Réduction de 25% du budget",
+                severity: "yellow",
+              },
+              {
+                rule: "Si les dépenses dépassent le plafond de 10%",
+                action: "Cap automatique + notification",
+                severity: "blue",
+              },
             ].map((item) => (
-              <div key={item.rule} className="flex items-start gap-3 p-3 rounded-xl bg-bg-tertiary border border-border-default">
+              <div
+                key={item.rule}
+                className="flex items-start gap-3 p-3 rounded-xl bg-bg-tertiary border border-border-default"
+              >
                 <ShieldAlert
                   className={cn(
                     "h-4 w-4 mt-0.5 shrink-0",
-                    item.severity === "red" ? "text-red-400" : item.severity === "yellow" ? "text-yellow-400" : "text-blue-400"
+                    item.severity === "red"
+                      ? "text-red-400"
+                      : item.severity === "yellow"
+                        ? "text-yellow-400"
+                        : "text-blue-400",
                   )}
                 />
                 <div>
                   <p className="text-sm text-text-primary">{item.rule}</p>
-                  <p className="text-xs text-text-muted mt-0.5">{"\u2192"} {item.action}</p>
+                  <p className="text-xs text-text-muted mt-0.5">
+                    {"\u2192"} {item.action}
+                  </p>
                 </div>
               </div>
             ))}

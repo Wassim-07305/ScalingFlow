@@ -14,9 +14,12 @@ export function ViabilityScore({
   className,
 }: ViabilityScoreProps) {
   const getColor = () => {
-    if (score >= 80) return { stroke: "#06D6A0", bg: "rgba(6, 214, 160, 0.15)" };
-    if (score >= 60) return { stroke: "#3B82F6", bg: "rgba(59, 130, 246, 0.15)" };
-    if (score >= 40) return { stroke: "#FBBF24", bg: "rgba(251, 191, 36, 0.15)" };
+    if (score >= 80)
+      return { stroke: "#06D6A0", bg: "rgba(6, 214, 160, 0.15)" };
+    if (score >= 60)
+      return { stroke: "#3B82F6", bg: "rgba(59, 130, 246, 0.15)" };
+    if (score >= 40)
+      return { stroke: "#FBBF24", bg: "rgba(251, 191, 36, 0.15)" };
     return { stroke: "#EF4444", bg: "rgba(239, 68, 68, 0.15)" };
   };
 
@@ -33,7 +36,10 @@ export function ViabilityScore({
 
   return (
     <div
-      className={cn("relative inline-flex items-center justify-center", className)}
+      className={cn(
+        "relative inline-flex items-center justify-center",
+        className,
+      )}
       style={{ width: d.size, height: d.size }}
     >
       <svg width={d.size} height={d.size} className="-rotate-90">
@@ -63,7 +69,7 @@ export function ViabilityScore({
       <span
         className={cn(
           "absolute font-bold font-[family-name:var(--font-mono)]",
-          d.fontSize
+          d.fontSize,
         )}
         style={{ color: colors.stroke }}
       >

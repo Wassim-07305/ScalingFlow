@@ -94,8 +94,8 @@ export function DailyTasks({ className, refreshKey }: DailyTasksProps) {
               completed: newCompleted,
               completed_at: newCompleted ? new Date().toISOString() : null,
             }
-          : t
-      )
+          : t,
+      ),
     );
 
     const { error } = await supabase
@@ -116,8 +116,8 @@ export function DailyTasks({ className, refreshKey }: DailyTasksProps) {
                 completed: task.completed,
                 completed_at: task.completed_at,
               }
-            : t
-        )
+            : t,
+        ),
       );
       toast.error("Impossible de mettre à jour la tâche");
     }
@@ -144,7 +144,10 @@ export function DailyTasks({ className, refreshKey }: DailyTasksProps) {
         <CardContent>
           <div className="space-y-2">
             {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-bg-tertiary/30 animate-pulse">
+              <div
+                key={i}
+                className="flex items-center gap-3 p-3 rounded-xl bg-bg-tertiary/30 animate-pulse"
+              >
                 <div className="h-4 w-4 rounded bg-bg-tertiary" />
                 <div className="flex-1 space-y-1.5">
                   <div className="h-4 w-3/4 rounded bg-bg-tertiary" />
@@ -171,7 +174,8 @@ export function DailyTasks({ className, refreshKey }: DailyTasksProps) {
           <div className="flex flex-col items-center justify-center py-8 text-center">
             <ListChecks className="h-10 w-10 text-text-muted/40 mb-3" />
             <p className="text-sm text-text-muted">
-              Aucune tâche pour le moment. Tes tâches apparaîtront ici au fur et à mesure de ta progression.
+              Aucune tâche pour le moment. Tes tâches apparaîtront ici au fur et
+              à mesure de ta progression.
             </p>
           </div>
         </CardContent>
@@ -210,7 +214,9 @@ export function DailyTasks({ className, refreshKey }: DailyTasksProps) {
                 key={task.id}
                 className={cn(
                   "flex items-center gap-3 p-3 rounded-xl transition-all",
-                  task.completed ? "bg-bg-tertiary/50 opacity-60" : "bg-bg-tertiary hover:bg-bg-tertiary/80"
+                  task.completed
+                    ? "bg-bg-tertiary/50 opacity-60"
+                    : "bg-bg-tertiary hover:bg-bg-tertiary/80",
                 )}
               >
                 <Checkbox
@@ -218,10 +224,14 @@ export function DailyTasks({ className, refreshKey }: DailyTasksProps) {
                   onCheckedChange={() => toggleTask(task.id)}
                 />
                 <div className="flex-1 min-w-0">
-                  <p className={cn(
-                    "text-sm font-medium",
-                    task.completed ? "text-text-muted line-through" : "text-text-primary"
-                  )}>
+                  <p
+                    className={cn(
+                      "text-sm font-medium",
+                      task.completed
+                        ? "text-text-muted line-through"
+                        : "text-text-primary",
+                    )}
+                  >
                     {task.title}
                   </p>
                 </div>
@@ -232,8 +242,17 @@ export function DailyTasks({ className, refreshKey }: DailyTasksProps) {
                       {duration}
                     </span>
                   )}
-                  <span className={cn("text-xs font-medium", priorityColor[priority])}>
-                    {priority === "high" ? "!!!" : priority === "medium" ? "!!" : "!"}
+                  <span
+                    className={cn(
+                      "text-xs font-medium",
+                      priorityColor[priority],
+                    )}
+                  >
+                    {priority === "high"
+                      ? "!!!"
+                      : priority === "medium"
+                        ? "!!"
+                        : "!"}
                   </span>
                 </div>
               </div>

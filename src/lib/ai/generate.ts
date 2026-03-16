@@ -11,7 +11,9 @@ const anthropic = process.env.ANTHROPIC_API_KEY
   : null;
 
 // Use Anthropic API directly when available, otherwise fallback to OpenRouter
-const USE_ANTHROPIC_DIRECT = Boolean(anthropic && process.env.ANTHROPIC_API_KEY);
+const USE_ANTHROPIC_DIRECT = Boolean(
+  anthropic && process.env.ANTHROPIC_API_KEY,
+);
 
 interface GenerateOptions {
   prompt: string;
@@ -28,7 +30,7 @@ async function anthropicGenerate(
   systemPrompt: string | undefined,
   userPrompt: string,
   maxTokens: number,
-  temperature: number
+  temperature: number,
 ): Promise<string> {
   if (!anthropic) throw new Error("Anthropic client not initialized");
 
@@ -47,7 +49,9 @@ async function anthropicGenerate(
   return textBlock.text;
 }
 
-async function openRouterFetch(body: Record<string, unknown>): Promise<ChatResponse> {
+async function openRouterFetch(
+  body: Record<string, unknown>,
+): Promise<ChatResponse> {
   let lastError: unknown;
 
   for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
@@ -55,7 +59,7 @@ async function openRouterFetch(body: Record<string, unknown>): Promise<ChatRespo
       const res = await fetch(`${OPENROUTER_BASE_URL}/chat/completions`, {
         method: "POST",
         headers: {
-          "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
+          Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify(body),
@@ -70,7 +74,8 @@ async function openRouterFetch(body: Record<string, unknown>): Promise<ChatRespo
     } catch (err) {
       lastError = err;
       const msg = err instanceof Error ? err.message : String(err);
-      const isRetryable = /connection|timeout|econnreset|socket|network|fetch failed/i.test(msg);
+      const isRetryable =
+        /connection|timeout|econnreset|socket|network|fetch failed/i.test(msg);
       if (!isRetryable || attempt === MAX_RETRIES - 1) throw err;
       console.warn(`OpenRouter retry ${attempt + 1}/${MAX_RETRIES}: ${msg}`);
       await new Promise((r) => setTimeout(r, RETRY_DELAY_MS * (attempt + 1)));
@@ -88,9 +93,17 @@ export async function generateText({
   // Try Anthropic direct API first if available
   if (USE_ANTHROPIC_DIRECT) {
     try {
-      return await anthropicGenerate(systemPrompt, prompt, maxTokens, temperature);
+      return await anthropicGenerate(
+        systemPrompt,
+        prompt,
+        maxTokens,
+        temperature,
+      );
     } catch (err) {
-      console.warn("Anthropic direct API failed, falling back to OpenRouter:", err);
+      console.warn(
+        "Anthropic direct API failed, falling back to OpenRouter:",
+        err,
+      );
     }
   }
 
@@ -136,16 +149,19 @@ export async function generateJSON<T>({
   let jsonStr = jsonMatch ? jsonMatch[1].trim() : text.trim();
 
   // Sanitize unescaped control characters inside JSON string values
-  jsonStr = jsonStr.replace(
-    /"(?:[^"\\]|\\.)*"/g,
-    (match) => match.replace(/[\x00-\x1f]/g, (ch) => {
+  jsonStr = jsonStr.replace(/"(?:[^"\\]|\\.)*"/g, (match) =>
+    match.replace(/[\x00-\x1f]/g, (ch) => {
       switch (ch) {
-        case "\n": return "\\n";
-        case "\r": return "\\r";
-        case "\t": return "\\t";
-        default: return "";
+        case "\n":
+          return "\\n";
+        case "\r":
+          return "\\r";
+        case "\t":
+          return "\\t";
+        default:
+          return "";
       }
-    })
+    }),
   );
 
   try {
@@ -167,13 +183,13 @@ export async function generateJSON<T>({
     throw new Error(
       `L'IA a retourné un JSON invalide. Réessaie.${
         parseError instanceof Error ? ` (${parseError.message})` : ""
-      }`
+      }`,
     );
   }
 }
 
 export function createStreamingResponse(
-  generator: AsyncGenerator<string>
+  generator: AsyncGenerator<string>,
 ): ReadableStream {
   return new ReadableStream({
     async start(controller) {
@@ -231,7 +247,7 @@ export async function* streamText({
   const res = await fetch(`${OPENROUTER_BASE_URL}/chat/completions`, {
     method: "POST",
     headers: {
-      "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
+      Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({

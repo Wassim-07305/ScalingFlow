@@ -12,12 +12,7 @@ export function NeonGradientText({
   as: Component = "span",
 }: NeonGradientTextProps) {
   return (
-    <Component
-      className={cn(
-        "text-accent font-semibold",
-        className
-      )}
-    >
+    <Component className={cn("text-accent font-semibold", className)}>
       {children}
     </Component>
   );

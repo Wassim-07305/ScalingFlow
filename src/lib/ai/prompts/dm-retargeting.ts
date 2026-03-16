@@ -5,7 +5,7 @@ export function dmRetargetingPrompt(
     unique_mechanism?: string;
     pricing?: { real_price?: number };
   },
-  avatar: Record<string, unknown>
+  avatar: Record<string, unknown>,
 ): string {
   return `Tu es un expert en publicité de retargeting orientée DM (Direct Message). Tu maîtrises la stratégie ScalingFlow de "DM Ads" : cibler les followers chauds (engagers, visiteurs profil, viewers de stories) avec des ads qui les poussent à envoyer un DM pour être qualifiés par un setter.
 

@@ -41,7 +41,10 @@ const CATEGORIES = [
 
 type Category = (typeof CATEGORIES)[number]["value"];
 
-const CATEGORY_BADGE_VARIANT: Record<Category, "default" | "blue" | "cyan" | "purple" | "yellow" | "muted"> = {
+const CATEGORY_BADGE_VARIANT: Record<
+  Category,
+  "default" | "blue" | "cyan" | "purple" | "yellow" | "muted"
+> = {
   framework: "blue",
   livre: "purple",
   formation: "cyan",
@@ -182,10 +185,15 @@ export function KnowledgeBaseAdmin() {
       "text/csv",
       "application/json",
     ];
-    const isText = validTypes.includes(file.type) || file.name.endsWith(".md") || file.name.endsWith(".txt");
+    const isText =
+      validTypes.includes(file.type) ||
+      file.name.endsWith(".md") ||
+      file.name.endsWith(".txt");
 
     if (!isText) {
-      toast.error("Seuls les fichiers texte (.txt, .md, .csv, .json) sont acceptés pour le moment");
+      toast.error(
+        "Seuls les fichiers texte (.txt, .md, .csv, .json) sont acceptés pour le moment",
+      );
       return;
     }
 
@@ -281,7 +289,7 @@ export function KnowledgeBaseAdmin() {
             <div
               className={cn(
                 "h-10 w-10 rounded-[8px] bg-bg-tertiary flex items-center justify-center",
-                stat.color
+                stat.color,
               )}
             >
               <stat.icon className="h-5 w-5" />
@@ -367,9 +375,7 @@ export function KnowledgeBaseAdmin() {
                 </label>
                 <select
                   value={formCategory}
-                  onChange={(e) =>
-                    setFormCategory(e.target.value as Category)
-                  }
+                  onChange={(e) => setFormCategory(e.target.value as Category)}
                   className="w-full text-sm bg-bg-secondary border border-border-default rounded-lg px-3 py-2 text-text-primary focus:outline-none focus:ring-1 focus:ring-accent"
                 >
                   {CATEGORIES.map((cat) => (
@@ -470,9 +476,8 @@ export function KnowledgeBaseAdmin() {
                   </p>
                   <Badge
                     variant={
-                      CATEGORY_BADGE_VARIANT[
-                        entry.source_type as Category
-                      ] || "muted"
+                      CATEGORY_BADGE_VARIANT[entry.source_type as Category] ||
+                      "muted"
                     }
                   >
                     {CATEGORIES.find((c) => c.value === entry.source_type)

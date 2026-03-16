@@ -19,6 +19,7 @@ Ces 4 tâches sont **indépendantes** et peuvent être exécutées en parallèle
 ### Task A1: Offer — Historique Cliquable
 
 **Files:**
+
 - Modify: `src/app/(dashboard)/offer/page.tsx`
 - Modify: `src/components/offer/offer-generator.tsx` (ajouter `initialData` prop)
 
@@ -35,6 +36,7 @@ interface OfferGeneratorProps {
 ```
 
 Quand `initialData` change, mettre à jour le state interne du résultat :
+
 ```tsx
 React.useEffect(() => {
   if (initialData) {
@@ -48,18 +50,22 @@ React.useEffect(() => {
 Dans `offer/page.tsx` :
 
 1. Ajouter `loadedData` state :
+
 ```tsx
 const [loadedData, setLoadedData] = React.useState<any>(null);
 ```
 
 2. Ajouter `handleHistorySelect` (même pattern que Assets) :
+
 ```tsx
 const handleHistorySelect = async (item: { id: string }) => {
   try {
     const supabase = createClient();
     const { data, error } = await supabase
       .from("offers")
-      .select("ai_raw_response, offer_name, positioning, unique_mechanism, pricing_strategy, guarantees, risk_reversal, delivery_structure, oto_offer, full_document")
+      .select(
+        "ai_raw_response, offer_name, positioning, unique_mechanism, pricing_strategy, guarantees, risk_reversal, delivery_structure, oto_offer, full_document",
+      )
       .eq("id", item.id)
       .single();
     if (error || !data) {
@@ -77,24 +83,29 @@ const handleHistorySelect = async (item: { id: string }) => {
 ```
 
 3. Passer `onSelect` à `GenerationHistory` et `initialData` à `OfferGenerator` :
+
 ```tsx
-{activeTab === "generate" && (
-  <OfferGenerator
-    marketAnalysisId={marketAnalysisId || undefined}
-    marketName={marketName || undefined}
-    initialData={loadedData}
-  />
-)}
-{activeTab === "history" && (
-  <GenerationHistory
-    table="offers"
-    titleField="offer_name"
-    subtitleField="positioning"
-    statusField="status"
-    emptyMessage="Aucune offre generee pour le moment."
-    onSelect={handleHistorySelect}
-  />
-)}
+{
+  activeTab === "generate" && (
+    <OfferGenerator
+      marketAnalysisId={marketAnalysisId || undefined}
+      marketName={marketName || undefined}
+      initialData={loadedData}
+    />
+  );
+}
+{
+  activeTab === "history" && (
+    <GenerationHistory
+      table="offers"
+      titleField="offer_name"
+      subtitleField="positioning"
+      statusField="status"
+      emptyMessage="Aucune offre generee pour le moment."
+      onSelect={handleHistorySelect}
+    />
+  );
+}
 ```
 
 4. Ajouter imports : `toast` from `sonner`
@@ -104,6 +115,7 @@ const handleHistorySelect = async (item: { id: string }) => {
 ### Task A2: Funnel — Historique Cliquable
 
 **Files:**
+
 - Modify: `src/app/(dashboard)/funnel/page.tsx`
 - Modify: `src/components/funnel/funnel-builder.tsx` (ajouter `initialData` prop)
 
@@ -122,6 +134,7 @@ React.useEffect(() => {
 **Step 2: Modifier la page Funnel**
 
 Même pattern que Offer :
+
 - `loadedData` state
 - `handleHistorySelect` qui fetch depuis `funnels` table (select `ai_raw_response, optin_page, vsl_page, thankyou_page`)
 - Passer `onSelect` à `GenerationHistory` et `initialData` à `FunnelBuilder`
@@ -132,6 +145,7 @@ Même pattern que Offer :
 ### Task A3: Ads — Historique Cliquable
 
 **Files:**
+
 - Modify: `src/app/(dashboard)/ads/page.tsx`
 - Modify: `src/components/ads/creative-generator.tsx` (ajouter `initialData`)
 - Modify: `src/components/ads/video-ad-generator.tsx` (ajouter `initialData`)
@@ -144,15 +158,21 @@ Chaque générateur reçoit `initialData?: any` et pré-remplit son résultat.
 **Step 2: Modifier la page Ads**
 
 Le `handleHistorySelect` doit déterminer le type de créatif et switch sur le bon tab :
+
 ```tsx
 const handleHistorySelect = async (item: { id: string }) => {
   const supabase = createClient();
   const { data, error } = await supabase
     .from("ad_creatives")
-    .select("creative_type, ai_raw_response, ad_copy, headline, hook, cta, video_script, angle")
+    .select(
+      "creative_type, ai_raw_response, ad_copy, headline, hook, cta, video_script, angle",
+    )
     .eq("id", item.id)
     .single();
-  if (error || !data) { toast.error("Impossible de charger"); return; }
+  if (error || !data) {
+    toast.error("Impossible de charger");
+    return;
+  }
 
   const parsed = data.ai_raw_response || data;
   const typeMap: Record<string, string> = {
@@ -161,7 +181,7 @@ const handleHistorySelect = async (item: { id: string }) => {
     video_script: "video_ads",
   };
   const tabKey = typeMap[data.creative_type] || "creatives";
-  setLoadedData(prev => ({ ...prev, [tabKey]: parsed }));
+  setLoadedData((prev) => ({ ...prev, [tabKey]: parsed }));
   setActiveTab(tabKey);
   toast.success("Creative chargée depuis l'historique");
 };
@@ -174,6 +194,7 @@ Note: `loadedData` doit être un `Record<string, any>` ici (comme Assets) car il
 ### Task A4: Content — Historique Cliquable
 
 **Files:**
+
 - Modify: `src/app/(dashboard)/content/page.tsx`
 - Modify: `src/components/content/strategy-overview.tsx` (ajouter `initialData`)
 - Modify: `src/components/content/reels-generator.tsx` (ajouter `initialData`)
@@ -188,6 +209,7 @@ Note: `loadedData` doit être un `Record<string, any>` ici (comme Assets) car il
 **Step 2: Modifier la page Content**
 
 Le `handleHistorySelect` mappe `content_type` au bon tab :
+
 ```tsx
 const CONTENT_TYPE_TO_TAB: Record<string, string> = {
   instagram_reel: "reels",
@@ -213,6 +235,7 @@ Ces 2 tâches sont **indépendantes** et peuvent être exécutées en parallèle
 ### Task B1: Sales — Ajouter onglet Historique
 
 **Files:**
+
 - Modify: `src/app/(dashboard)/sales/page.tsx` (refactoring complet)
 
 **Step 1: Refactorer la page Sales**
@@ -230,6 +253,7 @@ const TABS = [
 **Step 2: Ajouter `handleHistorySelect`**
 
 La page Sales utilise la table `sales_assets` avec `asset_type = 'sales_script'`. Le `handleHistorySelect` :
+
 ```tsx
 const handleHistorySelect = async (item: { id: string }) => {
   const supabase = createClient();
@@ -238,7 +262,10 @@ const handleHistorySelect = async (item: { id: string }) => {
     .select("asset_type, ai_raw_response, content, metadata")
     .eq("id", item.id)
     .single();
-  if (error || !data) { toast.error("Impossible de charger"); return; }
+  if (error || !data) {
+    toast.error("Impossible de charger");
+    return;
+  }
 
   const metadata = data.metadata as { scriptType?: string } | null;
   const scriptType = metadata?.scriptType || "discovery";
@@ -250,6 +277,7 @@ const handleHistorySelect = async (item: { id: string }) => {
 ```
 
 Le GenerationHistory filtre sur `asset_type`:
+
 ```tsx
 <GenerationHistory
   table="sales_assets"
@@ -275,6 +303,7 @@ interface GenerationHistoryProps {
 ```
 
 Dans le fetch :
+
 ```tsx
 let query = supabase.from(table).select(fields).eq("user_id", user.id);
 if (filters) {
@@ -282,7 +311,9 @@ if (filters) {
     query = query.eq(key, value);
   });
 }
-const { data, error } = await query.order("created_at", { ascending: false }).limit(20);
+const { data, error } = await query
+  .order("created_at", { ascending: false })
+  .limit(20);
 ```
 
 ---
@@ -290,6 +321,7 @@ const { data, error } = await query.order("created_at", { ascending: false }).li
 ### Task B2: Brand — Ajouter onglet Historique
 
 **Files:**
+
 - Modify: `src/app/(dashboard)/brand/page.tsx`
 
 **Step 1: Ajouter l'onglet Historique au système de tabs**
@@ -314,24 +346,56 @@ const handleHistorySelect = async (item: { id: string }) => {
     .select("*")
     .eq("id", item.id)
     .single();
-  if (error || !data) { toast.error("Impossible de charger"); return; }
+  if (error || !data) {
+    toast.error("Impossible de charger");
+    return;
+  }
 
   // Reconstruct BrandIdentityResult from DB record (same logic as fetchBrand)
   setBrandId(data.id);
   setSelectedName(data.selected_name);
   setOfferId(data.offer_id);
 
-  const brandNames = data.brand_names as unknown as BrandIdentityResult["noms"] | null;
-  const artDirection = data.art_direction as unknown as BrandIdentityResult["direction_artistique"] | null;
+  const brandNames = data.brand_names as unknown as
+    | BrandIdentityResult["noms"]
+    | null;
+  const artDirection = data.art_direction as unknown as
+    | BrandIdentityResult["direction_artistique"]
+    | null;
   let logoConcept = null;
-  try { logoConcept = data.logo_concept ? (typeof data.logo_concept === "string" ? JSON.parse(data.logo_concept) : data.logo_concept) : null; } catch {}
-  const brandKit = data.brand_kit as unknown as BrandIdentityResult["brand_kit"] | null;
+  try {
+    logoConcept = data.logo_concept
+      ? typeof data.logo_concept === "string"
+        ? JSON.parse(data.logo_concept)
+        : data.logo_concept
+      : null;
+  } catch {}
+  const brandKit = data.brand_kit as unknown as
+    | BrandIdentityResult["brand_kit"]
+    | null;
 
   setGenerated({
     noms: brandNames || [],
-    direction_artistique: artDirection || { palette: [], typographies: [], style_visuel: "", moodboard_description: "" },
-    logo_concept: logoConcept || { description: "", forme: "", symbolisme: "", variations: [] },
-    brand_kit: brandKit || { mission: "", vision: "", valeurs: [], ton: "", do_list: [], dont_list: [] },
+    direction_artistique: artDirection || {
+      palette: [],
+      typographies: [],
+      style_visuel: "",
+      moodboard_description: "",
+    },
+    logo_concept: logoConcept || {
+      description: "",
+      forme: "",
+      symbolisme: "",
+      variations: [],
+    },
+    brand_kit: brandKit || {
+      mission: "",
+      vision: "",
+      valeurs: [],
+      ton: "",
+      do_list: [],
+      dont_list: [],
+    },
   });
 
   setActiveTab("nom");
@@ -342,15 +406,17 @@ const handleHistorySelect = async (item: { id: string }) => {
 **Step 3: Rendre le History tab**
 
 ```tsx
-{activeTab === "history" && (
-  <GenerationHistory
-    table="brand_identities"
-    titleField="selected_name"
-    statusField="status"
-    emptyMessage="Aucune identité de marque générée pour le moment."
-    onSelect={handleHistorySelect}
-  />
-)}
+{
+  activeTab === "history" && (
+    <GenerationHistory
+      table="brand_identities"
+      titleField="selected_name"
+      statusField="status"
+      emptyMessage="Aucune identité de marque générée pour le moment."
+      onSelect={handleHistorySelect}
+    />
+  );
+}
 ```
 
 ---
@@ -362,6 +428,7 @@ Cette tâche est un prérequis pour B1 (Sales).
 ### Task C1: Ajouter prop `filters` à GenerationHistory
 
 **Files:**
+
 - Modify: `src/components/shared/generation-history.tsx`
 
 Ajouter la prop optionnelle `filters?: Record<string, string>` et appliquer les filtres dans la query Supabase. Voir détail dans Task B1 Step 3.
@@ -373,9 +440,11 @@ Ajouter la prop optionnelle `filters?: Record<string, string>` et appliquer les 
 ### Task D1: Installer jspdf + créer helper d'export
 
 **Files:**
+
 - Create: `src/lib/utils/export-pdf.ts`
 
 **Step 1: Installer la dépendance**
+
 ```bash
 npm install jspdf jspdf-autotable
 ```
@@ -393,7 +462,12 @@ interface ExportPDFOptions {
   filename?: string;
 }
 
-export function exportToPDF({ title, subtitle, content, filename }: ExportPDFOptions) {
+export function exportToPDF({
+  title,
+  subtitle,
+  content,
+  filename,
+}: ExportPDFOptions) {
   const doc = new jsPDF();
   const margin = 20;
   let y = margin;
@@ -422,7 +496,8 @@ export function exportToPDF({ title, subtitle, content, filename }: ExportPDFOpt
   doc.setFont("helvetica", "normal");
   doc.setTextColor(0);
 
-  const text = typeof content === "string" ? content : JSON.stringify(content, null, 2);
+  const text =
+    typeof content === "string" ? content : JSON.stringify(content, null, 2);
   const lines = doc.splitTextToSize(text, 170);
 
   for (const line of lines) {
@@ -447,6 +522,7 @@ export function exportToPDF({ title, subtitle, content, filename }: ExportPDFOpt
 ### Task D2: Ajouter bouton Export PDF au composant GenerationHistory
 
 **Files:**
+
 - Modify: `src/components/shared/generation-history.tsx`
 
 Ajouter un bouton "Exporter PDF" sur chaque item de l'historique (ou un bouton global "Exporter tout").
@@ -456,6 +532,7 @@ Alternative plus simple : ajouter un bouton PDF dans les pages de détail (quand
 ### Task D3: Ajouter boutons Export PDF aux pages générateurs
 
 **Files:** Tous les générateurs qui affichent un résultat :
+
 - `src/components/offer/offer-generator.tsx`
 - `src/components/funnel/funnel-builder.tsx`
 - `src/components/ads/creative-generator.tsx`
@@ -465,17 +542,24 @@ Alternative plus simple : ajouter un bouton PDF dans les pages de détail (quand
 - `src/app/(dashboard)/brand/page.tsx`
 
 Pattern : à côté du bouton "Copier" existant, ajouter un bouton "PDF" :
+
 ```tsx
 import { exportToPDF } from "@/lib/utils/export-pdf";
 import { FileDown } from "lucide-react";
 
-<Button variant="outline" size="sm" onClick={() => exportToPDF({
-  title: "Mon Offre",
-  content: result,
-})}>
+<Button
+  variant="outline"
+  size="sm"
+  onClick={() =>
+    exportToPDF({
+      title: "Mon Offre",
+      content: result,
+    })
+  }
+>
   <FileDown className="h-4 w-4 mr-1" />
   PDF
-</Button>
+</Button>;
 ```
 
 ---
@@ -485,6 +569,7 @@ import { FileDown } from "lucide-react";
 ### Task E1: Créer la page Vault
 
 **Files:**
+
 - Create: `src/app/(dashboard)/vault/page.tsx`
 - Modify: `src/lib/constants/navigation.ts` (ajouter item Vault)
 
@@ -493,6 +578,7 @@ import { FileDown } from "lucide-react";
 La page Vault affiche les données collectées pendant l'onboarding et permet de les modifier. Elle affiche aussi l'analyse IA du vault (`vault_analysis`).
 
 Sections :
+
 1. **Compétences** — skills[], vault_skills (éditable)
 2. **Situation** — situation, situation_details (éditable)
 3. **Formations** — formations[] (éditable)
@@ -505,6 +591,7 @@ Utiliser des Cards éditables avec mode lecture/édition.
 **Step 2: Ajouter la navigation**
 
 Dans `navigation.ts`, ajouter :
+
 ```tsx
 { label: "Vault", href: "/vault", icon: Archive, roles: ["user", "student", "admin", "coach"] },
 ```
@@ -532,6 +619,7 @@ Ordre optimal :
 ## Exécution recommandée
 
 **Subagent-Driven** — Dispatcher 4+ agents en parallèle :
+
 - Agent 1: C1 (filters) → B1 (Sales)
 - Agent 2: A1 (Offer) + A2 (Funnel)
 - Agent 3: A3 (Ads) + A4 (Content)

@@ -1,7 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { createClient } from "@/lib/supabase/client";
@@ -64,7 +70,9 @@ export function FunnelDeploy() {
     setLoading(true);
     const { data } = await supabase
       .from("funnels")
-      .select("id, funnel_name, published, published_slug, published_at, custom_domain, status, ai_raw_response, optin_page, vsl_page, thankyou_page")
+      .select(
+        "id, funnel_name, published, published_slug, published_at, custom_domain, status, ai_raw_response, optin_page, vsl_page, thankyou_page",
+      )
       .eq("user_id", user!.id)
       .order("created_at", { ascending: false });
 
@@ -147,7 +155,8 @@ export function FunnelDeploy() {
             Aucun funnel à déployer
           </h3>
           <p className="text-text-secondary text-sm">
-            Génère d&apos;abord un funnel dans l&apos;onglet &quot;Générer&quot; pour pouvoir le publier.
+            Génère d&apos;abord un funnel dans l&apos;onglet &quot;Générer&quot;
+            pour pouvoir le publier.
           </p>
         </CardContent>
       </Card>
@@ -170,9 +179,17 @@ export function FunnelDeploy() {
         <CardContent>
           <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
             {[
-              { icon: Globe, label: "URL publique", desc: "Lien unique pour chaque funnel" },
+              {
+                icon: Globe,
+                label: "URL publique",
+                desc: "Lien unique pour chaque funnel",
+              },
               { icon: Shield, label: "SSL inclus", desc: "HTTPS automatique" },
-              { icon: Smartphone, label: "Responsive", desc: "Optimisé mobile" },
+              {
+                icon: Smartphone,
+                label: "Responsive",
+                desc: "Optimisé mobile",
+              },
               { icon: Zap, label: "Performance", desc: "Chargement rapide" },
             ].map((item) => (
               <div
@@ -181,7 +198,9 @@ export function FunnelDeploy() {
               >
                 <item.icon className="h-5 w-5 text-accent shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-sm font-medium text-text-primary">{item.label}</p>
+                  <p className="text-sm font-medium text-text-primary">
+                    {item.label}
+                  </p>
                   <p className="text-xs text-text-muted">{item.desc}</p>
                 </div>
               </div>
@@ -194,11 +213,16 @@ export function FunnelDeploy() {
       <div className="space-y-4">
         {funnels.map((funnel) => {
           const isPublished = funnel.published && funnel.published_slug;
-          const publicUrl = isPublished ? `${appUrl}/f/${funnel.published_slug}` : null;
+          const publicUrl = isPublished
+            ? `${appUrl}/f/${funnel.published_slug}`
+            : null;
           const isSelected = selectedFunnel === funnel.id;
 
           return (
-            <Card key={funnel.id} className={cn(isPublished && "border-accent/30")}>
+            <Card
+              key={funnel.id}
+              className={cn(isPublished && "border-accent/30")}
+            >
               <CardContent className="pt-6">
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1 min-w-0">
@@ -240,7 +264,10 @@ export function FunnelDeploy() {
 
                     {funnel.published_at && (
                       <p className="text-xs text-text-muted mt-1">
-                        Publié le {new Date(funnel.published_at).toLocaleDateString("fr-FR")}
+                        Publié le{" "}
+                        {new Date(funnel.published_at).toLocaleDateString(
+                          "fr-FR",
+                        )}
                       </p>
                     )}
                   </div>
@@ -303,7 +330,7 @@ export function FunnelDeploy() {
                           setSlugInput(
                             e.target.value
                               .toLowerCase()
-                              .replace(/[^a-z0-9-]/g, "-")
+                              .replace(/[^a-z0-9-]/g, "-"),
                           )
                         }
                         placeholder="mon-offre"
@@ -348,17 +375,14 @@ export function FunnelDeploy() {
                 cname.vercel-dns.com
               </code>
             </li>
-            <li>
-              Ajoute le domaine dans les paramètres de ton projet Vercel
-            </li>
-            <li>
-              Le SSL sera automatiquement configuré par Vercel
-            </li>
+            <li>Ajoute le domaine dans les paramètres de ton projet Vercel</li>
+            <li>Le SSL sera automatiquement configuré par Vercel</li>
           </ol>
           <div className="flex items-start gap-2 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20">
             <AlertCircle className="h-4 w-4 text-amber-400 shrink-0 mt-0.5" />
             <p className="text-xs text-amber-300">
-              La propagation DNS peut prendre jusqu&apos;à 48h. Le SSL est activé automatiquement une fois le domaine vérifié.
+              La propagation DNS peut prendre jusqu&apos;à 48h. Le SSL est
+              activé automatiquement une fois le domaine vérifié.
             </p>
           </div>
         </CardContent>

@@ -23,11 +23,14 @@ export async function POST(req: NextRequest) {
     }
 
     // Rate limiting
-    const rl = await rateLimit(user.id, "generate-roadmap", { limit: 5, windowSeconds: 60 });
+    const rl = await rateLimit(user.id, "generate-roadmap", {
+      limit: 5,
+      windowSeconds: 60,
+    });
     if (!rl.allowed) {
       return NextResponse.json(
         { error: "Trop de requêtes. Réessaie dans quelques secondes." },
-        { status: 429 }
+        { status: 429 },
       );
     }
 
@@ -36,17 +39,18 @@ export async function POST(req: NextRequest) {
     if (!usage.allowed) {
       return NextResponse.json(
         { error: "Limite de générations IA atteinte", usage },
-        { status: 403 }
+        { status: 403 },
       );
     }
-
 
     const body = await req.json();
 
     // Fetch user profile for context
     const { data: profile } = await supabase
       .from("profiles")
-      .select("parcours, situation, skills, experience_level, objectives, hours_per_week, deadline")
+      .select(
+        "parcours, situation, skills, experience_level, objectives, hours_per_week, deadline",
+      )
       .eq("id", user.id)
       .single();
 
@@ -57,10 +61,22 @@ export async function POST(req: NextRequest) {
       { count: adCount },
       { count: contentCount },
     ] = await Promise.all([
-      supabase.from("offers").select("*", { count: "exact", head: true }).eq("user_id", user.id),
-      supabase.from("funnels").select("*", { count: "exact", head: true }).eq("user_id", user.id),
-      supabase.from("ad_creatives").select("*", { count: "exact", head: true }).eq("user_id", user.id),
-      supabase.from("content_pieces").select("*", { count: "exact", head: true }).eq("user_id", user.id),
+      supabase
+        .from("offers")
+        .select("*", { count: "exact", head: true })
+        .eq("user_id", user.id),
+      supabase
+        .from("funnels")
+        .select("*", { count: "exact", head: true })
+        .eq("user_id", user.id),
+      supabase
+        .from("ad_creatives")
+        .select("*", { count: "exact", head: true })
+        .eq("user_id", user.id),
+      supabase
+        .from("content_pieces")
+        .select("*", { count: "exact", head: true })
+        .eq("user_id", user.id),
     ]);
 
     const vaultContext = await buildFullVaultContext(user.id);
@@ -107,13 +123,17 @@ export async function POST(req: NextRequest) {
     if (insertError) {
       return NextResponse.json(
         { error: "Erreur lors de la sauvegarde des tâches" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
     // Award XP (non-blocking)
-    try { await awardXP(user.id, "milestone.completed"); } catch {}
-    try { await notifyGeneration(user.id, "milestone.completed"); } catch {}
+    try {
+      await awardXP(user.id, "milestone.completed");
+    } catch {}
+    try {
+      await notifyGeneration(user.id, "milestone.completed");
+    } catch {}
 
     return NextResponse.json({
       tasks_count: result.tasks.length,
@@ -123,7 +143,7 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     return NextResponse.json(
       { error: "Erreur lors de la génération de la roadmap" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

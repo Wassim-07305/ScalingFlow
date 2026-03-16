@@ -19,7 +19,7 @@ export function buildContentStrategyPrompt(
   market: string,
   offer: string,
   persona: string,
-  parcours: string
+  parcours: string,
 ): string {
   return `Tu es un expert en strategie de contenu digital pour les freelances et consultants.
 

@@ -27,12 +27,17 @@ export async function GET(req: NextRequest) {
     const isLibrary = searchParams.get("library") === "1";
 
     if (!isLibrary) {
-      return NextResponse.json({ error: "Paramètre manquant" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Paramètre manquant" },
+        { status: 400 },
+      );
     }
 
     const { data: pieces, error } = await supabase
       .from("content_pieces")
-      .select("id, content_type, title, hook, content, hashtags, published, ai_raw_response, created_at")
+      .select(
+        "id, content_type, title, hook, content, hashtags, published, ai_raw_response, created_at",
+      )
       .eq("user_id", user.id)
       .order("created_at", { ascending: false })
       .limit(200);
@@ -40,7 +45,7 @@ export async function GET(req: NextRequest) {
     if (error) {
       return NextResponse.json(
         { error: "Erreur lors du chargement de la bibliothèque" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -49,7 +54,7 @@ export async function GET(req: NextRequest) {
     const errMsg = error instanceof Error ? error.message : String(error);
     return NextResponse.json(
       { error: `Erreur bibliothèque: ${errMsg}` },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -73,7 +78,7 @@ export async function POST(req: NextRequest) {
     if (!rl.allowed) {
       return NextResponse.json(
         { error: "Trop de requêtes. Réessaie dans quelques secondes." },
-        { status: 429 }
+        { status: 429 },
       );
     }
 
@@ -82,7 +87,7 @@ export async function POST(req: NextRequest) {
     if (!usage.allowed) {
       return NextResponse.json(
         { error: "Limite de générations IA atteinte", usage },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -124,13 +129,14 @@ export async function POST(req: NextRequest) {
       persona: latestAnalysis?.avatar
         ? JSON.stringify(latestAnalysis.avatar, null, 2)
         : "Freelances et consultants qui veulent scaler leur business",
-      topPerformingTypes: performance_data?.top_types || preferences?.topTypes || undefined,
+      topPerformingTypes:
+        performance_data?.top_types || preferences?.topTypes || undefined,
       engagementMetrics: performance_data?.metrics || undefined,
       salesObjections: objections
         ? objections
             .map(
               (o: { text: string; frequency: number }) =>
-                `- "${o.text}" (fréquence : ${o.frequency}/10)`
+                `- "${o.text}" (fréquence : ${o.frequency}/10)`,
             )
             .join("\n")
         : undefined,
@@ -149,7 +155,7 @@ export async function POST(req: NextRequest) {
       context.adInsights = topAds
         .map(
           (ad) =>
-            `- Hook: "${ad.hook || ad.headline}" | Angle: ${ad.angle || "N/A"} | CTR: ${ad.ctr}%`
+            `- Hook: "${ad.hook || ad.headline}" | Angle: ${ad.angle || "N/A"} | CTR: ${ad.ctr}%`,
         )
         .join("\n");
     }
@@ -169,23 +175,28 @@ export async function POST(req: NextRequest) {
         piece.type === "reel"
           ? "instagram_reel"
           : piece.type === "carousel"
-          ? "instagram_carousel"
-          : piece.type === "story"
-          ? "instagram_story"
-          : "instagram_post";
+            ? "instagram_carousel"
+            : piece.type === "story"
+              ? "instagram_story"
+              : "instagram_post";
 
-      const { error: insertErr } = await supabase.from("content_pieces").insert({
-        user_id: user.id,
-        content_type: contentType,
-        title: `Batch hebdo - ${piece.pillar} - ${piece.type}`,
-        hook: piece.hook,
-        content: piece.script,
-        hashtags: piece.hashtags,
-        published: false,
-        ai_raw_response: piece,
-      });
+      const { error: insertErr } = await supabase
+        .from("content_pieces")
+        .insert({
+          user_id: user.id,
+          content_type: contentType,
+          title: `Batch hebdo - ${piece.pillar} - ${piece.type}`,
+          hook: piece.hook,
+          content: piece.script,
+          hashtags: piece.hashtags,
+          published: false,
+          ai_raw_response: piece,
+        });
       if (insertErr)
-        console.error("generate-weekly-content: failed to save piece", insertErr);
+        console.error(
+          "generate-weekly-content: failed to save piece",
+          insertErr,
+        );
     }
 
     // Award XP (non-blocking)
@@ -205,7 +216,7 @@ export async function POST(req: NextRequest) {
     const errMsg = error instanceof Error ? error.message : String(error);
     return NextResponse.json(
       { error: `Erreur lors de la génération du batch hebdo: ${errMsg}` },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

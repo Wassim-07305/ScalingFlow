@@ -23,7 +23,7 @@ self.addEventListener("push", (event) => {
   } catch (_) {
     const text = event.data.text();
     event.waitUntil(
-      self.registration.showNotification("ScalingFlow", { body: text })
+      self.registration.showNotification("ScalingFlow", { body: text }),
     );
   }
 });
@@ -49,6 +49,6 @@ self.addEventListener("notificationclick", (event) => {
           }
         }
         return self.clients.openWindow(link);
-      })
+      }),
   );
 });

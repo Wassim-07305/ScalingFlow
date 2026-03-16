@@ -2,7 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { checkAIUsage } from "@/lib/stripe/check-usage";
 import { createClient } from "@/lib/supabase/server";
 import { createStreamingResponse, streamText } from "@/lib/ai/generate";
-import { getAgent, type AgentType, type AgentDefinition } from "@/lib/ai/agents/index";
+import {
+  getAgent,
+  type AgentType,
+  type AgentDefinition,
+} from "@/lib/ai/agents/index";
 import { buildFullVaultContext } from "@/lib/ai/vault-context";
 import { buildRAGContext } from "@/lib/ai/rag";
 import { rateLimit } from "@/lib/utils/rate-limit";
@@ -13,7 +17,7 @@ import { SupabaseClient } from "@supabase/supabase-js";
 async function fetchAgentContext(
   supabase: SupabaseClient,
   userId: string,
-  agent: AgentDefinition
+  agent: AgentDefinition,
 ): Promise<string> {
   const blocks: string[] = [];
   const tables = agent.contextTables;
@@ -21,19 +25,27 @@ async function fetchAgentContext(
   if (tables.includes("market")) {
     const { data } = await supabase
       .from("market_analyses")
-      .select("market_name, market_description, problems, opportunities, viability_score, recommended_positioning, schwartz_level, schwartz_analysis, persona")
+      .select(
+        "market_name, market_description, problems, opportunities, viability_score, recommended_positioning, schwartz_level, schwartz_analysis, persona",
+      )
       .eq("user_id", userId)
       .order("created_at", { ascending: false })
       .limit(1)
       .single();
     if (data) {
-      const problems = Array.isArray(data.problems) ? data.problems.join(", ") : "N/A";
-      const opportunities = Array.isArray(data.opportunities) ? data.opportunities.join(", ") : "N/A";
+      const problems = Array.isArray(data.problems)
+        ? data.problems.join(", ")
+        : "N/A";
+      const opportunities = Array.isArray(data.opportunities)
+        ? data.opportunities.join(", ")
+        : "N/A";
       blocks.push(
-        `## Analyse de marché\n- Marché : ${data.market_name || "N/A"}\n- Description : ${data.market_description || "N/A"}\n- Problèmes identifiés : ${problems}\n- Opportunités : ${opportunities}\n- Score de viabilité : ${data.viability_score || "N/A"}/100\n- Positionnement recommandé : ${data.recommended_positioning || "N/A"}\n- Niveau Schwartz : ${data.schwartz_level || "N/A"}`
+        `## Analyse de marché\n- Marché : ${data.market_name || "N/A"}\n- Description : ${data.market_description || "N/A"}\n- Problèmes identifiés : ${problems}\n- Opportunités : ${opportunities}\n- Score de viabilité : ${data.viability_score || "N/A"}/100\n- Positionnement recommandé : ${data.recommended_positioning || "N/A"}\n- Niveau Schwartz : ${data.schwartz_level || "N/A"}`,
       );
       if (data.persona && typeof data.persona === "object") {
-        blocks.push(`## Avatar client (ICP)\n${JSON.stringify(data.persona, null, 2).slice(0, 2000)}`);
+        blocks.push(
+          `## Avatar client (ICP)\n${JSON.stringify(data.persona, null, 2).slice(0, 2000)}`,
+        );
       }
     }
   }
@@ -47,24 +59,30 @@ async function fetchAgentContext(
       .limit(1)
       .single();
     if (data?.competitors) {
-      blocks.push(`## Concurrents identifiés\n${JSON.stringify(data.competitors, null, 2).slice(0, 2000)}`);
+      blocks.push(
+        `## Concurrents identifiés\n${JSON.stringify(data.competitors, null, 2).slice(0, 2000)}`,
+      );
     }
     if (data?.competitor_analysis) {
-      blocks.push(`## Analyse concurrentielle\n${JSON.stringify(data.competitor_analysis, null, 2).slice(0, 2000)}`);
+      blocks.push(
+        `## Analyse concurrentielle\n${JSON.stringify(data.competitor_analysis, null, 2).slice(0, 2000)}`,
+      );
     }
   }
 
   if (tables.includes("funnel")) {
     const { data } = await supabase
       .from("funnels")
-      .select("funnel_name, status, optin_page, vsl_page, total_visits, total_optins, conversion_rate")
+      .select(
+        "funnel_name, status, optin_page, vsl_page, total_visits, total_optins, conversion_rate",
+      )
       .eq("user_id", userId)
       .order("created_at", { ascending: false })
       .limit(1)
       .single();
     if (data) {
       blocks.push(
-        `## Dernier funnel\n- Nom : ${data.funnel_name || "N/A"}\n- Statut : ${data.status || "N/A"}\n- Visites : ${data.total_visits || 0}\n- Optins : ${data.total_optins || 0}\n- Taux conversion : ${((data.conversion_rate || 0) * 100).toFixed(1)}%`
+        `## Dernier funnel\n- Nom : ${data.funnel_name || "N/A"}\n- Statut : ${data.status || "N/A"}\n- Visites : ${data.total_visits || 0}\n- Optins : ${data.total_optins || 0}\n- Taux conversion : ${((data.conversion_rate || 0) * 100).toFixed(1)}%`,
       );
     }
   }
@@ -72,15 +90,20 @@ async function fetchAgentContext(
   if (tables.includes("ads")) {
     const { data } = await supabase
       .from("ad_creatives")
-      .select("creative_type, hook, headline, ad_copy, target_audience, angle, ctr, spend, conversions")
+      .select(
+        "creative_type, hook, headline, ad_copy, target_audience, angle, ctr, spend, conversions",
+      )
       .eq("user_id", userId)
       .order("created_at", { ascending: false })
       .limit(3);
     if (data && data.length > 0) {
       const adLines = data.map(
-        (a, i) => `${i + 1}. [${a.creative_type || "ad"}] Hook: "${a.hook || "N/A"}" — Headline: "${a.headline || "N/A"}" — Audience: ${a.target_audience || "N/A"} — Angle: ${a.angle || "N/A"}`
+        (a, i) =>
+          `${i + 1}. [${a.creative_type || "ad"}] Hook: "${a.hook || "N/A"}" — Headline: "${a.headline || "N/A"}" — Audience: ${a.target_audience || "N/A"} — Angle: ${a.angle || "N/A"}`,
       );
-      blocks.push(`## Dernières créatives publicitaires\n${adLines.join("\n")}`);
+      blocks.push(
+        `## Dernières créatives publicitaires\n${adLines.join("\n")}`,
+      );
     }
   }
 
@@ -93,7 +116,8 @@ async function fetchAgentContext(
       .limit(5);
     if (data && data.length > 0) {
       const contentLines = data.map(
-        (c, i) => `${i + 1}. [${c.content_type || ""}] ${c.title || "Sans titre"}${c.hook ? ` — Hook: "${c.hook}"` : ""}`
+        (c, i) =>
+          `${i + 1}. [${c.content_type || ""}] ${c.title || "Sans titre"}${c.hook ? ` — Hook: "${c.hook}"` : ""}`,
       );
       blocks.push(`## Derniers contenus créés\n${contentLines.join("\n")}`);
     }
@@ -116,11 +140,14 @@ export async function POST(req: NextRequest) {
     }
 
     // Rate limiting
-    const rl = await rateLimit(user.id, "chat", { limit: 10, windowSeconds: 60 });
+    const rl = await rateLimit(user.id, "chat", {
+      limit: 10,
+      windowSeconds: 60,
+    });
     if (!rl.allowed) {
       return NextResponse.json(
         { error: "Trop de requêtes. Réessaie dans quelques secondes." },
-        { status: 429 }
+        { status: 429 },
       );
     }
 
@@ -129,10 +156,9 @@ export async function POST(req: NextRequest) {
     if (!usage.allowed) {
       return NextResponse.json(
         { error: "Limite de générations IA atteinte", usage },
-        { status: 403 }
+        { status: 403 },
       );
     }
-
 
     const body = await req.json();
     const { message, agentType, conversationId } = body as {
@@ -150,18 +176,19 @@ export async function POST(req: NextRequest) {
     const agent = getAgent(agentType || "general");
 
     // Fetch full vault context (profile + resources), latest offer, agent-specific context, and RAG context
-    const [vaultContext, { data: latestOffer }, agentContext, ragContext] = await Promise.all([
-      buildFullVaultContext(user.id),
-      supabase
-        .from("offers")
-        .select("offer_name, positioning, unique_mechanism")
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: false })
-        .limit(1)
-        .single(),
-      fetchAgentContext(supabase, user.id, agent),
-      buildRAGContext(user.id, message).catch(() => ""),
-    ]);
+    const [vaultContext, { data: latestOffer }, agentContext, ragContext] =
+      await Promise.all([
+        buildFullVaultContext(user.id),
+        supabase
+          .from("offers")
+          .select("offer_name, positioning, unique_mechanism")
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .single(),
+        fetchAgentContext(supabase, user.id, agent),
+        buildRAGContext(user.id, message).catch(() => ""),
+      ]);
 
     const offerBlock = latestOffer
       ? `\n## Dernière offre\n- Nom : ${latestOffer.offer_name}\n- Positionnement : ${latestOffer.positioning || "Non défini"}\n- Mecanisme unique : ${latestOffer.unique_mechanism || "Non défini"}\n`
@@ -194,7 +221,7 @@ export async function POST(req: NextRequest) {
             .slice(-10) // Keep last 10 messages for context
             .map(
               (m) =>
-                `${m.role === "user" ? "Utilisateur" : "Assistant"}: ${m.content}`
+                `${m.role === "user" ? "Utilisateur" : "Assistant"}: ${m.content}`,
             )
             .join("\n\n")
         : "";
@@ -219,7 +246,7 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     return new Response(
       JSON.stringify({ error: "Erreur lors de la génération" }),
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -43,7 +43,8 @@ export function RevenueChart() {
           const end = endOfMonth(monthDate).toISOString();
           const label = format(monthDate, "MMM", { locale: fr });
           // Capitaliser la première lettre
-          const capitalizedLabel = label.charAt(0).toUpperCase() + label.slice(1);
+          const capitalizedLabel =
+            label.charAt(0).toUpperCase() + label.slice(1);
 
           const [offersRes, creativesRes, funnelsRes, assetsRes] =
             await Promise.all([
@@ -107,7 +108,10 @@ export function RevenueChart() {
             <div className="flex h-full flex-col justify-end gap-2 px-4 pb-4">
               <div className="flex items-end gap-3 h-full">
                 {[40, 65, 45, 80, 55, 70].map((h, i) => (
-                  <div key={i} className="flex-1 flex flex-col justify-end gap-1">
+                  <div
+                    key={i}
+                    className="flex-1 flex flex-col justify-end gap-1"
+                  >
                     <div
                       className="w-full rounded-t bg-bg-tertiary animate-pulse"
                       style={{ height: `${h}%` }}
@@ -122,8 +126,13 @@ export function RevenueChart() {
               <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-accent/10 mb-3">
                 <TrendingUp className="h-6 w-6 text-accent" />
               </div>
-              <p className="text-sm font-medium text-text-primary mb-1">Pas encore de données</p>
-              <p className="text-xs text-text-muted max-w-[220px]">Tes statistiques mensuelles apparaîtront ici après tes premières générations.</p>
+              <p className="text-sm font-medium text-text-primary mb-1">
+                Pas encore de données
+              </p>
+              <p className="text-xs text-text-muted max-w-[220px]">
+                Tes statistiques mensuelles apparaîtront ici après tes premières
+                générations.
+              </p>
             </div>
           ) : (
             <ResponsiveContainer width="100%" height="100%">
@@ -167,10 +176,7 @@ export function RevenueChart() {
                     color: "#FFFFFF",
                     fontSize: "13px",
                   }}
-                  formatter={(value) => [
-                    String(value ?? 0),
-                    "Générations",
-                  ]}
+                  formatter={(value) => [String(value ?? 0), "Générations"]}
                 />
                 <Area
                   type="monotone"

@@ -34,7 +34,9 @@ export function StyleGuide({ direction, className }: StyleGuideProps) {
       // Old format: {primary_color: "#xxx", secondary_color: "#xxx", accent_color: "#xxx"}
       const colorsObj = raw.colors as Record<string, unknown>;
       palette = Object.entries(colorsObj)
-        .filter(([, v]) => typeof v === "string" && (v as string).startsWith("#"))
+        .filter(
+          ([, v]) => typeof v === "string" && (v as string).startsWith("#"),
+        )
         .map(([k, v]) => ({
           name: k.replace(/_/g, " ").replace(/color/i, "").trim(),
           hex: String(v),
@@ -55,12 +57,15 @@ export function StyleGuide({ direction, className }: StyleGuideProps) {
     // --- Typography ---
     // New format: typographies is array of {role, font_family, style}
     // Old format: typography is a flat object like {font_heading: "...", font_body: "..."}
-    let typographies: { role: string; font_family: string; style: string }[] = [];
+    let typographies: { role: string; font_family: string; style: string }[] =
+      [];
     const typoRaw = raw.typographies || raw.typography || raw.polices;
     if (Array.isArray(typoRaw)) {
       typographies = typoRaw.map((t: Record<string, unknown>) => ({
         role: String(t.role || t.usage || ""),
-        font_family: String(t.font_family || t.famille || t.font || t.police || ""),
+        font_family: String(
+          t.font_family || t.famille || t.font || t.police || "",
+        ),
         style: String(t.style || t.description || ""),
       }));
     } else if (typoRaw && typeof typoRaw === "object") {
@@ -86,21 +91,31 @@ export function StyleGuide({ direction, className }: StyleGuideProps) {
     }
 
     // --- Style & Mood ---
-    const style_visuel = String(raw.style_visuel || raw.style || raw.visual_style || "");
+    const style_visuel = String(
+      raw.style_visuel || raw.style || raw.visual_style || "",
+    );
     const moodboard_description = String(
-      raw.moodboard_description || raw.moodboard || raw.univers_visuel
-      || raw.mood || raw.imagery || ""
+      raw.moodboard_description ||
+        raw.moodboard ||
+        raw.univers_visuel ||
+        raw.mood ||
+        raw.imagery ||
+        "",
     );
 
     return { palette, typographies, style_visuel, moodboard_description };
   }, [direction]);
 
-  if (!normalized || (normalized.palette.length === 0 && normalized.typographies.length === 0)) {
+  if (
+    !normalized ||
+    (normalized.palette.length === 0 && normalized.typographies.length === 0)
+  ) {
     return (
       <div className={cn("text-center py-12", className)}>
         <Palette className="h-12 w-12 text-text-muted mx-auto mb-3" />
         <p className="text-text-secondary">
-          Aucune direction artistique générée. Lance la génération pour obtenir un guide de style.
+          Aucune direction artistique générée. Lance la génération pour obtenir
+          un guide de style.
         </p>
       </div>
     );
@@ -135,9 +150,13 @@ export function StyleGuide({ direction, className }: StyleGuideProps) {
                     <p className="text-sm font-medium text-text-primary truncate">
                       {color.name}
                     </p>
-                    <p className="text-xs text-text-muted font-mono">{color.hex}</p>
+                    <p className="text-xs text-text-muted font-mono">
+                      {color.hex}
+                    </p>
                     {color.usage && (
-                      <p className="text-xs text-text-secondary mt-0.5">{color.usage}</p>
+                      <p className="text-xs text-text-secondary mt-0.5">
+                        {color.usage}
+                      </p>
                     )}
                   </div>
                   <span className="absolute top-2 right-2 text-[9px] text-text-muted opacity-0 group-hover:opacity-100 transition-opacity">
@@ -164,14 +183,39 @@ export function StyleGuide({ direction, className }: StyleGuideProps) {
 
             {/* Live preview card */}
             {normalized.palette.length >= 2 && (
-              <div className="mt-4 p-4 rounded-xl border border-border-default/50" style={{ backgroundColor: normalized.palette[0]?.hex + "15" }}>
-                <p className="text-xs text-text-muted uppercase tracking-wider mb-2">Aperçu en temps réel</p>
+              <div
+                className="mt-4 p-4 rounded-xl border border-border-default/50"
+                style={{ backgroundColor: normalized.palette[0]?.hex + "15" }}
+              >
+                <p className="text-xs text-text-muted uppercase tracking-wider mb-2">
+                  Aperçu en temps réel
+                </p>
                 <div className="flex gap-3">
-                  <div className="flex-1 p-3 rounded-lg" style={{ backgroundColor: normalized.palette[0]?.hex + "20" }}>
-                    <p className="text-xs font-semibold" style={{ color: normalized.palette[0]?.hex }}>Titre principal</p>
-                    <p className="text-[10px] text-text-muted mt-1">Exemple de texte avec ta palette</p>
+                  <div
+                    className="flex-1 p-3 rounded-lg"
+                    style={{
+                      backgroundColor: normalized.palette[0]?.hex + "20",
+                    }}
+                  >
+                    <p
+                      className="text-xs font-semibold"
+                      style={{ color: normalized.palette[0]?.hex }}
+                    >
+                      Titre principal
+                    </p>
+                    <p className="text-[10px] text-text-muted mt-1">
+                      Exemple de texte avec ta palette
+                    </p>
                   </div>
-                  <div className="px-4 py-2 rounded-lg flex items-center text-xs font-semibold text-white" style={{ backgroundColor: normalized.palette[normalized.palette.length > 1 ? 1 : 0]?.hex }}>
+                  <div
+                    className="px-4 py-2 rounded-lg flex items-center text-xs font-semibold text-white"
+                    style={{
+                      backgroundColor:
+                        normalized.palette[
+                          normalized.palette.length > 1 ? 1 : 0
+                        ]?.hex,
+                    }}
+                  >
                     Bouton CTA
                   </div>
                 </div>
@@ -200,7 +244,9 @@ export function StyleGuide({ direction, className }: StyleGuideProps) {
                   <div className="flex items-center justify-between mb-3">
                     <Badge variant="muted">{typo.role}</Badge>
                     {typo.style && (
-                      <span className="text-xs text-text-muted">{typo.style}</span>
+                      <span className="text-xs text-text-muted">
+                        {typo.style}
+                      </span>
                     )}
                   </div>
                   <p className="text-xl font-bold text-text-primary mb-1">
@@ -235,7 +281,9 @@ export function StyleGuide({ direction, className }: StyleGuideProps) {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-text-secondary">{normalized.style_visuel}</p>
+            <p className="text-sm text-text-secondary">
+              {normalized.style_visuel}
+            </p>
           </CardContent>
         </Card>
       )}
@@ -250,7 +298,9 @@ export function StyleGuide({ direction, className }: StyleGuideProps) {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-text-secondary">{normalized.moodboard_description}</p>
+            <p className="text-sm text-text-secondary">
+              {normalized.moodboard_description}
+            </p>
           </CardContent>
         </Card>
       )}

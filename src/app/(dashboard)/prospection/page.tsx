@@ -11,7 +11,14 @@ import { GenerationHistory } from "@/components/shared/generation-history";
 import { TabBar } from "@/components/shared/tab-bar";
 import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
-import { Compass, Phone, MessageSquare, GitBranch, History, MessageCircle } from "lucide-react";
+import {
+  Compass,
+  Phone,
+  MessageSquare,
+  GitBranch,
+  History,
+  MessageCircle,
+} from "lucide-react";
 
 const TABS = [
   { key: "strategy", label: "Stratégie d'Acquisition", icon: Compass },

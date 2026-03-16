@@ -18,6 +18,7 @@ Plateforme SaaS tout-en-un propulsee par l'IA pour structurer, lancer et scaler 
 ## Fonctionnalites
 
 ### Generation IA
+
 - Analyse de marche, concurrents, persona
 - Creation d'offre complete (positionnement, pricing, garanties, OTO)
 - Funnel de vente (landing, VSL, thank you)
@@ -29,6 +30,7 @@ Plateforme SaaS tout-en-un propulsee par l'IA pour structurer, lancer et scaler 
 - Assistant IA multi-agents (strategist, copywriter, ad expert, sales coach...)
 
 ### Plateforme
+
 - **Onboarding** multi-etapes avec collecte de profil business
 - **Vault** personnel (competences, ressources, analyse IA)
 - **Dashboard** personnalise (KPIs, pipeline business, progression, charts)
@@ -39,12 +41,14 @@ Plateforme SaaS tout-en-un propulsee par l'IA pour structurer, lancer et scaler 
 - **Admin dashboard** (metriques, abonnements, activite — acces restreint par role)
 
 ### Monetisation
+
 - 3 plans : Free (5 generations/mois), Pro, Premium
 - Stripe Checkout + Billing Portal
 - Gating IA avec UpgradeWall (403 → composant upgrade)
 - Suivi d'usage via `activity_log`
 
 ### Auth & Securite
+
 - Supabase Auth (email/password)
 - Middleware de session avec protection des routes
 - Redirection onboarding obligatoire

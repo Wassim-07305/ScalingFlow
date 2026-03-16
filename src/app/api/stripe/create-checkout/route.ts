@@ -7,7 +7,7 @@ export async function POST(req: NextRequest) {
     if (!stripe) {
       return NextResponse.json(
         { error: "Stripe non configuré. Contacte le support." },
-        { status: 503 }
+        { status: 503 },
       );
     }
 
@@ -24,10 +24,7 @@ export async function POST(req: NextRequest) {
     const { priceId } = body as { priceId: string };
 
     if (!priceId) {
-      return NextResponse.json(
-        { error: "priceId requis" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "priceId requis" }, { status: 400 });
     }
 
     // Récupérer ou créer le stripe_customer_id
@@ -69,7 +66,7 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     return NextResponse.json(
       { error: "Erreur lors de la création de la session de paiement" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -1,6 +1,6 @@
 export function salesScriptPrompt(
   offer: Record<string, unknown>,
-  avatar: Record<string, unknown>
+  avatar: Record<string, unknown>,
 ): string {
   return `Tu es un expert en vente consultative pour les freelances et consultants dans le domaine de l'IA et de l'automatisation.
 

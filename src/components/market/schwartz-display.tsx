@@ -16,7 +16,10 @@ interface SchwartzDisplayProps {
   analysis: SchwartzAnalysisResult;
 }
 
-const NIVEAU_LABELS: Record<1 | 2 | 3 | 4 | 5, { label: string; color: string }> = {
+const NIVEAU_LABELS: Record<
+  1 | 2 | 3 | 4 | 5,
+  { label: string; color: string }
+> = {
   1: { label: "Marché vierge", color: "bg-emerald-500" },
   2: { label: "Problème connu", color: "bg-blue-500" },
   3: { label: "Solutions connues", color: "bg-yellow-500" },
@@ -24,12 +27,25 @@ const NIVEAU_LABELS: Record<1 | 2 | 3 | 4 | 5, { label: string; color: string }>
   5: { label: "Hyper-saturé", color: "bg-red-500" },
 };
 
-const STRATEGIE_LABELS: Record<string, { label: string; description: string }> = {
-  vsl: { label: "VSL (Video Sales Letter)", description: "Promesse directe via vidéo longue" },
-  social_funnel: { label: "Entonnoir Social", description: "Nurturing via contenu social" },
-  education_first: { label: "Éducation d'abord", description: "Créer la conscience du problème" },
-  direct_response: { label: "Réponse directe", description: "Preuves massives et identification" },
-};
+const STRATEGIE_LABELS: Record<string, { label: string; description: string }> =
+  {
+    vsl: {
+      label: "VSL (Video Sales Letter)",
+      description: "Promesse directe via vidéo longue",
+    },
+    social_funnel: {
+      label: "Entonnoir Social",
+      description: "Nurturing via contenu social",
+    },
+    education_first: {
+      label: "Éducation d'abord",
+      description: "Créer la conscience du problème",
+    },
+    direct_response: {
+      label: "Réponse directe",
+      description: "Preuves massives et identification",
+    },
+  };
 
 const PREUVE_COLORS: Record<string, "default" | "yellow" | "red"> = {
   faible: "default",
@@ -160,7 +176,9 @@ export function SchwartzDisplay({ analysis }: SchwartzDisplayProps) {
       </Card>
 
       {/* Recommandations Schwartz */}
-      {(analysis.schwartz_pricing_reco || analysis.social_content_reco || analysis.vsl_style_reco) && (
+      {(analysis.schwartz_pricing_reco ||
+        analysis.social_content_reco ||
+        analysis.vsl_style_reco) && (
         <div className="grid gap-4 md:grid-cols-3">
           {analysis.schwartz_pricing_reco && (
             <InfoCard icon={Target} title="Pricing recommandé">

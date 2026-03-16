@@ -2,12 +2,7 @@
 
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-} from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -88,7 +83,9 @@ export default function SettingsPage() {
   // Handle checkout success redirect
   useEffect(() => {
     if (searchParams.get("checkout") === "success") {
-      toast.success("Abonnement activé avec succès ! Bienvenue dans le plan Pro.");
+      toast.success(
+        "Abonnement activé avec succès ! Bienvenue dans le plan Pro.",
+      );
       setActiveTab("abonnement");
     }
   }, [searchParams]);
@@ -104,52 +101,55 @@ export default function SettingsPage() {
     }
   }, [profile?.avatar_url]);
 
-  const handleAvatarUpload = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || !user) return;
+  const handleAvatarUpload = useCallback(
+    async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (!file || !user) return;
 
-    if (!file.type.startsWith("image/")) {
-      toast.error("Seules les images sont acceptées.");
-      return;
-    }
-    if (file.size > 2 * 1024 * 1024) {
-      toast.error("L'image ne doit pas dépasser 2 Mo.");
-      return;
-    }
+      if (!file.type.startsWith("image/")) {
+        toast.error("Seules les images sont acceptées.");
+        return;
+      }
+      if (file.size > 2 * 1024 * 1024) {
+        toast.error("L'image ne doit pas dépasser 2 Mo.");
+        return;
+      }
 
-    setUploadingAvatar(true);
-    try {
-      const ext = file.name.split(".").pop() || "jpg";
-      const fileName = `${user.id}/avatar.${ext}`;
+      setUploadingAvatar(true);
+      try {
+        const ext = file.name.split(".").pop() || "jpg";
+        const fileName = `${user.id}/avatar.${ext}`;
 
-      const { error: uploadError } = await supabase.storage
-        .from("avatars")
-        .upload(fileName, file, { upsert: true });
+        const { error: uploadError } = await supabase.storage
+          .from("avatars")
+          .upload(fileName, file, { upsert: true });
 
-      if (uploadError) throw uploadError;
+        if (uploadError) throw uploadError;
 
-      const { data: urlData } = supabase.storage
-        .from("avatars")
-        .getPublicUrl(fileName);
+        const { data: urlData } = supabase.storage
+          .from("avatars")
+          .getPublicUrl(fileName);
 
-      const publicUrl = `${urlData.publicUrl}?t=${Date.now()}`;
+        const publicUrl = `${urlData.publicUrl}?t=${Date.now()}`;
 
-      const { error: updateError } = await supabase
-        .from("profiles")
-        .update({ avatar_url: publicUrl })
-        .eq("id", user.id);
+        const { error: updateError } = await supabase
+          .from("profiles")
+          .update({ avatar_url: publicUrl })
+          .eq("id", user.id);
 
-      if (updateError) throw updateError;
+        if (updateError) throw updateError;
 
-      setAvatarUrl(publicUrl);
-      toast.success("Photo de profil mise à jour !");
-    } catch {
-      toast.error("Erreur lors de l'upload de l'avatar.");
-    } finally {
-      setUploadingAvatar(false);
-      if (fileInputRef.current) fileInputRef.current.value = "";
-    }
-  }, [user, supabase]);
+        setAvatarUrl(publicUrl);
+        toast.success("Photo de profil mise à jour !");
+      } catch {
+        toast.error("Erreur lors de l'upload de l'avatar.");
+      } finally {
+        setUploadingAvatar(false);
+        if (fileInputRef.current) fileInputRef.current.value = "";
+      }
+    },
+    [user, supabase],
+  );
 
   const handleRemoveAvatar = useCallback(async () => {
     if (!user) return;
@@ -316,9 +316,9 @@ export default function SettingsPage() {
       NOTIF_KEYS.reduce((acc, { key }) => {
         acc[key] = meta?.[key] !== false;
         return acc;
-      }, {} as NotifPrefs)
+      }, {} as NotifPrefs),
     );
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
 
   const handleToggleNotif = (key: string) => {
@@ -365,11 +365,11 @@ export default function SettingsPage() {
             )}
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-text-primary">
-              Paramètres
-            </h1>
+            <h1 className="text-2xl font-bold text-text-primary">Paramètres</h1>
             <p className="text-sm text-text-secondary">
-              {profile?.full_name || user?.email || "Gère ton compte et tes préférences."}
+              {profile?.full_name ||
+                user?.email ||
+                "Gère ton compte et tes préférences."}
             </p>
             {profile && (
               <div className="mt-2 flex items-center gap-2">
@@ -377,7 +377,8 @@ export default function SettingsPage() {
                   {profile.selected_market || "Marché non défini"}
                 </Badge>
                 <Badge variant="purple" className="text-[10px]">
-                  {EXPERIENCE_LABELS[profile.experience_level || ""] || "Niveau non défini"}
+                  {EXPERIENCE_LABELS[profile.experience_level || ""] ||
+                    "Niveau non défini"}
                 </Badge>
               </div>
             )}
@@ -395,7 +396,7 @@ export default function SettingsPage() {
               "relative z-10 flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 whitespace-nowrap flex-shrink-0",
               activeTab === tab.id
                 ? "bg-accent text-white shadow-lg shadow-accent/20"
-                : "text-text-secondary hover:text-text-primary hover:bg-bg-tertiary"
+                : "text-text-secondary hover:text-text-primary hover:bg-bg-tertiary",
             )}
           >
             <tab.icon className="h-4 w-4" />
@@ -405,7 +406,10 @@ export default function SettingsPage() {
       </div>
 
       {/* Tab content with fade */}
-      <div key={activeTab} className="space-y-6 max-w-2xl animate-in fade-in slide-in-from-bottom-2 duration-300">
+      <div
+        key={activeTab}
+        className="space-y-6 max-w-2xl animate-in fade-in slide-in-from-bottom-2 duration-300"
+      >
         {/* ─── Profil ──────────────────────────────────────── */}
         {activeTab === "profil" && (
           <>
@@ -577,7 +581,9 @@ export default function SettingsPage() {
 
               <Separator className="my-4" />
 
-              <p className="text-xs text-text-muted mb-3 uppercase font-medium">E-mails</p>
+              <p className="text-xs text-text-muted mb-3 uppercase font-medium">
+                E-mails
+              </p>
               <div className="space-y-1">
                 {NOTIF_KEYS.map(({ key, label }) => (
                   <div
@@ -592,13 +598,17 @@ export default function SettingsPage() {
                       aria-label={label}
                       className={cn(
                         "relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 ease-out",
-                        notifPrefs[key] ? "bg-accent shadow-sm shadow-accent/30" : "bg-bg-tertiary border border-border-default"
+                        notifPrefs[key]
+                          ? "bg-accent shadow-sm shadow-accent/30"
+                          : "bg-bg-tertiary border border-border-default",
                       )}
                     >
                       <span
                         className={cn(
                           "inline-block h-4 w-4 rounded-full bg-white shadow-sm transition-all duration-300 ease-out",
-                          notifPrefs[key] ? "translate-x-6 scale-100" : "translate-x-1 scale-90"
+                          notifPrefs[key]
+                            ? "translate-x-6 scale-100"
+                            : "translate-x-1 scale-90",
                         )}
                       />
                     </button>
@@ -611,7 +621,9 @@ export default function SettingsPage() {
                 onClick={handleSaveNotifs}
                 disabled={savingNotifs}
               >
-                {savingNotifs && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+                {savingNotifs && (
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                )}
                 Sauvegarder les préférences
               </Button>
             </CardContent>
@@ -654,7 +666,7 @@ export default function SettingsPage() {
                     "overflow-hidden transition-all duration-300",
                     showPasswordSection
                       ? "max-h-80 opacity-100 mt-4"
-                      : "max-h-0 opacity-0"
+                      : "max-h-0 opacity-0",
                   )}
                 >
                   <div className="space-y-3">
@@ -670,7 +682,11 @@ export default function SettingsPage() {
                         <button
                           type="button"
                           onClick={() => setShowNewPassword((prev) => !prev)}
-                          aria-label={showNewPassword ? "Masquer le mot de passe" : "Afficher le mot de passe"}
+                          aria-label={
+                            showNewPassword
+                              ? "Masquer le mot de passe"
+                              : "Afficher le mot de passe"
+                          }
                           className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-primary transition-colors"
                         >
                           {showNewPassword ? (
@@ -695,7 +711,11 @@ export default function SettingsPage() {
                           onClick={() =>
                             setShowConfirmPassword((prev) => !prev)
                           }
-                          aria-label={showConfirmPassword ? "Masquer la confirmation" : "Afficher la confirmation"}
+                          aria-label={
+                            showConfirmPassword
+                              ? "Masquer la confirmation"
+                              : "Afficher la confirmation"
+                          }
                           className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-primary transition-colors"
                         >
                           {showConfirmPassword ? (
@@ -734,7 +754,8 @@ export default function SettingsPage() {
               {/* Suppression de compte */}
               <div>
                 <p className="text-sm text-text-secondary mb-3">
-                  La suppression de ton compte est irréversible. Toutes tes données seront définitivement effacées.
+                  La suppression de ton compte est irréversible. Toutes tes
+                  données seront définitivement effacées.
                 </p>
                 <Button
                   variant="destructive"
@@ -745,10 +766,16 @@ export default function SettingsPage() {
                   Supprimer mon compte
                 </Button>
 
-                <Dialog open={showDeleteDialog} onOpenChange={(open) => {
-                  setShowDeleteDialog(open);
-                  if (!open) { setDeleteConfirmText(""); setDeletingAccount(false); }
-                }}>
+                <Dialog
+                  open={showDeleteDialog}
+                  onOpenChange={(open) => {
+                    setShowDeleteDialog(open);
+                    if (!open) {
+                      setDeleteConfirmText("");
+                      setDeletingAccount(false);
+                    }
+                  }}
+                >
                   <DialogContent className="bg-bg-secondary border-border-default">
                     <DialogHeader>
                       <DialogTitle className="text-text-primary flex items-center gap-2">
@@ -756,13 +783,22 @@ export default function SettingsPage() {
                         Supprimer mon compte
                       </DialogTitle>
                       <DialogDescription className="text-text-secondary">
-                        Cette action est irréversible. Toutes tes données (profil, offres, funnels, posts, analyses) seront définitivement supprimées.
+                        Cette action est irréversible. Toutes tes données
+                        (profil, offres, funnels, posts, analyses) seront
+                        définitivement supprimées.
                       </DialogDescription>
                     </DialogHeader>
 
                     <div className="space-y-3 py-2">
-                      <Label htmlFor="delete-confirm" className="text-sm text-text-secondary">
-                        Tape <span className="font-bold text-red-400">SUPPRIMER</span> pour confirmer
+                      <Label
+                        htmlFor="delete-confirm"
+                        className="text-sm text-text-secondary"
+                      >
+                        Tape{" "}
+                        <span className="font-bold text-red-400">
+                          SUPPRIMER
+                        </span>{" "}
+                        pour confirmer
                       </Label>
                       <Input
                         id="delete-confirm"
@@ -785,9 +821,13 @@ export default function SettingsPage() {
                       <Button
                         variant="destructive"
                         onClick={handleDeleteAccount}
-                        disabled={deleteConfirmText !== "SUPPRIMER" || deletingAccount}
+                        disabled={
+                          deleteConfirmText !== "SUPPRIMER" || deletingAccount
+                        }
                       >
-                        {deletingAccount && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+                        {deletingAccount && (
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        )}
                         Supprimer définitivement
                       </Button>
                     </DialogFooter>
@@ -895,7 +935,14 @@ function UnipileSection() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          providers: ["LINKEDIN", "WHATSAPP", "INSTAGRAM", "MESSENGER", "TELEGRAM", "TWITTER"],
+          providers: [
+            "LINKEDIN",
+            "WHATSAPP",
+            "INSTAGRAM",
+            "MESSENGER",
+            "TELEGRAM",
+            "TWITTER",
+          ],
         }),
       });
       if (!res.ok) throw new Error();
@@ -909,7 +956,7 @@ function UnipileSection() {
         window.open(
           data.url,
           "unipile-auth",
-          `width=${w},height=${h},left=${left},top=${top},toolbar=no,menubar=no,scrollbars=yes`
+          `width=${w},height=${h},left=${left},top=${top},toolbar=no,menubar=no,scrollbars=yes`,
         );
       } else {
         toast.error("URL de connexion introuvable");
@@ -964,7 +1011,8 @@ function UnipileSection() {
         </Button>
       </div>
       <p className="text-xs text-text-muted">
-        Connecte LinkedIn, WhatsApp, Instagram, Messenger, Telegram ou Twitter pour gérer tes messages depuis ScalingFlow.
+        Connecte LinkedIn, WhatsApp, Instagram, Messenger, Telegram ou Twitter
+        pour gérer tes messages depuis ScalingFlow.
       </p>
 
       {loadingAccounts ? (
@@ -974,7 +1022,9 @@ function UnipileSection() {
       ) : accounts.length > 0 ? (
         <div className="space-y-1">
           {accounts.map((account) => {
-            const providerInfo = UNIPILE_PROVIDERS[account.provider.toUpperCase()] || {
+            const providerInfo = UNIPILE_PROVIDERS[
+              account.provider.toUpperCase()
+            ] || {
               label: account.provider,
               emoji: "🔗",
             };
@@ -999,11 +1049,14 @@ function UnipileSection() {
                       {account.connected_at && (
                         <span>
                           Connecté le{" "}
-                          {new Date(account.connected_at).toLocaleDateString("fr-FR", {
-                            day: "numeric",
-                            month: "short",
-                            year: "numeric",
-                          })}
+                          {new Date(account.connected_at).toLocaleDateString(
+                            "fr-FR",
+                            {
+                              day: "numeric",
+                              month: "short",
+                              year: "numeric",
+                            },
+                          )}
                         </span>
                       )}
                     </div>
@@ -1047,7 +1100,9 @@ type ConnectionStatus = {
 
 function IntegrationsCard() {
   const { user } = useUser();
-  const [connections, setConnections] = useState<Record<string, ConnectionStatus>>({});
+  const [connections, setConnections] = useState<
+    Record<string, ConnectionStatus>
+  >({});
   const [loading, setLoading] = useState(true);
   const [disconnecting, setDisconnecting] = useState<string | null>(null);
   const searchParams = useSearchParams();
@@ -1058,7 +1113,9 @@ function IntegrationsCard() {
     const error = searchParams.get("error");
     if (success?.includes("connected")) {
       const provider = success.replace("_connected", "");
-      toast.success(`${provider.charAt(0).toUpperCase() + provider.slice(1)} connecté avec succès !`);
+      toast.success(
+        `${provider.charAt(0).toUpperCase() + provider.slice(1)} connecté avec succès !`,
+      );
     }
     if (error) {
       toast.error(`Erreur de connexion : ${error}`);
@@ -1087,7 +1144,10 @@ function IntegrationsCard() {
     try {
       const res = await fetch(endpoint, { method: "POST" });
       if (res.ok) {
-        setConnections((prev) => ({ ...prev, [provider]: { connected: false } }));
+        setConnections((prev) => ({
+          ...prev,
+          [provider]: { connected: false },
+        }));
         toast.success("Déconnecté.");
       } else {
         toast.error("Erreur lors de la déconnexion.");
@@ -1121,7 +1181,9 @@ function IntegrationsCard() {
     return (
       <div className="flex items-center justify-between py-3">
         <div className="flex items-center gap-3">
-          <Badge variant={badgeVariant} className="text-xs">{label}</Badge>
+          <Badge variant={badgeVariant} className="text-xs">
+            {label}
+          </Badge>
           {conn?.connected ? (
             <div className="flex items-center gap-2">
               <span className="h-2 w-2 rounded-full bg-green-400" />
@@ -1151,7 +1213,9 @@ function IntegrationsCard() {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => { window.location.href = connectUrl; }}
+            onClick={() => {
+              window.location.href = connectUrl;
+            }}
             disabled={loading}
           >
             Connecter
@@ -1284,7 +1348,8 @@ function IntegrationsCard() {
               </Button>
             </div>
             <p className="text-xs text-text-muted mt-1">
-              Configure cette URL dans ton CRM (GHL, Zapier, Make) pour recevoir les leads entrants.
+              Configure cette URL dans ton CRM (GHL, Zapier, Make) pour recevoir
+              les leads entrants.
             </p>
           </>
         )}
@@ -1302,7 +1367,14 @@ const THEME_OPTIONS: { value: Theme; label: string; icon: typeof Sun }[] = [
 ];
 
 function PushNotificationToggle() {
-  const { isSupported, isSubscribed, isLoading, permission, subscribe, unsubscribe } = usePushNotifications();
+  const {
+    isSupported,
+    isSubscribed,
+    isLoading,
+    permission,
+    subscribe,
+    unsubscribe,
+  } = usePushNotifications();
   const [toggling, setToggling] = useState(false);
 
   const handleToggle = async () => {
@@ -1315,7 +1387,9 @@ function PushNotificationToggle() {
       if (ok) {
         toast.success("Notifications push activées !");
       } else if (permission === "denied") {
-        toast.error("Les notifications sont bloquées dans les paramètres de ton navigateur.");
+        toast.error(
+          "Les notifications sont bloquées dans les paramètres de ton navigateur.",
+        );
       }
     }
     setToggling(false);
@@ -1344,13 +1418,15 @@ function PushNotificationToggle() {
         aria-label="Notifications push"
         className={cn(
           "relative inline-flex h-6 w-11 items-center rounded-full transition-colors disabled:opacity-50",
-          isSubscribed ? "bg-accent" : "bg-bg-tertiary border border-border-default"
+          isSubscribed
+            ? "bg-accent"
+            : "bg-bg-tertiary border border-border-default",
         )}
       >
         <span
           className={cn(
             "inline-block h-4 w-4 rounded-full bg-white transition-transform",
-            isSubscribed ? "translate-x-6" : "translate-x-1"
+            isSubscribed ? "translate-x-6" : "translate-x-1",
           )}
         />
       </button>
@@ -1379,7 +1455,7 @@ function ThemeCard() {
                 "flex flex-col items-center gap-2 rounded-xl border p-4 transition-all",
                 theme === option.value
                   ? "border-accent bg-accent/10 text-accent"
-                  : "border-border-default bg-bg-secondary text-text-secondary hover:border-text-muted"
+                  : "border-border-default bg-bg-secondary text-text-secondary hover:border-text-muted",
               )}
             >
               <option.icon className="h-5 w-5" />

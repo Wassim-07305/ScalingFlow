@@ -103,17 +103,14 @@ export async function POST(req: NextRequest) {
     if (!checkIPRate(ip)) {
       return NextResponse.json(
         { error: "Limite atteinte. Maximum 5 scans par heure." },
-        { status: 429 }
+        { status: 429 },
       );
     }
 
     const { url } = await req.json();
 
     if (!url || typeof url !== "string") {
-      return NextResponse.json(
-        { error: "URL requise." },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "URL requise." }, { status: 400 });
     }
 
     // Validate URL format
@@ -126,7 +123,7 @@ export async function POST(req: NextRequest) {
     } catch {
       return NextResponse.json(
         { error: "URL invalide. Utilisez une URL complète (https://...)." },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -151,7 +148,7 @@ export async function POST(req: NextRequest) {
     if (blockedPatterns.some((p) => p.test(hostname))) {
       return NextResponse.json(
         { error: "URL non autorisée." },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -170,22 +167,24 @@ export async function POST(req: NextRequest) {
       if (!res.ok) {
         return NextResponse.json(
           { error: `Impossible d'accéder à la page (HTTP ${res.status}).` },
-          { status: 422 }
+          { status: 422 },
         );
       }
 
       html = await res.text();
     } catch {
       return NextResponse.json(
-        { error: "Impossible de charger la page. Vérifiez l'URL et réessayez." },
-        { status: 422 }
+        {
+          error: "Impossible de charger la page. Vérifiez l'URL et réessayez.",
+        },
+        { status: 422 },
       );
     }
 
     if (html.length < 100) {
       return NextResponse.json(
         { error: "La page semble vide ou inaccessible." },
-        { status: 422 }
+        { status: 422 },
       );
     }
 
@@ -200,7 +199,7 @@ export async function POST(req: NextRequest) {
     console.error("Funnel scan error:", error);
     return NextResponse.json(
       { error: "Erreur lors de l'analyse. Veuillez réessayer." },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

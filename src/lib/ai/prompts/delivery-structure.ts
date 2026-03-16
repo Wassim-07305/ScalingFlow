@@ -6,7 +6,7 @@ export function deliveryStructurePrompt(
     pricing_strategy?: string;
     delivery_structure?: string;
   },
-  avatar: Record<string, unknown>
+  avatar: Record<string, unknown>,
 ): string {
   return `Tu es un expert en design de systèmes de delivery et d'opérations pour les freelances et consultants premium.
 

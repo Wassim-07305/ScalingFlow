@@ -7,7 +7,10 @@ import { createClient } from "@/lib/supabase/server";
 
 const META_GRAPH_URL = "https://graph.facebook.com/v21.0";
 
-async function getMetaCredentials(supabase: Awaited<ReturnType<typeof createClient>>, userId: string) {
+async function getMetaCredentials(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  userId: string,
+) {
   const { data } = await supabase
     .from("connected_accounts")
     .select("access_token, provider_account_id")
@@ -35,7 +38,9 @@ async function getMetaCredentials(supabase: Awaited<ReturnType<typeof createClie
 export async function POST(req: NextRequest) {
   try {
     const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
     if (!user) {
       return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
@@ -45,7 +50,7 @@ export async function POST(req: NextRequest) {
     if (!token || !adAccountId) {
       return NextResponse.json(
         { error: "Connecte ton compte Meta Ads d'abord." },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -55,7 +60,7 @@ export async function POST(req: NextRequest) {
     if (!name || !audience_type) {
       return NextResponse.json(
         { error: "name et audience_type sont requis" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -75,14 +80,14 @@ export async function POST(req: NextRequest) {
             subtype: subtype || "CUSTOM",
             customer_file_source: "USER_PROVIDED_ONLY",
           }),
-        }
+        },
       );
 
       const data = await res.json();
       if (data.error) {
         return NextResponse.json(
           { error: `Meta API: ${data.error.message}` },
-          { status: 502 }
+          { status: 502 },
         );
       }
       metaAudienceId = data.id;
@@ -104,14 +109,14 @@ export async function POST(req: NextRequest) {
               ratio: source_data?.ratio || 0.01,
             }),
           }),
-        }
+        },
       );
 
       const data = await res.json();
       if (data.error) {
         return NextResponse.json(
           { error: `Meta API: ${data.error.message}` },
-          { status: 502 }
+          { status: 502 },
         );
       }
       metaAudienceId = data.id;
@@ -141,7 +146,7 @@ export async function POST(req: NextRequest) {
   } catch {
     return NextResponse.json(
       { error: "Erreur lors de la creation de l'audience" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -149,7 +154,9 @@ export async function POST(req: NextRequest) {
 export async function GET() {
   try {
     const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
     if (!user) {
       return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
@@ -165,7 +172,7 @@ export async function GET() {
   } catch {
     return NextResponse.json(
       { error: "Erreur lors de la recuperation des audiences" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

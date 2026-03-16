@@ -46,7 +46,11 @@ const CHALLENGE_DEFINITIONS: {
   color: string;
   target: number;
   xp_reward: number;
-  countQuery: (supabase: ReturnType<typeof createClient>, userId: string, weekStart: Date) => Promise<number>;
+  countQuery: (
+    supabase: ReturnType<typeof createClient>,
+    userId: string,
+    weekStart: Date,
+  ) => Promise<number>;
 }[] = [
   {
     key: "offers_week",
@@ -171,7 +175,9 @@ export function WeeklyChallenges() {
   const { user, profile, loading: userLoading } = useUser();
   const [challenges, setChallenges] = useState<Challenge[]>([]);
   const [loading, setLoading] = useState(true);
-  const [claimingChallenge, setClaimingChallenge] = useState<string | null>(null);
+  const [claimingChallenge, setClaimingChallenge] = useState<string | null>(
+    null,
+  );
 
   useEffect(() => {
     if (!user || userLoading) return;
@@ -192,13 +198,14 @@ export function WeeklyChallenges() {
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const completedKeys = new Set(
-          ((completedData ?? []) as any[]).map((c: any) => c.challenge_key)
+          ((completedData ?? []) as any[]).map((c: any) => c.challenge_key),
         );
 
         // Sélectionner 4 défis pour cette semaine (rotation basée sur l'ID utilisateur)
         const userSeed = user.id.charCodeAt(0) + user.id.charCodeAt(1);
         const weekSeed = weekStart.getTime();
-        const combinedSeed = (userSeed + weekSeed) % CHALLENGE_DEFINITIONS.length;
+        const combinedSeed =
+          (userSeed + weekSeed) % CHALLENGE_DEFINITIONS.length;
 
         const selectedDefs = [
           ...CHALLENGE_DEFINITIONS.slice(combinedSeed),
@@ -235,7 +242,8 @@ export function WeeklyChallenges() {
   }, [user, userLoading]);
 
   const handleClaimReward = async (challenge: Challenge) => {
-    if (!user || challenge.completed || challenge.current < challenge.target) return;
+    if (!user || challenge.completed || challenge.current < challenge.target)
+      return;
 
     setClaimingChallenge(challenge.key);
     const supabase = createClient();
@@ -270,16 +278,21 @@ export function WeeklyChallenges() {
     // Mettre à jour l'UI
     setChallenges((prev) =>
       prev.map((c) =>
-        c.key === challenge.key ? { ...c, completed: true } : c
-      )
+        c.key === challenge.key ? { ...c, completed: true } : c,
+      ),
     );
 
-    toast.success(`+${challenge.xp_reward} XP ! Défi "${challenge.title}" accompli !`);
+    toast.success(
+      `+${challenge.xp_reward} XP ! Défi "${challenge.title}" accompli !`,
+    );
     setClaimingChallenge(null);
   };
 
   const completedCount = challenges.filter((c) => c.completed).length;
-  const totalXP = challenges.reduce((sum, c) => sum + (c.completed ? c.xp_reward : 0), 0);
+  const totalXP = challenges.reduce(
+    (sum, c) => sum + (c.completed ? c.xp_reward : 0),
+    0,
+  );
   const maxXP = challenges.reduce((sum, c) => sum + c.xp_reward, 0);
 
   if (loading || userLoading) {
@@ -294,7 +307,10 @@ export function WeeklyChallenges() {
         <CardContent>
           <div className="grid gap-3 sm:grid-cols-2">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="p-4 rounded-xl border border-border-default bg-bg-tertiary">
+              <div
+                key={i}
+                className="p-4 rounded-xl border border-border-default bg-bg-tertiary"
+              >
                 <div className="flex items-start gap-3">
                   <div className="h-10 w-10 rounded-xl bg-bg-secondary animate-pulse shrink-0" />
                   <div className="flex-1 space-y-2">
@@ -336,7 +352,8 @@ export function WeeklyChallenges() {
           {challenges.map((challenge) => {
             const Icon = challenge.icon;
             const progress = (challenge.current / challenge.target) * 100;
-            const isReady = challenge.current >= challenge.target && !challenge.completed;
+            const isReady =
+              challenge.current >= challenge.target && !challenge.completed;
             const isClaiming = claimingChallenge === challenge.key;
 
             return (
@@ -348,7 +365,7 @@ export function WeeklyChallenges() {
                     ? "bg-accent/5 border-accent/20"
                     : isReady
                       ? "bg-accent/10 border-accent/40 cursor-pointer hover:border-accent/60 hover:shadow-[0_0_20px_rgba(52,211,153,0.1)] hover:scale-[1.01]"
-                      : "bg-bg-tertiary border-white/5 hover:border-white/10"
+                      : "bg-bg-tertiary border-white/5 hover:border-white/10",
                 )}
                 onClick={() => isReady && handleClaimReward(challenge)}
               >
@@ -356,7 +373,7 @@ export function WeeklyChallenges() {
                   <div
                     className={cn(
                       "flex h-10 w-10 items-center justify-center rounded-xl shrink-0",
-                      challenge.completed ? "bg-accent/20" : "bg-bg-secondary"
+                      challenge.completed ? "bg-accent/20" : "bg-bg-secondary",
                     )}
                   >
                     {challenge.completed ? (
@@ -372,7 +389,7 @@ export function WeeklyChallenges() {
                           "text-sm font-medium",
                           challenge.completed
                             ? "text-text-muted line-through"
-                            : "text-text-primary"
+                            : "text-text-primary",
                         )}
                       >
                         {challenge.title}
@@ -383,7 +400,10 @@ export function WeeklyChallenges() {
                         </Badge>
                       )}
                       {isReady && !isClaiming && (
-                        <Badge variant="default" className="text-[10px] gap-0.5 animate-pulse">
+                        <Badge
+                          variant="default"
+                          className="text-[10px] gap-0.5 animate-pulse"
+                        >
                           <Gift className="h-2.5 w-2.5" />
                           Réclamer
                         </Badge>
@@ -395,7 +415,10 @@ export function WeeklyChallenges() {
                     <div className="flex items-center gap-2">
                       <Progress
                         value={progress}
-                        className={cn("h-1.5 flex-1", challenge.completed && "opacity-50")}
+                        className={cn(
+                          "h-1.5 flex-1",
+                          challenge.completed && "opacity-50",
+                        )}
                       />
                       <span className="text-[10px] text-text-muted shrink-0">
                         {challenge.current}/{challenge.target}
@@ -406,7 +429,7 @@ export function WeeklyChallenges() {
                     <span
                       className={cn(
                         "text-xs font-semibold",
-                        challenge.completed ? "text-accent" : "text-text-muted"
+                        challenge.completed ? "text-accent" : "text-text-muted",
                       )}
                     >
                       +{challenge.xp_reward} XP

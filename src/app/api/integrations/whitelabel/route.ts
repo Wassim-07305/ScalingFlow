@@ -9,27 +9,40 @@ import { createClient } from "@/lib/supabase/server";
 export async function POST(req: NextRequest) {
   try {
     const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
     if (!user) {
       return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
     }
 
     const body = await req.json();
-    const { name, slug, logo_url, primary_color, accent_color, brand_name, custom_domain } = body;
+    const {
+      name,
+      slug,
+      logo_url,
+      primary_color,
+      accent_color,
+      brand_name,
+      custom_domain,
+    } = body;
 
     if (!name || !slug) {
       return NextResponse.json(
         { error: "name et slug sont requis" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     // Validate slug format
     if (!/^[a-z0-9-]+$/.test(slug)) {
       return NextResponse.json(
-        { error: "Le slug ne peut contenir que des lettres minuscules, chiffres et tirets" },
-        { status: 400 }
+        {
+          error:
+            "Le slug ne peut contenir que des lettres minuscules, chiffres et tirets",
+        },
+        { status: 400 },
       );
     }
 
@@ -53,11 +66,14 @@ export async function POST(req: NextRequest) {
       if (orgError.code === "23505") {
         return NextResponse.json(
           { error: "Ce slug est deja utilise" },
-          { status: 409 }
+          { status: 409 },
         );
       }
       console.error("[whitelabel] Org creation error:", orgError);
-      return NextResponse.json({ error: "Erreur lors de la création" }, { status: 500 });
+      return NextResponse.json(
+        { error: "Erreur lors de la création" },
+        { status: 500 },
+      );
     }
 
     // Add owner as member
@@ -78,7 +94,7 @@ export async function POST(req: NextRequest) {
   } catch {
     return NextResponse.json(
       { error: "Erreur lors de la creation de l'organisation" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -86,7 +102,9 @@ export async function POST(req: NextRequest) {
 export async function GET() {
   try {
     const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
     if (!user) {
       return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
@@ -135,7 +153,7 @@ export async function GET() {
   } catch {
     return NextResponse.json(
       { error: "Erreur lors de la recuperation" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -143,7 +161,9 @@ export async function GET() {
 export async function PATCH(req: NextRequest) {
   try {
     const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
     if (!user) {
       return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
@@ -162,8 +182,14 @@ export async function PATCH(req: NextRequest) {
 
     const body = await req.json();
     const allowedFields = [
-      "name", "logo_url", "primary_color", "accent_color",
-      "brand_name", "custom_domain", "features", "limits",
+      "name",
+      "logo_url",
+      "primary_color",
+      "accent_color",
+      "brand_name",
+      "custom_domain",
+      "features",
+      "limits",
     ];
 
     const updates: Record<string, unknown> = {};
@@ -174,7 +200,10 @@ export async function PATCH(req: NextRequest) {
     }
 
     if (Object.keys(updates).length === 0) {
-      return NextResponse.json({ error: "Aucune modification" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Aucune modification" },
+        { status: 400 },
+      );
     }
 
     const { data: org, error } = await supabase
@@ -186,14 +215,17 @@ export async function PATCH(req: NextRequest) {
 
     if (error) {
       console.error("[whitelabel] Update error:", error);
-      return NextResponse.json({ error: "Erreur lors de la mise à jour" }, { status: 500 });
+      return NextResponse.json(
+        { error: "Erreur lors de la mise à jour" },
+        { status: 500 },
+      );
     }
 
     return NextResponse.json({ success: true, organization: org });
   } catch {
     return NextResponse.json(
       { error: "Erreur lors de la mise a jour" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

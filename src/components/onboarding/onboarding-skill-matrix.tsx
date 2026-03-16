@@ -44,7 +44,7 @@ export function OnboardingSkillMatrix({
 
   const setLevel = (
     name: string,
-    level: "debutant" | "intermediaire" | "avance"
+    level: "debutant" | "intermediaire" | "avance",
   ) => {
     const existing = safeValue.find((s) => s.name === name);
     if (existing?.level === level) {
@@ -81,7 +81,7 @@ export function OnboardingSkillMatrix({
                     "rounded-lg px-3 py-1.5 text-xs font-medium transition-all duration-200",
                     currentLevel === lvl.value
                       ? "bg-emerald-500/30 text-emerald-300 shadow-sm shadow-emerald-500/20"
-                      : "bg-white/5 text-white/40 hover:bg-white/10 hover:text-white/60"
+                      : "bg-white/5 text-white/40 hover:bg-white/10 hover:text-white/60",
                   )}
                 >
                   {lvl.label}

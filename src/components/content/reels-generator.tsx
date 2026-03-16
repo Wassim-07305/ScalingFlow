@@ -2,12 +2,31 @@
 
 import React from "react";
 import { cn } from "@/lib/utils/cn";
-import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  CardDescription,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AILoading } from "@/components/shared/ai-loading";
 import { GlowCard } from "@/components/shared/glow-card";
-import { Copy, ChevronDown, ChevronUp, Clock, Pencil, Check, Film, Send, Save, Loader2, Sparkles, Zap } from "lucide-react";
+import {
+  Copy,
+  ChevronDown,
+  ChevronUp,
+  Clock,
+  Pencil,
+  Check,
+  Film,
+  Send,
+  Save,
+  Loader2,
+  Sparkles,
+  Zap,
+} from "lucide-react";
 import { toast } from "sonner";
 import type { ReelsScriptsResult } from "@/lib/ai/prompts/reels-scripts";
 import { UpgradeWall } from "@/components/shared/upgrade-wall";
@@ -30,7 +49,10 @@ interface ReelsGeneratorProps {
   initialData?: any;
 }
 
-const PILIER_BADGE: Record<string, "default" | "blue" | "cyan" | "purple" | "yellow"> = {
+const PILIER_BADGE: Record<
+  string,
+  "default" | "blue" | "cyan" | "purple" | "yellow"
+> = {
   know: "blue",
   like: "purple",
   trust: "default",
@@ -44,15 +66,25 @@ const PILIER_LABELS: Record<string, string> = {
   convert: "Conversion",
 };
 
-export function ReelsGenerator({ className, initialData }: ReelsGeneratorProps) {
+export function ReelsGenerator({
+  className,
+  initialData,
+}: ReelsGeneratorProps) {
   const { user } = useUser();
   const [loading, setLoading] = React.useState(false);
-  const [scripts, setScripts] = React.useState<ReelsScriptsResult["scripts"]>([]);
+  const [scripts, setScripts] = React.useState<ReelsScriptsResult["scripts"]>(
+    [],
+  );
   const [error, setError] = React.useState<string | null>(null);
   const [batchNumber, setBatchNumber] = React.useState(1);
-  const [expandedScript, setExpandedScript] = React.useState<number | null>(null);
+  const [expandedScript, setExpandedScript] = React.useState<number | null>(
+    null,
+  );
   const [copiedIndex, setCopiedIndex] = React.useState<number | null>(null);
-  const [usageLimited, setUsageLimited] = React.useState<{currentUsage: number; limit: number} | null>(null);
+  const [usageLimited, setUsageLimited] = React.useState<{
+    currentUsage: number;
+    limit: number;
+  } | null>(null);
   const [editingIndex, setEditingIndex] = React.useState<number | null>(null);
   const [publishDialogOpen, setPublishDialogOpen] = React.useState(false);
   const [publishContent, setPublishContent] = React.useState("");
@@ -63,8 +95,13 @@ export function ReelsGenerator({ className, initialData }: ReelsGeneratorProps) 
   // Massive generation state
   const [massiveMode, setMassiveMode] = React.useState(false);
   const [massiveLoading, setMassiveLoading] = React.useState(false);
-  const [massiveProgress, setMassiveProgress] = React.useState({ current: 0, total: 5 });
-  const [collapsedPiliers, setCollapsedPiliers] = React.useState<Record<string, boolean>>({});
+  const [massiveProgress, setMassiveProgress] = React.useState({
+    current: 0,
+    total: 5,
+  });
+  const [collapsedPiliers, setCollapsedPiliers] = React.useState<
+    Record<string, boolean>
+  >({});
 
   // Form state
   const [hookStyle, setHookStyle] = React.useState("curiosite");
@@ -99,7 +136,10 @@ export function ReelsGenerator({ className, initialData }: ReelsGeneratorProps) 
       if (!response.ok) {
         if (response.status === 403) {
           const errData = await response.json();
-          if (errData.usage) { setUsageLimited(errData.usage); return; }
+          if (errData.usage) {
+            setUsageLimited(errData.usage);
+            return;
+          }
         }
         throw new Error("Erreur lors de la génération");
       }
@@ -122,7 +162,9 @@ export function ReelsGenerator({ className, initialData }: ReelsGeneratorProps) 
           if (pieces) {
             setSavedIds(pieces.reverse().map((p: { id: string }) => p.id));
           }
-        } catch { /* non-blocking */ }
+        } catch {
+          /* non-blocking */
+        }
       }
       toast.success(`${generatedScripts.length} scripts Reels générés !`);
     } catch (err) {
@@ -160,7 +202,11 @@ export function ReelsGenerator({ className, initialData }: ReelsGeneratorProps) 
         if (!response.ok) {
           if (response.status === 403) {
             const errData = await response.json();
-            if (errData.usage) { setUsageLimited(errData.usage); setMassiveLoading(false); return; }
+            if (errData.usage) {
+              setUsageLimited(errData.usage);
+              setMassiveLoading(false);
+              return;
+            }
           }
           console.warn(`Batch ${i} échoué, on continue...`);
           continue;
@@ -199,7 +245,7 @@ export function ReelsGenerator({ className, initialData }: ReelsGeneratorProps) 
 
   const updateScript = (index: number, field: string, value: string) => {
     setScripts((prev) =>
-      prev.map((s, i) => (i === index ? { ...s, [field]: value } : s))
+      prev.map((s, i) => (i === index ? { ...s, [field]: value } : s)),
     );
     setIsDirty(true);
   };
@@ -260,17 +306,33 @@ export function ReelsGenerator({ className, initialData }: ReelsGeneratorProps) 
   };
 
   if (usageLimited) {
-    return <UpgradeWall currentUsage={usageLimited.currentUsage} limit={usageLimited.limit} className={className} />;
+    return (
+      <UpgradeWall
+        currentUsage={usageLimited.currentUsage}
+        limit={usageLimited.limit}
+        className={className}
+      />
+    );
   }
 
   if (loading) {
-    return <AILoading variant="immersive" text="Génération des scripts Reels" className={className} />;
+    return (
+      <AILoading
+        variant="immersive"
+        text="Génération des scripts Reels"
+        className={className}
+      />
+    );
   }
 
   if (massiveLoading) {
     return (
       <div className={cn("space-y-6", className)}>
-        <AILoading variant="immersive" text={`Génération massive — Batch ${massiveProgress.current}/${massiveProgress.total}`} className="mb-4" />
+        <AILoading
+          variant="immersive"
+          text={`Génération massive — Batch ${massiveProgress.current}/${massiveProgress.total}`}
+          className="mb-4"
+        />
 
         {/* Progress bar */}
         <Card>
@@ -279,14 +341,19 @@ export function ReelsGenerator({ className, initialData }: ReelsGeneratorProps) 
               <p className="text-sm font-medium text-text-primary">
                 Batch {massiveProgress.current} / {massiveProgress.total}
               </p>
-              <Badge variant="default" className="bg-gradient-to-r from-accent to-emerald-400 text-white">
+              <Badge
+                variant="default"
+                className="bg-gradient-to-r from-accent to-emerald-400 text-white"
+              >
                 {scripts.length} scripts générés
               </Badge>
             </div>
             <div className="w-full h-2 rounded-full bg-bg-tertiary overflow-hidden">
               <div
                 className="h-full rounded-full bg-gradient-to-r from-accent to-emerald-400 transition-all duration-500"
-                style={{ width: `${(massiveProgress.current / massiveProgress.total) * 100}%` }}
+                style={{
+                  width: `${(massiveProgress.current / massiveProgress.total) * 100}%`,
+                }}
               />
             </div>
           </CardContent>
@@ -298,8 +365,15 @@ export function ReelsGenerator({ className, initialData }: ReelsGeneratorProps) 
             {Object.entries(scriptsByPilier).map(([pilier, pilierScripts]) => (
               <Card key={pilier} className="border-accent/20">
                 <CardContent className="py-3 text-center">
-                  <Badge variant={PILIER_BADGE[pilier] || "default"} className="mb-1">{PILIER_LABELS[pilier] || pilier}</Badge>
-                  <p className="text-lg font-bold text-text-primary">{pilierScripts.length}</p>
+                  <Badge
+                    variant={PILIER_BADGE[pilier] || "default"}
+                    className="mb-1"
+                  >
+                    {PILIER_LABELS[pilier] || pilier}
+                  </Badge>
+                  <p className="text-lg font-bold text-text-primary">
+                    {pilierScripts.length}
+                  </p>
                   <p className="text-[10px] text-text-muted">scripts</p>
                 </CardContent>
               </Card>
@@ -320,13 +394,16 @@ export function ReelsGenerator({ className, initialData }: ReelsGeneratorProps) 
               Paramètres Reels / Shorts
             </CardTitle>
             <CardDescription>
-              Configure le style de hooks et le thème pour tes scripts vidéo courts.
+              Configure le style de hooks et le thème pour tes scripts vidéo
+              courts.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-5">
             {/* Hook style */}
             <div>
-              <label className="text-sm font-medium text-text-primary mb-2 block">Style de hook</label>
+              <label className="text-sm font-medium text-text-primary mb-2 block">
+                Style de hook
+              </label>
               <div className="flex flex-wrap gap-2">
                 {HOOK_STYLES.map((h) => (
                   <button
@@ -336,7 +413,7 @@ export function ReelsGenerator({ className, initialData }: ReelsGeneratorProps) 
                       "px-3 py-1.5 rounded-lg text-sm font-medium transition-all",
                       hookStyle === h.key
                         ? "bg-accent text-white"
-                        : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
+                        : "bg-bg-tertiary text-text-secondary hover:text-text-primary",
                     )}
                   >
                     {h.label}
@@ -348,7 +425,8 @@ export function ReelsGenerator({ className, initialData }: ReelsGeneratorProps) 
             {/* Topic */}
             <div>
               <label className="text-sm font-medium text-text-primary mb-1 block">
-                Thème principal <span className="text-text-muted font-normal">(optionnel)</span>
+                Thème principal{" "}
+                <span className="text-text-muted font-normal">(optionnel)</span>
               </label>
               <input
                 type="text"
@@ -361,7 +439,9 @@ export function ReelsGenerator({ className, initialData }: ReelsGeneratorProps) 
 
             {/* Mode selector */}
             <div className="p-4 rounded-xl bg-bg-tertiary/50 border border-border-default">
-              <label className="text-sm font-medium text-text-primary mb-2 block">Mode de génération</label>
+              <label className="text-sm font-medium text-text-primary mb-2 block">
+                Mode de génération
+              </label>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <button
                   onClick={() => setMassiveMode(false)}
@@ -369,15 +449,21 @@ export function ReelsGenerator({ className, initialData }: ReelsGeneratorProps) 
                     "p-3 rounded-xl border-2 text-left transition-all duration-200",
                     !massiveMode
                       ? "border-accent bg-accent/10 shadow-md shadow-accent/10"
-                      : "border-border-default bg-bg-secondary hover:border-border-default/80"
+                      : "border-border-default bg-bg-secondary hover:border-border-default/80",
                   )}
                 >
                   <div className="flex items-center gap-2 mb-1">
                     <Film className="h-4 w-4 text-accent" />
-                    <span className="text-sm font-semibold text-text-primary">Batch rapide</span>
-                    <Badge variant="muted" className="text-[10px]">12 scripts</Badge>
+                    <span className="text-sm font-semibold text-text-primary">
+                      Batch rapide
+                    </span>
+                    <Badge variant="muted" className="text-[10px]">
+                      12 scripts
+                    </Badge>
                   </div>
-                  <p className="text-xs text-text-muted">1 batch de 12 scripts Reels optimisés</p>
+                  <p className="text-xs text-text-muted">
+                    1 batch de 12 scripts Reels optimisés
+                  </p>
                 </button>
                 <button
                   onClick={() => setMassiveMode(true)}
@@ -385,15 +471,25 @@ export function ReelsGenerator({ className, initialData }: ReelsGeneratorProps) 
                     "p-3 rounded-xl border-2 text-left transition-all duration-200",
                     massiveMode
                       ? "border-accent bg-accent/10 shadow-md shadow-accent/10"
-                      : "border-border-default bg-bg-secondary hover:border-border-default/80"
+                      : "border-border-default bg-bg-secondary hover:border-border-default/80",
                   )}
                 >
                   <div className="flex items-center gap-2 mb-1">
                     <Zap className="h-4 w-4 text-yellow-400" />
-                    <span className="text-sm font-semibold text-text-primary">Pack complet</span>
-                    <Badge variant="default" className="text-[10px] bg-gradient-to-r from-accent to-emerald-400 text-white">60+ scripts</Badge>
+                    <span className="text-sm font-semibold text-text-primary">
+                      Pack complet
+                    </span>
+                    <Badge
+                      variant="default"
+                      className="text-[10px] bg-gradient-to-r from-accent to-emerald-400 text-white"
+                    >
+                      60+ scripts
+                    </Badge>
                   </div>
-                  <p className="text-xs text-text-muted">5 batches de 12 scripts = 60 scripts Reels groupés par pilier K/L/T/C</p>
+                  <p className="text-xs text-text-muted">
+                    5 batches de 12 scripts = 60 scripts Reels groupés par
+                    pilier K/L/T/C
+                  </p>
                 </button>
               </div>
             </div>
@@ -401,11 +497,19 @@ export function ReelsGenerator({ className, initialData }: ReelsGeneratorProps) 
             {error && <p className="text-sm text-danger">{error}</p>}
 
             {massiveMode ? (
-              <GenerateButton onClick={handleMassiveGenerate} className="w-full" icon={<Zap className="h-4 w-4 mr-2" />}>
+              <GenerateButton
+                onClick={handleMassiveGenerate}
+                className="w-full"
+                icon={<Zap className="h-4 w-4 mr-2" />}
+              >
                 Générer 60+ scripts Reels
               </GenerateButton>
             ) : (
-              <GenerateButton onClick={() => handleGenerate()} className="w-full" icon={<Film className="h-4 w-4 mr-2" />}>
+              <GenerateButton
+                onClick={() => handleGenerate()}
+                className="w-full"
+                icon={<Film className="h-4 w-4 mr-2" />}
+              >
                 Générer 12 scripts Reels
               </GenerateButton>
             )}
@@ -425,11 +529,16 @@ export function ReelsGenerator({ className, initialData }: ReelsGeneratorProps) 
     <div className={cn("space-y-4", className)}>
       <div className="flex items-center justify-between flex-wrap gap-2">
         <div className="flex items-center gap-2">
-          <Badge variant="default" className={cn(
-            "text-xs",
-            scripts.length >= 60 && "bg-gradient-to-r from-accent to-emerald-400 text-white"
-          )}>
-            {scripts.length} scripts {showGrouped ? "" : `(batch #${batchNumber})`}
+          <Badge
+            variant="default"
+            className={cn(
+              "text-xs",
+              scripts.length >= 60 &&
+                "bg-gradient-to-r from-accent to-emerald-400 text-white",
+            )}
+          >
+            {scripts.length} scripts{" "}
+            {showGrouped ? "" : `(batch #${batchNumber})`}
           </Badge>
           {showGrouped && (
             <Badge variant="muted" className="text-xs">
@@ -447,9 +556,14 @@ export function ReelsGenerator({ className, initialData }: ReelsGeneratorProps) 
               className="bg-gradient-to-r from-accent to-emerald-400 hover:from-accent/90 hover:to-emerald-400/90 text-white shadow-md shadow-accent/20"
             >
               {saving ? (
-                <><Loader2 className="h-3 w-3 animate-spin mr-1" /> Sauvegarde...</>
+                <>
+                  <Loader2 className="h-3 w-3 animate-spin mr-1" />{" "}
+                  Sauvegarde...
+                </>
               ) : (
-                <><Save className="h-3 w-3 mr-1" /> Sauvegarder</>
+                <>
+                  <Save className="h-3 w-3 mr-1" /> Sauvegarder
+                </>
               )}
             </Button>
           )}
@@ -474,8 +588,12 @@ export function ReelsGenerator({ className, initialData }: ReelsGeneratorProps) 
                 className="w-full flex items-center justify-between p-3 rounded-xl bg-bg-tertiary/50 border border-border-default hover:bg-bg-tertiary/80 transition-all"
               >
                 <div className="flex items-center gap-2">
-                  <Badge variant={PILIER_BADGE[pilier] || "default"}>{PILIER_LABELS[pilier] || pilier}</Badge>
-                  <span className="text-sm font-medium text-text-primary">{pilierScripts.length} scripts</span>
+                  <Badge variant={PILIER_BADGE[pilier] || "default"}>
+                    {PILIER_LABELS[pilier] || pilier}
+                  </Badge>
+                  <span className="text-sm font-medium text-text-primary">
+                    {pilierScripts.length} scripts
+                  </span>
                 </div>
                 {isCollapsed ? (
                   <ChevronDown className="h-4 w-4 text-text-muted" />
@@ -509,7 +627,10 @@ export function ReelsGenerator({ className, initialData }: ReelsGeneratorProps) 
     </div>
   );
 
-  function renderScriptCard(script: ReelsScriptsResult["scripts"][0], i: number) {
+  function renderScriptCard(
+    script: ReelsScriptsResult["scripts"][0],
+    i: number,
+  ) {
     const isExpanded = expandedScript === i;
     const isEditing = editingIndex === i;
     return (
@@ -549,15 +670,20 @@ export function ReelsGenerator({ className, initialData }: ReelsGeneratorProps) 
               onClick={() =>
                 copyToClipboard(
                   `Hook: ${script.hook}\n\n${script.corps}\n\nCTA: ${script.cta}\n\n${script.hashtags.join(" ")}`,
-                  i
+                  i,
                 )
               }
               className={cn(copiedIndex === i && "text-accent")}
             >
               {copiedIndex === i ? (
-                <><Check className="h-3 w-3 mr-1 animate-in zoom-in-50 duration-200" /> Copié !</>
+                <>
+                  <Check className="h-3 w-3 mr-1 animate-in zoom-in-50 duration-200" />{" "}
+                  Copié !
+                </>
               ) : (
-                <><Copy className="h-3 w-3 mr-1" /> Copier</>
+                <>
+                  <Copy className="h-3 w-3 mr-1" /> Copier
+                </>
               )}
             </Button>
             <Button
@@ -565,7 +691,9 @@ export function ReelsGenerator({ className, initialData }: ReelsGeneratorProps) 
               size="sm"
               title="Publier via Unipile"
               onClick={() => {
-                setPublishContent(`Hook: ${script.hook}\n\n${script.corps}\n\nCTA: ${script.cta}\n\n${script.hashtags.join(" ")}`);
+                setPublishContent(
+                  `Hook: ${script.hook}\n\n${script.corps}\n\nCTA: ${script.cta}\n\n${script.hashtags.join(" ")}`,
+                );
                 setPublishDialogOpen(true);
               }}
             >
@@ -619,7 +747,7 @@ export function ReelsGenerator({ className, initialData }: ReelsGeneratorProps) 
             <p
               className={cn(
                 "text-sm text-text-secondary whitespace-pre-wrap",
-                !isExpanded && "line-clamp-3"
+                !isExpanded && "line-clamp-3",
               )}
             >
               {script.corps}
@@ -637,7 +765,9 @@ export function ReelsGenerator({ className, initialData }: ReelsGeneratorProps) 
               className="w-full bg-transparent text-sm font-medium text-accent text-center focus:outline-none"
             />
           ) : (
-            <p className="text-sm font-medium text-accent text-center">{script.cta}</p>
+            <p className="text-sm font-medium text-accent text-center">
+              {script.cta}
+            </p>
           )}
         </div>
 

@@ -27,21 +27,27 @@ export async function POST(req: NextRequest) {
     }
 
     // Rate limiting
-    const rl = await rateLimit(user.id, "gamification-award", { limit: 30, windowSeconds: 60 });
+    const rl = await rateLimit(user.id, "gamification-award", {
+      limit: 30,
+      windowSeconds: 60,
+    });
     if (!rl.allowed) {
       return NextResponse.json(
         { error: "Trop de requêtes. Réessaie dans quelques secondes." },
-        { status: 429 }
+        { status: 429 },
       );
     }
 
     const body = await req.json();
     const activityType = body.activityType as string;
 
-    if (!activityType || !ALLOWED_ACTIVITIES.includes(activityType as AllowedActivity)) {
+    if (
+      !activityType ||
+      !ALLOWED_ACTIVITIES.includes(activityType as AllowedActivity)
+    ) {
       return NextResponse.json(
         { error: "Type d'activité invalide" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -50,9 +56,6 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(result);
   } catch {
-    return NextResponse.json(
-      { error: "Erreur interne" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Erreur interne" }, { status: 500 });
   }
 }

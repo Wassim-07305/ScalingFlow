@@ -25,7 +25,10 @@ export default function BrandLoading() {
             <div className="h-4 w-32 bg-bg-secondary rounded-lg" />
             <div className="flex gap-3">
               {Array.from({ length: 5 }).map((_, i) => (
-                <div key={i} className="h-10 w-10 bg-bg-secondary rounded-full" />
+                <div
+                  key={i}
+                  className="h-10 w-10 bg-bg-secondary rounded-full"
+                />
               ))}
             </div>
           </div>

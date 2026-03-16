@@ -40,18 +40,19 @@ export function Header({
 }: HeaderProps) {
   const pathname = usePathname();
   const router = useRouter();
-  const {
-    toggleMobileSidebar,
-    setNotificationsPanelOpen,
-    setSearchOpen,
-  } = useUIStore();
+  const { toggleMobileSidebar, setNotificationsPanelOpen, setSearchOpen } =
+    useUIStore();
 
   // Breadcrumb from pathname — skip UUID segments
-  const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  const UUID_RE =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   const segments = pathname.split("/").filter(Boolean);
   const breadcrumbs = segments
     .filter((seg) => !UUID_RE.test(seg))
-    .map((seg) => breadcrumbLabels[seg] || seg.charAt(0).toUpperCase() + seg.slice(1));
+    .map(
+      (seg) =>
+        breadcrumbLabels[seg] || seg.charAt(0).toUpperCase() + seg.slice(1),
+    );
 
   async function handleLogout() {
     const supabase = createClient();
@@ -85,7 +86,7 @@ export function Header({
                   className={cn(
                     idx === breadcrumbs.length - 1
                       ? "font-medium text-text-primary"
-                      : "text-text-secondary"
+                      : "text-text-secondary",
                   )}
                 >
                   {crumb}
@@ -102,7 +103,7 @@ export function Header({
           onClick={() => setSearchOpen(true)}
           className={cn(
             "flex h-10 w-full max-w-md items-center gap-2 rounded-lg border border-border-default bg-bg-tertiary px-3 text-sm text-text-muted",
-            "transition-all duration-200 hover:border-border-hover hover:bg-bg-elevated"
+            "transition-all duration-200 hover:border-border-hover hover:bg-bg-elevated",
           )}
         >
           <Search className="h-4 w-4" />
@@ -160,7 +161,9 @@ export function Header({
           {/* Dropdown */}
           <div className="invisible absolute right-0 top-full z-50 mt-1 w-56 rounded-xl border border-border-default bg-bg-secondary/95 backdrop-blur-xl p-1 opacity-0 shadow-2xl shadow-black/20 transition-all duration-200 group-focus-within:visible group-focus-within:opacity-100 group-focus-within:translate-y-0 translate-y-1">
             <div className="px-3 py-2">
-              <p className="text-sm font-medium text-text-primary">{userName}</p>
+              <p className="text-sm font-medium text-text-primary">
+                {userName}
+              </p>
               <p className="text-xs text-text-secondary">{email}</p>
             </div>
             <div className="mx-2 border-t border-border-default" />

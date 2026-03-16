@@ -8,7 +8,9 @@ import { createOAuthState } from "@/lib/utils/oauth-state";
 export async function GET() {
   try {
     const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
     if (!user) {
       return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
@@ -18,7 +20,7 @@ export async function GET() {
     if (!clientId) {
       return NextResponse.json(
         { error: "GHL_CLIENT_ID non configure" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -33,7 +35,9 @@ export async function GET() {
 
     const state = createOAuthState(user.id);
 
-    const authUrl = new URL("https://marketplace.gohighlevel.com/oauth/chooselocation");
+    const authUrl = new URL(
+      "https://marketplace.gohighlevel.com/oauth/chooselocation",
+    );
     authUrl.searchParams.set("client_id", clientId);
     authUrl.searchParams.set("redirect_uri", redirectUri);
     authUrl.searchParams.set("scope", scopes);
@@ -44,7 +48,7 @@ export async function GET() {
   } catch {
     return NextResponse.json(
       { error: "Erreur lors de la connexion GHL" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -32,7 +32,12 @@ export function AILoading({
 
   if (variant === "immersive") {
     return (
-      <div className={cn("flex flex-col items-center justify-center gap-6 py-16", className)}>
+      <div
+        className={cn(
+          "flex flex-col items-center justify-center gap-6 py-16",
+          className,
+        )}
+      >
         {/* Animated orb with glow */}
         <div className="relative">
           <motion.div
@@ -72,7 +77,9 @@ export function AILoading({
 
         <div className="text-center space-y-2">
           <p className="text-lg font-medium text-text-primary">{text}</p>
-          <p className="text-sm text-text-muted">Cela peut prendre quelques secondes</p>
+          <p className="text-sm text-text-muted">
+            Cela peut prendre quelques secondes
+          </p>
         </div>
 
         {/* Progress bar */}
@@ -93,7 +100,7 @@ export function AILoading({
     <div
       className={cn(
         "flex flex-col items-center justify-center gap-5 py-12",
-        className
+        className,
       )}
     >
       {/* Animated spinner with glow */}

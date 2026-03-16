@@ -11,7 +11,7 @@ export interface VideoAdScriptResult {
 
 export function buildVideoAdScriptPrompt(
   offer: string,
-  avatar: string
+  avatar: string,
 ): string {
   return `Tu es un expert en publicite video (Meta Ads, YouTube Ads, TikTok Ads) pour les freelances et consultants.
 

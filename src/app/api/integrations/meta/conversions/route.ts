@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
         {
           error: `Événement invalide. Événements acceptés : ${VALID_EVENTS.join(", ")}`,
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -61,8 +61,11 @@ export async function POST(req: NextRequest) {
     const config = await getMetaPixelConfig(supabase, user.id);
     if (!config) {
       return NextResponse.json(
-        { error: "Pixel Meta non configuré. Connecte ton compte Meta dans les paramètres." },
-        { status: 404 }
+        {
+          error:
+            "Pixel Meta non configuré. Connecte ton compte Meta dans les paramètres.",
+        },
+        { status: 404 },
       );
     }
 
@@ -77,7 +80,10 @@ export async function POST(req: NextRequest) {
     const userData: CAPIUserData = {
       email: email || undefined,
       phone: phone || undefined,
-      clientIpAddress: req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || undefined,
+      clientIpAddress:
+        req.headers.get("x-forwarded-for") ||
+        req.headers.get("x-real-ip") ||
+        undefined,
       clientUserAgent: req.headers.get("user-agent") || undefined,
       fbc: fbc || extractCookie("_fbc") || undefined,
       fbp: fbp || extractCookie("_fbp") || undefined,
@@ -98,13 +104,13 @@ export async function POST(req: NextRequest) {
       userData,
       Object.keys(customData).length > 0 ? customData : undefined,
       sourceUrl,
-      eventId
+      eventId,
     );
 
     if (!result.success) {
       return NextResponse.json(
         { error: result.error || "Erreur lors de l'envoi de l'événement" },
-        { status: 502 }
+        { status: 502 },
       );
     }
 
@@ -118,7 +124,7 @@ export async function POST(req: NextRequest) {
     console.error("[meta/conversions] Error:", error);
     return NextResponse.json(
       { error: "Erreur interne lors de l'envoi de l'événement" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

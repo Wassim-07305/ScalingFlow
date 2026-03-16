@@ -4,7 +4,13 @@ import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useUser } from "@/hooks/use-user";
 import { toast } from "sonner";
-import { UserPlus, DollarSign, TrendingUp, Users, BarChart3 } from "lucide-react";
+import {
+  UserPlus,
+  DollarSign,
+  TrendingUp,
+  Users,
+  BarChart3,
+} from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -14,14 +20,54 @@ import { LeadDetailPanel } from "./lead-detail-panel";
 import type { PipelineLead } from "./pipeline-card";
 
 export const STATUSES: ColumnConfig[] = [
-  { key: "nouveau",    label: "Nouveau",     color: "text-blue-400",    bgColor: "bg-blue-500/15" },
-  { key: "engage",     label: "Engagé",      color: "text-violet-400",  bgColor: "bg-violet-500/15" },
-  { key: "call_booke", label: "Call booké",   color: "text-cyan-400",    bgColor: "bg-cyan-500/15" },
-  { key: "no_show",    label: "No-show",      color: "text-orange-400",  bgColor: "bg-orange-500/15" },
-  { key: "follow_up",  label: "Follow-up",    color: "text-yellow-400",  bgColor: "bg-yellow-500/15" },
-  { key: "depot_pose", label: "Dépôt posé",  color: "text-indigo-400",  bgColor: "bg-indigo-500/15" },
-  { key: "close",      label: "Closé",        color: "text-emerald-400", bgColor: "bg-emerald-500/15" },
-  { key: "perdu",      label: "Perdu",        color: "text-red-400",     bgColor: "bg-red-500/15" },
+  {
+    key: "nouveau",
+    label: "Nouveau",
+    color: "text-blue-400",
+    bgColor: "bg-blue-500/15",
+  },
+  {
+    key: "engage",
+    label: "Engagé",
+    color: "text-violet-400",
+    bgColor: "bg-violet-500/15",
+  },
+  {
+    key: "call_booke",
+    label: "Call booké",
+    color: "text-cyan-400",
+    bgColor: "bg-cyan-500/15",
+  },
+  {
+    key: "no_show",
+    label: "No-show",
+    color: "text-orange-400",
+    bgColor: "bg-orange-500/15",
+  },
+  {
+    key: "follow_up",
+    label: "Follow-up",
+    color: "text-yellow-400",
+    bgColor: "bg-yellow-500/15",
+  },
+  {
+    key: "depot_pose",
+    label: "Dépôt posé",
+    color: "text-indigo-400",
+    bgColor: "bg-indigo-500/15",
+  },
+  {
+    key: "close",
+    label: "Closé",
+    color: "text-emerald-400",
+    bgColor: "bg-emerald-500/15",
+  },
+  {
+    key: "perdu",
+    label: "Perdu",
+    color: "text-red-400",
+    bgColor: "bg-red-500/15",
+  },
 ];
 
 export function PipelineBoard() {
@@ -112,7 +158,11 @@ export function PipelineBoard() {
 
     // Optimistic update
     setLeads((prev) =>
-      prev.map((l) => (l.id === leadId ? { ...l, status: newStatus, updated_at: new Date().toISOString() } : l))
+      prev.map((l) =>
+        l.id === leadId
+          ? { ...l, status: newStatus, updated_at: new Date().toISOString() }
+          : l,
+      ),
     );
 
     try {
@@ -126,12 +176,13 @@ export function PipelineBoard() {
         throw new Error("Erreur API");
       }
 
-      const statusLabel = STATUSES.find((s) => s.key === newStatus)?.label || newStatus;
+      const statusLabel =
+        STATUSES.find((s) => s.key === newStatus)?.label || newStatus;
       toast.success(`${lead.name} déplacé vers ${statusLabel}`);
     } catch {
       // Rollback
       setLeads((prev) =>
-        prev.map((l) => (l.id === leadId ? { ...l, status: oldStatus } : l))
+        prev.map((l) => (l.id === leadId ? { ...l, status: oldStatus } : l)),
       );
       toast.error("Erreur lors du changement de statut");
     }
@@ -151,7 +202,8 @@ export function PipelineBoard() {
   // Stats
   const totalLeads = leads.length;
   const closedLeads = leads.filter((l) => l.status === "close").length;
-  const conversionRate = totalLeads > 0 ? Math.round((closedLeads / totalLeads) * 100) : 0;
+  const conversionRate =
+    totalLeads > 0 ? Math.round((closedLeads / totalLeads) * 100) : 0;
   const potentialRevenue = leads
     .filter((l) => l.status !== "perdu")
     .reduce((sum, l) => sum + (l.amount || 0), 0);
@@ -165,7 +217,10 @@ export function PipelineBoard() {
         {/* Stats skeleton */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="rounded-2xl border border-border-default bg-bg-secondary/50 p-4">
+            <div
+              key={i}
+              className="rounded-2xl border border-border-default bg-bg-secondary/50 p-4"
+            >
               <div className="flex items-center gap-3">
                 <Skeleton className="h-9 w-9 rounded-xl" />
                 <div className="space-y-1.5 flex-1">
@@ -184,7 +239,10 @@ export function PipelineBoard() {
         <div className="overflow-x-auto pb-4 -mx-4 px-4 sm:-mx-0 sm:px-0">
           <div className="flex gap-3 min-w-max">
             {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="min-w-[280px] w-[280px] shrink-0 rounded-2xl border border-border-default bg-bg-primary/50 p-3">
+              <div
+                key={i}
+                className="min-w-[280px] w-[280px] shrink-0 rounded-2xl border border-border-default bg-bg-primary/50 p-3"
+              >
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
                     <Skeleton className="h-2.5 w-2.5 rounded-full" />
@@ -193,9 +251,11 @@ export function PipelineBoard() {
                   <Skeleton className="h-5 w-5 rounded-full" />
                 </div>
                 <div className="space-y-2">
-                  {Array.from({ length: Math.max(1, 3 - i % 3) }).map((_, j) => (
-                    <Skeleton key={j} className="h-24 rounded-2xl" />
-                  ))}
+                  {Array.from({ length: Math.max(1, 3 - (i % 3)) }).map(
+                    (_, j) => (
+                      <Skeleton key={j} className="h-24 rounded-2xl" />
+                    ),
+                  )}
                 </div>
               </div>
             ))}
@@ -300,7 +360,12 @@ function StatCard({
 }) {
   return (
     <div className="flex items-center gap-3 rounded-2xl border border-border-default bg-bg-secondary/50 px-4 py-3 backdrop-blur-sm transition-all duration-300 hover:border-accent/20 hover:shadow-lg hover:shadow-accent/5 hover:-translate-y-0.5 hover:bg-bg-secondary">
-      <div className={cn("flex h-9 w-9 items-center justify-center rounded-xl", bgColor)}>
+      <div
+        className={cn(
+          "flex h-9 w-9 items-center justify-center rounded-xl",
+          bgColor,
+        )}
+      >
         <Icon className={cn("h-4 w-4", color)} />
       </div>
       <div>

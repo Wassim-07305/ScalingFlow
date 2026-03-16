@@ -40,12 +40,16 @@ export default function ForgotPasswordPage() {
       {/* Header */}
       <div className="text-center space-y-2">
         <div className="flex items-center justify-center gap-3">
-          <Image src="/icons/icon-192.png" alt="ScalingFlow" width={40} height={40} className="rounded-[8px]" />
+          <Image
+            src="/icons/icon-192.png"
+            alt="ScalingFlow"
+            width={40}
+            height={40}
+            className="rounded-[8px]"
+          />
           <h1 className="text-3xl font-bold text-text-primary">ScalingFlow</h1>
         </div>
-        <p className="text-text-secondary">
-          Reinitialise ton mot de passe.
-        </p>
+        <p className="text-text-secondary">Reinitialise ton mot de passe.</p>
       </div>
 
       {sent ? (
@@ -56,7 +60,9 @@ export default function ForgotPasswordPage() {
               Email envoye !
             </p>
             <p className="text-sm text-text-secondary">
-              Si un compte existe avec <span className="font-medium text-text-primary">{email}</span>, tu recevras un lien de reinitialisation.
+              Si un compte existe avec{" "}
+              <span className="font-medium text-text-primary">{email}</span>, tu
+              recevras un lien de reinitialisation.
             </p>
           </div>
           <p className="text-xs text-text-muted text-center">
@@ -99,15 +105,15 @@ export default function ForgotPasswordPage() {
       {/* Footer */}
       <div className="text-center space-y-2">
         <p className="text-sm text-text-secondary">
-          <Link
-            href="/login"
-            className="text-info hover:underline font-medium"
-          >
+          <Link href="/login" className="text-info hover:underline font-medium">
             Retour a la connexion
           </Link>
         </p>
         <p className="text-xs text-text-muted">
-          <Link href="/welcome" className="hover:text-text-secondary transition-colors">
+          <Link
+            href="/welcome"
+            className="hover:text-text-secondary transition-colors"
+          >
             Retour a l&apos;accueil
           </Link>
         </p>

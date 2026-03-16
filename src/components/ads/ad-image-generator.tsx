@@ -145,7 +145,7 @@ export function AdImageGenerator({ className }: AdImageGeneratorProps) {
       const data = await response.json();
       setImages(data.images || []);
       toast.success(
-        `${data.images?.length || 0} créatives générées avec succès !`
+        `${data.images?.length || 0} créatives générées avec succès !`,
       );
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erreur inconnue");
@@ -179,13 +179,13 @@ export function AdImageGenerator({ className }: AdImageGeneratorProps) {
       const newImages: GeneratedImage[] = data.images || [];
       if (newImages.length > 0) {
         setImages((prev) =>
-          prev.map((img, i) => (i === index ? newImages[0] : img))
+          prev.map((img, i) => (i === index ? newImages[0] : img)),
         );
         toast.success("Image régénérée !");
       }
     } catch (err) {
       toast.error(
-        err instanceof Error ? err.message : "Erreur lors de la régénération"
+        err instanceof Error ? err.message : "Erreur lors de la régénération",
       );
     } finally {
       setRegeneratingIndex(null);
@@ -308,14 +308,12 @@ export function AdImageGenerator({ className }: AdImageGeneratorProps) {
                         "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all",
                         format === f.key
                           ? "bg-accent text-white"
-                          : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
+                          : "bg-bg-tertiary text-text-secondary hover:text-text-primary",
                       )}
                     >
                       <Icon className="h-4 w-4" />
                       {f.label}
-                      <span className="text-xs opacity-70">
-                        {f.dimensions}
-                      </span>
+                      <span className="text-xs opacity-70">{f.dimensions}</span>
                     </button>
                   );
                 })}
@@ -336,7 +334,7 @@ export function AdImageGenerator({ className }: AdImageGeneratorProps) {
                       "px-4 py-2 rounded-lg text-sm font-medium transition-all",
                       style === s.key
                         ? "bg-accent text-white"
-                        : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
+                        : "bg-bg-tertiary text-text-secondary hover:text-text-primary",
                     )}
                   >
                     {s.label}
@@ -400,7 +398,7 @@ export function AdImageGenerator({ className }: AdImageGeneratorProps) {
                       "px-4 py-2 rounded-lg text-sm font-medium transition-all",
                       numVariations === n
                         ? "bg-accent text-white"
-                        : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
+                        : "bg-bg-tertiary text-text-secondary hover:text-text-primary",
                     )}
                   >
                     {n} images
@@ -442,11 +440,7 @@ export function AdImageGenerator({ className }: AdImageGeneratorProps) {
               </Badge>
             </div>
             <div className="flex items-center gap-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setImages([])}
-              >
+              <Button variant="ghost" size="sm" onClick={() => setImages([])}>
                 Nouveau brief
               </Button>
               <Button variant="outline" size="sm" onClick={handleGenerate}>
@@ -461,7 +455,7 @@ export function AdImageGenerator({ className }: AdImageGeneratorProps) {
               "grid gap-6",
               format === "story"
                 ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
-                : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+                : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3",
             )}
           >
             {images.map((img, i) => (
@@ -471,7 +465,7 @@ export function AdImageGenerator({ className }: AdImageGeneratorProps) {
                     "relative bg-bg-tertiary",
                     format === "feed" && "aspect-square",
                     format === "story" && "aspect-[9/16]",
-                    format === "facebook" && "aspect-video"
+                    format === "facebook" && "aspect-video",
                   )}
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -502,7 +496,7 @@ export function AdImageGenerator({ className }: AdImageGeneratorProps) {
                       <RefreshCw
                         className={cn(
                           "h-4 w-4 mr-1",
-                          regeneratingIndex === i && "animate-spin"
+                          regeneratingIndex === i && "animate-spin",
                         )}
                       />
                       Régénérer
@@ -542,7 +536,7 @@ export function AdImageGenerator({ className }: AdImageGeneratorProps) {
                         <RefreshCw
                           className={cn(
                             "h-3 w-3",
-                            regeneratingIndex === i && "animate-spin"
+                            regeneratingIndex === i && "animate-spin",
                           )}
                         />
                       </Button>

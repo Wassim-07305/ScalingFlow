@@ -58,7 +58,7 @@ export function useAchievementListener() {
 
             triggerAchievement(achievement);
           }
-        }
+        },
       )
       .subscribe();
 

@@ -15,13 +15,13 @@ export async function GET(req: NextRequest) {
 
     if (error) {
       return NextResponse.redirect(
-        `${appUrl}/settings?tab=integrations&error=google_calendar_denied`
+        `${appUrl}/settings?tab=integrations&error=google_calendar_denied`,
       );
     }
 
     if (!code || !state) {
       return NextResponse.redirect(
-        `${appUrl}/settings?tab=integrations&error=google_calendar_missing_params`
+        `${appUrl}/settings?tab=integrations&error=google_calendar_missing_params`,
       );
     }
 
@@ -29,7 +29,7 @@ export async function GET(req: NextRequest) {
     const stateUserId = verifyOAuthState(state);
     if (!stateUserId) {
       return NextResponse.redirect(
-        `${appUrl}/settings?tab=integrations&error=google_calendar_invalid_state`
+        `${appUrl}/settings?tab=integrations&error=google_calendar_invalid_state`,
       );
     }
 
@@ -40,7 +40,7 @@ export async function GET(req: NextRequest) {
 
     if (!user || user.id !== stateUserId) {
       return NextResponse.redirect(
-        `${appUrl}/settings?tab=integrations&error=google_calendar_auth_mismatch`
+        `${appUrl}/settings?tab=integrations&error=google_calendar_auth_mismatch`,
       );
     }
 
@@ -50,7 +50,7 @@ export async function GET(req: NextRequest) {
     if (!clientId || !clientSecret) {
       console.error("Missing GOOGLE_CLIENT_ID or GOOGLE_CLIENT_SECRET");
       return NextResponse.redirect(
-        `${appUrl}/settings?tab=integrations&error=google_calendar_config_error`
+        `${appUrl}/settings?tab=integrations&error=google_calendar_config_error`,
       );
     }
 
@@ -74,7 +74,7 @@ export async function GET(req: NextRequest) {
     if (tokenData.error) {
       console.error("Google Calendar token error:", tokenData);
       return NextResponse.redirect(
-        `${appUrl}/settings?tab=integrations&error=google_calendar_token_error`
+        `${appUrl}/settings?tab=integrations&error=google_calendar_token_error`,
       );
     }
 
@@ -87,7 +87,7 @@ export async function GET(req: NextRequest) {
     try {
       const profileRes = await fetch(
         "https://www.googleapis.com/oauth2/v2/userinfo",
-        { headers: { Authorization: `Bearer ${accessToken}` } }
+        { headers: { Authorization: `Bearer ${accessToken}` } },
       );
       const profile = await profileRes.json();
       email = profile.email || "";
@@ -102,27 +102,22 @@ export async function GET(req: NextRequest) {
         provider: "google_calendar",
         access_token: accessToken,
         refresh_token: refreshToken,
-        token_expires_at: new Date(
-          Date.now() + expiresIn * 1000
-        ).toISOString(),
+        token_expires_at: new Date(Date.now() + expiresIn * 1000).toISOString(),
         provider_user_id: email,
         provider_username: email,
-        scopes: [
-          "calendar.readonly",
-          "calendar.events",
-        ],
+        scopes: ["calendar.readonly", "calendar.events"],
         metadata: { raw_scopes: tokenData.scope },
       },
-      { onConflict: "user_id,provider" }
+      { onConflict: "user_id,provider" },
     );
 
     return NextResponse.redirect(
-      `${appUrl}/settings?tab=integrations&success=google_calendar_connected`
+      `${appUrl}/settings?tab=integrations&success=google_calendar_connected`,
     );
   } catch (err) {
     console.error("Google Calendar callback error:", err);
     return NextResponse.redirect(
-      `${appUrl}/settings?tab=integrations&error=google_calendar_error`
+      `${appUrl}/settings?tab=integrations&error=google_calendar_error`,
     );
   }
 }

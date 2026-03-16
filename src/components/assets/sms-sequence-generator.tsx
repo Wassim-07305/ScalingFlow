@@ -14,7 +14,10 @@ interface SmsSequenceGeneratorProps {
   initialData?: any;
 }
 
-export function SmsSequenceGenerator({ className, initialData }: SmsSequenceGeneratorProps) {
+export function SmsSequenceGenerator({
+  className,
+  initialData,
+}: SmsSequenceGeneratorProps) {
   const [loading, setLoading] = React.useState(false);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [sequence, setSequence] = React.useState<any>(initialData || null);
@@ -47,7 +50,9 @@ export function SmsSequenceGenerator({ className, initialData }: SmsSequenceGene
   };
 
   if (loading) {
-    return <AILoading text="Rédaction de ta séquence SMS" className={className} />;
+    return (
+      <AILoading text="Rédaction de ta séquence SMS" className={className} />
+    );
   }
 
   if (!sequence) {
@@ -58,7 +63,9 @@ export function SmsSequenceGenerator({ className, initialData }: SmsSequenceGene
           <Sparkles className="h-4 w-4 mr-2" />
           Générer la séquence SMS
         </Button>
-        <p className="text-sm text-text-secondary mt-2">5 SMS de nurturing optimises</p>
+        <p className="text-sm text-text-secondary mt-2">
+          5 SMS de nurturing optimises
+        </p>
       </div>
     );
   }
@@ -77,61 +84,76 @@ export function SmsSequenceGenerator({ className, initialData }: SmsSequenceGene
       <div className="relative space-y-3">
         <div className="absolute left-5 top-0 bottom-0 w-px bg-border-default" />
 
-        {smsMessages.map((sms: {
-          day: number;
-          message: string;
-          cta_link: string;
-          purpose: string;
-        }, i: number) => (
-          <div key={i} className="relative pl-12">
-            <div className={cn(
-              "absolute left-3.5 top-4 w-3 h-3 rounded-full border-2",
-              expandedSms === i
-                ? "bg-accent border-accent"
-                : "bg-bg-tertiary border-border-default"
-            )} />
+        {smsMessages.map(
+          (
+            sms: {
+              day: number;
+              message: string;
+              cta_link: string;
+              purpose: string;
+            },
+            i: number,
+          ) => (
+            <div key={i} className="relative pl-12">
+              <div
+                className={cn(
+                  "absolute left-3.5 top-4 w-3 h-3 rounded-full border-2",
+                  expandedSms === i
+                    ? "bg-accent border-accent"
+                    : "bg-bg-tertiary border-border-default",
+                )}
+              />
 
-            <Card
-              className={cn(
-                "cursor-pointer transition-all",
-                expandedSms === i && "border-accent/30"
-              )}
-              onClick={() => setExpandedSms(expandedSms === i ? null : i)}
-            >
-              <CardHeader className="py-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <MessageSquare className="h-4 w-4 text-accent" />
-                    <div>
-                      <CardTitle className="text-sm">SMS #{i + 1}</CardTitle>
-                      <p className="text-xs text-text-muted mt-0.5">Jour {sms.day}</p>
+              <Card
+                className={cn(
+                  "cursor-pointer transition-all",
+                  expandedSms === i && "border-accent/30",
+                )}
+                onClick={() => setExpandedSms(expandedSms === i ? null : i)}
+              >
+                <CardHeader className="py-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <MessageSquare className="h-4 w-4 text-accent" />
+                      <div>
+                        <CardTitle className="text-sm">SMS #{i + 1}</CardTitle>
+                        <p className="text-xs text-text-muted mt-0.5">
+                          Jour {sms.day}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {sms.purpose && (
+                        <Badge variant="muted" className="text-xs">
+                          {sms.purpose}
+                        </Badge>
+                      )}
+                      {expandedSms === i ? (
+                        <ChevronUp className="h-4 w-4 text-text-muted" />
+                      ) : (
+                        <ChevronDown className="h-4 w-4 text-text-muted" />
+                      )}
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    {sms.purpose && <Badge variant="muted" className="text-xs">{sms.purpose}</Badge>}
-                    {expandedSms === i ? (
-                      <ChevronUp className="h-4 w-4 text-text-muted" />
-                    ) : (
-                      <ChevronDown className="h-4 w-4 text-text-muted" />
+                </CardHeader>
+                {expandedSms === i && (
+                  <CardContent className="pt-0">
+                    <div className="text-sm text-text-secondary whitespace-pre-wrap mb-4">
+                      {sms.message}
+                    </div>
+                    {sms.cta_link && (
+                      <div className="p-2 rounded-lg bg-accent-muted border border-accent/20 inline-block">
+                        <span className="text-sm font-medium text-accent">
+                          {sms.cta_link}
+                        </span>
+                      </div>
                     )}
-                  </div>
-                </div>
-              </CardHeader>
-              {expandedSms === i && (
-                <CardContent className="pt-0">
-                  <div className="text-sm text-text-secondary whitespace-pre-wrap mb-4">
-                    {sms.message}
-                  </div>
-                  {sms.cta_link && (
-                    <div className="p-2 rounded-lg bg-accent-muted border border-accent/20 inline-block">
-                      <span className="text-sm font-medium text-accent">{sms.cta_link}</span>
-                    </div>
-                  )}
-                </CardContent>
-              )}
-            </Card>
-          </div>
-        ))}
+                  </CardContent>
+                )}
+              </Card>
+            </div>
+          ),
+        )}
       </div>
     </div>
   );

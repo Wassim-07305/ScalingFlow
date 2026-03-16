@@ -31,11 +31,19 @@ export default function LoginPage() {
     if (error) {
       // Traduire les erreurs Supabase en français
       const msg = error.message.toLowerCase();
-      if (msg.includes("invalid login credentials") || msg.includes("invalid_credentials")) {
+      if (
+        msg.includes("invalid login credentials") ||
+        msg.includes("invalid_credentials")
+      ) {
         setError("Email ou mot de passe incorrect.");
       } else if (msg.includes("email not confirmed")) {
-        setError("Ton email n'a pas encore été vérifié. Vérifie ta boîte de réception.");
-      } else if (msg.includes("too many requests") || msg.includes("rate limit")) {
+        setError(
+          "Ton email n'a pas encore été vérifié. Vérifie ta boîte de réception.",
+        );
+      } else if (
+        msg.includes("too many requests") ||
+        msg.includes("rate limit")
+      ) {
         setError("Trop de tentatives. Réessaie dans quelques minutes.");
       } else if (msg.includes("user not found")) {
         setError("Aucun compte trouvé avec cet email.");
@@ -57,7 +65,13 @@ export default function LoginPage() {
       {/* Header */}
       <div className="text-center space-y-3">
         <div className="flex items-center justify-center gap-3">
-          <Image src="/icons/icon-192.png" alt="ScalingFlow" width={44} height={44} className="rounded-xl shadow-lg shadow-accent/10" />
+          <Image
+            src="/icons/icon-192.png"
+            alt="ScalingFlow"
+            width={44}
+            height={44}
+            className="rounded-xl shadow-lg shadow-accent/10"
+          />
           <h1 className="text-3xl font-bold text-text-primary">ScalingFlow</h1>
         </div>
         <p className="text-text-secondary">
@@ -115,7 +129,11 @@ export default function LoginPage() {
           </Link>
         </div>
 
-        <Button type="submit" className="w-full h-11 text-base group" disabled={loading}>
+        <Button
+          type="submit"
+          className="w-full h-11 text-base group"
+          disabled={loading}
+        >
           {loading ? (
             <Loader2 className="h-4 w-4 mr-2 animate-spin" />
           ) : (
@@ -137,7 +155,10 @@ export default function LoginPage() {
           </Link>
         </p>
         <p className="text-xs text-text-muted">
-          <Link href="/welcome" className="hover:text-text-secondary transition-colors">
+          <Link
+            href="/welcome"
+            className="hover:text-text-secondary transition-colors"
+          >
             Retour à l&apos;accueil
           </Link>
         </p>

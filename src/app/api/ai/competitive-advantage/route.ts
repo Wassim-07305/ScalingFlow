@@ -23,7 +23,9 @@ interface CompetitiveAdvantageResult {
 export async function POST() {
   try {
     const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
     if (!user) {
       return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
@@ -31,12 +33,17 @@ export async function POST() {
 
     const { data: profile } = await supabase
       .from("profiles")
-      .select("skills, vault_skills, situation, experience_level, industries, objectives, vault_analysis, vault_extraction, formations")
+      .select(
+        "skills, vault_skills, situation, experience_level, industries, objectives, vault_analysis, vault_extraction, formations",
+      )
       .eq("id", user.id)
       .single();
 
     if (!profile) {
-      return NextResponse.json({ error: "Profil introuvable" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Profil introuvable" },
+        { status: 404 },
+      );
     }
 
     const prompt = `Tu es un expert en strategie de positionnement et analyse concurrentielle pour les freelances et consultants.
@@ -74,7 +81,10 @@ Reponds UNIQUEMENT en JSON valide :
   ]
 }`;
 
-    const result = await generateJSON<CompetitiveAdvantageResult>({ prompt, maxTokens: 4096 });
+    const result = await generateJSON<CompetitiveAdvantageResult>({
+      prompt,
+      maxTokens: 4096,
+    });
 
     // Save to profile
     await supabase
@@ -82,14 +92,18 @@ Reponds UNIQUEMENT en JSON valide :
       .update({ competitive_advantage: result })
       .eq("id", user.id);
 
-    try { await awardXP(user.id, "generation.vault_analysis"); } catch { /* ignore xp errors */ }
+    try {
+      await awardXP(user.id, "generation.vault_analysis");
+    } catch {
+      /* ignore xp errors */
+    }
 
     return NextResponse.json(result);
   } catch (error) {
     console.error("Competitive advantage error:", error);
     return NextResponse.json(
       { error: "Erreur lors de l'analyse" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

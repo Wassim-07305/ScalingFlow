@@ -2,12 +2,27 @@
 
 import React from "react";
 import { cn } from "@/lib/utils/cn";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AILoading } from "@/components/shared/ai-loading";
 import { GlowCard } from "@/components/shared/glow-card";
-import { Sparkles, Copy, Instagram, User, Link, LayoutGrid, Star, Bookmark } from "lucide-react";
+import {
+  Sparkles,
+  Copy,
+  Instagram,
+  User,
+  Link,
+  LayoutGrid,
+  Star,
+  Bookmark,
+} from "lucide-react";
 import { toast } from "sonner";
 import type { InstagramProfileResult } from "@/lib/ai/prompts/instagram-profile";
 import { UpgradeWall } from "@/components/shared/upgrade-wall";
@@ -26,12 +41,20 @@ interface InstagramOptimizerProps {
   initialData?: any;
 }
 
-export function InstagramOptimizer({ className, initialData }: InstagramOptimizerProps) {
+export function InstagramOptimizer({
+  className,
+  initialData,
+}: InstagramOptimizerProps) {
   const [loading, setLoading] = React.useState(false);
-  const [result, setResult] = React.useState<InstagramProfileResult | null>(null);
+  const [result, setResult] = React.useState<InstagramProfileResult | null>(
+    null,
+  );
   const [error, setError] = React.useState<string | null>(null);
   const [copiedField, setCopiedField] = React.useState<string | null>(null);
-  const [usageLimited, setUsageLimited] = React.useState<{currentUsage: number; limit: number} | null>(null);
+  const [usageLimited, setUsageLimited] = React.useState<{
+    currentUsage: number;
+    limit: number;
+  } | null>(null);
 
   // Form state
   const [focus, setFocus] = React.useState("bio");
@@ -62,7 +85,10 @@ export function InstagramOptimizer({ className, initialData }: InstagramOptimize
       if (!response.ok) {
         if (response.status === 403) {
           const errData = await response.json();
-          if (errData.usage) { setUsageLimited(errData.usage); return; }
+          if (errData.usage) {
+            setUsageLimited(errData.usage);
+            return;
+          }
         }
         throw new Error("Erreur lors de la génération");
       }
@@ -87,11 +113,22 @@ export function InstagramOptimizer({ className, initialData }: InstagramOptimize
   };
 
   if (usageLimited) {
-    return <UpgradeWall currentUsage={usageLimited.currentUsage} limit={usageLimited.limit} className={className} />;
+    return (
+      <UpgradeWall
+        currentUsage={usageLimited.currentUsage}
+        limit={usageLimited.limit}
+        className={className}
+      />
+    );
   }
 
   if (loading) {
-    return <AILoading text="Optimisation du profil Instagram" className={className} />;
+    return (
+      <AILoading
+        text="Optimisation du profil Instagram"
+        className={className}
+      />
+    );
   }
 
   if (!result || showForm) {
@@ -104,13 +141,16 @@ export function InstagramOptimizer({ className, initialData }: InstagramOptimize
               Optimiser mon profil Instagram
             </CardTitle>
             <CardDescription>
-              Sélectionne le focus de l&apos;optimisation pour obtenir des recommandations ciblées.
+              Sélectionne le focus de l&apos;optimisation pour obtenir des
+              recommandations ciblées.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-5">
             {/* Optimization focus */}
             <div>
-              <label className="text-sm font-medium text-text-primary mb-2 block">Focus de l&apos;optimisation</label>
+              <label className="text-sm font-medium text-text-primary mb-2 block">
+                Focus de l&apos;optimisation
+              </label>
               <div className="flex flex-wrap gap-2">
                 {OPTIMIZATION_FOCUS.map((f) => (
                   <button
@@ -120,7 +160,7 @@ export function InstagramOptimizer({ className, initialData }: InstagramOptimize
                       "px-3 py-1.5 rounded-lg text-sm font-medium transition-all",
                       focus === f.key
                         ? "bg-accent text-white"
-                        : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
+                        : "bg-bg-tertiary text-text-secondary hover:text-text-primary",
                     )}
                   >
                     {f.label}
@@ -132,7 +172,8 @@ export function InstagramOptimizer({ className, initialData }: InstagramOptimize
             {/* Instagram handle */}
             <div>
               <label className="text-sm font-medium text-text-primary mb-1 block">
-                Nom d&apos;utilisateur Instagram <span className="text-text-muted font-normal">(optionnel)</span>
+                Nom d&apos;utilisateur Instagram{" "}
+                <span className="text-text-muted font-normal">(optionnel)</span>
               </label>
               <input
                 type="text"
@@ -164,7 +205,9 @@ export function InstagramOptimizer({ className, initialData }: InstagramOptimize
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Instagram className="h-5 w-5 text-[#E1306C]" />
-          <span className="text-sm font-medium text-text-primary">Profil optimisé</span>
+          <span className="text-sm font-medium text-text-primary">
+            Profil optimisé
+          </span>
         </div>
         <div className="flex items-center gap-2">
           <Button variant="ghost" size="sm" onClick={() => setShowForm(true)}>
@@ -182,7 +225,9 @@ export function InstagramOptimizer({ className, initialData }: InstagramOptimize
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
               <User className="h-4 w-4 text-text-muted" />
-              <p className="text-sm font-medium text-text-primary">Nom affiché</p>
+              <p className="text-sm font-medium text-text-primary">
+                Nom affiché
+              </p>
             </div>
             <Button
               variant="ghost"
@@ -193,7 +238,9 @@ export function InstagramOptimizer({ className, initialData }: InstagramOptimize
               {copiedField === "nom" ? "Copié !" : "Copier"}
             </Button>
           </div>
-          <p className="text-base font-semibold text-accent">{result.nom_affiche}</p>
+          <p className="text-base font-semibold text-accent">
+            {result.nom_affiche}
+          </p>
         </CardContent>
       </Card>
 
@@ -210,7 +257,9 @@ export function InstagramOptimizer({ className, initialData }: InstagramOptimize
             {copiedField === "bio" ? "Copié !" : "Copier"}
           </Button>
         </div>
-        <p className="text-sm text-text-secondary whitespace-pre-wrap">{result.bio}</p>
+        <p className="text-sm text-text-secondary whitespace-pre-wrap">
+          {result.bio}
+        </p>
       </GlowCard>
 
       {/* Highlights */}
@@ -230,7 +279,9 @@ export function InstagramOptimizer({ className, initialData }: InstagramOptimize
               >
                 <div className="flex items-center gap-2 mb-2">
                   <span className="text-lg">{h.icon_suggestion}</span>
-                  <p className="text-sm font-medium text-text-primary">{h.name}</p>
+                  <p className="text-sm font-medium text-text-primary">
+                    {h.name}
+                  </p>
                 </div>
                 <p className="text-xs text-text-secondary">{h.description}</p>
               </div>
@@ -244,11 +295,17 @@ export function InstagramOptimizer({ className, initialData }: InstagramOptimize
         <CardContent className="pt-5">
           <div className="flex items-center gap-2 mb-3">
             <Link className="h-4 w-4 text-text-muted" />
-            <p className="text-sm font-medium text-text-primary">Lien dans la bio</p>
+            <p className="text-sm font-medium text-text-primary">
+              Lien dans la bio
+            </p>
           </div>
           <div className="p-3 rounded-lg bg-accent/10 border border-accent/20">
-            <p className="text-sm font-medium text-accent">{result.cta_lien.texte}</p>
-            <p className="text-xs text-text-muted mt-1">{result.cta_lien.url_suggestion}</p>
+            <p className="text-sm font-medium text-accent">
+              {result.cta_lien.texte}
+            </p>
+            <p className="text-xs text-text-muted mt-1">
+              {result.cta_lien.url_suggestion}
+            </p>
           </div>
         </CardContent>
       </Card>
@@ -258,7 +315,9 @@ export function InstagramOptimizer({ className, initialData }: InstagramOptimize
         <CardContent className="pt-5">
           <div className="flex items-center gap-2 mb-3">
             <LayoutGrid className="h-4 w-4 text-text-muted" />
-            <p className="text-sm font-medium text-text-primary">Stratégie de grille</p>
+            <p className="text-sm font-medium text-text-primary">
+              Stratégie de grille
+            </p>
           </div>
           <p className="text-sm text-text-secondary whitespace-pre-wrap">
             {result.grille_strategy}
@@ -292,7 +351,9 @@ export function InstagramOptimizer({ className, initialData }: InstagramOptimize
                     {copiedField === `alt-${i}` ? "Copié !" : "Copier"}
                   </Button>
                 </div>
-                <p className="text-sm text-text-secondary whitespace-pre-wrap">{alt}</p>
+                <p className="text-sm text-text-secondary whitespace-pre-wrap">
+                  {alt}
+                </p>
               </div>
             ))}
           </div>

@@ -2,7 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { checkAIUsage } from "@/lib/stripe/check-usage";
 import { createClient } from "@/lib/supabase/server";
 import { generateJSON } from "@/lib/ai/generate";
-import { buildBrandIdentityPrompt, type BrandIdentityResult } from "@/lib/ai/prompts/brand-identity";
+import {
+  buildBrandIdentityPrompt,
+  type BrandIdentityResult,
+} from "@/lib/ai/prompts/brand-identity";
 import { awardXP } from "@/lib/gamification/xp-engine";
 import { notifyGeneration } from "@/lib/notifications/create";
 import { buildFullVaultContext } from "@/lib/ai/vault-context";
@@ -20,11 +23,14 @@ export async function POST(req: NextRequest) {
     }
 
     // Rate limiting
-    const rl = await rateLimit(user.id, "generate-brand", { limit: 5, windowSeconds: 60 });
+    const rl = await rateLimit(user.id, "generate-brand", {
+      limit: 5,
+      windowSeconds: 60,
+    });
     if (!rl.allowed) {
       return NextResponse.json(
         { error: "Trop de requêtes. Réessaie dans quelques secondes." },
-        { status: 429 }
+        { status: 429 },
       );
     }
 
@@ -33,10 +39,9 @@ export async function POST(req: NextRequest) {
     if (!usage.allowed) {
       return NextResponse.json(
         { error: "Limite de générations IA atteinte", usage },
-        { status: 403 }
+        { status: 403 },
       );
     }
-
 
     const body = await req.json();
     const { offerId } = body;
@@ -52,7 +57,7 @@ export async function POST(req: NextRequest) {
     if (!marketAnalysis) {
       return NextResponse.json(
         { error: "Aucune analyse de marché sélectionnée" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -81,8 +86,15 @@ export async function POST(req: NextRequest) {
       if (offerData) {
         offer = offerData;
         // Extract category OS from ai_raw_response if available
-        const rawResponse = offerData.ai_raw_response as Record<string, unknown> | null;
-        if (rawResponse && typeof rawResponse === "object" && "category_os" in rawResponse) {
+        const rawResponse = offerData.ai_raw_response as Record<
+          string,
+          unknown
+        > | null;
+        if (
+          rawResponse &&
+          typeof rawResponse === "object" &&
+          "category_os" in rawResponse
+        ) {
           categoryOS = rawResponse.category_os as CategoryOSData;
         }
       }
@@ -127,9 +139,15 @@ export async function POST(req: NextRequest) {
         user_id: user.id,
         offer_id: offerId || null,
         brand_names: brandIdentity.noms as unknown as Record<string, unknown>,
-        art_direction: brandIdentity.direction_artistique as unknown as Record<string, unknown>,
+        art_direction: brandIdentity.direction_artistique as unknown as Record<
+          string,
+          unknown
+        >,
         logo_concept: JSON.stringify(brandIdentity.logo_concept),
-        brand_kit: brandIdentity.brand_kit as unknown as Record<string, unknown>,
+        brand_kit: brandIdentity.brand_kit as unknown as Record<
+          string,
+          unknown
+        >,
         status: "draft" as const,
       })
       .select()
@@ -138,19 +156,23 @@ export async function POST(req: NextRequest) {
     if (saveError) {
       return NextResponse.json(
         { error: "Erreur lors de la sauvegarde de l'identité de marque" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
     // Award XP (non-blocking)
-    try { await awardXP(user.id, "generation.brand"); } catch {}
-    try { await notifyGeneration(user.id, "generation.brand"); } catch {}
+    try {
+      await awardXP(user.id, "generation.brand");
+    } catch {}
+    try {
+      await notifyGeneration(user.id, "generation.brand");
+    } catch {}
 
     return NextResponse.json({ ...brand, generated: brandIdentity });
   } catch (error) {
     return NextResponse.json(
       { error: "Erreur lors de la génération de l'identité de marque" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

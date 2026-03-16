@@ -5,7 +5,7 @@ export function followerAdsPrompt(
     unique_mechanism?: string;
   },
   avatar: Record<string, unknown>,
-  niche?: string
+  niche?: string,
 ): string {
   return `Tu es un expert en acquisition d'abonnés qualifiés via la publicité payante (Social Funnel). Tu maîtrises la stratégie "Profile Funnel" de ScalingFlow : attirer des followers qualifiés par des ads qui donnent de la valeur, puis les convertir via le contenu organique et les DM.
 

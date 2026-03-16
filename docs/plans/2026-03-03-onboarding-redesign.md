@@ -13,6 +13,7 @@
 ## Contexte
 
 ### Ce qui change
+
 - L'onboarding sort du layout `(dashboard)` — plus de sidebar, ecran complet
 - 1 question par ecran (au lieu de multi-champs par step)
 - Background anime avec blobs emeraude (a la Rivia, mais couleurs ScalingFlow)
@@ -25,6 +26,7 @@
 - Confetti a la completion
 
 ### Ce qui ne change PAS
+
 - Les questions et donnees collectees (meme `OnboardingFormData`)
 - L'analyse de marche IA a la fin (appel `/api/ai/analyze-market`)
 - La selection de marche et sauvegarde dans `profiles`
@@ -32,45 +34,45 @@
 
 ### Couleurs Rivia → ScalingFlow
 
-| Rivia | ScalingFlow |
-|-------|-------------|
-| `from-slate-950 via-blue-950 to-slate-900` | `from-[#050807] via-[#0a1a12] to-[#0B0E11]` |
-| `border-blue-400 bg-blue-500/20` | `border-emerald-400 bg-emerald-500/20` |
-| `text-blue-400` | `text-emerald-400` |
-| blob `bg-blue-500/10` | blob `bg-emerald-500/10` |
-| blob `bg-indigo-500/10` | blob `bg-teal-500/10` |
-| blob `bg-purple-500/10` | blob `bg-cyan-500/10` |
-| confetti bleu/indigo/violet | confetti `['#34D399','#10B981','#059669','#6EE7B7','#fff']` |
+| Rivia                                      | ScalingFlow                                                 |
+| ------------------------------------------ | ----------------------------------------------------------- |
+| `from-slate-950 via-blue-950 to-slate-900` | `from-[#050807] via-[#0a1a12] to-[#0B0E11]`                 |
+| `border-blue-400 bg-blue-500/20`           | `border-emerald-400 bg-emerald-500/20`                      |
+| `text-blue-400`                            | `text-emerald-400`                                          |
+| blob `bg-blue-500/10`                      | blob `bg-emerald-500/10`                                    |
+| blob `bg-indigo-500/10`                    | blob `bg-teal-500/10`                                       |
+| blob `bg-purple-500/10`                    | blob `bg-cyan-500/10`                                       |
+| confetti bleu/indigo/violet                | confetti `['#34D399','#10B981','#059669','#6EE7B7','#fff']` |
 
 ---
 
 ## Ecrans (22 total)
 
-| # | ID | Type | Titre | Champ DB |
-|---|----|------|-------|----------|
-| 0 | welcome | welcome | "Bienvenue sur ScalingFlow" | — |
-| 1 | firstName | text | "Comment tu t'appelles ?" | `first_name` |
-| 2 | lastName | text | "Et ton nom de famille ?" | `last_name` |
-| 3 | country | chips | "Tu es base ou ?" | `country` |
-| 4 | language | chips | "Quelle est ta langue principale ?" | `language` |
-| 5 | situation | chips | "Quelle est ta situation actuelle ?" | `situation` |
-| 6 | situationDetails | multi-field | "Dis-nous en plus..." | `situation_details` |
-| 7 | vaultSkills | skill-matrix | "Evalue tes competences" | `vault_skills` |
-| 8 | expertise_1 | textarea | "Ton plus grand accomplissement pro ?" | `expertise_answers.q1` |
-| 9 | expertise_2 | textarea | "Ta methode ou process unique ?" | `expertise_answers.q2` |
-| 10 | expertise_3 | textarea | "Quel resultat concret pour un client ?" | `expertise_answers.q3` |
-| 11 | expertise_4 | textarea | "Quel probleme resous-tu mieux que quiconque ?" | `expertise_answers.q4` |
-| 12 | expertise_5 | textarea | "Qu'est-ce que tes clients disent de toi ?" | `expertise_answers.q5` |
-| 13 | expertise_6 | textarea | "Ton 'unfair advantage' ?" | `expertise_answers.q6` |
-| 14 | parcours | chips | "Quel parcours te correspond ?" | `parcours` |
-| 15 | experienceLevel | chips | "Ton niveau d'experience ?" | `experience_level` |
-| 16 | currentRevenue | text-euro | "Ton revenu mensuel actuel ?" | `current_revenue` |
-| 17 | targetRevenue | text-euro | "Ton objectif de revenu mensuel ?" | `target_revenue` |
-| 18 | industries | chips-multi | "Dans quelles industries as-tu travaille ?" | `industries` |
-| 19 | objectives | chips-multi | "Tes objectifs principaux ?" | `objectives` |
-| 20 | budgetMonthly | chips | "Ton budget pub mensuel ?" | `budget_monthly` |
-| 21 | summary | summary | "Resume de ton profil" | — |
-| 22 | marketAnalysis | market-analysis | "Analyse de ton marche" | — |
+| #   | ID               | Type            | Titre                                           | Champ DB               |
+| --- | ---------------- | --------------- | ----------------------------------------------- | ---------------------- |
+| 0   | welcome          | welcome         | "Bienvenue sur ScalingFlow"                     | —                      |
+| 1   | firstName        | text            | "Comment tu t'appelles ?"                       | `first_name`           |
+| 2   | lastName         | text            | "Et ton nom de famille ?"                       | `last_name`            |
+| 3   | country          | chips           | "Tu es base ou ?"                               | `country`              |
+| 4   | language         | chips           | "Quelle est ta langue principale ?"             | `language`             |
+| 5   | situation        | chips           | "Quelle est ta situation actuelle ?"            | `situation`            |
+| 6   | situationDetails | multi-field     | "Dis-nous en plus..."                           | `situation_details`    |
+| 7   | vaultSkills      | skill-matrix    | "Evalue tes competences"                        | `vault_skills`         |
+| 8   | expertise_1      | textarea        | "Ton plus grand accomplissement pro ?"          | `expertise_answers.q1` |
+| 9   | expertise_2      | textarea        | "Ta methode ou process unique ?"                | `expertise_answers.q2` |
+| 10  | expertise_3      | textarea        | "Quel resultat concret pour un client ?"        | `expertise_answers.q3` |
+| 11  | expertise_4      | textarea        | "Quel probleme resous-tu mieux que quiconque ?" | `expertise_answers.q4` |
+| 12  | expertise_5      | textarea        | "Qu'est-ce que tes clients disent de toi ?"     | `expertise_answers.q5` |
+| 13  | expertise_6      | textarea        | "Ton 'unfair advantage' ?"                      | `expertise_answers.q6` |
+| 14  | parcours         | chips           | "Quel parcours te correspond ?"                 | `parcours`             |
+| 15  | experienceLevel  | chips           | "Ton niveau d'experience ?"                     | `experience_level`     |
+| 16  | currentRevenue   | text-euro       | "Ton revenu mensuel actuel ?"                   | `current_revenue`      |
+| 17  | targetRevenue    | text-euro       | "Ton objectif de revenu mensuel ?"              | `target_revenue`       |
+| 18  | industries       | chips-multi     | "Dans quelles industries as-tu travaille ?"     | `industries`           |
+| 19  | objectives       | chips-multi     | "Tes objectifs principaux ?"                    | `objectives`           |
+| 20  | budgetMonthly    | chips           | "Ton budget pub mensuel ?"                      | `budget_monthly`       |
+| 21  | summary          | summary         | "Resume de ton profil"                          | —                      |
+| 22  | marketAnalysis   | market-analysis | "Analyse de ton marche"                         | —                      |
 
 > Note : le step `situationDetails` (6) n'apparait que si `situation` n'est pas vide. Le step `resources/formations` est retire car peu utilise — il peut etre ajoute plus tard dans les parametres.
 
@@ -79,6 +81,7 @@
 ## Task 1 : Installer canvas-confetti
 
 **Files:**
+
 - Modify: `package.json`
 
 **Step 1: Installer la dependance**
@@ -108,6 +111,7 @@ git commit -m "chore: add canvas-confetti for onboarding completion"
 ## Task 2 : Creer le route group (onboarding)
 
 **Files:**
+
 - Create: `src/app/(onboarding)/layout.tsx`
 - Create: `src/app/(onboarding)/onboarding/page.tsx`
 - Delete: `src/app/(dashboard)/onboarding/page.tsx`
@@ -173,7 +177,11 @@ Creer un fichier placeholder `src/components/onboarding/onboarding-flow.tsx` :
 "use client";
 
 export function OnboardingFlow() {
-  return <div className="min-h-screen bg-black text-white flex items-center justify-center">Onboarding Flow (en construction)</div>;
+  return (
+    <div className="min-h-screen bg-black text-white flex items-center justify-center">
+      Onboarding Flow (en construction)
+    </div>
+  );
 }
 ```
 
@@ -195,6 +203,7 @@ git commit -m "feat: create (onboarding) route group with dedicated layout"
 ## Task 3 : Composants UI reutilisables
 
 **Files:**
+
 - Create: `src/components/onboarding/animated-background.tsx`
 - Create: `src/components/onboarding/onboarding-progress-bar.tsx`
 - Create: `src/components/onboarding/onboarding-top-bar.tsx`
@@ -244,7 +253,10 @@ interface OnboardingProgressBarProps {
   total: number;
 }
 
-export function OnboardingProgressBar({ step, total }: OnboardingProgressBarProps) {
+export function OnboardingProgressBar({
+  step,
+  total,
+}: OnboardingProgressBarProps) {
   const progress = total > 0 ? ((step + 1) / total) * 100 : 0;
 
   return (
@@ -278,7 +290,12 @@ interface OnboardingTopBarProps {
   isFirst: boolean;
 }
 
-export function OnboardingTopBar({ onBack, step, total, isFirst }: OnboardingTopBarProps) {
+export function OnboardingTopBar({
+  onBack,
+  step,
+  total,
+  isFirst,
+}: OnboardingTopBarProps) {
   return (
     <div className="relative z-10 flex items-center justify-between px-6 py-4">
       {/* Back */}
@@ -286,7 +303,9 @@ export function OnboardingTopBar({ onBack, step, total, isFirst }: OnboardingTop
         onClick={onBack}
         disabled={isFirst}
         className={`rounded-full p-2 transition-all ${
-          isFirst ? "opacity-0 pointer-events-none" : "text-white/50 hover:text-white hover:bg-white/10"
+          isFirst
+            ? "opacity-0 pointer-events-none"
+            : "text-white/50 hover:text-white hover:bg-white/10"
         }`}
       >
         <ArrowLeft className="h-5 w-5" />
@@ -294,7 +313,13 @@ export function OnboardingTopBar({ onBack, step, total, isFirst }: OnboardingTop
 
       {/* Logo */}
       <div className="flex items-center gap-2">
-        <Image src="/icons/icon-192.png" alt="Logo" width={24} height={24} className="rounded" />
+        <Image
+          src="/icons/icon-192.png"
+          alt="Logo"
+          width={24}
+          height={24}
+          className="rounded"
+        />
         <span className="text-sm font-semibold text-white/70">ScalingFlow</span>
       </div>
 
@@ -359,9 +384,11 @@ export function ChipSelector({
   };
 
   const gridClass =
-    columns === 3 ? "grid-cols-1 sm:grid-cols-3" :
-    columns === 2 ? "grid-cols-1 sm:grid-cols-2" :
-    "grid-cols-1";
+    columns === 3
+      ? "grid-cols-1 sm:grid-cols-3"
+      : columns === 2
+        ? "grid-cols-1 sm:grid-cols-2"
+        : "grid-cols-1";
 
   return (
     <div className="space-y-3">
@@ -374,11 +401,13 @@ export function ChipSelector({
               "rounded-xl border-2 px-5 py-4 text-left transition-all duration-200",
               value === opt.value
                 ? "border-emerald-400 bg-emerald-500/20 text-white scale-[1.02] shadow-lg shadow-emerald-500/10"
-                : "border-white/10 bg-white/5 text-white/70 hover:border-white/30 hover:bg-white/10"
+                : "border-white/10 bg-white/5 text-white/70 hover:border-white/30 hover:bg-white/10",
             )}
           >
             <span className="text-base font-medium">{opt.label}</span>
-            {opt.desc && <p className="mt-1 text-sm text-white/40">{opt.desc}</p>}
+            {opt.desc && (
+              <p className="mt-1 text-sm text-white/40">{opt.desc}</p>
+            )}
           </button>
         ))}
 
@@ -392,7 +421,7 @@ export function ChipSelector({
               "rounded-xl border-2 border-dashed px-5 py-4 text-left transition-all duration-200",
               showOther
                 ? "border-emerald-400 bg-emerald-500/10"
-                : "border-white/10 text-white/40 hover:border-white/30"
+                : "border-white/10 text-white/40 hover:border-white/30",
             )}
           >
             Autre
@@ -439,7 +468,11 @@ interface MultiChipSelectorProps {
   onChange: (value: string[]) => void;
 }
 
-export function MultiChipSelector({ options, value, onChange }: MultiChipSelectorProps) {
+export function MultiChipSelector({
+  options,
+  value,
+  onChange,
+}: MultiChipSelectorProps) {
   const toggle = (val: string) => {
     if (value.includes(val)) {
       onChange(value.filter((v) => v !== val));
@@ -460,7 +493,7 @@ export function MultiChipSelector({ options, value, onChange }: MultiChipSelecto
               "rounded-full border-2 px-5 py-2.5 text-sm font-medium transition-all duration-200",
               selected
                 ? "border-emerald-400 bg-emerald-500/20 text-white shadow-lg shadow-emerald-500/10"
-                : "border-white/10 bg-white/5 text-white/70 hover:border-white/30"
+                : "border-white/10 bg-white/5 text-white/70 hover:border-white/30",
             )}
           >
             {opt.label}
@@ -488,11 +521,13 @@ git commit -m "feat: add Rivia-style onboarding UI components"
 ## Task 4 : Skill Matrix component
 
 **Files:**
+
 - Create: `src/components/onboarding/onboarding-skill-matrix.tsx`
 
 Meme logique que `step-skills-vault.tsx` mais style Rivia : fond sombre, accents emeraude, border white/10.
 
 Les 6 categories avec icones :
+
 - Marketing Digital (Megaphone)
 - Vente & Closing (HandCoins)
 - Copywriting (PenTool)
@@ -516,11 +551,13 @@ git commit -m "feat: add skill matrix component for onboarding"
 ## Task 5 : Summary View component
 
 **Files:**
+
 - Create: `src/components/onboarding/onboarding-summary.tsx`
 
 Affiche toutes les reponses regroupees par section dans des cards `rounded-2xl border border-white/10 bg-white/5 p-5` :
 
 **Sections :**
+
 1. **Identite** — Prenom, Nom, Pays, Langue
 2. **Situation** — Type + details conditionnels
 3. **Competences** — Les 6 categories avec leur niveau
@@ -543,6 +580,7 @@ git commit -m "feat: add summary review component for onboarding"
 ## Task 6 : Questions configuration
 
 **Files:**
+
 - Create: `src/components/onboarding/questions.ts`
 
 Fichier data-driven definissant les 22 ecrans. Chaque question suit cette interface :
@@ -585,11 +623,13 @@ export interface Question {
 Toutes les constantes de `onboarding-wizard.tsx` (SKILLS, EXPERIENCE_LEVELS, INDUSTRIES, BUDGETS, pays, langues, situations, parcours, objectifs) sont deplacees ici en tant que chips des questions correspondantes.
 
 Le step `situationDetails` (6) a un `showWhen` conditionnel :
+
 ```typescript
-showWhen: (data) => data.situation !== "" && data.situation !== undefined
+showWhen: (data) => data.situation !== "" && data.situation !== undefined;
 ```
 
 Les champs conditionnels de `situationDetails` dependent de la `situation` selectionnee :
+
 - `zero` → textarea "biggest_challenge"
 - `salarie` → text "poste" + text "secteur"
 - `freelance` → textarea "missions" + textarea "biggest_challenge"
@@ -609,6 +649,7 @@ git commit -m "feat: add data-driven question definitions for onboarding"
 ## Task 7 : Composant principal OnboardingFlow
 
 **Files:**
+
 - Create: `src/components/onboarding/onboarding-flow.tsx` (remplace le placeholder)
 
 C'est le coeur de la refonte. ~500-600 lignes. Suit le pattern de Rivia `OnboardingPage.tsx`.
@@ -627,7 +668,9 @@ export function OnboardingFlow() {
   // State
   const [step, setStep] = useState(0);
   const [direction, setDirection] = useState(1);
-  const [formData, setFormData] = useState<Record<string, unknown>>({...defaults});
+  const [formData, setFormData] = useState<Record<string, unknown>>({
+    ...defaults,
+  });
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState(null);
   const [loading, setLoading] = useState(true); // Chargement initial du profil
@@ -639,9 +682,9 @@ export function OnboardingFlow() {
   const supabase = createClient();
 
   // Filtrer les questions visibles (showWhen)
-  const visibleQuestions = useMemo(() =>
-    QUESTIONS.filter((q) => !q.showWhen || q.showWhen(formData)),
-    [formData]
+  const visibleQuestions = useMemo(
+    () => QUESTIONS.filter((q) => !q.showWhen || q.showWhen(formData)),
+    [formData],
   );
   const totalSteps = visibleQuestions.length;
   const currentQuestion = visibleQuestions[step];
@@ -651,7 +694,11 @@ export function OnboardingFlow() {
   // Charger le profil existant au mount (pour reprendre)
   useEffect(() => {
     if (!user) return;
-    supabase.from("profiles").select("*").eq("id", user.id).single()
+    supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", user.id)
+      .single()
       .then(({ data }) => {
         if (data) {
           // Remplir formData depuis les colonnes du profil
@@ -665,12 +712,15 @@ export function OnboardingFlow() {
   // Progressive save
   const saveProgress = useCallback(async () => {
     if (!user) return;
-    await supabase.from("profiles").update({
-      onboarding_step: step,
-      first_name: formData.firstName,
-      last_name: formData.lastName,
-      // ... mapper tous les champs formData → colonnes profiles
-    }).eq("id", user.id);
+    await supabase
+      .from("profiles")
+      .update({
+        onboarding_step: step,
+        first_name: formData.firstName,
+        last_name: formData.lastName,
+        // ... mapper tous les champs formData → colonnes profiles
+      })
+      .eq("id", user.id);
   }, [user, step, formData]);
 
   // Navigation
@@ -711,37 +761,47 @@ export function OnboardingFlow() {
   }, [goNext]);
 
   // Market analysis (identique a l'actuel)
-  const handleAnalyze = async () => { /* ... meme logique ... */ };
+  const handleAnalyze = async () => {
+    /* ... meme logique ... */
+  };
   const handleSelectMarket = async (index: number) => {
     /* ... save profile complet + onboarding_completed: true ... */
     // Confetti !
-    confetti({ particleCount: 150, spread: 100, origin: { y: 0.6 }, colors: ['#34D399','#10B981','#059669','#6EE7B7','#fff'] });
-    setTimeout(() => { router.push("/offer"); router.refresh(); }, 2000);
+    confetti({
+      particleCount: 150,
+      spread: 100,
+      origin: { y: 0.6 },
+      colors: ["#34D399", "#10B981", "#059669", "#6EE7B7", "#fff"],
+    });
+    setTimeout(() => {
+      router.push("/offer");
+      router.refresh();
+    }, 2000);
   };
 
   // Render question
   const renderQuestion = (q: Question) => {
     switch (q.type) {
       case "welcome":
-        // Logo anime, titre "Bienvenue sur ScalingFlow", sous-titre, bouton "C'est parti"
+      // Logo anime, titre "Bienvenue sur ScalingFlow", sous-titre, bouton "C'est parti"
       case "text":
-        // Input underlined : border-b-2 border-white/20 bg-transparent text-2xl
+      // Input underlined : border-b-2 border-white/20 bg-transparent text-2xl
       case "text-euro":
-        // Meme que text mais avec prefixe "€"
+      // Meme que text mais avec prefixe "€"
       case "textarea":
-        // Textarea rounded-xl border-2 border-white/20 bg-white/5
+      // Textarea rounded-xl border-2 border-white/20 bg-white/5
       case "chips":
-        // <ChipSelector> avec auto-advance
+      // <ChipSelector> avec auto-advance
       case "chips-multi":
-        // <MultiChipSelector>
+      // <MultiChipSelector>
       case "multi-field":
-        // Champs conditionnels selon situation (renderSituationDetails)
+      // Champs conditionnels selon situation (renderSituationDetails)
       case "skill-matrix":
-        // <OnboardingSkillMatrix>
+      // <OnboardingSkillMatrix>
       case "summary":
-        // <OnboardingSummary>
+      // <OnboardingSummary>
       case "market-analysis":
-        // N'est pas un ecran dans QUESTIONS — gere par handleAnalyze
+      // N'est pas un ecran dans QUESTIONS — gere par handleAnalyze
     }
   };
 
@@ -750,7 +810,12 @@ export function OnboardingFlow() {
     <div className="relative flex min-h-screen flex-col bg-gradient-to-br from-[#050807] via-[#0a1a12] to-[#0B0E11]">
       <AnimatedBackground />
       <OnboardingProgressBar step={step} total={totalSteps} />
-      <OnboardingTopBar onBack={goPrev} step={step} total={totalSteps} isFirst={isFirst} />
+      <OnboardingTopBar
+        onBack={goPrev}
+        step={step}
+        total={totalSteps}
+        isFirst={isFirst}
+      />
 
       <div className="relative z-10 mx-auto flex w-full max-w-2xl flex-1 flex-col justify-center px-6 py-8">
         <AnimatePresence mode="wait" custom={direction}>
@@ -766,7 +831,9 @@ export function OnboardingFlow() {
               {currentQuestion.title}
             </h2>
             {currentQuestion.subtitle && (
-              <p className="mb-8 text-base text-white/40">{currentQuestion.subtitle}</p>
+              <p className="mb-8 text-base text-white/40">
+                {currentQuestion.subtitle}
+              </p>
             )}
             {renderQuestion(currentQuestion)}
           </motion.div>
@@ -777,7 +844,10 @@ export function OnboardingFlow() {
       {/* Pas visible pour chips (auto-advance) ni welcome (bouton inline) */}
       {needsContinueButton(currentQuestion) && (
         <div className="relative z-10 px-6 pb-8 text-center">
-          <button onClick={goNext} className="rounded-xl bg-emerald-500 px-8 py-3 font-semibold text-white transition hover:bg-emerald-400 disabled:opacity-30">
+          <button
+            onClick={goNext}
+            className="rounded-xl bg-emerald-500 px-8 py-3 font-semibold text-white transition hover:bg-emerald-400 disabled:opacity-30"
+          >
             Continuer
           </button>
         </div>
@@ -788,6 +858,7 @@ export function OnboardingFlow() {
 ```
 
 ### Points critiques :
+
 - Le `formData` utilise les memes cles que `OnboardingFormData` du store Zustand
 - Le mapping vers les colonnes Supabase est identique a `handleSelectMarket` dans l'ancien wizard
 - Le chargement initial reconstruit `formData` depuis le profil Supabase (reprise)
@@ -805,6 +876,7 @@ git commit -m "feat: implement main onboarding flow with Rivia-style UX"
 ## Task 8 : Cleanup — supprimer les anciens fichiers
 
 **Files:**
+
 - Delete: `src/components/onboarding/onboarding-wizard.tsx`
 - Delete: `src/components/onboarding/step-identity.tsx`
 - Delete: `src/components/onboarding/step-situation.tsx`
@@ -894,23 +966,23 @@ npx vercel --prod
 
 ## Fichiers finaux
 
-| Fichier | Action |
-|---------|--------|
-| `src/app/(onboarding)/layout.tsx` | CREATE |
-| `src/app/(onboarding)/onboarding/page.tsx` | CREATE |
-| `src/components/onboarding/onboarding-flow.tsx` | CREATE |
-| `src/components/onboarding/questions.ts` | CREATE |
-| `src/components/onboarding/animated-background.tsx` | CREATE |
-| `src/components/onboarding/onboarding-progress-bar.tsx` | CREATE |
-| `src/components/onboarding/onboarding-top-bar.tsx` | CREATE |
-| `src/components/onboarding/chip-selector.tsx` | CREATE |
-| `src/components/onboarding/multi-chip-selector.tsx` | CREATE |
-| `src/components/onboarding/onboarding-skill-matrix.tsx` | CREATE |
-| `src/components/onboarding/onboarding-summary.tsx` | CREATE |
-| `src/app/(dashboard)/onboarding/page.tsx` | DELETE |
-| `src/components/onboarding/onboarding-wizard.tsx` | DELETE |
-| `src/components/onboarding/step-*.tsx` (7 fichiers) | DELETE |
-| `src/components/shared/step-indicator.tsx` | DELETE (si pas utilise ailleurs) |
-| `src/stores/onboarding-store.ts` | DELETE (si pas utilise ailleurs) |
-| `src/components/onboarding/market-analysis.tsx` | KEEP |
-| `src/components/onboarding/viability-score.tsx` | KEEP |
+| Fichier                                                 | Action                           |
+| ------------------------------------------------------- | -------------------------------- |
+| `src/app/(onboarding)/layout.tsx`                       | CREATE                           |
+| `src/app/(onboarding)/onboarding/page.tsx`              | CREATE                           |
+| `src/components/onboarding/onboarding-flow.tsx`         | CREATE                           |
+| `src/components/onboarding/questions.ts`                | CREATE                           |
+| `src/components/onboarding/animated-background.tsx`     | CREATE                           |
+| `src/components/onboarding/onboarding-progress-bar.tsx` | CREATE                           |
+| `src/components/onboarding/onboarding-top-bar.tsx`      | CREATE                           |
+| `src/components/onboarding/chip-selector.tsx`           | CREATE                           |
+| `src/components/onboarding/multi-chip-selector.tsx`     | CREATE                           |
+| `src/components/onboarding/onboarding-skill-matrix.tsx` | CREATE                           |
+| `src/components/onboarding/onboarding-summary.tsx`      | CREATE                           |
+| `src/app/(dashboard)/onboarding/page.tsx`               | DELETE                           |
+| `src/components/onboarding/onboarding-wizard.tsx`       | DELETE                           |
+| `src/components/onboarding/step-*.tsx` (7 fichiers)     | DELETE                           |
+| `src/components/shared/step-indicator.tsx`              | DELETE (si pas utilise ailleurs) |
+| `src/stores/onboarding-store.ts`                        | DELETE (si pas utilise ailleurs) |
+| `src/components/onboarding/market-analysis.tsx`         | KEEP                             |
+| `src/components/onboarding/viability-score.tsx`         | KEEP                             |

@@ -48,7 +48,7 @@ export function UnipileSendDialog({
   const { accounts, loading: loadingAccounts } =
     useUnipileAccounts("messaging");
   const [selectedAccountId, setSelectedAccountId] = useState<string | null>(
-    null
+    null,
   );
   const [recipientId, setRecipientId] = useState("");
   const [sending, setSending] = useState(false);
@@ -67,7 +67,7 @@ export function UnipileSendDialog({
 
   const filteredAccounts = platformFilter
     ? accounts.filter(
-        (a) => a.provider.toLowerCase() === platformFilter.toLowerCase()
+        (a) => a.provider.toLowerCase() === platformFilter.toLowerCase(),
       )
     : accounts;
 
@@ -102,7 +102,7 @@ export function UnipileSendDialog({
       toast.success("Message envoyé avec succès !");
     } catch (err) {
       toast.error(
-        err instanceof Error ? err.message : "Erreur lors de l'envoi"
+        err instanceof Error ? err.message : "Erreur lors de l'envoi",
       );
     } finally {
       setSending(false);
@@ -180,11 +180,12 @@ export function UnipileSendDialog({
                 </label>
                 <div className="flex flex-wrap gap-2">
                   {filteredAccounts.map((account) => {
-                    const info =
-                      PROVIDER_LABELS[account.provider.toLowerCase()] || {
-                        label: account.provider,
-                        emoji: "🔗",
-                      };
+                    const info = PROVIDER_LABELS[
+                      account.provider.toLowerCase()
+                    ] || {
+                      label: account.provider,
+                      emoji: "🔗",
+                    };
                     const isSelected = selectedAccountId === account.id;
 
                     return (
@@ -195,7 +196,7 @@ export function UnipileSendDialog({
                           "flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all border",
                           isSelected
                             ? "border-accent bg-accent/10 text-accent"
-                            : "border-border-default bg-bg-tertiary text-text-secondary hover:text-text-primary"
+                            : "border-border-default bg-bg-tertiary text-text-secondary hover:text-text-primary",
                         )}
                       >
                         <span>{info.emoji}</span>
@@ -234,9 +235,7 @@ export function UnipileSendDialog({
               </Button>
               <Button
                 onClick={handleSend}
-                disabled={
-                  sending || !selectedAccountId || !recipientId.trim()
-                }
+                disabled={sending || !selectedAccountId || !recipientId.trim()}
               >
                 {sending ? (
                   <Loader2 className="h-4 w-4 animate-spin mr-2" />

@@ -58,7 +58,10 @@ async function loadMetricsFromSupabase(userId: string): Promise<DailyMetric[]> {
   if (!data || data.length === 0) return [];
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (data as any[]).map((row: any) => ({
-    date: typeof row.date === "string" ? row.date : new Date(row.date).toISOString().split("T")[0],
+    date:
+      typeof row.date === "string"
+        ? row.date
+        : new Date(row.date).toISOString().split("T")[0],
     spend: Number(row.spend),
     impressions: row.impressions,
     clicks: row.clicks,
@@ -70,23 +73,23 @@ async function loadMetricsFromSupabase(userId: string): Promise<DailyMetric[]> {
 }
 
 const CATEGORY_ICONS: Record<string, React.ElementType> = {
-  "Creatives": Palette,
-  "Audiences": Users,
-  "Budget": DollarSign,
-  "Funnel": Filter,
-  "Pricing": Tag,
+  Creatives: Palette,
+  Audiences: Users,
+  Budget: DollarSign,
+  Funnel: Filter,
+  Pricing: Tag,
 };
 
 const PRIORITY_VARIANTS: Record<string, "red" | "yellow" | "default"> = {
-  "Haute": "red",
-  "Moyenne": "yellow",
-  "Basse": "default",
+  Haute: "red",
+  Moyenne: "yellow",
+  Basse: "default",
 };
 
 const HEALTH_CONFIG: Record<string, { color: string; bgColor: string }> = {
-  "Bon": { color: "text-accent", bgColor: "bg-accent/12" },
-  "Moyen": { color: "text-warning", bgColor: "bg-warning/12" },
-  "Critique": { color: "text-danger", bgColor: "bg-danger/12" },
+  Bon: { color: "text-accent", bgColor: "bg-accent/12" },
+  Moyen: { color: "text-warning", bgColor: "bg-warning/12" },
+  Critique: { color: "text-danger", bgColor: "bg-danger/12" },
 };
 
 // ─── Main component ──────────────────────────────────────────
@@ -115,30 +118,40 @@ export function OptimizationRecommendations() {
     }
 
     // Compute aggregated summary
-    const totals = metricsData.length > 0
-      ? metricsData.reduce(
-          (acc, m) => ({
-            spend: acc.spend + m.spend,
-            impressions: acc.impressions + m.impressions,
-            clicks: acc.clicks + m.clicks,
-            leads: acc.leads + m.leads,
-            calls: acc.calls + m.calls,
-            clients: acc.clients + m.clients,
-            revenue: acc.revenue + m.revenue,
-            days: acc.days + 1,
-          }),
-          { spend: 0, impressions: 0, clicks: 0, leads: 0, calls: 0, clients: 0, revenue: 0, days: 0 }
-        )
-      : {
-          spend: 2710,
-          impressions: 271200,
-          clicks: 4615,
-          leads: 245,
-          calls: 85,
-          clients: 29,
-          revenue: 32813,
-          days: 14,
-        };
+    const totals =
+      metricsData.length > 0
+        ? metricsData.reduce(
+            (acc, m) => ({
+              spend: acc.spend + m.spend,
+              impressions: acc.impressions + m.impressions,
+              clicks: acc.clicks + m.clicks,
+              leads: acc.leads + m.leads,
+              calls: acc.calls + m.calls,
+              clients: acc.clients + m.clients,
+              revenue: acc.revenue + m.revenue,
+              days: acc.days + 1,
+            }),
+            {
+              spend: 0,
+              impressions: 0,
+              clicks: 0,
+              leads: 0,
+              calls: 0,
+              clients: 0,
+              revenue: 0,
+              days: 0,
+            },
+          )
+        : {
+            spend: 2710,
+            impressions: 271200,
+            clicks: 4615,
+            leads: 245,
+            calls: 85,
+            clients: 29,
+            revenue: 32813,
+            days: 14,
+          };
 
     const summary = {
       periode_jours: totals.days,
@@ -149,14 +162,18 @@ export function OptimizationRecommendations() {
       appels: totals.calls,
       clients: totals.clients,
       revenu: totals.revenue,
-      cpm: totals.impressions > 0 ? (totals.spend / totals.impressions) * 1000 : 0,
-      ctr: totals.impressions > 0 ? (totals.clicks / totals.impressions) * 100 : 0,
+      cpm:
+        totals.impressions > 0 ? (totals.spend / totals.impressions) * 1000 : 0,
+      ctr:
+        totals.impressions > 0 ? (totals.clicks / totals.impressions) * 100 : 0,
       cpc: totals.clicks > 0 ? totals.spend / totals.clicks : 0,
       cpl: totals.leads > 0 ? totals.spend / totals.leads : 0,
       cpa: totals.clients > 0 ? totals.spend / totals.clients : 0,
       roas: totals.spend > 0 ? totals.revenue / totals.spend : 0,
-      taux_lead_to_call: totals.leads > 0 ? (totals.calls / totals.leads) * 100 : 0,
-      taux_call_to_client: totals.calls > 0 ? (totals.clients / totals.calls) * 100 : 0,
+      taux_lead_to_call:
+        totals.leads > 0 ? (totals.calls / totals.leads) * 100 : 0,
+      taux_call_to_client:
+        totals.calls > 0 ? (totals.clients / totals.calls) * 100 : 0,
     };
 
     setLoading(true);
@@ -197,7 +214,11 @@ export function OptimizationRecommendations() {
                 : "Ajoute tes données dans l'onglet Dashboard d'abord, ou génère sur les données de démo."}
             </p>
           </div>
-          <Button onClick={handleGenerate} disabled={loading} className="shrink-0">
+          <Button
+            onClick={handleGenerate}
+            disabled={loading}
+            className="shrink-0"
+          >
             {loading ? (
               <Loader2 className="h-4 w-4 mr-2 animate-spin" />
             ) : (
@@ -217,11 +238,28 @@ export function OptimizationRecommendations() {
               <div className="flex items-center gap-6">
                 <div className="relative w-20 h-20 shrink-0">
                   <svg viewBox="0 0 80 80" className="w-full h-full -rotate-90">
-                    <circle cx="40" cy="40" r="34" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="6" />
                     <circle
-                      cx="40" cy="40" r="34" fill="none"
-                      stroke={result.health_score >= 70 ? "#34D399" : result.health_score >= 40 ? "#F59E0B" : "#EF4444"}
-                      strokeWidth="6" strokeLinecap="round"
+                      cx="40"
+                      cy="40"
+                      r="34"
+                      fill="none"
+                      stroke="rgba(255,255,255,0.06)"
+                      strokeWidth="6"
+                    />
+                    <circle
+                      cx="40"
+                      cy="40"
+                      r="34"
+                      fill="none"
+                      stroke={
+                        result.health_score >= 70
+                          ? "#34D399"
+                          : result.health_score >= 40
+                            ? "#F59E0B"
+                            : "#EF4444"
+                      }
+                      strokeWidth="6"
+                      strokeLinecap="round"
                       strokeDasharray={`${(result.health_score / 100) * 213.6} 213.6`}
                       className="transition-all duration-1000 ease-out"
                     />
@@ -230,7 +268,8 @@ export function OptimizationRecommendations() {
                     <span
                       className={cn(
                         "text-2xl font-bold",
-                        HEALTH_CONFIG[result.overall_health]?.color || "text-text-primary"
+                        HEALTH_CONFIG[result.overall_health]?.color ||
+                          "text-text-primary",
                       )}
                     >
                       {result.health_score}
@@ -247,14 +286,16 @@ export function OptimizationRecommendations() {
                         result.overall_health === "Bon"
                           ? "default"
                           : result.overall_health === "Moyen"
-                          ? "yellow"
-                          : "red"
+                            ? "yellow"
+                            : "red"
                       }
                     >
                       {result.overall_health}
                     </Badge>
                   </div>
-                  <p className="text-sm text-text-secondary">{result.summary}</p>
+                  <p className="text-sm text-text-secondary">
+                    {result.summary}
+                  </p>
                 </div>
               </div>
 
@@ -266,8 +307,8 @@ export function OptimizationRecommendations() {
                     result.health_score >= 70
                       ? "bg-accent"
                       : result.health_score >= 40
-                      ? "bg-warning"
-                      : "bg-danger"
+                        ? "bg-warning"
+                        : "bg-danger",
                   )}
                   style={{ width: `${result.health_score}%` }}
                 />
@@ -287,7 +328,10 @@ export function OptimizationRecommendations() {
               <CardContent>
                 <ul className="space-y-2">
                   {result.warnings.map((w, i) => (
-                    <li key={i} className="flex items-start gap-2 text-sm text-text-secondary">
+                    <li
+                      key={i}
+                      className="flex items-start gap-2 text-sm text-text-secondary"
+                    >
                       <AlertTriangle className="h-4 w-4 text-danger shrink-0 mt-0.5" />
                       {w}
                     </li>
@@ -309,7 +353,10 @@ export function OptimizationRecommendations() {
               <CardContent>
                 <ul className="space-y-2">
                   {result.quick_wins.map((qw, i) => (
-                    <li key={i} className="flex items-start gap-2 text-sm text-text-secondary">
+                    <li
+                      key={i}
+                      className="flex items-start gap-2 text-sm text-text-secondary"
+                    >
                       <CheckCircle2 className="h-4 w-4 text-accent shrink-0 mt-0.5" />
                       {qw}
                     </li>
@@ -342,7 +389,9 @@ export function OptimizationRecommendations() {
                         <span className="font-semibold text-text-primary text-sm">
                           {reco.title}
                         </span>
-                        <Badge variant={PRIORITY_VARIANTS[reco.priority] || "muted"}>
+                        <Badge
+                          variant={PRIORITY_VARIANTS[reco.priority] || "muted"}
+                        >
                           {reco.priority}
                         </Badge>
                         <Badge variant="muted">{reco.category}</Badge>
@@ -377,7 +426,10 @@ export function OptimizationRecommendations() {
                           </h4>
                           <ol className="space-y-2">
                             {reco.action_steps.map((step, i) => (
-                              <li key={i} className="flex items-start gap-2 text-sm text-text-secondary">
+                              <li
+                                key={i}
+                                className="flex items-start gap-2 text-sm text-text-secondary"
+                              >
                                 <span className="w-5 h-5 rounded-full bg-accent/12 text-accent text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">
                                   {i + 1}
                                 </span>
@@ -392,7 +444,9 @@ export function OptimizationRecommendations() {
                             <span className="text-xs text-text-muted">
                               Métrique à surveiller :
                             </span>
-                            <Badge variant="muted">{reco.metric_to_watch}</Badge>
+                            <Badge variant="muted">
+                              {reco.metric_to_watch}
+                            </Badge>
                           </div>
                         )}
                       </div>
@@ -416,8 +470,9 @@ export function OptimizationRecommendations() {
               Optimise tes campagnes avec l&apos;IA
             </h3>
             <p className="text-sm text-text-secondary max-w-md">
-              Clique sur &quot;Générer les recommandations&quot; pour obtenir une analyse complète
-              de tes métriques publicitaires et des recommandations actionnables.
+              Clique sur &quot;Générer les recommandations&quot; pour obtenir
+              une analyse complète de tes métriques publicitaires et des
+              recommandations actionnables.
             </p>
           </CardContent>
         </Card>

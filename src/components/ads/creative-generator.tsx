@@ -2,13 +2,33 @@
 
 import React from "react";
 import { cn } from "@/lib/utils/cn";
-import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  CardDescription,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AILoading } from "@/components/shared/ai-loading";
 import { GlowCard } from "@/components/shared/glow-card";
 import { GenerateButton } from "@/components/shared/generate-button";
-import { Sparkles, Image, Video, Target, Copy, Check, Loader2, ImagePlus, Pencil, Save, Zap, ChevronDown, ChevronUp } from "lucide-react";
+import {
+  Sparkles,
+  Image,
+  Video,
+  Target,
+  Copy,
+  Check,
+  Loader2,
+  ImagePlus,
+  Pencil,
+  Save,
+  Zap,
+  ChevronDown,
+  ChevronUp,
+} from "lucide-react";
 import { UpgradeWall } from "@/components/shared/upgrade-wall";
 import { createClient } from "@/lib/supabase/client";
 import { useUser } from "@/hooks/use-user";
@@ -30,11 +50,36 @@ const OBJECTIVES = [
 ] as const;
 
 const MASSIVE_BATCHES = [
-  { key: "cold_audience", label: "Cold Audience", description: "15 variations pour audience froide (intérêts)", color: "blue" },
-  { key: "warm_audience", label: "Warm Audience", description: "15 variations pour audience tiède (engagers)", color: "purple" },
-  { key: "hot_audience", label: "Hot Audience", description: "15 variations pour audience chaude (opt-ins)", color: "yellow" },
-  { key: "hooks_controverses", label: "Hooks Controversés", description: "15 variations avec hooks provocants", color: "orange" },
-  { key: "storytelling", label: "Storytelling", description: "15 variations narratives engageantes", color: "cyan" },
+  {
+    key: "cold_audience",
+    label: "Cold Audience",
+    description: "15 variations pour audience froide (intérêts)",
+    color: "blue",
+  },
+  {
+    key: "warm_audience",
+    label: "Warm Audience",
+    description: "15 variations pour audience tiède (engagers)",
+    color: "purple",
+  },
+  {
+    key: "hot_audience",
+    label: "Hot Audience",
+    description: "15 variations pour audience chaude (opt-ins)",
+    color: "yellow",
+  },
+  {
+    key: "hooks_controverses",
+    label: "Hooks Controversés",
+    description: "15 variations avec hooks provocants",
+    color: "orange",
+  },
+  {
+    key: "storytelling",
+    label: "Storytelling",
+    description: "15 variations narratives engageantes",
+    color: "cyan",
+  },
 ] as const;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -51,17 +96,29 @@ interface CreativeGeneratorProps {
   initialData?: any;
 }
 
-export function CreativeGenerator({ className, initialData }: CreativeGeneratorProps) {
+export function CreativeGenerator({
+  className,
+  initialData,
+}: CreativeGeneratorProps) {
   const { user } = useUser();
   const [loading, setLoading] = React.useState(false);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [variations, setVariations] = React.useState<any[]>([]);
-  const [variationGroups, setVariationGroups] = React.useState<VariationGroup[]>([]);
+  const [variationGroups, setVariationGroups] = React.useState<
+    VariationGroup[]
+  >([]);
   const [error, setError] = React.useState<string | null>(null);
   const [copiedIndex, setCopiedIndex] = React.useState<number | null>(null);
-  const [usageLimited, setUsageLimited] = React.useState<{currentUsage: number; limit: number} | null>(null);
-  const [generatingImage, setGeneratingImage] = React.useState<number | null>(null);
-  const [generatedImages, setGeneratedImages] = React.useState<Record<number, string[]>>({});
+  const [usageLimited, setUsageLimited] = React.useState<{
+    currentUsage: number;
+    limit: number;
+  } | null>(null);
+  const [generatingImage, setGeneratingImage] = React.useState<number | null>(
+    null,
+  );
+  const [generatedImages, setGeneratedImages] = React.useState<
+    Record<number, string[]>
+  >({});
   const [editingIndex, setEditingIndex] = React.useState<number | null>(null);
   const [savedIds, setSavedIds] = React.useState<string[]>([]);
   const [isDirty, setIsDirty] = React.useState(false);
@@ -70,8 +127,14 @@ export function CreativeGenerator({ className, initialData }: CreativeGeneratorP
   // Massive generation state
   const [massiveMode, setMassiveMode] = React.useState(false);
   const [massiveLoading, setMassiveLoading] = React.useState(false);
-  const [massiveProgress, setMassiveProgress] = React.useState({ current: 0, total: 5, currentBatch: "" });
-  const [collapsedGroups, setCollapsedGroups] = React.useState<Record<string, boolean>>({});
+  const [massiveProgress, setMassiveProgress] = React.useState({
+    current: 0,
+    total: 5,
+    currentBatch: "",
+  });
+  const [collapsedGroups, setCollapsedGroups] = React.useState<
+    Record<string, boolean>
+  >({});
 
   // Form state
   const [tone, setTone] = React.useState("urgente");
@@ -81,15 +144,20 @@ export function CreativeGenerator({ className, initialData }: CreativeGeneratorP
 
   React.useEffect(() => {
     if (initialData) {
-      const creatives = initialData.ad_creatives || initialData.variations || (Array.isArray(initialData) ? initialData : []);
-      setVariations(creatives.map((c: Record<string, unknown>) => ({
-        hook: c.hook || "",
-        body: c.ad_copy || c.body || "",
-        headline: c.headline || "",
-        cta: c.cta || "",
-        estimated_format: c.creative_type || c.estimated_format || "image",
-        angle: c.angle || "",
-      })));
+      const creatives =
+        initialData.ad_creatives ||
+        initialData.variations ||
+        (Array.isArray(initialData) ? initialData : []);
+      setVariations(
+        creatives.map((c: Record<string, unknown>) => ({
+          hook: c.hook || "",
+          body: c.ad_copy || c.body || "",
+          headline: c.headline || "",
+          cta: c.cta || "",
+          estimated_format: c.creative_type || c.estimated_format || "image",
+          angle: c.angle || "",
+        })),
+      );
     }
   }, [initialData]);
 
@@ -116,26 +184,33 @@ export function CreativeGenerator({ className, initialData }: CreativeGeneratorP
       if (!response.ok) {
         if (response.status === 403) {
           const errData = await response.json();
-          if (errData.usage) { setUsageLimited(errData.usage); return; }
+          if (errData.usage) {
+            setUsageLimited(errData.usage);
+            return;
+          }
         }
         throw new Error("Erreur lors de la génération");
       }
       const data = await response.json();
       const raw = data.ai_raw_response || data;
       const creatives = raw.ad_creatives || raw.variations || [];
-      const ids = (data.ad_creatives || []).map((c: Record<string, unknown>) => c.id).filter(Boolean);
+      const ids = (data.ad_creatives || [])
+        .map((c: Record<string, unknown>) => c.id)
+        .filter(Boolean);
       setSavedIds(ids);
       setIsDirty(false);
       setVariationGroups([]);
-      setVariations(creatives.map((c: Record<string, unknown>) => ({
-        hook: c.hook || "",
-        body: c.ad_copy || c.body || "",
-        headline: c.headline || "",
-        cta: c.cta || "",
-        estimated_format: c.creative_type || c.estimated_format || "image",
-        angle: c.angle || "",
-        target_audience: c.target_audience || "",
-      })));
+      setVariations(
+        creatives.map((c: Record<string, unknown>) => ({
+          hook: c.hook || "",
+          body: c.ad_copy || c.body || "",
+          headline: c.headline || "",
+          cta: c.cta || "",
+          estimated_format: c.creative_type || c.estimated_format || "image",
+          angle: c.angle || "",
+          target_audience: c.target_audience || "",
+        })),
+      );
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erreur");
     } finally {
@@ -155,7 +230,11 @@ export function CreativeGenerator({ className, initialData }: CreativeGeneratorP
 
     for (let i = 0; i < MASSIVE_BATCHES.length; i++) {
       const batch = MASSIVE_BATCHES[i];
-      setMassiveProgress({ current: i + 1, total: MASSIVE_BATCHES.length, currentBatch: batch.label });
+      setMassiveProgress({
+        current: i + 1,
+        total: MASSIVE_BATCHES.length,
+        currentBatch: batch.label,
+      });
 
       try {
         const response = await fetch("/api/ai/generate-ads", {
@@ -170,7 +249,11 @@ export function CreativeGenerator({ className, initialData }: CreativeGeneratorP
         if (!response.ok) {
           if (response.status === 403) {
             const errData = await response.json();
-            if (errData.usage) { setUsageLimited(errData.usage); setMassiveLoading(false); return; }
+            if (errData.usage) {
+              setUsageLimited(errData.usage);
+              setMassiveLoading(false);
+              return;
+            }
           }
           console.warn(`Batch ${batch.key} échoué, on continue...`);
           continue;
@@ -179,7 +262,9 @@ export function CreativeGenerator({ className, initialData }: CreativeGeneratorP
         const data = await response.json();
         const raw = data.ai_raw_response || data;
         const creatives = raw.ad_creatives || raw.variations || [];
-        const ids = (data.ad_creatives || []).map((c: Record<string, unknown>) => c.id).filter(Boolean);
+        const ids = (data.ad_creatives || [])
+          .map((c: Record<string, unknown>) => c.id)
+          .filter(Boolean);
         allIds.push(...ids);
 
         const group: VariationGroup = {
@@ -214,7 +299,7 @@ export function CreativeGenerator({ className, initialData }: CreativeGeneratorP
 
   const updateVariation = (index: number, field: string, value: string) => {
     setVariations((prev) =>
-      prev.map((v, i) => (i === index ? { ...v, [field]: value } : v))
+      prev.map((v, i) => (i === index ? { ...v, [field]: value } : v)),
     );
     setIsDirty(true);
   };
@@ -272,7 +357,8 @@ export function CreativeGenerator({ className, initialData }: CreativeGeneratorP
         body: JSON.stringify({
           brandName: v.headline || "Ad",
           concept: `Social media advertisement visual. "${v.hook}". Style: bold, eye-catching, scroll-stopping social media ad. Modern marketing aesthetic with strong contrast.`,
-          style: "social media advertisement, eye-catching, bold typography overlay, marketing creative",
+          style:
+            "social media advertisement, eye-catching, bold typography overlay, marketing creative",
         }),
       });
       if (!res.ok) {
@@ -283,7 +369,9 @@ export function CreativeGenerator({ className, initialData }: CreativeGeneratorP
       setGeneratedImages((prev) => ({ ...prev, [index]: data.images || [] }));
       toast.success("Visuels générés !");
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Erreur lors de la génération");
+      toast.error(
+        e instanceof Error ? e.message : "Erreur lors de la génération",
+      );
     } finally {
       setGeneratingImage(null);
     }
@@ -301,18 +389,34 @@ export function CreativeGenerator({ className, initialData }: CreativeGeneratorP
   };
 
   if (usageLimited) {
-    return <UpgradeWall currentUsage={usageLimited.currentUsage} limit={usageLimited.limit} className={className} />;
+    return (
+      <UpgradeWall
+        currentUsage={usageLimited.currentUsage}
+        limit={usageLimited.limit}
+        className={className}
+      />
+    );
   }
 
   // Loading states
   if (loading) {
-    return <AILoading variant="immersive" text="Création de tes publicités" className={className} />;
+    return (
+      <AILoading
+        variant="immersive"
+        text="Création de tes publicités"
+        className={className}
+      />
+    );
   }
 
   if (massiveLoading) {
     return (
       <div className={cn("space-y-6", className)}>
-        <AILoading variant="immersive" text={`Génération massive en cours — ${massiveProgress.currentBatch}`} className="mb-4" />
+        <AILoading
+          variant="immersive"
+          text={`Génération massive en cours — ${massiveProgress.currentBatch}`}
+          className="mb-4"
+        />
 
         {/* Progress bar */}
         <Card>
@@ -321,14 +425,20 @@ export function CreativeGenerator({ className, initialData }: CreativeGeneratorP
               <p className="text-sm font-medium text-text-primary">
                 Batch {massiveProgress.current} / {massiveProgress.total}
               </p>
-              <Badge variant="default" className="bg-gradient-to-r from-accent to-emerald-400 text-white">
-                {variationGroups.reduce((s, g) => s + g.variations.length, 0)} variations générées
+              <Badge
+                variant="default"
+                className="bg-gradient-to-r from-accent to-emerald-400 text-white"
+              >
+                {variationGroups.reduce((s, g) => s + g.variations.length, 0)}{" "}
+                variations générées
               </Badge>
             </div>
             <div className="w-full h-2 rounded-full bg-bg-tertiary overflow-hidden">
               <div
                 className="h-full rounded-full bg-gradient-to-r from-accent to-emerald-400 transition-all duration-500"
-                style={{ width: `${(massiveProgress.current / massiveProgress.total) * 100}%` }}
+                style={{
+                  width: `${(massiveProgress.current / massiveProgress.total) * 100}%`,
+                }}
               />
             </div>
             <div className="flex justify-between mt-2">
@@ -337,7 +447,9 @@ export function CreativeGenerator({ className, initialData }: CreativeGeneratorP
                   key={b.key}
                   className={cn(
                     "text-[10px]",
-                    i < massiveProgress.current ? "text-accent font-medium" : "text-text-muted"
+                    i < massiveProgress.current
+                      ? "text-accent font-medium"
+                      : "text-text-muted",
                   )}
                 >
                   {b.label.split(" ")[0]}
@@ -354,7 +466,9 @@ export function CreativeGenerator({ className, initialData }: CreativeGeneratorP
               <div className="flex items-center gap-2">
                 <Check className="h-4 w-4 text-accent" />
                 <CardTitle className="text-sm">{group.batchLabel}</CardTitle>
-                <Badge variant="default" className="text-xs">{group.variations.length} variations</Badge>
+                <Badge variant="default" className="text-xs">
+                  {group.variations.length} variations
+                </Badge>
               </div>
             </CardHeader>
           </Card>
@@ -374,14 +488,19 @@ export function CreativeGenerator({ className, initialData }: CreativeGeneratorP
               Paramètres de génération
             </CardTitle>
             <CardDescription>
-              Configure le style et l&apos;objectif de tes publicités avant de générer.
+              Configure le style et l&apos;objectif de tes publicités avant de
+              générer.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-5">
             {/* Tone selector */}
             <div>
-              <label className="text-sm font-medium text-text-primary mb-1.5 block">Tonalité</label>
-              <p className="text-xs text-text-muted mb-2">Le ton général de tes publicités</p>
+              <label className="text-sm font-medium text-text-primary mb-1.5 block">
+                Tonalité
+              </label>
+              <p className="text-xs text-text-muted mb-2">
+                Le ton général de tes publicités
+              </p>
               <div className="flex flex-wrap gap-2">
                 {TONES.map((t) => (
                   <button
@@ -391,7 +510,7 @@ export function CreativeGenerator({ className, initialData }: CreativeGeneratorP
                       "px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200",
                       tone === t.key
                         ? "bg-accent text-white shadow-md shadow-accent/25"
-                        : "bg-bg-tertiary text-text-secondary hover:text-text-primary hover:bg-bg-tertiary/80"
+                        : "bg-bg-tertiary text-text-secondary hover:text-text-primary hover:bg-bg-tertiary/80",
                     )}
                   >
                     {t.label}
@@ -402,8 +521,12 @@ export function CreativeGenerator({ className, initialData }: CreativeGeneratorP
 
             {/* Objective selector */}
             <div>
-              <label className="text-sm font-medium text-text-primary mb-1.5 block">Objectif</label>
-              <p className="text-xs text-text-muted mb-2">Ce que tu veux accomplir avec ces publicités</p>
+              <label className="text-sm font-medium text-text-primary mb-1.5 block">
+                Objectif
+              </label>
+              <p className="text-xs text-text-muted mb-2">
+                Ce que tu veux accomplir avec ces publicités
+              </p>
               <div className="flex flex-wrap gap-2">
                 {OBJECTIVES.map((o) => (
                   <button
@@ -413,7 +536,7 @@ export function CreativeGenerator({ className, initialData }: CreativeGeneratorP
                       "px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200",
                       objective === o.key
                         ? "bg-accent text-white shadow-md shadow-accent/25"
-                        : "bg-bg-tertiary text-text-secondary hover:text-text-primary hover:bg-bg-tertiary/80"
+                        : "bg-bg-tertiary text-text-secondary hover:text-text-primary hover:bg-bg-tertiary/80",
                     )}
                   >
                     {o.label}
@@ -425,9 +548,12 @@ export function CreativeGenerator({ className, initialData }: CreativeGeneratorP
             {/* Target audience */}
             <div>
               <label className="text-sm font-medium text-text-primary mb-1 block">
-                Audience cible <span className="text-text-muted font-normal">(optionnel)</span>
+                Audience cible{" "}
+                <span className="text-text-muted font-normal">(optionnel)</span>
               </label>
-              <p className="text-xs text-text-muted mb-2">Décris qui tu veux cibler pour des résultats plus précis</p>
+              <p className="text-xs text-text-muted mb-2">
+                Décris qui tu veux cibler pour des résultats plus précis
+              </p>
               <input
                 type="text"
                 value={targetAudience}
@@ -440,9 +566,12 @@ export function CreativeGenerator({ className, initialData }: CreativeGeneratorP
             {/* Product context */}
             <div>
               <label className="text-sm font-medium text-text-primary mb-1 block">
-                Contexte produit <span className="text-text-muted font-normal">(optionnel)</span>
+                Contexte produit{" "}
+                <span className="text-text-muted font-normal">(optionnel)</span>
               </label>
-              <p className="text-xs text-text-muted mb-2">Ton produit/service pour des publicités plus pertinentes</p>
+              <p className="text-xs text-text-muted mb-2">
+                Ton produit/service pour des publicités plus pertinentes
+              </p>
               <textarea
                 value={productContext}
                 onChange={(e) => setProductContext(e.target.value)}
@@ -454,7 +583,9 @@ export function CreativeGenerator({ className, initialData }: CreativeGeneratorP
 
             {/* Mode selector */}
             <div className="p-4 rounded-xl bg-bg-tertiary/50 border border-border-default">
-              <label className="text-sm font-medium text-text-primary mb-2 block">Mode de génération</label>
+              <label className="text-sm font-medium text-text-primary mb-2 block">
+                Mode de génération
+              </label>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <button
                   onClick={() => setMassiveMode(false)}
@@ -462,15 +593,21 @@ export function CreativeGenerator({ className, initialData }: CreativeGeneratorP
                     "p-3 rounded-xl border-2 text-left transition-all duration-200",
                     !massiveMode
                       ? "border-accent bg-accent/10 shadow-md shadow-accent/10"
-                      : "border-border-default bg-bg-secondary hover:border-border-default/80"
+                      : "border-border-default bg-bg-secondary hover:border-border-default/80",
                   )}
                 >
                   <div className="flex items-center gap-2 mb-1">
                     <Sparkles className="h-4 w-4 text-accent" />
-                    <span className="text-sm font-semibold text-text-primary">Rapide</span>
-                    <Badge variant="muted" className="text-[10px]">5 variations</Badge>
+                    <span className="text-sm font-semibold text-text-primary">
+                      Rapide
+                    </span>
+                    <Badge variant="muted" className="text-[10px]">
+                      5 variations
+                    </Badge>
                   </div>
-                  <p className="text-xs text-text-muted">Génération rapide de 5 variations avec 5 angles différents</p>
+                  <p className="text-xs text-text-muted">
+                    Génération rapide de 5 variations avec 5 angles différents
+                  </p>
                 </button>
                 <button
                   onClick={() => setMassiveMode(true)}
@@ -478,15 +615,24 @@ export function CreativeGenerator({ className, initialData }: CreativeGeneratorP
                     "p-3 rounded-xl border-2 text-left transition-all duration-200",
                     massiveMode
                       ? "border-accent bg-accent/10 shadow-md shadow-accent/10"
-                      : "border-border-default bg-bg-secondary hover:border-border-default/80"
+                      : "border-border-default bg-bg-secondary hover:border-border-default/80",
                   )}
                 >
                   <div className="flex items-center gap-2 mb-1">
                     <Zap className="h-4 w-4 text-yellow-400" />
-                    <span className="text-sm font-semibold text-text-primary">Massif</span>
-                    <Badge variant="default" className="text-[10px] bg-gradient-to-r from-accent to-emerald-400 text-white">75+ variations</Badge>
+                    <span className="text-sm font-semibold text-text-primary">
+                      Massif
+                    </span>
+                    <Badge
+                      variant="default"
+                      className="text-[10px] bg-gradient-to-r from-accent to-emerald-400 text-white"
+                    >
+                      75+ variations
+                    </Badge>
                   </div>
-                  <p className="text-xs text-text-muted">5 batches de 15 variations par type d&apos;audience et angle</p>
+                  <p className="text-xs text-text-muted">
+                    5 batches de 15 variations par type d&apos;audience et angle
+                  </p>
                 </button>
               </div>
             </div>
@@ -495,11 +641,18 @@ export function CreativeGenerator({ className, initialData }: CreativeGeneratorP
             {massiveMode && (
               <div className="space-y-2">
                 {MASSIVE_BATCHES.map((b) => (
-                  <div key={b.key} className="flex items-center gap-3 p-2.5 rounded-lg bg-bg-tertiary/30">
+                  <div
+                    key={b.key}
+                    className="flex items-center gap-3 p-2.5 rounded-lg bg-bg-tertiary/30"
+                  >
                     <div className="h-2 w-2 rounded-full bg-accent shrink-0" />
                     <div>
-                      <p className="text-xs font-medium text-text-primary">{b.label}</p>
-                      <p className="text-[10px] text-text-muted">{b.description}</p>
+                      <p className="text-xs font-medium text-text-primary">
+                        {b.label}
+                      </p>
+                      <p className="text-[10px] text-text-muted">
+                        {b.description}
+                      </p>
                     </div>
                   </div>
                 ))}
@@ -513,7 +666,11 @@ export function CreativeGenerator({ className, initialData }: CreativeGeneratorP
             )}
 
             {massiveMode ? (
-              <GenerateButton onClick={handleMassiveGenerate} className="w-full" icon={<Zap className="h-4 w-4 mr-2" />}>
+              <GenerateButton
+                onClick={handleMassiveGenerate}
+                className="w-full"
+                icon={<Zap className="h-4 w-4 mr-2" />}
+              >
                 Générer 75+ variations
               </GenerateButton>
             ) : (
@@ -533,7 +690,10 @@ export function CreativeGenerator({ className, initialData }: CreativeGeneratorP
       <div className={cn("space-y-4", className)}>
         <div className="flex items-center justify-between flex-wrap gap-2">
           <div className="flex items-center gap-2">
-            <Badge variant="default" className="text-xs bg-gradient-to-r from-accent to-emerald-400 text-white">
+            <Badge
+              variant="default"
+              className="text-xs bg-gradient-to-r from-accent to-emerald-400 text-white"
+            >
               {totalVariations} variations générées
             </Badge>
             <Badge variant="muted" className="text-xs">
@@ -560,8 +720,12 @@ export function CreativeGenerator({ className, initialData }: CreativeGeneratorP
               >
                 <div className="flex items-center gap-2">
                   <div className="h-2.5 w-2.5 rounded-full bg-accent" />
-                  <span className="text-sm font-semibold text-text-primary">{group.batchLabel}</span>
-                  <Badge variant="muted" className="text-[10px]">{group.variations.length} variations</Badge>
+                  <span className="text-sm font-semibold text-text-primary">
+                    {group.batchLabel}
+                  </span>
+                  <Badge variant="muted" className="text-[10px]">
+                    {group.variations.length} variations
+                  </Badge>
                 </div>
                 {isCollapsed ? (
                   <ChevronDown className="h-4 w-4 text-text-muted" />
@@ -573,9 +737,10 @@ export function CreativeGenerator({ className, initialData }: CreativeGeneratorP
               {!isCollapsed && (
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                   {group.variations.map((v, i) => {
-                    const globalIndex = variationGroups
-                      .slice(0, variationGroups.indexOf(group))
-                      .reduce((s, g) => s + g.variations.length, 0) + i;
+                    const globalIndex =
+                      variationGroups
+                        .slice(0, variationGroups.indexOf(group))
+                        .reduce((s, g) => s + g.variations.length, 0) + i;
                     return renderVariationCard(v, globalIndex, i);
                   })}
                 </div>
@@ -589,18 +754,31 @@ export function CreativeGenerator({ className, initialData }: CreativeGeneratorP
 
   // ─── Results view — standard mode (flat list) ───
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  function renderVariationCard(v: any, globalIndex: number, displayIndex: number) {
+  function renderVariationCard(
+    v: any,
+    globalIndex: number,
+    displayIndex: number,
+  ) {
     const isEditing = editingIndex === globalIndex;
     return (
-      <GlowCard key={globalIndex} glowColor={displayIndex % 2 === 0 ? "orange" : "blue"}>
+      <GlowCard
+        key={globalIndex}
+        glowColor={displayIndex % 2 === 0 ? "orange" : "blue"}
+      >
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <span className="text-xs font-bold text-text-muted">#{displayIndex + 1}</span>
+            <span className="text-xs font-bold text-text-muted">
+              #{displayIndex + 1}
+            </span>
             <Badge variant={v.estimated_format === "video" ? "blue" : "cyan"}>
               {v.estimated_format === "video" ? (
-                <><Video className="h-3 w-3 mr-1" /> Vidéo</>
+                <>
+                  <Video className="h-3 w-3 mr-1" /> Vidéo
+                </>
               ) : (
-                <><Image className="h-3 w-3 mr-1" /> Image</>
+                <>
+                  <Image className="h-3 w-3 mr-1" /> Image
+                </>
               )}
             </Badge>
           </div>
@@ -619,21 +797,35 @@ export function CreativeGenerator({ className, initialData }: CreativeGeneratorP
               className={cn(isEditing && "text-accent")}
             >
               {isEditing ? (
-                <><Check className="h-3 w-3 mr-1" /> OK</>
+                <>
+                  <Check className="h-3 w-3 mr-1" /> OK
+                </>
               ) : (
-                <><Pencil className="h-3 w-3 mr-1" /> Modifier</>
+                <>
+                  <Pencil className="h-3 w-3 mr-1" /> Modifier
+                </>
               )}
             </Button>
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => copyToClipboard(`${v.hook}\n\n${v.body}\n\n${v.headline}\n\nCTA: ${v.cta}`, globalIndex)}
+              onClick={() =>
+                copyToClipboard(
+                  `${v.hook}\n\n${v.body}\n\n${v.headline}\n\nCTA: ${v.cta}`,
+                  globalIndex,
+                )
+              }
               className={cn(copiedIndex === globalIndex && "text-accent")}
             >
               {copiedIndex === globalIndex ? (
-                <><Check className="h-3 w-3 mr-1 animate-in zoom-in-50 duration-200" /> Copié !</>
+                <>
+                  <Check className="h-3 w-3 mr-1 animate-in zoom-in-50 duration-200" />{" "}
+                  Copié !
+                </>
               ) : (
-                <><Copy className="h-3 w-3 mr-1" /> Copier</>
+                <>
+                  <Copy className="h-3 w-3 mr-1" /> Copier
+                </>
               )}
             </Button>
           </div>
@@ -645,7 +837,9 @@ export function CreativeGenerator({ className, initialData }: CreativeGeneratorP
             {isEditing ? (
               <textarea
                 value={v.hook}
-                onChange={(e) => updateVariation(globalIndex, "hook", e.target.value)}
+                onChange={(e) =>
+                  updateVariation(globalIndex, "hook", e.target.value)
+                }
                 className="w-full rounded-lg border border-accent/30 bg-bg-secondary px-2 py-1.5 text-sm font-medium text-accent resize-none focus:outline-none focus:ring-1 focus:ring-accent"
                 rows={2}
               />
@@ -658,7 +852,9 @@ export function CreativeGenerator({ className, initialData }: CreativeGeneratorP
             {isEditing ? (
               <textarea
                 value={v.body}
-                onChange={(e) => updateVariation(globalIndex, "body", e.target.value)}
+                onChange={(e) =>
+                  updateVariation(globalIndex, "body", e.target.value)
+                }
                 className="w-full rounded-lg border border-border-default bg-bg-secondary px-2 py-1.5 text-sm text-text-secondary resize-none focus:outline-none focus:ring-1 focus:ring-accent"
                 rows={4}
               />
@@ -672,11 +868,15 @@ export function CreativeGenerator({ className, initialData }: CreativeGeneratorP
               <input
                 type="text"
                 value={v.headline}
-                onChange={(e) => updateVariation(globalIndex, "headline", e.target.value)}
+                onChange={(e) =>
+                  updateVariation(globalIndex, "headline", e.target.value)
+                }
                 className="w-full rounded-lg border border-border-default bg-bg-secondary px-2 py-1.5 text-sm font-medium text-text-primary focus:outline-none focus:ring-1 focus:ring-accent"
               />
             ) : (
-              <p className="text-sm font-medium text-text-primary">{v.headline}</p>
+              <p className="text-sm font-medium text-text-primary">
+                {v.headline}
+              </p>
             )}
           </div>
           <div className="p-2.5 rounded-xl bg-accent/10 border border-accent/20">
@@ -684,27 +884,39 @@ export function CreativeGenerator({ className, initialData }: CreativeGeneratorP
               <input
                 type="text"
                 value={v.cta}
-                onChange={(e) => updateVariation(globalIndex, "cta", e.target.value)}
+                onChange={(e) =>
+                  updateVariation(globalIndex, "cta", e.target.value)
+                }
                 className="w-full bg-transparent text-sm font-medium text-accent text-center focus:outline-none"
               />
             ) : (
-              <p className="text-sm font-medium text-accent text-center">{v.cta}</p>
+              <p className="text-sm font-medium text-accent text-center">
+                {v.cta}
+              </p>
             )}
           </div>
           <div className="flex items-center gap-2 pt-2">
             <Target className="h-3 w-3 text-text-muted" />
-            <p className="text-xs text-text-muted">{v.angle} &middot; {v.target_audience}</p>
+            <p className="text-xs text-text-muted">
+              {v.angle} &middot; {v.target_audience}
+            </p>
           </div>
 
           {/* Generated images */}
-          {generatedImages[globalIndex] && generatedImages[globalIndex].length > 0 && (
-            <div className="grid grid-cols-2 gap-2 pt-2">
-              {generatedImages[globalIndex].map((url, j) => (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img key={j} src={url} alt={`Visual ${j + 1}`} className="rounded-lg w-full aspect-square object-cover" />
-              ))}
-            </div>
-          )}
+          {generatedImages[globalIndex] &&
+            generatedImages[globalIndex].length > 0 && (
+              <div className="grid grid-cols-2 gap-2 pt-2">
+                {generatedImages[globalIndex].map((url, j) => (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    key={j}
+                    src={url}
+                    alt={`Visual ${j + 1}`}
+                    className="rounded-lg w-full aspect-square object-cover"
+                  />
+                ))}
+              </div>
+            )}
 
           {/* Generate image button */}
           {v.estimated_format !== "video" && (
@@ -713,17 +925,24 @@ export function CreativeGenerator({ className, initialData }: CreativeGeneratorP
               size="sm"
               className={cn(
                 "w-full mt-2 transition-all",
-                generatingImage === globalIndex && "text-accent"
+                generatingImage === globalIndex && "text-accent",
               )}
               disabled={generatingImage === globalIndex}
               onClick={() => generateAdImage(globalIndex)}
             >
               {generatingImage === globalIndex ? (
-                <><Loader2 className="h-3 w-3 animate-spin mr-1" /> Génération en cours...</>
+                <>
+                  <Loader2 className="h-3 w-3 animate-spin mr-1" /> Génération
+                  en cours...
+                </>
               ) : generatedImages[globalIndex] ? (
-                <><ImagePlus className="h-3 w-3 mr-1" /> Régénérer les visuels</>
+                <>
+                  <ImagePlus className="h-3 w-3 mr-1" /> Régénérer les visuels
+                </>
               ) : (
-                <><ImagePlus className="h-3 w-3 mr-1" /> Générer des visuels IA</>
+                <>
+                  <ImagePlus className="h-3 w-3 mr-1" /> Générer des visuels IA
+                </>
               )}
             </Button>
           )}
@@ -735,7 +954,9 @@ export function CreativeGenerator({ className, initialData }: CreativeGeneratorP
   return (
     <div className={cn("space-y-4", className)}>
       <div className="flex items-center justify-between flex-wrap gap-2">
-        <Badge variant="default" className="text-xs">{variations.length} variations générées</Badge>
+        <Badge variant="default" className="text-xs">
+          {variations.length} variations générées
+        </Badge>
         <div className="flex items-center gap-2">
           {isDirty && savedIds.length > 0 && (
             <Button
@@ -746,9 +967,14 @@ export function CreativeGenerator({ className, initialData }: CreativeGeneratorP
               className="bg-gradient-to-r from-accent to-emerald-400 hover:from-accent/90 hover:to-emerald-400/90 text-white shadow-md shadow-accent/20"
             >
               {saving ? (
-                <><Loader2 className="h-3 w-3 animate-spin mr-1" /> Sauvegarde...</>
+                <>
+                  <Loader2 className="h-3 w-3 animate-spin mr-1" />{" "}
+                  Sauvegarde...
+                </>
               ) : (
-                <><Save className="h-3 w-3 mr-1" /> Sauvegarder</>
+                <>
+                  <Save className="h-3 w-3 mr-1" /> Sauvegarder
+                </>
               )}
             </Button>
           )}

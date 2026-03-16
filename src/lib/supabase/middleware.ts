@@ -3,10 +3,17 @@ import { NextResponse, type NextRequest } from "next/server";
 import { resolveOrganization } from "@/lib/whitelabel/resolve-org";
 
 export async function updateSession(request: NextRequest) {
-  const publicRoutes = ["/login", "/register", "/welcome", "/forgot-password", "/reset-password", "/diagnostic"];
+  const publicRoutes = [
+    "/login",
+    "/register",
+    "/welcome",
+    "/forgot-password",
+    "/reset-password",
+    "/diagnostic",
+  ];
   const isPublicFunnel = request.nextUrl.pathname.startsWith("/f/");
   const isPublicRoute = publicRoutes.some(
-    (route) => request.nextUrl.pathname === route
+    (route) => request.nextUrl.pathname === route,
   );
   const isOnboarding = request.nextUrl.pathname.startsWith("/onboarding");
   const isApiRoute = request.nextUrl.pathname.startsWith("/api/");
@@ -64,13 +71,13 @@ export async function updateSession(request: NextRequest) {
         },
         setAll(cookiesToSet) {
           cookiesToSet.forEach(({ name, value }) =>
-            request.cookies.set(name, value)
+            request.cookies.set(name, value),
           );
           supabaseResponse = NextResponse.next({
             request,
           });
           cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options)
+            supabaseResponse.cookies.set(name, value, options),
           );
           // Re-appliquer les headers org après recréation de la réponse
           if (resolvedOrgId) {

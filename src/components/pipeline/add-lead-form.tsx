@@ -76,7 +76,9 @@ export function AddLeadForm({ onSubmit, onClose }: AddLeadFormProps) {
             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-accent-muted">
               <UserPlus className="h-4 w-4 text-accent" />
             </div>
-            <h2 className="text-lg font-semibold text-text-primary">Ajouter un lead</h2>
+            <h2 className="text-lg font-semibold text-text-primary">
+              Ajouter un lead
+            </h2>
           </div>
           <button
             onClick={onClose}
@@ -143,7 +145,9 @@ export function AddLeadForm({ onSubmit, onClose }: AddLeadFormProps) {
               >
                 <option value="">Sélectionner...</option>
                 {SOURCES.map((s) => (
-                  <option key={s} value={s}>{s}</option>
+                  <option key={s} value={s}>
+                    {s}
+                  </option>
                 ))}
               </select>
             </div>
@@ -160,7 +164,7 @@ export function AddLeadForm({ onSubmit, onClose }: AddLeadFormProps) {
                 step="1"
                 className={cn(
                   "w-full rounded-xl border border-border-default bg-bg-tertiary px-3.5 py-2.5 text-sm text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30 focus:shadow-sm focus:shadow-accent/10 transition-all duration-200",
-                  "[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  "[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none",
                 )}
               />
             </div>

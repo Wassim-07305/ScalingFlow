@@ -7,7 +7,9 @@ import { createClient } from "@/lib/supabase/server";
 export async function GET() {
   try {
     const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
     if (!user) {
       return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
@@ -15,19 +17,33 @@ export async function GET() {
 
     const { data: connections } = await supabase
       .from("connected_accounts")
-      .select("provider, provider_username, provider_account_id, token_expires_at, connected_at, metadata")
+      .select(
+        "provider, provider_username, provider_account_id, token_expires_at, connected_at, metadata",
+      )
       .eq("user_id", user.id);
 
-    const status: Record<string, {
-      connected: boolean;
-      username?: string;
-      accountId?: string;
-      expiresAt?: string;
-      connectedAt?: string;
-      metadata?: Record<string, unknown>;
-    }> = {};
+    const status: Record<
+      string,
+      {
+        connected: boolean;
+        username?: string;
+        accountId?: string;
+        expiresAt?: string;
+        connectedAt?: string;
+        metadata?: Record<string, unknown>;
+      }
+    > = {};
 
-    const allProviders = ["meta", "ghl", "stripe_connect", "instagram", "google", "linkedin", "tiktok", "google_calendar"];
+    const allProviders = [
+      "meta",
+      "ghl",
+      "stripe_connect",
+      "instagram",
+      "google",
+      "linkedin",
+      "tiktok",
+      "google_calendar",
+    ];
 
     for (const provider of allProviders) {
       const conn = connections?.find((c) => c.provider === provider);
@@ -44,17 +60,19 @@ export async function GET() {
     }
 
     // Unipile-managed accounts (unipile_linkedin, unipile_instagram, etc.)
-    const unipileConnections = connections?.filter((c) =>
-      c.provider.startsWith("unipile_")
-    ) || [];
+    const unipileConnections =
+      connections?.filter((c) => c.provider.startsWith("unipile_")) || [];
 
-    const unipile: Record<string, {
-      connected: boolean;
-      username?: string;
-      accountId?: string;
-      connectedAt?: string;
-      metadata?: Record<string, unknown>;
-    }> = {};
+    const unipile: Record<
+      string,
+      {
+        connected: boolean;
+        username?: string;
+        accountId?: string;
+        connectedAt?: string;
+        metadata?: Record<string, unknown>;
+      }
+    > = {};
 
     for (const conn of unipileConnections) {
       const platformName = conn.provider.replace("unipile_", "");
@@ -71,7 +89,7 @@ export async function GET() {
   } catch {
     return NextResponse.json(
       { error: "Erreur lors de la recuperation du statut" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

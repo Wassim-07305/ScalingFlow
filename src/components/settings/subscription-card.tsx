@@ -23,9 +23,7 @@ export function SubscriptionCard() {
   const isActive = profile?.subscription_status === "active";
 
   // Déterminer le plan actuel
-  const currentPlanId = isActive
-    ? (profile?.subscription_plan || "pro")
-    : "free";
+  const currentPlanId = isActive ? profile?.subscription_plan || "pro" : "free";
   const currentPlan = getPlanById(currentPlanId);
   const freePlan = PLANS[0];
 
@@ -84,7 +82,7 @@ export function SubscriptionCard() {
                 <Check className="h-3.5 w-3.5 text-accent shrink-0" />
                 {feature}
               </div>
-            )
+            ),
           )}
         </div>
 

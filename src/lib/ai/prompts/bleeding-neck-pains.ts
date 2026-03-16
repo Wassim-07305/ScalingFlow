@@ -5,7 +5,7 @@ export function bleedingNeckPainsPrompt(
     problems?: string[];
     recommended_positioning?: string;
   },
-  avatar: Record<string, unknown>
+  avatar: Record<string, unknown>,
 ): string {
   return `Tu es un expert en psychologie du consommateur et en identification de "bleeding-neck pains" — les douleurs si intenses que le prospect est pret a payer immediatement pour les resoudre.
 

@@ -109,17 +109,42 @@ const DIMENSION_META: Record<
   string,
   { label: string; icon: typeof Target; color: string; bgColor: string }
 > = {
-  offre: { label: "Offre", icon: Target, color: "#34D399", bgColor: "rgba(52,211,153,0.1)" },
-  acquisition: { label: "Acquisition", icon: Megaphone, color: "#60A5FA", bgColor: "rgba(96,165,250,0.1)" },
-  delivery: { label: "Delivery", icon: Truck, color: "#F59E0B", bgColor: "rgba(245,158,11,0.1)" },
-  funnel: { label: "Funnel", icon: Filter, color: "#A78BFA", bgColor: "rgba(167,139,250,0.1)" },
+  offre: {
+    label: "Offre",
+    icon: Target,
+    color: "#34D399",
+    bgColor: "rgba(52,211,153,0.1)",
+  },
+  acquisition: {
+    label: "Acquisition",
+    icon: Megaphone,
+    color: "#60A5FA",
+    bgColor: "rgba(96,165,250,0.1)",
+  },
+  delivery: {
+    label: "Delivery",
+    icon: Truck,
+    color: "#F59E0B",
+    bgColor: "rgba(245,158,11,0.1)",
+  },
+  funnel: {
+    label: "Funnel",
+    icon: Filter,
+    color: "#A78BFA",
+    bgColor: "rgba(167,139,250,0.1)",
+  },
 };
 
 // ─── Radar Chart (SVG) ─────────────────────────────────────
 function RadarChart({
   scores,
 }: {
-  scores: { offre: number; acquisition: number; delivery: number; funnel: number };
+  scores: {
+    offre: number;
+    acquisition: number;
+    delivery: number;
+    funnel: number;
+  };
 }) {
   const size = 280;
   const cx = size / 2;
@@ -272,20 +297,26 @@ function RadarChart({
 }
 
 // ─── Score Badge ────────────────────────────────────────────
-function ScoreBadge({ score, size = "lg" }: { score: number; size?: "sm" | "lg" }) {
+function ScoreBadge({
+  score,
+  size = "lg",
+}: {
+  score: number;
+  size?: "sm" | "lg";
+}) {
   const color =
     score >= 75
       ? "text-accent border-accent/30 bg-accent/5"
       : score >= 50
-      ? "text-yellow-400 border-yellow-400/30 bg-yellow-400/5"
-      : "text-red-400 border-red-400/30 bg-red-400/5";
+        ? "text-yellow-400 border-yellow-400/30 bg-yellow-400/5"
+        : "text-red-400 border-red-400/30 bg-red-400/5";
 
   return (
     <div
       className={cn(
         "inline-flex items-center justify-center rounded-2xl border font-bold",
         color,
-        size === "lg" ? "h-20 w-20 text-2xl" : "h-12 w-12 text-base"
+        size === "lg" ? "h-20 w-20 text-2xl" : "h-12 w-12 text-base",
       )}
     >
       {score}
@@ -313,15 +344,21 @@ function AnimatedScore({ score }: { score: number }) {
 }
 
 function ScoreRing({ score }: { score: number }) {
-  const color =
-    score >= 75 ? "#34D399" : score >= 50 ? "#FBBF24" : "#EF4444";
+  const color = score >= 75 ? "#34D399" : score >= 50 ? "#FBBF24" : "#EF4444";
   const glowColor =
-    score >= 75 ? "rgba(52,211,153,0.15)" : score >= 50 ? "rgba(251,191,36,0.15)" : "rgba(239,68,68,0.15)";
+    score >= 75
+      ? "rgba(52,211,153,0.15)"
+      : score >= 50
+        ? "rgba(251,191,36,0.15)"
+        : "rgba(239,68,68,0.15)";
   const circumference = 2 * Math.PI * 52;
   const offset = circumference - (score / 100) * circumference;
 
   return (
-    <div className="relative inline-flex items-center justify-center" style={{ filter: `drop-shadow(0 0 20px ${glowColor})` }}>
+    <div
+      className="relative inline-flex items-center justify-center"
+      style={{ filter: `drop-shadow(0 0 20px ${glowColor})` }}
+    >
       <svg className="w-36 h-36 -rotate-90" viewBox="0 0 120 120">
         <circle
           cx="60"
@@ -345,7 +382,9 @@ function ScoreRing({ score }: { score: number }) {
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className="text-4xl font-black text-text-primary"><AnimatedScore score={score} /></span>
+        <span className="text-4xl font-black text-text-primary">
+          <AnimatedScore score={score} />
+        </span>
         <span className="text-[10px] font-medium text-text-muted uppercase tracking-wider">
           / 100
         </span>
@@ -382,7 +421,7 @@ export default function DiagnosticPage() {
 
   const updateField = <K extends keyof DiagnosticForm>(
     key: K,
-    value: DiagnosticForm[K]
+    value: DiagnosticForm[K],
   ) => {
     setForm((prev) => ({ ...prev, [key]: value }));
   };
@@ -398,7 +437,9 @@ export default function DiagnosticPage() {
 
   const handleSubmit = async () => {
     if (form.offer_name.trim() === "" && form.offer_description.trim() === "") {
-      setError("Remplis au moins le nom ou la description de ton offre avant de lancer le diagnostic.");
+      setError(
+        "Remplis au moins le nom ou la description de ton offre avant de lancer le diagnostic.",
+      );
       return;
     }
     setLoading(true);
@@ -417,7 +458,7 @@ export default function DiagnosticPage() {
       setResult(data);
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : "Erreur lors de l'analyse."
+        err instanceof Error ? err.message : "Erreur lors de l'analyse.",
       );
     } finally {
       setLoading(false);
@@ -448,15 +489,19 @@ export default function DiagnosticPage() {
     step === 0
       ? form.offer_name.trim() !== "" || form.offer_description.trim() !== ""
       : step === 1
-      ? form.acquisition_channels.length > 0
-      : step === 2
-      ? form.delivery_method.trim() !== ""
-      : true;
+        ? form.acquisition_channels.length > 0
+        : step === 2
+          ? form.delivery_method.trim() !== ""
+          : true;
 
   const handleNext = () => {
     if (!canNext) {
-      if (step === 0) setValidationError("Remplis au moins le nom ou la description de ton offre.");
-      else if (step === 1) setValidationError("Sélectionne au moins un canal d'acquisition.");
+      if (step === 0)
+        setValidationError(
+          "Remplis au moins le nom ou la description de ton offre.",
+        );
+      else if (step === 1)
+        setValidationError("Sélectionne au moins un canal d'acquisition.");
       else if (step === 2) setValidationError("Décris ton mode de livraison.");
       return;
     }
@@ -484,7 +529,8 @@ export default function DiagnosticPage() {
               <span className="text-accent">Diagnostic</span>
             </h1>
             <p className="text-lg text-text-secondary max-w-xl mx-auto leading-relaxed">
-              Voici l&apos;analyse complète de ton business avec des recommandations actionnables.
+              Voici l&apos;analyse complète de ton business avec des
+              recommandations actionnables.
             </p>
           </div>
         </section>
@@ -504,8 +550,8 @@ export default function DiagnosticPage() {
                 {result.score_global >= 75
                   ? "Excellent ! Ton business a de solides fondations."
                   : result.score_global >= 50
-                  ? "Pas mal, mais il y a des axes d'amélioration importants."
-                  : "Il y a du travail ! Concentre-toi sur les recommandations ci-dessous."}
+                    ? "Pas mal, mais il y a des axes d'amélioration importants."
+                    : "Il y a du travail ! Concentre-toi sur les recommandations ci-dessous."}
               </p>
             </div>
 
@@ -616,9 +662,21 @@ export default function DiagnosticPage() {
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {[
-                  { label: "Headline", score: funnelScan.headline_analysis.score, color: "#60A5FA" },
-                  { label: "CTA", score: funnelScan.cta_analysis.score, color: "#34D399" },
-                  { label: "Structure", score: funnelScan.structure_score, color: "#A78BFA" },
+                  {
+                    label: "Headline",
+                    score: funnelScan.headline_analysis.score,
+                    color: "#60A5FA",
+                  },
+                  {
+                    label: "CTA",
+                    score: funnelScan.cta_analysis.score,
+                    color: "#34D399",
+                  },
+                  {
+                    label: "Structure",
+                    score: funnelScan.structure_score,
+                    color: "#A78BFA",
+                  },
                 ].map((item) => (
                   <div
                     key={item.label}
@@ -664,8 +722,9 @@ export default function DiagnosticPage() {
                 Prêt à passer à l&apos;action ?
               </h2>
               <p className="text-text-secondary max-w-lg mx-auto leading-relaxed mt-2">
-                ScalingFlow génère automatiquement ton offre, ton funnel, tes ads et tout le contenu
-                dont tu as besoin pour scaler. Commence gratuitement.
+                ScalingFlow génère automatiquement ton offre, ton funnel, tes
+                ads et tout le contenu dont tu as besoin pour scaler. Commence
+                gratuitement.
               </p>
               <Link
                 href="/register"
@@ -716,8 +775,8 @@ export default function DiagnosticPage() {
             <span className="text-accent">Gratuit</span>
           </h1>
           <p className="text-lg text-text-secondary max-w-2xl mx-auto leading-relaxed">
-            Obtiens un score détaillé de ton business en 2 minutes.
-            Analyse ton offre, ton acquisition, ta delivery et ton funnel.
+            Obtiens un score détaillé de ton business en 2 minutes. Analyse ton
+            offre, ton acquisition, ta delivery et ton funnel.
           </p>
         </div>
       </section>
@@ -746,8 +805,8 @@ export default function DiagnosticPage() {
                   i === step
                     ? "bg-accent/10 text-accent border border-accent/20 shadow-sm shadow-accent/5"
                     : i < step
-                    ? "text-accent/60 cursor-pointer hover:bg-bg-tertiary"
-                    : "text-text-muted cursor-default"
+                      ? "text-accent/60 cursor-pointer hover:bg-bg-tertiary"
+                      : "text-text-muted cursor-default",
                 )}
               >
                 <div
@@ -756,15 +815,11 @@ export default function DiagnosticPage() {
                     i === step
                       ? "bg-accent text-white"
                       : i < step
-                      ? "bg-accent/20 text-accent"
-                      : "bg-bg-tertiary text-text-muted"
+                        ? "bg-accent/20 text-accent"
+                        : "bg-bg-tertiary text-text-muted",
                   )}
                 >
-                  {i < step ? (
-                    <CheckCircle2 className="h-3.5 w-3.5" />
-                  ) : (
-                    i + 1
-                  )}
+                  {i < step ? <CheckCircle2 className="h-3.5 w-3.5" /> : i + 1}
                 </div>
                 <span className="hidden sm:inline">{s.label}</span>
               </button>
@@ -772,7 +827,7 @@ export default function DiagnosticPage() {
                 <div
                   className={cn(
                     "flex-1 h-px mx-2 transition-colors duration-300",
-                    i < step ? "bg-accent/30" : "bg-border-default"
+                    i < step ? "bg-accent/30" : "bg-border-default",
                   )}
                 />
               )}
@@ -862,7 +917,7 @@ export default function DiagnosticPage() {
                         "px-3 py-1.5 rounded-xl text-xs font-medium border transition-all duration-200",
                         form.acquisition_channels.includes(ch)
                           ? "border-accent/50 bg-accent/10 text-accent shadow-sm shadow-accent/5"
-                          : "border-border-default text-text-muted hover:text-text-secondary hover:border-border-hover"
+                          : "border-border-default text-text-muted hover:text-text-secondary hover:border-border-hover",
                       )}
                     >
                       {ch}
@@ -988,7 +1043,8 @@ export default function DiagnosticPage() {
                   <div className="flex items-center gap-2 mt-2">
                     <CheckCircle2 className="h-3.5 w-3.5 text-accent" />
                     <p className="text-xs text-accent font-medium">
-                      Funnel scanné avec succès (score : {funnelScan.overall_score}/100)
+                      Funnel scanné avec succès (score :{" "}
+                      {funnelScan.overall_score}/100)
                     </p>
                   </div>
                 )}

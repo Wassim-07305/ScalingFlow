@@ -2,7 +2,10 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { BreadcrumbNav, type BreadcrumbFolder } from "@/components/drive/breadcrumb-nav";
+import {
+  BreadcrumbNav,
+  type BreadcrumbFolder,
+} from "@/components/drive/breadcrumb-nav";
 import { FolderCard } from "@/components/drive/folder-card";
 import { FileCard } from "@/components/drive/file-card";
 import { FilePreviewModal } from "@/components/drive/file-preview-modal";
@@ -79,15 +82,21 @@ function DriveSkeleton() {
 }
 
 export default function DrivePage() {
-  const [currentFolderId, setCurrentFolderId] = React.useState<string | null>(null);
-  const [breadcrumbPath, setBreadcrumbPath] = React.useState<BreadcrumbFolder[]>([]);
+  const [currentFolderId, setCurrentFolderId] = React.useState<string | null>(
+    null,
+  );
+  const [breadcrumbPath, setBreadcrumbPath] = React.useState<
+    BreadcrumbFolder[]
+  >([]);
   const [folders, setFolders] = React.useState<DriveFolder[]>([]);
   const [files, setFiles] = React.useState<DriveFile[]>([]);
   const [loading, setLoading] = React.useState(true);
 
   const [createFolderOpen, setCreateFolderOpen] = React.useState(false);
   const [uploadOpen, setUploadOpen] = React.useState(false);
-  const [renameFolderId, setRenameFolderId] = React.useState<string | null>(null);
+  const [renameFolderId, setRenameFolderId] = React.useState<string | null>(
+    null,
+  );
   const [previewFile, setPreviewFile] = React.useState<{
     name: string;
     fileUrl: string;
@@ -121,7 +130,10 @@ export default function DrivePage() {
           .from("drive_files")
           .select("id", { count: "exact", head: true })
           .eq("folder_id", f.id)
-          .then(({ count }: { count: number | null }) => ({ ...f, fileCount: count || 0 }))
+          .then(({ count }: { count: number | null }) => ({
+            ...f,
+            fileCount: count || 0,
+          })),
       );
       const foldersWithCounts = await Promise.all(countPromises);
       setFolders(foldersWithCounts);
@@ -171,7 +183,11 @@ export default function DrivePage() {
         .eq("id", currentId)
         .single();
 
-      const folder = folderData as { id: string; name: string; parent_id: string | null } | null;
+      const folder = folderData as {
+        id: string;
+        name: string;
+        parent_id: string | null;
+      } | null;
       if (!folder) break;
       path.unshift({ id: folder.id, name: folder.name });
       currentId = folder.parent_id;
@@ -276,9 +292,13 @@ export default function DrivePage() {
     if (file?.file_url) {
       try {
         const url = new URL(file.file_url);
-        const pathMatch = url.pathname.match(/\/storage\/v1\/object\/public\/drive\/(.+)$/);
+        const pathMatch = url.pathname.match(
+          /\/storage\/v1\/object\/public\/drive\/(.+)$/,
+        );
         if (pathMatch?.[1]) {
-          await supabase.storage.from("drive").remove([decodeURIComponent(pathMatch[1])]);
+          await supabase.storage
+            .from("drive")
+            .remove([decodeURIComponent(pathMatch[1])]);
         }
       } catch {
         // Storage cleanup failure is non-critical
@@ -305,11 +325,10 @@ export default function DrivePage() {
                 <HardDrive className="h-5 w-5 text-accent" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-text-primary">
-                  Drive
-                </h1>
+                <h1 className="text-2xl font-bold text-text-primary">Drive</h1>
                 <p className="text-sm text-text-secondary">
-                  Ton espace de stockage interne pour organiser tous tes fichiers.
+                  Ton espace de stockage interne pour organiser tous tes
+                  fichiers.
                 </p>
               </div>
             </div>
@@ -339,7 +358,8 @@ export default function DrivePage() {
               <div className="flex items-center gap-1.5 rounded-full bg-bg-tertiary/80 px-3 py-1 transition-all duration-200 hover:bg-accent/10 hover:scale-105">
                 <Folder className="h-3 w-3 text-accent" />
                 <span className="text-xs font-medium text-text-secondary">
-                  {folders.length} {folders.length <= 1 ? "dossier" : "dossiers"}
+                  {folders.length}{" "}
+                  {folders.length <= 1 ? "dossier" : "dossiers"}
                 </span>
               </div>
               <div className="flex items-center gap-1.5 rounded-full bg-bg-tertiary/80 px-3 py-1 transition-all duration-200 hover:bg-blue-500/10 hover:scale-105">
@@ -406,7 +426,11 @@ export default function DrivePage() {
               </p>
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
                 {folders.map((folder, idx) => (
-                  <div key={folder.id} style={{ animationDelay: `${idx * 50}ms` }} className="animate-in fade-in-0 zoom-in-95 duration-300 fill-mode-both">
+                  <div
+                    key={folder.id}
+                    style={{ animationDelay: `${idx * 50}ms` }}
+                    className="animate-in fade-in-0 zoom-in-95 duration-300 fill-mode-both"
+                  >
                     <FolderCard
                       id={folder.id}
                       name={folder.name}
@@ -430,7 +454,11 @@ export default function DrivePage() {
               </p>
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
                 {files.map((file, idx) => (
-                  <div key={file.id} style={{ animationDelay: `${idx * 50}ms` }} className="animate-in fade-in-0 zoom-in-95 duration-300 fill-mode-both">
+                  <div
+                    key={file.id}
+                    style={{ animationDelay: `${idx * 50}ms` }}
+                    className="animate-in fade-in-0 zoom-in-95 duration-300 fill-mode-both"
+                  >
                     <FileCard
                       id={file.id}
                       name={file.name}

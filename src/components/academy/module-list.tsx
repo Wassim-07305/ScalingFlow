@@ -74,7 +74,7 @@ export function ModuleList({ className }: ModuleListProps) {
 
   // Video en cours de lecture
   const [activeVideo, setActiveVideo] = React.useState<AcademyVideo | null>(
-    null
+    null,
   );
 
   // Quiz
@@ -117,7 +117,7 @@ export function ModuleList({ className }: ModuleListProps) {
 
     const watchedVideoIds = new Set(
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (progressData as any[] ?? []).map((p) => p.video_id)
+      ((progressData as any[]) ?? []).map((p) => p.video_id),
     );
 
     // Calculer les counts par module
@@ -134,17 +134,19 @@ export function ModuleList({ className }: ModuleListProps) {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const enrichedModules: AcademyModule[] = ((modulesData ?? []) as any[]).map((m) => ({
-      id: m.id,
-      module_name: m.module_name,
-      module_description: m.module_description,
-      module_order: m.module_order,
-      total_duration_minutes: m.total_duration_minutes || 0,
-      icon: m.icon,
-      color: m.color,
-      video_count: videoCountByModule[m.id] || 0,
-      completed_count: completedCountByModule[m.id] || 0,
-    }));
+    const enrichedModules: AcademyModule[] = ((modulesData ?? []) as any[]).map(
+      (m) => ({
+        id: m.id,
+        module_name: m.module_name,
+        module_description: m.module_description,
+        module_order: m.module_order,
+        total_duration_minutes: m.total_duration_minutes || 0,
+        icon: m.icon,
+        color: m.color,
+        video_count: videoCountByModule[m.id] || 0,
+        completed_count: completedCountByModule[m.id] || 0,
+      }),
+    );
 
     setModules(enrichedModules);
     setLoading(false);
@@ -203,11 +205,13 @@ export function ModuleList({ className }: ModuleListProps) {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const enrichedVideos: AcademyVideo[] = ((videosData ?? []) as any[]).map((v) => ({
-      ...v,
-      watched: progressMap[v.id]?.watched ?? false,
-      watched_at: progressMap[v.id]?.watched_at ?? null,
-    }));
+    const enrichedVideos: AcademyVideo[] = ((videosData ?? []) as any[]).map(
+      (v) => ({
+        ...v,
+        watched: progressMap[v.id]?.watched ?? false,
+        watched_at: progressMap[v.id]?.watched_at ?? null,
+      }),
+    );
 
     setVideos(enrichedVideos);
     setLoadingVideos(false);
@@ -230,8 +234,8 @@ export function ModuleList({ className }: ModuleListProps) {
       prev.map((v) =>
         v.id === videoId
           ? { ...v, watched: true, watched_at: new Date().toISOString() }
-          : v
-      )
+          : v,
+      ),
     );
 
     // Upsert dans video_progress
@@ -243,17 +247,15 @@ export function ModuleList({ className }: ModuleListProps) {
         watched_at: new Date().toISOString(),
         watch_percentage: 100,
       },
-      { onConflict: "user_id,video_id" }
+      { onConflict: "user_id,video_id" },
     );
 
     if (error) {
       // Rollback
       setVideos((prev) =>
         prev.map((v) =>
-          v.id === videoId
-            ? { ...v, watched: false, watched_at: null }
-            : v
-        )
+          v.id === videoId ? { ...v, watched: false, watched_at: null } : v,
+        ),
       );
       toast.error("Impossible de sauvegarder la progression");
       return;
@@ -266,13 +268,15 @@ export function ModuleList({ className }: ModuleListProps) {
         prev.map((m) =>
           m.id === selectedModule.id
             ? { ...m, completed_count: newCompletedCount }
-            : m
-        )
+            : m,
+        ),
       );
 
       // Celebration si module termine
       if (newCompletedCount >= selectedModule.video_count) {
-        toast.success(`Module "${selectedModule.module_name}" termine ! Bravo !`);
+        toast.success(
+          `Module "${selectedModule.module_name}" termine ! Bravo !`,
+        );
       } else {
         toast.success("Vidéo marquée comme vue !");
       }
@@ -306,7 +310,7 @@ export function ModuleList({ className }: ModuleListProps) {
         ? Math.round(
             (videos.filter((v) => v.watched).length /
               selectedModule.video_count) *
-              100
+              100,
           )
         : 0;
 
@@ -326,7 +330,10 @@ export function ModuleList({ className }: ModuleListProps) {
                 {videos.filter((v) => v.watched).length}/{videos.length} videos
                 vues
               </span>
-              <Progress value={moduleProgress} className="h-1.5 max-w-[120px]" />
+              <Progress
+                value={moduleProgress}
+                className="h-1.5 max-w-[120px]"
+              />
               <span className="text-xs text-text-muted">{moduleProgress}%</span>
             </div>
           </div>
@@ -407,7 +414,7 @@ export function ModuleList({ className }: ModuleListProps) {
                     "w-full text-left p-3 rounded-xl transition-all flex items-center gap-3",
                     activeVideo?.id === video.id
                       ? "bg-accent/10 border border-accent/30"
-                      : "bg-bg-tertiary hover:bg-bg-tertiary/80 border border-transparent"
+                      : "bg-bg-tertiary hover:bg-bg-tertiary/80 border border-transparent",
                   )}
                 >
                   <div className="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center">
@@ -423,9 +430,7 @@ export function ModuleList({ className }: ModuleListProps) {
                     <p
                       className={cn(
                         "text-sm font-medium truncate",
-                        video.watched
-                          ? "text-text-muted"
-                          : "text-text-primary"
+                        video.watched ? "text-text-muted" : "text-text-primary",
                       )}
                     >
                       {video.title}
@@ -506,7 +511,7 @@ export function ModuleList({ className }: ModuleListProps) {
                           ? "bg-accent/15"
                           : isInProgress
                             ? "bg-accent/15"
-                            : "bg-info/15"
+                            : "bg-info/15",
                       )}
                     >
                       {isCompleted ? (
@@ -524,9 +529,7 @@ export function ModuleList({ className }: ModuleListProps) {
                         {isInProgress && (
                           <Badge variant="default">En cours</Badge>
                         )}
-                        {isCompleted && (
-                          <Badge variant="cyan">Termine</Badge>
-                        )}
+                        {isCompleted && <Badge variant="cyan">Termine</Badge>}
                       </div>
                       <p className="text-sm text-text-secondary mb-3">
                         {mod.module_description}
@@ -542,10 +545,7 @@ export function ModuleList({ className }: ModuleListProps) {
                         )}
                         {mod.video_count > 0 && (
                           <div className="flex items-center gap-2 flex-1 max-w-[200px]">
-                            <Progress
-                              value={progress}
-                              className="h-1.5"
-                            />
+                            <Progress value={progress} className="h-1.5" />
                             <span className="text-xs text-text-muted">
                               {Math.round(progress)}%
                             </span>

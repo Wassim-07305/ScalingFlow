@@ -7,13 +7,25 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { ClientForm, type ClientFormData } from "@/components/clients/client-form";
-import { DealForm, type DealFormData, type DealStatus } from "@/components/clients/deal-form";
+import {
+  ClientForm,
+  type ClientFormData,
+} from "@/components/clients/client-form";
+import {
+  DealForm,
+  type DealFormData,
+  type DealStatus,
+} from "@/components/clients/deal-form";
 import {
   ClientActivityFeed,
   type ActivityItem,
 } from "@/components/clients/client-activity-feed";
-import { Skeleton, SkeletonCard, SkeletonLine, SkeletonCircle } from "@/components/ui/skeleton";
+import {
+  Skeleton,
+  SkeletonCard,
+  SkeletonLine,
+  SkeletonCircle,
+} from "@/components/ui/skeleton";
 import { createClient } from "@/lib/supabase/client";
 import { useUser } from "@/hooks/use-user";
 import { toast } from "sonner";
@@ -63,26 +75,96 @@ interface DealRow {
 
 const STATUS_CONFIG: Record<
   string,
-  { label: string; variant: "default" | "blue" | "muted" | "red" | "yellow"; color: string; bgColor: string }
+  {
+    label: string;
+    variant: "default" | "blue" | "muted" | "red" | "yellow";
+    color: string;
+    bgColor: string;
+  }
 > = {
-  prospect: { label: "Prospect", variant: "blue", color: "text-blue-400", bgColor: "bg-blue-500/15" },
-  actif: { label: "Actif", variant: "default", color: "text-emerald-400", bgColor: "bg-emerald-500/15" },
-  inactif: { label: "Inactif", variant: "muted", color: "text-text-muted", bgColor: "bg-bg-tertiary" },
-  churne: { label: "Churné", variant: "red", color: "text-red-400", bgColor: "bg-red-500/15" },
+  prospect: {
+    label: "Prospect",
+    variant: "blue",
+    color: "text-blue-400",
+    bgColor: "bg-blue-500/15",
+  },
+  actif: {
+    label: "Actif",
+    variant: "default",
+    color: "text-emerald-400",
+    bgColor: "bg-emerald-500/15",
+  },
+  inactif: {
+    label: "Inactif",
+    variant: "muted",
+    color: "text-text-muted",
+    bgColor: "bg-bg-tertiary",
+  },
+  churne: {
+    label: "Churné",
+    variant: "red",
+    color: "text-red-400",
+    bgColor: "bg-red-500/15",
+  },
 };
 
 const DEAL_STATUS_CONFIG: Record<
   DealStatus,
-  { label: string; variant: "default" | "blue" | "muted" | "red" | "yellow" | "purple"; color: string; bgColor: string }
+  {
+    label: string;
+    variant: "default" | "blue" | "muted" | "red" | "yellow" | "purple";
+    color: string;
+    bgColor: string;
+  }
 > = {
-  nouveau: { label: "Nouveau", variant: "blue", color: "text-blue-400", bgColor: "bg-blue-500/15" },
-  engage: { label: "Engagé", variant: "purple", color: "text-violet-400", bgColor: "bg-violet-500/15" },
-  call_booke: { label: "Call booké", variant: "blue", color: "text-cyan-400", bgColor: "bg-cyan-500/15" },
-  no_show: { label: "No-show", variant: "yellow", color: "text-orange-400", bgColor: "bg-orange-500/15" },
-  follow_up: { label: "Follow-up", variant: "yellow", color: "text-yellow-400", bgColor: "bg-yellow-500/15" },
-  depot_pose: { label: "Dépôt posé", variant: "purple", color: "text-indigo-400", bgColor: "bg-indigo-500/15" },
-  close: { label: "Closé", variant: "default", color: "text-emerald-400", bgColor: "bg-emerald-500/15" },
-  perdu: { label: "Perdu", variant: "red", color: "text-red-400", bgColor: "bg-red-500/15" },
+  nouveau: {
+    label: "Nouveau",
+    variant: "blue",
+    color: "text-blue-400",
+    bgColor: "bg-blue-500/15",
+  },
+  engage: {
+    label: "Engagé",
+    variant: "purple",
+    color: "text-violet-400",
+    bgColor: "bg-violet-500/15",
+  },
+  call_booke: {
+    label: "Call booké",
+    variant: "blue",
+    color: "text-cyan-400",
+    bgColor: "bg-cyan-500/15",
+  },
+  no_show: {
+    label: "No-show",
+    variant: "yellow",
+    color: "text-orange-400",
+    bgColor: "bg-orange-500/15",
+  },
+  follow_up: {
+    label: "Follow-up",
+    variant: "yellow",
+    color: "text-yellow-400",
+    bgColor: "bg-yellow-500/15",
+  },
+  depot_pose: {
+    label: "Dépôt posé",
+    variant: "purple",
+    color: "text-indigo-400",
+    bgColor: "bg-indigo-500/15",
+  },
+  close: {
+    label: "Closé",
+    variant: "default",
+    color: "text-emerald-400",
+    bgColor: "bg-emerald-500/15",
+  },
+  perdu: {
+    label: "Perdu",
+    variant: "red",
+    color: "text-red-400",
+    bgColor: "bg-red-500/15",
+  },
 };
 
 function formatCurrency(amount: number) {
@@ -249,7 +331,11 @@ export default function ClientDetailPage() {
           data.status === "close"
             ? `Deal "${data.title}" closé pour ${formatCurrency(data.amount)}`
             : `Deal "${data.title}" modifié`,
-        metadata: { deal_id: editingDeal.id, amount: data.amount, status: data.status },
+        metadata: {
+          deal_id: editingDeal.id,
+          amount: data.amount,
+          status: data.status,
+        },
       });
 
       toast.success("Deal mis à jour");
@@ -315,7 +401,7 @@ export default function ClientDetailPage() {
     if (!user || !client) return;
     if (
       !confirm(
-        `Supprimer définitivement le client "${client.name}" et tous ses deals ?`
+        `Supprimer définitivement le client "${client.name}" et tous ses deals ?`,
       )
     )
       return;
@@ -338,9 +424,12 @@ export default function ClientDetailPage() {
   // Computed stats
   const totalDeals = deals.reduce((sum, d) => sum + Number(d.amount), 0);
   const closedDeals = deals.filter((d) => d.status === "close");
-  const closedAmount = closedDeals.reduce((sum, d) => sum + Number(d.amount), 0);
+  const closedAmount = closedDeals.reduce(
+    (sum, d) => sum + Number(d.amount),
+    0,
+  );
   const activeDeals = deals.filter(
-    (d) => !["close", "perdu"].includes(d.status)
+    (d) => !["close", "perdu"].includes(d.status),
   );
 
   if (loading) {
@@ -440,11 +529,22 @@ export default function ClientDetailPage() {
               <h1 className="text-xl font-bold text-text-primary">
                 {client.name}
               </h1>
-              <span className={cn(
-                "inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium",
-                statusCfg.bgColor, statusCfg.color
-              )}>
-                <span className={cn("h-1.5 w-1.5 rounded-full", statusCfg.color === "text-text-muted" ? "bg-text-muted" : "bg-current", client.status === "actif" && "animate-pulse")} />
+              <span
+                className={cn(
+                  "inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium",
+                  statusCfg.bgColor,
+                  statusCfg.color,
+                )}
+              >
+                <span
+                  className={cn(
+                    "h-1.5 w-1.5 rounded-full",
+                    statusCfg.color === "text-text-muted"
+                      ? "bg-text-muted"
+                      : "bg-current",
+                    client.status === "actif" && "animate-pulse",
+                  )}
+                />
                 {statusCfg.label}
               </span>
             </div>
@@ -481,7 +581,10 @@ export default function ClientDetailPage() {
       </div>
 
       {/* Mini stats row */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6 animate-in fade-in-0 slide-in-from-bottom-2 duration-300" style={{ animationDelay: "100ms" }}>
+      <div
+        className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6 animate-in fade-in-0 slide-in-from-bottom-2 duration-300"
+        style={{ animationDelay: "100ms" }}
+      >
         <div className="flex items-center gap-3 rounded-2xl border border-border-default bg-bg-secondary/50 px-4 py-3 backdrop-blur-sm transition-all duration-300 hover:border-accent/20 hover:shadow-lg hover:shadow-accent/5 hover:-translate-y-0.5">
           <div className="rounded-xl bg-accent/10 p-2.5">
             <DollarSign className="h-4 w-4 text-accent" />
@@ -527,7 +630,7 @@ export default function ClientDetailPage() {
               "flex flex-1 items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200",
               activeTab === tab.id
                 ? "bg-accent text-white shadow-lg shadow-accent/20"
-                : "text-text-secondary hover:text-text-primary hover:bg-bg-tertiary"
+                : "text-text-secondary hover:text-text-primary hover:bg-bg-tertiary",
             )}
           >
             <tab.icon className="h-4 w-4" />
@@ -584,7 +687,9 @@ export default function ClientDetailPage() {
                   </div>
                   <div>
                     <p className="text-xs text-text-muted">Entreprise</p>
-                    <p className="text-sm text-text-primary">{client.company}</p>
+                    <p className="text-sm text-text-primary">
+                      {client.company}
+                    </p>
                   </div>
                 </div>
               )}
@@ -618,32 +723,47 @@ export default function ClientDetailPage() {
               <div className="rounded-2xl border border-accent/20 bg-gradient-to-br from-accent/5 to-bg-secondary p-4">
                 <div className="flex items-center gap-2 mb-2">
                   <Sparkles className="h-4 w-4 text-accent" />
-                  <span className="text-sm font-semibold text-accent">Deals closés</span>
+                  <span className="text-sm font-semibold text-accent">
+                    Deals closés
+                  </span>
                 </div>
                 <p className="text-2xl font-bold text-accent">
                   {formatCurrency(closedAmount)}
                 </p>
                 <p className="text-xs text-text-muted mt-1">
-                  {closedDeals.length} deal{closedDeals.length > 1 ? "s" : ""} closé{closedDeals.length > 1 ? "s" : ""}
+                  {closedDeals.length} deal{closedDeals.length > 1 ? "s" : ""}{" "}
+                  closé{closedDeals.length > 1 ? "s" : ""}
                 </p>
               </div>
             )}
 
             <Card>
               <div className="space-y-3">
-                <p className="text-xs text-text-muted uppercase tracking-wide">Résumé rapide</p>
+                <p className="text-xs text-text-muted uppercase tracking-wide">
+                  Résumé rapide
+                </p>
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-text-secondary">Total deals</span>
-                    <span className="text-sm font-medium text-text-primary">{deals.length}</span>
+                    <span className="text-sm text-text-secondary">
+                      Total deals
+                    </span>
+                    <span className="text-sm font-medium text-text-primary">
+                      {deals.length}
+                    </span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-text-secondary">En cours</span>
-                    <span className="text-sm font-medium text-text-primary">{activeDeals.length}</span>
+                    <span className="text-sm text-text-secondary">
+                      En cours
+                    </span>
+                    <span className="text-sm font-medium text-text-primary">
+                      {activeDeals.length}
+                    </span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-text-secondary">Closés</span>
-                    <span className="text-sm font-medium text-accent">{closedDeals.length}</span>
+                    <span className="text-sm font-medium text-accent">
+                      {closedDeals.length}
+                    </span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-text-secondary">Perdus</span>
@@ -686,7 +806,8 @@ export default function ClientDetailPage() {
                 Aucun deal pour ce client
               </h3>
               <p className="text-sm text-text-secondary mb-4 max-w-sm">
-                Créez votre premier deal pour suivre le chiffre d&apos;affaires de ce client.
+                Créez votre premier deal pour suivre le chiffre d&apos;affaires
+                de ce client.
               </p>
               <Button
                 size="sm"
@@ -711,7 +832,9 @@ export default function ClientDetailPage() {
                     </div>
                     <div>
                       <p className="text-sm font-semibold text-accent">
-                        {closedDeals.length} deal{closedDeals.length > 1 ? "s" : ""} closé{closedDeals.length > 1 ? "s" : ""}
+                        {closedDeals.length} deal
+                        {closedDeals.length > 1 ? "s" : ""} closé
+                        {closedDeals.length > 1 ? "s" : ""}
                       </p>
                       <p className="text-xs text-text-secondary">
                         Revenu total closé : {formatCurrency(closedAmount)}
@@ -734,10 +857,13 @@ export default function ClientDetailPage() {
                           <h3 className="text-sm font-semibold text-text-primary truncate">
                             {deal.title}
                           </h3>
-                          <span className={cn(
-                            "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium",
-                            dealCfg.bgColor, dealCfg.color
-                          )}>
+                          <span
+                            className={cn(
+                              "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium",
+                              dealCfg.bgColor,
+                              dealCfg.color,
+                            )}
+                          >
                             {dealCfg.label}
                           </span>
                         </div>

@@ -1,7 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AILoading } from "@/components/shared/ai-loading";
@@ -100,7 +106,7 @@ export function MechanismGenerator({ offerId }: MechanismGeneratorProps) {
         setTargetAvatar(
           typeof market.target_avatar === "string"
             ? market.target_avatar
-            : JSON.stringify(market.target_avatar || "")
+            : JSON.stringify(market.target_avatar || ""),
         );
         if (!mainProblem && market.market_description) {
           setMainProblem(String(market.market_description));
@@ -142,7 +148,9 @@ export function MechanismGenerator({ offerId }: MechanismGeneratorProps) {
       setResult(data);
       setExpandedIndex(data.recommended_index);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Erreur lors de la génération");
+      toast.error(
+        err instanceof Error ? err.message : "Erreur lors de la génération",
+      );
     } finally {
       setLoading(false);
     }
@@ -187,7 +195,7 @@ export function MechanismGenerator({ offerId }: MechanismGeneratorProps) {
           `Preuves :\n${m.evidence.map((e) => `- ${e}`).join("\n")}\n\n` +
           `Unicité : ${m.uniqueness}\n\n` +
           `Pitch : ${m.elevator_pitch}\n\n` +
-          `Score : ${m.score}/100\n`
+          `Score : ${m.score}/100\n`,
       )
       .join("\n---\n\n");
   };
@@ -207,7 +215,8 @@ export function MechanismGenerator({ offerId }: MechanismGeneratorProps) {
               Générateur de Mécanisme Unique
             </CardTitle>
             <CardDescription>
-              Trouve ton &quot;comment&quot; propriétaire qui rend ta promesse crédible et te différencie de tous les concurrents.
+              Trouve ton &quot;comment&quot; propriétaire qui rend ta promesse
+              crédible et te différencie de tous les concurrents.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -274,7 +283,9 @@ export function MechanismGenerator({ offerId }: MechanismGeneratorProps) {
             <h2 className="text-xl font-bold text-text-primary">
               3 mécanismes uniques générés
             </h2>
-            <p className="text-sm text-text-secondary">{result.recommendation}</p>
+            <p className="text-sm text-text-secondary">
+              {result.recommendation}
+            </p>
           </div>
 
           <div className="space-y-4">
@@ -289,7 +300,7 @@ export function MechanismGenerator({ offerId }: MechanismGeneratorProps) {
                   className={cn(
                     "cursor-pointer transition-all",
                     isSelected && "border-accent",
-                    isRecommended && !isSelected && "border-accent/40"
+                    isRecommended && !isSelected && "border-accent/40",
                   )}
                   onClick={() => setExpandedIndex(isExpanded ? null : index)}
                 >
@@ -300,7 +311,9 @@ export function MechanismGenerator({ offerId }: MechanismGeneratorProps) {
                         <div>
                           <CardTitle className="flex items-center gap-2 text-base">
                             {mechanism.name}
-                            {isRecommended && <Badge variant="cyan">Recommandé</Badge>}
+                            {isRecommended && (
+                              <Badge variant="cyan">Recommandé</Badge>
+                            )}
                           </CardTitle>
                           <p className="text-sm text-text-secondary mt-1 italic">
                             {mechanism.tagline}
@@ -323,7 +336,9 @@ export function MechanismGenerator({ offerId }: MechanismGeneratorProps) {
                           <Target className="h-4 w-4 text-red-400" />
                           Problème
                         </h4>
-                        <p className="text-sm text-text-secondary">{mechanism.problem}</p>
+                        <p className="text-sm text-text-secondary">
+                          {mechanism.problem}
+                        </p>
                       </div>
 
                       {/* Root cause */}
@@ -332,7 +347,9 @@ export function MechanismGenerator({ offerId }: MechanismGeneratorProps) {
                           <Lightbulb className="h-4 w-4 text-amber-400" />
                           Cause racine (l&apos;insight)
                         </h4>
-                        <p className="text-sm text-text-secondary">{mechanism.root_cause}</p>
+                        <p className="text-sm text-text-secondary">
+                          {mechanism.root_cause}
+                        </p>
                       </div>
 
                       {/* Solution steps */}
@@ -380,7 +397,9 @@ export function MechanismGenerator({ offerId }: MechanismGeneratorProps) {
                           <Fingerprint className="h-4 w-4 inline mr-1" />
                           Pourquoi c&apos;est unique
                         </h4>
-                        <p className="text-sm text-text-secondary">{mechanism.uniqueness}</p>
+                        <p className="text-sm text-text-secondary">
+                          {mechanism.uniqueness}
+                        </p>
                       </div>
 
                       {/* Elevator pitch */}

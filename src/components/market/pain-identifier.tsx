@@ -50,15 +50,13 @@ interface PainIdentifierProps {
   existingPains?: PainsResult | null;
 }
 
-const LAYER_CONFIG: Record<
-  string,
-  { icon: React.ElementType; color: string }
-> = {
-  Surface: { icon: AlertTriangle, color: "text-yellow-400" },
-  Économique: { icon: DollarSign, color: "text-red-400" },
-  Psychologique: { icon: Brain, color: "text-purple-400" },
-  Opportunite: { icon: Lightbulb, color: "text-blue-400" },
-};
+const LAYER_CONFIG: Record<string, { icon: React.ElementType; color: string }> =
+  {
+    Surface: { icon: AlertTriangle, color: "text-yellow-400" },
+    Économique: { icon: DollarSign, color: "text-red-400" },
+    Psychologique: { icon: Brain, color: "text-purple-400" },
+    Opportunite: { icon: Lightbulb, color: "text-blue-400" },
+  };
 
 export function PainIdentifier({
   marketAnalysisId,
@@ -66,7 +64,7 @@ export function PainIdentifier({
 }: PainIdentifierProps) {
   const [loading, setLoading] = React.useState(false);
   const [pains, setPains] = React.useState<PainsResult | null>(
-    existingPains || null
+    existingPains || null,
   );
   const [expandedLayer, setExpandedLayer] = React.useState<number | null>(0);
 
@@ -90,7 +88,7 @@ export function PainIdentifier({
       toast.success("Bleeding-neck pains identifiés !");
     } catch (err) {
       toast.error(
-        err instanceof Error ? err.message : "Erreur lors de l'analyse"
+        err instanceof Error ? err.message : "Erreur lors de l'analyse",
       );
     } finally {
       setLoading(false);
@@ -115,7 +113,11 @@ export function PainIdentifier({
             Identifie les douleurs les plus intenses de ton marché sur 4 couches
             de profondeur : surface, économique, psychologique et opportunité.
           </p>
-          <Button size="lg" onClick={handleGenerate} disabled={!marketAnalysisId}>
+          <Button
+            size="lg"
+            onClick={handleGenerate}
+            disabled={!marketAnalysisId}
+          >
             <Sparkles className="h-4 w-4 mr-2" />
             Identifier les pains
           </Button>
@@ -151,19 +153,39 @@ export function PainIdentifier({
           <div className="flex items-center gap-2">
             <div className="relative w-10 h-10">
               <svg viewBox="0 0 40 40" className="w-full h-full -rotate-90">
-                <circle cx="20" cy="20" r="16" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="3" />
                 <circle
-                  cx="20" cy="20" r="16" fill="none"
+                  cx="20"
+                  cy="20"
+                  r="16"
+                  fill="none"
+                  stroke="rgba(255,255,255,0.06)"
+                  strokeWidth="3"
+                />
+                <circle
+                  cx="20"
+                  cy="20"
+                  r="16"
+                  fill="none"
                   stroke={pains.severity_score >= 70 ? "#EF4444" : "#F59E0B"}
-                  strokeWidth="3" strokeLinecap="round"
+                  strokeWidth="3"
+                  strokeLinecap="round"
                   strokeDasharray={`${(pains.severity_score / 100) * 100.5} 100.5`}
                 />
               </svg>
-              <span className={cn("absolute inset-0 flex items-center justify-center text-xs font-bold", pains.severity_score >= 70 ? "text-red-400" : "text-yellow-400")}>
+              <span
+                className={cn(
+                  "absolute inset-0 flex items-center justify-center text-xs font-bold",
+                  pains.severity_score >= 70
+                    ? "text-red-400"
+                    : "text-yellow-400",
+                )}
+              >
                 {pains.severity_score}
               </span>
             </div>
-            <span className="text-xs text-text-muted font-medium">Sévérité</span>
+            <span className="text-xs text-text-muted font-medium">
+              Sévérité
+            </span>
           </div>
           <Button variant="outline" size="sm" onClick={handleGenerate}>
             <Sparkles className="h-4 w-4 mr-1" />
@@ -218,9 +240,7 @@ export function PainIdentifier({
           <Card key={layerIndex}>
             <CardHeader
               className="cursor-pointer"
-              onClick={() =>
-                setExpandedLayer(isExpanded ? null : layerIndex)
-              }
+              onClick={() => setExpandedLayer(isExpanded ? null : layerIndex)}
             >
               <div className="flex items-center justify-between">
                 <CardTitle className="flex items-center gap-2 text-sm">
@@ -269,7 +289,11 @@ export function PainIdentifier({
                       <div
                         className={cn(
                           "h-full rounded-full transition-all duration-500",
-                          pain.intensity >= 8 ? "bg-red-400" : pain.intensity >= 5 ? "bg-yellow-400" : "bg-blue-400"
+                          pain.intensity >= 8
+                            ? "bg-red-400"
+                            : pain.intensity >= 5
+                              ? "bg-yellow-400"
+                              : "bg-blue-400",
                         )}
                         style={{ width: `${pain.intensity * 10}%` }}
                       />
@@ -282,9 +306,7 @@ export function PainIdentifier({
                         </span>
                       </div>
                       <div>
-                        <span className="text-text-muted">
-                          Déclencheur :{" "}
-                        </span>
+                        <span className="text-text-muted">Déclencheur : </span>
                         <span className="text-text-secondary">
                           {pain.trigger}
                         </span>

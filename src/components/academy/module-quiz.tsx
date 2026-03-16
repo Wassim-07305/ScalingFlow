@@ -185,8 +185,9 @@ export function ModuleQuiz({
                 Quiz du module
               </h3>
               <p className="text-sm text-text-secondary max-w-sm">
-                Teste tes connaissances sur &laquo;&nbsp;{moduleTitle}&nbsp;&raquo;.
-                5 questions générées par l&apos;IA. Il faut 70% pour valider.
+                Teste tes connaissances sur &laquo;&nbsp;{moduleTitle}
+                &nbsp;&raquo;. 5 questions générées par l&apos;IA. Il faut 70%
+                pour valider.
               </p>
             </div>
             <Button onClick={fetchQuestions} className="gap-2">
@@ -229,7 +230,7 @@ export function ModuleQuiz({
             <div
               className={cn(
                 "h-16 w-16 rounded-full flex items-center justify-center",
-                passed ? "bg-accent/15" : "bg-red-500/15"
+                passed ? "bg-accent/15" : "bg-red-500/15",
               )}
             >
               {passed ? (
@@ -301,10 +302,8 @@ export function ModuleQuiz({
   // ─── Question en cours ──────────────────────────────────────
   const question = questions[currentIndex];
   const progress = ((currentIndex + 1) / questions.length) * 100;
-  const isCorrect =
-    confirmed && selectedAnswer === question.correct_index;
-  const isWrong =
-    confirmed && selectedAnswer !== question.correct_index;
+  const isCorrect = confirmed && selectedAnswer === question.correct_index;
+  const isWrong = confirmed && selectedAnswer !== question.correct_index;
 
   return (
     <Card>
@@ -358,7 +357,7 @@ export function ModuleQuiz({
                   "w-full text-left p-3.5 rounded-xl border transition-all flex items-center gap-3",
                   borderClass,
                   bgClass,
-                  !confirmed && "cursor-pointer"
+                  !confirmed && "cursor-pointer",
                 )}
               >
                 <div
@@ -370,7 +369,7 @@ export function ModuleQuiz({
                         ? "bg-red-500 text-white border-red-500"
                         : isSelected
                           ? "bg-accent/20 text-accent border-accent"
-                          : "bg-bg-secondary text-text-muted border-border-default"
+                          : "bg-bg-secondary text-text-muted border-border-default",
                   )}
                 >
                   {confirmed && isCorrectOption ? (
@@ -388,7 +387,7 @@ export function ModuleQuiz({
                       ? "text-accent font-medium"
                       : confirmed && isSelected && !isCorrectOption
                         ? "text-red-400"
-                        : "text-text-primary"
+                        : "text-text-primary",
                   )}
                 >
                   {option}
@@ -405,7 +404,7 @@ export function ModuleQuiz({
               "p-3.5 rounded-xl border text-sm",
               isCorrect
                 ? "bg-accent/5 border-accent/30 text-accent"
-                : "bg-red-500/5 border-red-500/30 text-red-400"
+                : "bg-red-500/5 border-red-500/30 text-red-400",
             )}
           >
             <p className="font-medium mb-1">

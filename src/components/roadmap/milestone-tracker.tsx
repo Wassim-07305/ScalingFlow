@@ -25,14 +25,70 @@ interface UserMilestone {
 
 // Milestones par defaut si la table est vide
 const FALLBACK_MILESTONES: Milestone[] = [
-  { id: "1", title: "Profil complete", description: "Onboarding termine", milestone_order: 1, badge_name: "Premier pas", icon: null },
-  { id: "2", title: "Marché validé", description: "Score viabilité > 70", milestone_order: 2, badge_name: "Explorateur", icon: null },
-  { id: "3", title: "Offre créée", description: "Offre générée et validée", milestone_order: 3, badge_name: "Créateur", icon: null },
-  { id: "4", title: "Funnel construit", description: "3 pages de funnel pretes", milestone_order: 4, badge_name: "Stratege", icon: null },
-  { id: "5", title: "1er Lead", description: "Premier lead capture", milestone_order: 5, badge_name: null, icon: null },
-  { id: "6", title: "1ere Vente", description: "Premier client converti", milestone_order: 6, badge_name: "Scaler", icon: null },
-  { id: "7", title: "5K/mois", description: "Atteindre 5 000 EUR de MRR", milestone_order: 7, badge_name: "Expert", icon: null },
-  { id: "8", title: "10K/mois", description: "Atteindre 10 000 EUR de MRR", milestone_order: 8, badge_name: "Legende", icon: null },
+  {
+    id: "1",
+    title: "Profil complete",
+    description: "Onboarding termine",
+    milestone_order: 1,
+    badge_name: "Premier pas",
+    icon: null,
+  },
+  {
+    id: "2",
+    title: "Marché validé",
+    description: "Score viabilité > 70",
+    milestone_order: 2,
+    badge_name: "Explorateur",
+    icon: null,
+  },
+  {
+    id: "3",
+    title: "Offre créée",
+    description: "Offre générée et validée",
+    milestone_order: 3,
+    badge_name: "Créateur",
+    icon: null,
+  },
+  {
+    id: "4",
+    title: "Funnel construit",
+    description: "3 pages de funnel pretes",
+    milestone_order: 4,
+    badge_name: "Stratege",
+    icon: null,
+  },
+  {
+    id: "5",
+    title: "1er Lead",
+    description: "Premier lead capture",
+    milestone_order: 5,
+    badge_name: null,
+    icon: null,
+  },
+  {
+    id: "6",
+    title: "1ere Vente",
+    description: "Premier client converti",
+    milestone_order: 6,
+    badge_name: "Scaler",
+    icon: null,
+  },
+  {
+    id: "7",
+    title: "5K/mois",
+    description: "Atteindre 5 000 EUR de MRR",
+    milestone_order: 7,
+    badge_name: "Expert",
+    icon: null,
+  },
+  {
+    id: "8",
+    title: "10K/mois",
+    description: "Atteindre 10 000 EUR de MRR",
+    milestone_order: 8,
+    badge_name: "Legende",
+    icon: null,
+  },
 ];
 
 interface MilestoneTrackerProps {
@@ -63,7 +119,9 @@ export function MilestoneTracker({ className }: MilestoneTrackerProps) {
       ]);
 
       const dbMilestones = milestonesRes.data ?? [];
-      setMilestones(dbMilestones.length > 0 ? dbMilestones : FALLBACK_MILESTONES);
+      setMilestones(
+        dbMilestones.length > 0 ? dbMilestones : FALLBACK_MILESTONES,
+      );
       setUserMilestones((userMilestonesRes.data ?? []) as UserMilestone[]);
       setLoading(false);
     };
@@ -73,7 +131,7 @@ export function MilestoneTracker({ className }: MilestoneTrackerProps) {
 
   // Détecter automatiquement les milestones complétés par les données existantes
   const completedIds = new Set(
-    userMilestones.filter((um) => um.completed).map((um) => um.milestone_id)
+    userMilestones.filter((um) => um.completed).map((um) => um.milestone_id),
   );
 
   // Auto-detection basée sur le profil (pour les milestones "profil complete", etc.)
@@ -87,9 +145,9 @@ export function MilestoneTracker({ className }: MilestoneTrackerProps) {
     if (autoCompletedTitles.has(milestone.title)) return "completed";
 
     // Le premier non-complete est "in_progress"
-    const allPreviousCompleted = milestones.slice(0, index).every(
-      (m) => completedIds.has(m.id) || autoCompletedTitles.has(m.title)
-    );
+    const allPreviousCompleted = milestones
+      .slice(0, index)
+      .every((m) => completedIds.has(m.id) || autoCompletedTitles.has(m.title));
     if (allPreviousCompleted && index === 0) return "in_progress";
     if (allPreviousCompleted) return "in_progress";
 
@@ -99,7 +157,7 @@ export function MilestoneTracker({ className }: MilestoneTrackerProps) {
   const isLoading = userLoading || loading;
 
   const completedCount = milestones.filter(
-    (m) => completedIds.has(m.id) || autoCompletedTitles.has(m.title)
+    (m) => completedIds.has(m.id) || autoCompletedTitles.has(m.title),
   ).length;
 
   return (
@@ -127,7 +185,10 @@ export function MilestoneTracker({ className }: MilestoneTrackerProps) {
               {milestones.map((milestone, index) => {
                 const status = getStatus(milestone, index);
                 return (
-                  <div key={milestone.id} className="relative flex items-start gap-4 pl-12">
+                  <div
+                    key={milestone.id}
+                    className="relative flex items-start gap-4 pl-12"
+                  >
                     <div className="absolute left-2.5">
                       {status === "completed" ? (
                         <CheckCircle className="h-5 w-5 text-accent" />
@@ -137,16 +198,24 @@ export function MilestoneTracker({ className }: MilestoneTrackerProps) {
                         <Lock className="h-5 w-5 text-text-muted" />
                       )}
                     </div>
-                    <div className={cn(
-                      "flex-1 p-3 rounded-xl",
-                      status === "completed" ? "bg-accent/5 border border-accent/20" :
-                      status === "in_progress" ? "bg-accent/5 border border-accent/20" :
-                      "bg-bg-tertiary border border-border-default opacity-60"
-                    )}>
+                    <div
+                      className={cn(
+                        "flex-1 p-3 rounded-xl",
+                        status === "completed"
+                          ? "bg-accent/5 border border-accent/20"
+                          : status === "in_progress"
+                            ? "bg-accent/5 border border-accent/20"
+                            : "bg-bg-tertiary border border-border-default opacity-60",
+                      )}
+                    >
                       <div className="flex items-center justify-between">
                         <div>
-                          <h4 className="font-medium text-text-primary text-sm">{milestone.title}</h4>
-                          <p className="text-xs text-text-muted mt-0.5">{milestone.description}</p>
+                          <h4 className="font-medium text-text-primary text-sm">
+                            {milestone.title}
+                          </h4>
+                          <p className="text-xs text-text-muted mt-0.5">
+                            {milestone.description}
+                          </p>
                         </div>
                         <div className="flex items-center gap-2">
                           {milestone.badge_name && status === "completed" && (
@@ -154,7 +223,9 @@ export function MilestoneTracker({ className }: MilestoneTrackerProps) {
                               {milestone.badge_name}
                             </Badge>
                           )}
-                          <Badge variant={status === "completed" ? "cyan" : "muted"}>
+                          <Badge
+                            variant={status === "completed" ? "cyan" : "muted"}
+                          >
                             #{milestone.milestone_order}
                           </Badge>
                         </div>

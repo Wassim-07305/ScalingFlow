@@ -38,7 +38,10 @@ export function EmptyState({
         </Button>
       </Link>
     ) : onAction ? (
-      <Button onClick={onAction} className="gap-2 shadow-lg shadow-emerald-500/20 hover:shadow-xl hover:shadow-emerald-500/30 hover:scale-[1.02] transition-all">
+      <Button
+        onClick={onAction}
+        className="gap-2 shadow-lg shadow-emerald-500/20 hover:shadow-xl hover:shadow-emerald-500/30 hover:scale-[1.02] transition-all"
+      >
         <ActionIcon className="h-4 w-4" />
         {actionLabel}
       </Button>
@@ -59,14 +62,16 @@ export function EmptyState({
       <div
         className={cn(
           "rounded-xl border border-dashed border-border-default bg-bg-secondary/50 p-8",
-          className
+          className,
         )}
       >
         <div className="flex flex-col items-center text-center">
           <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-accent/10 mb-4">
             <Icon className="h-6 w-6 text-accent" />
           </div>
-          <h3 className="text-sm font-medium text-text-primary mb-1">{title}</h3>
+          <h3 className="text-sm font-medium text-text-primary mb-1">
+            {title}
+          </h3>
           <p className="text-xs text-text-muted max-w-xs mb-4">{description}</p>
           {button}
         </div>
@@ -78,7 +83,7 @@ export function EmptyState({
     <div
       className={cn(
         "relative flex flex-col items-center justify-center text-center py-20 px-6",
-        className
+        className,
       )}
     >
       {/* Background decoration */}

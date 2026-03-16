@@ -179,7 +179,11 @@ async function runActor<T>(
         break;
       }
 
-      if (status === "FAILED" || status === "ABORTED" || status === "TIMED-OUT") {
+      if (
+        status === "FAILED" ||
+        status === "ABORTED" ||
+        status === "TIMED-OUT"
+      ) {
         console.warn(`[apify] Actor run ${runId} ended with status: ${status}`);
         return [];
       }
@@ -187,7 +191,9 @@ async function runActor<T>(
     }
 
     if (!datasetId) {
-      console.warn(`[apify] Timeout waiting for actor ${actorId} (run ${runId})`);
+      console.warn(
+        `[apify] Timeout waiting for actor ${actorId} (run ${runId})`,
+      );
       return [];
     }
 
@@ -198,7 +204,9 @@ async function runActor<T>(
     );
 
     if (!itemsRes.ok) {
-      console.warn(`[apify] Failed to fetch dataset ${datasetId}: ${itemsRes.status}`);
+      console.warn(
+        `[apify] Failed to fetch dataset ${datasetId}: ${itemsRes.status}`,
+      );
       return [];
     }
 
@@ -284,7 +292,8 @@ export async function scrapeInstagramProfile(
     bio: profile.biography ?? profile.bio ?? "",
     followers: profile.followersCount ?? profile.edge_followed_by?.count ?? 0,
     following: profile.followsCount ?? profile.edge_follow?.count ?? 0,
-    posts: profile.postsCount ?? profile.edge_owner_to_timeline_media?.count ?? 0,
+    posts:
+      profile.postsCount ?? profile.edge_owner_to_timeline_media?.count ?? 0,
     profilePicUrl: profile.profilePicUrl ?? profile.profile_pic_url_hd ?? "",
     recentPosts: Array.isArray(profile.latestPosts)
       ? profile.latestPosts.map((p: Record<string, unknown>) => ({
@@ -335,7 +344,10 @@ export async function scrapeInstagramPosts(params: {
     likes: item.likesCount ?? item.likes ?? 0,
     comments: item.commentsCount ?? item.comments ?? 0,
     timestamp: item.timestamp ?? "",
-    url: item.url ?? item.shortCode ? `https://www.instagram.com/p/${item.shortCode}/` : "",
+    url:
+      (item.url ?? item.shortCode)
+        ? `https://www.instagram.com/p/${item.shortCode}/`
+        : "",
     ownerUsername: item.ownerUsername ?? item.owner?.username ?? "",
     hashtags: toStringArray(item.hashtags),
   }));
@@ -376,11 +388,12 @@ export async function scrapeTikTok(params: {
     comments: item.commentCount ?? item.comments ?? 0,
     shares: item.shareCount ?? item.shares ?? 0,
     plays: item.playCount ?? item.plays ?? 0,
-    authorName: item.authorMeta?.name ?? item.author?.uniqueId ?? item.authorName ?? "",
+    authorName:
+      item.authorMeta?.name ?? item.author?.uniqueId ?? item.authorName ?? "",
     videoUrl: item.webVideoUrl ?? item.videoUrl ?? "",
     hashtags: Array.isArray(item.hashtags)
       ? item.hashtags.map((h: Record<string, unknown>) =>
-          typeof h === "string" ? h : (h.name as string) ?? "",
+          typeof h === "string" ? h : ((h.name as string) ?? ""),
         )
       : [],
   }));
@@ -394,7 +407,9 @@ export async function scrapeTikTok(params: {
  * Crawl a website and extract markdown content.
  * Uses actor: apify/website-content-crawler (FREE)
  */
-export async function crawlWebsite(url: string): Promise<WebCrawlResult | null> {
+export async function crawlWebsite(
+  url: string,
+): Promise<WebCrawlResult | null> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const raw = await runActor<any>("apify~website-content-crawler", {
     startUrls: [{ url }],
@@ -440,12 +455,13 @@ export async function scrapeGoogleTrends(params: {
     timelineData: Array.isArray(item.timelineData)
       ? item.timelineData.map((d: Record<string, unknown>) => ({
           date: (d.date as string) ?? (d.formattedTime as string) ?? "",
-          value: (d.value as number) ?? (Array.isArray(d.value) ? d.value[0] : 0),
+          value:
+            (d.value as number) ?? (Array.isArray(d.value) ? d.value[0] : 0),
         }))
       : [],
     relatedQueries: Array.isArray(item.relatedQueries)
       ? item.relatedQueries.map((q: Record<string, unknown>) =>
-          typeof q === "string" ? q : (q.query as string) ?? "",
+          typeof q === "string" ? q : ((q.query as string) ?? ""),
         )
       : toStringArray(item.relatedQueries),
   }));
@@ -556,7 +572,8 @@ export async function scrapeGoogleMapsReviews(params: {
     text: item.text ?? item.reviewText ?? item.body ?? "",
     stars: item.stars ?? item.rating ?? item.score ?? 0,
     publishedAtDate: item.publishedAtDate ?? item.publishAt ?? item.date ?? "",
-    responseFromOwner: item.responseFromOwner?.text ?? item.ownerResponse ?? null,
+    responseFromOwner:
+      item.responseFromOwner?.text ?? item.ownerResponse ?? null,
     reviewUrl: item.reviewUrl ?? item.url ?? "",
   }));
 }
@@ -589,17 +606,21 @@ export async function scrapeTrustpilotReviews(params: {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const raw = await runActor<any>("nikita-sviridenko~trustpilot-reviews-scraper", {
-    startUrls: [{ url: trustpilotUrl }],
-    maxItems: limit,
-  });
+  const raw = await runActor<any>(
+    "nikita-sviridenko~trustpilot-reviews-scraper",
+    {
+      startUrls: [{ url: trustpilotUrl }],
+      maxItems: limit,
+    },
+  );
 
   return raw.slice(0, limit).map((item) => ({
     title: item.title ?? item.heading ?? "",
     text: item.text ?? item.reviewBody ?? item.body ?? "",
     rating: item.rating ?? item.stars ?? item.score ?? 0,
     date: item.date ?? item.publishedDate ?? item.createdAt ?? "",
-    author: item.author ?? item.consumer?.displayName ?? item.reviewerName ?? "",
+    author:
+      item.author ?? item.consumer?.displayName ?? item.reviewerName ?? "",
   }));
 }
 
@@ -618,7 +639,9 @@ export interface WebsiteScreenshot {
  * Take a full-page screenshot of a website.
  * Uses actor: dz_omar/screenshot
  */
-export async function screenshotWebsite(url: string): Promise<WebsiteScreenshot | null> {
+export async function screenshotWebsite(
+  url: string,
+): Promise<WebsiteScreenshot | null> {
   const token = process.env.APIFY_TOKEN;
   if (!token) {
     console.warn("[apify] APIFY_TOKEN not configured");
@@ -643,7 +666,9 @@ export async function screenshotWebsite(url: string): Promise<WebsiteScreenshot 
     );
 
     if (!startRes.ok) {
-      console.warn(`[apify] Failed to start screenshot actor: ${startRes.status}`);
+      console.warn(
+        `[apify] Failed to start screenshot actor: ${startRes.status}`,
+      );
       return null;
     }
 
@@ -676,14 +701,22 @@ export async function screenshotWebsite(url: string): Promise<WebsiteScreenshot 
         break;
       }
 
-      if (status === "FAILED" || status === "ABORTED" || status === "TIMED-OUT") {
-        console.warn(`[apify] Screenshot run ${runId} ended with status: ${status}`);
+      if (
+        status === "FAILED" ||
+        status === "ABORTED" ||
+        status === "TIMED-OUT"
+      ) {
+        console.warn(
+          `[apify] Screenshot run ${runId} ended with status: ${status}`,
+        );
         return null;
       }
     }
 
     if (!datasetId) {
-      console.warn(`[apify] Timeout waiting for screenshot actor (run ${runId})`);
+      console.warn(
+        `[apify] Timeout waiting for screenshot actor (run ${runId})`,
+      );
       return null;
     }
 
@@ -701,7 +734,12 @@ export async function screenshotWebsite(url: string): Promise<WebsiteScreenshot 
 
     if (!item) return null;
 
-    const screenshotUrl = item.screenshotUrl ?? item.screenshot_url ?? item.url_screenshot ?? item.imageUrl ?? "";
+    const screenshotUrl =
+      item.screenshotUrl ??
+      item.screenshot_url ??
+      item.url_screenshot ??
+      item.imageUrl ??
+      "";
     if (!screenshotUrl) return null;
 
     return {
@@ -729,11 +767,16 @@ export interface TechStackResult {
  * Detect the technology stack of a website.
  * Uses actor: botflowtech/website-technology-stack-detector
  */
-export async function detectTechStack(url: string): Promise<TechStackResult | null> {
+export async function detectTechStack(
+  url: string,
+): Promise<TechStackResult | null> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const raw = await runActor<any>("botflowtech~website-technology-stack-detector", {
-    urls: [url],
-  });
+  const raw = await runActor<any>(
+    "botflowtech~website-technology-stack-detector",
+    {
+      urls: [url],
+    },
+  );
 
   const item = raw[0];
   if (!item) return null;
@@ -744,16 +787,23 @@ export async function detectTechStack(url: string): Promise<TechStackResult | nu
 
   if (Array.isArray(item.technologies)) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    technologies = item.technologies.map((t: any) => ({
-      name: typeof t === "string" ? t : (t.name ?? t.technology ?? ""),
-      category: typeof t === "string" ? "Autre" : (t.category ?? t.categories?.[0] ?? "Autre"),
-    })).filter((t: { name: string }) => t.name);
+    technologies = item.technologies
+      .map((t: any) => ({
+        name: typeof t === "string" ? t : (t.name ?? t.technology ?? ""),
+        category:
+          typeof t === "string"
+            ? "Autre"
+            : (t.category ?? t.categories?.[0] ?? "Autre"),
+      }))
+      .filter((t: { name: string }) => t.name);
   } else if (Array.isArray(item.detectedTechnologies)) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    technologies = item.detectedTechnologies.map((t: any) => ({
-      name: t.name ?? t.technology ?? "",
-      category: t.category ?? t.categories?.[0] ?? "Autre",
-    })).filter((t: { name: string }) => t.name);
+    technologies = item.detectedTechnologies
+      .map((t: any) => ({
+        name: t.name ?? t.technology ?? "",
+        category: t.category ?? t.categories?.[0] ?? "Autre",
+      }))
+      .filter((t: { name: string }) => t.name);
   }
 
   return {
@@ -769,7 +819,9 @@ export async function detectTechStack(url: string): Promise<TechStackResult | nu
 function toStringArray(value: unknown): string[] {
   if (!value) return [];
   if (Array.isArray(value)) {
-    return value.map((v) => (typeof v === "string" ? v : String(v))).filter(Boolean);
+    return value
+      .map((v) => (typeof v === "string" ? v : String(v)))
+      .filter(Boolean);
   }
   if (typeof value === "string") return [value];
   return [];

@@ -9,7 +9,17 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { AILoading } from "@/components/shared/ai-loading";
 import { GlowCard } from "@/components/shared/glow-card";
-import { Sparkles, Copy, Check, ChevronDown, ChevronUp, Youtube, Image, FileText, Send } from "lucide-react";
+import {
+  Sparkles,
+  Copy,
+  Check,
+  ChevronDown,
+  ChevronUp,
+  Youtube,
+  Image,
+  FileText,
+  Send,
+} from "lucide-react";
 import { toast } from "sonner";
 import type { YouTubeScriptResult } from "@/lib/ai/prompts/youtube-scripts";
 import { UpgradeWall } from "@/components/shared/upgrade-wall";
@@ -22,14 +32,20 @@ interface YouTubeGeneratorProps {
   initialData?: any;
 }
 
-export function YouTubeGenerator({ className, initialData }: YouTubeGeneratorProps) {
+export function YouTubeGenerator({
+  className,
+  initialData,
+}: YouTubeGeneratorProps) {
   const [loading, setLoading] = React.useState(false);
   const [result, setResult] = React.useState<YouTubeScriptResult | null>(null);
   const [error, setError] = React.useState<string | null>(null);
   const [topic, setTopic] = React.useState("");
   const [showFullScript, setShowFullScript] = React.useState(false);
   const [copiedField, setCopiedField] = React.useState<string | null>(null);
-  const [usageLimited, setUsageLimited] = React.useState<{currentUsage: number; limit: number} | null>(null);
+  const [usageLimited, setUsageLimited] = React.useState<{
+    currentUsage: number;
+    limit: number;
+  } | null>(null);
   const [publishDialogOpen, setPublishDialogOpen] = React.useState(false);
   const [publishContent, setPublishContent] = React.useState("");
 
@@ -58,7 +74,10 @@ export function YouTubeGenerator({ className, initialData }: YouTubeGeneratorPro
       if (!response.ok) {
         if (response.status === 403) {
           const errData = await response.json();
-          if (errData.usage) { setUsageLimited(errData.usage); return; }
+          if (errData.usage) {
+            setUsageLimited(errData.usage);
+            return;
+          }
         }
         throw new Error("Erreur lors de la génération");
       }
@@ -82,11 +101,23 @@ export function YouTubeGenerator({ className, initialData }: YouTubeGeneratorPro
   };
 
   if (usageLimited) {
-    return <UpgradeWall currentUsage={usageLimited.currentUsage} limit={usageLimited.limit} className={className} />;
+    return (
+      <UpgradeWall
+        currentUsage={usageLimited.currentUsage}
+        limit={usageLimited.limit}
+        className={className}
+      />
+    );
   }
 
   if (loading) {
-    return <AILoading variant="immersive" text="Génération du script YouTube" className={className} />;
+    return (
+      <AILoading
+        variant="immersive"
+        text="Génération du script YouTube"
+        className={className}
+      />
+    );
   }
 
   if (!result) {
@@ -104,7 +135,11 @@ export function YouTubeGenerator({ className, initialData }: YouTubeGeneratorPro
             />
           </div>
           {error && <p className="text-sm text-danger">{error}</p>}
-          <GenerateButton onClick={handleGenerate} className="w-full" icon={<Youtube className="h-4 w-4 mr-2" />}>
+          <GenerateButton
+            onClick={handleGenerate}
+            className="w-full"
+            icon={<Youtube className="h-4 w-4 mr-2" />}
+          >
             Générer le script YouTube
           </GenerateButton>
           <p className="text-sm text-text-secondary text-center">
@@ -121,7 +156,9 @@ export function YouTubeGenerator({ className, initialData }: YouTubeGeneratorPro
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Youtube className="h-5 w-5 text-danger" />
-          <span className="text-sm font-medium text-text-primary">Script généré</span>
+          <span className="text-sm font-medium text-text-primary">
+            Script généré
+          </span>
         </div>
         <div className="flex gap-2">
           <Input
@@ -141,7 +178,9 @@ export function YouTubeGenerator({ className, initialData }: YouTubeGeneratorPro
               const fullText = [
                 result.titre,
                 `\n${result.hook}`,
-                result.plan.map((s) => `${s.section} (${s.duree}): ${s.contenu}`).join("\n"),
+                result.plan
+                  .map((s) => `${s.section} (${s.duree}): ${s.contenu}`)
+                  .join("\n"),
                 `\n${result.description_youtube}`,
                 result.tags.join(", "),
               ].join("\n\n");
@@ -164,28 +203,42 @@ export function YouTubeGenerator({ className, initialData }: YouTubeGeneratorPro
             size="sm"
             onClick={() => copyToClipboard(result.titre, "titre")}
           >
-            {copiedField === "titre" ? <Check className="h-3 w-3 mr-1 animate-in zoom-in-50 duration-200" /> : <Copy className="h-3 w-3 mr-1" />}
+            {copiedField === "titre" ? (
+              <Check className="h-3 w-3 mr-1 animate-in zoom-in-50 duration-200" />
+            ) : (
+              <Copy className="h-3 w-3 mr-1" />
+            )}
             {copiedField === "titre" ? "Copié !" : "Copier"}
           </Button>
         </div>
-        <p className="text-lg font-semibold text-text-primary">{result.titre}</p>
+        <p className="text-lg font-semibold text-text-primary">
+          {result.titre}
+        </p>
       </GlowCard>
 
       {/* Hook */}
       <Card>
         <CardContent className="pt-5">
           <div className="flex items-center justify-between mb-2">
-            <p className="text-sm font-medium text-text-primary">Hook (30 premières secondes)</p>
+            <p className="text-sm font-medium text-text-primary">
+              Hook (30 premières secondes)
+            </p>
             <Button
               variant="ghost"
               size="sm"
               onClick={() => copyToClipboard(result.hook, "hook")}
             >
-              {copiedField === "hook" ? <Check className="h-3 w-3 mr-1 animate-in zoom-in-50 duration-200" /> : <Copy className="h-3 w-3 mr-1" />}
+              {copiedField === "hook" ? (
+                <Check className="h-3 w-3 mr-1 animate-in zoom-in-50 duration-200" />
+              ) : (
+                <Copy className="h-3 w-3 mr-1" />
+              )}
               {copiedField === "hook" ? "Copié !" : "Copier"}
             </Button>
           </div>
-          <p className="text-sm text-accent whitespace-pre-wrap">{result.hook}</p>
+          <p className="text-sm text-accent whitespace-pre-wrap">
+            {result.hook}
+          </p>
         </CardContent>
       </Card>
 
@@ -201,10 +254,16 @@ export function YouTubeGenerator({ className, initialData }: YouTubeGeneratorPro
           <div className="space-y-3">
             {result.plan.map((section, i) => (
               <div key={i} className="flex gap-4 p-3 rounded-lg bg-bg-tertiary">
-                <Badge variant="muted" className="shrink-0">{section.duree}</Badge>
+                <Badge variant="muted" className="shrink-0">
+                  {section.duree}
+                </Badge>
                 <div>
-                  <p className="text-sm font-medium text-text-primary">{section.section}</p>
-                  <p className="text-sm text-text-secondary mt-1">{section.contenu}</p>
+                  <p className="text-sm font-medium text-text-primary">
+                    {section.section}
+                  </p>
+                  <p className="text-sm text-text-secondary mt-1">
+                    {section.contenu}
+                  </p>
                 </div>
               </div>
             ))}
@@ -219,7 +278,9 @@ export function YouTubeGenerator({ className, initialData }: YouTubeGeneratorPro
             className="w-full flex items-center justify-between"
             onClick={() => setShowFullScript(!showFullScript)}
           >
-            <p className="text-sm font-medium text-text-primary">Script complet</p>
+            <p className="text-sm font-medium text-text-primary">
+              Script complet
+            </p>
             <div className="flex items-center gap-2">
               <Button
                 variant="ghost"
@@ -229,7 +290,11 @@ export function YouTubeGenerator({ className, initialData }: YouTubeGeneratorPro
                   copyToClipboard(result.script_complet, "script");
                 }}
               >
-                {copiedField === "script" ? <Check className="h-3 w-3 mr-1 animate-in zoom-in-50 duration-200" /> : <Copy className="h-3 w-3 mr-1" />}
+                {copiedField === "script" ? (
+                  <Check className="h-3 w-3 mr-1 animate-in zoom-in-50 duration-200" />
+                ) : (
+                  <Copy className="h-3 w-3 mr-1" />
+                )}
                 {copiedField === "script" ? "Copié !" : "Copier"}
               </Button>
               {showFullScript ? (
@@ -252,9 +317,13 @@ export function YouTubeGenerator({ className, initialData }: YouTubeGeneratorPro
         <CardContent className="pt-5">
           <div className="flex items-center gap-2 mb-2">
             <Image className="h-4 w-4 text-text-muted" />
-            <p className="text-sm font-medium text-text-primary">Concept de thumbnail</p>
+            <p className="text-sm font-medium text-text-primary">
+              Concept de thumbnail
+            </p>
           </div>
-          <p className="text-sm text-text-secondary">{result.thumbnail_concept}</p>
+          <p className="text-sm text-text-secondary">
+            {result.thumbnail_concept}
+          </p>
         </CardContent>
       </Card>
 
@@ -262,13 +331,21 @@ export function YouTubeGenerator({ className, initialData }: YouTubeGeneratorPro
       <Card>
         <CardContent className="pt-5">
           <div className="flex items-center justify-between mb-2">
-            <p className="text-sm font-medium text-text-primary">Description YouTube</p>
+            <p className="text-sm font-medium text-text-primary">
+              Description YouTube
+            </p>
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => copyToClipboard(result.description_youtube, "desc")}
+              onClick={() =>
+                copyToClipboard(result.description_youtube, "desc")
+              }
             >
-              {copiedField === "desc" ? <Check className="h-3 w-3 mr-1 animate-in zoom-in-50 duration-200" /> : <Copy className="h-3 w-3 mr-1" />}
+              {copiedField === "desc" ? (
+                <Check className="h-3 w-3 mr-1 animate-in zoom-in-50 duration-200" />
+              ) : (
+                <Copy className="h-3 w-3 mr-1" />
+              )}
               {copiedField === "desc" ? "Copié !" : "Copier"}
             </Button>
           </div>
@@ -277,7 +354,9 @@ export function YouTubeGenerator({ className, initialData }: YouTubeGeneratorPro
           </p>
           <div className="flex flex-wrap gap-1">
             {result.tags.map((tag, i) => (
-              <Badge key={i} variant="muted">{tag}</Badge>
+              <Badge key={i} variant="muted">
+                {tag}
+              </Badge>
             ))}
           </div>
         </CardContent>

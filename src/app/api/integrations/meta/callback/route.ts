@@ -16,14 +16,12 @@ export async function GET(req: NextRequest) {
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || "";
 
     if (error) {
-      return NextResponse.redirect(
-        `${appUrl}/settings?error=meta_denied`
-      );
+      return NextResponse.redirect(`${appUrl}/settings?error=meta_denied`);
     }
 
     if (!code || !state) {
       return NextResponse.redirect(
-        `${appUrl}/settings?error=meta_missing_params`
+        `${appUrl}/settings?error=meta_missing_params`,
       );
     }
 
@@ -31,16 +29,18 @@ export async function GET(req: NextRequest) {
     const stateUserId = verifyOAuthState(state);
     if (!stateUserId) {
       return NextResponse.redirect(
-        `${appUrl}/settings?error=meta_invalid_state`
+        `${appUrl}/settings?error=meta_invalid_state`,
       );
     }
 
     const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
     if (!user || user.id !== stateUserId) {
       return NextResponse.redirect(
-        `${appUrl}/settings?error=meta_auth_mismatch`
+        `${appUrl}/settings?error=meta_auth_mismatch`,
       );
     }
 
@@ -48,23 +48,27 @@ export async function GET(req: NextRequest) {
     const tokenUrl = new URL(`${META_GRAPH_URL}/oauth/access_token`);
     tokenUrl.searchParams.set("client_id", process.env.META_APP_ID!);
     tokenUrl.searchParams.set("client_secret", process.env.META_APP_SECRET!);
-    tokenUrl.searchParams.set("redirect_uri", `${appUrl}/api/integrations/meta/callback`);
+    tokenUrl.searchParams.set(
+      "redirect_uri",
+      `${appUrl}/api/integrations/meta/callback`,
+    );
     tokenUrl.searchParams.set("code", code);
 
     const tokenRes = await fetch(tokenUrl.toString());
     const tokenData = await tokenRes.json();
 
     if (tokenData.error) {
-      return NextResponse.redirect(
-        `${appUrl}/settings?error=meta_token_error`
-      );
+      return NextResponse.redirect(`${appUrl}/settings?error=meta_token_error`);
     }
 
     // Exchange for long-lived token (60 days)
     const longLivedUrl = new URL(`${META_GRAPH_URL}/oauth/access_token`);
     longLivedUrl.searchParams.set("grant_type", "fb_exchange_token");
     longLivedUrl.searchParams.set("client_id", process.env.META_APP_ID!);
-    longLivedUrl.searchParams.set("client_secret", process.env.META_APP_SECRET!);
+    longLivedUrl.searchParams.set(
+      "client_secret",
+      process.env.META_APP_SECRET!,
+    );
     longLivedUrl.searchParams.set("fb_exchange_token", tokenData.access_token);
 
     const longLivedRes = await fetch(longLivedUrl.toString());
@@ -75,20 +79,21 @@ export async function GET(req: NextRequest) {
 
     // Get user's ad accounts
     const meRes = await fetch(
-      `${META_GRAPH_URL}/me?fields=id,name&access_token=${accessToken}`
+      `${META_GRAPH_URL}/me?fields=id,name&access_token=${accessToken}`,
     );
     const meData = await meRes.json();
 
     const adAccountsRes = await fetch(
-      `${META_GRAPH_URL}/me/adaccounts?fields=id,name,account_status&access_token=${accessToken}`
+      `${META_GRAPH_URL}/me/adaccounts?fields=id,name,account_status&access_token=${accessToken}`,
     );
     const adAccountsData = await adAccountsRes.json();
     const adAccounts = adAccountsData.data || [];
 
     // Use first active ad account
-    const activeAccount = adAccounts.find(
-      (a: { account_status: number }) => a.account_status === 1
-    ) || adAccounts[0];
+    const activeAccount =
+      adAccounts.find(
+        (a: { account_status: number }) => a.account_status === 1,
+      ) || adAccounts[0];
 
     const adAccountId = activeAccount?.id?.replace("act_", "") || "";
 
@@ -111,7 +116,7 @@ export async function GET(req: NextRequest) {
         ],
         metadata: { ad_accounts: adAccounts },
       },
-      { onConflict: "user_id,provider" }
+      { onConflict: "user_id,provider" },
     );
 
     // Also update legacy profile fields for backward compatibility
@@ -123,13 +128,9 @@ export async function GET(req: NextRequest) {
       })
       .eq("id", user.id);
 
-    return NextResponse.redirect(
-      `${appUrl}/settings?success=meta_connected`
-    );
+    return NextResponse.redirect(`${appUrl}/settings?success=meta_connected`);
   } catch {
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || "";
-    return NextResponse.redirect(
-      `${appUrl}/settings?error=meta_error`
-    );
+    return NextResponse.redirect(`${appUrl}/settings?error=meta_error`);
   }
 }

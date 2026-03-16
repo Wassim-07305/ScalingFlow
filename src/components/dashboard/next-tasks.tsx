@@ -117,7 +117,8 @@ export function NextTasks() {
         ) : (
           <div className="space-y-2">
             {tasks.map((task) => {
-              const config = taskTypeConfig[task.task_type] || taskTypeConfig.action;
+              const config =
+                taskTypeConfig[task.task_type] || taskTypeConfig.action;
               const TypeIcon = config.icon;
 
               return (

@@ -8,7 +8,7 @@ const META_GRAPH_URL = "https://graph.facebook.com/v21.0";
 
 async function getMetaCredentials(
   supabase: Awaited<ReturnType<typeof createClient>>,
-  userId: string
+  userId: string,
 ) {
   const { data } = await supabase
     .from("connected_accounts")
@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
             "Connecte ton compte Meta Ads dans Paramètres → Intégrations pour utiliser cette fonctionnalité.",
           code: "META_NOT_CONNECTED",
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -67,7 +67,7 @@ export async function POST(req: NextRequest) {
     if (!type || !name) {
       return NextResponse.json(
         { error: "Le type et le nom de l'audience sont requis." },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -94,14 +94,14 @@ export async function POST(req: NextRequest) {
                 ratio: ((config.percentage as number) || 1) / 100,
               }),
             }),
-          }
+          },
         );
 
         const data = await res.json();
         if (data.error) {
           return NextResponse.json(
             { error: `Meta API : ${data.error.message}` },
-            { status: 502 }
+            { status: 502 },
           );
         }
         metaAudienceId = data.id;
@@ -115,7 +115,10 @@ export async function POST(req: NextRequest) {
 
     // ─── Warm Audience: Website visitors, engagers, video viewers ─
     if (type === "warm") {
-      const ruleMap: Record<string, { pixel_id?: string; object_id?: string; event_name?: string }> = {
+      const ruleMap: Record<
+        string,
+        { pixel_id?: string; object_id?: string; event_name?: string }
+      > = {
         website_visitors: { event_name: "PageView" },
         page_engagers: {},
         video_viewers: {},
@@ -142,23 +145,30 @@ export async function POST(req: NextRequest) {
                   operator: "or",
                   rules: [
                     {
-                      event_sources: [{ id: config.pixel_id || adAccountId, type: "pixel" }],
+                      event_sources: [
+                        { id: config.pixel_id || adAccountId, type: "pixel" },
+                      ],
                       retention_seconds: days * 86400,
-                      filter: { operator: "and", filters: [{ field: "url", operator: "i_contains", value: "/" }] },
+                      filter: {
+                        operator: "and",
+                        filters: [
+                          { field: "url", operator: "i_contains", value: "/" },
+                        ],
+                      },
                     },
                   ],
                 },
               }),
               customer_file_source: "USER_PROVIDED_ONLY",
             }),
-          }
+          },
         );
 
         const data = await res.json();
         if (data.error) {
           return NextResponse.json(
             { error: `Meta API : ${data.error.message}` },
-            { status: 502 }
+            { status: 502 },
           );
         }
         metaAudienceId = data.id;
@@ -179,7 +189,12 @@ export async function POST(req: NextRequest) {
                   operator: "or",
                   rules: [
                     {
-                      event_sources: [{ id: config.ig_account_id || adAccountId, type: "ig_business" }],
+                      event_sources: [
+                        {
+                          id: config.ig_account_id || adAccountId,
+                          type: "ig_business",
+                        },
+                      ],
                       retention_seconds: days * 86400,
                     },
                   ],
@@ -187,14 +202,14 @@ export async function POST(req: NextRequest) {
               }),
               customer_file_source: "USER_PROVIDED_ONLY",
             }),
-          }
+          },
         );
 
         const data = await res.json();
         if (data.error) {
           return NextResponse.json(
             { error: `Meta API : ${data.error.message}` },
-            { status: 502 }
+            { status: 502 },
           );
         }
         metaAudienceId = data.id;
@@ -214,23 +229,34 @@ export async function POST(req: NextRequest) {
                   operator: "or",
                   rules: [
                     {
-                      event_sources: [{ id: config.page_id || adAccountId, type: "page" }],
+                      event_sources: [
+                        { id: config.page_id || adAccountId, type: "page" },
+                      ],
                       retention_seconds: days * 86400,
-                      filter: { operator: "and", filters: [{ field: "event", operator: "eq", value: "video_watched" }] },
+                      filter: {
+                        operator: "and",
+                        filters: [
+                          {
+                            field: "event",
+                            operator: "eq",
+                            value: "video_watched",
+                          },
+                        ],
+                      },
                     },
                   ],
                 },
               }),
               customer_file_source: "USER_PROVIDED_ONLY",
             }),
-          }
+          },
         );
 
         const data = await res.json();
         if (data.error) {
           return NextResponse.json(
             { error: `Meta API : ${data.error.message}` },
-            { status: 502 }
+            { status: 502 },
           );
         }
         metaAudienceId = data.id;
@@ -250,7 +276,9 @@ export async function POST(req: NextRequest) {
                   operator: "or",
                   rules: [
                     {
-                      event_sources: [{ id: config.page_id || adAccountId, type: "page" }],
+                      event_sources: [
+                        { id: config.page_id || adAccountId, type: "page" },
+                      ],
                       retention_seconds: days * 86400,
                     },
                   ],
@@ -258,14 +286,14 @@ export async function POST(req: NextRequest) {
               }),
               customer_file_source: "USER_PROVIDED_ONLY",
             }),
-          }
+          },
         );
 
         const data = await res.json();
         if (data.error) {
           return NextResponse.json(
             { error: `Meta API : ${data.error.message}` },
-            { status: 502 }
+            { status: 502 },
           );
         }
         metaAudienceId = data.id;
@@ -288,14 +316,14 @@ export async function POST(req: NextRequest) {
             description: `Audience chaude — ${config.source || "opt-ins"}`,
             customer_file_source: "USER_PROVIDED_ONLY",
           }),
-        }
+        },
       );
 
       const data = await res.json();
       if (data.error) {
         return NextResponse.json(
           { error: `Meta API : ${data.error.message}` },
-          { status: 502 }
+          { status: 502 },
         );
       }
       metaAudienceId = data.id;
@@ -319,7 +347,11 @@ export async function POST(req: NextRequest) {
         audience_type: type,
         subtype: audienceSubtype,
         source_data: config,
-        status: metaAudienceId ? "ready" : type === "cold" && config.mode !== "lookalike" ? "targeting" : "draft",
+        status: metaAudienceId
+          ? "ready"
+          : type === "cold" && config.mode !== "lookalike"
+            ? "targeting"
+            : "draft",
       })
       .select()
       .single();
@@ -336,7 +368,7 @@ export async function POST(req: NextRequest) {
   } catch {
     return NextResponse.json(
       { error: "Erreur lors de la création de l'audience" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

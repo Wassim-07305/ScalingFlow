@@ -10,7 +10,7 @@ export interface PitchDeckResult {
 
 export function pitchDeckPrompt(
   offer: Record<string, unknown>,
-  avatar: Record<string, unknown>
+  avatar: Record<string, unknown>,
 ): string {
   return `Tu es un expert en création de pitch decks pour les freelances et consultants spécialisés en IA et automatisation.
 

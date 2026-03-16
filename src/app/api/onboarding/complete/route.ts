@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
       console.error("[onboarding/complete] DB error:", dbError);
       return NextResponse.json(
         { error: "Erreur de sauvegarde" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -52,9 +52,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true });
   } catch (err) {
     console.error("[onboarding/complete] Error:", err);
-    return NextResponse.json(
-      { error: "Erreur serveur" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }
 }

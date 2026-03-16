@@ -30,8 +30,15 @@ function hexToRgb(hex: string): string {
   return `${r}, ${g}, ${b}`;
 }
 
-function buildBrandKitHTML(brandName: string, data: BrandIdentityResult): string {
-  const { direction_artistique: dir, brand_kit: kit, logo_concept: logo } = data;
+function buildBrandKitHTML(
+  brandName: string,
+  data: BrandIdentityResult,
+): string {
+  const {
+    direction_artistique: dir,
+    brand_kit: kit,
+    logo_concept: logo,
+  } = data;
   const primaryColor = dir.palette[0]?.hex || "#34D399";
   const secondaryColor = dir.palette[1]?.hex || "#1C1F23";
   const date = new Date().toLocaleDateString("fr-FR", {
@@ -51,12 +58,15 @@ function buildBrandKitHTML(brandName: string, data: BrandIdentityResult): string
           <span class="mono">RGB ${hexToRgb(c.hex)}</span>
           <span class="usage">${esc(c.usage)}</span>
         </div>
-      </div>`
+      </div>`,
     )
     .join("\n");
 
   const colorStrip = dir.palette
-    .map((c) => `<div class="strip-segment" style="background:${esc(c.hex)}"></div>`)
+    .map(
+      (c) =>
+        `<div class="strip-segment" style="background:${esc(c.hex)}"></div>`,
+    )
     .join("");
 
   const typographyHTML = dir.typographies
@@ -67,25 +77,28 @@ function buildBrandKitHTML(brandName: string, data: BrandIdentityResult): string
         <p class="typo-name">${esc(t.font_family)}</p>
         <p class="typo-style">${esc(t.style)}</p>
         <p class="typo-sample">Aa Bb Cc Dd Ee Ff Gg 0123456789</p>
-      </div>`
+      </div>`,
     )
     .join("\n");
 
   const valeursHTML = kit.valeurs
-    .map((v) => `<span class="badge">${esc(typeof v === "string" ? v : JSON.stringify(v))}</span>`)
+    .map(
+      (v) =>
+        `<span class="badge">${esc(typeof v === "string" ? v : JSON.stringify(v))}</span>`,
+    )
     .join(" ");
 
   const doHTML = kit.do_list
     .map(
       (item) =>
-        `<li class="do-item">${esc(typeof item === "string" ? item : JSON.stringify(item))}</li>`
+        `<li class="do-item">${esc(typeof item === "string" ? item : JSON.stringify(item))}</li>`,
     )
     .join("\n");
 
   const dontHTML = kit.dont_list
     .map(
       (item) =>
-        `<li class="dont-item">${esc(typeof item === "string" ? item : JSON.stringify(item))}</li>`
+        `<li class="dont-item">${esc(typeof item === "string" ? item : JSON.stringify(item))}</li>`,
     )
     .join("\n");
 
@@ -345,6 +358,23 @@ function buildBrandKitHTML(brandName: string, data: BrandIdentityResult): string
     padding: 20px 24px;
   }
 
+  /* ── Email Templates ── */
+  .email-template-preview {
+    border: 1px solid #e5e5e5;
+    border-radius: 12px;
+    padding: 24px;
+    background: #fafafa;
+    margin-bottom: 12px;
+    overflow: auto;
+  }
+  .template-instructions {
+    font-size: 12px;
+    color: #888;
+    font-style: italic;
+    line-height: 1.6;
+    margin-bottom: 0;
+  }
+
   /* ── Footer ── */
   .pdf-footer {
     text-align: center;
@@ -442,6 +472,112 @@ function buildBrandKitHTML(brandName: string, data: BrandIdentityResult): string
     </div>
   </div>
 
+  <!-- Email Templates -->
+  <div class="section page-break">
+    <h2>Templates Email</h2>
+    <p style="margin-bottom:32px;font-size:14px;color:#666;">
+      Templates prêts à l'emploi pour tes communications email, utilisant ta charte graphique.
+    </p>
+
+    <!-- Signature Email -->
+    <h3 style="margin-bottom:16px;">Signature Email</h3>
+    <div class="email-template-preview">
+      <table cellpadding="0" cellspacing="0" border="0" style="font-family:Arial,Helvetica,sans-serif;max-width:500px;">
+        <tr>
+          <td style="padding-right:20px;border-right:3px solid ${esc(primaryColor)};vertical-align:top;">
+            <div style="width:64px;height:64px;border-radius:50%;background:${esc(primaryColor)};display:flex;align-items:center;justify-content:center;">
+              <span style="color:#fff;font-size:24px;font-weight:700;line-height:64px;text-align:center;display:block;width:64px;">${esc(brandName.charAt(0).toUpperCase())}</span>
+            </div>
+          </td>
+          <td style="padding-left:20px;vertical-align:top;">
+            <p style="margin:0 0 2px;font-size:16px;font-weight:700;color:#1a1a1a;">[Prénom Nom]</p>
+            <p style="margin:0 0 8px;font-size:13px;color:${esc(primaryColor)};font-weight:600;">[Titre / Poste]</p>
+            <p style="margin:0 0 2px;font-size:12px;color:#666;">${esc(brandName)}</p>
+            <p style="margin:0 0 8px;font-size:12px;color:#999;">[email@domaine.com] • [+33 6 00 00 00 00]</p>
+            <div style="display:flex;gap:8px;">
+              <a href="#" style="display:inline-block;width:24px;height:24px;border-radius:4px;background:${esc(primaryColor)};text-align:center;line-height:24px;color:#fff;font-size:12px;text-decoration:none;">in</a>
+              <a href="#" style="display:inline-block;width:24px;height:24px;border-radius:4px;background:${esc(primaryColor)};text-align:center;line-height:24px;color:#fff;font-size:12px;text-decoration:none;">ig</a>
+              <a href="#" style="display:inline-block;width:24px;height:24px;border-radius:4px;background:${esc(primaryColor)};text-align:center;line-height:24px;color:#fff;font-size:12px;text-decoration:none;">tw</a>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <p class="template-instructions">
+      Remplace [Prénom Nom], [Titre / Poste] et les coordonnées par tes informations. Copie ce bloc HTML dans la signature de ton client email.
+    </p>
+
+    <!-- Header Email -->
+    <h3 style="margin-top:40px;margin-bottom:16px;">Header Email</h3>
+    <div class="email-template-preview">
+      <table cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:600px;">
+        <tr>
+          <td style="background:linear-gradient(135deg, ${esc(primaryColor)}, ${esc(secondaryColor)});padding:32px 40px;border-radius:8px 8px 0 0;">
+            <table cellpadding="0" cellspacing="0" border="0" style="width:100%;">
+              <tr>
+                <td>
+                  <span style="font-size:24px;font-weight:800;color:#ffffff;letter-spacing:-0.5px;">${esc(brandName)}</span>
+                </td>
+                <td style="text-align:right;">
+                  <a href="#" style="color:rgba(255,255,255,0.8);font-size:12px;text-decoration:none;margin-left:16px;">Accueil</a>
+                  <a href="#" style="color:rgba(255,255,255,0.8);font-size:12px;text-decoration:none;margin-left:16px;">Blog</a>
+                  <a href="#" style="color:rgba(255,255,255,0.8);font-size:12px;text-decoration:none;margin-left:16px;">Contact</a>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        <tr>
+          <td style="background:#ffffff;padding:40px;border:1px solid #e5e5e5;border-top:none;">
+            <p style="font-size:14px;color:#444;line-height:1.7;margin:0;">
+              [Contenu de ton email ici...]
+            </p>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <p class="template-instructions">
+      Utilise ce header pour tes newsletters et emails marketing. Adapte les liens de navigation selon ton site.
+    </p>
+
+    <!-- Footer Email -->
+    <h3 style="margin-top:40px;margin-bottom:16px;">Footer Email</h3>
+    <div class="email-template-preview">
+      <table cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:600px;">
+        <tr>
+          <td style="background:#f7f7f7;padding:32px 40px;border-radius:0 0 8px 8px;border:1px solid #e5e5e5;border-top:none;">
+            <table cellpadding="0" cellspacing="0" border="0" style="width:100%;">
+              <tr>
+                <td style="text-align:center;">
+                  <div style="margin-bottom:16px;">
+                    <a href="#" style="display:inline-block;width:32px;height:32px;border-radius:50%;background:${esc(primaryColor)};text-align:center;line-height:32px;color:#fff;font-size:14px;text-decoration:none;margin:0 4px;">in</a>
+                    <a href="#" style="display:inline-block;width:32px;height:32px;border-radius:50%;background:${esc(primaryColor)};text-align:center;line-height:32px;color:#fff;font-size:14px;text-decoration:none;margin:0 4px;">ig</a>
+                    <a href="#" style="display:inline-block;width:32px;height:32px;border-radius:50%;background:${esc(primaryColor)};text-align:center;line-height:32px;color:#fff;font-size:14px;text-decoration:none;margin:0 4px;">tw</a>
+                    <a href="#" style="display:inline-block;width:32px;height:32px;border-radius:50%;background:${esc(primaryColor)};text-align:center;line-height:32px;color:#fff;font-size:14px;text-decoration:none;margin:0 4px;">yt</a>
+                  </div>
+                  <p style="font-size:12px;color:#999;margin:0 0 8px;">
+                    ${esc(brandName)} — [Adresse, Ville, Code Postal]
+                  </p>
+                  <p style="font-size:11px;color:#bbb;margin:0 0 12px;">
+                    Tu reçois cet email car tu es inscrit(e) à notre liste.
+                  </p>
+                  <a href="#" style="font-size:11px;color:${esc(primaryColor)};text-decoration:underline;">Se désinscrire</a>
+                  <span style="color:#ddd;margin:0 8px;">|</span>
+                  <a href="#" style="font-size:11px;color:${esc(primaryColor)};text-decoration:underline;">Préférences email</a>
+                  <span style="color:#ddd;margin:0 8px;">|</span>
+                  <a href="#" style="font-size:11px;color:${esc(primaryColor)};text-decoration:underline;">Voir en ligne</a>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <p class="template-instructions">
+      Ce footer est conforme RGPD avec lien de désinscription. Remplace l'adresse et les liens par les tiens.
+    </p>
+  </div>
+
   <div class="pdf-footer">
     ${esc(brandName)} — Kit de Marque — ${esc(date)} — Généré par ScalingFlow
   </div>
@@ -450,7 +586,11 @@ function buildBrandKitHTML(brandName: string, data: BrandIdentityResult): string
 </html>`;
 }
 
-export function BrandKitExport({ brandName, generated, className }: BrandKitExportProps) {
+export function BrandKitExport({
+  brandName,
+  generated,
+  className,
+}: BrandKitExportProps) {
   const [exporting, setExporting] = React.useState(false);
 
   const handleExport = () => {
@@ -490,7 +630,9 @@ export function BrandKitExport({ brandName, generated, className }: BrandKitExpo
         }
       }, 1500);
 
-      toast.success("Kit de marque prêt — utilise « Enregistrer en PDF » dans la boîte de dialogue d'impression");
+      toast.success(
+        "Kit de marque prêt — utilise « Enregistrer en PDF » dans la boîte de dialogue d'impression",
+      );
     } catch {
       toast.error("Erreur lors de la génération du kit");
     } finally {
@@ -527,13 +669,15 @@ export function BrandKitExport({ brandName, generated, className }: BrandKitExpo
       </CardHeader>
       <CardContent className="space-y-4">
         <p className="text-sm text-text-secondary">
-          Exporte l&apos;ensemble de ton identité de marque dans un document professionnel :
-          palette de couleurs, typographies, ton de communication, logo et charte éditoriale.
+          Exporte l&apos;ensemble de ton identité de marque dans un document
+          professionnel : palette de couleurs, typographies, ton de
+          communication, logo et charte éditoriale.
         </p>
 
         {!hasData && (
           <p className="text-sm text-text-muted italic">
-            Génère d&apos;abord une identité de marque et sélectionne un nom pour activer l&apos;export.
+            Génère d&apos;abord une identité de marque et sélectionne un nom
+            pour activer l&apos;export.
           </p>
         )}
 

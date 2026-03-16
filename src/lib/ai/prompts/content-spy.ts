@@ -4,7 +4,7 @@ export function contentSpyPrompt(
     handle?: string;
     platform: string;
   },
-  scrapedData?: string
+  scrapedData?: string,
 ): string {
   const scrapedSection = scrapedData
     ? `\n## DONNÉES RÉELLES SCRAPÉES DU WEB

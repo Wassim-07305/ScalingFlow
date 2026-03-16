@@ -63,12 +63,21 @@ export default function BrandPage() {
   const [generating, setGenerating] = React.useState(false);
   const [brandId, setBrandId] = React.useState<string | null>(null);
   const [selectedName, setSelectedName] = React.useState<string | null>(null);
-  const [generated, setGenerated] = React.useState<BrandIdentityResult | null>(null);
+  const [generated, setGenerated] = React.useState<BrandIdentityResult | null>(
+    null,
+  );
   const [offerId, setOfferId] = React.useState<string | null>(null);
-  const [usageLimited, setUsageLimited] = React.useState<{currentUsage: number; limit: number} | null>(null);
-  const [brandDirection, setBrandDirection] = React.useState<string>(BRAND_DIRECTIONS[0]);
+  const [usageLimited, setUsageLimited] = React.useState<{
+    currentUsage: number;
+    limit: number;
+  } | null>(null);
+  const [brandDirection, setBrandDirection] = React.useState<string>(
+    BRAND_DIRECTIONS[0],
+  );
   const [industry, setIndustry] = React.useState("");
-  const [colorPreference, setColorPreference] = React.useState<string>(COLOR_PREFERENCES[0]);
+  const [colorPreference, setColorPreference] = React.useState<string>(
+    COLOR_PREFERENCES[0],
+  );
 
   // Fetch existing brand identity
   React.useEffect(() => {
@@ -94,19 +103,25 @@ export default function BrandPage() {
           setOfferId(brand.offer_id);
 
           // Reconstruct generated data from DB
-          const brandNames = brand.brand_names as unknown as BrandIdentityResult["noms"] | null;
-          const artDirection = brand.art_direction as unknown as BrandIdentityResult["direction_artistique"] | null;
+          const brandNames = brand.brand_names as unknown as
+            | BrandIdentityResult["noms"]
+            | null;
+          const artDirection = brand.art_direction as unknown as
+            | BrandIdentityResult["direction_artistique"]
+            | null;
           let logoConcept: BrandIdentityResult["logo_concept"] | null = null;
           try {
             logoConcept = brand.logo_concept
-              ? (typeof brand.logo_concept === "string"
+              ? ((typeof brand.logo_concept === "string"
                   ? JSON.parse(brand.logo_concept)
-                  : brand.logo_concept) as BrandIdentityResult["logo_concept"]
+                  : brand.logo_concept) as BrandIdentityResult["logo_concept"])
               : null;
           } catch {
             // logo_concept may be malformed JSON — ignore
           }
-          const brandKit = brand.brand_kit as unknown as BrandIdentityResult["brand_kit"] | null;
+          const brandKit = brand.brand_kit as unknown as
+            | BrandIdentityResult["brand_kit"]
+            | null;
 
           if (brandNames || artDirection || logoConcept || brandKit) {
             setGenerated({
@@ -154,7 +169,7 @@ export default function BrandPage() {
     };
 
     fetchBrand();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
 
   const handleGenerate = async () => {
@@ -174,7 +189,10 @@ export default function BrandPage() {
 
       if (!response.ok) {
         const errData = await response.json().catch(() => ({}));
-        if (response.status === 403 && errData.usage) { setUsageLimited(errData.usage); return; }
+        if (response.status === 403 && errData.usage) {
+          setUsageLimited(errData.usage);
+          return;
+        }
         throw new Error(errData.error || "Erreur lors de la génération");
       }
 
@@ -184,7 +202,9 @@ export default function BrandPage() {
       setSelectedName(null);
       toast.success("Identité de marque générée avec succès !");
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Une erreur est survenue");
+      toast.error(
+        err instanceof Error ? err.message : "Une erreur est survenue",
+      );
     } finally {
       setGenerating(false);
     }
@@ -207,19 +227,25 @@ export default function BrandPage() {
       setSelectedName(data.selected_name);
       setOfferId(data.offer_id);
 
-      const brandNames = data.brand_names as unknown as BrandIdentityResult["noms"] | null;
-      const artDirection = data.art_direction as unknown as BrandIdentityResult["direction_artistique"] | null;
+      const brandNames = data.brand_names as unknown as
+        | BrandIdentityResult["noms"]
+        | null;
+      const artDirection = data.art_direction as unknown as
+        | BrandIdentityResult["direction_artistique"]
+        | null;
       let logoConcept = null;
       try {
         logoConcept = data.logo_concept
-          ? (typeof data.logo_concept === "string"
-              ? JSON.parse(data.logo_concept)
-              : data.logo_concept)
+          ? typeof data.logo_concept === "string"
+            ? JSON.parse(data.logo_concept)
+            : data.logo_concept
           : null;
       } catch {
         // logo_concept may be malformed JSON — ignore
       }
-      const brandKit = data.brand_kit as unknown as BrandIdentityResult["brand_kit"] | null;
+      const brandKit = data.brand_kit as unknown as
+        | BrandIdentityResult["brand_kit"]
+        | null;
 
       setGenerated({
         noms: brandNames || [],
@@ -252,7 +278,12 @@ export default function BrandPage() {
   };
 
   if (usageLimited) {
-    return <UpgradeWall currentUsage={usageLimited.currentUsage} limit={usageLimited.limit} />;
+    return (
+      <UpgradeWall
+        currentUsage={usageLimited.currentUsage}
+        limit={usageLimited.limit}
+      />
+    );
   }
 
   if (loading) {
@@ -304,7 +335,7 @@ export default function BrandPage() {
               "flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all",
               activeTab === tab.key
                 ? "bg-accent text-white"
-                : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
+                : "bg-bg-tertiary text-text-secondary hover:text-text-primary",
             )}
           >
             <tab.icon className="h-4 w-4" />
@@ -343,7 +374,7 @@ export default function BrandPage() {
                       "px-3 py-1.5 rounded-lg text-sm font-medium border transition-all",
                       brandDirection === dir
                         ? "border-accent bg-accent-muted text-accent"
-                        : "border-border-default bg-bg-tertiary text-text-secondary hover:border-border-hover"
+                        : "border-border-default bg-bg-tertiary text-text-secondary hover:border-border-hover",
                     )}
                   >
                     {dir}
@@ -375,7 +406,7 @@ export default function BrandPage() {
                       "px-3 py-1.5 rounded-lg text-sm font-medium border transition-all",
                       colorPreference === color
                         ? "border-accent bg-accent-muted text-accent"
-                        : "border-border-default bg-bg-tertiary text-text-secondary hover:border-border-hover"
+                        : "border-border-default bg-bg-tertiary text-text-secondary hover:border-border-hover",
                     )}
                   >
                     {color}
@@ -385,7 +416,12 @@ export default function BrandPage() {
             </div>
 
             {/* Generate button */}
-            <Button className="w-full" size="lg" onClick={handleGenerate} disabled={generating}>
+            <Button
+              className="w-full"
+              size="lg"
+              onClick={handleGenerate}
+              disabled={generating}
+            >
               <Sparkles className="h-4 w-4 mr-2" />
               Générer mon identité de marque
             </Button>
@@ -439,15 +475,25 @@ function BrandKitView({
     const raw = kit as Record<string, unknown>;
     const toStrArr = (v: unknown): string[] => {
       if (!Array.isArray(v)) return [];
-      return v.map((item) => (typeof item === "string" ? item : JSON.stringify(item)));
+      return v.map((item) =>
+        typeof item === "string" ? item : JSON.stringify(item),
+      );
     };
 
     const mission = String(raw.mission || "");
     const vision = String(raw.vision || "");
     const valeurs = toStrArr(raw.valeurs || raw.values || raw.valeur || []);
-    const ton = String(raw.ton || raw.tone || raw.ton_de_communication || raw.tone_of_voice || "");
+    const ton = String(
+      raw.ton ||
+        raw.tone ||
+        raw.ton_de_communication ||
+        raw.tone_of_voice ||
+        "",
+    );
     const do_list = toStrArr(raw.do_list || raw.do || raw.a_faire || []);
-    const dont_list = toStrArr(raw.dont_list || raw.dont || raw.a_ne_pas_faire || []);
+    const dont_list = toStrArr(
+      raw.dont_list || raw.dont || raw.a_ne_pas_faire || [],
+    );
 
     // Old format: flat keys like primary_color, accent_color, font_heading, font_body, logo_url
     const flatItems: { label: string; value: string }[] = [];
@@ -460,14 +506,28 @@ function BrandKitView({
       logo_url: "URL du logo",
     };
     for (const [key, label] of Object.entries(flatKeys)) {
-      if (raw[key] && typeof raw[key] === "string" && (raw[key] as string).length > 0) {
+      if (
+        raw[key] &&
+        typeof raw[key] === "string" &&
+        (raw[key] as string).length > 0
+      ) {
         flatItems.push({ label, value: String(raw[key]) });
       }
     }
 
-    const isOldFormat = flatItems.length > 0 && !mission && !vision && valeurs.length === 0;
+    const isOldFormat =
+      flatItems.length > 0 && !mission && !vision && valeurs.length === 0;
 
-    return { mission, vision, valeurs, ton, do_list, dont_list, flatItems, isOldFormat };
+    return {
+      mission,
+      vision,
+      valeurs,
+      ton,
+      do_list,
+      dont_list,
+      flatItems,
+      isOldFormat,
+    };
   }, [kit]);
 
   if (!normalized) {
@@ -493,8 +553,13 @@ function BrandKitView({
           <CardContent>
             <div className="grid gap-3 sm:grid-cols-2">
               {normalized.flatItems.map((item, i) => (
-                <div key={i} className="p-4 rounded-xl bg-bg-tertiary border border-border-default">
-                  <p className="text-xs text-text-muted uppercase tracking-wide mb-1">{item.label}</p>
+                <div
+                  key={i}
+                  className="p-4 rounded-xl bg-bg-tertiary border border-border-default"
+                >
+                  <p className="text-xs text-text-muted uppercase tracking-wide mb-1">
+                    {item.label}
+                  </p>
                   <div className="flex items-center gap-2">
                     {item.value.startsWith("#") && (
                       <div
@@ -502,14 +567,18 @@ function BrandKitView({
                         style={{ backgroundColor: item.value }}
                       />
                     )}
-                    <p className="text-sm font-medium text-text-primary">{item.value}</p>
+                    <p className="text-sm font-medium text-text-primary">
+                      {item.value}
+                    </p>
                   </div>
                 </div>
               ))}
             </div>
             {normalized.ton && (
               <div className="mt-4 p-4 rounded-xl bg-bg-tertiary border border-border-default">
-                <p className="text-xs text-text-muted uppercase tracking-wide mb-1">Ton de communication</p>
+                <p className="text-xs text-text-muted uppercase tracking-wide mb-1">
+                  Ton de communication
+                </p>
                 <p className="text-sm text-text-secondary">{normalized.ton}</p>
               </div>
             )}
@@ -530,7 +599,9 @@ function BrandKitView({
               <CardTitle className="text-base">Mission</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-text-secondary">{normalized.mission || "—"}</p>
+              <p className="text-sm text-text-secondary">
+                {normalized.mission || "—"}
+              </p>
             </CardContent>
           </Card>
           <Card>
@@ -538,7 +609,9 @@ function BrandKitView({
               <CardTitle className="text-base">Vision</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-text-secondary">{normalized.vision || "—"}</p>
+              <p className="text-sm text-text-secondary">
+                {normalized.vision || "—"}
+              </p>
             </CardContent>
           </Card>
         </div>
@@ -580,8 +653,7 @@ function BrandKitView({
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-base">
-                <CheckCircle className="h-4 w-4 text-accent" />
-                À faire
+                <CheckCircle className="h-4 w-4 text-accent" />À faire
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
@@ -596,8 +668,7 @@ function BrandKitView({
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-base">
-                <XCircle className="h-4 w-4 text-danger" />
-                À ne pas faire
+                <XCircle className="h-4 w-4 text-danger" />À ne pas faire
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">

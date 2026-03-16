@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
     if (!rl.allowed) {
       return NextResponse.json(
         { error: "Trop de requêtes. Réessaie dans quelques secondes." },
-        { status: 429 }
+        { status: 429 },
       );
     }
 
@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
     if (!usage.allowed) {
       return NextResponse.json(
         { error: "Limite de générations IA atteinte", usage },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
     if (!objections || !Array.isArray(objections) || objections.length === 0) {
       return NextResponse.json(
         { error: "Au moins une objection est requise" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -117,21 +117,27 @@ export async function POST(req: NextRequest) {
         published: false,
         ai_raw_response: item.reel,
       });
-      if (reelErr) console.error("objections-to-content: failed to save reel", reelErr);
+      if (reelErr)
+        console.error("objections-to-content: failed to save reel", reelErr);
 
       // Save carousel
-      const { error: carouselErr } = await supabase.from("content_pieces").insert({
-        user_id: user.id,
-        content_type: "instagram_carousel",
-        title: `Objection → Carousel : "${item.objection.slice(0, 50)}"`,
-        hook: item.carousel.hook_cover,
-        content: item.carousel.caption,
-        hashtags: item.carousel.hashtags,
-        published: false,
-        ai_raw_response: item.carousel,
-      });
+      const { error: carouselErr } = await supabase
+        .from("content_pieces")
+        .insert({
+          user_id: user.id,
+          content_type: "instagram_carousel",
+          title: `Objection → Carousel : "${item.objection.slice(0, 50)}"`,
+          hook: item.carousel.hook_cover,
+          content: item.carousel.caption,
+          hashtags: item.carousel.hashtags,
+          published: false,
+          ai_raw_response: item.carousel,
+        });
       if (carouselErr)
-        console.error("objections-to-content: failed to save carousel", carouselErr);
+        console.error(
+          "objections-to-content: failed to save carousel",
+          carouselErr,
+        );
     }
 
     // Award XP (non-blocking)
@@ -151,7 +157,7 @@ export async function POST(req: NextRequest) {
     const errMsg = error instanceof Error ? error.message : String(error);
     return NextResponse.json(
       { error: `Erreur lors de la transformation des objections: ${errMsg}` },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

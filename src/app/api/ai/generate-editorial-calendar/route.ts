@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
     if (!usage.allowed) {
       return NextResponse.json(
         { error: "Limite de générations IA atteinte", usage },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -33,8 +33,7 @@ export async function POST(req: NextRequest) {
 
     // Use provided start date or tomorrow
     const start =
-      startDate ||
-      new Date(Date.now() + 86400000).toISOString().split("T")[0];
+      startDate || new Date(Date.now() + 86400000).toISOString().split("T")[0];
 
     // Fetch user context in parallel
     const [vaultContext, { data: latestOffer }, { data: latestMarket }] =
@@ -50,7 +49,7 @@ export async function POST(req: NextRequest) {
         supabase
           .from("market_analyses")
           .select(
-            "market_name, recommended_positioning, persona, target_avatar"
+            "market_name, recommended_positioning, persona, target_avatar",
           )
           .eq("user_id", user.id)
           .order("created_at", { ascending: false })
@@ -80,7 +79,7 @@ export async function POST(req: NextRequest) {
       offerStr,
       personaStr,
       start,
-      vaultContext
+      vaultContext,
     );
 
     const result = await generateJSON<EditorialCalendarResult>({
@@ -105,7 +104,7 @@ export async function POST(req: NextRequest) {
     console.error("Error generating editorial calendar:", error);
     return NextResponse.json(
       { error: "Erreur lors de la génération du plan editorial" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

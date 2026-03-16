@@ -2,7 +2,13 @@
 
 import React from "react";
 import { PageHeader } from "@/components/layout/page-header";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AILoading } from "@/components/shared/ai-loading";
@@ -50,7 +56,10 @@ export default function SalesPage() {
   const [error, setError] = React.useState<string | null>(null);
   const [activeTab, setActiveTab] = React.useState<string>("discovery");
   const [copied, setCopied] = React.useState(false);
-  const [usageLimited, setUsageLimited] = React.useState<{currentUsage: number; limit: number} | null>(null);
+  const [usageLimited, setUsageLimited] = React.useState<{
+    currentUsage: number;
+    limit: number;
+  } | null>(null);
 
   const activeType = activeTab === "history" ? "discovery" : activeTab;
 
@@ -68,7 +77,10 @@ export default function SalesPage() {
       if (!response.ok) {
         if (response.status === 403) {
           const errData = await response.json();
-          if (errData.usage) { setUsageLimited(errData.usage); return; }
+          if (errData.usage) {
+            setUsageLimited(errData.usage);
+            return;
+          }
         }
         throw new Error("Erreur lors de la génération");
       }
@@ -82,7 +94,8 @@ export default function SalesPage() {
   };
 
   const copyAll = () => {
-    const text = typeof script === "string" ? script : JSON.stringify(script, null, 2);
+    const text =
+      typeof script === "string" ? script : JSON.stringify(script, null, 2);
     navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -106,7 +119,10 @@ export default function SalesPage() {
       let parsed = data.ai_raw_response;
       if (!parsed && data.content) {
         try {
-          parsed = typeof data.content === "string" ? JSON.parse(data.content) : data.content;
+          parsed =
+            typeof data.content === "string"
+              ? JSON.parse(data.content)
+              : data.content;
         } catch {
           parsed = null;
         }
@@ -135,7 +151,12 @@ export default function SalesPage() {
 
   const renderGenerator = () => {
     if (usageLimited) {
-      return <UpgradeWall currentUsage={usageLimited.currentUsage} limit={usageLimited.limit} />;
+      return (
+        <UpgradeWall
+          currentUsage={usageLimited.currentUsage}
+          limit={usageLimited.limit}
+        />
+      );
     }
 
     if (loading) {
@@ -151,12 +172,17 @@ export default function SalesPage() {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => exportToPDF({
-                  title: activeType === "discovery" ? "Script Appel Découverte" : "Script de Closing",
-                  subtitle: "Généré par ScalingFlow",
-                  content: script,
-                  filename: `script-${activeType}-scalingflow.pdf`,
-                })}
+                onClick={() =>
+                  exportToPDF({
+                    title:
+                      activeType === "discovery"
+                        ? "Script Appel Découverte"
+                        : "Script de Closing",
+                    subtitle: "Généré par ScalingFlow",
+                    content: script,
+                    filename: `script-${activeType}-scalingflow.pdf`,
+                  })
+                }
               >
                 <FileDown className="h-4 w-4 mr-1" />
                 PDF
@@ -168,7 +194,13 @@ export default function SalesPage() {
             </div>
           </div>
           <SalesScriptView script={script} />
-          <Button variant="outline" onClick={() => { setScript(null); handleGenerate(); }}>
+          <Button
+            variant="outline"
+            onClick={() => {
+              setScript(null);
+              handleGenerate();
+            }}
+          >
             Régénérer
           </Button>
         </div>
@@ -183,7 +215,8 @@ export default function SalesPage() {
             Générateur de scripts
           </CardTitle>
           <CardDescription>
-            L&apos;IA va créer un script de vente adapté à ton offre et ton avatar
+            L&apos;IA va créer un script de vente adapté à ton offre et ton
+            avatar
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -218,7 +251,7 @@ export default function SalesPage() {
               "flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all whitespace-nowrap",
               activeTab === tab.key
                 ? "bg-accent text-white"
-                : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
+                : "bg-bg-tertiary text-text-secondary hover:text-text-primary",
             )}
           >
             <tab.icon className="h-4 w-4" />
@@ -278,7 +311,9 @@ function SalesScriptView({ script }: { script: SalesScript }) {
       <GlowCard glowColor="orange">
         <div className="prose prose-invert prose-sm max-w-none">
           <pre className="text-text-secondary text-sm whitespace-pre-wrap font-sans">
-            {typeof script === "string" ? script : JSON.stringify(script, null, 2)}
+            {typeof script === "string"
+              ? script
+              : JSON.stringify(script, null, 2)}
           </pre>
         </div>
       </GlowCard>
@@ -340,8 +375,12 @@ function SalesScriptView({ script }: { script: SalesScript }) {
                           key={j}
                           className="flex items-start gap-2 rounded-lg bg-accent-muted/30 border border-accent/10 px-3 py-2"
                         >
-                          <span className="text-accent text-sm mt-0.5 shrink-0">&ldquo;</span>
-                          <p className="text-sm text-text-primary italic">{q}</p>
+                          <span className="text-accent text-sm mt-0.5 shrink-0">
+                            &ldquo;
+                          </span>
+                          <p className="text-sm text-text-primary italic">
+                            {q}
+                          </p>
                         </div>
                       ))}
                     </div>
@@ -356,28 +395,36 @@ function SalesScriptView({ script }: { script: SalesScript }) {
                       <p className="text-xs text-info font-medium uppercase tracking-wide mb-1">
                         Transition
                       </p>
-                      <p className="text-sm text-text-secondary">{section.transition}</p>
+                      <p className="text-sm text-text-secondary">
+                        {section.transition}
+                      </p>
                     </div>
                   </div>
                 )}
 
                 {/* Mistakes to avoid */}
-                {section.mistakes_to_avoid && section.mistakes_to_avoid.length > 0 && (
-                  <div>
-                    <p className="flex items-center gap-2 text-xs text-text-muted uppercase tracking-wide mb-2">
-                      <AlertTriangle className="h-3.5 w-3.5 text-warning" />
-                      Erreurs à éviter
-                    </p>
-                    <div className="space-y-1">
-                      {section.mistakes_to_avoid.map((m, j) => (
-                        <div key={j} className="flex items-start gap-2 text-sm">
-                          <span className="text-warning mt-0.5 shrink-0">&#x2717;</span>
-                          <span className="text-text-muted">{m}</span>
-                        </div>
-                      ))}
+                {section.mistakes_to_avoid &&
+                  section.mistakes_to_avoid.length > 0 && (
+                    <div>
+                      <p className="flex items-center gap-2 text-xs text-text-muted uppercase tracking-wide mb-2">
+                        <AlertTriangle className="h-3.5 w-3.5 text-warning" />
+                        Erreurs à éviter
+                      </p>
+                      <div className="space-y-1">
+                        {section.mistakes_to_avoid.map((m, j) => (
+                          <div
+                            key={j}
+                            className="flex items-start gap-2 text-sm"
+                          >
+                            <span className="text-warning mt-0.5 shrink-0">
+                              &#x2717;
+                            </span>
+                            <span className="text-text-muted">{m}</span>
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
               </CardContent>
             )}
           </Card>

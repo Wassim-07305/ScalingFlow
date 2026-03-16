@@ -2,7 +2,13 @@
 
 import React from "react";
 import { cn } from "@/lib/utils/cn";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AILoading } from "@/components/shared/ai-loading";
@@ -39,21 +45,25 @@ interface ObjectionInput {
 
 export function ObjectionContent({ className }: ObjectionContentProps) {
   const [loading, setLoading] = React.useState(false);
-  const [result, setResult] = React.useState<ObjectionContentResult | null>(null);
+  const [result, setResult] = React.useState<ObjectionContentResult | null>(
+    null,
+  );
   const [error, setError] = React.useState<string | null>(null);
   const [usageLimited, setUsageLimited] = React.useState<{
     currentUsage: number;
     limit: number;
   } | null>(null);
   const [expandedCard, setExpandedCard] = React.useState<number | null>(null);
-  const [expandedType, setExpandedType] = React.useState<Record<string, string>>({});
+  const [expandedType, setExpandedType] = React.useState<
+    Record<string, string>
+  >({});
   const [copiedField, setCopiedField] = React.useState<string | null>(null);
 
   // Form state
   const [showForm, setShowForm] = React.useState(true);
-  const [objectionInputs, setObjectionInputs] = React.useState<ObjectionInput[]>([
-    { id: 1, text: "", frequency: 5 },
-  ]);
+  const [objectionInputs, setObjectionInputs] = React.useState<
+    ObjectionInput[]
+  >([{ id: 1, text: "", frequency: 5 }]);
   const nextIdRef = React.useRef(2);
 
   const addObjection = () => {
@@ -67,9 +77,13 @@ export function ObjectionContent({ className }: ObjectionContentProps) {
     setObjectionInputs((prev) => prev.filter((o) => o.id !== id));
   };
 
-  const updateObjection = (id: number, field: "text" | "frequency", value: string | number) => {
+  const updateObjection = (
+    id: number,
+    field: "text" | "frequency",
+    value: string | number,
+  ) => {
     setObjectionInputs((prev) =>
-      prev.map((o) => (o.id === id ? { ...o, [field]: value } : o))
+      prev.map((o) => (o.id === id ? { ...o, [field]: value } : o)),
     );
   };
 
@@ -133,7 +147,9 @@ export function ObjectionContent({ className }: ObjectionContentProps) {
 
   const copyCarousel = (piece: ObjectionContentPiece, index: number) => {
     const slidesText = piece.carousel.slides
-      .map((s) => `Slide ${s.numero}: ${s.texte_principal}\n${s.texte_secondaire}`)
+      .map(
+        (s) => `Slide ${s.numero}: ${s.texte_principal}\n${s.texte_secondaire}`,
+      )
       .join("\n\n");
     const text = `Cover: ${piece.carousel.hook_cover}\n\n${slidesText}\n\nCTA: ${piece.carousel.cta_final}\n\nCaption: ${piece.carousel.caption}\n\nHashtags: ${piece.carousel.hashtags.join(" ")}`;
     copyToClipboard(text, `carousel-${index}`);
@@ -168,8 +184,8 @@ export function ObjectionContent({ className }: ObjectionContentProps) {
               {"Objections → Contenu"}
             </CardTitle>
             <CardDescription>
-              Transforme tes objections de vente fréquentes en Reels et carousels
-              qui les adressent de manière subtile et éducative.
+              Transforme tes objections de vente fréquentes en Reels et
+              carousels qui les adressent de manière subtile et éducative.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-5">
@@ -184,8 +200,12 @@ export function ObjectionContent({ className }: ObjectionContentProps) {
                     <input
                       type="text"
                       value={obj.text}
-                      onChange={(e) => updateObjection(obj.id, "text", e.target.value)}
-                      placeholder={"Ex: \"C'est trop cher\", \"Je n'ai pas le temps\"..."}
+                      onChange={(e) =>
+                        updateObjection(obj.id, "text", e.target.value)
+                      }
+                      placeholder={
+                        'Ex: "C\'est trop cher", "Je n\'ai pas le temps"...'
+                      }
                       className="w-full rounded-lg border border-border-default bg-bg-secondary px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
                     />
                   </div>
@@ -193,7 +213,11 @@ export function ObjectionContent({ className }: ObjectionContentProps) {
                     <select
                       value={obj.frequency}
                       onChange={(e) =>
-                        updateObjection(obj.id, "frequency", Number(e.target.value))
+                        updateObjection(
+                          obj.id,
+                          "frequency",
+                          Number(e.target.value),
+                        )
                       }
                       className="w-full rounded-lg border border-border-default bg-bg-secondary px-2 py-2 text-sm text-text-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
                     >
@@ -249,8 +273,9 @@ export function ObjectionContent({ className }: ObjectionContentProps) {
       <div className="flex items-center justify-between">
         <div>
           <h3 className="text-base font-semibold text-text-primary">
-            {result.total_objections} objection{result.total_objections > 1 ? "s" : ""}{" "}
-            {"transformée"}{result.total_objections > 1 ? "s" : ""} en contenu
+            {result.total_objections} objection
+            {result.total_objections > 1 ? "s" : ""} {"transformée"}
+            {result.total_objections > 1 ? "s" : ""} en contenu
           </h3>
           <p className="text-sm text-text-secondary mt-0.5">
             {result.total_objections * 2} pièces de contenu générées
@@ -315,7 +340,7 @@ export function ObjectionContent({ className }: ObjectionContentProps) {
                         "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all",
                         viewingType === "reel"
                           ? "bg-accent text-white"
-                          : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
+                          : "bg-bg-tertiary text-text-secondary hover:text-text-primary",
                       )}
                     >
                       <Film className="h-3.5 w-3.5" />
@@ -323,13 +348,16 @@ export function ObjectionContent({ className }: ObjectionContentProps) {
                     </button>
                     <button
                       onClick={() =>
-                        setExpandedType((prev) => ({ ...prev, [i]: "carousel" }))
+                        setExpandedType((prev) => ({
+                          ...prev,
+                          [i]: "carousel",
+                        }))
                       }
                       className={cn(
                         "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all",
                         viewingType === "carousel"
                           ? "bg-accent text-white"
-                          : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
+                          : "bg-bg-tertiary text-text-secondary hover:text-text-primary",
                       )}
                     >
                       <Layers className="h-3.5 w-3.5" />
@@ -346,7 +374,9 @@ export function ObjectionContent({ className }: ObjectionContentProps) {
                           <span className="text-sm font-medium text-text-primary">
                             Script Reel
                           </span>
-                          <Badge variant="muted">{piece.reel.duree_estimee}</Badge>
+                          <Badge variant="muted">
+                            {piece.reel.duree_estimee}
+                          </Badge>
                         </div>
                         <Button
                           variant="ghost"
@@ -464,7 +494,7 @@ export function ObjectionContent({ className }: ObjectionContentProps) {
                               onClick={() =>
                                 copyToClipboard(
                                   piece.carousel.caption,
-                                  `caption-${i}`
+                                  `caption-${i}`,
                                 )
                               }
                             >

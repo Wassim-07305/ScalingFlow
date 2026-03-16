@@ -45,7 +45,9 @@ export function GenerationHistory({
   const [items, setItems] = React.useState<HistoryItem[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [deletingId, setDeletingId] = React.useState<string | null>(null);
-  const [confirmDeleteId, setConfirmDeleteId] = React.useState<string | null>(null);
+  const [confirmDeleteId, setConfirmDeleteId] = React.useState<string | null>(
+    null,
+  );
   const supabase = createClient();
 
   React.useEffect(() => {
@@ -89,7 +91,7 @@ export function GenerationHistory({
               ? (row[statusField] as string) || undefined
               : undefined,
             created_at: row.created_at as string,
-          }))
+          })),
         );
       }
       setLoading(false);
@@ -174,11 +176,18 @@ export function GenerationHistory({
 
   if (items.length === 0) {
     return (
-      <div className={cn("flex flex-col items-center justify-center text-center py-12", className)}>
+      <div
+        className={cn(
+          "flex flex-col items-center justify-center text-center py-12",
+          className,
+        )}
+      >
         <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-accent/10 mb-4">
           <Inbox className="h-7 w-7 text-accent" />
         </div>
-        <p className="text-sm font-medium text-text-primary mb-1">Aucun historique</p>
+        <p className="text-sm font-medium text-text-primary mb-1">
+          Aucun historique
+        </p>
         <p className="text-sm text-text-muted max-w-xs">{emptyMessage}</p>
       </div>
     );
@@ -187,14 +196,16 @@ export function GenerationHistory({
   return (
     <div className={cn("space-y-3", className)}>
       <div className="flex items-center justify-between mb-2">
-        <p className="text-sm text-text-muted">{items.length} élément{items.length > 1 ? "s" : ""}</p>
+        <p className="text-sm text-text-muted">
+          {items.length} élément{items.length > 1 ? "s" : ""}
+        </p>
       </div>
       {items.map((item) => (
         <Card
           key={item.id}
           className={cn(
             "transition-all group",
-            onSelect && "cursor-pointer hover:border-border-hover"
+            onSelect && "cursor-pointer hover:border-border-hover",
           )}
           onClick={() => {
             if (confirmDeleteId === item.id) return;
@@ -230,7 +241,10 @@ export function GenerationHistory({
 
                 {/* Delete button */}
                 {confirmDeleteId === item.id ? (
-                  <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+                  <div
+                    className="flex items-center gap-1"
+                    onClick={(e) => e.stopPropagation()}
+                  >
                     <Button
                       variant="ghost"
                       size="sm"

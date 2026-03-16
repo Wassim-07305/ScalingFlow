@@ -7,7 +7,7 @@ export async function POST() {
     if (!stripe) {
       return NextResponse.json(
         { error: "Stripe non configuré. Contacte le support." },
-        { status: 503 }
+        { status: 503 },
       );
     }
 
@@ -29,7 +29,7 @@ export async function POST() {
     if (!profile?.stripe_customer_id) {
       return NextResponse.json(
         { error: "Aucun abonnement Stripe associé à ce compte." },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -44,7 +44,7 @@ export async function POST() {
   } catch (error) {
     return NextResponse.json(
       { error: "Erreur lors de l'accès au portail de facturation" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

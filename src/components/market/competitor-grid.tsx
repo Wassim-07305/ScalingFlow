@@ -138,7 +138,9 @@ function CompetitorCard({ competitor }: { competitor: Competitor }) {
             <Target className="h-3 w-3 text-info" />
             Différenciation
           </h4>
-          <p className="text-sm text-text-secondary">{competitor.differentiation}</p>
+          <p className="text-sm text-text-secondary">
+            {competitor.differentiation}
+          </p>
         </div>
 
         {/* Funnel & Revenue */}
@@ -168,20 +170,33 @@ function CompetitorCard({ competitor }: { competitor: Competitor }) {
             </h4>
             <div className="space-y-2">
               {competitor.ad_insights.map((ad, i) => (
-                <div key={i} className="bg-bg-tertiary/50 rounded-lg p-2.5 space-y-1.5">
+                <div
+                  key={i}
+                  className="bg-bg-tertiary/50 rounded-lg p-2.5 space-y-1.5"
+                >
                   <div className="flex items-center justify-between">
-                    <Badge variant="blue" className="text-xs">{ad.platform}</Badge>
-                    <span className="text-xs text-text-muted">{ad.estimated_monthly_spend}</span>
+                    <Badge variant="blue" className="text-xs">
+                      {ad.platform}
+                    </Badge>
+                    <span className="text-xs text-text-muted">
+                      {ad.estimated_monthly_spend}
+                    </span>
                   </div>
                   {ad.main_hooks.length > 0 && (
                     <div className="flex flex-wrap gap-1">
                       {ad.main_hooks.map((h, j) => (
-                        <span key={j} className="text-xs text-text-secondary bg-bg-secondary px-1.5 py-0.5 rounded">{h}</span>
+                        <span
+                          key={j}
+                          className="text-xs text-text-secondary bg-bg-secondary px-1.5 py-0.5 rounded"
+                        >
+                          {h}
+                        </span>
                       ))}
                     </div>
                   )}
                   <div className="text-xs text-text-muted">
-                    CTA : {ad.cta_patterns.join(", ")} | LP : {ad.landing_page_type}
+                    CTA : {ad.cta_patterns.join(", ")} | LP :{" "}
+                    {ad.landing_page_type}
                   </div>
                 </div>
               ))}
@@ -190,42 +205,78 @@ function CompetitorCard({ competitor }: { competitor: Competitor }) {
         )}
 
         {/* Content Insights */}
-        {competitor.content_insights && competitor.content_insights.length > 0 && (
-          <div className="space-y-2">
-            <h4 className="text-xs font-medium text-text-muted uppercase tracking-wider flex items-center gap-1.5">
-              <BarChart3 className="h-3 w-3 text-accent" />
-              Insights Contenu Organique
-            </h4>
+        {competitor.content_insights &&
+          competitor.content_insights.length > 0 && (
             <div className="space-y-2">
-              {competitor.content_insights.map((c, i) => (
-                <div key={i} className="bg-bg-tertiary/50 rounded-lg p-2.5 space-y-1">
-                  <div className="flex items-center justify-between">
-                    <Badge variant="default" className="text-xs">{c.platform}</Badge>
-                    <span className="text-xs text-text-muted">{c.audience_size_estimate}</span>
+              <h4 className="text-xs font-medium text-text-muted uppercase tracking-wider flex items-center gap-1.5">
+                <BarChart3 className="h-3 w-3 text-accent" />
+                Insights Contenu Organique
+              </h4>
+              <div className="space-y-2">
+                {competitor.content_insights.map((c, i) => (
+                  <div
+                    key={i}
+                    className="bg-bg-tertiary/50 rounded-lg p-2.5 space-y-1"
+                  >
+                    <div className="flex items-center justify-between">
+                      <Badge variant="default" className="text-xs">
+                        {c.platform}
+                      </Badge>
+                      <span className="text-xs text-text-muted">
+                        {c.audience_size_estimate}
+                      </span>
+                    </div>
+                    <div className="text-xs text-text-secondary">
+                      {c.posting_frequency} | Engagement : {c.engagement_level}
+                    </div>
+                    <div className="flex flex-wrap gap-1">
+                      {c.top_content_types.map((t, j) => (
+                        <span
+                          key={j}
+                          className="text-xs text-accent bg-accent/10 px-1.5 py-0.5 rounded"
+                        >
+                          {t}
+                        </span>
+                      ))}
+                    </div>
                   </div>
-                  <div className="text-xs text-text-secondary">
-                    {c.posting_frequency} | Engagement : {c.engagement_level}
-                  </div>
-                  <div className="flex flex-wrap gap-1">
-                    {c.top_content_types.map((t, j) => (
-                      <span key={j} className="text-xs text-accent bg-accent/10 px-1.5 py-0.5 rounded">{t}</span>
-                    ))}
-                  </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
-        )}
+          )}
       </CardContent>
     </Card>
   );
 }
 
-const DATA_SOURCE_LABELS: Record<DataSource, { label: string; color: string; bgColor: string; borderColor: string }> = {
-  apify_crawl: { label: "Apify Crawl", color: "text-emerald-400", bgColor: "bg-emerald-500/10", borderColor: "border-emerald-500/20" },
-  google_trends: { label: "Google Trends", color: "text-blue-400", bgColor: "bg-blue-500/10", borderColor: "border-blue-500/20" },
-  web_scraping: { label: "Web Scraping", color: "text-orange-400", bgColor: "bg-orange-500/10", borderColor: "border-orange-500/20" },
-  ai_only: { label: "Analyse IA", color: "text-purple-400", bgColor: "bg-purple-500/10", borderColor: "border-purple-500/20" },
+const DATA_SOURCE_LABELS: Record<
+  DataSource,
+  { label: string; color: string; bgColor: string; borderColor: string }
+> = {
+  apify_crawl: {
+    label: "Apify Crawl",
+    color: "text-emerald-400",
+    bgColor: "bg-emerald-500/10",
+    borderColor: "border-emerald-500/20",
+  },
+  google_trends: {
+    label: "Google Trends",
+    color: "text-blue-400",
+    bgColor: "bg-blue-500/10",
+    borderColor: "border-blue-500/20",
+  },
+  web_scraping: {
+    label: "Web Scraping",
+    color: "text-orange-400",
+    bgColor: "bg-orange-500/10",
+    borderColor: "border-orange-500/20",
+  },
+  ai_only: {
+    label: "Analyse IA",
+    color: "text-purple-400",
+    bgColor: "bg-purple-500/10",
+    borderColor: "border-purple-500/20",
+  },
 };
 
 export function CompetitorGrid({
@@ -245,7 +296,9 @@ export function CompetitorGrid({
   return (
     <div className="space-y-6">
       {/* Data source badge */}
-      <div className={`flex items-center gap-2 p-3 rounded-lg ${sourceConfig.bgColor} border ${sourceConfig.borderColor}`}>
+      <div
+        className={`flex items-center gap-2 p-3 rounded-lg ${sourceConfig.bgColor} border ${sourceConfig.borderColor}`}
+      >
         {scrapingUsed ? (
           <Zap className={`h-4 w-4 shrink-0 ${sourceConfig.color}`} />
         ) : (
@@ -254,8 +307,7 @@ export function CompetitorGrid({
         <p className={`text-sm ${sourceConfig.color}`}>
           {scrapingUsed
             ? `Analyse enrichie via ${sourceConfig.label} — données réelles`
-            : "Analyse basée sur l'intelligence artificielle"
-          }
+            : "Analyse basée sur l'intelligence artificielle"}
         </p>
         <Badge variant="default" className="ml-auto shrink-0 text-xs">
           {sourceConfig.label}
@@ -274,14 +326,31 @@ export function CompetitorGrid({
           <CardContent>
             <div className="space-y-3">
               {trendsData.map((trend, i) => {
-                const avgValue = trend.timelineData.length > 0
-                  ? Math.round(trend.timelineData.reduce((s, d) => s + d.value, 0) / trend.timelineData.length)
-                  : 0;
+                const avgValue =
+                  trend.timelineData.length > 0
+                    ? Math.round(
+                        trend.timelineData.reduce((s, d) => s + d.value, 0) /
+                          trend.timelineData.length,
+                      )
+                    : 0;
                 return (
-                  <div key={i} className="p-3 rounded-lg bg-bg-tertiary border border-border-default">
+                  <div
+                    key={i}
+                    className="p-3 rounded-lg bg-bg-tertiary border border-border-default"
+                  >
                     <div className="flex items-center justify-between mb-2">
-                      <p className="text-sm font-medium text-text-primary">{trend.term}</p>
-                      <Badge variant={avgValue > 60 ? "default" : avgValue > 30 ? "blue" : "cyan"}>
+                      <p className="text-sm font-medium text-text-primary">
+                        {trend.term}
+                      </p>
+                      <Badge
+                        variant={
+                          avgValue > 60
+                            ? "default"
+                            : avgValue > 30
+                              ? "blue"
+                              : "cyan"
+                        }
+                      >
                         Intérêt : {avgValue}/100
                       </Badge>
                     </div>
@@ -315,23 +384,33 @@ export function CompetitorGrid({
             <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
               <div className="text-center">
                 <p className="text-xs text-text-muted">CPA moyen</p>
-                <p className="text-sm font-semibold text-text-primary">{industryBenchmarks.avg_cpa}</p>
+                <p className="text-sm font-semibold text-text-primary">
+                  {industryBenchmarks.avg_cpa}
+                </p>
               </div>
               <div className="text-center">
                 <p className="text-xs text-text-muted">CTR moyen</p>
-                <p className="text-sm font-semibold text-text-primary">{industryBenchmarks.avg_ctr}</p>
+                <p className="text-sm font-semibold text-text-primary">
+                  {industryBenchmarks.avg_ctr}
+                </p>
               </div>
               <div className="text-center">
                 <p className="text-xs text-text-muted">Taux conversion</p>
-                <p className="text-sm font-semibold text-text-primary">{industryBenchmarks.avg_conversion_rate}</p>
+                <p className="text-sm font-semibold text-text-primary">
+                  {industryBenchmarks.avg_conversion_rate}
+                </p>
               </div>
               <div className="text-center">
                 <p className="text-xs text-text-muted">Ads dominant</p>
-                <p className="text-sm font-semibold text-text-primary">{industryBenchmarks.dominant_ad_platform}</p>
+                <p className="text-sm font-semibold text-text-primary">
+                  {industryBenchmarks.dominant_ad_platform}
+                </p>
               </div>
               <div className="text-center">
                 <p className="text-xs text-text-muted">Contenu dominant</p>
-                <p className="text-sm font-semibold text-text-primary">{industryBenchmarks.dominant_content_platform}</p>
+                <p className="text-sm font-semibold text-text-primary">
+                  {industryBenchmarks.dominant_content_platform}
+                </p>
               </div>
             </div>
           </CardContent>
@@ -360,7 +439,9 @@ export function CompetitorGrid({
                 let displayUrl = s.url;
                 try {
                   displayUrl = new URL(s.url).hostname.replace("www.", "");
-                } catch { /* keep original */ }
+                } catch {
+                  /* keep original */
+                }
 
                 return (
                   <a
@@ -383,7 +464,9 @@ export function CompetitorGrid({
                       </div>
                     </div>
                     <div className="px-3 py-2.5">
-                      <p className="text-sm text-text-secondary truncate">{displayUrl}</p>
+                      <p className="text-sm text-text-secondary truncate">
+                        {displayUrl}
+                      </p>
                     </div>
                   </a>
                 );
@@ -408,10 +491,14 @@ export function CompetitorGrid({
                 let displayUrl = ts.url;
                 try {
                   displayUrl = new URL(ts.url).hostname.replace("www.", "");
-                } catch { /* keep original */ }
+                } catch {
+                  /* keep original */
+                }
 
                 // Group technologies by category
-                const grouped = ts.technologies.reduce<Record<string, string[]>>((acc, tech) => {
+                const grouped = ts.technologies.reduce<
+                  Record<string, string[]>
+                >((acc, tech) => {
                   const cat = tech.category || "Autre";
                   if (!acc[cat]) acc[cat] = [];
                   acc[cat].push(tech.name);
@@ -419,12 +506,19 @@ export function CompetitorGrid({
                 }, {});
 
                 return (
-                  <div key={i} className="p-4 rounded-xl bg-bg-tertiary border border-border-default">
-                    <p className="text-sm font-medium text-text-primary mb-3">{displayUrl}</p>
+                  <div
+                    key={i}
+                    className="p-4 rounded-xl bg-bg-tertiary border border-border-default"
+                  >
+                    <p className="text-sm font-medium text-text-primary mb-3">
+                      {displayUrl}
+                    </p>
                     <div className="space-y-3">
                       {Object.entries(grouped).map(([category, techs]) => (
                         <div key={category}>
-                          <p className="text-xs text-text-secondary mb-1.5 uppercase tracking-wider">{category}</p>
+                          <p className="text-xs text-text-secondary mb-1.5 uppercase tracking-wider">
+                            {category}
+                          </p>
                           <div className="flex flex-wrap gap-1.5">
                             {techs.map((name, j) => (
                               <span
@@ -447,7 +541,9 @@ export function CompetitorGrid({
       )}
 
       {/* Synthese strategique */}
-      {(marketGaps || positioningOpportunities || recommendedDifferentiation) && (
+      {(marketGaps ||
+        positioningOpportunities ||
+        recommendedDifferentiation) && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Lacunes du marché */}
           {marketGaps && marketGaps.length > 0 && (
@@ -461,7 +557,10 @@ export function CompetitorGrid({
               <CardContent>
                 <ul className="space-y-2">
                   {marketGaps.map((gap, i) => (
-                    <li key={i} className="flex items-start gap-2 text-sm text-text-secondary">
+                    <li
+                      key={i}
+                      className="flex items-start gap-2 text-sm text-text-secondary"
+                    >
                       <span className="text-warning mt-0.5">-</span>
                       {gap}
                     </li>
@@ -483,7 +582,10 @@ export function CompetitorGrid({
               <CardContent>
                 <ul className="space-y-2">
                   {positioningOpportunities.map((opp, i) => (
-                    <li key={i} className="flex items-start gap-2 text-sm text-text-secondary">
+                    <li
+                      key={i}
+                      className="flex items-start gap-2 text-sm text-text-secondary"
+                    >
                       <span className="text-accent mt-0.5">-</span>
                       {opp}
                     </li>

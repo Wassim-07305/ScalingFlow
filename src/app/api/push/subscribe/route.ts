@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
   if (!endpoint || !keys?.p256dh || !keys?.auth) {
     return NextResponse.json(
       { error: "Données de souscription invalides" },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
       p256dh: keys.p256dh,
       auth: keys.auth,
     },
-    { onConflict: "user_id,endpoint" }
+    { onConflict: "user_id,endpoint" },
   );
 
   if (error) {

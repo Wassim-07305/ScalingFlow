@@ -35,7 +35,7 @@ export async function GET(req: NextRequest) {
     console.error("Error listing conversations:", error);
     return NextResponse.json(
       { error: "Erreur lors du chargement des conversations" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -86,7 +86,7 @@ export async function POST(req: NextRequest) {
     console.error("Error saving conversation:", error);
     return NextResponse.json(
       { error: "Erreur lors de la sauvegarde" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -120,7 +120,7 @@ export async function DELETE(req: NextRequest) {
     console.error("Error deleting conversation:", error);
     return NextResponse.json(
       { error: "Erreur lors de la suppression" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

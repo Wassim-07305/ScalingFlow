@@ -2,7 +2,13 @@
 
 import React from "react";
 import { cn } from "@/lib/utils/cn";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AILoading } from "@/components/shared/ai-loading";
@@ -33,17 +39,46 @@ interface StrategyOverviewProps {
 }
 
 const PILIER_CONFIG = {
-  know: { label: "Know", icon: Target, color: "bg-info", textColor: "text-info" },
-  like: { label: "Like", icon: Heart, color: "bg-[#A78BFA]", textColor: "text-[#A78BFA]" },
-  trust: { label: "Trust", icon: Shield, color: "bg-accent", textColor: "text-accent" },
-  convert: { label: "Convert", icon: Zap, color: "bg-warning", textColor: "text-warning" },
+  know: {
+    label: "Know",
+    icon: Target,
+    color: "bg-info",
+    textColor: "text-info",
+  },
+  like: {
+    label: "Like",
+    icon: Heart,
+    color: "bg-[#A78BFA]",
+    textColor: "text-[#A78BFA]",
+  },
+  trust: {
+    label: "Trust",
+    icon: Shield,
+    color: "bg-accent",
+    textColor: "text-accent",
+  },
+  convert: {
+    label: "Convert",
+    icon: Zap,
+    color: "bg-warning",
+    textColor: "text-warning",
+  },
 } as const;
 
-export function StrategyOverview({ className, onStrategyGenerated, initialData }: StrategyOverviewProps) {
+export function StrategyOverview({
+  className,
+  onStrategyGenerated,
+  initialData,
+}: StrategyOverviewProps) {
   const [loading, setLoading] = React.useState(false);
-  const [strategy, setStrategy] = React.useState<ContentStrategyResult | null>(null);
+  const [strategy, setStrategy] = React.useState<ContentStrategyResult | null>(
+    null,
+  );
   const [error, setError] = React.useState<string | null>(null);
-  const [usageLimited, setUsageLimited] = React.useState<{currentUsage: number; limit: number} | null>(null);
+  const [usageLimited, setUsageLimited] = React.useState<{
+    currentUsage: number;
+    limit: number;
+  } | null>(null);
 
   // Form state
   const [strategyType, setStrategyType] = React.useState("organique");
@@ -77,7 +112,10 @@ export function StrategyOverview({ className, onStrategyGenerated, initialData }
       if (!response.ok) {
         if (response.status === 403) {
           const errData = await response.json();
-          if (errData.usage) { setUsageLimited(errData.usage); return; }
+          if (errData.usage) {
+            setUsageLimited(errData.usage);
+            return;
+          }
         }
         throw new Error("Erreur lors de la génération");
       }
@@ -97,11 +135,22 @@ export function StrategyOverview({ className, onStrategyGenerated, initialData }
   };
 
   if (usageLimited) {
-    return <UpgradeWall currentUsage={usageLimited.currentUsage} limit={usageLimited.limit} className={className} />;
+    return (
+      <UpgradeWall
+        currentUsage={usageLimited.currentUsage}
+        limit={usageLimited.limit}
+        className={className}
+      />
+    );
   }
 
   if (loading) {
-    return <AILoading text="Création de la stratégie de contenu" className={className} />;
+    return (
+      <AILoading
+        text="Création de la stratégie de contenu"
+        className={className}
+      />
+    );
   }
 
   if (!strategy || showForm) {
@@ -114,13 +163,16 @@ export function StrategyOverview({ className, onStrategyGenerated, initialData }
               Paramètres de stratégie
             </CardTitle>
             <CardDescription>
-              Définis le type de stratégie, la plateforme principale et tes objectifs.
+              Définis le type de stratégie, la plateforme principale et tes
+              objectifs.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-5">
             {/* Strategy type */}
             <div>
-              <label className="text-sm font-medium text-text-primary mb-2 block">Type de stratégie</label>
+              <label className="text-sm font-medium text-text-primary mb-2 block">
+                Type de stratégie
+              </label>
               <div className="flex flex-wrap gap-2">
                 {STRATEGY_TYPES.map((t) => (
                   <button
@@ -130,7 +182,7 @@ export function StrategyOverview({ className, onStrategyGenerated, initialData }
                       "px-3 py-1.5 rounded-lg text-sm font-medium transition-all",
                       strategyType === t.key
                         ? "bg-accent text-white"
-                        : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
+                        : "bg-bg-tertiary text-text-secondary hover:text-text-primary",
                     )}
                   >
                     {t.label}
@@ -141,7 +193,9 @@ export function StrategyOverview({ className, onStrategyGenerated, initialData }
 
             {/* Primary platform */}
             <div>
-              <label className="text-sm font-medium text-text-primary mb-2 block">Plateforme principale</label>
+              <label className="text-sm font-medium text-text-primary mb-2 block">
+                Plateforme principale
+              </label>
               <div className="flex flex-wrap gap-2">
                 {PRIMARY_PLATFORMS.map((p) => (
                   <button
@@ -151,7 +205,7 @@ export function StrategyOverview({ className, onStrategyGenerated, initialData }
                       "px-3 py-1.5 rounded-lg text-sm font-medium transition-all",
                       primaryPlatform === p.key
                         ? "bg-accent text-white"
-                        : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
+                        : "bg-bg-tertiary text-text-secondary hover:text-text-primary",
                     )}
                   >
                     {p.label}
@@ -163,7 +217,8 @@ export function StrategyOverview({ className, onStrategyGenerated, initialData }
             {/* Business objective */}
             <div>
               <label className="text-sm font-medium text-text-primary mb-1 block">
-                Objectif principal <span className="text-text-muted font-normal">(optionnel)</span>
+                Objectif principal{" "}
+                <span className="text-text-muted font-normal">(optionnel)</span>
               </label>
               <input
                 type="text"
@@ -197,7 +252,9 @@ export function StrategyOverview({ className, onStrategyGenerated, initialData }
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-base font-semibold text-text-primary">Stratégie globale</h3>
+          <h3 className="text-base font-semibold text-text-primary">
+            Stratégie globale
+          </h3>
           <p className="text-sm text-text-secondary mt-0.5">
             {strategie_globale.frequence_recommandee}
           </p>
@@ -215,23 +272,36 @@ export function StrategyOverview({ className, onStrategyGenerated, initialData }
       {/* Ratio KLCT */}
       <Card>
         <CardContent className="pt-5">
-          <p className="text-sm font-medium text-text-primary mb-4">Répartition KLCT</p>
+          <p className="text-sm font-medium text-text-primary mb-4">
+            Répartition KLCT
+          </p>
           <div className="space-y-3">
-            {(Object.keys(PILIER_CONFIG) as Array<keyof typeof PILIER_CONFIG>).map((key) => {
+            {(
+              Object.keys(PILIER_CONFIG) as Array<keyof typeof PILIER_CONFIG>
+            ).map((key) => {
               const config = PILIER_CONFIG[key];
               const value = ratio[key];
               return (
                 <div key={key} className="space-y-1">
                   <div className="flex items-center justify-between text-sm">
                     <div className="flex items-center gap-2">
-                      <config.icon className={cn("h-4 w-4", config.textColor)} />
-                      <span className="text-text-secondary">{config.label}</span>
+                      <config.icon
+                        className={cn("h-4 w-4", config.textColor)}
+                      />
+                      <span className="text-text-secondary">
+                        {config.label}
+                      </span>
                     </div>
-                    <span className={cn("font-medium", config.textColor)}>{value}%</span>
+                    <span className={cn("font-medium", config.textColor)}>
+                      {value}%
+                    </span>
                   </div>
                   <div className="h-2 bg-bg-tertiary rounded-full overflow-hidden">
                     <div
-                      className={cn("h-full rounded-full transition-all", config.color)}
+                      className={cn(
+                        "h-full rounded-full transition-all",
+                        config.color,
+                      )}
                       style={{ width: `${value}%` }}
                     />
                   </div>
@@ -245,10 +315,14 @@ export function StrategyOverview({ className, onStrategyGenerated, initialData }
       {/* Plateformes prioritaires */}
       <Card>
         <CardContent className="pt-5">
-          <p className="text-sm font-medium text-text-primary mb-3">Plateformes prioritaires</p>
+          <p className="text-sm font-medium text-text-primary mb-3">
+            Plateformes prioritaires
+          </p>
           <div className="flex flex-wrap gap-2">
             {strategie_globale.plateformes_prioritaires.map((p, i) => (
-              <Badge key={i} variant="cyan">{p}</Badge>
+              <Badge key={i} variant="cyan">
+                {p}
+              </Badge>
             ))}
           </div>
         </CardContent>

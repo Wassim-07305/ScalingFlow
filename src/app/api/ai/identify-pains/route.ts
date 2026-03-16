@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
     if (!market_analysis_id) {
       return NextResponse.json(
         { error: "market_analysis_id requis" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
     if (fetchError || !analysis) {
       return NextResponse.json(
         { error: "Analyse introuvable" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -49,10 +49,9 @@ export async function POST(req: NextRequest) {
         market_name: analysis.market_name,
         market_description: analysis.market_description || undefined,
         problems: (analysis.problems as string[]) || undefined,
-        recommended_positioning:
-          analysis.recommended_positioning || undefined,
+        recommended_positioning: analysis.recommended_positioning || undefined,
       },
-      avatar
+      avatar,
     );
 
     const result = await generateJSON({ prompt, maxTokens: 4096 });
@@ -75,7 +74,7 @@ export async function POST(req: NextRequest) {
     console.error("Identify pains error:", error);
     return NextResponse.json(
       { error: "Erreur lors de l'identification des pains" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

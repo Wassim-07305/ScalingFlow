@@ -148,7 +148,7 @@ export function GoogleCalendarWidget({ className }: { className?: string }) {
     <div
       className={cn(
         "rounded-2xl border border-border-default/50 bg-bg-secondary/30 backdrop-blur-sm overflow-hidden",
-        className
+        className,
       )}
     >
       {/* Header */}
@@ -178,7 +178,7 @@ export function GoogleCalendarWidget({ className }: { className?: string }) {
             <RefreshCw
               className={cn(
                 "h-4 w-4 text-text-muted",
-                refreshing && "animate-spin"
+                refreshing && "animate-spin",
               )}
             />
           </Button>

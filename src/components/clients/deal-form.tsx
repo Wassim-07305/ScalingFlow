@@ -121,7 +121,9 @@ export function DealForm({
               id="deal-title"
               placeholder="Coaching 3 mois"
               value={form.title}
-              onChange={(e) => setForm((p) => ({ ...p, title: e.target.value }))}
+              onChange={(e) =>
+                setForm((p) => ({ ...p, title: e.target.value }))
+              }
               required
             />
           </div>
@@ -137,7 +139,10 @@ export function DealForm({
                 placeholder="2000"
                 value={form.amount || ""}
                 onChange={(e) =>
-                  setForm((p) => ({ ...p, amount: parseFloat(e.target.value) || 0 }))
+                  setForm((p) => ({
+                    ...p,
+                    amount: parseFloat(e.target.value) || 0,
+                  }))
                 }
               />
             </div>
@@ -169,7 +174,9 @@ export function DealForm({
               id="deal-notes"
               placeholder="Détails du deal..."
               value={form.notes}
-              onChange={(e) => setForm((p) => ({ ...p, notes: e.target.value }))}
+              onChange={(e) =>
+                setForm((p) => ({ ...p, notes: e.target.value }))
+              }
               className="min-h-[70px]"
             />
           </div>

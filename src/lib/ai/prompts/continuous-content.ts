@@ -28,7 +28,9 @@ export interface WeeklyBatchResult {
   contenus: ContentPiece[];
 }
 
-export function continuousContentPrompt(context: ContinuousContentContext): string {
+export function continuousContentPrompt(
+  context: ContinuousContentContext,
+): string {
   return `Tu es un expert en stratégie de contenu organique et en growth marketing pour les entrepreneurs francophones.
 
 ## CONTEXTE BUSINESS
@@ -36,22 +38,38 @@ export function continuousContentPrompt(context: ContinuousContentContext): stri
 - Offre : ${context.offer}
 - Persona cible : ${context.persona}
 
-${context.topPerformingTypes ? `## DONNÉES DE PERFORMANCE (adaptation intelligente)
+${
+  context.topPerformingTypes
+    ? `## DONNÉES DE PERFORMANCE (adaptation intelligente)
 Types de contenu les plus performants cette semaine :
 ${context.topPerformingTypes}
-→ Génère DAVANTAGE de contenus du type qui performe le mieux. Adapte le mix en conséquence.` : ""}
+→ Génère DAVANTAGE de contenus du type qui performe le mieux. Adapte le mix en conséquence.`
+    : ""
+}
 
-${context.engagementMetrics ? `## MÉTRIQUES D'ENGAGEMENT
+${
+  context.engagementMetrics
+    ? `## MÉTRIQUES D'ENGAGEMENT
 ${context.engagementMetrics}
-→ Utilise ces données pour orienter les angles et les hooks.` : ""}
+→ Utilise ces données pour orienter les angles et les hooks.`
+    : ""
+}
 
-${context.salesObjections ? `## OBJECTIONS DE VENTE FRÉQUENTES
+${
+  context.salesObjections
+    ? `## OBJECTIONS DE VENTE FRÉQUENTES
 ${context.salesObjections}
-→ Intègre des contenus qui adressent ces objections de manière subtile (éducation, preuve sociale, storytelling).` : ""}
+→ Intègre des contenus qui adressent ces objections de manière subtile (éducation, preuve sociale, storytelling).`
+    : ""
+}
 
-${context.adInsights ? `## INSIGHTS PUBLICITAIRES
+${
+  context.adInsights
+    ? `## INSIGHTS PUBLICITAIRES
 ${context.adInsights}
-→ Décline les hooks et angles performants en contenu organique.` : ""}
+→ Décline les hooks et angles performants en contenu organique.`
+    : ""
+}
 
 ## TA MISSION
 Génère un batch de 5 contenus pour la semaine, en respectant ces règles :

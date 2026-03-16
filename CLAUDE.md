@@ -16,9 +16,11 @@ ScalingFlow is an AI-powered SaaS platform for business scaling (French-language
 ## Architecture
 
 ### Tech Stack
+
 React 19 + TypeScript 5.9 + Next.js 16 (App Router) + Tailwind CSS 4 + Supabase (PostgreSQL + Auth + RLS). State: Zustand (2 stores). AI: Anthropic Claude SDK (6 endpoints, 11 prompt templates). Payments: Stripe. Email: Resend. Charts: Recharts. PWA: @ducanh2912/next-pwa. Deployed on Vercel.
 
 ### Directory Layout
+
 ```
 src/
   app/
@@ -91,10 +93,13 @@ src/
 **Client-side dominant**: 64 files with `"use client"`. No Server Actions — mutations go through API routes or direct Supabase calls.
 
 ### Path Alias
+
 `@/*` maps to `./src/*` (configured in `tsconfig.json`). Always use `@/` imports.
 
 ### Environment Variables
+
 Defined in `.env.local`:
+
 - `NEXT_PUBLIC_SUPABASE_URL` — Supabase project URL
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY` — Supabase anonymous key
 - `SUPABASE_SERVICE_ROLE_KEY` — Service role key (server-side only)
@@ -111,6 +116,7 @@ Defined in `.env.local`:
 - `NEXT_PUBLIC_APP_URL` — Public app URL
 
 ### Supabase
+
 - Browser client in `lib/supabase/client.ts`, server client in `lib/supabase/server.ts`
 - Session management via middleware
 - Single migration file (19KB)

@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
     if (!documentId || !content) {
       return NextResponse.json(
         { error: "documentId et content sont requis" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
     if (chunks.length === 0) {
       return NextResponse.json(
         { error: "Le document est vide ou invalide" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
     console.error("Error indexing document:", error);
     return NextResponse.json(
       { error: "Erreur lors de l'indexation du document" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -94,7 +94,7 @@ export async function DELETE(req: NextRequest) {
     if (!documentId) {
       return NextResponse.json(
         { error: "documentId est requis" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -113,7 +113,7 @@ export async function DELETE(req: NextRequest) {
     console.error("Error deleting document chunks:", error);
     return NextResponse.json(
       { error: "Erreur lors de la suppression" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

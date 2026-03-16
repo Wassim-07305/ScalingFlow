@@ -13,7 +13,7 @@ import { createClient } from "@/lib/supabase/server";
  */
 export async function buildVaultResourcesContext(
   userId: string,
-  maxChars = 8000
+  maxChars = 8000,
 ): Promise<string> {
   const supabase = await createClient();
 
@@ -69,7 +69,7 @@ export async function buildFullVaultContext(userId: string): Promise<string> {
     supabase
       .from("profiles")
       .select(
-        "first_name, situation, situation_details, vault_skills, expertise_answers, parcours, experience_level, current_revenue, target_revenue, industries, objectives, selected_market, niche"
+        "first_name, situation, situation_details, vault_skills, expertise_answers, parcours, experience_level, current_revenue, target_revenue, industries, objectives, selected_market, niche",
       )
       .eq("id", userId)
       .single(),
@@ -82,13 +82,19 @@ export async function buildFullVaultContext(userId: string): Promise<string> {
   if (profile.first_name) context += `- Prénom : ${profile.first_name}\n`;
   if (profile.situation) context += `- Situation : ${profile.situation}\n`;
   if (profile.parcours) context += `- Parcours : ${profile.parcours}\n`;
-  if (profile.experience_level) context += `- Niveau : ${profile.experience_level}\n`;
-  if (profile.current_revenue) context += `- Revenu actuel : ${profile.current_revenue} EUR/mois\n`;
-  if (profile.target_revenue) context += `- Objectif : ${profile.target_revenue} EUR/mois\n`;
-  if (profile.selected_market) context += `- Marché sélectionné : ${profile.selected_market}\n`;
+  if (profile.experience_level)
+    context += `- Niveau : ${profile.experience_level}\n`;
+  if (profile.current_revenue)
+    context += `- Revenu actuel : ${profile.current_revenue} EUR/mois\n`;
+  if (profile.target_revenue)
+    context += `- Objectif : ${profile.target_revenue} EUR/mois\n`;
+  if (profile.selected_market)
+    context += `- Marché sélectionné : ${profile.selected_market}\n`;
   if (profile.niche) context += `- Niche : ${profile.niche}\n`;
 
-  const skills = profile.vault_skills as { name: string; level: string }[] | null;
+  const skills = profile.vault_skills as
+    | { name: string; level: string }[]
+    | null;
   if (skills && Array.isArray(skills) && skills.length > 0) {
     context += "\n### Compétences\n";
     for (const s of skills) {

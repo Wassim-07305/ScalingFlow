@@ -1,7 +1,13 @@
 "use client";
 
 import React from "react";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AILoading } from "@/components/shared/ai-loading";
@@ -126,7 +132,8 @@ export function OutboundWorkflow() {
   };
 
   const copyAll = () => {
-    const text = typeof result === "string" ? result : JSON.stringify(result, null, 2);
+    const text =
+      typeof result === "string" ? result : JSON.stringify(result, null, 2);
     navigator.clipboard.writeText(text);
     setCopied(true);
     toast.success("Copié dans le presse-papiers");
@@ -174,7 +181,9 @@ export function OutboundWorkflow() {
         {/* Aperçu */}
         {result.overview && (
           <GlowCard glowColor="blue">
-            <p className="text-sm text-text-secondary leading-relaxed">{result.overview}</p>
+            <p className="text-sm text-text-secondary leading-relaxed">
+              {result.overview}
+            </p>
           </GlowCard>
         )}
 
@@ -183,7 +192,10 @@ export function OutboundWorkflow() {
           <div className="flex items-center gap-2 p-3 rounded-lg bg-bg-tertiary">
             <Users className="h-4 w-4 text-accent shrink-0" />
             <span className="text-sm text-text-secondary">
-              Cible : <span className="text-text-primary font-medium">{result.target_persona}</span>
+              Cible :{" "}
+              <span className="text-text-primary font-medium">
+                {result.target_persona}
+              </span>
             </span>
           </div>
         )}
@@ -199,10 +211,7 @@ export function OutboundWorkflow() {
               return (
                 <div key={i}>
                   <Card
-                    className={cn(
-                      "relative",
-                      isExpanded && "border-accent/30"
-                    )}
+                    className={cn("relative", isExpanded && "border-accent/30")}
                   >
                     <CardHeader
                       className="cursor-pointer py-3"
@@ -214,7 +223,9 @@ export function OutboundWorkflow() {
                             {step.step_number}
                           </div>
                           <div className="flex flex-col">
-                            <span className="text-text-primary">{step.action}</span>
+                            <span className="text-text-primary">
+                              {step.action}
+                            </span>
                             <div className="flex items-center gap-2 mt-0.5">
                               <Badge variant="cyan" className="text-xs">
                                 <ChannelIcon className="h-3 w-3 mr-1" />
@@ -243,14 +254,20 @@ export function OutboundWorkflow() {
                       <CardContent className="pt-0 space-y-3">
                         {step.description && (
                           <div className="p-3 rounded-lg bg-bg-tertiary">
-                            <p className="text-xs text-text-muted uppercase mb-1">Description</p>
-                            <p className="text-sm text-text-secondary">{step.description}</p>
+                            <p className="text-xs text-text-muted uppercase mb-1">
+                              Description
+                            </p>
+                            <p className="text-sm text-text-secondary">
+                              {step.description}
+                            </p>
                           </div>
                         )}
 
                         {step.template && (
                           <div className="relative p-4 rounded-lg bg-bg-tertiary border-l-2 border-accent">
-                            <p className="text-xs text-accent uppercase font-medium mb-2">Template / Script</p>
+                            <p className="text-xs text-accent uppercase font-medium mb-2">
+                              Template / Script
+                            </p>
                             <p className="text-sm text-text-primary whitespace-pre-wrap pr-8">
                               {step.template}
                             </p>
@@ -289,22 +306,34 @@ export function OutboundWorkflow() {
             <Card>
               <CardContent className="pt-6 text-center">
                 <Users className="h-5 w-5 text-accent mx-auto mb-2" />
-                <p className="text-xs text-text-muted uppercase">Leads / mois</p>
-                <p className="text-lg font-bold text-text-primary">{result.summary.expected_leads_per_month}</p>
+                <p className="text-xs text-text-muted uppercase">
+                  Leads / mois
+                </p>
+                <p className="text-lg font-bold text-text-primary">
+                  {result.summary.expected_leads_per_month}
+                </p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="pt-6 text-center">
                 <DollarSign className="h-5 w-5 text-accent mx-auto mb-2" />
-                <p className="text-xs text-text-muted uppercase">Coût par lead</p>
-                <p className="text-lg font-bold text-text-primary">{result.summary.cost_per_lead}</p>
+                <p className="text-xs text-text-muted uppercase">
+                  Coût par lead
+                </p>
+                <p className="text-lg font-bold text-text-primary">
+                  {result.summary.cost_per_lead}
+                </p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="pt-6 text-center">
                 <Clock className="h-5 w-5 text-accent mx-auto mb-2" />
-                <p className="text-xs text-text-muted uppercase">Temps / semaine</p>
-                <p className="text-lg font-bold text-text-primary">{result.summary.time_investment_per_week}</p>
+                <p className="text-xs text-text-muted uppercase">
+                  Temps / semaine
+                </p>
+                <p className="text-lg font-bold text-text-primary">
+                  {result.summary.time_investment_per_week}
+                </p>
               </CardContent>
             </Card>
           </div>
@@ -314,7 +343,10 @@ export function OutboundWorkflow() {
           <div className="flex items-center justify-center gap-2 p-3 rounded-lg bg-accent/5 border border-accent/20">
             <TrendingUp className="h-4 w-4 text-accent" />
             <span className="text-sm text-text-secondary">
-              Taux de conversion attendu : <span className="text-accent font-bold">{result.summary.expected_conversion_rate}</span>
+              Taux de conversion attendu :{" "}
+              <span className="text-accent font-bold">
+                {result.summary.expected_conversion_rate}
+              </span>
             </span>
           </div>
         )}
@@ -332,7 +364,10 @@ export function OutboundWorkflow() {
               <CardContent className="pt-0">
                 <ul className="space-y-1.5">
                   {result.automation_tips.map((tip, i) => (
-                    <li key={i} className="text-xs text-text-secondary flex items-start gap-2">
+                    <li
+                      key={i}
+                      className="text-xs text-text-secondary flex items-start gap-2"
+                    >
                       <span className="text-accent">{"\u2192"}</span>
                       {tip}
                     </li>
@@ -375,7 +410,10 @@ export function OutboundWorkflow() {
             <CardContent className="pt-0">
               <div className="grid gap-2 md:grid-cols-2">
                 {result.kpis_to_track.map((kpi, i) => (
-                  <div key={i} className="flex items-center gap-2 p-2 rounded-lg bg-bg-tertiary">
+                  <div
+                    key={i}
+                    className="flex items-center gap-2 p-2 rounded-lg bg-bg-tertiary"
+                  >
                     <div className="h-2 w-2 rounded-full bg-accent" />
                     <span className="text-xs text-text-secondary">{kpi}</span>
                   </div>
@@ -385,7 +423,11 @@ export function OutboundWorkflow() {
           </Card>
         )}
 
-        <Button variant="outline" onClick={() => setResult(null)} className="transition-all hover:border-accent/40">
+        <Button
+          variant="outline"
+          onClick={() => setResult(null)}
+          className="transition-all hover:border-accent/40"
+        >
           <Sparkles className="h-4 w-4 mr-2" />
           Régénérer le workflow
         </Button>
@@ -400,9 +442,12 @@ export function OutboundWorkflow() {
         <div className="inline-flex items-center justify-center h-14 w-14 rounded-2xl bg-accent/10 border border-accent/20 mb-4">
           <GitBranch className="h-7 w-7 text-accent" />
         </div>
-        <h3 className="font-semibold text-text-primary text-lg mb-1.5">Workflow Outbound</h3>
+        <h3 className="font-semibold text-text-primary text-lg mb-1.5">
+          Workflow Outbound
+        </h3>
         <p className="text-sm text-text-secondary max-w-md mx-auto">
-          L&apos;IA va créer un workflow complet de prospection outbound multi-canal avec templates, timings et KPIs.
+          L&apos;IA va créer un workflow complet de prospection outbound
+          multi-canal avec templates, timings et KPIs.
         </p>
       </div>
 

@@ -14,14 +14,14 @@ interface TestResult {
 async function testWithTimeout(
   name: string,
   fn: () => Promise<boolean>,
-  timeoutMs = 5000
+  timeoutMs = 5000,
 ): Promise<TestResult> {
   const start = Date.now();
   try {
     const result = await Promise.race([
       fn(),
       new Promise<boolean>((_, reject) =>
-        setTimeout(() => reject(new Error("Timeout")), timeoutMs)
+        setTimeout(() => reject(new Error("Timeout")), timeoutMs),
       ),
     ]);
     return {
@@ -60,7 +60,7 @@ export async function GET() {
           .select("id", { count: "exact", head: true })
           .eq("id", user.id);
         return !error;
-      })
+      }),
     );
 
     // 2. Test Meta Graph API
@@ -76,10 +76,10 @@ export async function GET() {
       tests.push(
         await testWithTimeout("Meta Ads API", async () => {
           const res = await fetch(
-            `https://graph.facebook.com/v21.0/me?access_token=${metaToken}`
+            `https://graph.facebook.com/v21.0/me?access_token=${metaToken}`,
           );
           return res.ok;
-        })
+        }),
       );
     }
 
@@ -92,7 +92,7 @@ export async function GET() {
             headers: { Authorization: `Bearer ${stripeKey}` },
           });
           return res.ok;
-        })
+        }),
       );
     }
 
@@ -116,7 +116,7 @@ export async function GET() {
             }),
           });
           return res.ok;
-        })
+        }),
       );
     }
 
@@ -130,7 +130,7 @@ export async function GET() {
             headers: { "X-API-KEY": unipileToken },
           });
           return res.ok || res.status === 404; // 404 is OK — API is reachable
-        })
+        }),
       );
     }
 
@@ -143,7 +143,7 @@ export async function GET() {
             headers: { Authorization: `Bearer ${resendKey}` },
           });
           return res.ok;
-        })
+        }),
       );
     }
 
@@ -158,7 +158,7 @@ export async function GET() {
   } catch {
     return NextResponse.json(
       { error: "Erreur lors des tests de connectivité" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

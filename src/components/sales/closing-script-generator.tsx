@@ -4,7 +4,13 @@ import React from "react";
 import { cn } from "@/lib/utils/cn";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { AILoading } from "@/components/shared/ai-loading";
 import { CopyExportBar } from "@/components/shared/copy-export-bar";
 import { GlowCard } from "@/components/shared/glow-card";
@@ -71,14 +77,14 @@ const DURATIONS = [
 ] as const;
 
 const STEP_ICONS = [
-  Phone,      // 1. Accroche
-  Target,     // 2. Cadrage
-  Search,     // 3. Découverte
-  Flame,      // 4. Amplification douleur
-  Eye,        // 5. Vision
-  Gift,       // 6. Présentation offre
+  Phone, // 1. Accroche
+  Target, // 2. Cadrage
+  Search, // 3. Découverte
+  Flame, // 4. Amplification douleur
+  Eye, // 5. Vision
+  Gift, // 6. Présentation offre
   ShieldAlert, // 7. Objections
-  Trophy,     // 8. Close
+  Trophy, // 8. Close
 ];
 
 const STEP_COLORS: Array<"emerald" | "blue" | "cyan" | "purple" | "orange"> = [
@@ -98,7 +104,9 @@ interface ClosingScriptGeneratorProps {
   className?: string;
 }
 
-export function ClosingScriptGenerator({ className }: ClosingScriptGeneratorProps) {
+export function ClosingScriptGenerator({
+  className,
+}: ClosingScriptGeneratorProps) {
   const [loading, setLoading] = React.useState(false);
   const [result, setResult] = React.useState<ClosingScriptResult | null>(null);
   const [error, setError] = React.useState<string | null>(null);
@@ -229,7 +237,8 @@ export function ClosingScriptGenerator({ className }: ClosingScriptGeneratorProp
               Script de Closing
             </CardTitle>
             <CardDescription>
-              Génère un script de vente structuré en 8 étapes pour closer tes prospects efficacement.
+              Génère un script de vente structuré en 8 étapes pour closer tes
+              prospects efficacement.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-5">
@@ -247,7 +256,7 @@ export function ClosingScriptGenerator({ className }: ClosingScriptGeneratorProp
                       "px-4 py-2 rounded-lg text-sm font-medium transition-all",
                       callType === type.key
                         ? "bg-accent text-white"
-                        : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
+                        : "bg-bg-tertiary text-text-secondary hover:text-text-primary",
                     )}
                   >
                     {type.label}
@@ -270,7 +279,7 @@ export function ClosingScriptGenerator({ className }: ClosingScriptGeneratorProp
                       "flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-all",
                       duration === d.key
                         ? "bg-accent text-white"
-                        : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
+                        : "bg-bg-tertiary text-text-secondary hover:text-text-primary",
                     )}
                   >
                     <Clock className="h-3.5 w-3.5" />
@@ -293,7 +302,8 @@ export function ClosingScriptGenerator({ className }: ClosingScriptGeneratorProp
                 className="w-full rounded-lg border border-border-default bg-bg-tertiary px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent/50 min-h-[90px] resize-none"
               />
               <p className="text-xs text-text-muted mt-1">
-                Sépare les objections par des virgules. L&apos;IA les intégrera dans le script.
+                Sépare les objections par des virgules. L&apos;IA les intégrera
+                dans le script.
               </p>
             </div>
 
@@ -309,7 +319,9 @@ export function ClosingScriptGenerator({ className }: ClosingScriptGeneratorProp
 
   /* ─── Result display ─── */
   const sections = Array.isArray(result.sections) ? result.sections : [];
-  const objectionsList = Array.isArray(result.objections) ? result.objections : [];
+  const objectionsList = Array.isArray(result.objections)
+    ? result.objections
+    : [];
 
   return (
     <div className={cn("space-y-6", className)}>
@@ -375,7 +387,10 @@ export function ClosingScriptGenerator({ className }: ClosingScriptGeneratorProp
                       {section.name}
                     </CardTitle>
                     <div className="flex items-center gap-2">
-                      <Badge variant="muted" className="flex items-center gap-1">
+                      <Badge
+                        variant="muted"
+                        className="flex items-center gap-1"
+                      >
                         <Clock className="h-3 w-3" />
                         {section.duration}
                       </Badge>
@@ -418,46 +433,54 @@ export function ClosingScriptGenerator({ className }: ClosingScriptGeneratorProp
                   )}
 
                   {/* Buying signals */}
-                  {section.buying_signals && section.buying_signals.length > 0 && (
-                    <div>
-                      <p className="flex items-center gap-2 text-xs text-text-muted uppercase tracking-wide mb-2">
-                        <CheckCircle2 className="h-3.5 w-3.5 text-accent" />
-                        Signaux d&apos;achat à détecter
-                      </p>
-                      <div className="space-y-1.5">
-                        {section.buying_signals.map((signal, j) => (
-                          <div
-                            key={j}
-                            className="flex items-start gap-2 rounded-lg bg-accent-muted/30 border border-accent/10 px-3 py-2"
-                          >
-                            <CheckCircle2 className="h-3.5 w-3.5 text-accent mt-0.5 shrink-0" />
-                            <p className="text-sm text-text-primary">{signal}</p>
-                          </div>
-                        ))}
+                  {section.buying_signals &&
+                    section.buying_signals.length > 0 && (
+                      <div>
+                        <p className="flex items-center gap-2 text-xs text-text-muted uppercase tracking-wide mb-2">
+                          <CheckCircle2 className="h-3.5 w-3.5 text-accent" />
+                          Signaux d&apos;achat à détecter
+                        </p>
+                        <div className="space-y-1.5">
+                          {section.buying_signals.map((signal, j) => (
+                            <div
+                              key={j}
+                              className="flex items-start gap-2 rounded-lg bg-accent-muted/30 border border-accent/10 px-3 py-2"
+                            >
+                              <CheckCircle2 className="h-3.5 w-3.5 text-accent mt-0.5 shrink-0" />
+                              <p className="text-sm text-text-primary">
+                                {signal}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )}
 
                   {/* Key questions */}
-                  {section.key_questions && section.key_questions.length > 0 && (
-                    <div>
-                      <p className="flex items-center gap-2 text-xs text-text-muted uppercase tracking-wide mb-2">
-                        <MessageCircle className="h-3.5 w-3.5" />
-                        Questions clés
-                      </p>
-                      <div className="space-y-2">
-                        {section.key_questions.map((q, j) => (
-                          <div
-                            key={j}
-                            className="flex items-start gap-2 rounded-lg bg-accent-muted/30 border border-accent/10 px-3 py-2"
-                          >
-                            <span className="text-accent text-sm mt-0.5 shrink-0">&ldquo;</span>
-                            <p className="text-sm text-text-primary italic">{q}</p>
-                          </div>
-                        ))}
+                  {section.key_questions &&
+                    section.key_questions.length > 0 && (
+                      <div>
+                        <p className="flex items-center gap-2 text-xs text-text-muted uppercase tracking-wide mb-2">
+                          <MessageCircle className="h-3.5 w-3.5" />
+                          Questions clés
+                        </p>
+                        <div className="space-y-2">
+                          {section.key_questions.map((q, j) => (
+                            <div
+                              key={j}
+                              className="flex items-start gap-2 rounded-lg bg-accent-muted/30 border border-accent/10 px-3 py-2"
+                            >
+                              <span className="text-accent text-sm mt-0.5 shrink-0">
+                                &ldquo;
+                              </span>
+                              <p className="text-sm text-text-primary italic">
+                                {q}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )}
 
                   {/* Transition */}
                   {section.transition && (
@@ -467,28 +490,36 @@ export function ClosingScriptGenerator({ className }: ClosingScriptGeneratorProp
                         <p className="text-xs text-info font-medium uppercase tracking-wide mb-1">
                           Transition
                         </p>
-                        <p className="text-sm text-text-secondary">{section.transition}</p>
+                        <p className="text-sm text-text-secondary">
+                          {section.transition}
+                        </p>
                       </div>
                     </div>
                   )}
 
                   {/* Mistakes to avoid */}
-                  {section.mistakes_to_avoid && section.mistakes_to_avoid.length > 0 && (
-                    <div>
-                      <p className="flex items-center gap-2 text-xs text-text-muted uppercase tracking-wide mb-2">
-                        <AlertTriangle className="h-3.5 w-3.5 text-warning" />
-                        Erreurs à éviter
-                      </p>
-                      <div className="space-y-1">
-                        {section.mistakes_to_avoid.map((m, j) => (
-                          <div key={j} className="flex items-start gap-2 text-sm">
-                            <span className="text-warning mt-0.5 shrink-0">&#x2717;</span>
-                            <span className="text-text-muted">{m}</span>
-                          </div>
-                        ))}
+                  {section.mistakes_to_avoid &&
+                    section.mistakes_to_avoid.length > 0 && (
+                      <div>
+                        <p className="flex items-center gap-2 text-xs text-text-muted uppercase tracking-wide mb-2">
+                          <AlertTriangle className="h-3.5 w-3.5 text-warning" />
+                          Erreurs à éviter
+                        </p>
+                        <div className="space-y-1">
+                          {section.mistakes_to_avoid.map((m, j) => (
+                            <div
+                              key={j}
+                              className="flex items-start gap-2 text-sm"
+                            >
+                              <span className="text-warning mt-0.5 shrink-0">
+                                &#x2717;
+                              </span>
+                              <span className="text-text-muted">{m}</span>
+                            </div>
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )}
                 </CardContent>
               )}
             </Card>
@@ -514,7 +545,9 @@ export function ClosingScriptGenerator({ className }: ClosingScriptGeneratorProp
                       Réponses aux objections
                     </h3>
                     <p className="text-xs text-text-muted">
-                      {objectionsList.length} objection{objectionsList.length > 1 ? "s" : ""} les plus fréquentes avec réponse
+                      {objectionsList.length} objection
+                      {objectionsList.length > 1 ? "s" : ""} les plus fréquentes
+                      avec réponse
                     </p>
                   </div>
                 </div>
@@ -538,7 +571,10 @@ export function ClosingScriptGenerator({ className }: ClosingScriptGeneratorProp
                 <Card key={i}>
                   <CardContent className="py-4">
                     <div className="flex items-start gap-3 mb-3">
-                      <Badge variant="red" className="text-xs flex-shrink-0 mt-0.5">
+                      <Badge
+                        variant="red"
+                        className="text-xs flex-shrink-0 mt-0.5"
+                      >
                         #{i + 1}
                       </Badge>
                       <p className="text-sm font-medium text-text-primary">

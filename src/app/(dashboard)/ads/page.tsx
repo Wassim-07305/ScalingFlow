@@ -18,7 +18,21 @@ import { GenerationHistory } from "@/components/shared/generation-history";
 import { cn } from "@/lib/utils/cn";
 import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
-import { Sparkles, BarChart3, Video, MessageSquare, Users, MessageCircle, History, Zap, Eye, ImagePlus, Activity, Scissors, Rocket } from "lucide-react";
+import {
+  Sparkles,
+  BarChart3,
+  Video,
+  MessageSquare,
+  Users,
+  MessageCircle,
+  History,
+  Zap,
+  Eye,
+  ImagePlus,
+  Activity,
+  Scissors,
+  Rocket,
+} from "lucide-react";
 
 const TABS = [
   { key: "creatives", label: "Creatives IA", icon: Sparkles },
@@ -54,7 +68,10 @@ export default function AdsPage() {
         return;
       }
       const parsed = data.ai_raw_response || data;
-      const tabKey = data.asset_type === "dm_retargeting" ? "dm_retargeting" : "follower_ads";
+      const tabKey =
+        data.asset_type === "dm_retargeting"
+          ? "dm_retargeting"
+          : "follower_ads";
       setLoadedData((prev) => ({ ...prev, [tabKey]: parsed }));
       setActiveTab(tabKey);
       toast.success("Asset chargé depuis l'historique");
@@ -68,7 +85,9 @@ export default function AdsPage() {
       const supabase = createClient();
       const { data, error } = await supabase
         .from("ad_creatives")
-        .select("creative_type, ai_raw_response, ad_copy, headline, hook, cta, video_script, angle")
+        .select(
+          "creative_type, ai_raw_response, ad_copy, headline, hook, cta, video_script, angle",
+        )
         .eq("id", item.id)
         .single();
       if (error || !data) {
@@ -107,7 +126,7 @@ export default function AdsPage() {
               "flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all whitespace-nowrap",
               activeTab === tab.key
                 ? "bg-accent text-white"
-                : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
+                : "bg-bg-tertiary text-text-secondary hover:text-text-primary",
             )}
           >
             <tab.icon className="h-4 w-4" />
@@ -116,14 +135,24 @@ export default function AdsPage() {
         ))}
       </div>
 
-      {activeTab === "creatives" && <CreativeGenerator initialData={loadedData.creatives} />}
+      {activeTab === "creatives" && (
+        <CreativeGenerator initialData={loadedData.creatives} />
+      )}
       {activeTab === "images" && <AdImageGenerator />}
       {activeTab === "campaigns" && <CampaignDashboard />}
       {activeTab === "automation" && <AdsAutomation />}
-      {activeTab === "video_ads" && <VideoAdGenerator initialData={loadedData.video_ads} />}
-      {activeTab === "dm_scripts" && <DMScriptGenerator initialData={loadedData.dm_scripts} />}
-      {activeTab === "follower_ads" && <FollowerAdsGenerator initialData={loadedData.follower_ads} />}
-      {activeTab === "dm_retargeting" && <DmRetargetingGenerator initialData={loadedData.dm_retargeting} />}
+      {activeTab === "video_ads" && (
+        <VideoAdGenerator initialData={loadedData.video_ads} />
+      )}
+      {activeTab === "dm_scripts" && (
+        <DMScriptGenerator initialData={loadedData.dm_scripts} />
+      )}
+      {activeTab === "follower_ads" && (
+        <FollowerAdsGenerator initialData={loadedData.follower_ads} />
+      )}
+      {activeTab === "dm_retargeting" && (
+        <DmRetargetingGenerator initialData={loadedData.dm_retargeting} />
+      )}
       {activeTab === "monitor" && <AdsMonitor />}
       {activeTab === "decisions" && <AutoDecisionsLog />}
       {activeTab === "scaling" && <ScalingDashboard />}

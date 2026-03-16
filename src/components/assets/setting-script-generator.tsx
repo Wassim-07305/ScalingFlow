@@ -4,7 +4,13 @@ import React from "react";
 import { cn } from "@/lib/utils/cn";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { AILoading } from "@/components/shared/ai-loading";
 import { GlowCard } from "@/components/shared/glow-card";
 import {
@@ -45,10 +51,15 @@ export function SettingScriptGenerator({
   initialData,
 }: SettingScriptGeneratorProps) {
   const [loading, setLoading] = React.useState(false);
-  const [script, setScript] = React.useState<SettingScriptResult | null>(initialData || null);
+  const [script, setScript] = React.useState<SettingScriptResult | null>(
+    initialData || null,
+  );
   const [error, setError] = React.useState<string | null>(null);
   const [activeTab, setActiveTab] = React.useState<TabKey>("opening");
-  const [usageLimited, setUsageLimited] = React.useState<{currentUsage: number; limit: number} | null>(null);
+  const [usageLimited, setUsageLimited] = React.useState<{
+    currentUsage: number;
+    limit: number;
+  } | null>(null);
   const [callType, setCallType] = React.useState<string>("Découverte");
   const [context, setContext] = React.useState("");
 
@@ -64,13 +75,20 @@ export function SettingScriptGenerator({
       const response = await fetch("/api/ai/generate-assets", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type: "setting_script", callType, context: context || undefined }),
+        body: JSON.stringify({
+          type: "setting_script",
+          callType,
+          context: context || undefined,
+        }),
       });
 
       if (!response.ok) {
         if (response.status === 403) {
           const errData = await response.json();
-          if (errData.usage) { setUsageLimited(errData.usage); return; }
+          if (errData.usage) {
+            setUsageLimited(errData.usage);
+            return;
+          }
         }
         throw new Error("Erreur lors de la génération");
       }
@@ -85,7 +103,13 @@ export function SettingScriptGenerator({
   };
 
   if (usageLimited) {
-    return <UpgradeWall currentUsage={usageLimited.currentUsage} limit={usageLimited.limit} className={className} />;
+    return (
+      <UpgradeWall
+        currentUsage={usageLimited.currentUsage}
+        limit={usageLimited.limit}
+        className={className}
+      />
+    );
   }
 
   if (loading) {
@@ -100,16 +124,22 @@ export function SettingScriptGenerator({
   if (!script) {
     return (
       <div className={cn("max-w-xl mx-auto py-8", className)}>
-        {error && <p className="text-sm text-danger mb-4 text-center">{error}</p>}
+        {error && (
+          <p className="text-sm text-danger mb-4 text-center">{error}</p>
+        )}
         <Card>
           <CardHeader>
             <CardTitle>Script de Setting</CardTitle>
-            <CardDescription>Script complet pour qualifier et booker tes prospects</CardDescription>
+            <CardDescription>
+              Script complet pour qualifier et booker tes prospects
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             {/* Call type */}
             <div>
-              <label className="text-sm font-medium text-text-primary mb-2 block">Type d&apos;appel</label>
+              <label className="text-sm font-medium text-text-primary mb-2 block">
+                Type d&apos;appel
+              </label>
               <div className="flex flex-wrap gap-2">
                 {CALL_TYPES.map((type) => (
                   <button
@@ -119,7 +149,7 @@ export function SettingScriptGenerator({
                       "px-3 py-1.5 rounded-lg text-sm font-medium transition-all",
                       callType === type
                         ? "bg-accent text-white"
-                        : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
+                        : "bg-bg-tertiary text-text-secondary hover:text-text-primary",
                     )}
                   >
                     {type}
@@ -130,7 +160,9 @@ export function SettingScriptGenerator({
 
             {/* Optional context */}
             <div>
-              <label className="text-sm font-medium text-text-primary mb-2 block">Contexte (optionnel)</label>
+              <label className="text-sm font-medium text-text-primary mb-2 block">
+                Contexte (optionnel)
+              </label>
               <textarea
                 value={context}
                 onChange={(e) => setContext(e.target.value)}
@@ -162,7 +194,7 @@ export function SettingScriptGenerator({
                 "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all",
                 activeTab === tab.key
                   ? "bg-accent text-white"
-                  : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
+                  : "bg-bg-tertiary text-text-secondary hover:text-text-primary",
               )}
             >
               <tab.icon className="h-3 w-3" />
@@ -170,7 +202,12 @@ export function SettingScriptGenerator({
             </button>
           ))}
         </div>
-        <Button variant="outline" size="sm" onClick={() => setScript(null)} className="flex-shrink-0 ml-2">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setScript(null)}
+          className="flex-shrink-0 ml-2"
+        >
           <RefreshCw className="h-4 w-4 mr-1" />
           Nouveau brief
         </Button>

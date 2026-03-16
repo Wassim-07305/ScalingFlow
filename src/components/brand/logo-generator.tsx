@@ -19,7 +19,11 @@ interface LogoResult {
   url: string;
 }
 
-export function LogoGenerator({ concept, brandName, palette }: LogoGeneratorProps) {
+export function LogoGenerator({
+  concept,
+  brandName,
+  palette,
+}: LogoGeneratorProps) {
   const [logos, setLogos] = React.useState<LogoResult[]>([]);
   const [loading, setLoading] = React.useState(false);
 
@@ -52,15 +56,21 @@ export function LogoGenerator({ concept, brandName, palette }: LogoGeneratorProp
         setLogos(data.logos);
       } else if (data.images) {
         // Fallback for old format
-        setLogos(data.images.map((url: string, i: number) => ({
-          type: ["principal", "icone", "monochrome"][i] || `variation-${i}`,
-          label: ["Logo principal", "Logo icone", "Logo monochrome"][i] || `Variation ${i + 1}`,
-          url,
-        })));
+        setLogos(
+          data.images.map((url: string, i: number) => ({
+            type: ["principal", "icone", "monochrome"][i] || `variation-${i}`,
+            label:
+              ["Logo principal", "Logo icone", "Logo monochrome"][i] ||
+              `Variation ${i + 1}`,
+            url,
+          })),
+        );
       }
       toast.success("Logos générés !");
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Erreur lors de la génération");
+      toast.error(
+        e instanceof Error ? e.message : "Erreur lors de la génération",
+      );
     } finally {
       setLoading(false);
     }
@@ -79,27 +89,42 @@ export function LogoGenerator({ concept, brandName, palette }: LogoGeneratorProp
           {concept ? (
             <>
               <div>
-                <p className="text-xs text-text-muted uppercase tracking-wide mb-1">Description</p>
-                <p className="text-sm text-text-secondary">{concept.description}</p>
+                <p className="text-xs text-text-muted uppercase tracking-wide mb-1">
+                  Description
+                </p>
+                <p className="text-sm text-text-secondary">
+                  {concept.description}
+                </p>
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="p-4 rounded-xl bg-bg-tertiary border border-border-default">
-                  <p className="text-xs text-text-muted uppercase tracking-wide mb-1">Forme</p>
+                  <p className="text-xs text-text-muted uppercase tracking-wide mb-1">
+                    Forme
+                  </p>
                   <p className="text-sm text-text-primary">{concept.forme}</p>
                 </div>
                 <div className="p-4 rounded-xl bg-bg-tertiary border border-border-default">
-                  <p className="text-xs text-text-muted uppercase tracking-wide mb-1">Symbolisme</p>
-                  <p className="text-sm text-text-primary">{concept.symbolisme}</p>
+                  <p className="text-xs text-text-muted uppercase tracking-wide mb-1">
+                    Symbolisme
+                  </p>
+                  <p className="text-sm text-text-primary">
+                    {concept.symbolisme}
+                  </p>
                 </div>
               </div>
             </>
           ) : (
             <p className="text-sm text-text-secondary text-center py-4">
-              Génère d&apos;abord une identité de marque pour obtenir un concept de logo.
+              Génère d&apos;abord une identité de marque pour obtenir un concept
+              de logo.
             </p>
           )}
 
-          <Button onClick={generate} disabled={loading || !concept} className="w-full">
+          <Button
+            onClick={generate}
+            disabled={loading || !concept}
+            className="w-full"
+          >
             {loading ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin mr-2" />
@@ -151,13 +176,16 @@ export function LogoGenerator({ concept, brandName, palette }: LogoGeneratorProp
                     </a>
                   </div>
                   <div className="p-2 text-center">
-                    <span className="text-xs text-text-muted">{logo.label}</span>
+                    <span className="text-xs text-text-muted">
+                      {logo.label}
+                    </span>
                   </div>
                 </div>
               ))}
             </div>
             <p className="text-xs text-text-muted text-center mt-4">
-              Les logos sont générés par IA en SVG vectoriel. Utilise-les comme base pour un designer professionnel.
+              Les logos sont générés par IA en SVG vectoriel. Utilise-les comme
+              base pour un designer professionnel.
             </p>
           </CardContent>
         </Card>

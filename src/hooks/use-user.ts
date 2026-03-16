@@ -10,24 +10,53 @@ type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 // Explicitly list columns to avoid fetching sensitive fields
 // (meta_access_token, claude_api_key, webhook_api_key, stripe_customer_id)
 const PROFILE_COLUMNS = [
-  "id", "email", "full_name", "first_name", "last_name",
-  "country", "language", "avatar_url", "role",
-  "onboarding_completed", "onboarding_step",
-  "situation", "situation_details",
-  "skills", "vault_skills", "expertise_answers",
-  "parcours", "formations",
-  "experience_level", "current_revenue", "target_revenue",
-  "industries", "objectives", "budget_monthly",
-  "hours_per_week", "deadline", "team_size",
-  "vault_completed", "vault_analysis", "vault_extraction", "vault_updated_at",
-  "selected_market", "market_viability_score", "niche",
-  "xp_points", "level", "streak_days", "last_active_date", "badges",
+  "id",
+  "email",
+  "full_name",
+  "first_name",
+  "last_name",
+  "country",
+  "language",
+  "avatar_url",
+  "role",
+  "onboarding_completed",
+  "onboarding_step",
+  "situation",
+  "situation_details",
+  "skills",
+  "vault_skills",
+  "expertise_answers",
+  "parcours",
+  "formations",
+  "experience_level",
+  "current_revenue",
+  "target_revenue",
+  "industries",
+  "objectives",
+  "budget_monthly",
+  "hours_per_week",
+  "deadline",
+  "team_size",
+  "vault_completed",
+  "vault_analysis",
+  "selected_market",
+  "market_viability_score",
+  "niche",
+  "xp_points",
+  "level",
+  "streak_days",
+  "last_active_date",
+  "badges",
   "global_progress",
-  "show_on_leaderboard", "show_revenue",
-  "subscription_status", "subscription_plan",
+  "show_on_leaderboard",
+  "show_revenue",
+  "subscription_status",
   "meta_ad_account_id",
-  "ghl_webhook_url", "organization_id", "stripe_connect_account_id",
-  "created_at", "updated_at",
+  "ghl_webhook_url",
+  "organization_id",
+  "stripe_connect_account_id",
+  "created_at",
+  "updated_at",
 ].join(", ");
 
 const AUTH_TIMEOUT_MS = 5000;
@@ -85,7 +114,7 @@ export function useUser() {
 
     const {
       data: { subscription },
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } = supabase.auth.onAuthStateChange(async (_event: any, session: any) => {
       if (!mounted) return;
       setUser(session?.user ?? null);

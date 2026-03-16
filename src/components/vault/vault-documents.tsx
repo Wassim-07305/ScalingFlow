@@ -149,7 +149,7 @@ export function VaultDocuments() {
                   "px-3 py-1.5 rounded-lg text-sm font-medium transition-all",
                   selectedCategory === cat.value
                     ? "bg-accent text-white"
-                    : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
+                    : "bg-bg-tertiary text-text-secondary hover:text-text-primary",
                 )}
               >
                 {cat.label}
@@ -163,9 +163,13 @@ export function VaultDocuments() {
           >
             <Upload className="h-8 w-8 text-text-muted mx-auto mb-2" />
             <p className="text-sm text-text-secondary">
-              {uploading ? "Upload en cours..." : "Clique ou glisse tes fichiers ici"}
+              {uploading
+                ? "Upload en cours..."
+                : "Clique ou glisse tes fichiers ici"}
             </p>
-            <p className="text-xs text-text-muted mt-1">PDF, DOCX, images, audio</p>
+            <p className="text-xs text-text-muted mt-1">
+              PDF, DOCX, images, audio
+            </p>
             <input
               ref={fileInputRef}
               type="file"
@@ -191,7 +195,10 @@ export function VaultDocuments() {
             const Icon = getFileIcon(doc.file_type);
             const category = CATEGORIES.find((c) => c.value === doc.category);
             return (
-              <Card key={doc.id} className="hover:border-accent/20 transition-colors">
+              <Card
+                key={doc.id}
+                className="hover:border-accent/20 transition-colors"
+              >
                 <CardContent className="py-3">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
@@ -199,12 +206,16 @@ export function VaultDocuments() {
                         <Icon className="h-4 w-4 text-accent" />
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-text-primary">{doc.file_name}</p>
+                        <p className="text-sm font-medium text-text-primary">
+                          {doc.file_name}
+                        </p>
                         <div className="flex items-center gap-2 mt-0.5">
                           <Badge variant="muted" className="text-xs">
                             {category?.label || doc.category}
                           </Badge>
-                          <span className="text-xs text-text-muted">{formatSize(doc.file_size)}</span>
+                          <span className="text-xs text-text-muted">
+                            {formatSize(doc.file_size)}
+                          </span>
                         </div>
                       </div>
                     </div>

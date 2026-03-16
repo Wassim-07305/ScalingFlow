@@ -108,7 +108,10 @@ export function LeadsChart() {
             <div className="flex h-full flex-col justify-end gap-2 px-4 pb-4">
               <div className="flex items-end gap-3 h-full">
                 {[50, 70, 35, 85, 60, 45].map((h, i) => (
-                  <div key={i} className="flex-1 flex flex-col justify-end gap-1">
+                  <div
+                    key={i}
+                    className="flex-1 flex flex-col justify-end gap-1"
+                  >
                     <div
                       className="w-full rounded-t bg-bg-tertiary animate-pulse"
                       style={{ height: `${h}%` }}
@@ -123,8 +126,12 @@ export function LeadsChart() {
               <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-accent/10 mb-3">
                 <BarChart3 className="h-6 w-6 text-accent" />
               </div>
-              <p className="text-sm font-medium text-text-primary mb-1">Pas encore de créations</p>
-              <p className="text-xs text-text-muted max-w-[220px]">Génère ta première offre ou funnel pour voir les stats ici.</p>
+              <p className="text-sm font-medium text-text-primary mb-1">
+                Pas encore de créations
+              </p>
+              <p className="text-xs text-text-muted max-w-[220px]">
+                Génère ta première offre ou funnel pour voir les stats ici.
+              </p>
             </div>
           ) : (
             <ResponsiveContainer width="100%" height="100%">

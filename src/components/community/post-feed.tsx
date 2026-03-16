@@ -53,11 +53,30 @@ type CategoryId = (typeof CATEGORIES)[number]["id"];
 // DB categories for the post composer (excludes "all" filter)
 const POST_CATEGORIES = CATEGORIES.filter((c) => c.id !== "all");
 
-const CATEGORY_STYLES: Record<string, { bg: string; text: string; border: string }> = {
-  wins: { bg: "bg-emerald-500/10", text: "text-emerald-400", border: "border-emerald-500/20" },
-  questions: { bg: "bg-blue-500/10", text: "text-blue-400", border: "border-blue-500/20" },
-  general: { bg: "bg-amber-500/10", text: "text-amber-400", border: "border-amber-500/20" },
-  feedback: { bg: "bg-purple-500/10", text: "text-purple-400", border: "border-purple-500/20" },
+const CATEGORY_STYLES: Record<
+  string,
+  { bg: string; text: string; border: string }
+> = {
+  wins: {
+    bg: "bg-emerald-500/10",
+    text: "text-emerald-400",
+    border: "border-emerald-500/20",
+  },
+  questions: {
+    bg: "bg-blue-500/10",
+    text: "text-blue-400",
+    border: "border-blue-500/20",
+  },
+  general: {
+    bg: "bg-amber-500/10",
+    text: "text-amber-400",
+    border: "border-amber-500/20",
+  },
+  feedback: {
+    bg: "bg-purple-500/10",
+    text: "text-purple-400",
+    border: "border-purple-500/20",
+  },
 };
 
 // ─── Types ──────────────────────────────────────────────────
@@ -97,7 +116,13 @@ interface Comment {
 // ─── Helpers ────────────────────────────────────────────────
 function getInitials(name: string | null | undefined) {
   if (!name) return "??";
-  return name.split(" ").map((w) => w[0]).filter(Boolean).join("").toUpperCase().slice(0, 2);
+  return name
+    .split(" ")
+    .map((w) => w[0])
+    .filter(Boolean)
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
 }
 
 const EXPERIENCE_LABELS: Record<string, string> = {
@@ -134,7 +159,9 @@ function MiniProfileCard({
     const fetchProfile = async () => {
       const { data } = await supabase
         .from("profiles")
-        .select("full_name, avatar_url, niche, experience_level, xp_points, badges, created_at")
+        .select(
+          "full_name, avatar_url, niche, experience_level, xp_points, badges, created_at",
+        )
         .eq("id", userId)
         .single();
       if (data) {
@@ -201,7 +228,8 @@ function MiniProfileCard({
               )}
               {dp.experience_level && (
                 <span className="inline-block mt-1 text-[10px] font-medium px-2 py-0.5 rounded-full bg-accent/10 text-accent">
-                  {EXPERIENCE_LABELS[dp.experience_level] || dp.experience_level}
+                  {EXPERIENCE_LABELS[dp.experience_level] ||
+                    dp.experience_level}
                 </span>
               )}
             </div>
@@ -287,7 +315,7 @@ function PostComposer({
         "rounded-2xl border bg-bg-secondary/80 backdrop-blur-sm transition-all duration-300",
         focused
           ? "border-accent/40 shadow-lg shadow-accent/5"
-          : "border-border-default"
+          : "border-border-default",
       )}
     >
       <div className="p-4">
@@ -327,7 +355,7 @@ function PostComposer({
                     "px-3 py-1.5 rounded-lg text-xs font-medium transition-all border",
                     category === cat.id
                       ? `${style?.bg} ${style?.text} ${style?.border}`
-                      : "border-transparent text-text-muted hover:text-text-secondary hover:bg-bg-tertiary"
+                      : "border-transparent text-text-muted hover:text-text-secondary hover:bg-bg-tertiary",
                   )}
                 >
                   {cat.emoji} {cat.label}
@@ -349,7 +377,7 @@ function PostComposer({
                 "flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all",
                 content.trim()
                   ? "bg-accent text-white hover:bg-accent/90 shadow-lg shadow-accent/20"
-                  : "bg-bg-tertiary text-text-muted cursor-not-allowed"
+                  : "bg-bg-tertiary text-text-muted cursor-not-allowed",
               )}
             >
               {submitting ? (
@@ -399,8 +427,12 @@ function PostCard({
   const [editing, setEditing] = React.useState(false);
   const [editContent, setEditContent] = React.useState(post.content);
   const [commentInput, setCommentInput] = React.useState("");
-  const [activeProfileUserId, setActiveProfileUserId] = React.useState<string | null>(null);
-  const [editingCommentId, setEditingCommentId] = React.useState<string | null>(null);
+  const [activeProfileUserId, setActiveProfileUserId] = React.useState<
+    string | null
+  >(null);
+  const [editingCommentId, setEditingCommentId] = React.useState<string | null>(
+    null,
+  );
   const [editCommentContent, setEditCommentContent] = React.useState("");
 
   const displayName = post.profiles?.full_name || "Membre ScalingFlow";
@@ -412,7 +444,7 @@ function PostCard({
         "group rounded-2xl border bg-bg-secondary/60 backdrop-blur-sm transition-all duration-200 hover:border-border-default/80",
         post.pinned
           ? "border-accent/30 bg-accent/[0.02]"
-          : "border-border-default/50"
+          : "border-border-default/50",
       )}
     >
       <div className="p-5">
@@ -439,7 +471,7 @@ function PostCard({
               <button
                 onClick={() => {
                   setActiveProfileUserId(
-                    activeProfileUserId === post.user_id ? null : post.user_id
+                    activeProfileUserId === post.user_id ? null : post.user_id,
                   );
                 }}
                 className="text-sm font-semibold text-text-primary hover:text-accent transition-colors"
@@ -457,11 +489,12 @@ function PostCard({
                     "text-[10px] font-medium px-2 py-0.5 rounded-full border",
                     catStyle.bg,
                     catStyle.text,
-                    catStyle.border
+                    catStyle.border,
                   )}
                 >
                   {CATEGORIES.find((c) => c.id === post.category)?.emoji}{" "}
-                  {CATEGORIES.find((c) => c.id === post.category)?.label || post.category}
+                  {CATEGORIES.find((c) => c.id === post.category)?.label ||
+                    post.category}
                 </span>
               )}
             </div>
@@ -564,16 +597,18 @@ function PostCard({
               "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-all",
               post.liked_by_me
                 ? "text-rose-400 bg-rose-500/10 hover:bg-rose-500/15"
-                : "text-text-muted hover:text-rose-400 hover:bg-rose-500/10"
+                : "text-text-muted hover:text-rose-400 hover:bg-rose-500/10",
             )}
           >
             <Heart
               className={cn(
                 "h-4 w-4 transition-transform",
-                post.liked_by_me && "fill-current scale-110"
+                post.liked_by_me && "fill-current scale-110",
               )}
             />
-            <span className="text-xs font-medium">{post.likes_count || ""}</span>
+            <span className="text-xs font-medium">
+              {post.likes_count || ""}
+            </span>
           </button>
 
           <button
@@ -582,7 +617,7 @@ function PostCard({
               "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-all",
               isCommentsExpanded
                 ? "text-info bg-info/10"
-                : "text-text-muted hover:text-info hover:bg-info/10"
+                : "text-text-muted hover:text-info hover:bg-info/10",
             )}
           >
             <MessageCircle className="h-4 w-4" />
@@ -683,7 +718,7 @@ function PostCard({
                                   onEditComment(
                                     comment.id,
                                     post.id,
-                                    editCommentContent
+                                    editCommentContent,
                                   );
                                   setEditingCommentId(null);
                                 }
@@ -698,7 +733,7 @@ function PostCard({
                                 onEditComment(
                                   comment.id,
                                   post.id,
-                                  editCommentContent
+                                  editCommentContent,
                                 );
                                 setEditingCommentId(null);
                               }}
@@ -762,7 +797,7 @@ function PostCard({
                     "flex items-center justify-center w-8 h-8 rounded-xl transition-all",
                     commentInput.trim()
                       ? "bg-accent text-white hover:bg-accent/90"
-                      : "bg-bg-tertiary text-text-muted"
+                      : "bg-bg-tertiary text-text-muted",
                   )}
                 >
                   {isSubmittingComment ? (
@@ -794,10 +829,16 @@ export function PostFeed({ className }: { className?: string }) {
   const [searchOpen, setSearchOpen] = React.useState(false);
 
   // Comments state
-  const [expandedComments, setExpandedComments] = React.useState<Set<string>>(new Set());
+  const [expandedComments, setExpandedComments] = React.useState<Set<string>>(
+    new Set(),
+  );
   const [comments, setComments] = React.useState<Record<string, Comment[]>>({});
-  const [loadingComments, setLoadingComments] = React.useState<Set<string>>(new Set());
-  const [submittingComment, setSubmittingComment] = React.useState<Set<string>>(new Set());
+  const [loadingComments, setLoadingComments] = React.useState<Set<string>>(
+    new Set(),
+  );
+  const [submittingComment, setSubmittingComment] = React.useState<Set<string>>(
+    new Set(),
+  );
 
   // Likes
   const [likingPosts, setLikingPosts] = React.useState<Set<string>>(new Set());
@@ -809,7 +850,7 @@ export function PostFeed({ className }: { className?: string }) {
     const { data, error } = await supabase
       .from("community_posts")
       .select(
-        "*, profiles:user_id(full_name, avatar_url, niche, experience_level, xp_points, badges, created_at)"
+        "*, profiles:user_id(full_name, avatar_url, niche, experience_level, xp_points, badges, created_at)",
       )
       .order("pinned", { ascending: false })
       .order("created_at", { ascending: false });
@@ -860,7 +901,7 @@ export function PostFeed({ className }: { className?: string }) {
           p.content.toLowerCase().includes(q) ||
           (p.title && p.title.toLowerCase().includes(q)) ||
           (p.profiles?.full_name &&
-            p.profiles.full_name.toLowerCase().includes(q))
+            p.profiles.full_name.toLowerCase().includes(q)),
       );
     }
     return result;
@@ -919,8 +960,8 @@ export function PostFeed({ className }: { className?: string }) {
                 ? Math.max(0, p.likes_count - 1)
                 : p.likes_count + 1,
             }
-          : p
-      )
+          : p,
+      ),
     );
 
     if (wasLiked) {
@@ -939,8 +980,8 @@ export function PostFeed({ className }: { className?: string }) {
           prev.map((p) =>
             p.id === postId
               ? { ...p, liked_by_me: true, likes_count: post.likes_count }
-              : p
-          )
+              : p,
+          ),
         );
       }
     } else {
@@ -957,8 +998,8 @@ export function PostFeed({ className }: { className?: string }) {
           prev.map((p) =>
             p.id === postId
               ? { ...p, liked_by_me: false, likes_count: post.likes_count }
-              : p
-          )
+              : p,
+          ),
         );
       }
     }
@@ -1037,10 +1078,8 @@ export function PostFeed({ className }: { className?: string }) {
       const post = posts.find((p) => p.id === postId);
       setPosts((prev) =>
         prev.map((p) =>
-          p.id === postId
-            ? { ...p, comments_count: p.comments_count + 1 }
-            : p
-        )
+          p.id === postId ? { ...p, comments_count: p.comments_count + 1 } : p,
+        ),
       );
       if (post) {
         await supabase
@@ -1067,7 +1106,7 @@ export function PostFeed({ className }: { className?: string }) {
       return;
     }
     setPosts((prev) =>
-      prev.map((p) => (p.id === postId ? { ...p, content } : p))
+      prev.map((p) => (p.id === postId ? { ...p, content } : p)),
     );
     toast.success("Post modifié");
   };
@@ -1103,8 +1142,8 @@ export function PostFeed({ className }: { className?: string }) {
       prev.map((p) =>
         p.id === postId
           ? { ...p, comments_count: Math.max(0, p.comments_count - 1) }
-          : p
-      )
+          : p,
+      ),
     );
     if (post) {
       await supabase
@@ -1118,7 +1157,7 @@ export function PostFeed({ className }: { className?: string }) {
   const handleEditComment = async (
     commentId: string,
     postId: string,
-    content: string
+    content: string,
   ) => {
     if (!content.trim()) return;
     const { error } = await supabase
@@ -1132,7 +1171,7 @@ export function PostFeed({ className }: { className?: string }) {
     setComments((prev) => ({
       ...prev,
       [postId]: (prev[postId] || []).map((c) =>
-        c.id === commentId ? { ...c, content: content.trim() } : c
+        c.id === commentId ? { ...c, content: content.trim() } : c,
       ),
     }));
     toast.success("Commentaire modifié");
@@ -1171,7 +1210,7 @@ export function PostFeed({ className }: { className?: string }) {
         <div
           className={cn(
             "flex items-center gap-2 transition-all duration-300",
-            searchOpen ? "flex-1" : ""
+            searchOpen ? "flex-1" : "",
           )}
         >
           {searchOpen ? (
@@ -1227,7 +1266,7 @@ export function PostFeed({ className }: { className?: string }) {
                 "flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-medium whitespace-nowrap transition-all border",
                 isActive
                   ? "bg-accent text-white border-accent shadow-lg shadow-accent/20"
-                  : "bg-bg-secondary/80 text-text-secondary border-border-default/50 hover:border-border-default hover:text-text-primary"
+                  : "bg-bg-secondary/80 text-text-secondary border-border-default/50 hover:border-border-default hover:text-text-primary",
               )}
             >
               {cat.emoji && <span>{cat.emoji}</span>}
@@ -1235,7 +1274,7 @@ export function PostFeed({ className }: { className?: string }) {
               <span
                 className={cn(
                   "text-[10px] px-1.5 py-0.5 rounded-full font-bold",
-                  isActive ? "bg-white/20" : "bg-bg-tertiary"
+                  isActive ? "bg-white/20" : "bg-bg-tertiary",
                 )}
               >
                 {count}

@@ -89,7 +89,7 @@ export async function POST(req: NextRequest) {
     if (!rl.allowed) {
       return NextResponse.json(
         { error: "Trop de requêtes. Réessaie dans quelques secondes." },
-        { status: 429 }
+        { status: 429 },
       );
     }
 
@@ -97,7 +97,7 @@ export async function POST(req: NextRequest) {
     if (!usage.allowed) {
       return NextResponse.json(
         { error: "Limite de générations IA atteinte", usage },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -106,7 +106,7 @@ export async function POST(req: NextRequest) {
     if (!body.market || body.market.trim().length < 3) {
       return NextResponse.json(
         { error: "Le marché est requis (min 3 caractères)" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -120,9 +120,9 @@ export async function POST(req: NextRequest) {
         const queries = buildSearchQueries(body);
 
         // Run search queries in parallel (limit to first 2 to stay fast)
-        const searchPromises = queries.slice(0, 2).map((q) =>
-          searchAndScrape(q, 3)
-        );
+        const searchPromises = queries
+          .slice(0, 2)
+          .map((q) => searchAndScrape(q, 3));
         const searchResults = await Promise.all(searchPromises);
 
         // Collect all scraped content, deduplicate by URL
@@ -147,7 +147,10 @@ export async function POST(req: NextRequest) {
         // Keep only top 5 scraped pages to avoid token overflow
         scrapedPages = scrapedPages.slice(0, 5);
       } catch (err) {
-        console.warn("Firecrawl scraping failed, falling back to AI-only:", err);
+        console.warn(
+          "Firecrawl scraping failed, falling back to AI-only:",
+          err,
+        );
         scrapedPages = [];
         sourceUrls = [];
       }
@@ -160,8 +163,12 @@ export async function POST(req: NextRequest) {
         const apifyResults = await Promise.allSettled([
           // YouTube : chercher des vidéos pertinentes et récupérer les commentaires
           scrapeYouTubeTranscript(
-            `https://www.youtube.com/results?search_query=${encodeURIComponent(body.niche || body.market)}+avis+problème`
-          ).then((r) => r ? `### YouTube Transcript\n${JSON.stringify(r).slice(0, 3000)}` : ""),
+            `https://www.youtube.com/results?search_query=${encodeURIComponent(body.niche || body.market)}+avis+problème`,
+          ).then((r) =>
+            r
+              ? `### YouTube Transcript\n${JSON.stringify(r).slice(0, 3000)}`
+              : "",
+          ),
 
           // Google Maps Reviews
           scrapeGoogleMapsReviews({
@@ -170,7 +177,7 @@ export async function POST(req: NextRequest) {
           }).then((reviews) =>
             reviews && reviews.length > 0
               ? `### Google Maps Reviews (${reviews.length} avis)\n${reviews.map((r) => `- ${r.stars}★ : "${r.text}" (${r.name})`).join("\n")}`
-              : ""
+              : "",
           ),
 
           // Trustpilot Reviews
@@ -180,7 +187,7 @@ export async function POST(req: NextRequest) {
           }).then((reviews) =>
             reviews && reviews.length > 0
               ? `### Trustpilot Reviews (${reviews.length} avis)\n${reviews.map((r) => `- ${r.rating}★ : "${r.text}" (${r.author})`).join("\n")}`
-              : ""
+              : "",
           ),
 
           // Facebook posts/groups
@@ -190,12 +197,15 @@ export async function POST(req: NextRequest) {
           ).then((posts) =>
             posts && posts.length > 0
               ? `### Facebook Posts (${posts.length} posts)\n${posts.map((p) => `- "${p.text?.slice(0, 200)}" (${p.likes} likes, ${p.comments} commentaires)`).join("\n")}`
-              : ""
+              : "",
           ),
         ]);
 
         const apifyParts = apifyResults
-          .filter((r): r is PromiseFulfilledResult<string> => r.status === "fulfilled" && !!r.value)
+          .filter(
+            (r): r is PromiseFulfilledResult<string> =>
+              r.status === "fulfilled" && !!r.value,
+          )
           .map((r) => r.value)
           .filter(Boolean);
 
@@ -244,7 +254,7 @@ export async function POST(req: NextRequest) {
     console.error("[scrape-insights] Error:", error);
     return NextResponse.json(
       { error: "Erreur lors de la recherche" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -116,18 +116,19 @@ export function PreLaunchChecklist() {
     const hasMarket = !!profile?.selected_market;
 
     // Check pixel config from profile
-    const hasPixel = !!profile?.meta_access_token && !!profile?.meta_ad_account_id;
+    const hasPixel =
+      !!profile?.meta_access_token && !!profile?.meta_ad_account_id;
 
     // Check integrations
     const integrationStatus = integrationsResult?.status || {};
     const connectedCount = Object.values(integrationStatus).filter(
-      (s: unknown) => (s as { connected: boolean })?.connected
+      (s: unknown) => (s as { connected: boolean })?.connected,
     ).length;
 
     // Check audience config exists on any campaign
     const hasAudience =
       campaignsResult.data?.some(
-        (c: { audience_config: unknown }) => c.audience_config !== null
+        (c: { audience_config: unknown }) => c.audience_config !== null,
       ) ?? false;
 
     const items: CheckItem[] = [
@@ -147,7 +148,8 @@ export function PreLaunchChecklist() {
       {
         id: "funnel",
         label: "Funnel configuré",
-        description: "Un funnel de vente doit être en place pour convertir les prospects.",
+        description:
+          "Un funnel de vente doit être en place pour convertir les prospects.",
         icon: <GitBranch className="h-5 w-5" />,
         status: funnelsCount > 0 ? "pass" : "fail",
         detail:
@@ -172,7 +174,8 @@ export function PreLaunchChecklist() {
       {
         id: "brand",
         label: "Identité de marque",
-        description: "Le branding (nom, couleurs, direction artistique) doit être défini.",
+        description:
+          "Le branding (nom, couleurs, direction artistique) doit être défini.",
         icon: <Palette className="h-5 w-5" />,
         status: brandCount > 0 ? "pass" : "fail",
         detail:
@@ -185,9 +188,14 @@ export function PreLaunchChecklist() {
       {
         id: "pixel",
         label: "Pixel & CAPI",
-        description: "Le pixel Meta et le token CAPI doivent être configurés pour le tracking.",
+        description:
+          "Le pixel Meta et le token CAPI doivent être configurés pour le tracking.",
         icon: <Code2 className="h-5 w-5" />,
-        status: hasPixel ? "pass" : profile?.meta_ad_account_id ? "warn" : "fail",
+        status: hasPixel
+          ? "pass"
+          : profile?.meta_ad_account_id
+            ? "warn"
+            : "fail",
         detail: hasPixel
           ? "Pixel et CAPI configurés"
           : profile?.meta_ad_account_id
@@ -199,7 +207,8 @@ export function PreLaunchChecklist() {
       {
         id: "integrations",
         label: "Intégrations connectées",
-        description: "Au moins une intégration externe doit être connectée (Meta, Stripe, etc.).",
+        description:
+          "Au moins une intégration externe doit être connectée (Meta, Stripe, etc.).",
         icon: <Link2 className="h-5 w-5" />,
         status:
           connectedCount >= 2 ? "pass" : connectedCount === 1 ? "warn" : "fail",
@@ -213,7 +222,8 @@ export function PreLaunchChecklist() {
       {
         id: "content",
         label: "Contenu prêt",
-        description: "Des créatives publicitaires ou du contenu doivent être générés.",
+        description:
+          "Des créatives publicitaires ou du contenu doivent être générés.",
         icon: <FileText className="h-5 w-5" />,
         status:
           adsCount > 0 && contentCount > 0
@@ -231,8 +241,7 @@ export function PreLaunchChecklist() {
       {
         id: "audience",
         label: "Audience configurée",
-        description:
-          "Au moins une campagne avec une audience cible définie.",
+        description: "Au moins une campagne avec une audience cible définie.",
         icon: <Users className="h-5 w-5" />,
         status: hasAudience ? "pass" : campaignsCount > 0 ? "warn" : "fail",
         detail: hasAudience
@@ -246,7 +255,8 @@ export function PreLaunchChecklist() {
       {
         id: "api_connectivity",
         label: "Connectivité API",
-        description: "Test en temps réel de la connectivité des APIs externes (Meta, Stripe, Supabase).",
+        description:
+          "Test en temps réel de la connectivité des APIs externes (Meta, Stripe, Supabase).",
         icon: <Wifi className="h-5 w-5" />,
         status:
           apiTestResult.totalCount === 0
@@ -261,7 +271,12 @@ export function PreLaunchChecklist() {
             ? "Aucun service configuré à tester"
             : apiTestResult.passedCount === apiTestResult.totalCount
               ? `${apiTestResult.passedCount}/${apiTestResult.totalCount} APIs connectées et fonctionnelles`
-              : `${apiTestResult.passedCount}/${apiTestResult.totalCount} APIs fonctionnelles — ${(apiTestResult.tests || []).filter((t: { status: string }) => t.status === "fail").map((t: { name: string }) => t.name).join(", ")} en erreur`,
+              : `${apiTestResult.passedCount}/${apiTestResult.totalCount} APIs fonctionnelles — ${(
+                  apiTestResult.tests || []
+                )
+                  .filter((t: { status: string }) => t.status === "fail")
+                  .map((t: { name: string }) => t.name)
+                  .join(", ")} en erreur`,
         fixLink: "/settings",
         fixLabel: "Vérifier les APIs",
       },
@@ -278,7 +293,8 @@ export function PreLaunchChecklist() {
   const passedCount = checks.filter((c) => c.status === "pass").length;
   const warnCount = checks.filter((c) => c.status === "warn").length;
   const failCount = checks.filter((c) => c.status === "fail").length;
-  const progressPct = checks.length > 0 ? Math.round((passedCount / checks.length) * 100) : 0;
+  const progressPct =
+    checks.length > 0 ? Math.round((passedCount / checks.length) * 100) : 0;
   const allGreen = checks.length > 0 && passedCount === checks.length;
 
   // ─── Loading skeleton ────────────────────────────────────────
@@ -351,10 +367,14 @@ export function PreLaunchChecklist() {
                 <Badge variant="default">{passedCount} OK</Badge>
               )}
               {warnCount > 0 && (
-                <Badge variant="yellow">{warnCount} avertissement{warnCount > 1 ? "s" : ""}</Badge>
+                <Badge variant="yellow">
+                  {warnCount} avertissement{warnCount > 1 ? "s" : ""}
+                </Badge>
               )}
               {failCount > 0 && (
-                <Badge variant="red">{failCount} manquant{failCount > 1 ? "s" : ""}</Badge>
+                <Badge variant="red">
+                  {failCount} manquant{failCount > 1 ? "s" : ""}
+                </Badge>
               )}
               <Button
                 variant="ghost"
@@ -382,7 +402,7 @@ export function PreLaunchChecklist() {
               "transition-all",
               check.status === "pass" && "border-accent/20",
               check.status === "warn" && "border-yellow-500/20",
-              check.status === "fail" && "border-red-500/20"
+              check.status === "fail" && "border-red-500/20",
             )}
           >
             <CardContent className="py-4">
@@ -392,8 +412,9 @@ export function PreLaunchChecklist() {
                   className={cn(
                     "flex items-center justify-center w-10 h-10 rounded-xl shrink-0",
                     check.status === "pass" && "bg-accent/10 text-accent",
-                    check.status === "warn" && "bg-yellow-500/10 text-yellow-400",
-                    check.status === "fail" && "bg-red-500/10 text-red-400"
+                    check.status === "warn" &&
+                      "bg-yellow-500/10 text-yellow-400",
+                    check.status === "fail" && "bg-red-500/10 text-red-400",
                   )}
                 >
                   {check.icon}
@@ -422,7 +443,7 @@ export function PreLaunchChecklist() {
                         "text-xs mt-1 font-medium",
                         check.status === "pass" && "text-accent",
                         check.status === "warn" && "text-yellow-400",
-                        check.status === "fail" && "text-red-400"
+                        check.status === "fail" && "text-red-400",
                       )}
                     >
                       {check.detail}
@@ -433,7 +454,11 @@ export function PreLaunchChecklist() {
                 {/* Fix link */}
                 {check.status !== "pass" && check.fixLink && (
                   <Link href={check.fixLink}>
-                    <Button variant="ghost" size="sm" className="shrink-0 gap-1.5 text-xs">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="shrink-0 gap-1.5 text-xs"
+                    >
                       {check.fixLabel}
                       <ArrowRight className="h-3 w-3" />
                     </Button>

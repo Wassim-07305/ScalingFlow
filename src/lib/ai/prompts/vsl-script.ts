@@ -1,7 +1,7 @@
 export function vslScriptPrompt(
   offer: Record<string, unknown>,
   avatar: Record<string, unknown>,
-  structure: "dsl" | "education" | "case_study" = "dsl"
+  structure: "dsl" | "education" | "case_study" = "dsl",
 ): string {
   const structureInstructions = getStructureInstructions(structure);
 
@@ -27,56 +27,103 @@ ${structureInstructions}
 - Transitions fluides entre les sections
 - Adapté au marché francophone
 
+## Directives de montage
+Pour CHAQUE section, tu dois fournir des indications de montage vidéo professionnelles :
+- **b_roll_instructions** : 2-3 suggestions visuelles concrètes de B-roll à intercaler (ex: "B-roll: personne stressée devant laptop", "B-roll: graphiques qui montent")
+- **title_card** : texte court à afficher en overlay/titre à l'écran pendant cette section (ex: "Le problème #1 des freelances")
+- **transition** : type de transition vers la section suivante — "cut" (coupe franche), "fade" (fondu), "zoom" (zoom avant/arrière), "swipe" (balayage)
+- **music_cue** : ambiance musicale recommandée (ex: "musique tension basse", "musique inspirante crescendo", "silence dramatique", "musique épique")
+- **duration_seconds** : durée estimée de la section en secondes
+
 ## Format de réponse
 Réponds UNIQUEMENT en JSON valide avec la structure suivante :
 {
   "structure": "${structure}",
+  "version": "15min",
+  "total_duration": 900,
   "sections": [
     {
       "step": 1,
       "name": "Nom de la section",
-      "duration": "Durée estimée",
-      "script": "Le texte complet du script pour cette section..."
+      "duration": "Durée estimée (ex: 30 secondes)",
+      "duration_seconds": 30,
+      "script": "Le texte complet du script pour cette section...",
+      "b_roll_instructions": ["B-roll: suggestion visuelle 1", "B-roll: suggestion visuelle 2"],
+      "title_card": "Texte overlay à afficher",
+      "transition": "cut",
+      "music_cue": "ambiance musicale recommandée"
     },
     {
       "step": 2,
       "name": "...",
       "duration": "...",
-      "script": "..."
+      "duration_seconds": 0,
+      "script": "...",
+      "b_roll_instructions": ["..."],
+      "title_card": "...",
+      "transition": "fade",
+      "music_cue": "..."
     },
     {
       "step": 3,
       "name": "...",
       "duration": "...",
-      "script": "..."
+      "duration_seconds": 0,
+      "script": "...",
+      "b_roll_instructions": ["..."],
+      "title_card": "...",
+      "transition": "cut",
+      "music_cue": "..."
     },
     {
       "step": 4,
       "name": "...",
       "duration": "...",
-      "script": "..."
+      "duration_seconds": 0,
+      "script": "...",
+      "b_roll_instructions": ["..."],
+      "title_card": "...",
+      "transition": "fade",
+      "music_cue": "..."
     },
     {
       "step": 5,
       "name": "...",
       "duration": "...",
-      "script": "..."
+      "duration_seconds": 0,
+      "script": "...",
+      "b_roll_instructions": ["..."],
+      "title_card": "...",
+      "transition": "zoom",
+      "music_cue": "..."
     },
     {
       "step": 6,
       "name": "...",
       "duration": "...",
-      "script": "..."
+      "duration_seconds": 0,
+      "script": "...",
+      "b_roll_instructions": ["..."],
+      "title_card": "...",
+      "transition": "fade",
+      "music_cue": "..."
     },
     {
       "step": 7,
       "name": "...",
       "duration": "...",
-      "script": "..."
+      "duration_seconds": 0,
+      "script": "...",
+      "b_roll_instructions": ["..."],
+      "title_card": "...",
+      "transition": "fade",
+      "music_cue": "..."
     }
   ],
   "full_script": "Le script complet assemblé, prêt à être lu..."
-}`;
+}
+
+IMPORTANT : La somme des duration_seconds de toutes les sections doit correspondre approximativement à total_duration. Adapte la longueur des scripts en conséquence.`;
 }
 
 const structureLabels: Record<"dsl" | "education" | "case_study", string> = {
@@ -85,7 +132,9 @@ const structureLabels: Record<"dsl" | "education" | "case_study", string> = {
   case_study: "Étude de cas",
 };
 
-function getStructureInstructions(structure: "dsl" | "education" | "case_study"): string {
+function getStructureInstructions(
+  structure: "dsl" | "education" | "case_study",
+): string {
   switch (structure) {
     case "dsl":
       return `1. **Hook (Accroche)** — 30 secondes max

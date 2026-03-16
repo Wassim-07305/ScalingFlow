@@ -1,9 +1,12 @@
-export function offerCreationPrompt(market: {
-  name: string;
-  problems: string[];
-  avatar: Record<string, unknown>;
-  positioning: string;
-}, skills: string[]): string {
+export function offerCreationPrompt(
+  market: {
+    name: string;
+    problems: string[];
+    avatar: Record<string, unknown>;
+    positioning: string;
+  },
+  skills: string[],
+): string {
   return `Tu es un expert en creation d'offres irresistibles pour des services d'infrastructure IA. Tu maitrises les principes de ScalingFlow : mecanisme unique, offre no-brainer, inversion du risque, ancrage de prix. Tu integres les frameworks de Dan Kennedy, Alex Hormozi et Russell Brunson.
 
 ## MARCHE SELECTIONNE

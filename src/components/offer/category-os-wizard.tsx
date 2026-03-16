@@ -26,9 +26,24 @@ import { UpgradeWall } from "@/components/shared/upgrade-wall";
 const STEPS = [
   { key: "new_game", label: "New Game", icon: Gamepad2, color: "text-accent" },
   { key: "ennemi", label: "Ennemi", icon: Sword, color: "text-danger" },
-  { key: "truth_bombs", label: "Truth Bombs", icon: Bomb, color: "text-warning" },
-  { key: "modele_tangible", label: "Framework", icon: Blocks, color: "text-info" },
-  { key: "identite", label: "Identité", icon: Fingerprint, color: "text-[#A78BFA]" },
+  {
+    key: "truth_bombs",
+    label: "Truth Bombs",
+    icon: Bomb,
+    color: "text-warning",
+  },
+  {
+    key: "modele_tangible",
+    label: "Framework",
+    icon: Blocks,
+    color: "text-info",
+  },
+  {
+    key: "identite",
+    label: "Identité",
+    icon: Fingerprint,
+    color: "text-[#A78BFA]",
+  },
 ] as const;
 
 interface CategoryOSWizardProps {
@@ -36,11 +51,17 @@ interface CategoryOSWizardProps {
   className?: string;
 }
 
-export function CategoryOSWizard({ offerId, className }: CategoryOSWizardProps) {
+export function CategoryOSWizard({
+  offerId,
+  className,
+}: CategoryOSWizardProps) {
   const [loading, setLoading] = React.useState(false);
   const [result, setResult] = React.useState<CategoryOSResult | null>(null);
   const [currentStep, setCurrentStep] = React.useState(0);
-  const [usageLimited, setUsageLimited] = React.useState<{currentUsage: number; limit: number} | null>(null);
+  const [usageLimited, setUsageLimited] = React.useState<{
+    currentUsage: number;
+    limit: number;
+  } | null>(null);
 
   const handleGenerate = async () => {
     if (!offerId) {
@@ -61,7 +82,10 @@ export function CategoryOSWizard({ offerId, className }: CategoryOSWizardProps) 
 
       if (!response.ok) {
         const errData = await response.json().catch(() => ({}));
-        if (response.status === 403 && errData.usage) { setUsageLimited(errData.usage); return; }
+        if (response.status === 403 && errData.usage) {
+          setUsageLimited(errData.usage);
+          return;
+        }
         throw new Error(errData.error || "Erreur lors de la génération");
       }
 
@@ -69,14 +93,22 @@ export function CategoryOSWizard({ offerId, className }: CategoryOSWizardProps) 
       setResult(data);
       toast.success("Category OS généré avec succès !");
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Une erreur est survenue");
+      toast.error(
+        err instanceof Error ? err.message : "Une erreur est survenue",
+      );
     } finally {
       setLoading(false);
     }
   };
 
   if (usageLimited) {
-    return <UpgradeWall currentUsage={usageLimited.currentUsage} limit={usageLimited.limit} className={className} />;
+    return (
+      <UpgradeWall
+        currentUsage={usageLimited.currentUsage}
+        limit={usageLimited.limit}
+        className={className}
+      />
+    );
   }
 
   if (loading) {
@@ -96,7 +128,9 @@ export function CategoryOSWizard({ offerId, className }: CategoryOSWizardProps) 
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-sm text-text-secondary">
-                Le Category OS définit ton positionnement unique en 5 étapes : nouvelle catégorie, ennemi commun, vérités dérangeantes, framework propriétaire et identité de marque.
+                Le Category OS définit ton positionnement unique en 5 étapes :
+                nouvelle catégorie, ennemi commun, vérités dérangeantes,
+                framework propriétaire et identité de marque.
               </p>
               <Button size="lg" onClick={handleGenerate}>
                 <Sparkles className="h-4 w-4 mr-2" />
@@ -130,8 +164,8 @@ export function CategoryOSWizard({ offerId, className }: CategoryOSWizardProps) 
               i === currentStep
                 ? "bg-accent text-white"
                 : i < currentStep
-                ? "bg-accent-muted text-accent"
-                : "bg-bg-tertiary text-text-muted hover:text-text-secondary"
+                  ? "bg-accent-muted text-accent"
+                  : "bg-bg-tertiary text-text-muted hover:text-text-secondary",
             )}
           >
             <s.icon className="h-3.5 w-3.5" />
@@ -152,7 +186,9 @@ export function CategoryOSWizard({ offerId, className }: CategoryOSWizardProps) 
           {currentStep === 0 && <NewGameStep data={result.new_game} />}
           {currentStep === 1 && <EnnemiStep data={result.ennemi} />}
           {currentStep === 2 && <TruthBombsStep data={result.truth_bombs} />}
-          {currentStep === 3 && <ModeleTangibleStep data={result.modele_tangible} />}
+          {currentStep === 3 && (
+            <ModeleTangibleStep data={result.modele_tangible} />
+          )}
           {currentStep === 4 && <IdentiteStep data={result.identite} />}
         </CardContent>
       </Card>
@@ -172,7 +208,9 @@ export function CategoryOSWizard({ offerId, className }: CategoryOSWizardProps) 
         </span>
         {currentStep < STEPS.length - 1 ? (
           <Button
-            onClick={() => setCurrentStep((s) => Math.min(STEPS.length - 1, s + 1))}
+            onClick={() =>
+              setCurrentStep((s) => Math.min(STEPS.length - 1, s + 1))
+            }
           >
             Suivant
             <ChevronRight className="h-4 w-4 ml-1" />
@@ -197,7 +235,9 @@ function NewGameStep({ data }: { data: CategoryOSResult["new_game"] }) {
         <p className="text-xs text-accent font-medium uppercase tracking-wide mb-1">
           Nouvelle catégorie
         </p>
-        <p className="text-xl font-bold text-text-primary">{data.category_name}</p>
+        <p className="text-xl font-bold text-text-primary">
+          {data.category_name}
+        </p>
       </div>
       <div className="space-y-4">
         <div>
@@ -230,7 +270,9 @@ function EnnemiStep({ data }: { data: CategoryOSResult["ennemi"] }) {
       </div>
       <div className="space-y-4">
         <div>
-          <p className="text-xs text-text-muted uppercase tracking-wide mb-1">Description</p>
+          <p className="text-xs text-text-muted uppercase tracking-wide mb-1">
+            Description
+          </p>
           <p className="text-sm text-text-secondary">{data.description}</p>
         </div>
         <div>
@@ -269,7 +311,9 @@ function TruthBombsStep({ data }: { data: CategoryOSResult["truth_bombs"] }) {
               {bomb.statement}
             </p>
           </div>
-          <p className="text-sm text-text-secondary pl-10">{bomb.explanation}</p>
+          <p className="text-sm text-text-secondary pl-10">
+            {bomb.explanation}
+          </p>
           <div className="flex items-center gap-2 pl-10">
             <Lightbulb className="h-3.5 w-3.5 text-warning" />
             <p className="text-xs text-warning">{bomb.impact}</p>
@@ -280,14 +324,20 @@ function TruthBombsStep({ data }: { data: CategoryOSResult["truth_bombs"] }) {
   );
 }
 
-function ModeleTangibleStep({ data }: { data: CategoryOSResult["modele_tangible"] }) {
+function ModeleTangibleStep({
+  data,
+}: {
+  data: CategoryOSResult["modele_tangible"];
+}) {
   return (
     <div className="space-y-6">
       <div className="p-4 rounded-xl bg-info/10 border border-info/20">
         <p className="text-xs text-info font-medium uppercase tracking-wide mb-1">
           Framework propriétaire
         </p>
-        <p className="text-xl font-bold text-text-primary">{data.framework_name}</p>
+        <p className="text-xl font-bold text-text-primary">
+          {data.framework_name}
+        </p>
       </div>
       <div className="space-y-3">
         {data.steps.map((step, i) => (
@@ -300,7 +350,9 @@ function ModeleTangibleStep({ data }: { data: CategoryOSResult["modele_tangible"
             </span>
             <div>
               <p className="font-medium text-text-primary">{step.name}</p>
-              <p className="text-sm text-text-secondary mt-1">{step.description}</p>
+              <p className="text-sm text-text-secondary mt-1">
+                {step.description}
+              </p>
             </div>
           </div>
         ))}
@@ -319,7 +371,9 @@ function IdentiteStep({ data }: { data: CategoryOSResult["identite"] }) {
   return (
     <div className="space-y-6">
       <div className="space-y-3">
-        <p className="text-xs text-text-muted uppercase tracking-wide">Headlines de marque</p>
+        <p className="text-xs text-text-muted uppercase tracking-wide">
+          Headlines de marque
+        </p>
         {data.brand_headlines.map((headline, i) => (
           <div
             key={i}
@@ -334,10 +388,14 @@ function IdentiteStep({ data }: { data: CategoryOSResult["identite"] }) {
           <p className="text-xs text-[#A78BFA] font-medium uppercase tracking-wide mb-1">
             Tagline
           </p>
-          <p className="text-base font-semibold text-text-primary">{data.tagline}</p>
+          <p className="text-base font-semibold text-text-primary">
+            {data.tagline}
+          </p>
         </div>
         <div className="p-4 rounded-xl bg-bg-tertiary border border-border-default">
-          <p className="text-xs text-text-muted uppercase tracking-wide mb-1">Ton de voix</p>
+          <p className="text-xs text-text-muted uppercase tracking-wide mb-1">
+            Ton de voix
+          </p>
           <p className="text-sm text-text-secondary">{data.tone_of_voice}</p>
         </div>
       </div>
@@ -345,7 +403,9 @@ function IdentiteStep({ data }: { data: CategoryOSResult["identite"] }) {
         <p className="text-xs text-text-muted uppercase tracking-wide mb-2">
           Proposition de valeur
         </p>
-        <p className="text-base text-text-primary font-medium">{data.value_proposition}</p>
+        <p className="text-base text-text-primary font-medium">
+          {data.value_proposition}
+        </p>
       </div>
       <Badge variant="default">Category OS termine</Badge>
     </div>

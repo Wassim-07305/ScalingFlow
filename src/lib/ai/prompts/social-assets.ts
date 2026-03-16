@@ -9,7 +9,7 @@ export function socialAssetsPrompt(
     colors?: string[];
     fonts?: string[];
     tone?: string;
-  }
+  },
 ): string {
   return `Tu es un expert en création de visuels et assets pour les réseaux sociaux. Tu maîtrises le design de contenus qui convertissent sur Instagram, Facebook, LinkedIn et YouTube.
 
@@ -21,10 +21,14 @@ export function socialAssetsPrompt(
 ## Avatar cible
 ${JSON.stringify(avatar, null, 2)}
 
-${brandKit ? `## Kit de marque
+${
+  brandKit
+    ? `## Kit de marque
 - Couleurs : ${brandKit.colors?.join(", ") || "Non définies"}
 - Typographies : ${brandKit.fonts?.join(", ") || "Non définies"}
-- Ton : ${brandKit.tone || "Professionnel et percutant"}` : ""}
+- Ton : ${brandKit.tone || "Professionnel et percutant"}`
+    : ""
+}
 
 ## Ta mission
 Génère un pack complet de social assets prêts à être designés. Chaque asset doit inclure le texte exact, les dimensions recommandées et les instructions de design.

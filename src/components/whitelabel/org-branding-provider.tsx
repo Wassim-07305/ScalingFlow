@@ -15,7 +15,10 @@ interface OrgBrandingProviderProps {
  * When the user belongs to an org with custom colors, the accent/brand
  * colors across the entire UI are dynamically updated.
  */
-export function OrgBrandingProvider({ organization, children }: OrgBrandingProviderProps) {
+export function OrgBrandingProvider({
+  organization,
+  children,
+}: OrgBrandingProviderProps) {
   useEffect(() => {
     if (!organization) return;
 

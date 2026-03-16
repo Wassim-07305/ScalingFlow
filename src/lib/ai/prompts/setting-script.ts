@@ -1,6 +1,8 @@
 export interface SettingScriptResult {
   opening: { script: string; notes: string };
-  qualification: { questions: { question: string; ideal_answer: string; red_flag: string }[] };
+  qualification: {
+    questions: { question: string; ideal_answer: string; red_flag: string }[];
+  };
   presentation: { script: string; notes: string };
   objection_handling: { objection: string; response: string }[];
   closing: { script: string; transition_to_call: string };
@@ -9,7 +11,7 @@ export interface SettingScriptResult {
 
 export function settingScriptPrompt(
   offer: Record<string, unknown>,
-  avatar: Record<string, unknown>
+  avatar: Record<string, unknown>,
 ): string {
   return `Tu es un expert en vente par téléphone et en setting (prise de rendez-vous qualifiés) pour les freelances et consultants spécialisés en IA et automatisation.
 

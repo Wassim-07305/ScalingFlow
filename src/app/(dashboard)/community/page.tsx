@@ -40,8 +40,14 @@ function CommunityStats({ streakDays }: { streakDays: number }) {
   useEffect(() => {
     async function fetchStats() {
       const now = new Date();
-      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
-      const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString();
+      const startOfMonth = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        1,
+      ).toISOString();
+      const thirtyDaysAgo = new Date(
+        now.getTime() - 30 * 24 * 60 * 60 * 1000,
+      ).toISOString();
 
       const [membersRes, postsRes, winsRes] = await Promise.all([
         supabase
@@ -71,10 +77,30 @@ function CommunityStats({ streakDays }: { streakDays: number }) {
   }, [supabase, streakDays]);
 
   const statItems = [
-    { icon: Users, label: "Membres actifs", value: stats.activeMembers, color: "text-accent" },
-    { icon: MessageSquare, label: "Posts ce mois", value: stats.postsThisMonth, color: "text-info" },
-    { icon: Flame, label: "Streak", value: stats.streak, color: "text-warning" },
-    { icon: Star, label: "Victoires", value: stats.wins, color: "text-cyan-400" },
+    {
+      icon: Users,
+      label: "Membres actifs",
+      value: stats.activeMembers,
+      color: "text-accent",
+    },
+    {
+      icon: MessageSquare,
+      label: "Posts ce mois",
+      value: stats.postsThisMonth,
+      color: "text-info",
+    },
+    {
+      icon: Flame,
+      label: "Streak",
+      value: stats.streak,
+      color: "text-warning",
+    },
+    {
+      icon: Star,
+      label: "Victoires",
+      value: stats.wins,
+      color: "text-cyan-400",
+    },
   ];
 
   return (
@@ -84,7 +110,7 @@ function CommunityStats({ streakDays }: { streakDays: number }) {
           key={stat.label}
           className={cn(
             "flex items-center gap-3 rounded-2xl border border-border-default bg-bg-secondary/50 px-4 py-3 backdrop-blur-sm transition-all duration-500",
-            loaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
+            loaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2",
           )}
           style={{ transitionDelay: loaded ? `${i * 80}ms` : "0ms" }}
         >
@@ -92,7 +118,9 @@ function CommunityStats({ streakDays }: { streakDays: number }) {
             <stat.icon className="h-4 w-4" />
           </div>
           <div>
-            <p className="text-lg font-bold text-text-primary tabular-nums">{stat.value}</p>
+            <p className="text-lg font-bold text-text-primary tabular-nums">
+              {stat.value}
+            </p>
             <p className="text-[11px] text-text-muted">{stat.label}</p>
           </div>
         </div>
@@ -112,7 +140,10 @@ export default function CommunityPage() {
   useEffect(() => {
     if (!tabsContainerRef.current || !tabIndicatorRef.current) return;
     const activeIndex = TABS.findIndex((t) => t.id === activeTab);
-    const buttons = tabsContainerRef.current.querySelectorAll<HTMLButtonElement>("button[data-tab]");
+    const buttons =
+      tabsContainerRef.current.querySelectorAll<HTMLButtonElement>(
+        "button[data-tab]",
+      );
     const btn = buttons[activeIndex];
     if (!btn) return;
     const container = tabsContainerRef.current;
@@ -181,7 +212,7 @@ export default function CommunityPage() {
               "relative z-10 flex flex-1 items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors duration-200",
               activeTab === tab.id
                 ? "text-white"
-                : "text-text-secondary hover:text-text-primary"
+                : "text-text-secondary hover:text-text-primary",
             )}
           >
             <tab.icon className="h-4 w-4" />

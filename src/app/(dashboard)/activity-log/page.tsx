@@ -184,11 +184,12 @@ export default function ActivityLogPage() {
     const supabase = createClient();
 
     // Construire les filtres par catégorie
-    const categoryTypes = category === "Tout"
-      ? null
-      : Object.entries(ACTIVITY_META)
-          .filter(([, meta]) => meta.category === category)
-          .map(([type]) => type);
+    const categoryTypes =
+      category === "Tout"
+        ? null
+        : Object.entries(ACTIVITY_META)
+            .filter(([, meta]) => meta.category === category)
+            .map(([type]) => type);
 
     // Requête count
     let countQuery = supabase
@@ -233,7 +234,7 @@ export default function ActivityLogPage() {
   const totalPages = Math.ceil(total / PAGE_SIZE);
   const totalXp = activities.reduce(
     (sum, a) => sum + ((a.activity_data?.xp_awarded as number) ?? 0),
-    0
+    0,
   );
 
   if (userLoading || (loading && activities.length === 0)) {
@@ -271,7 +272,9 @@ export default function ActivityLogPage() {
       >
         <div className="flex items-center gap-2 text-sm text-text-muted">
           <Activity className="h-4 w-4" />
-          <span>{total} activité{total > 1 ? "s" : ""}</span>
+          <span>
+            {total} activité{total > 1 ? "s" : ""}
+          </span>
           {totalXp > 0 && (
             <Badge variant="muted" className="ml-1">
               +{totalXp} XP sur cette page
@@ -290,7 +293,7 @@ export default function ActivityLogPage() {
               "px-3 py-1.5 rounded-lg text-xs font-medium transition-colors",
               category === cat
                 ? "bg-accent text-white"
-                : "bg-bg-secondary text-text-muted hover:bg-bg-tertiary hover:text-text-primary"
+                : "bg-bg-secondary text-text-muted hover:bg-bg-tertiary hover:text-text-primary",
             )}
           >
             {cat}
@@ -331,7 +334,7 @@ export default function ActivityLogPage() {
                     <div
                       className={cn(
                         "flex h-9 w-9 items-center justify-center rounded-xl bg-bg-tertiary shrink-0",
-                        meta.color
+                        meta.color,
                       )}
                     >
                       <Icon className="h-4 w-4" />
@@ -339,9 +342,13 @@ export default function ActivityLogPage() {
                     <div className="flex-1 min-w-0">
                       <p className="text-sm text-text-primary">{meta.label}</p>
                       <p className="text-xs text-text-muted">
-                        {format(new Date(a.created_at), "EEEE d MMMM yyyy 'a' HH:mm", {
-                          locale: fr,
-                        })}
+                        {format(
+                          new Date(a.created_at),
+                          "EEEE d MMMM yyyy 'a' HH:mm",
+                          {
+                            locale: fr,
+                          },
+                        )}
                       </p>
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
@@ -374,7 +381,9 @@ export default function ActivityLogPage() {
                     <ChevronLeft className="h-4 w-4" />
                   </button>
                   <button
-                    onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
+                    onClick={() =>
+                      setPage((p) => Math.min(totalPages - 1, p + 1))
+                    }
                     disabled={page >= totalPages - 1}
                     className="p-1.5 rounded-lg hover:bg-bg-tertiary disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                   >

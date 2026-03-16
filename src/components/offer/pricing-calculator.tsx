@@ -2,7 +2,13 @@
 
 import React, { useState, useMemo } from "react";
 import { cn } from "@/lib/utils/cn";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
@@ -44,7 +50,8 @@ export function PricingCalculator({ className }: PricingCalculatorProps) {
 
     // Le prix recommandé est le MAX entre le prix ajusté et le plancher
     const prixRecommande = Math.max(prixAjuste, prixPlancher);
-    const floorApplied = prixRecommande === prixPlancher && prixPlancher > prixAjuste;
+    const floorApplied =
+      prixRecommande === prixPlancher && prixPlancher > prixAjuste;
 
     const tiers = {
       basic: {
@@ -64,25 +71,28 @@ export function PricingCalculator({ className }: PricingCalculatorProps) {
       },
     };
 
-    const margeNette = prixRecommande > 0
-      ? Math.round(((prixRecommande - coutDelivery) / prixRecommande) * 100)
-      : 0;
+    const margeNette =
+      prixRecommande > 0
+        ? Math.round(((prixRecommande - coutDelivery) / prixRecommande) * 100)
+        : 0;
 
-    const roiClient = prixRecommande > 0
-      ? Math.round((revenuPotentiel / prixRecommande) * 100) / 100
-      : 0;
+    const roiClient =
+      prixRecommande > 0
+        ? Math.round((revenuPotentiel / prixRecommande) * 100) / 100
+        : 0;
 
     let positionnement: "inférieur" | "aligné" | "supérieur" = "aligné";
     let positionnementDelta = 0;
     if (prixMarche > 0 && prixRecommande > 0) {
-      positionnementDelta = Math.round(((prixRecommande - prixMarche) / prixMarche) * 100);
+      positionnementDelta = Math.round(
+        ((prixRecommande - prixMarche) / prixMarche) * 100,
+      );
       if (positionnementDelta > 15) positionnement = "supérieur";
       else if (positionnementDelta < -15) positionnement = "inférieur";
     }
 
-    const revenuMensuelEstime = nombreClients > 0
-      ? prixRecommande * nombreClients
-      : 0;
+    const revenuMensuelEstime =
+      nombreClients > 0 ? prixRecommande * nombreClients : 0;
 
     return {
       prixRecommande,
@@ -97,7 +107,15 @@ export function PricingCalculator({ className }: PricingCalculatorProps) {
       positionnementDelta,
       revenuMensuelEstime,
     };
-  }, [revenuPotentiel, dureeAccompagnement, coutDelivery, nombreClients, prixMarche, coutAcquisition, probabiliteResultat]);
+  }, [
+    revenuPotentiel,
+    dureeAccompagnement,
+    coutDelivery,
+    nombreClients,
+    prixMarche,
+    coutAcquisition,
+    probabiliteResultat,
+  ]);
 
   const getPositionnementIcon = () => {
     switch (calculations.positionnement) {
@@ -131,7 +149,8 @@ export function PricingCalculator({ className }: PricingCalculatorProps) {
             Calculateur de Prix Automatique
           </CardTitle>
           <CardDescription>
-            Renseigne les données de ton marché pour calculer le prix optimal de ton offre.
+            Renseigne les données de ton marché pour calculer le prix optimal de
+            ton offre.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -144,7 +163,9 @@ export function PricingCalculator({ className }: PricingCalculatorProps) {
               <Input
                 type="number"
                 value={revenuPotentiel || ""}
-                onChange={(e) => setRevenuPotentiel(parseInt(e.target.value) || 0)}
+                onChange={(e) =>
+                  setRevenuPotentiel(parseInt(e.target.value) || 0)
+                }
                 placeholder="Ex : 50000"
               />
               <p className="text-xs text-text-muted mt-1">
@@ -159,7 +180,9 @@ export function PricingCalculator({ className }: PricingCalculatorProps) {
               <Input
                 type="number"
                 value={dureeAccompagnement || ""}
-                onChange={(e) => setDureeAccompagnement(parseInt(e.target.value) || 1)}
+                onChange={(e) =>
+                  setDureeAccompagnement(parseInt(e.target.value) || 1)
+                }
                 placeholder="Ex : 3"
                 min={1}
               />
@@ -187,7 +210,9 @@ export function PricingCalculator({ className }: PricingCalculatorProps) {
               <Input
                 type="number"
                 value={nombreClients || ""}
-                onChange={(e) => setNombreClients(parseInt(e.target.value) || 0)}
+                onChange={(e) =>
+                  setNombreClients(parseInt(e.target.value) || 0)
+                }
                 placeholder="Ex : 10"
                 min={0}
               />
@@ -200,7 +225,9 @@ export function PricingCalculator({ className }: PricingCalculatorProps) {
               <Input
                 type="number"
                 value={coutAcquisition || ""}
-                onChange={(e) => setCoutAcquisition(parseInt(e.target.value) || 0)}
+                onChange={(e) =>
+                  setCoutAcquisition(parseInt(e.target.value) || 0)
+                }
                 placeholder="Ex : 200"
               />
               <p className="text-xs text-text-muted mt-1">
@@ -215,13 +242,18 @@ export function PricingCalculator({ className }: PricingCalculatorProps) {
               <Input
                 type="number"
                 value={probabiliteResultat || ""}
-                onChange={(e) => setProbabiliteResultat(Math.min(100, Math.max(1, parseInt(e.target.value) || 80)))}
+                onChange={(e) =>
+                  setProbabiliteResultat(
+                    Math.min(100, Math.max(1, parseInt(e.target.value) || 80)),
+                  )
+                }
                 placeholder="Ex : 80"
                 min={1}
                 max={100}
               />
               <p className="text-xs text-text-muted mt-1">
-                Probabilité que le client atteigne le résultat promis (ajuste le prix)
+                Probabilité que le client atteigne le résultat promis (ajuste le
+                prix)
               </p>
             </div>
             <div className="sm:col-span-2">
@@ -254,16 +286,22 @@ export function PricingCalculator({ className }: PricingCalculatorProps) {
                   {calculations.prixRecommande.toLocaleString("fr-FR")} €
                 </p>
                 <p className="text-xs text-text-muted">
-                  = 10% × {revenuPotentiel.toLocaleString("fr-FR")} € × {calculations.multiplicateurProba * 100}% probabilité
+                  = 10% × {revenuPotentiel.toLocaleString("fr-FR")} € ×{" "}
+                  {calculations.multiplicateurProba * 100}% probabilité
                 </p>
                 {calculations.floorApplied && (
                   <p className="text-xs text-warning font-medium">
-                    Plancher appliqué : (CAC {coutAcquisition.toLocaleString("fr-FR")} € + Delivery {coutDelivery.toLocaleString("fr-FR")} €) × 2 = {calculations.prixPlancher.toLocaleString("fr-FR")} €
+                    Plancher appliqué : (CAC{" "}
+                    {coutAcquisition.toLocaleString("fr-FR")} € + Delivery{" "}
+                    {coutDelivery.toLocaleString("fr-FR")} €) × 2 ={" "}
+                    {calculations.prixPlancher.toLocaleString("fr-FR")} €
                   </p>
                 )}
                 {!calculations.floorApplied && coutAcquisition > 0 && (
                   <p className="text-xs text-text-muted">
-                    Plancher (CAC + Delivery) × 2 = {calculations.prixPlancher.toLocaleString("fr-FR")} € — non appliqué
+                    Plancher (CAC + Delivery) × 2 ={" "}
+                    {calculations.prixPlancher.toLocaleString("fr-FR")} € — non
+                    appliqué
                   </p>
                 )}
               </div>
@@ -279,7 +317,8 @@ export function PricingCalculator({ className }: PricingCalculatorProps) {
                   key={key}
                   className={cn(
                     "relative transition-all",
-                    isRecommended && "border-accent/50 shadow-lg shadow-accent/5"
+                    isRecommended &&
+                      "border-accent/50 shadow-lg shadow-accent/5",
                   )}
                 >
                   {isRecommended && (
@@ -294,16 +333,20 @@ export function PricingCalculator({ className }: PricingCalculatorProps) {
                     <p
                       className={cn(
                         "text-3xl font-bold",
-                        isRecommended ? "text-accent" : "text-text-primary"
+                        isRecommended ? "text-accent" : "text-text-primary",
                       )}
                     >
                       {tier.prix.toLocaleString("fr-FR")} €
                     </p>
-                    <p className="text-xs text-text-muted">{tier.description}</p>
+                    <p className="text-xs text-text-muted">
+                      {tier.description}
+                    </p>
                     {nombreClients > 0 && (
                       <div className="pt-2 border-t border-border-default">
                         <p className="text-xs text-text-muted">
-                          Revenu estimé : {(tier.prix * nombreClients).toLocaleString("fr-FR")} €/mois
+                          Revenu estimé :{" "}
+                          {(tier.prix * nombreClients).toLocaleString("fr-FR")}{" "}
+                          €/mois
                         </p>
                       </div>
                     )}
@@ -331,7 +374,7 @@ export function PricingCalculator({ className }: PricingCalculatorProps) {
                           ? "text-accent"
                           : calculations.margeNette >= 40
                             ? "text-yellow-400"
-                            : "text-red-400"
+                            : "text-red-400",
                       )}
                     >
                       {calculations.margeNette} %
@@ -369,8 +412,15 @@ export function PricingCalculator({ className }: PricingCalculatorProps) {
                     {getPositionnementIcon()}
                   </div>
                   <div>
-                    <p className="text-xs text-text-muted">Positionnement vs marché</p>
-                    <p className={cn("text-xl font-bold capitalize", getPositionnementColor())}>
+                    <p className="text-xs text-text-muted">
+                      Positionnement vs marché
+                    </p>
+                    <p
+                      className={cn(
+                        "text-xl font-bold capitalize",
+                        getPositionnementColor(),
+                      )}
+                    >
                       {calculations.positionnement}
                     </p>
                     {prixMarche > 0 && (
@@ -395,16 +445,24 @@ export function PricingCalculator({ className }: PricingCalculatorProps) {
                       <DollarSign className="h-5 w-5 text-accent" />
                     </div>
                     <div>
-                      <p className="text-xs text-text-muted">Revenu mensuel estimé (prix recommandé)</p>
+                      <p className="text-xs text-text-muted">
+                        Revenu mensuel estimé (prix recommandé)
+                      </p>
                       <p className="text-2xl font-bold text-accent">
-                        {calculations.revenuMensuelEstime.toLocaleString("fr-FR")} €
+                        {calculations.revenuMensuelEstime.toLocaleString(
+                          "fr-FR",
+                        )}{" "}
+                        €
                       </p>
                     </div>
                   </div>
                   <div className="text-right">
                     <p className="text-xs text-text-muted">Revenu annuel</p>
                     <p className="text-lg font-semibold text-text-primary">
-                      {(calculations.revenuMensuelEstime * 12).toLocaleString("fr-FR")} €
+                      {(calculations.revenuMensuelEstime * 12).toLocaleString(
+                        "fr-FR",
+                      )}{" "}
+                      €
                     </p>
                   </div>
                 </div>

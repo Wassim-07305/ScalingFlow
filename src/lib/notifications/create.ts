@@ -1,7 +1,13 @@
 import { createClient } from "@/lib/supabase/server";
 import { sendPushToUser } from "@/lib/notifications/push";
 
-type NotificationType = "milestone" | "badge" | "community" | "task" | "system" | "win";
+type NotificationType =
+  | "milestone"
+  | "badge"
+  | "community"
+  | "task"
+  | "system"
+  | "win";
 
 interface CreateNotificationParams {
   userId: string;
@@ -57,13 +63,19 @@ const GENERATION_LABELS: Record<string, { label: string; link: string }> = {
   "generation.pitch_deck": { label: "Pitch deck", link: "/assets" },
   "generation.setting_script": { label: "Script setting", link: "/assets" },
   "generation.lead_magnet": { label: "Lead magnet", link: "/assets" },
-  "generation.content_strategy": { label: "Stratégie contenu", link: "/content" },
+  "generation.content_strategy": {
+    label: "Stratégie contenu",
+    link: "/content",
+  },
   "generation.reels": { label: "Scripts Reels", link: "/content" },
   "generation.youtube": { label: "Script YouTube", link: "/content" },
   "generation.stories": { label: "Scripts Stories", link: "/content" },
   "generation.carousel": { label: "Carrousel", link: "/content" },
   "generation.instagram": { label: "Profil Instagram", link: "/content" },
-  "generation.editorial_calendar": { label: "Calendrier éditorial", link: "/content" },
+  "generation.editorial_calendar": {
+    label: "Calendrier éditorial",
+    link: "/content",
+  },
   "generation.post": { label: "Post", link: "/content" },
   "generation.roadmap": { label: "Roadmap", link: "/roadmap" },
   "generation.vault_analysis": { label: "Analyse vault", link: "/vault" },

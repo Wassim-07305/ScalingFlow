@@ -17,9 +17,19 @@ interface TabBarProps {
   className?: string;
 }
 
-export function TabBar({ tabs, activeTab, onTabChange, className }: TabBarProps) {
+export function TabBar({
+  tabs,
+  activeTab,
+  onTabChange,
+  className,
+}: TabBarProps) {
   return (
-    <div className={cn("flex gap-1.5 mb-6 overflow-x-auto pb-1 scrollbar-none", className)}>
+    <div
+      className={cn(
+        "flex gap-1.5 mb-6 overflow-x-auto pb-1 scrollbar-none",
+        className,
+      )}
+    >
       {tabs.map((tab) => {
         const isActive = activeTab === tab.key;
         const Icon = tab.icon;
@@ -31,7 +41,7 @@ export function TabBar({ tabs, activeTab, onTabChange, className }: TabBarProps)
               "relative flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors whitespace-nowrap",
               isActive
                 ? "text-white"
-                : "text-text-secondary hover:text-text-primary hover:bg-white/[0.04]"
+                : "text-text-secondary hover:text-text-primary hover:bg-white/[0.04]",
             )}
           >
             {isActive && (

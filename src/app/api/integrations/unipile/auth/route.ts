@@ -22,21 +22,34 @@ export async function POST(request: NextRequest) {
 
     if (!providers || !Array.isArray(providers) || providers.length === 0) {
       return NextResponse.json(
-        { error: "Le champ providers est requis (ex: [\"LINKEDIN\", \"INSTAGRAM\"])" },
-        { status: 400 }
+        {
+          error:
+            'Le champ providers est requis (ex: ["LINKEDIN", "INSTAGRAM"])',
+        },
+        { status: 400 },
       );
     }
 
     const validProviders = [
-      "LINKEDIN", "WHATSAPP", "INSTAGRAM", "MESSENGER",
-      "TELEGRAM", "TWITTER", "MAIL", "GOOGLE", "OUTLOOK", "IMAP",
+      "LINKEDIN",
+      "WHATSAPP",
+      "INSTAGRAM",
+      "MESSENGER",
+      "TELEGRAM",
+      "TWITTER",
+      "MAIL",
+      "GOOGLE",
+      "OUTLOOK",
+      "IMAP",
     ];
 
-    const invalidProviders = providers.filter((p) => !validProviders.includes(p));
+    const invalidProviders = providers.filter(
+      (p) => !validProviders.includes(p),
+    );
     if (invalidProviders.length > 0) {
       return NextResponse.json(
         { error: `Fournisseurs invalides : ${invalidProviders.join(", ")}` },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -46,7 +59,7 @@ export async function POST(request: NextRequest) {
     if (!apiUrl) {
       return NextResponse.json(
         { error: "UNIPILE_API_URL non configuré" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -56,14 +69,24 @@ export async function POST(request: NextRequest) {
     const unipile = getUnipileClient();
     const link = await unipile.account.createHostedAuthLink({
       type: "create",
-      providers: providers as Array<"LINKEDIN" | "WHATSAPP" | "INSTAGRAM" | "MESSENGER" | "TELEGRAM" | "TWITTER" | "MAIL" | "GOOGLE" | "OUTLOOK">,
+      providers: providers as Array<
+        | "LINKEDIN"
+        | "WHATSAPP"
+        | "INSTAGRAM"
+        | "MESSENGER"
+        | "TELEGRAM"
+        | "TWITTER"
+        | "MAIL"
+        | "GOOGLE"
+        | "OUTLOOK"
+      >,
       expiresOn,
       api_url: apiUrl,
       success_redirect_url: `${appUrl}/settings/unipile-callback?unipile=success`,
       failure_redirect_url: `${appUrl}/settings/unipile-callback?unipile=error`,
       notify_url: `${appUrl}/api/integrations/unipile/webhook`,
       name: user.id,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any);
 
     return NextResponse.json({ url: link.url });
@@ -71,7 +94,7 @@ export async function POST(request: NextRequest) {
     console.error("[Unipile Auth]", error);
     return NextResponse.json(
       { error: "Erreur lors de la génération du lien de connexion" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -23,10 +23,34 @@ interface Phase {
 }
 
 const PHASE_COLORS = {
-  hook: { accent: "#3B82F6", bg: "rgba(59,130,246,0.12)", ring: "ring-blue-400/30", text: "text-blue-400", gradient: "from-blue-400" },
-  build: { accent: "#A78BFA", bg: "rgba(167,139,250,0.12)", ring: "ring-purple-400/30", text: "text-purple-400", gradient: "from-purple-400" },
-  deliver: { accent: "#F59E0B", bg: "rgba(245,158,11,0.12)", ring: "ring-orange-400/30", text: "text-orange-400", gradient: "from-orange-400" },
-  scale: { accent: "#34D399", bg: "rgba(52,211,153,0.12)", ring: "ring-emerald-400/30", text: "text-emerald-400", gradient: "from-emerald-400" },
+  hook: {
+    accent: "#3B82F6",
+    bg: "rgba(59,130,246,0.12)",
+    ring: "ring-blue-400/30",
+    text: "text-blue-400",
+    gradient: "from-blue-400",
+  },
+  build: {
+    accent: "#A78BFA",
+    bg: "rgba(167,139,250,0.12)",
+    ring: "ring-purple-400/30",
+    text: "text-purple-400",
+    gradient: "from-purple-400",
+  },
+  deliver: {
+    accent: "#F59E0B",
+    bg: "rgba(245,158,11,0.12)",
+    ring: "ring-orange-400/30",
+    text: "text-orange-400",
+    gradient: "from-orange-400",
+  },
+  scale: {
+    accent: "#34D399",
+    bg: "rgba(52,211,153,0.12)",
+    ring: "ring-emerald-400/30",
+    text: "text-emerald-400",
+    gradient: "from-emerald-400",
+  },
 };
 
 const PHASES: Phase[] = [
@@ -112,7 +136,7 @@ function PhaseProgressionSkeleton({ className }: { className?: string }) {
 export function PhaseProgression({ className }: PhaseProgressionProps) {
   const { user, profile } = useUser();
   const [completedTitles, setCompletedTitles] = useState<Set<string>>(
-    new Set()
+    new Set(),
   );
   const [loading, setLoading] = useState(true);
 
@@ -135,9 +159,9 @@ export function PhaseProgression({ className }: PhaseProgressionProps) {
       ]);
 
       const milestoneMap = new Map<string, string>();
-      (
-        (milestonesRes.data ?? []) as { id: string; title: string }[]
-      ).forEach((m) => milestoneMap.set(m.id, m.title));
+      ((milestonesRes.data ?? []) as { id: string; title: string }[]).forEach(
+        (m) => milestoneMap.set(m.id, m.title),
+      );
 
       const completed = new Set<string>();
       (
@@ -169,14 +193,14 @@ export function PhaseProgression({ className }: PhaseProgressionProps) {
   const getPhaseCompletion = (phase: Phase): number => {
     if (phase.milestoneKeys.length === 0) return 0;
     const done = phase.milestoneKeys.filter((k) =>
-      completedTitles.has(k)
+      completedTitles.has(k),
     ).length;
     return Math.round((done / phase.milestoneKeys.length) * 100);
   };
 
   // Find current phase (first not 100%)
   const currentPhaseIndex = PHASES.findIndex(
-    (p) => getPhaseCompletion(p) < 100
+    (p) => getPhaseCompletion(p) < 100,
   );
   const activeIndex =
     currentPhaseIndex === -1 ? PHASES.length - 1 : currentPhaseIndex;
@@ -195,7 +219,8 @@ export function PhaseProgression({ className }: PhaseProgressionProps) {
           const isCompleted = completion === 100;
           const isFuture = index > activeIndex;
           const Icon = phase.icon;
-          const phaseColor = PHASE_COLORS[phase.key as keyof typeof PHASE_COLORS];
+          const phaseColor =
+            PHASE_COLORS[phase.key as keyof typeof PHASE_COLORS];
 
           return (
             <React.Fragment key={phase.key}>
@@ -208,13 +233,17 @@ export function PhaseProgression({ className }: PhaseProgressionProps) {
                       ? `border-[${phaseColor.accent}]/40 shadow-lg`
                       : isCompleted
                         ? "border-accent/20 bg-accent/5"
-                        : "border-border-default/50 bg-bg-secondary/30"
+                        : "border-border-default/50 bg-bg-secondary/30",
                   )}
-                  style={isActive ? {
-                    borderColor: `${phaseColor.accent}40`,
-                    background: `linear-gradient(to bottom, ${phaseColor.accent}18, ${phaseColor.accent}08)`,
-                    boxShadow: `0 8px 32px ${phaseColor.accent}15`,
-                  } : undefined}
+                  style={
+                    isActive
+                      ? {
+                          borderColor: `${phaseColor.accent}40`,
+                          background: `linear-gradient(to bottom, ${phaseColor.accent}18, ${phaseColor.accent}08)`,
+                          boxShadow: `0 8px 32px ${phaseColor.accent}15`,
+                        }
+                      : undefined
+                  }
                 >
                   {/* Completed checkmark */}
                   {isCompleted && (
@@ -238,20 +267,26 @@ export function PhaseProgression({ className }: PhaseProgressionProps) {
                         ? "ring-2 shadow-lg"
                         : isCompleted
                           ? "bg-accent/15"
-                          : "bg-bg-tertiary"
+                          : "bg-bg-tertiary",
                     )}
-                    style={isActive ? {
-                      backgroundColor: `${phaseColor.accent}30`,
-                      boxShadow: `0 4px 16px ${phaseColor.accent}25`,
-                      outlineColor: `${phaseColor.accent}40`,
-                    } : undefined}
+                    style={
+                      isActive
+                        ? {
+                            backgroundColor: `${phaseColor.accent}30`,
+                            boxShadow: `0 4px 16px ${phaseColor.accent}25`,
+                            outlineColor: `${phaseColor.accent}40`,
+                          }
+                        : undefined
+                    }
                   >
                     <Icon
                       className={cn(
                         "h-6 w-6 transition-colors",
-                        isCompleted ? "text-accent" : "text-text-muted/60"
+                        isCompleted ? "text-accent" : "text-text-muted/60",
                       )}
-                      style={isActive ? { color: phaseColor.accent } : undefined}
+                      style={
+                        isActive ? { color: phaseColor.accent } : undefined
+                      }
                     />
                   </div>
 
@@ -263,7 +298,7 @@ export function PhaseProgression({ className }: PhaseProgressionProps) {
                         ? "text-accent"
                         : isCompleted
                           ? "text-accent/60"
-                          : "text-text-muted/50"
+                          : "text-text-muted/50",
                     )}
                   >
                     Phase {index + 1}
@@ -273,7 +308,7 @@ export function PhaseProgression({ className }: PhaseProgressionProps) {
                       "text-sm font-bold mb-1",
                       isActive || isCompleted
                         ? "text-text-primary"
-                        : "text-text-secondary/60"
+                        : "text-text-secondary/60",
                     )}
                   >
                     {phase.title}
@@ -283,7 +318,7 @@ export function PhaseProgression({ className }: PhaseProgressionProps) {
                   <p
                     className={cn(
                       "text-[11px] leading-tight mb-3",
-                      isFuture ? "text-text-muted/40" : "text-text-muted"
+                      isFuture ? "text-text-muted/40" : "text-text-muted",
                     )}
                   >
                     {phase.subtitle}
@@ -295,7 +330,10 @@ export function PhaseProgression({ className }: PhaseProgressionProps) {
                       className="h-full rounded-full transition-all duration-700 ease-out"
                       style={{
                         width: `${completion}%`,
-                        backgroundColor: (isCompleted || isActive) ? phaseColor.accent : "rgba(255,255,255,0.08)",
+                        backgroundColor:
+                          isCompleted || isActive
+                            ? phaseColor.accent
+                            : "rgba(255,255,255,0.08)",
                       }}
                     />
                   </div>
@@ -304,9 +342,13 @@ export function PhaseProgression({ className }: PhaseProgressionProps) {
                   <span
                     className={cn(
                       "text-xs font-semibold mt-2",
-                      !isCompleted && !isActive && "text-text-muted/40"
+                      !isCompleted && !isActive && "text-text-muted/40",
                     )}
-                    style={(isCompleted || isActive) ? { color: phaseColor.accent } : undefined}
+                    style={
+                      isCompleted || isActive
+                        ? { color: phaseColor.accent }
+                        : undefined
+                    }
                   >
                     {completion}%
                   </span>
@@ -323,7 +365,7 @@ export function PhaseProgression({ className }: PhaseProgressionProps) {
                         "absolute inset-y-0 left-0 rounded-full transition-all duration-500",
                         getPhaseCompletion(PHASES[index]) === 100
                           ? "bg-accent w-full"
-                          : "bg-border-default/30 w-0"
+                          : "bg-border-default/30 w-0",
                       )}
                     />
                   </div>
@@ -363,7 +405,7 @@ export function PhaseProgression({ className }: PhaseProgressionProps) {
                     ? "border-accent/40 bg-gradient-to-r from-accent/10 to-accent/5 shadow-lg shadow-accent/10"
                     : isCompleted
                       ? "border-accent/20 bg-accent/5"
-                      : "border-border-default/30 bg-bg-secondary/30"
+                      : "border-border-default/30 bg-bg-secondary/30",
                 )}
               >
                 {/* Icon with status indicator */}
@@ -375,7 +417,7 @@ export function PhaseProgression({ className }: PhaseProgressionProps) {
                         ? "bg-accent/20 ring-2 ring-accent/30"
                         : isCompleted
                           ? "bg-accent/15"
-                          : "bg-bg-tertiary"
+                          : "bg-bg-tertiary",
                     )}
                   >
                     {isCompleted ? (
@@ -389,7 +431,7 @@ export function PhaseProgression({ className }: PhaseProgressionProps) {
                       <Icon
                         className={cn(
                           "h-5 w-5",
-                          isActive ? "text-accent" : "text-text-muted"
+                          isActive ? "text-accent" : "text-text-muted",
                         )}
                       />
                     )}
@@ -406,7 +448,7 @@ export function PhaseProgression({ className }: PhaseProgressionProps) {
                             ? "text-accent"
                             : isCompleted
                               ? "text-accent/60"
-                              : "text-text-muted/40"
+                              : "text-text-muted/40",
                         )}
                       >
                         Phase {index + 1}
@@ -416,7 +458,7 @@ export function PhaseProgression({ className }: PhaseProgressionProps) {
                           "text-sm font-bold",
                           isActive || isCompleted
                             ? "text-text-primary"
-                            : "text-text-secondary/60"
+                            : "text-text-secondary/60",
                         )}
                       >
                         {phase.title}
@@ -429,7 +471,7 @@ export function PhaseProgression({ className }: PhaseProgressionProps) {
                           ? "text-accent"
                           : isActive
                             ? "text-accent"
-                            : "text-text-muted/40"
+                            : "text-text-muted/40",
                       )}
                     >
                       {completion}%
@@ -438,7 +480,7 @@ export function PhaseProgression({ className }: PhaseProgressionProps) {
                   <p
                     className={cn(
                       "text-[11px] mb-2",
-                      isFuture ? "text-text-muted/40" : "text-text-muted"
+                      isFuture ? "text-text-muted/40" : "text-text-muted",
                     )}
                   >
                     {phase.subtitle}
@@ -449,7 +491,7 @@ export function PhaseProgression({ className }: PhaseProgressionProps) {
                         "h-full rounded-full transition-all duration-700 ease-out",
                         isCompleted || isActive
                           ? "bg-accent"
-                          : "bg-text-muted/20"
+                          : "bg-text-muted/20",
                       )}
                       style={{ width: `${completion}%` }}
                     />

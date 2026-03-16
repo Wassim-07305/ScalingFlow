@@ -44,7 +44,9 @@ const PILIER_EMOJI: Record<string, string> = {
 export default function EditorialCalendarPage() {
   const [loading, setLoading] = React.useState(false);
   const [items, setItems] = React.useState<CalendarItem[]>([]);
-  const [strategie, setStrategie] = React.useState<EditorialCalendarResult["strategie"] | null>(null);
+  const [strategie, setStrategie] = React.useState<
+    EditorialCalendarResult["strategie"] | null
+  >(null);
   const [view, setView] = React.useState<"grid" | "list">("grid");
   const [filter, setFilter] = React.useState<string | null>(null);
   const [expandedDay, setExpandedDay] = React.useState<number | null>(null);
@@ -163,9 +165,7 @@ export default function EditorialCalendarPage() {
                   <div className="flex gap-3">
                     {(["know", "like", "trust"] as const).map((p) => (
                       <div key={p} className="text-center">
-                        <span className="text-lg">
-                          {PILIER_EMOJI[p]}
-                        </span>
+                        <span className="text-lg">{PILIER_EMOJI[p]}</span>
                         <p className="text-xs font-bold text-text-primary">
                           {strategie.piliers[p].pourcentage}%
                         </p>
@@ -189,7 +189,7 @@ export default function EditorialCalendarPage() {
                   "px-3 py-1.5 rounded-lg text-xs font-medium transition-all",
                   !filter
                     ? "bg-accent text-white"
-                    : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
+                    : "bg-bg-tertiary text-text-secondary hover:text-text-primary",
                 )}
               >
                 Tous ({items.length})
@@ -204,7 +204,7 @@ export default function EditorialCalendarPage() {
                       "px-3 py-1.5 rounded-lg text-xs font-medium transition-all",
                       filter === p
                         ? "bg-accent text-white"
-                        : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
+                        : "bg-bg-tertiary text-text-secondary hover:text-text-primary",
                     )}
                   >
                     {PILIER_LABEL[p]} ({count})
@@ -238,7 +238,7 @@ export default function EditorialCalendarPage() {
                   key={item.jour}
                   className={cn(
                     "cursor-pointer transition-all hover:ring-1 hover:ring-accent/50",
-                    expandedDay === item.jour && "ring-1 ring-accent"
+                    expandedDay === item.jour && "ring-1 ring-accent",
                   )}
                   onClick={() =>
                     setExpandedDay(expandedDay === item.jour ? null : item.jour)
@@ -273,7 +273,9 @@ export default function EditorialCalendarPage() {
                         </div>
                         <div>
                           <p className="text-[10px] text-text-muted">CTA</p>
-                          <p className="text-xs text-text-primary">{item.cta}</p>
+                          <p className="text-xs text-text-primary">
+                            {item.cta}
+                          </p>
                         </div>
                         <div className="flex gap-2 flex-wrap">
                           <Badge variant="muted" className="text-[10px]">
@@ -337,7 +339,9 @@ export default function EditorialCalendarPage() {
                         </div>
                         <div>
                           <p className="text-xs text-text-muted">CTA</p>
-                          <p className="text-sm text-text-primary">{item.cta}</p>
+                          <p className="text-sm text-text-primary">
+                            {item.cta}
+                          </p>
                         </div>
                         <div className="flex gap-2">
                           <Badge variant="muted">{item.plateforme}</Badge>

@@ -5,7 +5,7 @@ export function otoOfferPrompt(
     unique_mechanism?: string;
     pricing_strategy?: string;
   },
-  avatar: Record<string, unknown>
+  avatar: Record<string, unknown>,
 ): string {
   return `Tu es un expert en création d'offres OTO (One-Time Offer) post-achat pour maximiser la valeur client.
 

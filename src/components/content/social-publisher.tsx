@@ -64,7 +64,9 @@ interface SocialPublisherProps {
 export function SocialPublisher({ initialContent }: SocialPublisherProps) {
   const [accounts, setAccounts] = useState<UnipileAccount[]>([]);
   const [loadingAccounts, setLoadingAccounts] = useState(true);
-  const [selectedAccountIds, setSelectedAccountIds] = useState<Set<string>>(new Set());
+  const [selectedAccountIds, setSelectedAccountIds] = useState<Set<string>>(
+    new Set(),
+  );
   const [content, setContent] = useState(initialContent || "");
   const [mediaUrls, setMediaUrls] = useState<string[]>([]);
   const [newMediaUrl, setNewMediaUrl] = useState("");
@@ -81,7 +83,7 @@ export function SocialPublisher({ initialContent }: SocialPublisherProps) {
       const data = await res.json();
       // Filter to postable providers only
       const postable = (data.accounts || []).filter((a: UnipileAccount) =>
-        Object.keys(POSTABLE_PROVIDERS).includes(a.provider.toUpperCase())
+        Object.keys(POSTABLE_PROVIDERS).includes(a.provider.toUpperCase()),
       );
       setAccounts(postable);
     } catch {
@@ -194,13 +196,13 @@ export function SocialPublisher({ initialContent }: SocialPublisherProps) {
 
     if (failCount === 0) {
       toast.success(
-        `Publication réussie sur ${successCount} compte${successCount > 1 ? "s" : ""} !`
+        `Publication réussie sur ${successCount} compte${successCount > 1 ? "s" : ""} !`,
       );
     } else if (successCount === 0) {
       toast.error("Échec de la publication sur tous les comptes");
     } else {
       toast.warning(
-        `${successCount} réussi${successCount > 1 ? "s" : ""}, ${failCount} échoué${failCount > 1 ? "s" : ""}`
+        `${successCount} réussi${successCount > 1 ? "s" : ""}, ${failCount} échoué${failCount > 1 ? "s" : ""}`,
       );
     }
 
@@ -218,7 +220,8 @@ export function SocialPublisher({ initialContent }: SocialPublisherProps) {
             Aucun compte social connecté
           </h3>
           <p className="text-sm text-text-secondary max-w-md">
-            Connecte tes comptes sociaux (LinkedIn, Instagram, Twitter) depuis les{" "}
+            Connecte tes comptes sociaux (LinkedIn, Instagram, Twitter) depuis
+            les{" "}
             <a href="/settings" className="text-accent underline">
               paramètres
             </a>{" "}
@@ -240,7 +243,8 @@ export function SocialPublisher({ initialContent }: SocialPublisherProps) {
             Publier sur les réseaux sociaux
           </CardTitle>
           <CardDescription>
-            Publie ton contenu simultanément sur plusieurs plateformes connectées via Unipile.
+            Publie ton contenu simultanément sur plusieurs plateformes
+            connectées via Unipile.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -250,7 +254,9 @@ export function SocialPublisher({ initialContent }: SocialPublisherProps) {
             {loadingAccounts ? (
               <div className="flex items-center gap-2 py-4">
                 <Loader2 className="h-4 w-4 animate-spin text-text-muted" />
-                <span className="text-sm text-text-muted">Chargement des comptes...</span>
+                <span className="text-sm text-text-muted">
+                  Chargement des comptes...
+                </span>
               </div>
             ) : (
               <div className="flex flex-wrap gap-2">
@@ -269,13 +275,20 @@ export function SocialPublisher({ initialContent }: SocialPublisherProps) {
                         "flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-medium transition-all",
                         isSelected
                           ? "border-accent bg-accent/10 text-accent"
-                          : "border-border-default bg-bg-secondary text-text-secondary hover:border-text-muted"
+                          : "border-border-default bg-bg-secondary text-text-secondary hover:border-text-muted",
                       )}
                     >
-                      <Icon className={cn("h-4 w-4", isSelected ? "text-accent" : cfg.color)} />
+                      <Icon
+                        className={cn(
+                          "h-4 w-4",
+                          isSelected ? "text-accent" : cfg.color,
+                        )}
+                      />
                       <span>{cfg.label}</span>
                       {account.username && (
-                        <span className="text-xs text-text-muted">@{account.username}</span>
+                        <span className="text-xs text-text-muted">
+                          @{account.username}
+                        </span>
                       )}
                       {isSelected && (
                         <CheckCircle2 className="h-4 w-4 text-accent ml-1" />
@@ -289,7 +302,9 @@ export function SocialPublisher({ initialContent }: SocialPublisherProps) {
 
           {/* Content textarea */}
           <div className="space-y-2">
-            <Label className="text-sm font-medium">Contenu de la publication</Label>
+            <Label className="text-sm font-medium">
+              Contenu de la publication
+            </Label>
             <textarea
               value={content}
               onChange={(e) => setContent(e.target.value)}
@@ -389,7 +404,8 @@ export function SocialPublisher({ initialContent }: SocialPublisherProps) {
                               alt="Média"
                               className="h-full w-full object-cover"
                               onError={(e) => {
-                                (e.target as HTMLImageElement).style.display = "none";
+                                (e.target as HTMLImageElement).style.display =
+                                  "none";
                               }}
                             />
                           </div>
@@ -425,7 +441,9 @@ export function SocialPublisher({ initialContent }: SocialPublisherProps) {
           {/* Publish button */}
           <Button
             onClick={handlePublish}
-            disabled={publishing || !content.trim() || selectedAccountIds.size === 0}
+            disabled={
+              publishing || !content.trim() || selectedAccountIds.size === 0
+            }
             className="w-full sm:w-auto"
           >
             {publishing ? (
@@ -449,24 +467,31 @@ export function SocialPublisher({ initialContent }: SocialPublisherProps) {
                 Résultats
               </p>
               {results.map((r) => {
-                const cfg =
-                  POSTABLE_PROVIDERS[r.provider.toUpperCase()];
+                const cfg = POSTABLE_PROVIDERS[r.provider.toUpperCase()];
                 const Icon = cfg?.icon || MessageCircle;
                 return (
                   <div
                     key={r.account_id}
                     className="flex items-center gap-3 py-2"
                   >
-                    <Icon className={cn("h-4 w-4", cfg?.color || "text-text-muted")} />
+                    <Icon
+                      className={cn("h-4 w-4", cfg?.color || "text-text-muted")}
+                    />
                     <span className="text-sm text-text-primary">
                       {cfg?.label || r.provider}
                     </span>
                     {r.success ? (
-                      <Badge variant="default" className="bg-green-500/20 text-green-400 text-xs">
+                      <Badge
+                        variant="default"
+                        className="bg-green-500/20 text-green-400 text-xs"
+                      >
                         Publié
                       </Badge>
                     ) : (
-                      <Badge variant="default" className="bg-red-500/20 text-red-400 text-xs">
+                      <Badge
+                        variant="default"
+                        className="bg-red-500/20 text-red-400 text-xs"
+                      >
                         Échoué : {r.error}
                       </Badge>
                     )}

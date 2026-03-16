@@ -36,7 +36,7 @@ interface AlertPayload {
 
 async function getMetaCredentials(
   supabase: Awaited<ReturnType<typeof createClient>>,
-  userId: string
+  userId: string,
 ) {
   const { data } = await supabase
     .from("connected_accounts")
@@ -74,7 +74,7 @@ function detectAnomalies(
   campaignName: string,
   creativeId: string | null,
   campaignId: string | null,
-  userId: string
+  userId: string,
 ): AlertPayload[] {
   const alerts: AlertPayload[] = [];
   const base = {
@@ -126,7 +126,8 @@ function detectAnomalies(
     alerts.push({
       ...base,
       alert_type: "high_frequency",
-      severity: kpi.frequency > config.frequency_max * 1.5 ? "critical" : "warning",
+      severity:
+        kpi.frequency > config.frequency_max * 1.5 ? "critical" : "warning",
       metric_name: "Fréquence",
       metric_value: kpi.frequency,
       threshold_value: config.frequency_max,
@@ -165,7 +166,7 @@ export async function POST(req: NextRequest) {
   } catch {
     return NextResponse.json(
       { error: "Erreur lors du monitoring" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -208,14 +209,14 @@ export async function GET(req: NextRequest) {
   } catch {
     return NextResponse.json(
       { error: "Erreur lors du monitoring CRON" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
 async function runMonitoring(
   supabase: Awaited<ReturnType<typeof createClient>>,
-  userId: string
+  userId: string,
 ) {
   // Récupérer la config utilisateur
   const { data: configData } = await supabase
@@ -265,7 +266,7 @@ async function runMonitoring(
               insight.actions?.find(
                 (a: { action_type: string }) =>
                   a.action_type === "offsite_conversion.fb_pixel_purchase" ||
-                  a.action_type === "lead"
+                  a.action_type === "lead",
               )?.value ?? 0;
             const spend = parseFloat(insight.spend || "0");
             const revenue = conversions * 50; // estimation si pas de valeur
@@ -289,7 +290,7 @@ async function runMonitoring(
               campaign.campaign_name,
               null,
               campaign.id,
-              userId
+              userId,
             );
             allAlerts.push(...alerts);
           }
@@ -310,8 +311,7 @@ async function runMonitoring(
       for (const creative of creatives) {
         const kpi: KPISnapshot = {
           ctr: creative.ctr ?? 0,
-          cpc:
-            creative.clicks > 0 ? creative.spend / creative.clicks : 0,
+          cpc: creative.clicks > 0 ? creative.spend / creative.clicks : 0,
           cpm:
             creative.impressions > 0
               ? (creative.spend / creative.impressions) * 1000
@@ -334,7 +334,7 @@ async function runMonitoring(
           campaign.campaign_name,
           creative.id,
           campaign.id,
-          userId
+          userId,
         );
         allAlerts.push(...alerts);
       }

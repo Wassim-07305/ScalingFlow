@@ -103,7 +103,10 @@ interface MetaAdResult {
 
 type ScrapingSource = "apify" | "firecrawl" | "ai_only";
 
-const SCRAPING_SOURCE_CONFIG: Record<ScrapingSource, { label: string; variant: "default" | "blue" | "muted" }> = {
+const SCRAPING_SOURCE_CONFIG: Record<
+  ScrapingSource,
+  { label: string; variant: "default" | "blue" | "muted" }
+> = {
   apify: { label: "Meta Ad Library", variant: "default" },
   firecrawl: { label: "Web Scraping", variant: "blue" },
   ai_only: { label: "Analyse IA", variant: "muted" },
@@ -125,7 +128,8 @@ export function AdSpy({ className }: AdSpyProps) {
   const [result, setResult] = React.useState<AdSpyResult | null>(null);
   const [sources, setSources] = React.useState<string[]>([]);
   const [scrapingUsed, setScrapingUsed] = React.useState(false);
-  const [scrapingSource, setScrapingSource] = React.useState<ScrapingSource>("ai_only");
+  const [scrapingSource, setScrapingSource] =
+    React.useState<ScrapingSource>("ai_only");
   const [realAds, setRealAds] = React.useState<MetaAdResult[]>([]);
   const [realAdsExpanded, setRealAdsExpanded] = React.useState(true);
 
@@ -172,13 +176,17 @@ export function AdSpy({ className }: AdSpyProps) {
       setRealAds(data.real_ads || []);
       setRealAdsExpanded(true);
 
-      toast.success(data.scraping_source === "apify"
-        ? `Analyse terminée avec ${(data.real_ads || []).length} publicités réelles !`
-        : data.scraping_used
-          ? "Analyse terminée avec données web scrapées !"
-          : "Analyse terminée !");
+      toast.success(
+        data.scraping_source === "apify"
+          ? `Analyse terminée avec ${(data.real_ads || []).length} publicités réelles !`
+          : data.scraping_used
+            ? "Analyse terminée avec données web scrapées !"
+            : "Analyse terminée !",
+      );
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Erreur lors de l'analyse");
+      toast.error(
+        err instanceof Error ? err.message : "Erreur lors de l'analyse",
+      );
     } finally {
       setLoading(false);
     }
@@ -190,7 +198,12 @@ export function AdSpy({ className }: AdSpyProps) {
   };
 
   if (loading) {
-    return <AILoading text="Analyse des publicités concurrentes" className={className} />;
+    return (
+      <AILoading
+        text="Analyse des publicités concurrentes"
+        className={className}
+      />
+    );
   }
 
   // Formulaire
@@ -207,7 +220,8 @@ export function AdSpy({ className }: AdSpyProps) {
                 Ad Spy — Veille Concurrentielle
               </h3>
               <p className="text-sm text-text-secondary">
-                Analyse la stratégie publicitaire de tes concurrents grâce à l&apos;IA
+                Analyse la stratégie publicitaire de tes concurrents grâce à
+                l&apos;IA
               </p>
             </div>
           </div>
@@ -286,7 +300,17 @@ export function AdSpy({ className }: AdSpyProps) {
           </h3>
           <Badge variant="default">{result.platform}</Badge>
         </div>
-        <Button variant="outline" size="sm" onClick={() => { setResult(null); setSources([]); setScrapingUsed(false); setScrapingSource("ai_only"); setRealAds([]); }}>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => {
+            setResult(null);
+            setSources([]);
+            setScrapingUsed(false);
+            setScrapingSource("ai_only");
+            setRealAds([]);
+          }}
+        >
           Nouvelle analyse
         </Button>
       </div>
@@ -295,7 +319,9 @@ export function AdSpy({ className }: AdSpyProps) {
       <div className="flex items-center gap-3">
         <Badge variant={SCRAPING_SOURCE_CONFIG[scrapingSource].variant}>
           {scrapingSource === "apify" && <Globe className="h-3 w-3 mr-1" />}
-          {scrapingSource === "firecrawl" && <Monitor className="h-3 w-3 mr-1" />}
+          {scrapingSource === "firecrawl" && (
+            <Monitor className="h-3 w-3 mr-1" />
+          )}
           {SCRAPING_SOURCE_CONFIG[scrapingSource].label}
         </Badge>
         {scrapingUsed && (
@@ -371,8 +397,8 @@ export function AdSpy({ className }: AdSpyProps) {
                         />
                         {ad.imageUrls.length > 1 && (
                           <div className="absolute bottom-2 right-2 flex items-center gap-1 px-2 py-0.5 rounded-md bg-black/70 text-xs text-white">
-                            <ImageIcon className="h-3 w-3" />
-                            +{ad.imageUrls.length - 1}
+                            <ImageIcon className="h-3 w-3" />+
+                            {ad.imageUrls.length - 1}
                           </div>
                         )}
                       </div>
@@ -415,7 +441,11 @@ export function AdSpy({ className }: AdSpyProps) {
                       </div>
                       <div className="flex gap-1">
                         {ad.platforms?.map((p, j) => (
-                          <Badge key={j} variant="muted" className="text-[10px]">
+                          <Badge
+                            key={j}
+                            variant="muted"
+                            className="text-[10px]"
+                          >
                             {p}
                           </Badge>
                         ))}
@@ -474,24 +504,36 @@ export function AdSpy({ className }: AdSpyProps) {
       <GlowCard glowColor="purple">
         <div className="flex items-center gap-2 mb-3">
           <TrendingUp className="h-4 w-4 text-accent" />
-          <h4 className="font-semibold text-text-primary">Vue d&apos;ensemble</h4>
+          <h4 className="font-semibold text-text-primary">
+            Vue d&apos;ensemble
+          </h4>
         </div>
         <p className="text-sm text-text-secondary mb-4">{result.overview}</p>
         <div className="grid gap-3 sm:grid-cols-3">
           <div className="p-3 rounded-lg bg-bg-tertiary border border-border-default text-center">
-            <p className="text-2xl font-bold text-accent">{result.estimated_active_ads}</p>
+            <p className="text-2xl font-bold text-accent">
+              {result.estimated_active_ads}
+            </p>
             <p className="text-xs text-text-muted">Ads actives estimees</p>
           </div>
           <div className="p-3 rounded-lg bg-bg-tertiary border border-border-default text-center">
-            <p className="text-2xl font-bold text-accent">{result.estimated_monthly_spend}</p>
+            <p className="text-2xl font-bold text-accent">
+              {result.estimated_monthly_spend}
+            </p>
             <p className="text-xs text-text-muted">Budget mensuel estime</p>
           </div>
           <div className="p-3 rounded-lg bg-bg-tertiary border border-border-default text-center">
             <p className="text-xs text-text-muted mb-2">Mix creatif</p>
             <div className="flex gap-1.5 justify-center">
-              <Badge variant="blue">{result.creative_mix.video_pct}% Video</Badge>
-              <Badge variant="cyan">{result.creative_mix.image_pct}% Image</Badge>
-              <Badge variant="default">{result.creative_mix.carousel_pct}% Carousel</Badge>
+              <Badge variant="blue">
+                {result.creative_mix.video_pct}% Video
+              </Badge>
+              <Badge variant="cyan">
+                {result.creative_mix.image_pct}% Image
+              </Badge>
+              <Badge variant="default">
+                {result.creative_mix.carousel_pct}% Carousel
+              </Badge>
             </div>
           </div>
         </div>
@@ -514,9 +556,13 @@ export function AdSpy({ className }: AdSpyProps) {
               >
                 <div className="flex items-center justify-between">
                   <Badge variant="blue">{pattern.type}</Badge>
-                  <span className="text-xs text-text-muted">{pattern.frequency}</span>
+                  <span className="text-xs text-text-muted">
+                    {pattern.frequency}
+                  </span>
                 </div>
-                <p className="text-sm text-text-secondary italic">&ldquo;{pattern.example}&rdquo;</p>
+                <p className="text-sm text-text-secondary italic">
+                  &ldquo;{pattern.example}&rdquo;
+                </p>
                 <Button
                   variant="ghost"
                   size="sm"
@@ -560,7 +606,9 @@ export function AdSpy({ className }: AdSpyProps) {
                   {hook.effectiveness}
                 </Badge>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-text-primary">{hook.framework}</p>
+                  <p className="text-sm font-medium text-text-primary">
+                    {hook.framework}
+                  </p>
                   <p className="text-sm text-text-secondary mt-1 italic">
                     &ldquo;{hook.example}&rdquo;
                   </p>
@@ -613,7 +661,9 @@ export function AdSpy({ className }: AdSpyProps) {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-text-secondary">{result.funnel_structure}</p>
+            <p className="text-sm text-text-secondary">
+              {result.funnel_structure}
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -629,21 +679,29 @@ export function AdSpy({ className }: AdSpyProps) {
         <CardContent className="space-y-3">
           <div>
             <p className="text-xs text-text-muted mb-1">Demographique</p>
-            <p className="text-sm text-text-secondary">{result.targeting_inference.demographics}</p>
+            <p className="text-sm text-text-secondary">
+              {result.targeting_inference.demographics}
+            </p>
           </div>
           <div>
             <p className="text-xs text-text-muted mb-1">Interets cibles</p>
             <div className="flex flex-wrap gap-1.5">
               {result.targeting_inference.interests.map((interest, i) => (
-                <Badge key={i} variant="cyan">{interest}</Badge>
+                <Badge key={i} variant="cyan">
+                  {interest}
+                </Badge>
               ))}
             </div>
           </div>
           <div>
-            <p className="text-xs text-text-muted mb-1">Sources lookalike probables</p>
+            <p className="text-xs text-text-muted mb-1">
+              Sources lookalike probables
+            </p>
             <div className="flex flex-wrap gap-1.5">
               {result.targeting_inference.lookalike_sources.map((src, i) => (
-                <Badge key={i} variant="blue">{src}</Badge>
+                <Badge key={i} variant="blue">
+                  {src}
+                </Badge>
               ))}
             </div>
           </div>
@@ -662,7 +720,10 @@ export function AdSpy({ className }: AdSpyProps) {
           <CardContent>
             <ul className="space-y-2">
               {result.strengths.map((s, i) => (
-                <li key={i} className="flex items-start gap-2 text-sm text-text-secondary">
+                <li
+                  key={i}
+                  className="flex items-start gap-2 text-sm text-text-secondary"
+                >
                   <span className="text-green-400 mt-0.5">+</span>
                   {s}
                 </li>
@@ -681,7 +742,10 @@ export function AdSpy({ className }: AdSpyProps) {
           <CardContent>
             <ul className="space-y-2">
               {result.weaknesses.map((w, i) => (
-                <li key={i} className="flex items-start gap-2 text-sm text-text-secondary">
+                <li
+                  key={i}
+                  className="flex items-start gap-2 text-sm text-text-secondary"
+                >
                   <span className="text-yellow-400 mt-0.5">-</span>
                   {w}
                 </li>
@@ -706,7 +770,9 @@ export function AdSpy({ className }: AdSpyProps) {
                 key={i}
                 className="p-3 rounded-lg bg-accent/5 border border-accent/20 space-y-2"
               >
-                <p className="text-sm font-medium text-text-primary">{opp.opportunity}</p>
+                <p className="text-sm font-medium text-text-primary">
+                  {opp.opportunity}
+                </p>
                 <p className="text-sm text-accent">{opp.action}</p>
               </div>
             ))}
@@ -742,8 +808,12 @@ export function AdSpy({ className }: AdSpyProps) {
                   {rec.priority}
                 </Badge>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-text-primary">{rec.action}</p>
-                  <p className="text-sm text-text-muted mt-1">{rec.expected_impact}</p>
+                  <p className="text-sm font-medium text-text-primary">
+                    {rec.action}
+                  </p>
+                  <p className="text-sm text-text-muted mt-1">
+                    {rec.expected_impact}
+                  </p>
                 </div>
               </div>
             ))}

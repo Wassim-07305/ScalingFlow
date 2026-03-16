@@ -1,7 +1,15 @@
 "use client";
 
 import React, { useCallback, useState } from "react";
-import { Upload, FileText, Link, X, Loader2, CheckCircle, AlertCircle } from "lucide-react";
+import {
+  Upload,
+  FileText,
+  Link,
+  X,
+  Loader2,
+  CheckCircle,
+  AlertCircle,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils/cn";
 import { toast } from "sonner";
@@ -18,7 +26,8 @@ const ACCEPTED_TYPES = [
   "image/webp",
 ];
 
-const ACCEPTED_EXTENSIONS = ".pdf,.txt,.md,.csv,.doc,.docx,.jpg,.jpeg,.png,.webp";
+const ACCEPTED_EXTENSIONS =
+  ".pdf,.txt,.md,.csv,.doc,.docx,.jpg,.jpeg,.png,.webp";
 
 const TYPE_LABELS: Record<string, string> = {
   doc: "Document",
@@ -91,14 +100,14 @@ export function ResourceUpload({ onUploadComplete }: ResourceUploadProps) {
           onUploadComplete?.(data.resource);
         } catch (err) {
           toast.error(
-            err instanceof Error ? err.message : `Erreur pour ${file.name}`
+            err instanceof Error ? err.message : `Erreur pour ${file.name}`,
           );
         }
       }
 
       setUploading(false);
     },
-    [onUploadComplete]
+    [onUploadComplete],
   );
 
   const handleDrop = useCallback(
@@ -107,7 +116,7 @@ export function ResourceUpload({ onUploadComplete }: ResourceUploadProps) {
       setIsDragging(false);
       handleFiles(e.dataTransfer.files);
     },
-    [handleFiles]
+    [handleFiles],
   );
 
   const handleAddUrl = async () => {
@@ -157,7 +166,7 @@ export function ResourceUpload({ onUploadComplete }: ResourceUploadProps) {
           "relative flex flex-col items-center justify-center rounded-2xl border-2 border-dashed px-6 py-10 transition-all",
           isDragging
             ? "border-emerald-400 bg-emerald-500/10"
-            : "border-border-default bg-bg-tertiary hover:border-border-hover"
+            : "border-border-default bg-bg-tertiary hover:border-border-hover",
         )}
       >
         {uploading ? (
@@ -226,12 +235,12 @@ export function ResourceUpload({ onUploadComplete }: ResourceUploadProps) {
                     "rounded-lg px-3 py-1.5 text-xs font-medium transition-colors",
                     urlType === type
                       ? "bg-accent text-white"
-                      : "bg-bg-secondary text-text-muted hover:text-text-primary"
+                      : "bg-bg-secondary text-text-muted hover:text-text-primary",
                   )}
                 >
                   {TYPE_LABELS[type]}
                 </button>
-              )
+              ),
             )}
           </div>
 
@@ -277,7 +286,11 @@ interface ResourceItemProps {
   deleting?: boolean;
 }
 
-export function ResourceItem({ resource, onDelete, deleting }: ResourceItemProps) {
+export function ResourceItem({
+  resource,
+  onDelete,
+  deleting,
+}: ResourceItemProps) {
   const isFile = !!resource.file_path;
   const sizeLabel = resource.file_size
     ? resource.file_size > 1024 * 1024
@@ -300,7 +313,9 @@ export function ResourceItem({ resource, onDelete, deleting }: ResourceItemProps
           {resource.title}
         </p>
         <div className="flex items-center gap-2 text-xs text-text-muted">
-          <span>{TYPE_LABELS[resource.resource_type] || resource.resource_type}</span>
+          <span>
+            {TYPE_LABELS[resource.resource_type] || resource.resource_type}
+          </span>
           {sizeLabel && <span>· {sizeLabel}</span>}
           {resource.has_extracted_text && (
             <span className="flex items-center gap-0.5 text-emerald-400">

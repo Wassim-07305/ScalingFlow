@@ -50,13 +50,16 @@ const DEFAULT_THEME: Required<BrandTheme> = {
 export function generateFunnelPageHTML(
   data: FunnelData,
   pageType: "optin" | "vsl" | "thankyou",
-  options?: { brandName?: string; theme?: BrandTheme }
+  options?: { brandName?: string; theme?: BrandTheme },
 ): string {
   const theme = { ...DEFAULT_THEME, ...options?.theme };
   const brandName = options?.brandName || "Mon Offre";
   const accentRGB = hexToRGB(theme.accentColor);
 
-  const googleFontsLink = buildGoogleFontsLink(theme.fontHeading, theme.fontBody);
+  const googleFontsLink = buildGoogleFontsLink(
+    theme.fontHeading,
+    theme.fontBody,
+  );
 
   let bodyContent = "";
 
@@ -78,7 +81,9 @@ export function generateFunnelPageHTML(
       <div class="container">
         <h2>Ce que vous allez obtenir</h2>
         <div class="benefits-grid">
-          ${p.bullet_points.map((bp, i) => `
+          ${p.bullet_points
+            .map(
+              (bp, i) => `
           <div class="benefit-card" style="animation-delay: ${i * 0.1}s">
             <div class="benefit-icon">
               <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
@@ -86,7 +91,9 @@ export function generateFunnelPageHTML(
               </svg>
             </div>
             <p>${esc(bp)}</p>
-          </div>`).join("")}
+          </div>`,
+            )
+            .join("")}
         </div>
       </div>
     </section>
@@ -132,7 +139,9 @@ export function generateFunnelPageHTML(
       <div class="container">
         <h2>Pourquoi choisir cette solution</h2>
         <div class="benefits-grid">
-          ${p.benefit_bullets.map((b, i) => `
+          ${p.benefit_bullets
+            .map(
+              (b, i) => `
           <div class="benefit-card" style="animation-delay: ${i * 0.1}s">
             <div class="benefit-icon">
               <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
@@ -140,25 +149,35 @@ export function generateFunnelPageHTML(
               </svg>
             </div>
             <p>${esc(b)}</p>
-          </div>`).join("")}
+          </div>`,
+            )
+            .join("")}
         </div>
       </div>
     </section>
 
-    ${p.faq && p.faq.length > 0 ? `
+    ${
+      p.faq && p.faq.length > 0
+        ? `
     <!-- FAQ -->
     <section class="faq-section">
       <div class="container">
         <h2>Questions fréquentes</h2>
         <div class="faq-list">
-          ${p.faq.map((f) => `
+          ${p.faq
+            .map(
+              (f) => `
           <details class="faq-item">
             <summary>${esc(f.question)}</summary>
             <p>${esc(f.answer)}</p>
-          </details>`).join("")}
+          </details>`,
+            )
+            .join("")}
         </div>
       </div>
-    </section>` : ""}
+    </section>`
+        : ""
+    }
 
     <!-- CTA bottom -->
     <section class="cta-section">
@@ -188,16 +207,22 @@ export function generateFunnelPageHTML(
       <div class="container">
         <h2>Prochaines étapes</h2>
         <div class="steps-list">
-          ${p.next_steps.map((step, i) => `
+          ${p.next_steps
+            .map(
+              (step, i) => `
           <div class="step-card" style="animation-delay: ${i * 0.15}s">
             <div class="step-number">${i + 1}</div>
             <p>${esc(step)}</p>
-          </div>`).join("")}
+          </div>`,
+            )
+            .join("")}
         </div>
       </div>
     </section>
 
-    ${p.upsell_headline ? `
+    ${
+      p.upsell_headline
+        ? `
     <!-- Upsell -->
     <section class="upsell-section">
       <div class="container">
@@ -208,7 +233,9 @@ export function generateFunnelPageHTML(
           <a href="#" class="cta-btn">${esc(p.upsell_cta || "Découvrir")}</a>
         </div>
       </div>
-    </section>` : ""}`;
+    </section>`
+        : ""
+    }`;
   }
 
   return `<!DOCTYPE html>
@@ -672,7 +699,11 @@ export function generateFunnelPageHTML(
  * Legacy: generates full HTML with all 3 pages concatenated.
  * Kept for backward-compatible export & download.
  */
-export function exportFunnelToHTML(data: FunnelData, brandName?: string, theme?: BrandTheme): string {
+export function exportFunnelToHTML(
+  data: FunnelData,
+  brandName?: string,
+  theme?: BrandTheme,
+): string {
   const t = { ...DEFAULT_THEME, ...theme };
   const title = brandName || "Mon Offre";
   const accentRGB = hexToRGB(t.accentColor);
@@ -688,7 +719,9 @@ export function exportFunnelToHTML(data: FunnelData, brandName?: string, theme?:
         <h1 class="gradient-text">${esc(data.optin_page.headline)}</h1>
         <p class="subtitle">${esc(data.optin_page.subheadline)}</p>
         <div class="benefits-list">
-          ${data.optin_page.bullet_points.map((b) => `
+          ${data.optin_page.bullet_points
+            .map(
+              (b) => `
           <div class="benefit-item">
             <span class="check-icon">
               <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
@@ -696,7 +729,9 @@ export function exportFunnelToHTML(data: FunnelData, brandName?: string, theme?:
               </svg>
             </span>
             <span>${esc(b)}</span>
-          </div>`).join("")}
+          </div>`,
+            )
+            .join("")}
         </div>
         <div class="cta-box">
           <a href="#vsl" class="cta-btn">${esc(data.optin_page.cta_text)}</a>
@@ -723,7 +758,9 @@ export function exportFunnelToHTML(data: FunnelData, brandName?: string, theme?:
           </div>
         </div>
         <div class="benefits-list">
-          ${data.vsl_page.benefit_bullets.map((b) => `
+          ${data.vsl_page.benefit_bullets
+            .map(
+              (b) => `
           <div class="benefit-item">
             <span class="check-icon">
               <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
@@ -731,17 +768,23 @@ export function exportFunnelToHTML(data: FunnelData, brandName?: string, theme?:
               </svg>
             </span>
             <span>${esc(b)}</span>
-          </div>`).join("")}
+          </div>`,
+            )
+            .join("")}
         </div>
         ${
           data.vsl_page.faq && data.vsl_page.faq.length > 0
             ? `<div class="faq-container">
           <h2>Questions fréquentes</h2>
-          ${data.vsl_page.faq.map((f) => `
+          ${data.vsl_page.faq
+            .map(
+              (f) => `
           <details class="faq-item">
             <summary>${esc(f.question)}</summary>
             <p>${esc(f.answer)}</p>
-          </details>`).join("")}
+          </details>`,
+            )
+            .join("")}
         </div>`
             : ""
         }
@@ -761,11 +804,15 @@ export function exportFunnelToHTML(data: FunnelData, brandName?: string, theme?:
         </div>
         <h1>${esc(data.thankyou_page.confirmation_message)}</h1>
         <div class="steps-list">
-          ${data.thankyou_page.next_steps.map((s, i) => `
+          ${data.thankyou_page.next_steps
+            .map(
+              (s, i) => `
           <div class="step-item">
             <div class="step-num">${i + 1}</div>
             <span>${esc(s)}</span>
-          </div>`).join("")}
+          </div>`,
+            )
+            .join("")}
         </div>
         ${
           data.thankyou_page.upsell_headline
@@ -879,9 +926,18 @@ function hexToRGB(hex: string): string {
 
 function adjustBrightness(hex: string, amount: number): string {
   const clean = hex.replace("#", "");
-  const r = Math.min(255, Math.max(0, (parseInt(clean.substring(0, 2), 16) || 0) + amount));
-  const g = Math.min(255, Math.max(0, (parseInt(clean.substring(2, 4), 16) || 0) + amount));
-  const b = Math.min(255, Math.max(0, (parseInt(clean.substring(4, 6), 16) || 0) + amount));
+  const r = Math.min(
+    255,
+    Math.max(0, (parseInt(clean.substring(0, 2), 16) || 0) + amount),
+  );
+  const g = Math.min(
+    255,
+    Math.max(0, (parseInt(clean.substring(2, 4), 16) || 0) + amount),
+  );
+  const b = Math.min(
+    255,
+    Math.max(0, (parseInt(clean.substring(4, 6), 16) || 0) + amount),
+  );
   return `#${r.toString(16).padStart(2, "0")}${g.toString(16).padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
 }
 
@@ -894,11 +950,15 @@ function adjustOpacity(hex: string, opacity: number): string {
 }
 
 function buildGoogleFontsLink(heading: string, body: string): string {
-  const fonts = new Set([heading, body].filter((f) => f && f !== "Inter" && f !== "system-ui"));
+  const fonts = new Set(
+    [heading, body].filter((f) => f && f !== "Inter" && f !== "system-ui"),
+  );
   if (fonts.size === 0) {
     return `<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">`;
   }
-  const familyParams = [...fonts].map((f) => `family=${f.replace(/\s+/g, "+")}:wght@400;500;600;700;800`).join("&");
+  const familyParams = [...fonts]
+    .map((f) => `family=${f.replace(/\s+/g, "+")}:wght@400;500;600;700;800`)
+    .join("&");
   return `<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&${familyParams}&display=swap" rel="stylesheet">`;
 }
 

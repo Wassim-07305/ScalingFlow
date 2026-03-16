@@ -49,7 +49,7 @@ export function ParcoursSelector({
         situationDetails:
           (formData.situationDetails as Record<string, unknown>) || {},
       }),
-    [formData]
+    [formData],
   );
 
   const topRec = recommendations[0];
@@ -67,7 +67,8 @@ export function ParcoursSelector({
           <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" />
           <div>
             <p className="text-sm font-medium text-emerald-300">
-              Parcours recommandé : {PARCOURS_LIST.find((p) => p.id === topRec.id)?.label}
+              Parcours recommandé :{" "}
+              {PARCOURS_LIST.find((p) => p.id === topRec.id)?.label}
             </p>
             <p className="mt-0.5 text-xs text-white/40">{topRec.reason}</p>
           </div>
@@ -95,7 +96,7 @@ export function ParcoursSelector({
                 "group relative w-full rounded-2xl border-2 px-5 py-4 text-left transition-all",
                 isSelected
                   ? "border-emerald-400 bg-emerald-500/10 shadow-lg shadow-emerald-500/10"
-                  : "border-white/10 bg-white/5 hover:border-white/20 hover:bg-white/8"
+                  : "border-white/10 bg-white/5 hover:border-white/20 hover:bg-white/8",
               )}
             >
               {/* Selected check */}
@@ -116,7 +117,7 @@ export function ParcoursSelector({
                     "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-colors",
                     isSelected
                       ? "bg-emerald-400/20 text-emerald-400"
-                      : "bg-white/10 text-white/50 group-hover:text-white/70"
+                      : "bg-white/10 text-white/50 group-hover:text-white/70",
                   )}
                 >
                   <Icon className="h-5 w-5" />
@@ -128,7 +129,7 @@ export function ParcoursSelector({
                     <span
                       className={cn(
                         "text-base font-semibold",
-                        isSelected ? "text-emerald-300" : "text-white/80"
+                        isSelected ? "text-emerald-300" : "text-white/80",
                       )}
                     >
                       {parcours.label}
@@ -160,7 +161,10 @@ export function ParcoursSelector({
                             className="h-full rounded-full bg-emerald-400/60"
                             initial={{ width: 0 }}
                             animate={{ width: `${Math.min(fitScore, 100)}%` }}
-                            transition={{ delay: i * 0.06 + 0.3, duration: 0.4 }}
+                            transition={{
+                              delay: i * 0.06 + 0.3,
+                              duration: 0.4,
+                            }}
                           />
                         </div>
                       </div>

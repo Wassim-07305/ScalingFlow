@@ -15,7 +15,9 @@ export const metadata: Metadata = {
     statusBarStyle: "black-translucent",
     title: "ScalingFlow",
   },
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://scalingflow.com"),
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_APP_URL || "https://scalingflow.com",
+  ),
   openGraph: {
     siteName: "ScalingFlow",
     locale: "fr_FR",
@@ -65,9 +67,23 @@ export default function RootLayout({
           rel="stylesheet"
           href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
         />
-        <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png" />
-        <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16.png" />
-        <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
+        <link
+          rel="icon"
+          type="image/png"
+          sizes="32x32"
+          href="/icons/favicon-32.png"
+        />
+        <link
+          rel="icon"
+          type="image/png"
+          sizes="16x16"
+          href="/icons/favicon-16.png"
+        />
+        <link
+          rel="apple-touch-icon"
+          sizes="180x180"
+          href="/icons/apple-touch-icon.png"
+        />
       </head>
       <body className="min-h-screen bg-bg-primary text-text-primary antialiased">
         <Providers>{children}</Providers>

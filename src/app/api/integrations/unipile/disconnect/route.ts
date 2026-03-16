@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
     if (!account_id) {
       return NextResponse.json(
         { error: "Le champ account_id est requis" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
       console.error("[Unipile Disconnect] Erreur SDK :", err);
       return NextResponse.json(
         { error: "Compte non trouvé ou erreur lors de la suppression" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
     console.error("[Unipile Disconnect]", error);
     return NextResponse.json(
       { error: "Erreur lors de la déconnexion du compte" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

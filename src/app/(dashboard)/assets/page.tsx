@@ -62,7 +62,10 @@ export default function AssetsPage() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [loadedData, setLoadedData] = React.useState<Record<string, any>>({});
 
-  const handleHistorySelect = async (item: { id: string; subtitle?: string }) => {
+  const handleHistorySelect = async (item: {
+    id: string;
+    subtitle?: string;
+  }) => {
     try {
       const supabase = createClient();
       const { data, error } = await supabase
@@ -79,7 +82,8 @@ export default function AssetsPage() {
       // Determine the actual asset type (check metadata for original_type)
       const metadata = data.metadata as { original_type?: string } | null;
       const assetType = metadata?.original_type || data.asset_type;
-      const tabKey = ASSET_TYPE_TO_TAB[assetType] || ASSET_TYPE_TO_TAB[data.asset_type];
+      const tabKey =
+        ASSET_TYPE_TO_TAB[assetType] || ASSET_TYPE_TO_TAB[data.asset_type];
 
       if (!tabKey) {
         toast.error("Type d'asset non reconnu");
@@ -90,7 +94,10 @@ export default function AssetsPage() {
       let parsed = data.ai_raw_response;
       if (!parsed && data.content) {
         try {
-          parsed = typeof data.content === "string" ? JSON.parse(data.content) : data.content;
+          parsed =
+            typeof data.content === "string"
+              ? JSON.parse(data.content)
+              : data.content;
         } catch {
           parsed = null;
         }
@@ -126,7 +133,7 @@ export default function AssetsPage() {
               "flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all whitespace-nowrap",
               activeTab === tab.key
                 ? "bg-accent text-white"
-                : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
+                : "bg-bg-tertiary text-text-secondary hover:text-text-primary",
             )}
           >
             <tab.icon className="h-4 w-4" />
@@ -136,14 +143,28 @@ export default function AssetsPage() {
       </div>
 
       {activeTab === "vsl" && <VSLGenerator initialData={loadedData.vsl} />}
-      {activeTab === "email" && <EmailSequence initialData={loadedData.email} />}
+      {activeTab === "email" && (
+        <EmailSequence initialData={loadedData.email} />
+      )}
       {activeTab === "sms" && <SmsSequence initialData={loadedData.sms} />}
-      {activeTab === "pitch_deck" && <PitchDeckGenerator initialData={loadedData.pitch_deck} />}
-      {activeTab === "sales_letter" && <SalesLetterGenerator initialData={loadedData.sales_letter} />}
-      {activeTab === "setting_script" && <SettingScriptGenerator initialData={loadedData.setting_script} />}
-      {activeTab === "lead_magnet" && <LeadMagnetGenerator initialData={loadedData.lead_magnet} />}
-      {activeTab === "case_study" && <CaseStudyGenerator initialData={loadedData.case_study} />}
-      {activeTab === "social_assets" && <SocialAssetsGenerator initialData={loadedData.social_assets} />}
+      {activeTab === "pitch_deck" && (
+        <PitchDeckGenerator initialData={loadedData.pitch_deck} />
+      )}
+      {activeTab === "sales_letter" && (
+        <SalesLetterGenerator initialData={loadedData.sales_letter} />
+      )}
+      {activeTab === "setting_script" && (
+        <SettingScriptGenerator initialData={loadedData.setting_script} />
+      )}
+      {activeTab === "lead_magnet" && (
+        <LeadMagnetGenerator initialData={loadedData.lead_magnet} />
+      )}
+      {activeTab === "case_study" && (
+        <CaseStudyGenerator initialData={loadedData.case_study} />
+      )}
+      {activeTab === "social_assets" && (
+        <SocialAssetsGenerator initialData={loadedData.social_assets} />
+      )}
       {activeTab === "history" && (
         <GenerationHistory
           table="sales_assets"

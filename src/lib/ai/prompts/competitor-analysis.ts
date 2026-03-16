@@ -49,10 +49,14 @@ export interface CompetitorAnalysisInput {
   user_skills?: string[];
 }
 
-export function buildCompetitorAnalysisPrompt(data: CompetitorAnalysisInput, scrapedData?: string): string {
-  const skillsContext = data.user_skills && data.user_skills.length > 0
-    ? `\n- Competences de l'utilisateur : ${data.user_skills.join(", ")}`
-    : "";
+export function buildCompetitorAnalysisPrompt(
+  data: CompetitorAnalysisInput,
+  scrapedData?: string,
+): string {
+  const skillsContext =
+    data.user_skills && data.user_skills.length > 0
+      ? `\n- Competences de l'utilisateur : ${data.user_skills.join(", ")}`
+      : "";
 
   const scrapedSection = scrapedData
     ? `\n\n## DONNÉES RÉELLES SCRAPÉES DES SITES CONCURRENTS

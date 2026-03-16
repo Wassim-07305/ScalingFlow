@@ -21,7 +21,10 @@ function getAdminClient() {
 async function recalculateScores() {
   const supabase = getAdminClient();
   if (!supabase) {
-    return NextResponse.json({ error: "Configuration manquante" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Configuration manquante" },
+      { status: 500 },
+    );
   }
 
   const { data: profiles, error: profilesError } = await supabase
@@ -30,19 +33,38 @@ async function recalculateScores() {
     .eq("onboarding_completed", true);
 
   if (profilesError || !profiles) {
-    return NextResponse.json({ error: "Erreur lecture profils" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Erreur lecture profils" },
+      { status: 500 },
+    );
   }
 
   let updated = 0;
 
   for (const profile of profiles) {
-    const [offersRes, funnelsRes, adsRes, postsRes, commentsRes] = await Promise.all([
-      supabase.from("offers").select("id", { count: "exact", head: true }).eq("user_id", profile.id),
-      supabase.from("funnels").select("id", { count: "exact", head: true }).eq("user_id", profile.id),
-      supabase.from("ad_creatives").select("id", { count: "exact", head: true }).eq("user_id", profile.id),
-      supabase.from("community_posts").select("id", { count: "exact", head: true }).eq("user_id", profile.id),
-      supabase.from("community_comments").select("id", { count: "exact", head: true }).eq("user_id", profile.id),
-    ]);
+    const [offersRes, funnelsRes, adsRes, postsRes, commentsRes] =
+      await Promise.all([
+        supabase
+          .from("offers")
+          .select("id", { count: "exact", head: true })
+          .eq("user_id", profile.id),
+        supabase
+          .from("funnels")
+          .select("id", { count: "exact", head: true })
+          .eq("user_id", profile.id),
+        supabase
+          .from("ad_creatives")
+          .select("id", { count: "exact", head: true })
+          .eq("user_id", profile.id),
+        supabase
+          .from("community_posts")
+          .select("id", { count: "exact", head: true })
+          .eq("user_id", profile.id),
+        supabase
+          .from("community_comments")
+          .select("id", { count: "exact", head: true })
+          .eq("user_id", profile.id),
+      ]);
 
     const offers = offersRes.count ?? 0;
     const funnels = funnelsRes.count ?? 0;
@@ -52,7 +74,8 @@ async function recalculateScores() {
 
     const progressScore = (profile.xp_points ?? 0) + (profile.level ?? 1) * 100;
     const businessScore = offers * 50 + funnels * 75 + ads * 30;
-    const engagementScore = (profile.streak_days ?? 0) * 10 + posts * 5 + comments * 2;
+    const engagementScore =
+      (profile.streak_days ?? 0) * 10 + posts * 5 + comments * 2;
     const compositeScore = progressScore + businessScore + engagementScore;
 
     await supabase.from("leaderboard_scores").upsert(
@@ -63,7 +86,7 @@ async function recalculateScores() {
         engagement_score: engagementScore,
         composite_score: compositeScore,
       },
-      { onConflict: "user_id" }
+      { onConflict: "user_id" },
     );
 
     updated++;
@@ -101,9 +124,12 @@ export async function POST(req: Request) {
     const expectedSecret = process.env.CRON_SECRET;
 
     if (!expectedSecret || cronSecret !== expectedSecret) {
-      const { createClient: createServerClient } = await import("@/lib/supabase/server");
+      const { createClient: createServerClient } =
+        await import("@/lib/supabase/server");
       const userSupabase = await createServerClient();
-      const { data: { user } } = await userSupabase.auth.getUser();
+      const {
+        data: { user },
+      } = await userSupabase.auth.getUser();
       if (!user) {
         return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
       }

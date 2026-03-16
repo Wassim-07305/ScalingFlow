@@ -5,7 +5,14 @@ import { GlowCard } from "@/components/shared/glow-card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { RefreshCw, CheckCircle, Shield, Zap, Gift, FileDown } from "lucide-react";
+import {
+  RefreshCw,
+  CheckCircle,
+  Shield,
+  Zap,
+  Gift,
+  FileDown,
+} from "lucide-react";
 import { exportToPDF } from "@/lib/utils/export-pdf";
 
 interface OfferPreviewProps {
@@ -24,9 +31,16 @@ interface OfferPreviewProps {
   className?: string;
 }
 
-export function OfferPreview({ offer, onRegenerate, className }: OfferPreviewProps) {
+export function OfferPreview({
+  offer,
+  onRegenerate,
+  className,
+}: OfferPreviewProps) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const raw: Record<string, any> = (offer.ai_raw_response || offer) as Record<string, any>;
+  const raw: Record<string, any> = (offer.ai_raw_response || offer) as Record<
+    string,
+    any
+  >;
   const packaging = raw.packaging || {};
   const delivery = raw.delivery || {};
 
@@ -45,9 +59,7 @@ export function OfferPreview({ offer, onRegenerate, className }: OfferPreviewPro
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-text-primary">
-            {name}
-          </h2>
+          <h2 className="text-2xl font-bold text-text-primary">{name}</h2>
           {positioning && (
             <p className="mt-2 text-text-secondary max-w-2xl">{positioning}</p>
           )}
@@ -56,12 +68,14 @@ export function OfferPreview({ offer, onRegenerate, className }: OfferPreviewPro
           <Button
             variant="outline"
             size="sm"
-            onClick={() => exportToPDF({
-              title: name,
-              subtitle: "Offre générée par ScalingFlow",
-              content: raw,
-              filename: `offre-${name.toLowerCase().replace(/[^a-z0-9]+/g, "-")}.pdf`,
-            })}
+            onClick={() =>
+              exportToPDF({
+                title: name,
+                subtitle: "Offre générée par ScalingFlow",
+                content: raw,
+                filename: `offre-${name.toLowerCase().replace(/[^a-z0-9]+/g, "-")}.pdf`,
+              })
+            }
           >
             <FileDown className="h-4 w-4 mr-1" />
             PDF
@@ -80,11 +94,15 @@ export function OfferPreview({ offer, onRegenerate, className }: OfferPreviewPro
         <GlowCard glowColor="orange">
           <div className="flex items-center gap-2 mb-4">
             <Zap className="h-5 w-5 text-accent" />
-            <h3 className="text-lg font-semibold text-text-primary">Mécanisme Unique</h3>
+            <h3 className="text-lg font-semibold text-text-primary">
+              Mécanisme Unique
+            </h3>
           </div>
           <p className="text-accent font-medium mb-3">{mechanism.name}</p>
           {mechanism.description && (
-            <p className="text-text-secondary text-sm mb-4">{mechanism.description}</p>
+            <p className="text-text-secondary text-sm mb-4">
+              {mechanism.description}
+            </p>
           )}
           {mechanism.steps?.length > 0 && (
             <div className="space-y-3">
@@ -121,20 +139,29 @@ export function OfferPreview({ offer, onRegenerate, className }: OfferPreviewPro
           </div>
           {pricing.value_breakdown?.length > 0 && (
             <div className="space-y-2">
-              {pricing.value_breakdown.map((item: { item: string; value: number }, i: number) => (
-                <div key={i} className="flex justify-between py-2 border-b border-border-default/50">
-                  <span className="text-text-primary text-sm">{item.item}</span>
-                  <span className="text-accent font-medium text-sm">
-                    {item.value?.toLocaleString("fr-FR")} &euro;
-                  </span>
-                </div>
-              ))}
+              {pricing.value_breakdown.map(
+                (item: { item: string; value: number }, i: number) => (
+                  <div
+                    key={i}
+                    className="flex justify-between py-2 border-b border-border-default/50"
+                  >
+                    <span className="text-text-primary text-sm">
+                      {item.item}
+                    </span>
+                    <span className="text-accent font-medium text-sm">
+                      {item.value?.toLocaleString("fr-FR")} &euro;
+                    </span>
+                  </div>
+                ),
+              )}
             </div>
           )}
           {pricing.payment_options?.length > 0 && (
             <div className="mt-4 flex flex-wrap gap-2">
               {pricing.payment_options.map((opt: string, i: number) => (
-                <Badge key={i} variant="muted">{opt}</Badge>
+                <Badge key={i} variant="muted">
+                  {opt}
+                </Badge>
               ))}
             </div>
           )}
@@ -152,18 +179,32 @@ export function OfferPreview({ offer, onRegenerate, className }: OfferPreviewPro
           </CardHeader>
           <CardContent>
             <div className="grid gap-3 sm:grid-cols-2">
-              {guarantees.map((g: { type: string; description: string; duration: string }, i: number) => (
-                <div key={i} className="p-4 rounded-xl bg-bg-tertiary border border-border-default">
-                  <div className="flex items-center gap-2 mb-2">
-                    <CheckCircle className="h-4 w-4 text-accent" />
-                    <span className="font-medium text-text-primary text-sm">{g.type}</span>
+              {guarantees.map(
+                (
+                  g: { type: string; description: string; duration: string },
+                  i: number,
+                ) => (
+                  <div
+                    key={i}
+                    className="p-4 rounded-xl bg-bg-tertiary border border-border-default"
+                  >
+                    <div className="flex items-center gap-2 mb-2">
+                      <CheckCircle className="h-4 w-4 text-accent" />
+                      <span className="font-medium text-text-primary text-sm">
+                        {g.type}
+                      </span>
+                    </div>
+                    <p className="text-text-secondary text-xs">
+                      {g.description}
+                    </p>
+                    {g.duration && (
+                      <Badge variant="cyan" className="mt-2">
+                        {g.duration}
+                      </Badge>
+                    )}
                   </div>
-                  <p className="text-text-secondary text-xs">{g.description}</p>
-                  {g.duration && (
-                    <Badge variant="cyan" className="mt-2">{g.duration}</Badge>
-                  )}
-                </div>
-              ))}
+                ),
+              )}
             </div>
           </CardContent>
         </Card>
@@ -199,9 +240,15 @@ export function OfferPreview({ offer, onRegenerate, className }: OfferPreviewPro
       {/* OTO */}
       {oto && (
         <GlowCard glowColor="blue">
-          <h3 className="text-lg font-semibold text-text-primary mb-2">OTO (One-Time Offer)</h3>
+          <h3 className="text-lg font-semibold text-text-primary mb-2">
+            OTO (One-Time Offer)
+          </h3>
           {oto.name && <p className="text-info font-medium">{oto.name}</p>}
-          {oto.description && <p className="text-text-secondary text-sm mt-1">{oto.description}</p>}
+          {oto.description && (
+            <p className="text-text-secondary text-sm mt-1">
+              {oto.description}
+            </p>
+          )}
           {oto.price > 0 && (
             <p className="text-accent font-bold text-xl mt-2">
               {oto.price?.toLocaleString("fr-FR")} &euro;
@@ -219,22 +266,41 @@ export function OfferPreview({ offer, onRegenerate, className }: OfferPreviewPro
           <CardContent>
             <div className="space-y-4">
               {deliveryData.problematiques.map(
-                (p: { name: string; agents_ia: string[]; process: string[]; outils: string[] }, i: number) => (
-                  <div key={i} className="p-4 rounded-xl bg-bg-tertiary border border-border-default">
-                    <h4 className="font-medium text-text-primary mb-3">{p.name}</h4>
+                (
+                  p: {
+                    name: string;
+                    agents_ia: string[];
+                    process: string[];
+                    outils: string[];
+                  },
+                  i: number,
+                ) => (
+                  <div
+                    key={i}
+                    className="p-4 rounded-xl bg-bg-tertiary border border-border-default"
+                  >
+                    <h4 className="font-medium text-text-primary mb-3">
+                      {p.name}
+                    </h4>
                     <div className="flex flex-wrap gap-1.5">
                       {p.agents_ia?.map((a: string, j: number) => (
-                        <Badge key={`ai-${j}`} variant="blue">{a}</Badge>
+                        <Badge key={`ai-${j}`} variant="blue">
+                          {a}
+                        </Badge>
                       ))}
                       {p.process?.map((pr: string, j: number) => (
-                        <Badge key={`pr-${j}`} variant="cyan">{pr}</Badge>
+                        <Badge key={`pr-${j}`} variant="cyan">
+                          {pr}
+                        </Badge>
                       ))}
                       {p.outils?.map((o: string, j: number) => (
-                        <Badge key={`o-${j}`} variant="muted">{o}</Badge>
+                        <Badge key={`o-${j}`} variant="muted">
+                          {o}
+                        </Badge>
                       ))}
                     </div>
                   </div>
-                )
+                ),
               )}
             </div>
           </CardContent>

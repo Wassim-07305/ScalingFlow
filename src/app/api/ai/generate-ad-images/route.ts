@@ -16,9 +16,24 @@ interface ReplicateResponse {
 }
 
 const FORMAT_CONFIG = {
-  feed: { aspect_ratio: "1:1", label: "Feed 1080×1080", width: 1080, height: 1080 },
-  story: { aspect_ratio: "9:16", label: "Story 1080×1920", width: 1080, height: 1920 },
-  facebook: { aspect_ratio: "16:9", label: "Facebook 1200×628", width: 1200, height: 628 },
+  feed: {
+    aspect_ratio: "1:1",
+    label: "Feed 1080×1080",
+    width: 1080,
+    height: 1080,
+  },
+  story: {
+    aspect_ratio: "9:16",
+    label: "Story 1080×1920",
+    width: 1080,
+    height: 1920,
+  },
+  facebook: {
+    aspect_ratio: "16:9",
+    label: "Facebook 1200×628",
+    width: 1200,
+    height: 628,
+  },
 } as const;
 
 type AdFormat = keyof typeof FORMAT_CONFIG;
@@ -27,8 +42,7 @@ type AdStyle = "minimal" | "bold" | "elegant";
 const STYLE_DESCRIPTIONS: Record<AdStyle, string> = {
   minimal:
     "Clean minimalist design with generous whitespace, subtle typography, muted tones, and simple geometric shapes. Modern and sleek.",
-  bold:
-    "Bold and eye-catching design with strong contrast, large impactful typography, vibrant saturated colors, dynamic composition. High energy.",
+  bold: "Bold and eye-catching design with strong contrast, large impactful typography, vibrant saturated colors, dynamic composition. High energy.",
   elegant:
     "Sophisticated elegant design with refined serif typography, luxury feel, subtle gradients, premium textures, gold or metallic accents.",
 };
@@ -51,7 +65,7 @@ export async function POST(req: NextRequest) {
     if (!rl.allowed) {
       return NextResponse.json(
         { error: "Trop de requêtes. Réessaie dans 2 minutes." },
-        { status: 429 }
+        { status: 429 },
       );
     }
 
@@ -59,7 +73,7 @@ export async function POST(req: NextRequest) {
     if (!usage.allowed) {
       return NextResponse.json(
         { error: "Limite de générations IA atteinte", usage },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -70,7 +84,7 @@ export async function POST(req: NextRequest) {
           error:
             "Génération d'images non configurée (REPLICATE_API_TOKEN manquant)",
         },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -94,7 +108,7 @@ export async function POST(req: NextRequest) {
     if (!ad_text?.headline || !format) {
       return NextResponse.json(
         { error: "ad_text.headline et format sont requis" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -102,7 +116,7 @@ export async function POST(req: NextRequest) {
     if (!formatConfig) {
       return NextResponse.json(
         { error: "Format invalide. Utilise: feed, story ou facebook" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -145,7 +159,7 @@ export async function POST(req: NextRequest) {
         brand_name,
         styleDesc,
         formatConfig,
-        variation.suffix
+        variation.suffix,
       );
 
       const createRes = await fetch(REPLICATE_API_URL, {
@@ -168,7 +182,7 @@ export async function POST(req: NextRequest) {
 
       if (!createRes.ok) {
         console.error(
-          `[generate-ad-images] Replicate error for variation ${i + 1}`
+          `[generate-ad-images] Replicate error for variation ${i + 1}`,
         );
         continue;
       }
@@ -198,7 +212,7 @@ export async function POST(req: NextRequest) {
     if (results.length === 0) {
       return NextResponse.json(
         { error: "La génération des images publicitaires a échoué" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -212,7 +226,7 @@ export async function POST(req: NextRequest) {
     console.error("[generate-ad-images] Error:", error);
     return NextResponse.json(
       { error: "Erreur lors de la génération des images publicitaires" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -223,7 +237,7 @@ function buildAdImagePrompt(
   brandName: string,
   styleDesc: string,
   formatConfig: { label: string; width: number; height: number },
-  variationSuffix: string
+  variationSuffix: string,
 ): string {
   let prompt = `Professional advertisement creative for social media. `;
   prompt += `Format: ${formatConfig.label} (${formatConfig.width}x${formatConfig.height}px). `;

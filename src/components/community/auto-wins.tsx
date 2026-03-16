@@ -4,7 +4,15 @@ import React from "react";
 import { cn } from "@/lib/utils/cn";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Trophy, Zap, Rocket, Star, Sparkles, TrendingUp } from "lucide-react";
+import {
+  Loader2,
+  Trophy,
+  Zap,
+  Rocket,
+  Star,
+  Sparkles,
+  TrendingUp,
+} from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useUser } from "@/hooks/use-user";
 import { toast } from "sonner";
@@ -34,19 +42,55 @@ const REACTION_EMOJIS = [
 
 const WIN_CONFIG: Record<
   WinItem["type"],
-  { icon: React.ElementType; gradient: string; badge: string; badgeColor: "cyan" | "purple" | "default" | "yellow" | "blue" }
+  {
+    icon: React.ElementType;
+    gradient: string;
+    badge: string;
+    badgeColor: "cyan" | "purple" | "default" | "yellow" | "blue";
+  }
 > = {
-  badge: { icon: Trophy, gradient: "from-cyan-500/20 to-cyan-500/5", badge: "Badge", badgeColor: "cyan" },
-  xp: { icon: Zap, gradient: "from-purple-500/20 to-purple-500/5", badge: "XP", badgeColor: "purple" },
-  funnel: { icon: Rocket, gradient: "from-emerald-500/20 to-emerald-500/5", badge: "Funnel", badgeColor: "default" },
-  revenue: { icon: Star, gradient: "from-yellow-500/20 to-yellow-500/5", badge: "Revenue", badgeColor: "yellow" },
-  milestone: { icon: TrendingUp, gradient: "from-blue-500/20 to-blue-500/5", badge: "Milestone", badgeColor: "blue" },
+  badge: {
+    icon: Trophy,
+    gradient: "from-cyan-500/20 to-cyan-500/5",
+    badge: "Badge",
+    badgeColor: "cyan",
+  },
+  xp: {
+    icon: Zap,
+    gradient: "from-purple-500/20 to-purple-500/5",
+    badge: "XP",
+    badgeColor: "purple",
+  },
+  funnel: {
+    icon: Rocket,
+    gradient: "from-emerald-500/20 to-emerald-500/5",
+    badge: "Funnel",
+    badgeColor: "default",
+  },
+  revenue: {
+    icon: Star,
+    gradient: "from-yellow-500/20 to-yellow-500/5",
+    badge: "Revenue",
+    badgeColor: "yellow",
+  },
+  milestone: {
+    icon: TrendingUp,
+    gradient: "from-blue-500/20 to-blue-500/5",
+    badge: "Milestone",
+    badgeColor: "blue",
+  },
 };
 
 // ─── Helpers ────────────────────────────────────────────────
 function getInitials(name: string | null | undefined) {
   if (!name) return "??";
-  return name.split(" ").map((w) => w[0]).filter(Boolean).join("").toUpperCase().slice(0, 2);
+  return name
+    .split(" ")
+    .map((w) => w[0])
+    .filter(Boolean)
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
 }
 
 // ─── Main Component ─────────────────────────────────────────
@@ -80,24 +124,44 @@ export function AutoWins({ className }: { className?: string }) {
       .order("updated_at", { ascending: false })
       .limit(10);
 
-    const winsFromPosts: WinItem[] = ((autoPosts ?? []) as Record<string, unknown>[]).map((p) => {
-      const profiles = p.profiles as { full_name: string | null; avatar_url: string | null } | null;
+    const winsFromPosts: WinItem[] = (
+      (autoPosts ?? []) as Record<string, unknown>[]
+    ).map((p) => {
+      const profiles = p.profiles as {
+        full_name: string | null;
+        avatar_url: string | null;
+      } | null;
       const content = (p.content as string) || "";
       let type: WinItem["type"] = "milestone";
       let emoji = "\uD83C\uDF89";
 
-      if (content.includes("badge")) { type = "badge"; emoji = "\uD83C\uDFC6"; }
-      else if (content.includes("XP") || content.includes("niveau")) { type = "xp"; emoji = "\u26A1"; }
-      else if (content.includes("funnel") || content.includes("publié")) { type = "funnel"; emoji = "\uD83D\uDE80"; }
-      else if (content.includes("revenue") || content.includes("vente") || content.includes("client")) { type = "revenue"; emoji = "\uD83D\uDCB0"; }
+      if (content.includes("badge")) {
+        type = "badge";
+        emoji = "\uD83C\uDFC6";
+      } else if (content.includes("XP") || content.includes("niveau")) {
+        type = "xp";
+        emoji = "\u26A1";
+      } else if (content.includes("funnel") || content.includes("publié")) {
+        type = "funnel";
+        emoji = "\uD83D\uDE80";
+      } else if (
+        content.includes("revenue") ||
+        content.includes("vente") ||
+        content.includes("client")
+      ) {
+        type = "revenue";
+        emoji = "\uD83D\uDCB0";
+      }
 
       return {
         id: p.id as string,
         user_id: p.user_id as string,
         user_name: profiles?.full_name || "Membre ScalingFlow",
         avatar_url: profiles?.avatar_url || null,
-        type, title: (p.title as string) || "Nouvelle victoire !",
-        description: content, emoji,
+        type,
+        title: (p.title as string) || "Nouvelle victoire !",
+        description: content,
+        emoji,
         timestamp: p.created_at as string,
         reactions: (p.reactions as Record<string, string[]>) || {},
       };
@@ -109,7 +173,8 @@ export function AutoWins({ className }: { className?: string }) {
       if (badges.length > 0) {
         const latestBadge = badges[badges.length - 1];
         const alreadyExists = winsFromPosts.some(
-          (w) => w.user_id === achiever.id && w.description.includes(latestBadge)
+          (w) =>
+            w.user_id === achiever.id && w.description.includes(latestBadge),
         );
         if (!alreadyExists) {
           syntheticWins.push({
@@ -117,7 +182,8 @@ export function AutoWins({ className }: { className?: string }) {
             user_id: achiever.id,
             user_name: achiever.full_name || "Membre ScalingFlow",
             avatar_url: achiever.avatar_url,
-            type: "badge", title: "Badge débloqué !",
+            type: "badge",
+            title: "Badge débloqué !",
             description: `A obtenu le badge "${latestBadge}"`,
             emoji: "\uD83C\uDFC6",
             timestamp: achiever.updated_at,
@@ -130,7 +196,9 @@ export function AutoWins({ className }: { className?: string }) {
       if (xp > 0 && xp % 500 < 100) {
         const milestone = Math.floor(xp / 500) * 500;
         const alreadyExists = winsFromPosts.some(
-          (w) => w.user_id === achiever.id && w.description.includes(`${milestone} XP`)
+          (w) =>
+            w.user_id === achiever.id &&
+            w.description.includes(`${milestone} XP`),
         );
         if (!alreadyExists && milestone > 0) {
           syntheticWins.push({
@@ -138,7 +206,8 @@ export function AutoWins({ className }: { className?: string }) {
             user_id: achiever.id,
             user_name: achiever.full_name || "Membre ScalingFlow",
             avatar_url: achiever.avatar_url,
-            type: "xp", title: "Palier XP atteint !",
+            type: "xp",
+            title: "Palier XP atteint !",
             description: `A franchi le cap des ${milestone} XP (Niveau ${achiever.level || 1})`,
             emoji: "\u26A1",
             timestamp: achiever.updated_at,
@@ -149,7 +218,8 @@ export function AutoWins({ className }: { className?: string }) {
     }
 
     const allWins = [...winsFromPosts, ...syntheticWins].sort(
-      (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+      (a, b) =>
+        new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
     );
 
     setWins(allWins);
@@ -164,7 +234,8 @@ export function AutoWins({ className }: { className?: string }) {
     if (!user) return;
 
     // Only persist reactions for real posts (not synthetic wins)
-    const isSyntheticWin = winId.startsWith("badge-") || winId.startsWith("xp-");
+    const isSyntheticWin =
+      winId.startsWith("badge-") || winId.startsWith("xp-");
 
     setReactingTo(winId);
 
@@ -183,7 +254,7 @@ export function AutoWins({ className }: { className?: string }) {
         }
         updatedReactions = reactions;
         return { ...w, reactions };
-      })
+      }),
     );
 
     // Persist to Supabase for real posts
@@ -228,7 +299,12 @@ export function AutoWins({ className }: { className?: string }) {
   // ─── Empty state ────────────────────────────────────────────
   if (wins.length === 0) {
     return (
-      <div className={cn("flex flex-col items-center justify-center py-16 text-center", className)}>
+      <div
+        className={cn(
+          "flex flex-col items-center justify-center py-16 text-center",
+          className,
+        )}
+      >
         <div className="h-20 w-20 rounded-2xl bg-gradient-to-br from-accent/10 to-cyan-500/10 flex items-center justify-center mb-4">
           <Trophy className="h-10 w-10 text-text-muted/30" />
         </div>
@@ -252,7 +328,9 @@ export function AutoWins({ className }: { className?: string }) {
           <Sparkles className="h-5 w-5 text-accent" />
         </div>
         <div>
-          <h2 className="text-lg font-bold text-text-primary">Victoires automatiques</h2>
+          <h2 className="text-lg font-bold text-text-primary">
+            Victoires automatiques
+          </h2>
           <p className="text-xs text-text-muted">
             Les accomplissements des membres sont célébrés ici
           </p>
@@ -267,7 +345,10 @@ export function AutoWins({ className }: { className?: string }) {
           <div
             key={win.id}
             className="group rounded-2xl border border-border-default/50 bg-bg-secondary/60 backdrop-blur-sm overflow-hidden transition-all duration-500 hover:border-accent/20 hover:shadow-lg hover:shadow-accent/5 animate-in fade-in slide-in-from-bottom-3"
-            style={{ animationDelay: `${idx * 60}ms`, animationFillMode: "both" }}
+            style={{
+              animationDelay: `${idx * 60}ms`,
+              animationFillMode: "both",
+            }}
           >
             {/* Gradient accent bar */}
             <div className={cn("h-0.5 bg-gradient-to-r", config.gradient)} />
@@ -278,7 +359,7 @@ export function AutoWins({ className }: { className?: string }) {
                 <div
                   className={cn(
                     "flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br flex items-center justify-center text-xl",
-                    config.gradient
+                    config.gradient,
                   )}
                 >
                   {win.emoji}
@@ -298,7 +379,10 @@ export function AutoWins({ className }: { className?: string }) {
                         {win.user_name}
                       </span>
                     </div>
-                    <Badge variant={config.badgeColor} className="text-[10px] gap-1">
+                    <Badge
+                      variant={config.badgeColor}
+                      className="text-[10px] gap-1"
+                    >
                       <IconComponent className="h-3 w-3" />
                       {config.badge}
                     </Badge>
@@ -336,17 +420,24 @@ export function AutoWins({ className }: { className?: string }) {
                             hasReacted
                               ? "bg-accent/15 border-accent/30 shadow-sm scale-105"
                               : "bg-bg-tertiary/80 border-transparent hover:border-border-default hover:bg-bg-tertiary hover:scale-105",
-                            "disabled:opacity-50 active:scale-95"
+                            "disabled:opacity-50 active:scale-95",
                           )}
                         >
-                          <span className={cn("text-sm transition-transform duration-200", hasReacted && "animate-in zoom-in duration-300")}>{emoji}</span>
+                          <span
+                            className={cn(
+                              "text-sm transition-transform duration-200",
+                              hasReacted && "animate-in zoom-in duration-300",
+                            )}
+                          >
+                            {emoji}
+                          </span>
                           {reactionUsers.length > 0 && (
                             <span
                               className={cn(
                                 "text-[10px] font-bold",
                                 hasReacted
                                   ? "text-accent"
-                                  : "text-text-secondary"
+                                  : "text-text-secondary",
                               )}
                             >
                               {reactionUsers.length}

@@ -60,11 +60,14 @@ export async function POST(req: NextRequest) {
     }
 
     // Rate limiting
-    const rl = await rateLimit(user.id, "generate-assets", { limit: 5, windowSeconds: 60 });
+    const rl = await rateLimit(user.id, "generate-assets", {
+      limit: 5,
+      windowSeconds: 60,
+    });
     if (!rl.allowed) {
       return NextResponse.json(
         { error: "Trop de requêtes. Réessaie dans quelques secondes." },
-        { status: 429 }
+        { status: 429 },
       );
     }
 
@@ -73,10 +76,9 @@ export async function POST(req: NextRequest) {
     if (!usage.allowed) {
       return NextResponse.json(
         { error: "Limite de générations IA atteinte", usage },
-        { status: 403 }
+        { status: 403 },
       );
     }
-
 
     const body = await req.json();
     let { offerId, assetType } = body;
@@ -103,7 +105,7 @@ export async function POST(req: NextRequest) {
     if (!assetType) {
       return NextResponse.json(
         { error: "assetType est requis" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -112,7 +114,7 @@ export async function POST(req: NextRequest) {
         {
           error: `Type d'asset invalide. Types acceptés : ${VALID_ASSET_TYPES.join(", ")}`,
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -131,7 +133,7 @@ export async function POST(req: NextRequest) {
     if (!offerId) {
       return NextResponse.json(
         { error: "Aucune offre trouvée. Génère d'abord une offre." },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -144,10 +146,7 @@ export async function POST(req: NextRequest) {
       .single();
 
     if (offerError || !offer) {
-      return NextResponse.json(
-        { error: "Offre introuvable" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Offre introuvable" }, { status: 404 });
     }
 
     const avatar = offer.market_analyses?.avatar || {};
@@ -161,7 +160,7 @@ export async function POST(req: NextRequest) {
         prompt = vslScriptPrompt(
           offer.offer_data || offer,
           avatar,
-          body.structure || "dsl"
+          body.structure || "dsl",
         );
         break;
 
@@ -171,15 +170,12 @@ export async function POST(req: NextRequest) {
             offer_name: offer.offer_name,
             unique_mechanism: offer.unique_mechanism,
           },
-          avatar
+          avatar,
         );
         break;
 
       case "sms_sequence":
-        prompt = smsSequencePrompt(
-          { offer_name: offer.offer_name },
-          avatar
-        );
+        prompt = smsSequencePrompt({ offer_name: offer.offer_name }, avatar);
         break;
 
       case "sales_script":
@@ -192,7 +188,7 @@ export async function POST(req: NextRequest) {
           {
             metric: body.metric || "Chiffre d'affaires",
             value: body.value || "x3 en 90 jours",
-          }
+          },
         );
         break;
 
@@ -214,7 +210,7 @@ export async function POST(req: NextRequest) {
         prompt = leadMagnetPrompt(
           offer.offer_data || offer,
           avatar,
-          body.leadMagnetType || "checklist"
+          body.leadMagnetType || "checklist",
         );
         maxTokens = 6000;
         break;
@@ -223,7 +219,7 @@ export async function POST(req: NextRequest) {
         prompt = socialAssetsPrompt(
           offer.offer_data || offer,
           avatar,
-          body.brandKit
+          body.brandKit,
         );
         maxTokens = 6000;
         break;
@@ -232,23 +228,20 @@ export async function POST(req: NextRequest) {
         prompt = followerAdsPrompt(
           offer.offer_data || offer,
           avatar,
-          body.niche
+          body.niche,
         );
         maxTokens = 6000;
         break;
 
       case "dm_retargeting":
-        prompt = dmRetargetingPrompt(
-          offer.offer_data || offer,
-          avatar
-        );
+        prompt = dmRetargetingPrompt(offer.offer_data || offer, avatar);
         maxTokens = 6000;
         break;
 
       default:
         return NextResponse.json(
           { error: "Type d'asset non supporté" },
-          { status: 400 }
+          { status: 400 },
         );
     }
 
@@ -259,7 +252,10 @@ export async function POST(req: NextRequest) {
     }
 
     // Generate asset using AI
-    const generatedAsset = await generateJSON<Record<string, unknown>>({ prompt, maxTokens });
+    const generatedAsset = await generateJSON<Record<string, unknown>>({
+      prompt,
+      maxTokens,
+    });
 
     // Save asset to database
     // DB columns: title (text), content (text), ai_raw_response (jsonb)
@@ -278,7 +274,8 @@ export async function POST(req: NextRequest) {
         title: `${assetType} — ${offer.offer_name}`,
         content: JSON.stringify(generatedAsset),
         ai_raw_response: generatedAsset,
-        metadata: dbAssetType !== assetType ? { original_type: assetType } : null,
+        metadata:
+          dbAssetType !== assetType ? { original_type: assetType } : null,
         status: "draft",
       })
       .select()
@@ -287,7 +284,7 @@ export async function POST(req: NextRequest) {
     if (saveError) {
       return NextResponse.json(
         { error: "Erreur lors de la sauvegarde" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -306,14 +303,16 @@ export async function POST(req: NextRequest) {
       follower_ads: "generation.ads",
       dm_retargeting: "generation.ads",
     };
-    try { await awardXP(user.id, assetXPMap[assetType] || "generation.vsl"); } catch {}
+    try {
+      await awardXP(user.id, assetXPMap[assetType] || "generation.vsl");
+    } catch {}
 
     return NextResponse.json(asset);
   } catch (error) {
     console.error("[generate-assets] Error:", error);
     return NextResponse.json(
       { error: "Erreur lors de la génération de l'asset" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

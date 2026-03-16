@@ -2,12 +2,26 @@
 
 import React from "react";
 import { cn } from "@/lib/utils/cn";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AILoading } from "@/components/shared/ai-loading";
 import { GlowCard } from "@/components/shared/glow-card";
-import { Sparkles, Copy, Check, MessageSquare, Send, RotateCcw, RefreshCw } from "lucide-react";
+import {
+  Sparkles,
+  Copy,
+  Check,
+  MessageSquare,
+  Send,
+  RotateCcw,
+  RefreshCw,
+} from "lucide-react";
 import { toast } from "sonner";
 import type { DMScriptsResult } from "@/lib/ai/prompts/dm-scripts";
 import { UpgradeWall } from "@/components/shared/upgrade-wall";
@@ -22,13 +36,21 @@ interface DMScriptGeneratorProps {
 
 const SCRIPT_STYLES = ["Direct", "Soft", "Storytelling", "Question"] as const;
 
-export function DMScriptGenerator({ className, initialData }: DMScriptGeneratorProps) {
+export function DMScriptGenerator({
+  className,
+  initialData,
+}: DMScriptGeneratorProps) {
   const [loading, setLoading] = React.useState(false);
   const [result, setResult] = React.useState<DMScriptsResult | null>(null);
   const [error, setError] = React.useState<string | null>(null);
-  const [activeSubTab, setActiveSubTab] = React.useState<"prospection" | "retargeting">("prospection");
+  const [activeSubTab, setActiveSubTab] = React.useState<
+    "prospection" | "retargeting"
+  >("prospection");
   const [copiedField, setCopiedField] = React.useState<string | null>(null);
-  const [usageLimited, setUsageLimited] = React.useState<{currentUsage: number; limit: number} | null>(null);
+  const [usageLimited, setUsageLimited] = React.useState<{
+    currentUsage: number;
+    limit: number;
+  } | null>(null);
   const [scriptStyle, setScriptStyle] = React.useState<string>("Direct");
   const [context, setContext] = React.useState("");
   const [sendDialogOpen, setSendDialogOpen] = React.useState(false);
@@ -48,13 +70,20 @@ export function DMScriptGenerator({ className, initialData }: DMScriptGeneratorP
       const response = await fetch("/api/ai/generate-ads", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ adType: "dm_scripts", scriptStyle, context: context || undefined }),
+        body: JSON.stringify({
+          adType: "dm_scripts",
+          scriptStyle,
+          context: context || undefined,
+        }),
       });
 
       if (!response.ok) {
         if (response.status === 403) {
           const errData = await response.json();
-          if (errData.usage) { setUsageLimited(errData.usage); return; }
+          if (errData.usage) {
+            setUsageLimited(errData.usage);
+            return;
+          }
         }
         throw new Error("Erreur lors de la génération");
       }
@@ -78,26 +107,44 @@ export function DMScriptGenerator({ className, initialData }: DMScriptGeneratorP
   };
 
   if (usageLimited) {
-    return <UpgradeWall currentUsage={usageLimited.currentUsage} limit={usageLimited.limit} className={className} />;
+    return (
+      <UpgradeWall
+        currentUsage={usageLimited.currentUsage}
+        limit={usageLimited.limit}
+        className={className}
+      />
+    );
   }
 
   if (loading) {
-    return <AILoading variant="immersive" text="Génération des scripts DM" className={className} />;
+    return (
+      <AILoading
+        variant="immersive"
+        text="Génération des scripts DM"
+        className={className}
+      />
+    );
   }
 
   if (!result) {
     return (
       <div className={cn("max-w-xl mx-auto py-8", className)}>
-        {error && <p className="text-sm text-danger mb-4 text-center">{error}</p>}
+        {error && (
+          <p className="text-sm text-danger mb-4 text-center">{error}</p>
+        )}
         <Card>
           <CardHeader>
             <CardTitle>Scripts DM</CardTitle>
-            <CardDescription>3 séquences de prospection + 5 scénarios de retargeting</CardDescription>
+            <CardDescription>
+              3 séquences de prospection + 5 scénarios de retargeting
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             {/* Script style */}
             <div>
-              <label className="text-sm font-medium text-text-primary mb-2 block">Style de script</label>
+              <label className="text-sm font-medium text-text-primary mb-2 block">
+                Style de script
+              </label>
               <div className="flex flex-wrap gap-2">
                 {SCRIPT_STYLES.map((style) => (
                   <button
@@ -107,7 +154,7 @@ export function DMScriptGenerator({ className, initialData }: DMScriptGeneratorP
                       "px-3 py-1.5 rounded-lg text-sm font-medium transition-all",
                       scriptStyle === style
                         ? "bg-accent text-white"
-                        : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
+                        : "bg-bg-tertiary text-text-secondary hover:text-text-primary",
                     )}
                   >
                     {style}
@@ -118,7 +165,9 @@ export function DMScriptGenerator({ className, initialData }: DMScriptGeneratorP
 
             {/* Optional context */}
             <div>
-              <label className="text-sm font-medium text-text-primary mb-2 block">Contexte (optionnel)</label>
+              <label className="text-sm font-medium text-text-primary mb-2 block">
+                Contexte (optionnel)
+              </label>
               <textarea
                 value={context}
                 onChange={(e) => setContext(e.target.value)}
@@ -147,7 +196,7 @@ export function DMScriptGenerator({ className, initialData }: DMScriptGeneratorP
               "flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all",
               activeSubTab === "prospection"
                 ? "bg-accent text-white"
-                : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
+                : "bg-bg-tertiary text-text-secondary hover:text-text-primary",
             )}
           >
             <Send className="h-4 w-4" />
@@ -159,7 +208,7 @@ export function DMScriptGenerator({ className, initialData }: DMScriptGeneratorP
               "flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all",
               activeSubTab === "retargeting"
                 ? "bg-accent text-white"
-                : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
+                : "bg-bg-tertiary text-text-secondary hover:text-text-primary",
             )}
           >
             <RotateCcw className="h-4 w-4" />
@@ -200,22 +249,35 @@ export function DMScriptGenerator({ className, initialData }: DMScriptGeneratorP
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => copyToClipboard(seq.opener, `${seqKey}-opener`)}
+                            onClick={() =>
+                              copyToClipboard(seq.opener, `${seqKey}-opener`)
+                            }
                           >
-                            {copiedField === `${seqKey}-opener` ? <Check className="h-3 w-3 mr-1 animate-in zoom-in-50 duration-200" /> : <Copy className="h-3 w-3 mr-1" />}
-                            {copiedField === `${seqKey}-opener` ? "Copié !" : "Copier"}
+                            {copiedField === `${seqKey}-opener` ? (
+                              <Check className="h-3 w-3 mr-1 animate-in zoom-in-50 duration-200" />
+                            ) : (
+                              <Copy className="h-3 w-3 mr-1" />
+                            )}
+                            {copiedField === `${seqKey}-opener`
+                              ? "Copié !"
+                              : "Copier"}
                           </Button>
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => { setSendMessage(seq.opener); setSendDialogOpen(true); }}
+                            onClick={() => {
+                              setSendMessage(seq.opener);
+                              setSendDialogOpen(true);
+                            }}
                             title="Envoyer via Unipile"
                           >
                             <Send className="h-3 w-3 text-accent" />
                           </Button>
                         </div>
                       </div>
-                      <p className="text-sm text-text-secondary whitespace-pre-wrap">{seq.opener}</p>
+                      <p className="text-sm text-text-secondary whitespace-pre-wrap">
+                        {seq.opener}
+                      </p>
                     </div>
 
                     {/* Follow-up 1 */}
@@ -226,15 +288,26 @@ export function DMScriptGenerator({ className, initialData }: DMScriptGeneratorP
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => copyToClipboard(seq.follow_up_1, `${seqKey}-fu1`)}
+                            onClick={() =>
+                              copyToClipboard(seq.follow_up_1, `${seqKey}-fu1`)
+                            }
                           >
-                            {copiedField === `${seqKey}-fu1` ? <Check className="h-3 w-3 mr-1 animate-in zoom-in-50 duration-200" /> : <Copy className="h-3 w-3 mr-1" />}
-                            {copiedField === `${seqKey}-fu1` ? "Copié !" : "Copier"}
+                            {copiedField === `${seqKey}-fu1` ? (
+                              <Check className="h-3 w-3 mr-1 animate-in zoom-in-50 duration-200" />
+                            ) : (
+                              <Copy className="h-3 w-3 mr-1" />
+                            )}
+                            {copiedField === `${seqKey}-fu1`
+                              ? "Copié !"
+                              : "Copier"}
                           </Button>
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => { setSendMessage(seq.follow_up_1); setSendDialogOpen(true); }}
+                            onClick={() => {
+                              setSendMessage(seq.follow_up_1);
+                              setSendDialogOpen(true);
+                            }}
                             title="Envoyer via Unipile"
                           >
                             <Send className="h-3 w-3 text-accent" />
@@ -254,15 +327,26 @@ export function DMScriptGenerator({ className, initialData }: DMScriptGeneratorP
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => copyToClipboard(seq.follow_up_2, `${seqKey}-fu2`)}
+                            onClick={() =>
+                              copyToClipboard(seq.follow_up_2, `${seqKey}-fu2`)
+                            }
                           >
-                            {copiedField === `${seqKey}-fu2` ? <Check className="h-3 w-3 mr-1 animate-in zoom-in-50 duration-200" /> : <Copy className="h-3 w-3 mr-1" />}
-                            {copiedField === `${seqKey}-fu2` ? "Copié !" : "Copier"}
+                            {copiedField === `${seqKey}-fu2` ? (
+                              <Check className="h-3 w-3 mr-1 animate-in zoom-in-50 duration-200" />
+                            ) : (
+                              <Copy className="h-3 w-3 mr-1" />
+                            )}
+                            {copiedField === `${seqKey}-fu2`
+                              ? "Copié !"
+                              : "Copier"}
                           </Button>
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => { setSendMessage(seq.follow_up_2); setSendDialogOpen(true); }}
+                            onClick={() => {
+                              setSendMessage(seq.follow_up_2);
+                              setSendDialogOpen(true);
+                            }}
                             title="Envoyer via Unipile"
                           >
                             <Send className="h-3 w-3 text-accent" />
@@ -282,22 +366,35 @@ export function DMScriptGenerator({ className, initialData }: DMScriptGeneratorP
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => copyToClipboard(seq.closing, `${seqKey}-closing`)}
+                            onClick={() =>
+                              copyToClipboard(seq.closing, `${seqKey}-closing`)
+                            }
                           >
-                            {copiedField === `${seqKey}-closing` ? <Check className="h-3 w-3 mr-1 animate-in zoom-in-50 duration-200" /> : <Copy className="h-3 w-3 mr-1" />}
-                            {copiedField === `${seqKey}-closing` ? "Copié !" : "Copier"}
+                            {copiedField === `${seqKey}-closing` ? (
+                              <Check className="h-3 w-3 mr-1 animate-in zoom-in-50 duration-200" />
+                            ) : (
+                              <Copy className="h-3 w-3 mr-1" />
+                            )}
+                            {copiedField === `${seqKey}-closing`
+                              ? "Copié !"
+                              : "Copier"}
                           </Button>
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => { setSendMessage(seq.closing); setSendDialogOpen(true); }}
+                            onClick={() => {
+                              setSendMessage(seq.closing);
+                              setSendDialogOpen(true);
+                            }}
                             title="Envoyer via Unipile"
                           >
                             <Send className="h-3 w-3 text-accent" />
                           </Button>
                         </div>
                       </div>
-                      <p className="text-sm text-accent whitespace-pre-wrap">{seq.closing}</p>
+                      <p className="text-sm text-accent whitespace-pre-wrap">
+                        {seq.closing}
+                      </p>
                     </div>
                   </div>
                 </CardContent>
@@ -318,23 +415,36 @@ export function DMScriptGenerator({ className, initialData }: DMScriptGeneratorP
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => copyToClipboard(item.message, `retarget-${i}`)}
+                    onClick={() =>
+                      copyToClipboard(item.message, `retarget-${i}`)
+                    }
                   >
-                    {copiedField === `retarget-${i}` ? <Check className="h-3 w-3 mr-1 animate-in zoom-in-50 duration-200" /> : <Copy className="h-3 w-3 mr-1" />}
+                    {copiedField === `retarget-${i}` ? (
+                      <Check className="h-3 w-3 mr-1 animate-in zoom-in-50 duration-200" />
+                    ) : (
+                      <Copy className="h-3 w-3 mr-1" />
+                    )}
                     {copiedField === `retarget-${i}` ? "Copié !" : "Copier"}
                   </Button>
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => { setSendMessage(item.message); setSendDialogOpen(true); }}
+                    onClick={() => {
+                      setSendMessage(item.message);
+                      setSendDialogOpen(true);
+                    }}
                     title="Envoyer via Unipile"
                   >
                     <Send className="h-3 w-3 text-accent" />
                   </Button>
                 </div>
               </div>
-              <p className="text-sm font-medium text-text-primary mb-2">{item.scenario}</p>
-              <p className="text-sm text-text-secondary whitespace-pre-wrap">{item.message}</p>
+              <p className="text-sm font-medium text-text-primary mb-2">
+                {item.scenario}
+              </p>
+              <p className="text-sm text-text-secondary whitespace-pre-wrap">
+                {item.message}
+              </p>
             </GlowCard>
           ))}
         </div>

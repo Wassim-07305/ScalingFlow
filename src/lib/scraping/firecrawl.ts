@@ -58,7 +58,7 @@ export async function scrapeUrl(url: string): Promise<ScrapeResult | null> {
     const res = await fetch(`${FIRECRAWL_BASE_URL}/scrape`, {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${process.env.FIRECRAWL_API_KEY}`,
+        Authorization: `Bearer ${process.env.FIRECRAWL_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
@@ -96,7 +96,7 @@ export async function scrapeUrl(url: string): Promise<ScrapeResult | null> {
  */
 export async function searchWeb(
   query: string,
-  limit: number = 5
+  limit: number = 5,
 ): Promise<WebSearchResult[]> {
   if (!process.env.FIRECRAWL_API_KEY) return [];
 
@@ -104,7 +104,7 @@ export async function searchWeb(
     const res = await fetch(`${FIRECRAWL_BASE_URL}/search`, {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${process.env.FIRECRAWL_API_KEY}`,
+        Authorization: `Bearer ${process.env.FIRECRAWL_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
@@ -147,7 +147,7 @@ export async function searchWeb(
  */
 export async function searchAndScrape(
   query: string,
-  limit: number = 5
+  limit: number = 5,
 ): Promise<{ results: WebSearchResult[]; scrapedContent: ScrapeResult[] }> {
   const results = await searchWeb(query, limit);
 
@@ -174,7 +174,7 @@ function truncateContent(content: string, maxChars: number): string {
     truncated.lastIndexOf(". "),
     truncated.lastIndexOf(".\n"),
     truncated.lastIndexOf("! "),
-    truncated.lastIndexOf("? ")
+    truncated.lastIndexOf("? "),
   );
 
   if (lastSentenceEnd > maxChars * 0.7) {

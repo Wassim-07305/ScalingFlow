@@ -25,7 +25,7 @@ export async function GET() {
     if (!clientId) {
       return NextResponse.json(
         { error: "GOOGLE_CLIENT_ID non configuré" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -47,7 +47,7 @@ export async function GET() {
   } catch {
     return NextResponse.json(
       { error: "Erreur lors de la connexion" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

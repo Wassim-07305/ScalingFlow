@@ -52,39 +52,74 @@ interface MonitorCheck {
 function getSeverityConfig(severity: Alert["severity"]) {
   switch (severity) {
     case "critical":
-      return { label: "Critique", color: "text-red-400", bg: "bg-red-500/10", border: "border-red-500/30", dot: "bg-red-400" };
+      return {
+        label: "Critique",
+        color: "text-red-400",
+        bg: "bg-red-500/10",
+        border: "border-red-500/30",
+        dot: "bg-red-400",
+      };
     case "warning":
-      return { label: "Attention", color: "text-yellow-400", bg: "bg-yellow-500/10", border: "border-yellow-500/30", dot: "bg-yellow-400" };
+      return {
+        label: "Attention",
+        color: "text-yellow-400",
+        bg: "bg-yellow-500/10",
+        border: "border-yellow-500/30",
+        dot: "bg-yellow-400",
+      };
     case "info":
-      return { label: "Info", color: "text-blue-400", bg: "bg-blue-500/10", border: "border-blue-500/30", dot: "bg-blue-400" };
+      return {
+        label: "Info",
+        color: "text-blue-400",
+        bg: "bg-blue-500/10",
+        border: "border-blue-500/30",
+        dot: "bg-blue-400",
+      };
   }
 }
 
 function getAlertIcon(type: string) {
   switch (type) {
-    case "low_ctr": return MousePointer;
-    case "high_cpc": return DollarSign;
-    case "high_cpm": return BarChart3;
-    case "high_frequency": return RefreshCw;
-    case "low_roas": return TrendingDown;
-    default: return AlertTriangle;
+    case "low_ctr":
+      return MousePointer;
+    case "high_cpc":
+      return DollarSign;
+    case "high_cpm":
+      return BarChart3;
+    case "high_frequency":
+      return RefreshCw;
+    case "low_roas":
+      return TrendingDown;
+    default:
+      return AlertTriangle;
   }
 }
 
 function getAlertTypeLabel(type: string) {
   switch (type) {
-    case "low_ctr": return "CTR bas";
-    case "high_cpc": return "CPC élevé";
-    case "high_cpm": return "CPM élevé";
-    case "high_frequency": return "Fréquence élevée";
-    case "low_roas": return "ROAS bas";
-    default: return "Anomalie";
+    case "low_ctr":
+      return "CTR bas";
+    case "high_cpc":
+      return "CPC élevé";
+    case "high_cpm":
+      return "CPM élevé";
+    case "high_frequency":
+      return "Fréquence élevée";
+    case "low_roas":
+      return "ROAS bas";
+    default:
+      return "Anomalie";
   }
 }
 
 function formatTimestamp(ts: string): string {
   const d = new Date(ts);
-  return d.toLocaleString("fr-FR", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" });
+  return d.toLocaleString("fr-FR", {
+    day: "2-digit",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 }
 
 // ─── Skeleton Loader ────────────────────────────────────────
@@ -152,7 +187,7 @@ export function AdsMonitor() {
         toast.success(
           data.alertsCount > 0
             ? `${data.alertsCount} alerte${data.alertsCount > 1 ? "s" : ""} détectée${data.alertsCount > 1 ? "s" : ""}`
-            : "Aucune anomalie détectée"
+            : "Aucune anomalie détectée",
         );
         setHistory((prev) => [
           {
@@ -183,7 +218,9 @@ export function AdsMonitor() {
     if (error) {
       toast.error("Impossible de résoudre l'alerte");
     } else {
-      setAlerts((prev) => prev.map((a) => (a.id === alertId ? { ...a, resolved: true } : a)));
+      setAlerts((prev) =>
+        prev.map((a) => (a.id === alertId ? { ...a, resolved: true } : a)),
+      );
       toast.success("Alerte résolue");
     }
   };
@@ -194,8 +231,12 @@ export function AdsMonitor() {
 
   const unresolvedAlerts = alerts.filter((a) => !a.resolved);
   const resolvedAlerts = alerts.filter((a) => a.resolved);
-  const criticalCount = unresolvedAlerts.filter((a) => a.severity === "critical").length;
-  const warningCount = unresolvedAlerts.filter((a) => a.severity === "warning").length;
+  const criticalCount = unresolvedAlerts.filter(
+    (a) => a.severity === "critical",
+  ).length;
+  const warningCount = unresolvedAlerts.filter(
+    (a) => a.severity === "warning",
+  ).length;
 
   return (
     <div className="space-y-6">
@@ -205,8 +246,12 @@ export function AdsMonitor() {
           {
             label: "Alertes actives",
             value: unresolvedAlerts.length,
-            color: unresolvedAlerts.length > 0 ? "text-red-400" : "text-emerald-400",
-            bg: unresolvedAlerts.length > 0 ? "bg-red-500/10" : "bg-emerald-500/10",
+            color:
+              unresolvedAlerts.length > 0 ? "text-red-400" : "text-emerald-400",
+            bg:
+              unresolvedAlerts.length > 0
+                ? "bg-red-500/10"
+                : "bg-emerald-500/10",
             icon: AlertTriangle,
           },
           {
@@ -231,9 +276,17 @@ export function AdsMonitor() {
             icon: CheckCircle,
           },
         ].map((item) => (
-          <div key={item.label} className={cn("p-4 rounded-xl border border-border-default", item.bg)}>
+          <div
+            key={item.label}
+            className={cn(
+              "p-4 rounded-xl border border-border-default",
+              item.bg,
+            )}
+          >
             <div className="flex items-center justify-between mb-1">
-              <p className="text-[10px] text-text-muted uppercase tracking-wider">{item.label}</p>
+              <p className="text-[10px] text-text-muted uppercase tracking-wider">
+                {item.label}
+              </p>
               <item.icon className={cn("h-4 w-4", item.color)} />
             </div>
             <p className={cn("text-2xl font-bold", item.color)}>{item.value}</p>
@@ -289,7 +342,7 @@ export function AdsMonitor() {
                     className={cn(
                       "rounded-xl border p-4 transition-all",
                       cfg.border,
-                      cfg.bg
+                      cfg.bg,
                     )}
                   >
                     <div className="flex items-start justify-between gap-3">
@@ -310,12 +363,16 @@ export function AdsMonitor() {
                             >
                               {cfg.label}
                             </Badge>
-                            <Badge variant="muted">{getAlertTypeLabel(alert.alert_type)}</Badge>
+                            <Badge variant="muted">
+                              {getAlertTypeLabel(alert.alert_type)}
+                            </Badge>
                             <span className="text-sm font-semibold text-text-primary truncate">
                               {alert.creative_name}
                             </span>
                           </div>
-                          <p className="text-xs text-text-secondary">{alert.message}</p>
+                          <p className="text-xs text-text-secondary">
+                            {alert.message}
+                          </p>
                           <div className="flex items-center gap-4 mt-2 text-[10px] text-text-muted">
                             <span>{alert.campaign_name}</span>
                             <span className="flex items-center gap-1">
@@ -328,18 +385,42 @@ export function AdsMonitor() {
                           {alert.kpi_snapshot && (
                             <div className="flex flex-wrap gap-3 mt-2">
                               {[
-                                { label: "CTR", value: `${(alert.kpi_snapshot.ctr ?? 0).toFixed(2)}%`, warn: alert.alert_type === "low_ctr" },
-                                { label: "CPC", value: `${(alert.kpi_snapshot.cpc ?? 0).toFixed(2)}€`, warn: alert.alert_type === "high_cpc" },
-                                { label: "CPM", value: `${(alert.kpi_snapshot.cpm ?? 0).toFixed(2)}€`, warn: alert.alert_type === "high_cpm" },
-                                { label: "ROAS", value: `${(alert.kpi_snapshot.roas ?? 0).toFixed(2)}x`, warn: alert.alert_type === "low_roas" },
-                                { label: "Fréq.", value: `${(alert.kpi_snapshot.frequency ?? 0).toFixed(1)}`, warn: alert.alert_type === "high_frequency" },
+                                {
+                                  label: "CTR",
+                                  value: `${(alert.kpi_snapshot.ctr ?? 0).toFixed(2)}%`,
+                                  warn: alert.alert_type === "low_ctr",
+                                },
+                                {
+                                  label: "CPC",
+                                  value: `${(alert.kpi_snapshot.cpc ?? 0).toFixed(2)}€`,
+                                  warn: alert.alert_type === "high_cpc",
+                                },
+                                {
+                                  label: "CPM",
+                                  value: `${(alert.kpi_snapshot.cpm ?? 0).toFixed(2)}€`,
+                                  warn: alert.alert_type === "high_cpm",
+                                },
+                                {
+                                  label: "ROAS",
+                                  value: `${(alert.kpi_snapshot.roas ?? 0).toFixed(2)}x`,
+                                  warn: alert.alert_type === "low_roas",
+                                },
+                                {
+                                  label: "Fréq.",
+                                  value: `${(alert.kpi_snapshot.frequency ?? 0).toFixed(1)}`,
+                                  warn: alert.alert_type === "high_frequency",
+                                },
                               ].map((kpi) => (
                                 <div key={kpi.label} className="text-center">
-                                  <p className="text-[9px] text-text-muted uppercase">{kpi.label}</p>
+                                  <p className="text-[9px] text-text-muted uppercase">
+                                    {kpi.label}
+                                  </p>
                                   <p
                                     className={cn(
                                       "text-xs font-semibold",
-                                      kpi.warn ? "text-red-400" : "text-text-primary"
+                                      kpi.warn
+                                        ? "text-red-400"
+                                        : "text-text-primary",
                                     )}
                                   >
                                     {kpi.value}
@@ -372,7 +453,9 @@ export function AdsMonitor() {
               <div className="p-3 rounded-full bg-emerald-500/10 mb-4">
                 <CheckCircle className="h-8 w-8 text-emerald-400" />
               </div>
-              <p className="text-sm font-medium text-text-primary mb-1">Aucune anomalie détectée</p>
+              <p className="text-sm font-medium text-text-primary mb-1">
+                Aucune anomalie détectée
+              </p>
               <p className="text-xs text-text-muted">
                 Toutes tes créatives fonctionnent dans les seuils normaux.
               </p>
@@ -398,19 +481,28 @@ export function AdsMonitor() {
                   className="flex items-center justify-between p-3 rounded-xl bg-bg-tertiary border border-border-default"
                 >
                   <div className="flex items-center gap-3">
-                    <div className={cn(
-                      "w-2 h-2 rounded-full",
-                      check.alertsCount > 0 ? "bg-yellow-400" : "bg-emerald-400"
-                    )} />
+                    <div
+                      className={cn(
+                        "w-2 h-2 rounded-full",
+                        check.alertsCount > 0
+                          ? "bg-yellow-400"
+                          : "bg-emerald-400",
+                      )}
+                    />
                     <div>
                       <p className="text-xs text-text-primary">
-                        {check.campaignsChecked} campagne{check.campaignsChecked !== 1 ? "s" : ""} vérifiée{check.campaignsChecked !== 1 ? "s" : ""}
+                        {check.campaignsChecked} campagne
+                        {check.campaignsChecked !== 1 ? "s" : ""} vérifiée
+                        {check.campaignsChecked !== 1 ? "s" : ""}
                       </p>
-                      <p className="text-[10px] text-text-muted">{formatTimestamp(check.timestamp)}</p>
+                      <p className="text-[10px] text-text-muted">
+                        {formatTimestamp(check.timestamp)}
+                      </p>
                     </div>
                   </div>
                   <Badge variant={check.alertsCount > 0 ? "yellow" : "default"}>
-                    {check.alertsCount} alerte{check.alertsCount !== 1 ? "s" : ""}
+                    {check.alertsCount} alerte
+                    {check.alertsCount !== 1 ? "s" : ""}
                   </Badge>
                 </div>
               ))}
@@ -424,7 +516,9 @@ export function AdsMonitor() {
         <details className="group">
           <summary className="cursor-pointer text-xs text-text-muted hover:text-text-secondary transition-colors flex items-center gap-2 mb-3">
             <CheckCircle className="h-3.5 w-3.5" />
-            {resolvedAlerts.length} alerte{resolvedAlerts.length !== 1 ? "s" : ""} résolue{resolvedAlerts.length !== 1 ? "s" : ""}
+            {resolvedAlerts.length} alerte
+            {resolvedAlerts.length !== 1 ? "s" : ""} résolue
+            {resolvedAlerts.length !== 1 ? "s" : ""}
           </summary>
           <div className="space-y-2">
             {resolvedAlerts.slice(0, 10).map((alert) => (
@@ -436,7 +530,9 @@ export function AdsMonitor() {
                   <CheckCircle className="h-3.5 w-3.5 text-emerald-400" />
                   <div>
                     <p className="text-xs text-text-primary">{alert.message}</p>
-                    <p className="text-[10px] text-text-muted">{formatTimestamp(alert.created_at)}</p>
+                    <p className="text-[10px] text-text-muted">
+                      {formatTimestamp(alert.created_at)}
+                    </p>
                   </div>
                 </div>
                 <Badge variant="muted">Résolu</Badge>

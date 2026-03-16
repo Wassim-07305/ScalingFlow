@@ -7,7 +7,7 @@ export function callAnalysisPrompt(
     analysis_focus?: string;
     call_result?: string;
     recording_url?: string;
-  }
+  },
 ): string {
   return `Tu es un expert en analyse de calls de vente B2B pour les services high-ticket (coaching, consulting, agence).
 

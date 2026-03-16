@@ -7,7 +7,17 @@ import { AILoading } from "@/components/shared/ai-loading";
 import { createClient } from "@/lib/supabase/client";
 import { useUser } from "@/hooks/use-user";
 import { toast } from "sonner";
-import { Sparkles, Send, CheckCircle, RotateCcw, RefreshCw, Key, Eye, EyeOff, Loader2 as Loader2Icon } from "lucide-react";
+import {
+  Sparkles,
+  Send,
+  CheckCircle,
+  RotateCcw,
+  RefreshCw,
+  Key,
+  Eye,
+  EyeOff,
+  Loader2 as Loader2Icon,
+} from "lucide-react";
 
 const EXTRACTION_QUESTIONS = [
   "Quel est le problème principal que tu résous pour tes clients ? Donne un exemple concret.",
@@ -33,8 +43,12 @@ export function VaultExtraction() {
   const [answers, setAnswers] = React.useState<ExtractionAnswer[]>([]);
   const [currentAnswer, setCurrentAnswer] = React.useState("");
   const [generating, setGenerating] = React.useState(false);
-  const [extractionResult, setExtractionResult] = React.useState<string | null>(null);
-  const [existingExtraction, setExistingExtraction] = React.useState<string | null>(null);
+  const [extractionResult, setExtractionResult] = React.useState<string | null>(
+    null,
+  );
+  const [existingExtraction, setExistingExtraction] = React.useState<
+    string | null
+  >(null);
   const [loading, setLoading] = React.useState(true);
   const [updating, setUpdating] = React.useState(false);
 
@@ -57,7 +71,7 @@ export function VaultExtraction() {
         setExistingExtraction(
           typeof data.vault_extraction === "string"
             ? data.vault_extraction
-            : JSON.stringify(data.vault_extraction, null, 2)
+            : JSON.stringify(data.vault_extraction, null, 2),
         );
       }
       if (data?.claude_api_key) {
@@ -99,9 +113,10 @@ export function VaultExtraction() {
 
       if (!response.ok) throw new Error("Erreur lors de la mise à jour");
       const data = await response.json();
-      const result = typeof data.extraction === "string"
-        ? data.extraction
-        : JSON.stringify(data.extraction, null, 2);
+      const result =
+        typeof data.extraction === "string"
+          ? data.extraction
+          : JSON.stringify(data.extraction, null, 2);
       setExistingExtraction(result);
       setExtractionResult(result);
 
@@ -148,9 +163,10 @@ export function VaultExtraction() {
 
       if (!response.ok) throw new Error("Erreur lors de la génération");
       const data = await response.json();
-      const result = typeof data.extraction === "string"
-        ? data.extraction
-        : JSON.stringify(data.extraction, null, 2);
+      const result =
+        typeof data.extraction === "string"
+          ? data.extraction
+          : JSON.stringify(data.extraction, null, 2);
       setExtractionResult(result);
       setExistingExtraction(result);
       toast.success("Extraction d'expertise terminée !");
@@ -171,7 +187,9 @@ export function VaultExtraction() {
   if (loading) return <AILoading text="Chargement" />;
 
   if (generating) {
-    return <AILoading text="Analyse de tes réponses et création du document d'expertise" />;
+    return (
+      <AILoading text="Analyse de tes réponses et création du document d'expertise" />
+    );
   }
 
   // Show existing extraction if available and not in questionnaire mode
@@ -184,7 +202,11 @@ export function VaultExtraction() {
             Extraction d&apos;expertise complétée
           </h3>
           <div className="flex items-center gap-2">
-            <Button variant="outline" onClick={handleUpdate} disabled={updating}>
+            <Button
+              variant="outline"
+              onClick={handleUpdate}
+              disabled={updating}
+            >
               {updating ? (
                 <Loader2Icon className="h-4 w-4 mr-2 animate-spin" />
               ) : (
@@ -217,7 +239,8 @@ export function VaultExtraction() {
                 </h4>
               </div>
               <p className="text-xs text-text-muted">
-                Ta clé est utilisée uniquement pour l&apos;extraction de mémoire. Elle est stockée de manière sécurisée.
+                Ta clé est utilisée uniquement pour l&apos;extraction de
+                mémoire. Elle est stockée de manière sécurisée.
               </p>
               <div className="flex items-center gap-2">
                 <div className="relative flex-1">
@@ -297,7 +320,7 @@ export function VaultExtraction() {
           <div
             className="h-full bg-accent rounded-full transition-all"
             style={{
-              width: `${((currentStep) / EXTRACTION_QUESTIONS.length) * 100}%`,
+              width: `${(currentStep / EXTRACTION_QUESTIONS.length) * 100}%`,
             }}
           />
         </div>
@@ -308,7 +331,9 @@ export function VaultExtraction() {
         <div key={i} className="space-y-2">
           <div className="flex items-start gap-2">
             <Sparkles className="h-4 w-4 text-accent mt-0.5 shrink-0" />
-            <p className="text-sm font-medium text-text-primary">{a.question}</p>
+            <p className="text-sm font-medium text-text-primary">
+              {a.question}
+            </p>
           </div>
           <div className="ml-6 p-3 rounded-lg bg-bg-tertiary">
             <p className="text-sm text-text-secondary">{a.answer}</p>
@@ -339,9 +364,14 @@ export function VaultExtraction() {
 
           <div className="flex justify-between items-center">
             <p className="text-xs text-text-muted">Cmd + Enter pour valider</p>
-            <Button onClick={handleSubmitAnswer} disabled={!currentAnswer.trim()}>
+            <Button
+              onClick={handleSubmitAnswer}
+              disabled={!currentAnswer.trim()}
+            >
               <Send className="h-4 w-4 mr-2" />
-              {currentStep < EXTRACTION_QUESTIONS.length - 1 ? "Suivant" : "Terminer"}
+              {currentStep < EXTRACTION_QUESTIONS.length - 1
+                ? "Suivant"
+                : "Terminer"}
             </Button>
           </div>
         </CardContent>

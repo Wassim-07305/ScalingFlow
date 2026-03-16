@@ -50,18 +50,15 @@ export function GlowCard({
     <div
       className={cn(
         "relative rounded-xl bg-bg-secondary border border-border-default p-5 transition-all duration-300",
-        hoverable && [
-          colors.border,
-          colors.shadow,
-          "hover:translate-y-[-2px]",
-        ],
+        hoverable && [colors.border, colors.shadow, "hover:translate-y-[-2px]"],
         // Glow effect pseudo-element
-        hoverable && intensity !== "subtle" && [
-          "after:absolute after:inset-0 after:rounded-xl after:opacity-0 after:transition-opacity after:duration-300 after:-z-10 after:blur-xl",
-          colors.glow,
-          "hover:after:opacity-100",
-        ],
-        className
+        hoverable &&
+          intensity !== "subtle" && [
+            "after:absolute after:inset-0 after:rounded-xl after:opacity-0 after:transition-opacity after:duration-300 after:-z-10 after:blur-xl",
+            colors.glow,
+            "hover:after:opacity-100",
+          ],
+        className,
       )}
       {...props}
     >

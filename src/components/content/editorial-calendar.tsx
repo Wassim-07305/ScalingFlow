@@ -2,11 +2,29 @@
 
 import React from "react";
 import { cn } from "@/lib/utils/cn";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { AILoading } from "@/components/shared/ai-loading";
-import { Sparkles, LayoutGrid, List, ChevronDown, ChevronUp, CheckCircle2, Clock, Circle, CalendarDays, Send, Calendar } from "lucide-react";
+import {
+  Sparkles,
+  LayoutGrid,
+  List,
+  ChevronDown,
+  ChevronUp,
+  CheckCircle2,
+  Clock,
+  Circle,
+  CalendarDays,
+  Send,
+  Calendar,
+} from "lucide-react";
 import { toast } from "sonner";
 import { format, addDays } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -30,7 +48,10 @@ type CalendarItem = EditorialCalendarResult["calendrier"][number];
 
 type ContentStatus = "draft" | "scheduled" | "published";
 
-const STATUS_CONFIG: Record<ContentStatus, { label: string; icon: typeof Circle; color: string }> = {
+const STATUS_CONFIG: Record<
+  ContentStatus,
+  { label: string; icon: typeof Circle; color: string }
+> = {
   draft: { label: "Brouillon", icon: Circle, color: "text-text-muted" },
   scheduled: { label: "Planifié", icon: Clock, color: "text-yellow-400" },
   published: { label: "Publié", icon: CheckCircle2, color: "text-accent" },
@@ -42,7 +63,10 @@ const NEXT_STATUS: Record<ContentStatus, ContentStatus> = {
   published: "draft",
 };
 
-const PILIER_BADGE: Record<string, "default" | "blue" | "cyan" | "purple" | "yellow"> = {
+const PILIER_BADGE: Record<
+  string,
+  "default" | "blue" | "cyan" | "purple" | "yellow"
+> = {
   know: "blue",
   like: "purple",
   trust: "default",
@@ -54,15 +78,23 @@ const PILIER_LABEL: Record<string, string> = {
   trust: "Trust",
 };
 
-export function EditorialCalendar({ className, initialData }: EditorialCalendarProps) {
+export function EditorialCalendar({
+  className,
+  initialData,
+}: EditorialCalendarProps) {
   const [loading, setLoading] = React.useState(false);
   const [items, setItems] = React.useState<CalendarItem[]>([]);
   const [view, setView] = React.useState<"grid" | "list">("grid");
   const [filter, setFilter] = React.useState<string | null>(null);
   const [expandedDay, setExpandedDay] = React.useState<number | null>(null);
   const [error, setError] = React.useState<string | null>(null);
-  const [usageLimited, setUsageLimited] = React.useState<{currentUsage: number; limit: number} | null>(null);
-  const [statuses, setStatuses] = React.useState<Record<number, ContentStatus>>({});
+  const [usageLimited, setUsageLimited] = React.useState<{
+    currentUsage: number;
+    limit: number;
+  } | null>(null);
+  const [statuses, setStatuses] = React.useState<Record<number, ContentStatus>>(
+    {},
+  );
   const [publishDialogOpen, setPublishDialogOpen] = React.useState(false);
   const [publishContent, setPublishContent] = React.useState("");
 
@@ -137,7 +169,10 @@ export function EditorialCalendar({ className, initialData }: EditorialCalendarP
       if (!response.ok) {
         if (response.status === 403) {
           const errData = await response.json();
-          if (errData.usage) { setUsageLimited(errData.usage); return; }
+          if (errData.usage) {
+            setUsageLimited(errData.usage);
+            return;
+          }
         }
         throw new Error("Erreur lors de la génération");
       }
@@ -160,16 +195,29 @@ export function EditorialCalendar({ className, initialData }: EditorialCalendarP
     : items;
 
   if (usageLimited) {
-    return <UpgradeWall currentUsage={usageLimited.currentUsage} limit={usageLimited.limit} className={className} />;
+    return (
+      <UpgradeWall
+        currentUsage={usageLimited.currentUsage}
+        limit={usageLimited.limit}
+        className={className}
+      />
+    );
   }
 
   if (loading) {
-    return <AILoading text="Génération du plan éditorial" className={className} />;
+    return (
+      <AILoading text="Génération du plan éditorial" className={className} />
+    );
   }
 
   if (items.length === 0 || showForm) {
     return (
-      <div className={cn("space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500", className)}>
+      <div
+        className={cn(
+          "space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500",
+          className,
+        )}
+      >
         <Card className="border-border-default/50 bg-bg-secondary/30 backdrop-blur-sm">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -177,7 +225,8 @@ export function EditorialCalendar({ className, initialData }: EditorialCalendarP
               Plan éditorial
             </CardTitle>
             <CardDescription>
-              Configure la durée et les piliers de contenu pour générer un calendrier éditorial complet.
+              Configure la durée et les piliers de contenu pour générer un
+              calendrier éditorial complet.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-5">
@@ -197,7 +246,9 @@ export function EditorialCalendar({ className, initialData }: EditorialCalendarP
 
             {/* Duration */}
             <div>
-              <label className="text-sm font-medium text-text-primary mb-2 block">Durée du calendrier</label>
+              <label className="text-sm font-medium text-text-primary mb-2 block">
+                Durée du calendrier
+              </label>
               <div className="flex flex-wrap gap-2">
                 {CALENDAR_DURATIONS.map((d) => (
                   <button
@@ -207,7 +258,7 @@ export function EditorialCalendar({ className, initialData }: EditorialCalendarP
                       "px-3 py-1.5 rounded-lg text-sm font-medium transition-all",
                       duration === d.key
                         ? "bg-accent text-white"
-                        : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
+                        : "bg-bg-tertiary text-text-secondary hover:text-text-primary",
                     )}
                   >
                     {d.label}
@@ -219,7 +270,8 @@ export function EditorialCalendar({ className, initialData }: EditorialCalendarP
             {/* Content pillars */}
             <div>
               <label className="text-sm font-medium text-text-primary mb-1 block">
-                Piliers de contenu <span className="text-text-muted font-normal">(optionnel)</span>
+                Piliers de contenu{" "}
+                <span className="text-text-muted font-normal">(optionnel)</span>
               </label>
               <input
                 type="text"
@@ -246,7 +298,12 @@ export function EditorialCalendar({ className, initialData }: EditorialCalendarP
   }
 
   return (
-    <div className={cn("space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500", className)}>
+    <div
+      className={cn(
+        "space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500",
+        className,
+      )}
+    >
       {/* Date de début */}
       <div className="flex items-center gap-3">
         <Calendar className="h-4 w-4 text-accent shrink-0" />
@@ -268,7 +325,7 @@ export function EditorialCalendar({ className, initialData }: EditorialCalendarP
               "px-3 py-1.5 rounded-lg text-xs font-medium transition-all",
               !filter
                 ? "bg-accent text-white"
-                : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
+                : "bg-bg-tertiary text-text-secondary hover:text-text-primary",
             )}
           >
             Tous
@@ -281,7 +338,7 @@ export function EditorialCalendar({ className, initialData }: EditorialCalendarP
                 "px-3 py-1.5 rounded-lg text-xs font-medium transition-all",
                 filter === p
                   ? "bg-accent text-white"
-                  : "bg-bg-tertiary text-text-secondary hover:text-text-primary"
+                  : "bg-bg-tertiary text-text-secondary hover:text-text-primary",
               )}
             >
               {PILIER_LABEL[p]}
@@ -291,9 +348,18 @@ export function EditorialCalendar({ className, initialData }: EditorialCalendarP
         <div className="flex items-center gap-3">
           {items.length > 0 && (
             <div className="flex items-center gap-2 text-xs text-text-muted">
-              <span className="flex items-center gap-1"><CheckCircle2 className="h-3 w-3 text-accent" />{statusCounts.published}</span>
-              <span className="flex items-center gap-1"><Clock className="h-3 w-3 text-yellow-400" />{statusCounts.scheduled}</span>
-              <span className="flex items-center gap-1"><Circle className="h-3 w-3 text-text-muted" />{statusCounts.draft}</span>
+              <span className="flex items-center gap-1">
+                <CheckCircle2 className="h-3 w-3 text-accent" />
+                {statusCounts.published}
+              </span>
+              <span className="flex items-center gap-1">
+                <Clock className="h-3 w-3 text-yellow-400" />
+                {statusCounts.scheduled}
+              </span>
+              <span className="flex items-center gap-1">
+                <Circle className="h-3 w-3 text-text-muted" />
+                {statusCounts.draft}
+              </span>
             </div>
           )}
           <div className="flex gap-1">
@@ -323,33 +389,53 @@ export function EditorialCalendar({ className, initialData }: EditorialCalendarP
               key={item.jour}
               className={cn(
                 "cursor-pointer transition-all duration-300 hover:border-accent/20 hover:shadow-md hover:shadow-accent/5",
-                expandedDay === item.jour && "ring-1 ring-accent shadow-lg shadow-accent/10"
+                expandedDay === item.jour &&
+                  "ring-1 ring-accent shadow-lg shadow-accent/10",
               )}
-              onClick={() => setExpandedDay(expandedDay === item.jour ? null : item.jour)}
+              onClick={() =>
+                setExpandedDay(expandedDay === item.jour ? null : item.jour)
+              }
             >
               <CardContent className="p-3">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-1.5">
                     <div className="flex flex-col">
-                      <span className="text-xs font-bold text-text-primary">{formatCalendarDate(item.jour)}</span>
-                      <span className="text-[9px] text-text-muted capitalize">{formatWeekday(item.jour)}</span>
+                      <span className="text-xs font-bold text-text-primary">
+                        {formatCalendarDate(item.jour)}
+                      </span>
+                      <span className="text-[9px] text-text-muted capitalize">
+                        {formatWeekday(item.jour)}
+                      </span>
                     </div>
                     <button
                       onClick={(e) => toggleStatus(item.jour, e)}
                       title={STATUS_CONFIG[getStatus(item.jour)].label}
                       className="p-0.5 rounded hover:bg-bg-tertiary transition-colors"
                     >
-                      {React.createElement(STATUS_CONFIG[getStatus(item.jour)].icon, {
-                        className: cn("h-3.5 w-3.5", STATUS_CONFIG[getStatus(item.jour)].color),
-                      })}
+                      {React.createElement(
+                        STATUS_CONFIG[getStatus(item.jour)].icon,
+                        {
+                          className: cn(
+                            "h-3.5 w-3.5",
+                            STATUS_CONFIG[getStatus(item.jour)].color,
+                          ),
+                        },
+                      )}
                     </button>
                   </div>
-                  <Badge variant={PILIER_BADGE[item.pilier]} className="text-[10px] px-1.5 py-0">
+                  <Badge
+                    variant={PILIER_BADGE[item.pilier]}
+                    className="text-[10px] px-1.5 py-0"
+                  >
                     {PILIER_LABEL[item.pilier]}
                   </Badge>
                 </div>
-                <p className="text-xs text-text-muted mb-1">{item.type_contenu}</p>
-                <p className="text-xs font-medium text-text-primary line-clamp-2">{item.titre}</p>
+                <p className="text-xs text-text-muted mb-1">
+                  {item.type_contenu}
+                </p>
+                <p className="text-xs font-medium text-text-primary line-clamp-2">
+                  {item.titre}
+                </p>
                 {expandedDay === item.jour && (
                   <div className="mt-3 pt-3 border-t border-border-default space-y-2">
                     <div>
@@ -358,8 +444,12 @@ export function EditorialCalendar({ className, initialData }: EditorialCalendarP
                     </div>
                     <div className="flex items-center justify-between">
                       <div className="flex gap-2">
-                        <Badge variant="muted" className="text-[10px]">{item.plateforme}</Badge>
-                        <Badge variant="muted" className="text-[10px]">{item.format}</Badge>
+                        <Badge variant="muted" className="text-[10px]">
+                          {item.plateforme}
+                        </Badge>
+                        <Badge variant="muted" className="text-[10px]">
+                          {item.format}
+                        </Badge>
                       </div>
                       <button
                         onClick={(e) => {
@@ -386,22 +476,34 @@ export function EditorialCalendar({ className, initialData }: EditorialCalendarP
             <Card
               key={item.jour}
               className="cursor-pointer"
-              onClick={() => setExpandedDay(expandedDay === item.jour ? null : item.jour)}
+              onClick={() =>
+                setExpandedDay(expandedDay === item.jour ? null : item.jour)
+              }
             >
               <CardContent className="py-3">
                 <div className="flex items-center gap-4">
                   <div className="shrink-0 w-16">
-                    <span className="text-sm font-bold text-text-primary block">{formatCalendarDate(item.jour)}</span>
-                    <span className="text-[10px] text-text-muted capitalize">{formatWeekday(item.jour)}</span>
+                    <span className="text-sm font-bold text-text-primary block">
+                      {formatCalendarDate(item.jour)}
+                    </span>
+                    <span className="text-[10px] text-text-muted capitalize">
+                      {formatWeekday(item.jour)}
+                    </span>
                   </div>
                   <button
                     onClick={(e) => toggleStatus(item.jour, e)}
                     title={STATUS_CONFIG[getStatus(item.jour)].label}
                     className="p-1 rounded hover:bg-bg-tertiary transition-colors shrink-0"
                   >
-                    {React.createElement(STATUS_CONFIG[getStatus(item.jour)].icon, {
-                      className: cn("h-4 w-4", STATUS_CONFIG[getStatus(item.jour)].color),
-                    })}
+                    {React.createElement(
+                      STATUS_CONFIG[getStatus(item.jour)].icon,
+                      {
+                        className: cn(
+                          "h-4 w-4",
+                          STATUS_CONFIG[getStatus(item.jour)].color,
+                        ),
+                      },
+                    )}
                   </button>
                   <Badge
                     variant={PILIER_BADGE[item.pilier]}

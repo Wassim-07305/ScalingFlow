@@ -26,7 +26,8 @@ const TOKEN_CONFIGS: Record<string, TokenConfig> = {
     tokenUrl: "https://oauth2.googleapis.com/token",
     clientIdEnv: "GOOGLE_CLIENT_ID",
     clientSecretEnv: "GOOGLE_CLIENT_SECRET",
-    profileUrl: "https://www.googleapis.com/youtube/v3/channels?part=snippet&mine=true",
+    profileUrl:
+      "https://www.googleapis.com/youtube/v3/channels?part=snippet&mine=true",
     mapProvider: "google",
   },
   linkedin: {
@@ -40,14 +41,15 @@ const TOKEN_CONFIGS: Record<string, TokenConfig> = {
     tokenUrl: "https://open.tiktokapis.com/v2/oauth/token/",
     clientIdEnv: "TIKTOK_CLIENT_KEY",
     clientSecretEnv: "TIKTOK_CLIENT_SECRET",
-    profileUrl: "https://open.tiktokapis.com/v2/user/info/?fields=open_id,display_name,avatar_url",
+    profileUrl:
+      "https://open.tiktokapis.com/v2/user/info/?fields=open_id,display_name,avatar_url",
     mapProvider: "tiktok",
   },
 };
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: Promise<{ provider: string }> }
+  { params }: { params: Promise<{ provider: string }> },
 ) {
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || "";
 
@@ -64,24 +66,34 @@ export async function GET(
     const error = req.nextUrl.searchParams.get("error");
 
     if (error) {
-      return NextResponse.redirect(`${appUrl}/settings?error=${provider}_denied`);
+      return NextResponse.redirect(
+        `${appUrl}/settings?error=${provider}_denied`,
+      );
     }
 
     if (!code || !state) {
-      return NextResponse.redirect(`${appUrl}/settings?error=${provider}_missing_params`);
+      return NextResponse.redirect(
+        `${appUrl}/settings?error=${provider}_missing_params`,
+      );
     }
 
     // SECURITY: Verify HMAC-signed state to prevent CSRF
     const stateUserId = verifyOAuthState(state);
     if (!stateUserId) {
-      return NextResponse.redirect(`${appUrl}/settings?error=${provider}_invalid_state`);
+      return NextResponse.redirect(
+        `${appUrl}/settings?error=${provider}_invalid_state`,
+      );
     }
 
     const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
     if (!user || user.id !== stateUserId) {
-      return NextResponse.redirect(`${appUrl}/settings?error=${provider}_auth_mismatch`);
+      return NextResponse.redirect(
+        `${appUrl}/settings?error=${provider}_auth_mismatch`,
+      );
     }
 
     const clientId = process.env[config.clientIdEnv]!;
@@ -143,7 +155,9 @@ export async function GET(
     }
 
     if (tokenData.error) {
-      return NextResponse.redirect(`${appUrl}/settings?error=${provider}_token_error`);
+      return NextResponse.redirect(
+        `${appUrl}/settings?error=${provider}_token_error`,
+      );
     }
 
     const accessToken = tokenData.access_token as string;
@@ -159,7 +173,7 @@ export async function GET(
         if (provider === "instagram") {
           // Get Instagram Business Account through Facebook Pages
           const pagesRes = await fetch(
-            `${config.profileUrl}?fields=id,name,instagram_business_account{id,username}&access_token=${accessToken}`
+            `${config.profileUrl}?fields=id,name,instagram_business_account{id,username}&access_token=${accessToken}`,
           );
           const pagesData = await pagesRes.json();
           const page = pagesData.data?.[0];
@@ -187,7 +201,8 @@ export async function GET(
           });
           const data = await res.json();
           const tiktokUser = data.data?.user;
-          providerUserId = tiktokUser?.open_id || (tokenData.open_id as string) || "";
+          providerUserId =
+            tiktokUser?.open_id || (tokenData.open_id as string) || "";
           providerUsername = tiktokUser?.display_name || "";
         }
       } catch {
@@ -208,10 +223,12 @@ export async function GET(
         scopes: [],
         metadata: { raw_scopes: tokenData.scope },
       },
-      { onConflict: "user_id,provider" }
+      { onConflict: "user_id,provider" },
     );
 
-    return NextResponse.redirect(`${appUrl}/settings?success=${provider}_connected`);
+    return NextResponse.redirect(
+      `${appUrl}/settings?success=${provider}_connected`,
+    );
   } catch {
     return NextResponse.redirect(`${appUrl}/settings?error=social_oauth_error`);
   }

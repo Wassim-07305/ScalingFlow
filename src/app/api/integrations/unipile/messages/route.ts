@@ -14,7 +14,9 @@ async function verifyAccountExists(accountId: string) {
     const items = Array.isArray(result)
       ? result
       : (result as { items?: Array<Record<string, unknown>> }).items || [];
-    return items.some((a: Record<string, unknown>) => String(a.id) === accountId);
+    return items.some(
+      (a: Record<string, unknown>) => String(a.id) === accountId,
+    );
   } catch {
     return false;
   }
@@ -39,7 +41,7 @@ export async function GET(request: NextRequest) {
     if (!accountId) {
       return NextResponse.json(
         { error: "Le paramètre account_id est requis" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -48,7 +50,7 @@ export async function GET(request: NextRequest) {
     if (!isOwner) {
       return NextResponse.json(
         { error: "Compte non trouvé ou accès non autorisé" },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -71,7 +73,7 @@ export async function GET(request: NextRequest) {
     console.error("[Unipile Messages GET]", error);
     return NextResponse.json(
       { error: "Erreur lors de la récupération des messages" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -99,21 +101,21 @@ export async function POST(request: NextRequest) {
     if (!account_id) {
       return NextResponse.json(
         { error: "Le champ account_id est requis" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     if (!text || text.trim().length === 0) {
       return NextResponse.json(
         { error: "Le champ text est requis" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     if (!chat_id && !attendee_id) {
       return NextResponse.json(
         { error: "Le champ chat_id ou attendee_id est requis" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -122,7 +124,7 @@ export async function POST(request: NextRequest) {
     if (!isOwner) {
       return NextResponse.json(
         { error: "Compte non trouvé ou accès non autorisé" },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -148,7 +150,7 @@ export async function POST(request: NextRequest) {
     console.error("[Unipile Messages POST]", error);
     return NextResponse.json(
       { error: "Erreur lors de l'envoi du message" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

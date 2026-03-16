@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
     if (!pixel_id || !access_token) {
       return NextResponse.json(
         { valid: false, error: "Le Pixel ID et l'Access Token sont requis." },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
       {
         method: "GET",
         headers: { "Content-Type": "application/json" },
-      }
+      },
     );
 
     const result = await response.json();
@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
         result.error?.message || "Pixel introuvable ou token invalide.";
       return NextResponse.json(
         { valid: false, error: errorMessage },
-        { status: 200 }
+        { status: 200 },
       );
     }
 
@@ -56,8 +56,11 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.error("[meta/verify-pixel] Error:", error);
     return NextResponse.json(
-      { valid: false, error: "Erreur interne lors de la vérification du pixel." },
-      { status: 500 }
+      {
+        valid: false,
+        error: "Erreur interne lors de la vérification du pixel.",
+      },
+      { status: 500 },
     );
   }
 }
