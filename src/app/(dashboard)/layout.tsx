@@ -21,9 +21,14 @@ export default async function DashboardLayout({
   children: React.ReactNode;
 }) {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+
+  // Timeout de 5s sur la vérification d'auth pour éviter un blocage si Supabase est lent
+  const authResult = await Promise.race([
+    supabase.auth.getUser(),
+    new Promise<null>((resolve) => setTimeout(() => resolve(null), 5000)),
+  ]);
+
+  const user = authResult && "data" in authResult ? authResult.data.user : null;
 
   if (!user) {
     redirect("/login");
