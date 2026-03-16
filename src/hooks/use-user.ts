@@ -95,13 +95,16 @@ export function useUser() {
         setUser(user);
 
         if (user) {
-          const { data: profile, error } = await supabase
+          const { data: profileData, error } = await supabase
             .from("profiles")
             .select(PROFILE_COLUMNS)
             .eq("id", user.id)
             .single();
-          if (error) console.error("useUser: failed to load profile", error);
-          if (mounted) setProfile(profile);
+          if (error) {
+            console.error("useUser: failed to load profile", error);
+          } else if (mounted && profileData) {
+            setProfile(profileData);
+          }
         }
       } catch (err) {
         console.error("useUser: failed to load user", err);
@@ -121,13 +124,16 @@ export function useUser() {
       // If auth event fires before getUser resolves, mark as done
       done();
       if (session?.user) {
-        const { data: profile, error } = await supabase
+        const { data: profileData, error } = await supabase
           .from("profiles")
           .select(PROFILE_COLUMNS)
           .eq("id", session.user.id)
           .single();
-        if (error) console.error("useUser: failed to load profile", error);
-        if (mounted) setProfile(profile);
+        if (error) {
+          console.error("useUser: failed to load profile", error);
+        } else if (mounted && profileData) {
+          setProfile(profileData);
+        }
       } else {
         setProfile(null);
       }

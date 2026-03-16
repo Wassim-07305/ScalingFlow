@@ -245,13 +245,13 @@ export default function SalesPage() {
   };
 
   return (
-    <div>
+    <div className="overflow-x-hidden">
       <PageHeader
         title="Vente"
         description="Scripts et outils pour closer tes prospects."
       />
 
-      <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
+      <div className="flex gap-2 mb-6 overflow-x-auto pb-2 -mx-1 px-1">
         {TABS.map((tab) => (
           <button
             key={tab.key}

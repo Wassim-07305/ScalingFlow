@@ -30,57 +30,36 @@ ${context.call_result ? `Le résultat du call est "${context.call_result}", pren
 ## Format de réponse
 Réponds UNIQUEMENT en JSON valide :
 {
-  "overall_score": 7.5,
+  "overall_score": 72,
   "overall_verdict": "Verdict global en une phrase",
   "scores": {
-    "discovery": {
-      "score": 8,
-      "max": 10,
-      "strengths": ["Ce qui a été bien fait"],
-      "improvements": ["Ce qui peut être amélioré"],
-      "key_moment": "Le moment clé de la phase discovery"
+    "decouverte": {
+      "score": 75,
+      "max": 100,
+      "strengths": ["Ce qui a été bien fait (min 2)"],
+      "improvements": ["Ce qui peut être amélioré (min 2)"],
+      "key_moment": "Le moment clé de la phase découverte"
     },
-    "rapport_building": {
-      "score": 7,
-      "max": 10,
+    "pitch": {
+      "score": 68,
+      "max": 100,
       "strengths": ["..."],
       "improvements": ["..."],
       "key_moment": "..."
     },
-    "problem_reframing": {
-      "score": 6,
-      "max": 10,
-      "strengths": ["..."],
-      "improvements": ["..."],
-      "key_moment": "..."
-    },
-    "objection_handling": {
-      "score": 7,
-      "max": 10,
+    "objections": {
+      "score": 60,
+      "max": 100,
       "strengths": ["..."],
       "improvements": ["..."],
       "key_moment": "..."
     },
     "closing": {
-      "score": 5,
-      "max": 10,
+      "score": 55,
+      "max": 100,
       "strengths": ["..."],
       "improvements": ["..."],
       "key_moment": "..."
-    },
-    "tonality_energy": {
-      "score": 7,
-      "max": 10,
-      "strengths": ["Ton engageant, voix posée et confiante"],
-      "improvements": ["Manque d'enthousiasme dans la phase de présentation"],
-      "key_moment": "Moment où le ton a changé (positif ou négatif)"
-    },
-    "conversation_control": {
-      "score": 6,
-      "max": 10,
-      "strengths": ["Bonne gestion du temps", "Transitions fluides"],
-      "improvements": ["Le prospect a monopolisé la parole trop longtemps"],
-      "key_moment": "Moment où le contrôle a été perdu/repris"
     }
   },
   "key_phrases_to_keep": [
@@ -130,12 +109,16 @@ Réponds UNIQUEMENT en JSON valide :
     "silence_management": "Comment les silences ont été gérés (bien/mal, utilisés stratégiquement ou remplis par anxiété)"
   },
   "next_steps": ["Action recommandée 1", "Action recommandée 2"],
-  "training_focus": ["Compétence à travailler en priorité"]
+  "training_focus": ["Compétence à travailler en priorité"],
+  "suggested_script": "Script de vente personnalisé de minimum 200 mots, structuré avec les phases d'accroche, découverte, pitch, gestion des objections et closing. Adapté aux faiblesses identifiées dans l'analyse."
 }
 
 IMPORTANT :
+- Tous les scores sont sur 100 (pas sur 10). Le score global "overall_score" est aussi sur 100.
+- Le scoring couvre exactement 4 dimensions : decouverte, pitch, objections, closing.
 - Le champ "playbook" doit contenir 5 à 7 actions concrètes basées sur les faiblesses identifiées. Chaque action a une priorité : "haute", "moyenne" ou "basse".
-- Le scoring couvre 7 dimensions (pas 5) : discovery, rapport_building, problem_reframing, objection_handling, closing, tonality_energy, conversation_control.
+- Chaque dimension doit avoir au moins 2 strengths et 2 improvements.
 - L'analyse des speakers doit estimer le ratio de parole vendeur/prospect (idéal : 30-40% vendeur / 60-70% prospect pour un discovery call, 40-50% / 50-60% pour un closing).
-- Détecte les interruptions et la gestion des silences.`;
+- Détecte les interruptions et la gestion des silences.
+- Inclure un champ "suggested_script" (string, min 200 mots) contenant un script de vente personnalisé basé sur les faiblesses identifiées, les objections mal gérées et les bonnes pratiques à renforcer.`;
 }

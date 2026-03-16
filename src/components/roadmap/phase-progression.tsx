@@ -144,72 +144,77 @@ export function PhaseProgression({ className }: PhaseProgressionProps) {
     if (!user) return;
 
     const fetchMilestones = async () => {
-      const supabase = createClient();
+      try {
+        const supabase = createClient();
 
-      const [milestonesRes, userMilestonesRes] = await Promise.all([
-        supabase
-          .from("milestones")
-          .select("id, title")
-          .order("milestone_order", { ascending: true }),
-        supabase
-          .from("user_milestones")
-          .select("milestone_id, completed")
-          .eq("user_id", user.id)
-          .eq("completed", true),
-      ]);
+        const [milestonesRes, userMilestonesRes] = await Promise.all([
+          supabase
+            .from("milestones")
+            .select("id, title")
+            .order("milestone_order", { ascending: true }),
+          supabase
+            .from("user_milestones")
+            .select("milestone_id, completed")
+            .eq("user_id", user.id)
+            .eq("completed", true),
+        ]);
 
-      const milestoneMap = new Map<string, string>();
-      ((milestonesRes.data ?? []) as { id: string; title: string }[]).forEach(
-        (m) => milestoneMap.set(m.id, m.title),
-      );
+        const milestoneMap = new Map<string, string>();
+        ((milestonesRes.data ?? []) as { id: string; title: string }[]).forEach(
+          (m) => milestoneMap.set(m.id, m.title),
+        );
 
-      const completed = new Set<string>();
-      (
-        (userMilestonesRes.data ?? []) as {
-          milestone_id: string;
-          completed: boolean;
-        }[]
-      ).forEach((um) => {
-        const title = milestoneMap.get(um.milestone_id);
-        if (title) completed.add(title);
-      });
+        const completed = new Set<string>();
+        (
+          (userMilestonesRes.data ?? []) as {
+            milestone_id: string;
+            completed: boolean;
+          }[]
+        ).forEach((um) => {
+          const title = milestoneMap.get(um.milestone_id);
+          if (title) completed.add(title);
+        });
 
-      // Auto-detect from profile
-      if (profile?.onboarding_completed) completed.add("Profil complete");
-      if (
-        profile?.market_viability_score &&
-        profile.market_viability_score > 70
-      )
-        completed.add("Marché validé");
+        // Auto-detect from profile
+        if (profile?.onboarding_completed) completed.add("Profil complete");
+        if (
+          profile?.market_viability_score &&
+          profile.market_viability_score > 70
+        )
+          completed.add("Marché validé");
 
-      // Auto-detect from data (offers, funnels, leads, sales)
-      const [offersRes, funnelsRes, leadsRes, salesRes] = await Promise.all([
-        supabase
-          .from("offers")
-          .select("id", { count: "exact", head: true })
-          .eq("user_id", user.id),
-        supabase
-          .from("funnels")
-          .select("id", { count: "exact", head: true })
-          .eq("user_id", user.id),
-        supabase
-          .from("funnel_leads")
-          .select("id", { count: "exact", head: true })
-          .eq("user_id", user.id),
-        supabase
-          .from("funnel_leads")
-          .select("id", { count: "exact", head: true })
-          .eq("user_id", user.id)
-          .eq("status", "converted"),
-      ]);
+        // Auto-detect from data (offers, funnels, leads, sales)
+        const [offersRes, funnelsRes, leadsRes, salesRes] = await Promise.all([
+          supabase
+            .from("offers")
+            .select("id", { count: "exact", head: true })
+            .eq("user_id", user.id),
+          supabase
+            .from("funnels")
+            .select("id", { count: "exact", head: true })
+            .eq("user_id", user.id),
+          supabase
+            .from("funnel_leads")
+            .select("id", { count: "exact", head: true })
+            .eq("user_id", user.id),
+          supabase
+            .from("funnel_leads")
+            .select("id", { count: "exact", head: true })
+            .eq("user_id", user.id)
+            .eq("status", "converted"),
+        ]);
 
-      if ((offersRes.count ?? 0) > 0) completed.add("Offre créée");
-      if ((funnelsRes.count ?? 0) > 0) completed.add("Funnel construit");
-      if ((leadsRes.count ?? 0) > 0) completed.add("1er Lead");
-      if ((salesRes.count ?? 0) > 0) completed.add("1ere Vente");
+        if ((offersRes.count ?? 0) > 0) completed.add("Offre créée");
+        if ((funnelsRes.count ?? 0) > 0) completed.add("Funnel construit");
+        if ((leadsRes.count ?? 0) > 0) completed.add("1er Lead");
+        if ((salesRes.count ?? 0) > 0) completed.add("1ere Vente");
 
-      setCompletedTitles(completed);
-      setLoading(false);
+        setCompletedTitles(completed);
+      } catch (err) {
+        console.error("PhaseProgression: failed to fetch milestones", err);
+      } finally {
+        setLoading(false);
+      }
     };
 
     fetchMilestones();

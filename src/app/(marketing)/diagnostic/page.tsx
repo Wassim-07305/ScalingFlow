@@ -37,12 +37,10 @@ interface DiagnosticForm {
   delivery_method: string;
   delivery_nb_clients: string;
   delivery_satisfaction: string;
-  // Step 4: Funnel
-  funnel_url: string;
-  funnel_headline: string;
-  funnel_cta: string;
-  // Contact
+  // Step 4: Toi
+  first_name: string;
   email: string;
+  monthly_revenue: string;
 }
 
 interface DiagnosticResult {
@@ -105,7 +103,7 @@ const STEPS = [
   { label: "Offre", icon: Target, description: "Ce que tu vends" },
   { label: "Acquisition", icon: Megaphone, description: "Comment tu attires" },
   { label: "Delivery", icon: Truck, description: "Comment tu livres" },
-  { label: "Funnel", icon: Filter, description: "Comment tu convertis" },
+  { label: "Toi", icon: Filter, description: "Tes infos" },
 ];
 
 const DIMENSION_META: Record<
@@ -149,7 +147,7 @@ function RadarChart({
     funnel: number;
   };
 }) {
-  const size = 280;
+  const size = 340;
   const cx = size / 2;
   const cy = size / 2;
   const maxR = 110;
@@ -183,7 +181,7 @@ function RadarChart({
   // Label positions (pushed outward)
   const labelPositions = dims.map((_, i) => {
     const angle = (Math.PI * 2 * i) / n - Math.PI / 2;
-    const labelR = maxR + 28;
+    const labelR = maxR + 40;
     return {
       x: cx + labelR * Math.cos(angle),
       y: cy + labelR * Math.sin(angle),
@@ -417,10 +415,9 @@ export default function DiagnosticPage() {
     delivery_method: "",
     delivery_nb_clients: "",
     delivery_satisfaction: "",
-    funnel_url: "",
-    funnel_headline: "",
-    funnel_cta: "",
+    first_name: "",
     email: "",
+    monthly_revenue: "",
   });
 
   const updateField = <K extends keyof DiagnosticForm>(
@@ -469,29 +466,9 @@ export default function DiagnosticPage() {
     }
   };
 
-  const handleScanFunnel = async () => {
-    if (!form.funnel_url) return;
-    setScanLoading(true);
-    try {
-      const res = await fetch("/api/public/scan-funnel", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url: form.funnel_url }),
-      });
-      if (res.ok) {
-        const data: FunnelScanResult = await res.json();
-        setFunnelScan(data);
-      } else {
-        setFunnelScan(null);
-        toast.error("Impossible de scanner ce funnel. Vérifie l'URL et réessaie.");
-      }
-    } catch {
-      setFunnelScan(null);
-      toast.error("Impossible de scanner ce funnel. Vérifie l'URL et réessaie.");
-    } finally {
-      setScanLoading(false);
-    }
-  };
+  // Funnel scan removed — kept state variables for backward compatibility with results display
+  void scanLoading;
+  void setScanLoading;
 
   const canNext =
     step === 0
@@ -1009,80 +986,41 @@ export default function DiagnosticPage() {
             </>
           )}
 
-          {/* Step 4: Funnel */}
+          {/* Step 4: Infos personnelles */}
           {step === 3 && (
             <>
               <div>
                 <h2 className="text-lg font-semibold text-text-primary mb-1">
-                  Funnel & Conversion
+                  Tes informations
                 </h2>
                 <p className="text-sm text-text-muted">
-                  As-tu un funnel en place ?
+                  Pour personnaliser ton diagnostic et te l&apos;envoyer.
                 </p>
               </div>
-              <FieldGroup label="URL du funnel (optionnel)">
-                <div className="flex gap-2">
-                  <input
-                    type="url"
-                    value={form.funnel_url}
-                    onChange={(e) => updateField("funnel_url", e.target.value)}
-                    placeholder="https://ton-site.com/offre"
-                    className="form-input flex-1"
-                  />
-                  {form.funnel_url && (
-                    <button
-                      type="button"
-                      onClick={handleScanFunnel}
-                      disabled={scanLoading}
-                      className="shrink-0 px-4 py-2 rounded-xl border border-accent/30 bg-accent/5 text-accent text-sm font-medium hover:bg-accent/10 transition-all duration-200 disabled:opacity-50"
-                    >
-                      {scanLoading ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : (
-                        <div className="flex items-center gap-1.5">
-                          <Globe className="h-3.5 w-3.5" />
-                          Scanner
-                        </div>
-                      )}
-                    </button>
-                  )}
-                </div>
-                {funnelScan && (
-                  <div className="flex items-center gap-2 mt-2">
-                    <CheckCircle2 className="h-3.5 w-3.5 text-accent" />
-                    <p className="text-xs text-accent font-medium">
-                      Funnel scanné avec succès (score :{" "}
-                      {funnelScan.overall_score}/100)
-                    </p>
-                  </div>
-                )}
-              </FieldGroup>
-              <FieldGroup label="Headline principale">
+              <FieldGroup label="Ton prénom">
                 <input
                   type="text"
-                  value={form.funnel_headline}
-                  onChange={(e) =>
-                    updateField("funnel_headline", e.target.value)
-                  }
-                  placeholder="Ex : Double tes revenus en 90 jours"
+                  value={form.first_name}
+                  onChange={(e) => updateField("first_name", e.target.value)}
+                  placeholder="Ex : Thomas"
                   className="form-input"
                 />
               </FieldGroup>
-              <FieldGroup label="CTA principal">
-                <input
-                  type="text"
-                  value={form.funnel_cta}
-                  onChange={(e) => updateField("funnel_cta", e.target.value)}
-                  placeholder="Ex : Réserve ton appel stratégique"
-                  className="form-input"
-                />
-              </FieldGroup>
-              <FieldGroup label="Ton email (pour recevoir les résultats)">
+              <FieldGroup label="Ton email">
                 <input
                   type="email"
                   value={form.email}
                   onChange={(e) => updateField("email", e.target.value)}
-                  placeholder="Ex : tim@business.com"
+                  placeholder="Ex : thomas@business.com"
+                  className="form-input"
+                />
+              </FieldGroup>
+              <FieldGroup label="CA mensuel actuel">
+                <input
+                  type="text"
+                  value={form.monthly_revenue}
+                  onChange={(e) => updateField("monthly_revenue", e.target.value)}
+                  placeholder="Ex : 5 000 €/mois"
                   className="form-input"
                 />
               </FieldGroup>
@@ -1193,16 +1131,16 @@ function Navbar() {
             ScalingFlow
           </span>
         </Link>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           <Link
             href="/login"
-            className="text-sm font-medium text-text-secondary hover:text-text-primary transition-colors"
+            className="hidden sm:inline text-sm font-medium text-text-secondary hover:text-text-primary transition-colors"
           >
             Connexion
           </Link>
           <Link
             href="/register"
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-accent text-white text-sm font-medium hover:bg-accent/90 transition-all duration-200 shadow-[0_0_16px_rgba(52,211,153,0.15)]"
+            className="inline-flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl bg-accent text-white text-sm font-medium hover:bg-accent/90 transition-all duration-200 shadow-[0_0_16px_rgba(52,211,153,0.15)]"
           >
             Commencer
             <ArrowRight className="h-4 w-4" />

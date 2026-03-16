@@ -47,14 +47,12 @@ interface CallAnalysisResult {
   overall_score: number;
   overall_verdict: string;
   scores: {
-    discovery: ScoreSection;
-    rapport_building: ScoreSection;
-    problem_reframing: ScoreSection;
-    objection_handling: ScoreSection;
+    decouverte: ScoreSection;
+    pitch: ScoreSection;
+    objections: ScoreSection;
     closing: ScoreSection;
-    tonality_energy?: ScoreSection;
-    conversation_control?: ScoreSection;
   };
+  suggested_script?: string;
   key_phrases_to_keep: Array<{ phrase: string; why: string }>;
   key_phrases_to_improve: Array<{ phrase: string; suggestion: string }>;
   objections_detected: Array<{
@@ -83,23 +81,17 @@ interface CallAnalysisResult {
 }
 
 const SCORE_LABELS: Record<string, string> = {
-  discovery: "Discovery",
-  rapport_building: "Rapport",
-  problem_reframing: "Recadrage",
-  objection_handling: "Objections",
+  decouverte: "Découverte",
+  pitch: "Pitch",
+  objections: "Objections",
   closing: "Closing",
-  tonality_energy: "Tonalité & Énergie",
-  conversation_control: "Contrôle de conversation",
 };
 
 const SCORE_ICONS: Record<string, string> = {
-  discovery: "🔍",
-  rapport_building: "🤝",
-  problem_reframing: "🎯",
-  objection_handling: "🛡️",
+  decouverte: "🔍",
+  pitch: "🎯",
+  objections: "🛡️",
   closing: "🏆",
-  tonality_energy: "🎤",
-  conversation_control: "⚡",
 };
 
 const PROSPECT_ORIGINS = [
@@ -539,6 +531,12 @@ export function CallAnalyzer({ initialResult, initialTranscript, onResultClear }
               </div>
             </div>
 
+            {transcript.length > 0 && transcript.trim().length < 50 && (
+              <p className="text-xs text-red-400 -mt-2">
+                Le transcript doit contenir au moins 50 caractères ({transcript.trim().length}/50)
+              </p>
+            )}
+
             <Button
               size="lg"
               onClick={handleAnalyze}
@@ -582,7 +580,7 @@ export function CallAnalyzer({ initialResult, initialTranscript, onResultClear }
             {/* Score ring */}
             <ScoreRing
               score={result.overall_score}
-              max={10}
+              max={100}
               size={100}
               strokeWidth={7}
               className="shrink-0"
@@ -651,7 +649,7 @@ export function CallAnalyzer({ initialResult, initialTranscript, onResultClear }
           </div>
 
           {/* Score breakdown — mini rings */}
-          <div className="grid grid-cols-3 sm:grid-cols-5 gap-3 mt-6 pt-5 border-t border-border-default/30">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6 pt-5 border-t border-border-default/30">
             {Object.entries(result.scores).map(([key, section]) => (
               <button
                 key={key}
@@ -1084,62 +1082,72 @@ export function CallAnalyzer({ initialResult, initialTranscript, onResultClear }
         </Card>
       </div>
 
-      {/* Generate Script Button */}
-      <Card className="border-accent/20 bg-gradient-to-r from-accent/5 via-bg-secondary to-bg-secondary">
-        <CardContent className="pt-6">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div className="flex items-start gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent/10 shrink-0">
-                <FileText className="h-5 w-5 text-accent" />
-              </div>
-              <div>
-                <h3 className="text-sm font-semibold text-text-primary">
-                  Script personnalisé
-                </h3>
-                <p className="text-xs text-text-secondary mt-0.5">
-                  Génère un script de vente adapté basé sur les faiblesses
-                  identifiées dans ton analyse.
-                </p>
-              </div>
+      {/* Auto-generated Script */}
+      {(result.suggested_script || generatedScript) ? (
+        <Card className="border-accent/20 bg-gradient-to-r from-accent/5 via-bg-secondary to-bg-secondary">
+          <CardHeader className="py-4">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-sm flex items-center gap-2">
+                <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-accent/10">
+                  <FileText className="h-4 w-4 text-accent" />
+                </div>
+                Script de vente personnalisé
+                <Badge variant="default" className="text-[10px]">Auto-généré</Badge>
+              </CardTitle>
+              <button
+                onClick={() => {
+                  const scriptText = result.suggested_script || generatedScript || "";
+                  navigator.clipboard.writeText(scriptText);
+                  toast.success("Script copié !");
+                }}
+                className="text-xs text-accent hover:text-accent-hover transition-colors font-medium"
+              >
+                Copier
+              </button>
             </div>
-            <Button
-              onClick={handleGenerateScript}
-              disabled={scriptLoading}
-              className="shrink-0 rounded-xl"
-            >
-              {scriptLoading ? (
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-              ) : (
-                <Sparkles className="h-4 w-4 mr-2" />
-              )}
-              Générer le script
-            </Button>
-          </div>
-
-          {/* Generated script */}
-          {generatedScript && (
-            <div className="mt-5 p-5 rounded-xl bg-bg-tertiary border border-border-default/50">
-              <div className="flex items-center justify-between mb-3">
-                <Badge variant="default" className="text-xs">
-                  Script généré
-                </Badge>
-                <button
-                  onClick={() => {
-                    navigator.clipboard.writeText(generatedScript);
-                    toast.success("Script copié !");
-                  }}
-                  className="text-xs text-accent hover:text-accent-hover transition-colors font-medium"
-                >
-                  Copier
-                </button>
-              </div>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <div className="p-5 rounded-xl bg-bg-tertiary border border-border-default/50">
               <pre className="text-sm text-text-secondary whitespace-pre-wrap font-sans leading-relaxed max-h-96 overflow-y-auto">
-                {generatedScript}
+                {result.suggested_script || generatedScript}
               </pre>
             </div>
-          )}
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      ) : (
+        <Card className="border-accent/20 bg-gradient-to-r from-accent/5 via-bg-secondary to-bg-secondary">
+          <CardContent className="pt-6">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div className="flex items-start gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent/10 shrink-0">
+                  <FileText className="h-5 w-5 text-accent" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-semibold text-text-primary">
+                    Script personnalisé
+                  </h3>
+                  <p className="text-xs text-text-secondary mt-0.5">
+                    Génère un script de vente adapté basé sur les faiblesses
+                    identifiées dans ton analyse.
+                  </p>
+                </div>
+              </div>
+              <Button
+                onClick={handleGenerateScript}
+                disabled={scriptLoading}
+                className="shrink-0 rounded-xl"
+              >
+                {scriptLoading ? (
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                ) : (
+                  <Sparkles className="h-4 w-4 mr-2" />
+                )}
+                Générer le script
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }

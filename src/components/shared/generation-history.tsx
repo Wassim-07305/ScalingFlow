@@ -54,47 +54,56 @@ export function GenerationHistory({
     if (!user) return;
 
     const fetchHistory = async () => {
-      setLoading(true);
-      const fields = [
-        "id",
-        titleField,
-        subtitleField,
-        statusField,
-        "created_at",
-      ]
-        .filter(Boolean)
-        .join(", ");
+      try {
+        setLoading(true);
+        const fields = [
+          "id",
+          titleField,
+          subtitleField,
+          statusField,
+          "created_at",
+        ]
+          .filter(Boolean)
+          .join(", ");
 
-      let query = supabase.from(table).select(fields).eq("user_id", user.id);
-      if (filters) {
-        Object.entries(filters).forEach(([key, value]) => {
-          if (Array.isArray(value)) {
-            query = query.in(key, value);
-          } else {
-            query = query.eq(key, value);
-          }
-        });
-      }
-      const { data, error } = await query
-        .order("created_at", { ascending: false })
-        .limit(20);
+        let query = supabase.from(table).select(fields).eq("user_id", user.id);
+        if (filters) {
+          Object.entries(filters).forEach(([key, value]) => {
+            if (Array.isArray(value)) {
+              query = query.in(key, value);
+            } else {
+              query = query.eq(key, value);
+            }
+          });
+        }
+        const { data, error } = await query
+          .order("created_at", { ascending: false })
+          .limit(20);
 
-      if (!error && data) {
-        setItems(
-          (data as unknown as Record<string, unknown>[]).map((row) => ({
-            id: row.id as string,
-            title: (row[titleField] as string) || "Sans titre",
-            subtitle: subtitleField
-              ? (row[subtitleField] as string) || undefined
-              : undefined,
-            status: statusField
-              ? (row[statusField] as string) || undefined
-              : undefined,
-            created_at: row.created_at as string,
-          })),
-        );
+        if (error) {
+          console.error("GenerationHistory: fetch error", error);
+          setItems([]);
+        } else if (data) {
+          setItems(
+            (data as unknown as Record<string, unknown>[]).map((row) => ({
+              id: row.id as string,
+              title: (row[titleField] as string) || "Sans titre",
+              subtitle: subtitleField
+                ? (row[subtitleField] as string) || undefined
+                : undefined,
+              status: statusField
+                ? (row[statusField] as string) || undefined
+                : undefined,
+              created_at: row.created_at as string,
+            })),
+          );
+        }
+      } catch (err) {
+        console.error("GenerationHistory: unexpected error", err);
+        setItems([]);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
 
     fetchHistory();

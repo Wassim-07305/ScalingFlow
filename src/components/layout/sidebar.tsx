@@ -89,10 +89,19 @@ export function Sidebar({
   }
 
   async function handleLogout() {
-    const supabase = createClient();
-    await supabase.auth.signOut();
-    router.push("/login");
-    router.refresh();
+    try {
+      const supabase = createClient();
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error("Logout error:", error);
+      }
+      router.push("/login");
+      router.refresh();
+    } catch (err) {
+      console.error("Unexpected logout error:", err);
+      router.push("/login");
+      router.refresh();
+    }
   }
 
   return (

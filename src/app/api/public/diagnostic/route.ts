@@ -30,10 +30,9 @@ On te fournit les informations d'un business. Tu dois analyser chaque dimension 
 - Nombre de clients actifs : ${data.delivery_nb_clients || "Non précisé"}
 - Satisfaction client : ${data.delivery_satisfaction || "Non précisé"}
 
-### Funnel
-- URL du funnel : ${data.funnel_url || "Pas de funnel"}
-- Headline principale : ${data.funnel_headline || "Non précisé"}
-- CTA principal : ${data.funnel_cta || "Non précisé"}
+### Profil
+- Prénom : ${data.first_name || "Non précisé"}
+- CA mensuel : ${data.monthly_revenue || "Non précisé"}
 
 ## Instructions
 
@@ -71,9 +70,9 @@ interface DiagnosticInput {
   delivery_method?: string;
   delivery_nb_clients?: string;
   delivery_satisfaction?: string;
-  funnel_url?: string;
-  funnel_headline?: string;
-  funnel_cta?: string;
+  first_name?: string;
+  email?: string;
+  monthly_revenue?: string;
 }
 
 interface DiagnosticResult {
@@ -132,9 +131,9 @@ export async function POST(req: NextRequest) {
     body.delivery_method = truncate(body.delivery_method);
     body.delivery_nb_clients = truncate(body.delivery_nb_clients);
     body.delivery_satisfaction = truncate(body.delivery_satisfaction);
-    body.funnel_url = truncate(body.funnel_url);
-    body.funnel_headline = truncate(body.funnel_headline);
-    body.funnel_cta = truncate(body.funnel_cta);
+    body.first_name = truncate(body.first_name);
+    body.email = truncate(body.email);
+    body.monthly_revenue = truncate(body.monthly_revenue);
 
     const result = await generateJSON<DiagnosticResult>({
       prompt: diagnosticPrompt(body),
