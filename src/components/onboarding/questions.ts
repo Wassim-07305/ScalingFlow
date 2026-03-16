@@ -56,6 +56,15 @@ export const QUESTIONS: Question[] = [
     placeholder: "Prénom",
   },
 
+  // 1a — Nom (CDC Q-0.1.2)
+  {
+    id: "lastName",
+    type: "text",
+    title: "Et ton nom de famille ?",
+    field: "lastName",
+    placeholder: "Nom",
+  },
+
   // 1b — Pays (CDC Q-0.1.3)
   {
     id: "country",
@@ -157,6 +166,17 @@ export const QUESTIONS: Question[] = [
     subtitle:
       "Ces questions font émerger ce que tu ne sais pas forcément formuler. C'est là où on identifie ton unfair advantage.",
     field: "expertiseProfonde",
+  },
+
+  // 5b — Formations suivies (CDC Q-0.2.2)
+  {
+    id: "formations",
+    type: "textarea",
+    title: "Quelles formations as-tu suivies ?",
+    subtitle: "Diplômes, certifications, formations en ligne, livres clés...",
+    field: "formations_text",
+    placeholder:
+      "Ex : MBA Marketing, certification Google Ads, formation Scaling Flow...",
   },
 
   // 6 — Industries

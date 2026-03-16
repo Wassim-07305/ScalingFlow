@@ -30,9 +30,11 @@ import type { SelectedSkill } from "./skill-categories";
 
 const INITIAL_FORM_DATA: Record<string, unknown> = {
   firstName: "",
+  lastName: "",
   country: "",
   language: "",
   situation: "",
+  formations_text: "",
   situationDetails: {},
   vaultSkills: [],
   expertiseProfonde: {},
@@ -219,6 +221,7 @@ function buildExpertiseAnswers(
 function buildProfilePayload(formData: Record<string, unknown>) {
   return {
     first_name: (formData.firstName as string) || null,
+    last_name: (formData.lastName as string) || null,
     country: (formData.country as string) || null,
     language: (formData.language as string) || null,
     situation: (formData.situation as string) || null,
@@ -236,6 +239,7 @@ function buildProfilePayload(formData: Record<string, unknown>) {
     deadline: (formData.deadline as string) || null,
     team_preference: (formData.teamPreference as string) || null,
     has_paying_clients: (formData.hasPayingClients as string) || null,
+    formations_text: (formData.formations_text as string) || null,
     vault_completed: true,
   };
 }
@@ -292,6 +296,7 @@ export function OnboardingFlow() {
         if (profile) {
           const r: Record<string, unknown> = { ...INITIAL_FORM_DATA };
           if (profile.first_name) r.firstName = profile.first_name;
+          if (profile.last_name) r.lastName = profile.last_name;
           if (profile.country) r.country = profile.country;
           if (profile.language) r.language = profile.language;
           if (profile.situation) r.situation = profile.situation;
@@ -323,6 +328,8 @@ export function OnboardingFlow() {
             r.teamPreference = profile.team_preference;
           if (profile.has_paying_clients)
             r.hasPayingClients = profile.has_paying_clients;
+          if (profile.formations_text)
+            r.formations_text = profile.formations_text;
 
           // Compute visible questions from restored data for correct step
           const restoredVisible = QUESTIONS.filter(

@@ -50,6 +50,7 @@ export interface Database {
           parcours_answers: Json | null;
           team_preference: string | null;
           has_paying_clients: string | null;
+          formations_text: string | null;
           vault_completed: boolean;
           vault_analysis: Json | null;
           selected_market: string | null;
@@ -118,6 +119,7 @@ export interface Database {
           parcours_answers?: Json | null;
           team_preference?: string | null;
           has_paying_clients?: string | null;
+          formations_text?: string | null;
           vault_completed?: boolean;
           vault_analysis?: Json | null;
           selected_market?: string | null;
@@ -184,6 +186,7 @@ export interface Database {
           parcours_answers?: Json | null;
           team_preference?: string | null;
           has_paying_clients?: string | null;
+          formations_text?: string | null;
           vault_completed?: boolean;
           vault_analysis?: Json | null;
           selected_market?: string | null;
