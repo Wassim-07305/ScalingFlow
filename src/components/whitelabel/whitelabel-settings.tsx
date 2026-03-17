@@ -21,10 +21,13 @@ import {
   UserCircle,
   Globe,
   Camera,
-  Copy,
-  ExternalLink,
+  Mail,
+  MessageSquare,
+  Lock,
+  Sparkles,
 } from "lucide-react";
 import { useOrganization, type OrgMember } from "@/hooks/use-organization";
+import { useUser } from "@/hooks/use-user";
 import { createClient } from "@/lib/supabase/client";
 
 // ─── Create Organization Form ─────────────────────────────────
@@ -151,6 +154,12 @@ function BrandingSection({
   const [customDomain, setCustomDomain] = useState(
     organization.custom_domain || "",
   );
+  const [supportEmail, setSupportEmail] = useState(
+    organization.support_email || "",
+  );
+  const [welcomeMessage, setWelcomeMessage] = useState(
+    organization.custom_welcome_message || "",
+  );
   const [logoUrl, setLogoUrl] = useState(organization.logo_url || "");
   const [saving, setSaving] = useState(false);
   const [uploadingLogo, setUploadingLogo] = useState(false);
@@ -211,6 +220,8 @@ function BrandingSection({
           accent_color: accentColor,
           custom_domain: customDomain.trim() || null,
           logo_url: logoUrl || null,
+          support_email: supportEmail.trim() || null,
+          custom_welcome_message: welcomeMessage.trim() || null,
         }),
       });
 
@@ -384,6 +395,40 @@ function BrandingSection({
               style={{ backgroundColor: accentColor }}
             />
           </div>
+        </div>
+
+        <Separator />
+
+        {/* Support email */}
+        <div>
+          <Label className="flex items-center gap-2">
+            <Mail className="h-4 w-4" />
+            Email de support affiché aux clients
+          </Label>
+          <Input
+            type="email"
+            value={supportEmail}
+            onChange={(e) => setSupportEmail(e.target.value)}
+            placeholder="support@tonbusiness.com"
+          />
+        </div>
+
+        {/* Welcome message */}
+        <div>
+          <Label className="flex items-center gap-2">
+            <MessageSquare className="h-4 w-4" />
+            Message de bienvenue personnalisé
+          </Label>
+          <textarea
+            value={welcomeMessage}
+            onChange={(e) => setWelcomeMessage(e.target.value)}
+            placeholder="Bienvenue dans ton espace ! Ici tu trouveras tous les outils pour scaler ton business..."
+            rows={3}
+            className="w-full rounded-xl border border-border-default bg-bg-secondary px-3 py-2.5 text-sm text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20 transition-all resize-none mt-1"
+          />
+          <p className="text-xs text-text-muted mt-1">
+            Affiché sur le dashboard de tes clients.
+          </p>
         </div>
 
         <Separator />
@@ -631,11 +676,164 @@ function MembersSection({
   );
 }
 
+// ─── Module Toggles Section ──────────────────────────────────────
+
+const TOGGLEABLE_MODULES = [
+  { key: "vault", label: "Vault" },
+  { key: "market", label: "Marché" },
+  { key: "offer", label: "Offre" },
+  { key: "brand", label: "Marque" },
+  { key: "funnel", label: "Funnel" },
+  { key: "assets", label: "Assets" },
+  { key: "ads", label: "Publicités" },
+  { key: "content", label: "Contenu" },
+  { key: "prospection", label: "Prospection" },
+  { key: "pipeline", label: "Pipeline" },
+  { key: "sales", label: "Vente" },
+  { key: "academy", label: "Academy" },
+  { key: "drive", label: "Drive" },
+] as const;
+
+function ModulesSection({
+  organization,
+  onUpdated,
+}: {
+  organization: NonNullable<ReturnType<typeof useOrganization>["organization"]>;
+  onUpdated: () => void;
+}) {
+  const features = (organization.features as Record<string, boolean>) || {};
+  const [modules, setModules] = useState<Record<string, boolean>>(() => {
+    const initial: Record<string, boolean> = {};
+    TOGGLEABLE_MODULES.forEach((m) => {
+      initial[m.key] = features[m.key] !== false; // enabled by default
+    });
+    return initial;
+  });
+  const [saving, setSaving] = useState(false);
+
+  const toggleModule = (key: string) => {
+    setModules((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      const res = await fetch("/api/integrations/whitelabel", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ features: modules }),
+      });
+
+      if (!res.ok) {
+        toast.error("Erreur lors de la sauvegarde.");
+        return;
+      }
+
+      toast.success("Modules mis à jour !");
+      onUpdated();
+    } catch {
+      toast.error("Erreur inattendue.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Sparkles className="h-5 w-5 text-accent" />
+          Modules activés pour tes clients
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <p className="text-sm text-text-secondary">
+          Choisis les modules accessibles par tes clients. Les modules
+          désactivés seront masqués de leur navigation.
+        </p>
+
+        <div className="grid gap-2 sm:grid-cols-2">
+          {TOGGLEABLE_MODULES.map((mod) => (
+            <button
+              key={mod.key}
+              onClick={() => toggleModule(mod.key)}
+              className={cn(
+                "flex items-center justify-between p-3 rounded-xl border transition-all duration-200",
+                modules[mod.key]
+                  ? "border-accent/30 bg-accent/5"
+                  : "border-border-default bg-bg-tertiary opacity-60",
+              )}
+            >
+              <span className="text-sm font-medium text-text-primary">
+                {mod.label}
+              </span>
+              {modules[mod.key] ? (
+                <div className="flex h-6 w-10 items-center rounded-full bg-accent p-0.5">
+                  <div className="h-5 w-5 rounded-full bg-white translate-x-4 transition-transform" />
+                </div>
+              ) : (
+                <div className="flex h-6 w-10 items-center rounded-full bg-bg-secondary border border-border-default p-0.5">
+                  <div className="h-5 w-5 rounded-full bg-text-muted/30 transition-transform" />
+                </div>
+              )}
+            </button>
+          ))}
+        </div>
+
+        <Button onClick={handleSave} disabled={saving} className="w-full">
+          {saving ? (
+            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+          ) : (
+            <Sparkles className="h-4 w-4 mr-2" />
+          )}
+          Sauvegarder les modules
+        </Button>
+      </CardContent>
+    </Card>
+  );
+}
+
+// ─── Premium Gate ──────────────────────────────────────────────
+
+function PremiumGate() {
+  return (
+    <Card className="border-purple-500/20 bg-purple-500/5">
+      <CardContent className="pt-6">
+        <div className="flex flex-col items-center justify-center py-8 text-center">
+          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-purple-500/15 mb-4">
+            <Lock className="h-8 w-8 text-purple-400" />
+          </div>
+          <h3 className="text-lg font-bold text-text-primary mb-2">
+            White Label — Premium
+          </h3>
+          <p className="text-sm text-text-muted max-w-md mb-6">
+            Offre une expérience brandée à tes clients avec ton logo, tes
+            couleurs et ton nom de marque. Disponible avec le plan Premium.
+          </p>
+          <Badge variant="purple" className="text-sm px-4 py-1.5">
+            <Crown className="h-4 w-4 mr-2" />
+            Passer en Premium
+          </Badge>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
 // ─── Main Whitelabel Settings ──────────────────────────────────
 
 export function WhitelabelSettings() {
+  const { profile } = useUser();
   const { organization, role, members, loading, isOwner, isAdmin, refetch } =
     useOrganization();
+
+  const subscriptionPlan = profile?.subscription_plan || "free";
+  const isPremium = subscriptionPlan === "premium";
+
+  // Premium gate — show upgrade CTA for Free/Pro users
+  if (!loading && !isPremium && !organization) {
+    return <PremiumGate />;
+  }
 
   if (loading) {
     return (
@@ -766,6 +964,9 @@ export function WhitelabelSettings() {
 
       {/* Members */}
       <MembersSection members={members} isOwner={isOwner} onUpdated={refetch} />
+
+      {/* Modules toggles */}
+      <ModulesSection organization={organization} onUpdated={refetch} />
     </div>
   );
 }

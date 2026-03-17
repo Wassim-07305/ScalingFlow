@@ -96,7 +96,7 @@ export async function POST(req: NextRequest) {
           body: JSON.stringify({
             activityType: "challenge.completed",
             data: { type: "deal_closed", leadName: lead.name },
-            xpOverride: 50,
+            xpOverride: 150,
           }),
         });
       } catch {

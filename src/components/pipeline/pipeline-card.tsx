@@ -9,6 +9,7 @@ import {
   DollarSign,
   Clock,
   GripVertical,
+  Snowflake,
 } from "lucide-react";
 
 export interface PipelineLead {
@@ -47,7 +48,14 @@ function timeAgo(dateStr: string): string {
   return `${diffM}mois`;
 }
 
+function isColdLead(updatedAt: string): boolean {
+  const diffMs = Date.now() - new Date(updatedAt).getTime();
+  return diffMs > 3 * 24 * 60 * 60 * 1000; // > 3 jours
+}
+
 export function PipelineCard({ lead, onClick, isDragging }: PipelineCardProps) {
+  const isCold = lead.status !== "close" && lead.status !== "perdu" && isColdLead(lead.updated_at);
+
   return (
     <div
       role="button"
@@ -139,14 +147,20 @@ export function PipelineCard({ lead, onClick, isDragging }: PipelineCardProps) {
         </div>
       </div>
 
-      {/* Source badge */}
-      {lead.source && (
-        <div className="mt-2">
+      {/* Source badge + cold indicator */}
+      <div className="flex items-center gap-1.5 mt-2 flex-wrap">
+        {lead.source && (
           <span className="inline-block rounded-full bg-bg-tertiary px-2 py-0.5 text-[11px] text-text-muted">
             {lead.source}
           </span>
-        </div>
-      )}
+        )}
+        {isCold && (
+          <span className="inline-flex items-center gap-1 rounded-full bg-blue-500/10 px-2 py-0.5 text-[11px] font-medium text-blue-400">
+            <Snowflake className="h-3 w-3" />
+            Froid
+          </span>
+        )}
+      </div>
     </div>
   );
 }

@@ -68,6 +68,7 @@ export function DashboardShell({
         custom_onboarding_steps: null,
         custom_welcome_message: null,
         custom_prompts: null,
+        support_email: null,
         owner_id: "",
         created_at: "",
         updated_at: "",

@@ -12,7 +12,12 @@ import {
   DollarSign,
   Loader2,
   Megaphone,
+  Link as LinkIcon,
+  Lock,
+  Users,
+  Target,
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
 import { useUser } from "@/hooks/use-user";
 import { toast } from "sonner";
@@ -96,17 +101,6 @@ export function CampaignDashboard({ className }: CampaignDashboardProps) {
     fetchCampaigns();
   }, [user, userLoading, supabase]);
 
-  const totalSpent = campaigns.reduce((s, c) => s + c.total_spend, 0);
-  const totalConversions = campaigns.reduce(
-    (s, c) => s + c.total_conversions,
-    0,
-  );
-  const totalClicks = campaigns.reduce((s, c) => s + c.total_clicks, 0);
-  const totalImpressions = campaigns.reduce(
-    (s, c) => s + c.total_impressions,
-    0,
-  );
-
   if (loading || userLoading) {
     return (
       <div className={cn("space-y-6", className)}>
@@ -117,66 +111,148 @@ export function CampaignDashboard({ className }: CampaignDashboardProps) {
     );
   }
 
-  if (campaigns.length === 0) {
-    return (
-      <div className={cn("space-y-6", className)}>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex flex-col items-center justify-center py-12 text-center">
-              <Megaphone className="h-12 w-12 text-text-muted/40 mb-4" />
-              <p className="text-sm text-text-muted">
-                Aucune campagne publicitaire. Crée tes premières publicités pour
-                voir tes campagnes ici.
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
+  // ─── Mode Simulation (no real campaigns) ───
+  const isSimulation = campaigns.length === 0;
+
+  const MOCK_CAMPAIGNS: AdCampaign[] = [
+    {
+      id: "sim-1",
+      campaign_name: "Coaching Business — Cold Audience",
+      status: "active",
+      daily_budget: 50,
+      total_budget: 1500,
+      total_spend: 847,
+      total_impressions: 124300,
+      total_clicks: 2486,
+      total_conversions: 47,
+      roas: 3.2,
+    },
+    {
+      id: "sim-2",
+      campaign_name: "Retargeting — Visiteurs site web",
+      status: "active",
+      daily_budget: 30,
+      total_budget: 900,
+      total_spend: 412,
+      total_impressions: 38200,
+      total_clicks: 1147,
+      total_conversions: 31,
+      roas: 4.8,
+    },
+    {
+      id: "sim-3",
+      campaign_name: "Lookalike — Clients existants",
+      status: "paused",
+      daily_budget: 40,
+      total_budget: 1200,
+      total_spend: 623,
+      total_impressions: 89400,
+      total_clicks: 1788,
+      total_conversions: 22,
+      roas: 2.1,
+    },
+  ];
+
+  const displayCampaigns = isSimulation ? MOCK_CAMPAIGNS : campaigns;
+
+  const totalSpent = displayCampaigns.reduce((s, c) => s + c.total_spend, 0);
+  const totalConversions = displayCampaigns.reduce(
+    (s, c) => s + c.total_conversions,
+    0,
+  );
+  const totalClicks = displayCampaigns.reduce((s, c) => s + c.total_clicks, 0);
+  const totalImpressions = displayCampaigns.reduce(
+    (s, c) => s + c.total_impressions,
+    0,
+  );
+  const avgCPM =
+    totalImpressions > 0 ? (totalSpent / totalImpressions) * 1000 : 0;
+  const avgCPC = totalClicks > 0 ? totalSpent / totalClicks : 0;
+  const avgCPL = totalConversions > 0 ? totalSpent / totalConversions : 0;
+  const avgROAS =
+    totalSpent > 0
+      ? displayCampaigns.reduce((s, c) => s + c.roas * c.total_spend, 0) /
+        totalSpent
+      : 0;
 
   return (
     <div className={cn("space-y-6", className)}>
+      {/* Simulation banner */}
+      {isSimulation && (
+        <div className="flex items-center justify-between rounded-2xl border border-orange-500/20 bg-orange-500/5 p-4">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-500/15">
+              <Eye className="h-5 w-5 text-orange-400" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-text-primary">
+                Mode simulation
+              </p>
+              <p className="text-xs text-text-muted">
+                Les données ci-dessous sont simulées. Connecte ton compte Meta pour voir tes vraies performances.
+              </p>
+            </div>
+          </div>
+          <Button variant="outline" size="sm" disabled className="gap-2 shrink-0">
+            <LinkIcon className="h-3.5 w-3.5" />
+            Connecter Meta
+            <Badge variant="muted" className="text-[9px] ml-1">
+              Bientôt
+            </Badge>
+          </Button>
+        </div>
+      )}
+
       {/* KPIs */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
         {[
           {
-            label: "Dépense",
-            value: totalSpent,
-            suffix: " €",
+            label: "Dépense totale",
+            value: `${totalSpent.toLocaleString("fr-FR")} €`,
             icon: DollarSign,
             color: "text-accent",
           },
           {
-            label: "Impressions",
-            value: totalImpressions,
+            label: "CPM",
+            value: `${avgCPM.toFixed(2)} €`,
             icon: Eye,
             color: "text-info",
           },
           {
-            label: "Clics",
-            value: totalClicks,
+            label: "CPC",
+            value: `${avgCPC.toFixed(2)} €`,
             icon: MousePointer,
-            color: "text-accent",
+            color: "text-violet-400",
           },
           {
-            label: "Conversions",
-            value: totalConversions,
+            label: "CPL",
+            value: `${avgCPL.toFixed(2)} €`,
+            icon: Target,
+            color: "text-cyan-400",
+          },
+          {
+            label: "ROAS",
+            value: `${avgROAS.toFixed(1)}x`,
             icon: TrendingUp,
-            color: "text-accent",
+            color: "text-emerald-400",
+          },
+          {
+            label: "Reach",
+            value: totalImpressions.toLocaleString("fr-FR"),
+            icon: Users,
+            color: "text-blue-400",
           },
         ].map((kpi) => (
           <Card key={kpi.label}>
-            <CardContent className="pt-6">
+            <CardContent className="pt-5 pb-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs text-text-muted">{kpi.label}</p>
-                  <p className={cn("text-2xl font-bold", kpi.color)}>
-                    <AnimatedCounter value={kpi.value} />
-                    {kpi.suffix || ""}
+                  <p className="text-[11px] text-text-muted">{kpi.label}</p>
+                  <p className={cn("text-lg font-bold", kpi.color)}>
+                    {kpi.value}
                   </p>
                 </div>
-                <kpi.icon className={cn("h-5 w-5", kpi.color)} />
+                <kpi.icon className={cn("h-4 w-4", kpi.color)} />
               </div>
             </CardContent>
           </Card>
@@ -186,11 +262,19 @@ export function CampaignDashboard({ className }: CampaignDashboardProps) {
       {/* Campaigns list */}
       <Card>
         <CardHeader>
-          <CardTitle>Campagnes</CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle>Campagnes {isSimulation ? "(simulées)" : ""}</CardTitle>
+            {isSimulation && (
+              <Badge variant="muted" className="text-[10px] gap-1">
+                <Lock className="h-3 w-3" />
+                Données de démonstration
+              </Badge>
+            )}
+          </div>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
-            {campaigns.map((campaign) => {
+            {displayCampaigns.map((campaign) => {
               const budget =
                 campaign.total_budget ?? campaign.daily_budget ?? 0;
               const ctr =

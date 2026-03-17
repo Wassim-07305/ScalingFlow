@@ -50,6 +50,7 @@ const PROFILE_COLUMNS = [
   "global_progress",
   "show_on_leaderboard",
   "show_revenue",
+  "subscription_plan",
   "subscription_status",
   "meta_ad_account_id",
   "ghl_webhook_url",

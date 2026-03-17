@@ -190,6 +190,8 @@ export async function PATCH(req: NextRequest) {
       "custom_domain",
       "features",
       "limits",
+      "support_email",
+      "custom_welcome_message",
     ];
 
     const updates: Record<string, unknown> = {};

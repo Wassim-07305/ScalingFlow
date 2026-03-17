@@ -35,18 +35,30 @@ import { useUser } from "@/hooks/use-user";
 import { toast } from "sonner";
 
 const TONES = [
-  { key: "urgente", label: "Urgente" },
-  { key: "educative", label: "Éducative" },
-  { key: "inspirante", label: "Inspirante" },
-  { key: "provocante", label: "Provocante" },
+  { key: "inspirant", label: "Inspirant" },
+  { key: "educatif", label: "Éducatif" },
+  { key: "direct", label: "Direct" },
+  { key: "emotionnel", label: "Émotionnel" },
   { key: "storytelling", label: "Storytelling" },
 ] as const;
 
 const OBJECTIVES = [
-  { key: "ventes", label: "Ventes directes" },
   { key: "leads", label: "Génération de leads" },
+  { key: "ventes", label: "Vente directe" },
   { key: "notoriete", label: "Notoriété" },
-  { key: "engagement", label: "Engagement" },
+] as const;
+
+const AD_FORMATS = [
+  { key: "reel", label: "Reel" },
+  { key: "story", label: "Story" },
+  { key: "image", label: "Image" },
+  { key: "carrousel", label: "Carrousel" },
+] as const;
+
+const WIZARD_STEPS = [
+  { key: "contexte", label: "Contexte", step: 1 },
+  { key: "offre", label: "Offre", step: 2 },
+  { key: "style", label: "Style", step: 3 },
 ] as const;
 
 const MASSIVE_BATCHES = [
@@ -137,9 +149,15 @@ export function CreativeGenerator({
   >({});
 
   // Form state
-  const [tone, setTone] = React.useState("urgente");
-  const [objective, setObjective] = React.useState("ventes");
+  const [wizardStep, setWizardStep] = React.useState(1);
+  const [adFormat, setAdFormat] = React.useState("reel");
+  const [tone, setTone] = React.useState("direct");
+  const [objective, setObjective] = React.useState("leads");
   const [targetAudience, setTargetAudience] = React.useState("");
+  const [dailyBudget, setDailyBudget] = React.useState("");
+  const [offerDescription, setOfferDescription] = React.useState("");
+  const [offerPrice, setOfferPrice] = React.useState("");
+  const [offerResult, setOfferResult] = React.useState("");
   const [productContext, setProductContext] = React.useState("");
 
   React.useEffect(() => {
@@ -176,8 +194,13 @@ export function CreativeGenerator({
         body: JSON.stringify({
           tone,
           objective,
+          adFormat,
           targetAudience: targetAudience || undefined,
           productContext: productContext || undefined,
+          offerDescription: offerDescription || undefined,
+          offerPrice: offerPrice || undefined,
+          offerResult: offerResult || undefined,
+          dailyBudget: dailyBudget || undefined,
         }),
       });
 
@@ -477,207 +500,361 @@ export function CreativeGenerator({
     );
   }
 
-  // Form view — no variations yet
+  // Form view — no variations yet (3-step wizard)
   if (variations.length === 0 && variationGroups.length === 0) {
+    const canGoNext =
+      wizardStep === 1
+        ? true
+        : wizardStep === 2
+          ? true
+          : true;
+
     return (
       <div className={cn("space-y-6", className)}>
+        {/* Stepper */}
+        <div className="flex items-center gap-2">
+          {WIZARD_STEPS.map((s, i) => (
+            <React.Fragment key={s.key}>
+              {i > 0 && (
+                <div
+                  className={cn(
+                    "flex-1 h-px",
+                    wizardStep > s.step - 1
+                      ? "bg-accent"
+                      : "bg-border-default",
+                  )}
+                />
+              )}
+              <button
+                onClick={() => setWizardStep(s.step)}
+                className={cn(
+                  "flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all",
+                  wizardStep === s.step
+                    ? "bg-accent text-white shadow-md shadow-accent/25"
+                    : wizardStep > s.step
+                      ? "bg-accent/15 text-accent"
+                      : "bg-bg-tertiary text-text-muted",
+                )}
+              >
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-white/20 text-xs font-bold">
+                  {s.step}
+                </span>
+                {s.label}
+              </button>
+            </React.Fragment>
+          ))}
+        </div>
+
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Sparkles className="h-5 w-5 text-accent" />
-              Paramètres de génération
+              {wizardStep === 1
+                ? "Contexte de la publicité"
+                : wizardStep === 2
+                  ? "Ton offre"
+                  : "Style & génération"}
             </CardTitle>
             <CardDescription>
-              Configure le style et l&apos;objectif de tes publicités avant de
-              générer.
+              {wizardStep === 1
+                ? "Définis le type, l'objectif et l'audience de ta pub."
+                : wizardStep === 2
+                  ? "Décris l'offre que tu veux promouvoir."
+                  : "Choisis le ton et le mode de génération."}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-5">
-            {/* Tone selector */}
-            <div>
-              <label className="text-sm font-medium text-text-primary mb-1.5 block">
-                Tonalité
-              </label>
-              <p className="text-xs text-text-muted mb-2">
-                Le ton général de tes publicités
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {TONES.map((t) => (
-                  <button
-                    key={t.key}
-                    onClick={() => setTone(t.key)}
-                    className={cn(
-                      "px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200",
-                      tone === t.key
-                        ? "bg-accent text-white shadow-md shadow-accent/25"
-                        : "bg-bg-tertiary text-text-secondary hover:text-text-primary hover:bg-bg-tertiary/80",
-                    )}
-                  >
-                    {t.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Objective selector */}
-            <div>
-              <label className="text-sm font-medium text-text-primary mb-1.5 block">
-                Objectif
-              </label>
-              <p className="text-xs text-text-muted mb-2">
-                Ce que tu veux accomplir avec ces publicités
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {OBJECTIVES.map((o) => (
-                  <button
-                    key={o.key}
-                    onClick={() => setObjective(o.key)}
-                    className={cn(
-                      "px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200",
-                      objective === o.key
-                        ? "bg-accent text-white shadow-md shadow-accent/25"
-                        : "bg-bg-tertiary text-text-secondary hover:text-text-primary hover:bg-bg-tertiary/80",
-                    )}
-                  >
-                    {o.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Target audience */}
-            <div>
-              <label className="text-sm font-medium text-text-primary mb-1 block">
-                Audience cible{" "}
-                <span className="text-text-muted font-normal">(optionnel)</span>
-              </label>
-              <p className="text-xs text-text-muted mb-2">
-                Décris qui tu veux cibler pour des résultats plus précis
-              </p>
-              <input
-                type="text"
-                value={targetAudience}
-                onChange={(e) => setTargetAudience(e.target.value)}
-                placeholder="Ex: entrepreneurs 25-45 ans, coaches, e-commerçants..."
-                className="w-full rounded-xl border border-border-default bg-bg-secondary px-3 py-2.5 text-sm text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20 transition-all"
-              />
-            </div>
-
-            {/* Product context */}
-            <div>
-              <label className="text-sm font-medium text-text-primary mb-1 block">
-                Contexte produit{" "}
-                <span className="text-text-muted font-normal">(optionnel)</span>
-              </label>
-              <p className="text-xs text-text-muted mb-2">
-                Ton produit/service pour des publicités plus pertinentes
-              </p>
-              <textarea
-                value={productContext}
-                onChange={(e) => setProductContext(e.target.value)}
-                placeholder="Décris brièvement ton produit/service pour des résultats plus pertinents..."
-                rows={2}
-                className="w-full rounded-xl border border-border-default bg-bg-secondary px-3 py-2.5 text-sm text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20 transition-all resize-none"
-              />
-            </div>
-
-            {/* Mode selector */}
-            <div className="p-4 rounded-xl bg-bg-tertiary/50 border border-border-default">
-              <label className="text-sm font-medium text-text-primary mb-2 block">
-                Mode de génération
-              </label>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <button
-                  onClick={() => setMassiveMode(false)}
-                  className={cn(
-                    "p-3 rounded-xl border-2 text-left transition-all duration-200",
-                    !massiveMode
-                      ? "border-accent bg-accent/10 shadow-md shadow-accent/10"
-                      : "border-border-default bg-bg-secondary hover:border-border-default/80",
-                  )}
-                >
-                  <div className="flex items-center gap-2 mb-1">
-                    <Sparkles className="h-4 w-4 text-accent" />
-                    <span className="text-sm font-semibold text-text-primary">
-                      Rapide
-                    </span>
-                    <Badge variant="muted" className="text-[10px]">
-                      5 variations
-                    </Badge>
+            {/* ─── Step 1: Contexte ─── */}
+            {wizardStep === 1 && (
+              <>
+                {/* Ad format */}
+                <div>
+                  <label className="text-sm font-medium text-text-primary mb-1.5 block">
+                    Type de publicité
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    {AD_FORMATS.map((f) => (
+                      <button
+                        key={f.key}
+                        onClick={() => setAdFormat(f.key)}
+                        className={cn(
+                          "px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200",
+                          adFormat === f.key
+                            ? "bg-accent text-white shadow-md shadow-accent/25"
+                            : "bg-bg-tertiary text-text-secondary hover:text-text-primary hover:bg-bg-tertiary/80",
+                        )}
+                      >
+                        {f.label}
+                      </button>
+                    ))}
                   </div>
-                  <p className="text-xs text-text-muted">
-                    Génération rapide de 5 variations avec 5 angles différents
+                </div>
+
+                {/* Objective */}
+                <div>
+                  <label className="text-sm font-medium text-text-primary mb-1.5 block">
+                    Objectif
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    {OBJECTIVES.map((o) => (
+                      <button
+                        key={o.key}
+                        onClick={() => setObjective(o.key)}
+                        className={cn(
+                          "px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200",
+                          objective === o.key
+                            ? "bg-accent text-white shadow-md shadow-accent/25"
+                            : "bg-bg-tertiary text-text-secondary hover:text-text-primary hover:bg-bg-tertiary/80",
+                        )}
+                      >
+                        {o.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Target audience */}
+                <div>
+                  <label className="text-sm font-medium text-text-primary mb-1 block">
+                    Audience cible
+                  </label>
+                  <input
+                    type="text"
+                    value={targetAudience}
+                    onChange={(e) => setTargetAudience(e.target.value)}
+                    placeholder="Ex: entrepreneurs 25-45 ans, coaches, e-commerçants..."
+                    className="w-full rounded-xl border border-border-default bg-bg-secondary px-3 py-2.5 text-sm text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20 transition-all"
+                  />
+                </div>
+
+                {/* Daily budget */}
+                <div>
+                  <label className="text-sm font-medium text-text-primary mb-1 block">
+                    Budget journalier estimé{" "}
+                    <span className="text-text-muted font-normal">(optionnel)</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={dailyBudget}
+                    onChange={(e) => setDailyBudget(e.target.value)}
+                    placeholder="Ex: 50€/jour"
+                    className="w-full rounded-xl border border-border-default bg-bg-secondary px-3 py-2.5 text-sm text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20 transition-all"
+                  />
+                </div>
+              </>
+            )}
+
+            {/* ─── Step 2: Offre ─── */}
+            {wizardStep === 2 && (
+              <>
+                <div>
+                  <label className="text-sm font-medium text-text-primary mb-1 block">
+                    Description de l&apos;offre
+                  </label>
+                  <p className="text-xs text-text-muted mb-2">
+                    Décris le produit ou service que tu veux promouvoir
                   </p>
-                </button>
-                <button
-                  onClick={() => setMassiveMode(true)}
-                  className={cn(
-                    "p-3 rounded-xl border-2 text-left transition-all duration-200",
-                    massiveMode
-                      ? "border-accent bg-accent/10 shadow-md shadow-accent/10"
-                      : "border-border-default bg-bg-secondary hover:border-border-default/80",
-                  )}
-                >
-                  <div className="flex items-center gap-2 mb-1">
-                    <Zap className="h-4 w-4 text-yellow-400" />
-                    <span className="text-sm font-semibold text-text-primary">
-                      Massif
-                    </span>
-                    <Badge
-                      variant="default"
-                      className="text-[10px] bg-gradient-to-r from-accent to-emerald-400 text-white"
+                  <textarea
+                    value={offerDescription}
+                    onChange={(e) => setOfferDescription(e.target.value)}
+                    placeholder="Ex: Programme de coaching business en 12 semaines pour passer de 0 à 10k€/mois..."
+                    rows={3}
+                    className="w-full rounded-xl border border-border-default bg-bg-secondary px-3 py-2.5 text-sm text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20 transition-all resize-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium text-text-primary mb-1 block">
+                    Prix / Valeur perçue{" "}
+                    <span className="text-text-muted font-normal">(optionnel)</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={offerPrice}
+                    onChange={(e) => setOfferPrice(e.target.value)}
+                    placeholder="Ex: 2 997€ (valeur 10 000€)"
+                    className="w-full rounded-xl border border-border-default bg-bg-secondary px-3 py-2.5 text-sm text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20 transition-all"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium text-text-primary mb-1 block">
+                    Résultat promis au client
+                  </label>
+                  <input
+                    type="text"
+                    value={offerResult}
+                    onChange={(e) => setOfferResult(e.target.value)}
+                    placeholder="Ex: Passer de 0 à 10k€/mois en 90 jours"
+                    className="w-full rounded-xl border border-border-default bg-bg-secondary px-3 py-2.5 text-sm text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20 transition-all"
+                  />
+                </div>
+
+                {/* Product context (complément) */}
+                <div>
+                  <label className="text-sm font-medium text-text-primary mb-1 block">
+                    Contexte supplémentaire{" "}
+                    <span className="text-text-muted font-normal">(optionnel)</span>
+                  </label>
+                  <textarea
+                    value={productContext}
+                    onChange={(e) => setProductContext(e.target.value)}
+                    placeholder="Informations complémentaires sur ton business, ta niche, tes résultats clients..."
+                    rows={2}
+                    className="w-full rounded-xl border border-border-default bg-bg-secondary px-3 py-2.5 text-sm text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20 transition-all resize-none"
+                  />
+                </div>
+              </>
+            )}
+
+            {/* ─── Step 3: Style & Génération ─── */}
+            {wizardStep === 3 && (
+              <>
+                {/* Tone selector */}
+                <div>
+                  <label className="text-sm font-medium text-text-primary mb-1.5 block">
+                    Ton souhaité
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    {TONES.map((t) => (
+                      <button
+                        key={t.key}
+                        onClick={() => setTone(t.key)}
+                        className={cn(
+                          "px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200",
+                          tone === t.key
+                            ? "bg-accent text-white shadow-md shadow-accent/25"
+                            : "bg-bg-tertiary text-text-secondary hover:text-text-primary hover:bg-bg-tertiary/80",
+                        )}
+                      >
+                        {t.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Mode selector */}
+                <div className="p-4 rounded-xl bg-bg-tertiary/50 border border-border-default">
+                  <label className="text-sm font-medium text-text-primary mb-2 block">
+                    Mode de génération
+                  </label>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <button
+                      onClick={() => setMassiveMode(false)}
+                      className={cn(
+                        "p-3 rounded-xl border-2 text-left transition-all duration-200",
+                        !massiveMode
+                          ? "border-accent bg-accent/10 shadow-md shadow-accent/10"
+                          : "border-border-default bg-bg-secondary hover:border-border-default/80",
+                      )}
                     >
-                      75+ variations
-                    </Badge>
+                      <div className="flex items-center gap-2 mb-1">
+                        <Sparkles className="h-4 w-4 text-accent" />
+                        <span className="text-sm font-semibold text-text-primary">
+                          Rapide
+                        </span>
+                        <Badge variant="muted" className="text-[10px]">
+                          5 variations
+                        </Badge>
+                      </div>
+                      <p className="text-xs text-text-muted">
+                        5 variations avec variante A/B incluse
+                      </p>
+                    </button>
+                    <button
+                      onClick={() => setMassiveMode(true)}
+                      className={cn(
+                        "p-3 rounded-xl border-2 text-left transition-all duration-200",
+                        massiveMode
+                          ? "border-accent bg-accent/10 shadow-md shadow-accent/10"
+                          : "border-border-default bg-bg-secondary hover:border-border-default/80",
+                      )}
+                    >
+                      <div className="flex items-center gap-2 mb-1">
+                        <Zap className="h-4 w-4 text-yellow-400" />
+                        <span className="text-sm font-semibold text-text-primary">
+                          Massif
+                        </span>
+                        <Badge
+                          variant="default"
+                          className="text-[10px] bg-gradient-to-r from-accent to-emerald-400 text-white"
+                        >
+                          75+ variations
+                        </Badge>
+                      </div>
+                      <p className="text-xs text-text-muted">
+                        5 batches de 15 variations par audience
+                      </p>
+                    </button>
                   </div>
-                  <p className="text-xs text-text-muted">
-                    5 batches de 15 variations par type d&apos;audience et angle
-                  </p>
-                </button>
-              </div>
-            </div>
+                </div>
 
-            {/* Massive mode details */}
-            {massiveMode && (
-              <div className="space-y-2">
-                {MASSIVE_BATCHES.map((b) => (
-                  <div
-                    key={b.key}
-                    className="flex items-center gap-3 p-2.5 rounded-lg bg-bg-tertiary/30"
+                {/* Massive mode details */}
+                {massiveMode && (
+                  <div className="space-y-2">
+                    {MASSIVE_BATCHES.map((b) => (
+                      <div
+                        key={b.key}
+                        className="flex items-center gap-3 p-2.5 rounded-lg bg-bg-tertiary/30"
+                      >
+                        <div className="h-2 w-2 rounded-full bg-accent shrink-0" />
+                        <div>
+                          <p className="text-xs font-medium text-text-primary">
+                            {b.label}
+                          </p>
+                          <p className="text-[10px] text-text-muted">
+                            {b.description}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {error && (
+                  <div className="p-3 rounded-xl bg-danger/10 border border-danger/20">
+                    <p className="text-sm text-danger">{error}</p>
+                  </div>
+                )}
+
+                {massiveMode ? (
+                  <GenerateButton
+                    onClick={handleMassiveGenerate}
+                    className="w-full"
+                    icon={<Zap className="h-4 w-4 mr-2" />}
                   >
-                    <div className="h-2 w-2 rounded-full bg-accent shrink-0" />
-                    <div>
-                      <p className="text-xs font-medium text-text-primary">
-                        {b.label}
-                      </p>
-                      <p className="text-[10px] text-text-muted">
-                        {b.description}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
+                    Générer 75+ variations
+                  </GenerateButton>
+                ) : (
+                  <GenerateButton onClick={handleGenerate} className="w-full">
+                    Générer 5 variations
+                  </GenerateButton>
+                )}
+              </>
             )}
 
-            {error && (
-              <div className="p-3 rounded-xl bg-danger/10 border border-danger/20">
-                <p className="text-sm text-danger">{error}</p>
-              </div>
-            )}
-
-            {massiveMode ? (
-              <GenerateButton
-                onClick={handleMassiveGenerate}
-                className="w-full"
-                icon={<Zap className="h-4 w-4 mr-2" />}
+            {/* Navigation buttons */}
+            <div className="flex items-center justify-between pt-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setWizardStep((s) => Math.max(1, s - 1))}
+                disabled={wizardStep === 1}
+                className={cn(wizardStep === 1 && "invisible")}
               >
-                Générer 75+ variations
-              </GenerateButton>
-            ) : (
-              <GenerateButton onClick={handleGenerate} className="w-full">
-                Générer 5 variations
-              </GenerateButton>
-            )}
+                Précédent
+              </Button>
+              {wizardStep < 3 && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setWizardStep((s) => Math.min(3, s + 1))}
+                  disabled={!canGoNext}
+                >
+                  Suivant
+                </Button>
+              )}
+            </div>
           </CardContent>
         </Card>
       </div>
