@@ -199,19 +199,17 @@ export const NAV_SECTIONS: NavSection[] = [
     ),
   },
   {
-    label: "Acquisition",
+    label: "Marketing",
     items: NAV_ITEMS.filter((i) =>
-      [
-        "/funnel",
-        "/assets",
-        "/ads",
-        "/content",
-        "/prospection",
-        "/clients",
-        "/pipeline",
-        "/sales",
-        "/calendar",
-      ].includes(i.href),
+      ["/funnel", "/assets", "/ads", "/content"].includes(i.href),
+    ),
+  },
+  {
+    label: "Commercial",
+    items: NAV_ITEMS.filter((i) =>
+      ["/prospection", "/pipeline", "/clients", "/sales", "/calendar"].includes(
+        i.href,
+      ),
     ),
   },
   {
@@ -219,13 +217,9 @@ export const NAV_SECTIONS: NavSection[] = [
     items: NAV_ITEMS.filter((i) => ["/launch", "/analytics"].includes(i.href)),
   },
   {
-    label: "Formation",
-    items: NAV_ITEMS.filter((i) => ["/academy", "/roadmap"].includes(i.href)),
-  },
-  {
-    label: "Gamification",
+    label: "Apprentissage",
     items: NAV_ITEMS.filter((i) =>
-      ["/progress", "/leaderboard", "/community", "/activity-log"].includes(
+      ["/academy", "/roadmap", "/progress", "/leaderboard", "/community"].includes(
         i.href,
       ),
     ),
@@ -233,7 +227,9 @@ export const NAV_SECTIONS: NavSection[] = [
   {
     label: "Outils",
     items: NAV_ITEMS.filter((i) =>
-      ["/drive", "/assistant", "/portal", "/admin"].includes(i.href),
+      ["/drive", "/assistant", "/activity-log", "/portal", "/admin"].includes(
+        i.href,
+      ),
     ),
   },
 ];
