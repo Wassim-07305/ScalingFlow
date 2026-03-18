@@ -96,16 +96,12 @@ export function Sidebar({
   async function handleLogout() {
     try {
       const supabase = createClient();
-      const { error } = await supabase.auth.signOut();
-      if (error) {
-        console.error("Logout error:", error);
-      }
-      router.push("/login");
-      router.refresh();
+      await supabase.auth.signOut();
     } catch (err) {
-      console.error("Unexpected logout error:", err);
-      router.push("/login");
-      router.refresh();
+      console.error("Logout error:", err);
+    } finally {
+      // Hard redirect to clear all cached state
+      window.location.href = "/login";
     }
   }
 

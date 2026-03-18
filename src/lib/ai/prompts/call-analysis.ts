@@ -113,9 +113,9 @@ Réponds UNIQUEMENT en JSON valide :
   "suggested_script": "Script de vente personnalisé de minimum 200 mots, structuré avec les phases d'accroche, découverte, pitch, gestion des objections et closing. Adapté aux faiblesses identifiées dans l'analyse."
 }
 
-IMPORTANT :
-- Tous les scores sont sur 100 (pas sur 10). Le score global "overall_score" est aussi sur 100.
-- Le scoring couvre exactement 4 dimensions : decouverte, pitch, objections, closing.
+IMPORTANT — RÈGLES STRICTES :
+- Tous les scores sont sur 100 (PAS sur 10). Chaque "max" vaut 100. Le "overall_score" est sur 100.
+- Le champ "scores" contient EXACTEMENT 4 clés : "decouverte", "pitch", "objections", "closing". PAS d'autres clés. PAS "discovery", PAS "rapport", PAS "recadrage".
 - Le champ "playbook" doit contenir 5 à 7 actions concrètes basées sur les faiblesses identifiées. Chaque action a une priorité : "haute", "moyenne" ou "basse".
 - Chaque dimension doit avoir au moins 2 strengths et 2 improvements.
 - L'analyse des speakers doit estimer le ratio de parole vendeur/prospect (idéal : 30-40% vendeur / 60-70% prospect pour un discovery call, 40-50% / 50-60% pour un closing).

@@ -147,7 +147,7 @@ function RadarChart({
     funnel: number;
   };
 }) {
-  const size = 340;
+  const size = 380;
   const cx = size / 2;
   const cy = size / 2;
   const maxR = 110;
@@ -1076,8 +1076,7 @@ export default function DiagnosticPage() {
             {step < STEPS.length - 1 ? (
               <button
                 onClick={handleNext}
-                disabled={!canNext}
-                className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-accent text-white text-sm font-medium hover:bg-accent/90 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed shadow-[0_0_20px_rgba(52,211,153,0.15)]"
+                className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-accent text-white text-sm font-medium hover:bg-accent/90 transition-all duration-200 shadow-[0_0_20px_rgba(52,211,153,0.15)]"
               >
                 Suivant
                 <ArrowRight className="h-4 w-4" />
@@ -1140,7 +1139,7 @@ function Navbar() {
             height={32}
             className="rounded-lg"
           />
-          <span className="text-lg font-bold text-text-primary">
+          <span className="text-lg font-bold text-text-primary hidden sm:inline">
             ScalingFlow
           </span>
         </Link>

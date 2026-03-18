@@ -300,12 +300,27 @@ export function CallAnalyzer({ initialResult, initialTranscript, onResultClear }
       const data = await response.json();
       setResult(data);
       toast.success("Analyse du call terminée !");
+
+      // Auto-generate script if the AI didn't include one
+      if (!data.suggested_script) {
+        autoGenerateScriptRef.current = true;
+      }
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Erreur");
     } finally {
       setLoading(false);
     }
   };
+
+  // Auto-trigger script generation after result renders
+  const autoGenerateScriptRef = React.useRef(false);
+  React.useEffect(() => {
+    if (autoGenerateScriptRef.current && result && !result.suggested_script && !generatedScript) {
+      autoGenerateScriptRef.current = false;
+      handleGenerateScript();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [result]);
 
   const handleGenerateScript = async () => {
     if (!result) return;
