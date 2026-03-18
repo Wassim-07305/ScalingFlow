@@ -98,31 +98,31 @@ Pour chaque insight :
 
 ## STRUCTURATION PAR COUCHES (PersonaForge)
 Tu DOIS structurer les douleurs en 3 niveaux :
-1. **Symptômes de surface** (5-7) : Ce que les gens DISENT (plaintes visibles, expressions utilisées)
-2. **Causes racines** (7-10) : Ce qui BLOQUE réellement (problèmes profonds sous-jacents)
-3. **Événements déclencheurs** (4-5) : Les MOMENTS bascules qui poussent à agir (rupture, échec, deadline, etc.)
+1. **Symptômes de surface** (4-5) : Ce que les gens DISENT (plaintes visibles, expressions utilisées)
+2. **Causes racines** (4-6) : Ce qui BLOQUE réellement (problèmes profonds sous-jacents)
+3. **Événements déclencheurs** (3-4) : Les MOMENTS bascules qui poussent à agir (rupture, échec, deadline, etc.)
 
 ## Output JSON
 
 Reponds UNIQUEMENT en JSON avec cette structure :
 {
-  "insights": [...],  // 25-35 insights detailles (PAS 15, MINIMUM 25)
+  "insights": [...],  // 15-20 insights detailles
   "pain_layers": {
     "surface_symptoms": [{ "symptom": "...", "frequency": 80, "exact_quotes": ["..."] }],
     "root_causes": [{ "cause": "...", "frequency": 60, "exact_quotes": ["..."] }],
     "triggering_events": [{ "event": "...", "frequency": 40, "exact_quotes": ["..."] }]
   },
-  "top_pain_points": [...],  // Top 8-12 douleurs avec frequence et citations
-  "top_desires": [...],  // Top 5-8 desirs
-  "common_objections": [...],  // 5-8 objections courantes avec contre-arguments
+  "top_pain_points": [...],  // Top 6-8 douleurs avec frequence et citations
+  "top_desires": [...],  // Top 4-6 desirs
+  "common_objections": [...],  // 4-6 objections courantes avec contre-arguments
   "language_vault": {
-    "power_words": [...],  // 10-15 mots puissants utilises par la cible
-    "phrases_to_reuse": [...],  // 8-12 phrases exactes reutilisables en copy
-    "emotional_triggers": [...],  // 6-10 declencheurs emotionnels
-    "before_after_descriptions": [...]  // 4-6 descriptions avant/apres
+    "power_words": [...],  // 8-10 mots puissants utilises par la cible
+    "phrases_to_reuse": [...],  // 6-8 phrases exactes reutilisables en copy
+    "emotional_triggers": [...],  // 4-6 declencheurs emotionnels
+    "before_after_descriptions": [...]  // 3-4 descriptions avant/apres
   },
-  "content_angles": [...],  // 5-8 angles de contenu inspires des insights
-  "summary": "..."  // Resume de 3-5 phrases
+  "content_angles": [...],  // 4-6 angles de contenu inspires des insights
+  "summary": "..."  // Resume de 2-3 phrases
 }
 
 IMPORTANT :
@@ -130,5 +130,10 @@ IMPORTANT :
 - Utilise le vocabulaire EXACT de la cible (pas du jargon marketing)
 - Les citations doivent sonner authentiques, comme ecrites par de vrais utilisateurs
 - Les subreddits et forums doivent etre plausibles pour cette niche
-- Tout en francais sauf les noms de sources (Reddit, YouTube, etc.)`;
+- Tout en francais sauf les noms de sources (Reddit, YouTube, etc.)
+- TOUS les champs STRING doivent etre remplis — NE LAISSE JAMAIS un champ vide ("") ou null
+- Pour common_objections : "context" et "counter_argument" doivent toujours contenir du texte (min 10 mots chacun)
+- Pour content_angles : "source_inspiration" et "hook_idea" doivent toujours contenir du texte
+- Pour before_after_descriptions : "before" ET "after" doivent toujours etre remplis
+- Pour exact_quotes : chaque tableau doit contenir au moins 1 citation non vide`;
 }

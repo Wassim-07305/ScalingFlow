@@ -401,7 +401,7 @@ export function InsightsScraper({
                   />
                 </div>
                 <div className="space-y-1">
-                  {pain.exact_quotes.map((q, j) => (
+                  {(pain.exact_quotes ?? []).map((q, j) => (
                     <p key={j} className="text-xs text-text-secondary italic">
                       &ldquo;{q}&rdquo;
                     </p>
@@ -444,7 +444,7 @@ export function InsightsScraper({
                   </span>
                 </div>
                 <div className="space-y-1">
-                  {desire.exact_quotes.map((q, j) => (
+                  {(desire.exact_quotes ?? []).map((q, j) => (
                     <p key={j} className="text-xs text-text-secondary italic">
                       &ldquo;{q}&rdquo;
                     </p>
@@ -484,12 +484,16 @@ export function InsightsScraper({
                 <p className="text-sm font-medium text-red-400">
                   &ldquo;{obj.objection}&rdquo;
                 </p>
-                <p className="text-xs text-text-muted">
-                  Contexte : {obj.context}
-                </p>
-                <p className="text-xs text-accent">
-                  Contre-argument : {obj.counter_argument}
-                </p>
+                {obj.context && (
+                  <p className="text-xs text-text-muted">
+                    Contexte : {obj.context}
+                  </p>
+                )}
+                {obj.counter_argument && (
+                  <p className="text-xs text-accent">
+                    Contre-argument : {obj.counter_argument}
+                  </p>
+                )}
               </div>
             ))}
           </CardContent>
@@ -567,35 +571,41 @@ export function InsightsScraper({
                 ))}
               </div>
             </div>
+            {(result.language_vault.before_after_descriptions ?? []).filter((ba) => ba.before || ba.after).length > 0 && (
             <div>
               <p className="text-xs text-text-muted uppercase mb-2">
                 Avant / Après
               </p>
               <div className="grid gap-2">
-                {result.language_vault.before_after_descriptions.map(
-                  (ba, i) => (
+                {(result.language_vault.before_after_descriptions ?? [])
+                  .filter((ba) => ba.before || ba.after)
+                  .map((ba, i) => (
                     <div key={i} className="grid grid-cols-2 gap-2">
-                      <div className="p-2 rounded-lg bg-red-500/5 border border-red-500/10">
-                        <p className="text-[10px] text-red-400 uppercase mb-1">
-                          Avant
-                        </p>
-                        <p className="text-xs text-text-secondary">
-                          {ba.before}
-                        </p>
-                      </div>
-                      <div className="p-2 rounded-lg bg-green-500/5 border border-green-500/10">
-                        <p className="text-[10px] text-accent uppercase mb-1">
-                          Après
-                        </p>
-                        <p className="text-xs text-text-secondary">
-                          {ba.after}
-                        </p>
-                      </div>
+                      {ba.before && (
+                        <div className="p-2 rounded-lg bg-red-500/5 border border-red-500/10">
+                          <p className="text-[10px] text-red-400 uppercase mb-1">
+                            Avant
+                          </p>
+                          <p className="text-xs text-text-secondary">
+                            {ba.before}
+                          </p>
+                        </div>
+                      )}
+                      {ba.after && (
+                        <div className="p-2 rounded-lg bg-green-500/5 border border-green-500/10">
+                          <p className="text-[10px] text-accent uppercase mb-1">
+                            Après
+                          </p>
+                          <p className="text-xs text-text-secondary">
+                            {ba.after}
+                          </p>
+                        </div>
+                      )}
                     </div>
-                  ),
-                )}
+                  ))}
               </div>
             </div>
+            )}
           </CardContent>
         )}
       </Card>
@@ -620,17 +630,21 @@ export function InsightsScraper({
         </CardHeader>
         {expandedSection === "angles" && (
           <CardContent className="pt-0 space-y-2">
-            {result.content_angles.map((angle, i) => (
+            {(result.content_angles ?? []).filter((a) => a.angle).map((angle, i) => (
               <div key={i} className="p-3 rounded-xl bg-bg-tertiary/50">
                 <p className="text-sm font-medium text-text-primary mb-1">
                   {angle.angle}
                 </p>
-                <p className="text-xs text-text-muted mb-1">
-                  Inspiré de : {angle.source_inspiration}
-                </p>
-                <p className="text-xs text-accent">
-                  Hook : &ldquo;{angle.hook_idea}&rdquo;
-                </p>
+                {angle.source_inspiration && (
+                  <p className="text-xs text-text-muted mb-1">
+                    Inspiré de : {angle.source_inspiration}
+                  </p>
+                )}
+                {angle.hook_idea && (
+                  <p className="text-xs text-accent">
+                    Hook : &ldquo;{angle.hook_idea}&rdquo;
+                  </p>
+                )}
               </div>
             ))}
           </CardContent>

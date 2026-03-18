@@ -813,6 +813,72 @@ export async function detectTechStack(
 }
 
 // ---------------------------------------------------------------------------
+// Reddit
+// ---------------------------------------------------------------------------
+
+export interface RedditPostResult {
+  title: string;
+  text: string;
+  subreddit: string;
+  score: number;
+  comments: number;
+  url: string;
+  author: string;
+  topComments: string[];
+}
+
+/**
+ * Scrape Reddit posts by keyword search.
+ * Uses Reddit's public JSON API (no key required).
+ */
+export async function scrapeReddit(params: {
+  query: string;
+  limit?: number;
+}): Promise<RedditPostResult[]> {
+  const { query, limit = 20 } = params;
+
+  if (!query) {
+    console.warn("[reddit] scrapeReddit: no query provided");
+    return [];
+  }
+
+  try {
+    const url = `https://www.reddit.com/search.json?q=${encodeURIComponent(query)}&sort=relevance&limit=${limit}&type=link`;
+    const res = await fetch(url, {
+      headers: { "User-Agent": "ScalingFlow/1.0 market-research-bot" },
+      signal: AbortSignal.timeout(15000),
+    });
+
+    if (!res.ok) {
+      console.warn(`[reddit] Search failed: ${res.status}`);
+      return [];
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const data: any = await res.json();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const posts = data?.data?.children ?? [];
+
+    return posts.slice(0, limit).map((child: any) => {
+      const p = child.data;
+      return {
+        title: p.title ?? "",
+        text: p.selftext ?? "",
+        subreddit: p.subreddit ?? "",
+        score: p.score ?? 0,
+        comments: p.num_comments ?? 0,
+        url: p.url ?? `https://reddit.com${p.permalink ?? ""}`,
+        author: p.author ?? "",
+        topComments: [],
+      };
+    });
+  } catch (err) {
+    console.warn("[reddit] scrapeReddit error:", err);
+    return [];
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Utils
 // ---------------------------------------------------------------------------
 

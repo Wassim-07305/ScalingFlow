@@ -1,4 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
+import { jsonrepair } from "jsonrepair";
 import { AI_MODEL } from "./anthropic";
 
 const OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1";
@@ -166,25 +167,26 @@ export async function generateJSON<T>({
 
   try {
     return JSON.parse(jsonStr) as T;
-  } catch (parseError) {
-    // Last resort: try to find the first { ... } or [ ... ] block
-    const objectMatch = jsonStr.match(/\{[\s\S]*\}/);
-    const arrayMatch = jsonStr.match(/\[[\s\S]*\]/);
-    const fallback = objectMatch?.[0] || arrayMatch?.[0];
+  } catch {
+    // Try jsonrepair to fix truncated/malformed JSON
+    try {
+      return JSON.parse(jsonrepair(jsonStr)) as T;
+    } catch {
+      // Last resort: find the first { } or [ ] block and repair it
+      const objectMatch = jsonStr.match(/\{[\s\S]*/);
+      const arrayMatch = jsonStr.match(/\[[\s\S]*/);
+      const fallback = objectMatch?.[0] || arrayMatch?.[0];
 
-    if (fallback) {
-      try {
-        return JSON.parse(fallback) as T;
-      } catch {
-        // Both attempts failed
+      if (fallback) {
+        try {
+          return JSON.parse(jsonrepair(fallback)) as T;
+        } catch {
+          // All attempts failed
+        }
       }
-    }
 
-    throw new Error(
-      `L'IA a retourné un JSON invalide. Réessaie.${
-        parseError instanceof Error ? ` (${parseError.message})` : ""
-      }`,
-    );
+      throw new Error("L'IA a retourné un JSON invalide. Réessaie.");
+    }
   }
 }
 

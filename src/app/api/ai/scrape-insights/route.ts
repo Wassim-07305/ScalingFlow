@@ -16,13 +16,7 @@ import {
   searchAndScrape,
   type ScrapeResult,
 } from "@/lib/scraping/firecrawl";
-import {
-  isApifyConfigured,
-  scrapeYouTubeTranscript,
-  scrapeFacebookPosts,
-  scrapeGoogleMapsReviews,
-  scrapeTrustpilotReviews,
-} from "@/lib/scraping/apify";
+import { scrapeReddit } from "@/lib/scraping/apify";
 
 // Env vars: FIRECRAWL_API_KEY, APIFY_TOKEN
 
@@ -156,64 +150,28 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // ─── Phase 1b: Apify real scraping (Reddit, YouTube, Reviews) ───
+    // ─── Phase 1b: Reddit scraping (public API) ───
     let apifyContext = "";
-    if (isApifyConfigured()) {
+    {
       try {
-        const apifyResults = await Promise.allSettled([
-          // YouTube : chercher des vidéos pertinentes et récupérer les commentaires
-          scrapeYouTubeTranscript(
-            `https://www.youtube.com/results?search_query=${encodeURIComponent(body.niche || body.market)}+avis+problème`,
-          ).then((r) =>
-            r
-              ? `### YouTube Transcript\n${JSON.stringify(r).slice(0, 3000)}`
-              : "",
-          ),
+        const redditPosts = await scrapeReddit({
+          query: `${body.niche || body.market} problème aide conseil`,
+          limit: 10,
+        });
 
-          // Google Maps Reviews
-          scrapeGoogleMapsReviews({
-            googleMapsUrl: `https://www.google.com/maps/search/${encodeURIComponent(body.niche || body.market)}`,
-            limit: 10,
-          }).then((reviews) =>
-            reviews && reviews.length > 0
-              ? `### Google Maps Reviews (${reviews.length} avis)\n${reviews.map((r) => `- ${r.stars}★ : "${r.text}" (${r.name})`).join("\n")}`
-              : "",
-          ),
+        if (redditPosts.length > 0) {
+          const redditText = redditPosts
+            .slice(0, 10)
+            .map(
+              (p) =>
+                `- r/${p.subreddit} | "${p.title.slice(0, 100)}" (${p.score} upvotes)\n  ${p.text?.slice(0, 150) || ""}`,
+            )
+            .join("\n");
 
-          // Trustpilot Reviews
-          scrapeTrustpilotReviews({
-            trustpilotUrl: `https://www.trustpilot.com/search?query=${encodeURIComponent(body.niche || body.market)}`,
-            limit: 10,
-          }).then((reviews) =>
-            reviews && reviews.length > 0
-              ? `### Trustpilot Reviews (${reviews.length} avis)\n${reviews.map((r) => `- ${r.rating}★ : "${r.text}" (${r.author})`).join("\n")}`
-              : "",
-          ),
-
-          // Facebook posts/groups
-          scrapeFacebookPosts(
-            `https://www.facebook.com/search/posts/?q=${encodeURIComponent((body.niche || body.market) + " problème aide")}`,
-            10,
-          ).then((posts) =>
-            posts && posts.length > 0
-              ? `### Facebook Posts (${posts.length} posts)\n${posts.map((p) => `- "${p.text?.slice(0, 200)}" (${p.likes} likes, ${p.comments} commentaires)`).join("\n")}`
-              : "",
-          ),
-        ]);
-
-        const apifyParts = apifyResults
-          .filter(
-            (r): r is PromiseFulfilledResult<string> =>
-              r.status === "fulfilled" && !!r.value,
-          )
-          .map((r) => r.value)
-          .filter(Boolean);
-
-        if (apifyParts.length > 0) {
-          apifyContext = `\n\n## DONNÉES SCRAPÉES VIA APIFY (sources réelles)\n${apifyParts.join("\n\n")}`;
+          apifyContext = `\n\n## DONNÉES REDDIT RÉELLES (${redditPosts.length} posts)\n${redditText}`;
         }
       } catch (err) {
-        console.warn("[scrape-insights] Apify scraping failed:", err);
+        console.warn("[scrape-insights] Reddit scraping failed:", err);
       }
     }
 
@@ -233,7 +191,7 @@ export async function POST(req: NextRequest) {
 
     const result = await generateJSON<MarketInsightsResult>({
       prompt: fullPrompt,
-      maxTokens: 8192,
+      maxTokens: 10000,
       temperature: 0.8,
     });
 

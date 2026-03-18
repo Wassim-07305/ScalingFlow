@@ -128,6 +128,7 @@ export default function MarketPage() {
       const selected = (data as any[]).find((a) => a.selected) || data[0];
       if (selected) {
         setSelectedAnalysis(selected);
+        setExpandedAnalysis(selected.id);
       }
     }
     setLoadingData(false);
@@ -411,7 +412,7 @@ export default function MarketPage() {
       )}
 
       {/* Loading state */}
-      {loadingData && (
+      {loadingData && activeTab === "analyse" && (
         <div className="space-y-4">
           {Array.from({ length: 3 }).map((_, i) => (
             <Card key={i}>

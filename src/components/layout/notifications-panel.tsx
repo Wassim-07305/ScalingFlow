@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Bell, Check } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -53,8 +53,15 @@ export function NotificationsPanel({
   const { notificationsPanelOpen, setNotificationsPanelOpen } = useUIStore();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
+  const onUnreadCountChangeRef = useRef(onUnreadCountChange);
+  onUnreadCountChangeRef.current = onUnreadCountChange;
 
   const icons = { ...DEFAULT_TYPE_ICONS, ...typeIcons };
+
+  // Sync unreadCount to parent after render (avoids setState-during-render warning)
+  useEffect(() => {
+    onUnreadCountChangeRef.current(unreadCount);
+  }, [unreadCount]);
 
   useEffect(() => {
     const supabase = createClient();
@@ -71,7 +78,6 @@ export function NotificationsPanel({
         setNotifications(data);
         const count = data.filter((n: Notification) => !n.read).length;
         setUnreadCount(count);
-        onUnreadCountChange(count);
       }
     }
 
@@ -92,11 +98,7 @@ export function NotificationsPanel({
         (payload: any) => {
           const newNotif = payload.new as Notification;
           setNotifications((prev) => [newNotif, ...prev].slice(0, 30));
-          setUnreadCount((prev) => {
-            const next = prev + 1;
-            onUnreadCountChange(next);
-            return next;
-          });
+          setUnreadCount((prev) => prev + 1);
           toast(newNotif.title, { description: newNotif.body || undefined });
         },
       )
@@ -105,25 +107,20 @@ export function NotificationsPanel({
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [userId, onUnreadCountChange]);
+  }, [userId]);
 
   async function handleMarkRead(id: string) {
     await markNotificationRead(id);
     setNotifications((prev) =>
       prev.map((n) => (n.id === id ? { ...n, read: true } : n)),
     );
-    setUnreadCount((prev) => {
-      const next = Math.max(0, prev - 1);
-      onUnreadCountChange(next);
-      return next;
-    });
+    setUnreadCount((prev) => Math.max(0, prev - 1));
   }
 
   async function handleMarkAllRead() {
     await markAllNotificationsRead();
     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
     setUnreadCount(0);
-    onUnreadCountChange(0);
   }
 
   return (

@@ -408,7 +408,7 @@ export default function SettingsPage() {
       {/* Tab content with fade */}
       <div
         key={activeTab}
-        className="space-y-6 max-w-2xl animate-in fade-in slide-in-from-bottom-2 duration-300"
+        className="space-y-6 max-w-2xl mx-auto animate-in fade-in slide-in-from-bottom-2 duration-300"
       >
         {/* ─── Profil ──────────────────────────────────────── */}
         {activeTab === "profil" && (
