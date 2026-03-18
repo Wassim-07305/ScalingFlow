@@ -48,6 +48,7 @@ interface SidebarProps {
   logoHref?: string;
   adminRoles?: string[];
   settingsHref?: string;
+  disabledFeatures?: string[];
 }
 
 export function Sidebar({
@@ -60,6 +61,7 @@ export function Sidebar({
   logoHref = "/",
   adminRoles = ["admin"],
   settingsHref = "/settings",
+  disabledFeatures = [],
 }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
@@ -173,9 +175,15 @@ export function Sidebar({
         {/* Navigation with collapsible sections */}
         <nav className="flex-1 overflow-y-auto px-3 py-4">
           {navSections.map((section, sIdx) => {
-            const visibleItems = section.items.filter((item) =>
-              item.roles.includes(role),
-            );
+            const visibleItems = section.items.filter((item) => {
+              if (!item.roles.includes(role)) return false;
+              // Hide items whose module is disabled by org features
+              if (disabledFeatures.length > 0) {
+                const featureKey = item.href.replace(/^\//, "");
+                if (featureKey && disabledFeatures.includes(featureKey)) return false;
+              }
+              return true;
+            });
             if (visibleItems.length === 0) return null;
 
             const hasLabel = !!section.label;

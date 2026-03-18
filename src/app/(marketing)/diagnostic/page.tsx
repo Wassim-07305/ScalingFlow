@@ -445,11 +445,14 @@ export default function DiagnosticPage() {
     }
     setLoading(true);
     setError(null);
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 30000);
     try {
       const res = await fetch("/api/public/diagnostic", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
+        signal: controller.signal,
       });
       if (!res.ok) {
         const data = await res.json();
@@ -458,10 +461,15 @@ export default function DiagnosticPage() {
       const data: DiagnosticResult = await res.json();
       setResult(data);
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Erreur lors de l'analyse.",
-      );
+      if (err instanceof DOMException && err.name === "AbortError") {
+        setError("L'analyse a pris trop de temps. Réessaie dans un instant.");
+      } else {
+        setError(
+          err instanceof Error ? err.message : "Erreur lors de l'analyse.",
+        );
+      }
     } finally {
+      clearTimeout(timeout);
       setLoading(false);
     }
   };
@@ -477,7 +485,10 @@ export default function DiagnosticPage() {
         ? form.acquisition_channels.length > 0
         : step === 2
           ? form.delivery_method.trim() !== ""
-          : true;
+          : step === 3
+            ? form.first_name.trim() !== "" &&
+              /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)
+            : true;
 
   const handleNext = () => {
     if (!canNext) {
@@ -488,6 +499,8 @@ export default function DiagnosticPage() {
       else if (step === 1)
         setValidationError("Sélectionne au moins un canal d'acquisition.");
       else if (step === 2) setValidationError("Décris ton mode de livraison.");
+      else if (step === 3)
+        setValidationError("Renseigne ton prénom et un email valide.");
       return;
     }
     setValidationError(null);
@@ -552,7 +565,7 @@ export default function DiagnosticPage() {
               Object.keys(DIMENSION_META) as Array<keyof typeof DIMENSION_META>
             ).map((key) => {
               const meta = DIMENSION_META[key];
-              const score = result.scores[key as keyof typeof result.scores];
+              const score = (result.scores[key as keyof typeof result.scores] ?? 0);
               return (
                 <div
                   key={key}
@@ -592,10 +605,10 @@ export default function DiagnosticPage() {
             ).map((key) => {
               const meta = DIMENSION_META[key];
               const recs =
-                result.recommendations[
+                result.recommendations?.[
                   key as keyof typeof result.recommendations
                 ] || [];
-              const score = result.scores[key as keyof typeof result.scores];
+              const score = (result.scores[key as keyof typeof result.scores] ?? 0);
               return (
                 <div
                   key={key}

@@ -504,10 +504,10 @@ export function CreativeGenerator({
   if (variations.length === 0 && variationGroups.length === 0) {
     const canGoNext =
       wizardStep === 1
-        ? true
+        ? !!adFormat && !!objective
         : wizardStep === 2
-          ? true
-          : true;
+          ? offerDescription.trim().length > 0
+          : !!tone;
 
     return (
       <div className={cn("space-y-6", className)}>

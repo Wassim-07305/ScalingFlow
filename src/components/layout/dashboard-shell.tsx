@@ -17,6 +17,7 @@ interface OrgBranding {
   logo_url: string | null;
   primary_color: string;
   accent_color: string;
+  features: Record<string, boolean> | null;
 }
 
 interface DashboardShellProps {
@@ -63,7 +64,7 @@ export function DashboardShell({
         primary_color: orgBranding.primary_color,
         accent_color: orgBranding.accent_color,
         brand_name: orgBranding.brand_name,
-        features: {},
+        features: orgBranding.features || {},
         limits: {},
         custom_onboarding_steps: null,
         custom_welcome_message: null,
@@ -74,6 +75,14 @@ export function DashboardShell({
         updated_at: "",
       }
     : null;
+
+  // Compute disabled features from org branding
+  const disabledFeatures: string[] = [];
+  if (orgBranding?.features) {
+    for (const [key, enabled] of Object.entries(orgBranding.features)) {
+      if (enabled === false) disabledFeatures.push(key);
+    }
+  }
 
   return (
     <OrgBrandingProvider organization={orgForProvider}>
@@ -90,6 +99,7 @@ export function DashboardShell({
         logoSrc={logoSrc}
         appName={appName}
         adminRoles={["admin"]}
+        disabledFeatures={disabledFeatures}
       >
         {children}
       </AppShell>

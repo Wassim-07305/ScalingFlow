@@ -36,6 +36,7 @@ interface AppShellProps {
   logoSrc?: string;
   appName?: React.ReactNode;
   adminRoles?: string[];
+  disabledFeatures?: string[];
 }
 
 // ─── Component ──────────────────────────────────────────────
@@ -54,6 +55,7 @@ export function AppShell({
   logoSrc = "/icons/icon-192.png",
   appName = "ScalingFlow",
   adminRoles,
+  disabledFeatures,
 }: AppShellProps) {
   const [unreadCount, setUnreadCount] = useState(0);
 
@@ -74,6 +76,7 @@ export function AppShell({
           logoSrc={logoSrc}
           appName={appName}
           adminRoles={adminRoles}
+          disabledFeatures={disabledFeatures}
         />
 
         {/* Main area */}

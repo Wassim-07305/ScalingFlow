@@ -422,7 +422,9 @@ export async function POST(req: NextRequest) {
           .select()
           .single();
 
-        if (!saveError && adCreative) {
+        if (saveError) {
+          console.error("[generate-ads] Failed to save creative:", saveError.message);
+        } else if (adCreative) {
           savedCreatives.push(adCreative);
         }
       }

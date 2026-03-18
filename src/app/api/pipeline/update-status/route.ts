@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { sendCAPIIfConfigured } from "@/lib/tracking/meta-capi";
+import { awardXP } from "@/lib/gamification/xp-engine";
 
 const VALID_STATUSES = [
   "nouveau",
@@ -83,24 +84,11 @@ export async function POST(req: NextRequest) {
       sendCAPIIfConfigured(supabase, user.id, "Lead", {}).catch(() => {});
     }
 
-    // Award XP when deal is closed
+    // Award 150 XP when deal is closed (server-side direct call)
     if (newStatus === "close" && oldStatus !== "close") {
       try {
-        const baseUrl = req.nextUrl.origin;
-        await fetch(`${baseUrl}/api/gamification/award`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            cookie: req.headers.get("cookie") || "",
-          },
-          body: JSON.stringify({
-            activityType: "challenge.completed",
-            data: { type: "deal_closed", leadName: lead.name },
-            xpOverride: 150,
-          }),
-        });
+        await awardXP(user.id, "challenge.completed", { type: "deal_closed", leadName: lead.name }, 150);
       } catch {
-        // XP award is best-effort — don't fail the status update
         console.warn("Failed to award XP for closed deal");
       }
     }

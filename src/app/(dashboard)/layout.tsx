@@ -52,18 +52,19 @@ export default async function DashboardLayout({
     organization_id: null,
   };
 
-  // Fetch organization branding if user belongs to one
+  // Fetch organization branding + features if user belongs to one
   let orgBranding: {
     brand_name: string | null;
     logo_url: string | null;
     primary_color: string;
     accent_color: string;
+    features: Record<string, boolean> | null;
   } | null = null;
 
   if (userProfile.organization_id) {
     const { data: org } = await supabase
       .from("organizations")
-      .select("brand_name, logo_url, primary_color, accent_color")
+      .select("brand_name, logo_url, primary_color, accent_color, features")
       .eq("id", userProfile.organization_id)
       .single();
 

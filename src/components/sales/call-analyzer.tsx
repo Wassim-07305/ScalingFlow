@@ -293,7 +293,10 @@ export function CallAnalyzer({ initialResult, initialTranscript, onResultClear }
         }),
       });
 
-      if (!response.ok) throw new Error("Erreur lors de l'analyse");
+      if (!response.ok) {
+        const errData = await response.json().catch(() => ({}));
+        throw new Error(errData.error || "Erreur lors de l'analyse");
+      }
       const data = await response.json();
       setResult(data);
       toast.success("Analyse du call terminée !");
@@ -317,7 +320,7 @@ export function CallAnalyzer({ initialResult, initialTranscript, onResultClear }
           analysisContext: {
             overall_score: result.overall_score,
             weaknesses: Object.entries(result.scores)
-              .filter(([, s]) => s.score < 7)
+              .filter(([, s]) => s.score < 70)
               .map(([k, s]) => ({
                 area: SCORE_LABELS[k],
                 improvements: s.improvements,
@@ -328,7 +331,10 @@ export function CallAnalyzer({ initialResult, initialTranscript, onResultClear }
         }),
       });
 
-      if (!response.ok) throw new Error("Erreur lors de la génération");
+      if (!response.ok) {
+        const errData = await response.json().catch(() => ({}));
+        throw new Error(errData.error || "Erreur lors de la génération");
+      }
       const data = await response.json();
       const content = data.ai_raw_response || data;
       setGeneratedScript(

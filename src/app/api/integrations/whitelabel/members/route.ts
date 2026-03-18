@@ -27,10 +27,30 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Non autorisé" }, { status: 403 });
     }
 
+    // Server-side Premium gate
+    const { data: callerProfile } = await supabase
+      .from("profiles")
+      .select("subscription_plan")
+      .eq("id", user.id)
+      .single();
+    if (callerProfile?.subscription_plan !== "premium") {
+      return NextResponse.json(
+        { error: "Un abonnement Premium est requis" },
+        { status: 403 },
+      );
+    }
+
     const { email, role = "member" } = await req.json();
 
-    if (!email) {
-      return NextResponse.json({ error: "email requis" }, { status: 400 });
+    if (
+      !email ||
+      typeof email !== "string" ||
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())
+    ) {
+      return NextResponse.json(
+        { error: "Email invalide" },
+        { status: 400 },
+      );
     }
 
     // Find user by email
@@ -114,6 +134,29 @@ export async function DELETE(req: NextRequest) {
         { error: "Tu ne peux pas te retirer toi-meme" },
         { status: 400 },
       );
+    }
+
+    // Prevent removing the last admin/owner
+    const { data: targetMember } = await supabase
+      .from("organization_members")
+      .select("role")
+      .eq("organization_id", membership.organization_id)
+      .eq("user_id", user_id)
+      .single();
+
+    if (targetMember && ["owner", "admin"].includes(targetMember.role)) {
+      const { count } = await supabase
+        .from("organization_members")
+        .select("id", { count: "exact", head: true })
+        .eq("organization_id", membership.organization_id)
+        .in("role", ["owner", "admin"]);
+
+      if ((count ?? 0) <= 1) {
+        return NextResponse.json(
+          { error: "Impossible de retirer le dernier administrateur" },
+          { status: 400 },
+        );
+      }
     }
 
     await supabase

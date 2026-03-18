@@ -22,7 +22,7 @@ import type { PipelineLead } from "./pipeline-card";
 export const STATUSES: ColumnConfig[] = [
   {
     key: "nouveau",
-    label: "Nouveau",
+    label: "Nouveau lead",
     color: "text-gray-400",
     bgColor: "bg-gray-500/15",
   },
