@@ -59,13 +59,17 @@ export function buildCompetitorAnalysisPrompt(
       : "";
 
   const scrapedSection = scrapedData
-    ? `\n\n## DONNÉES RÉELLES SCRAPÉES DES SITES CONCURRENTS
-Les données ci-dessous proviennent de VRAIS sites web de concurrents. Utilise-les comme base factuelle pour ton analyse.
-Identifie le positionnement réel, le pricing, les forces/faiblesses, les landing pages, le messaging et les CTAs observés.
+    ? `\n\n## DONNÉES RÉELLES SCRAPÉES (sites + publicités)
+Les données ci-dessous proviennent de VRAIES sources : sites web de concurrents scrapés et/ou annonces actives Meta Ad Library.
+Utilise-les comme base factuelle pour ton analyse.
 
 ${scrapedData}
 
-IMPORTANT : Intègre ces données réelles dans ton analyse. Les concurrents dont le site a été scrapé doivent figurer en priorité dans ta liste et leur analyse doit refléter les données observées.\n`
+IMPORTANT :
+- Intègre ces données réelles dans ton analyse en priorité sur tes connaissances générales
+- Les concurrents dont le site ou les annonces ont été scrapés doivent figurer dans ta liste
+- Si des données META AD LIBRARY sont présentes : utilise les titres, corps, CTAs et formats observés pour renseigner les ad_insights de chaque concurrent — ce sont de VRAIES annonces actives
+- Les hooks, CTAs et landing_page_type doivent refléter les annonces réelles observées\n`
     : "";
 
   return `Tu es un expert en veille concurrentielle et en analyse strategique de marche. ${scrapedData ? "Tu combines des données réelles scrapées avec ta connaissance des marchés pour fournir une analyse factuelle et approfondie." : "Tu analyses les concurrents d'un marche donne sans scraping — tu utilises ta connaissance des marches, des acteurs cles et des tendances pour fournir une analyse pertinente."}

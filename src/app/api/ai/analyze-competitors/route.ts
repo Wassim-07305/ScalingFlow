@@ -20,15 +20,32 @@ import {
   isApifyConfigured,
   crawlWebsite,
   scrapeGoogleTrends,
+  scrapeMetaAdLibrary,
   screenshotWebsite,
   detectTechStack,
   type WebCrawlResult,
   type GoogleTrendsResult,
+  type MetaAdResult,
   type WebsiteScreenshot,
   type TechStackResult,
 } from "@/lib/scraping/apify";
 
 export const maxDuration = 60;
+
+function buildMetaAdsContext(ads: MetaAdResult[]): string {
+  let ctx = `\n## DONNÉES RÉELLES META AD LIBRARY (${ads.length} annonces actives)\n`;
+  ctx += `Ces annonces sont actuellement actives sur Meta (Facebook/Instagram).\n\n`;
+  for (const ad of ads) {
+    ctx += `- **${ad.brand || "Inconnu"}** | Format: ${ad.format} | Plateformes: ${ad.platforms.join(", ")}\n`;
+    if (ad.headline) ctx += `  Titre: "${ad.headline.slice(0, 100)}"\n`;
+    if (ad.body) ctx += `  Corps: "${ad.body.slice(0, 200)}"\n`;
+    if (ad.ctaText)
+      ctx += `  CTA: "${ad.ctaText}" → ${ad.ctaUrl?.slice(0, 80) || "N/A"}\n`;
+    ctx += "\n";
+  }
+  ctx += `IMPORTANT: Utilise ces données pour renseigner les ad_insights de chaque concurrent identifié.\n`;
+  return ctx;
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -108,6 +125,7 @@ export async function POST(req: NextRequest) {
 
     const apifyReady = isApifyConfigured();
     const firecrawlReady = isFirecrawlConfigured();
+    let metaAdsContext = "";
 
     // --- Apify : crawl des URLs concurrents + Google Trends ---
     if (apifyReady) {
@@ -183,6 +201,30 @@ export async function POST(req: NextRequest) {
               if (dataSource === "ai_only") dataSource = "google_trends";
             }
           }),
+        );
+
+        // Meta Ad Library — annonces actives sur ce marché
+        apifyPromises.push(
+          scrapeMetaAdLibrary({
+            searchQuery: marketAnalysis.market_name,
+            country:
+              marketAnalysis.country === "France"
+                ? "FR"
+                : marketAnalysis.country || "FR",
+            limit: 15,
+          })
+            .then((ads: MetaAdResult[]) => {
+              if (ads.length > 0) {
+                metaAdsContext = buildMetaAdsContext(ads);
+                if (dataSource === "ai_only") dataSource = "apify_crawl";
+              }
+            })
+            .catch((err) => {
+              console.warn(
+                "[analyze-competitors] Meta Ad Library failed (non-blocking):",
+                err,
+              );
+            }),
         );
 
         await Promise.all(apifyPromises);
@@ -300,6 +342,11 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // Merge all scraped context (website crawl + trends + Meta Ads)
+    const fullScrapedContext = [scrapedContext, metaAdsContext]
+      .filter(Boolean)
+      .join("\n");
+
     const [basePrompt, vaultContext] = await Promise.all([
       Promise.resolve(
         buildCompetitorAnalysisPrompt(
@@ -311,7 +358,7 @@ export async function POST(req: NextRequest) {
             language: marketAnalysis.language,
             user_skills: profile?.skills ?? undefined,
           },
-          scrapedContext || undefined,
+          fullScrapedContext || undefined,
         ),
       ),
       buildFullVaultContext(user.id),
