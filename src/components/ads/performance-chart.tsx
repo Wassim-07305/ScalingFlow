@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo} from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils/cn";
 import { useUser } from "@/hooks/use-user";
@@ -49,7 +49,7 @@ const METRICS: {
 export function PerformanceChart({ className }: PerformanceChartProps) {
   const { user, loading: userLoading } = useUser();
   const [data, setData] = useState<DailyMetric[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [activeMetric, setActiveMetric] = useState<MetricKey>("roas");
   const [trend, setTrend] = useState<"up" | "down" | "stable">("stable");
   const [trendPercent, setTrendPercent] = useState(0);
@@ -58,7 +58,7 @@ export function PerformanceChart({ className }: PerformanceChartProps) {
     if (userLoading || !user) return;
 
     const fetchData = async () => {
-      const supabase = createClient();
+      const supabase = useMemo(() => createClient(), []);
       const endDate = new Date();
       const startDate = subDays(endDate, 30);
 

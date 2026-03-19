@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import { cn } from "@/lib/utils/cn";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -49,7 +49,7 @@ export function DailyTasks({ className, refreshKey }: DailyTasksProps) {
   const { user, loading: userLoading } = useUser();
   const [tasks, setTasks] = React.useState<Task[]>([]);
   const [loading, setLoading] = React.useState(true);
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   React.useEffect(() => {
     if (userLoading) return;

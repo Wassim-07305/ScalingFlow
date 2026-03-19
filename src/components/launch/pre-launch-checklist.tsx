@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useMemo} from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -46,13 +46,13 @@ interface CheckItem {
 export function PreLaunchChecklist() {
   const { user, profile } = useUser();
   const [checks, setChecks] = useState<CheckItem[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const supabase = useMemo(() => createClient(), []);
 
   const runChecks = useCallback(async () => {
     if (!user) return;
 
     setLoading(true);
-    const supabase = createClient();
 
     // Build all checks in parallel
     const [
@@ -284,7 +284,7 @@ export function PreLaunchChecklist() {
 
     setChecks(items);
     setLoading(false);
-  }, [user, profile]);
+  }, [user, profile, supabase]);
 
   useEffect(() => {
     runChecks();

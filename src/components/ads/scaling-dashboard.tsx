@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo} from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -169,13 +169,13 @@ export function ScalingDashboard() {
   const { user, loading: userLoading } = useUser();
   const [entries, setEntries] = useState<ScalingEntry[]>([]);
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [scaling, setScaling] = useState(false);
   const [showScaleForm, setShowScaleForm] = useState(false);
   const [selectedCampaignId, setSelectedCampaignId] = useState<string>("");
   const [scalePercent, setScalePercent] = useState("20");
   const [roasThreshold, setRoasThreshold] = useState("1.5");
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   const fetchData = useCallback(async () => {
     if (!user) return;

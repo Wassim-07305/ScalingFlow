@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils/cn";
@@ -63,7 +63,7 @@ export function ParcoursSelector() {
   React.useEffect(() => {
     if (!user) return;
     const fetchParcours = async () => {
-      const supabase = createClient();
+      const supabase = useMemo(() => createClient(), []);
       const { data } = await supabase
         .from("profiles")
         .select("parcours")

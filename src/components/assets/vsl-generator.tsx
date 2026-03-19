@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import { cn } from "@/lib/utils/cn";
 import {
   Card,
@@ -137,7 +137,7 @@ export function VSLGenerator({ className, initialData }: VSLGeneratorProps) {
     if (!savedId || !user) return;
     setSaving(true);
     try {
-      const supabase = createClient();
+      const supabase = useMemo(() => createClient(), []);
       const { error } = await supabase
         .from("sales_assets")
         .update({

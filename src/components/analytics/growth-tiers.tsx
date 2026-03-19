@@ -191,13 +191,13 @@ export function GrowthTiers({
 }: GrowthTiersProps) {
   const { user } = useUser();
   const [monthlyData, setMonthlyData] = useState<MonthlyRevenue[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [hasData, setHasData] = useState(false);
 
   // Fetch revenue entries from Supabase, grouped by month
   useEffect(() => {
     if (!user) return;
-    const supabase = createClient();
+    const supabase = useMemo(() => createClient(), []);
 
     const fetchRevenue = async () => {
       setLoading(true);

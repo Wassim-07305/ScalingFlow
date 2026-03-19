@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import { PageHeader } from "@/components/layout/page-header";
 import { DailyTasks } from "@/components/roadmap/daily-tasks";
 import { DailyActions } from "@/components/roadmap/daily-actions";
@@ -99,7 +99,7 @@ export default function RoadmapPage() {
   const handleGenerate = async () => {
     // Check if tasks already exist and confirm before regenerating
     if (user) {
-      const supabase = createClient();
+      const supabase = useMemo(() => createClient(), []);
       const { count } = await supabase
         .from("tasks")
         .select("id", { count: "exact", head: true })

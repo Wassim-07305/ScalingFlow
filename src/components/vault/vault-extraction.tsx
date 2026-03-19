@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { AILoading } from "@/components/shared/ai-loading";
@@ -61,7 +61,7 @@ export function VaultExtraction() {
   React.useEffect(() => {
     if (!user) return;
     const fetchExisting = async () => {
-      const supabase = createClient();
+      const supabase = useMemo(() => createClient(), []);
       const { data } = await supabase
         .from("profiles")
         .select("vault_extraction, claude_api_key")

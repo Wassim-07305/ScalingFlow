@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo} from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -172,10 +172,10 @@ function getProgressPct(test: ABTest): number {
 // ─── Main component ──────────────────────────────────────────
 export function ABTestManager() {
   const { user } = useUser();
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
   const [tests, setTests] = useState<ABTest[]>([]);
   const [isDemo, setIsDemo] = useState(true);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [showUpdateForm, setShowUpdateForm] = useState<string | null>(null);
   const [newTest, setNewTest] = useState({

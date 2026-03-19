@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo} from "react";
 import { useRouter } from "next/navigation";
 import {
   Package,
@@ -85,7 +85,7 @@ export function StatsOverview() {
     avgRoas: 0,
     milestones: 0,
   });
-  const [countsLoading, setCountsLoading] = useState(true);
+  const [countsLoading, setCountsLoading] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -93,7 +93,7 @@ export function StatsOverview() {
     const fetchCounts = async () => {
       setCountsLoading(true);
       try {
-        const supabase = createClient();
+        const supabase = useMemo(() => createClient(), []);
 
         const [
           offersRes,

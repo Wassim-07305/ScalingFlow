@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import { cn } from "@/lib/utils/cn";
 import {
   Card,
@@ -108,7 +108,7 @@ export function FunnelBuilder({ className, initialData }: FunnelBuilderProps) {
     const fetchOffers = async () => {
       try {
         const { createClient } = await import("@/lib/supabase/client");
-        const supabase = createClient();
+        const supabase = useMemo(() => createClient(), []);
         const { data } = await supabase
           .from("offers")
           .select("id, offer_name")

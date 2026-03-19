@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo} from "react";
 import {
   Card,
   CardHeader,
@@ -66,7 +66,7 @@ export function MechanismGenerator({ offerId }: MechanismGeneratorProps) {
   const [targetAvatar, setTargetAvatar] = useState("");
 
   const { user } = useUser();
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   // Auto-load from profile and offer
   useEffect(() => {

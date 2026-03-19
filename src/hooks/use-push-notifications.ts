@@ -19,7 +19,7 @@ export function usePushNotifications() {
   const { user } = useUser();
   const [isSupported, setIsSupported] = useState(false);
   const [isSubscribed, setIsSubscribed] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [permission, setPermission] =
     useState<NotificationPermission>("default");
 

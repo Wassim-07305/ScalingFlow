@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import { cn } from "@/lib/utils/cn";
 import {
   Card,
@@ -331,7 +331,7 @@ export function CreativeGenerator({
     if (!user || savedIds.length === 0) return;
     setSaving(true);
     try {
-      const supabase = createClient();
+      const supabase = useMemo(() => createClient(), []);
       let hasError = false;
       for (let i = 0; i < variations.length; i++) {
         const id = savedIds[i];

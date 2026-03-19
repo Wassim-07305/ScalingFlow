@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useMemo} from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { AILoading } from "@/components/shared/ai-loading";
@@ -290,7 +290,7 @@ export function VaultSkillMap() {
   React.useEffect(() => {
     if (!user) return;
     const fetchData = async () => {
-      const supabase = createClient();
+      const supabase = useMemo(() => createClient(), []);
       const { data } = await supabase
         .from("profiles")
         .select("skills, vault_skills")

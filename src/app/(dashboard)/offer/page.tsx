@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import { PageHeader } from "@/components/layout/page-header";
 import { TabBar } from "@/components/shared/tab-bar";
 import { OfferGenerator } from "@/components/offer/offer-generator";
@@ -59,7 +59,7 @@ export default function OfferPage() {
     valueBreakdown: { item: string; value: number }[];
   }>({ anchorPrice: 0, realPrice: 0, valueBreakdown: [] });
   const [savingPricing, setSavingPricing] = React.useState(false);
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   // Fetch user's latest offer and market analysis
   React.useEffect(() => {

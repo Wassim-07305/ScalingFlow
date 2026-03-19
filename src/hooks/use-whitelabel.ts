@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo} from "react";
 import { useUser } from "@/hooks/use-user";
 import { createClient } from "@/lib/supabase/client";
 
@@ -41,7 +41,7 @@ export function useWhitelabel(): WhitelabelBranding {
     }
 
     const fetchBranding = async () => {
-      const supabase = createClient();
+      const supabase = useMemo(() => createClient(), []);
       const { data: org } = await supabase
         .from("organizations")
         .select("brand_name, logo_url, primary_color, accent_color, name")

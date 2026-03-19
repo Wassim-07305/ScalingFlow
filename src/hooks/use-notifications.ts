@@ -18,7 +18,7 @@ export function useNotifications() {
   const { user } = useUser();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const supabase = useMemo(() => createClient(), []);
 
   const fetchNotifications = useCallback(async () => {

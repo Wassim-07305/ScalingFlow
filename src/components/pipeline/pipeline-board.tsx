@@ -74,7 +74,7 @@ export function PipelineBoard() {
   const supabase = useMemo(() => createClient(), []);
   const { user } = useUser();
   const [leads, setLeads] = useState<PipelineLead[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
   const [selectedLead, setSelectedLead] = useState<PipelineLead | null>(null);
 

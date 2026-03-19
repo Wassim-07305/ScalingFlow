@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -39,7 +39,7 @@ export function VaultCompetitiveAdvantage() {
   React.useEffect(() => {
     if (!user) return;
     const fetchExisting = async () => {
-      const supabase = createClient();
+      const supabase = useMemo(() => createClient(), []);
       const { data } = await supabase
         .from("profiles")
         .select("competitive_advantage")

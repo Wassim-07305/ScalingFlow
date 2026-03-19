@@ -100,7 +100,7 @@ export function DirectMessages() {
   const [selectedUserName, setSelectedUserName] = useState<string>("");
   const [newMessage, setNewMessage] = useState("");
   const [sending, setSending] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [loadingMessages, setLoadingMessages] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<

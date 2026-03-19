@@ -92,7 +92,7 @@ const CTA_OPTIONS = [
 export function CampaignLauncher() {
   const { user } = useUser();
   const [audiences, setAudiences] = useState<Audience[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [launching, setLaunching] = useState(false);
   const [metaConnected, setMetaConnected] = useState<boolean | null>(null);
   const [showConfirm, setShowConfirm] = useState(false);

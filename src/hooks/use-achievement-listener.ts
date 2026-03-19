@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useMemo} from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useUser } from "@/hooks/use-user";
 import { triggerAchievement } from "@/stores/achievement-store";
@@ -25,7 +25,7 @@ export function useAchievementListener() {
   useEffect(() => {
     if (!user) return;
 
-    const supabase = createClient();
+    const supabase = useMemo(() => createClient(), []);
 
     // Ecouter les nouvelles notifications en temps reel
     const channel = supabase

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useMemo} from "react";
 import { PageHeader } from "@/components/layout/page-header";
 import { TabBar } from "@/components/shared/tab-bar";
 import { PersonaDisplay } from "@/components/market/persona-display";
@@ -65,7 +65,7 @@ type TabKey = (typeof TABS)[number]["key"];
 
 export default function MarketPage() {
   const { user, profile } = useUser();
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   const [activeTab, setActiveTab] = useState<TabKey>("analyse");
   const [analyses, setAnalyses] = useState<MarketAnalysis[]>([]);
@@ -94,7 +94,7 @@ export default function MarketPage() {
     | undefined
   >(undefined);
   const [loadingSchwartz, setLoadingSchwartz] = useState(false);
-  const [loadingData, setLoadingData] = useState(true);
+  const [loadingData, setLoadingData] = useState(false);
   const [usageLimited, setUsageLimited] = useState<{
     currentUsage: number;
     limit: number;
@@ -113,25 +113,49 @@ export default function MarketPage() {
     if (!user) return;
     setLoadingData(true);
 
+    // Phase 1 : métadonnées légères (pas de JSON lourd) → page visible rapidement
     const { data, error } = await supabase
       .from("market_analyses")
-      .select("*")
+      .select(
+        "id, user_id, market_name, market_description, recommended_positioning, country, language, viability_score, selected, problems, demand_signals, target_avatar, created_at",
+      )
       .eq("user_id", user.id)
       .order("created_at", { ascending: false });
 
     if (error) {
       toast.error("Erreur lors du chargement des analyses");
-    } else if (data) {
-      setAnalyses(data);
-      // Sélectionner la première analyse par défaut (ou celle marquée selected)
+      setLoadingData(false);
+      return;
+    }
+
+    if (data && data.length > 0) {
+      setAnalyses(data as MarketAnalysis[]);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const selected = (data as any[]).find((a) => a.selected) || data[0];
-      if (selected) {
-        setSelectedAnalysis(selected);
-        setExpandedAnalysis(selected.id);
-      }
+      setSelectedAnalysis(selected as MarketAnalysis);
+      setExpandedAnalysis(selected.id);
     }
     setLoadingData(false);
+
+    // Phase 2 : charger les JSON lourds en arrière-plan pour l'analyse sélectionnée
+    if (data && data.length > 0) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const selected = (data as any[]).find((a) => a.selected) || data[0];
+      const { data: fullData } = await supabase
+        .from("market_analyses")
+        .select("id, ai_raw_response, competitor_analysis, persona, schwartz_analysis")
+        .eq("id", selected.id)
+        .single();
+
+      if (fullData) {
+        setSelectedAnalysis((prev) =>
+          prev ? { ...prev, ...fullData } : prev,
+        );
+        setAnalyses((prev) =>
+          prev.map((a) => (a.id === fullData.id ? { ...a, ...fullData } : a)),
+        );
+      }
+    }
   }, [user, supabase]);
 
   // Charger les concurrents de l'analyse sélectionnée
@@ -947,8 +971,28 @@ export default function MarketPage() {
       )}
 
       {/* TAB: Concurrence */}
-      {activeTab === "concurrence" && !loadingData && selectedAnalysis && (
+      {activeTab === "concurrence" && (
         <div>
+          {loadingData && (
+            <div className="flex items-center justify-center py-16">
+              <Loader2 className="h-8 w-8 animate-spin text-text-muted" />
+            </div>
+          )}
+          {!loadingData && !selectedAnalysis && (
+            <Card>
+              <CardContent className="flex flex-col items-center justify-center py-12">
+                <Swords className="h-12 w-12 text-text-muted mb-4" />
+                <h3 className="text-lg font-medium text-text-primary mb-2">
+                  Aucune analyse de marché
+                </h3>
+                <p className="text-sm text-text-secondary text-center max-w-md">
+                  Lance d&apos;abord une analyse de marché depuis l&apos;onboarding.
+                </p>
+              </CardContent>
+            </Card>
+          )}
+          {!loadingData && selectedAnalysis && (
+          <div>
           {competitors.length > 0 ? (
             (() => {
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -1038,6 +1082,8 @@ export default function MarketPage() {
                 </Button>
               </CardContent>
             </Card>
+          )}
+          </div>
           )}
         </div>
       )}

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo} from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -145,10 +145,10 @@ function MonitorSkeleton() {
 export function AdsMonitor() {
   const { user, loading: userLoading } = useUser();
   const [alerts, setAlerts] = useState<Alert[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [checking, setChecking] = useState(false);
   const [history, setHistory] = useState<MonitorCheck[]>([]);
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   const fetchAlerts = useCallback(async () => {
     if (!user) return;

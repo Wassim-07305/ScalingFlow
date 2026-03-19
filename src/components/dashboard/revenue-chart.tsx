@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo} from "react";
 import {
   AreaChart,
   Area,
@@ -25,7 +25,7 @@ interface MonthData {
 export function RevenueChart() {
   const { user, loading: userLoading } = useUser();
   const [data, setData] = useState<MonthData[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -33,7 +33,7 @@ export function RevenueChart() {
     const fetchGenerationsPerMonth = async () => {
       setLoading(true);
       try {
-        const supabase = createClient();
+        const supabase = useMemo(() => createClient(), []);
         const now = new Date();
         const months: MonthData[] = [];
 

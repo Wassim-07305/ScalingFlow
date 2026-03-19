@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo} from "react";
 import { cn } from "@/lib/utils/cn";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -50,7 +50,7 @@ export function LeadDetailPanel({
   onUpdate,
   onDelete,
 }: LeadDetailPanelProps) {
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
   const [activities, setActivities] = useState<PipelineActivity[]>([]);
   const [loadingActivities, setLoadingActivities] = useState(true);
   const [notes, setNotes] = useState(lead.notes || "");

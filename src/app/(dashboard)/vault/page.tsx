@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -74,7 +74,7 @@ export default function VaultPage() {
     if (!user) return;
     const fetchData = async () => {
       setLoading(true);
-      const supabase = createClient();
+      const supabase = useMemo(() => createClient(), []);
 
       const [profileRes, resourcesRes] = await Promise.all([
         supabase

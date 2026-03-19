@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useCallback, useRef, useMemo} from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -72,7 +72,7 @@ export default function SettingsPage() {
   const { user, profile } = useUser();
   const searchParams = useSearchParams();
   const router = useRouter();
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   const [activeTab, setActiveTab] = useState<TabId>("profil");
 
@@ -878,7 +878,7 @@ const UNIPILE_PROVIDERS: Record<string, { label: string; emoji: string }> = {
 
 function UnipileSection() {
   const [accounts, setAccounts] = useState<UnipileAccount[]>([]);
-  const [loadingAccounts, setLoadingAccounts] = useState(true);
+  const [loadingAccounts, setLoadingAccounts] = useState(false);
   const [connecting, setConnecting] = useState(false);
   const [disconnecting, setDisconnecting] = useState<string | null>(null);
   const searchParams = useSearchParams();
@@ -1099,7 +1099,7 @@ function IntegrationsCard() {
   const [connections, setConnections] = useState<
     Record<string, ConnectionStatus>
   >({});
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [disconnecting, setDisconnecting] = useState<string | null>(null);
   const searchParams = useSearchParams();
 

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo} from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -118,10 +118,10 @@ const DEMO_PLAN: DailyPlan = {
 // ─── Main Component ──────────────────────────────────────────
 export function DailyActions({ className }: { className?: string }) {
   const { user } = useUser();
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
   const [plan, setPlan] = useState<DailyPlan>(DEMO_PLAN);
   const [isDemo, setIsDemo] = useState(true);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [syncing, setSyncing] = useState(false);
 

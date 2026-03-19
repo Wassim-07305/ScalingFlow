@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo} from "react";
 import { cn } from "@/lib/utils/cn";
 import {
   Magnet,
@@ -138,14 +138,14 @@ export function PhaseProgression({ className }: PhaseProgressionProps) {
   const [completedTitles, setCompletedTitles] = useState<Set<string>>(
     new Set(),
   );
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (!user) return;
 
     const fetchMilestones = async () => {
       try {
-        const supabase = createClient();
+        const supabase = useMemo(() => createClient(), []);
 
         const [milestonesRes, userMilestonesRes] = await Promise.all([
           supabase

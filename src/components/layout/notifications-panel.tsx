@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo} from "react";
 import { Bell, Check } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -64,7 +64,7 @@ export function NotificationsPanel({
   }, [unreadCount]);
 
   useEffect(() => {
-    const supabase = createClient();
+    const supabase = useMemo(() => createClient(), []);
 
     async function fetchNotifications() {
       const { data } = await supabase

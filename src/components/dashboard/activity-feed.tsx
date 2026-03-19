@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo} from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { useUser } from "@/hooks/use-user";
 import { createClient } from "@/lib/supabase/client";
@@ -121,7 +121,7 @@ const activityMeta: Record<
 export function ActivityFeed() {
   const { user } = useUser();
   const [activities, setActivities] = useState<ActivityItem[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -129,7 +129,7 @@ export function ActivityFeed() {
     const fetch = async () => {
       setLoading(true);
       try {
-        const supabase = createClient();
+        const supabase = useMemo(() => createClient(), []);
         const { data } = await supabase
           .from("activity_log")
           .select("id, activity_type, activity_data, created_at")

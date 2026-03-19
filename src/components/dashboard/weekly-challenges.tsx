@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo} from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
@@ -174,7 +174,7 @@ function getWeekKey(): string {
 export function WeeklyChallenges() {
   const { user, profile, loading: userLoading } = useUser();
   const [challenges, setChallenges] = useState<Challenge[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [claimingChallenge, setClaimingChallenge] = useState<string | null>(
     null,
   );
@@ -185,7 +185,7 @@ export function WeeklyChallenges() {
     const fetchChallenges = async () => {
       setLoading(true);
       try {
-        const supabase = createClient();
+        const supabase = useMemo(() => createClient(), []);
         const weekStart = getWeekStart();
         const weekKey = getWeekKey();
 

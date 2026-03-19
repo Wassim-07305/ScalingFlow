@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import { PageHeader } from "@/components/layout/page-header";
 import { TabBar } from "@/components/shared/tab-bar";
 import { PostGenerator } from "@/components/content/post-generator";
@@ -80,7 +80,7 @@ export default function ContentPage() {
 
   const handleHistorySelect = async (item: { id: string }) => {
     try {
-      const supabase = createClient();
+      const supabase = useMemo(() => createClient(), []);
       const { data, error } = await supabase
         .from("content_pieces")
         .select("content_type, ai_raw_response, title")

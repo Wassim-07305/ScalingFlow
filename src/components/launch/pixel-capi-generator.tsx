@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo} from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -188,7 +188,7 @@ function useCopyToClipboard() {
 // ─── Main component ──────────────────────────────────────────
 export function PixelCAPIGenerator() {
   const { user } = useUser();
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   const [config, setConfig] = useState<PixelConfig>({
     pixelId: "",
@@ -199,7 +199,7 @@ export function PixelCAPIGenerator() {
     "pixel",
   );
   const [saving, setSaving] = useState(false);
-  const [loadingConfig, setLoadingConfig] = useState(true);
+  const [loadingConfig, setLoadingConfig] = useState(false);
   const [savedConfig, setSavedConfig] = useState(false);
   const [testing, setTesting] = useState(false);
   const [testResult, setTestResult] = useState<{

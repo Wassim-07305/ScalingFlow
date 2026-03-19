@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo} from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -49,7 +49,7 @@ interface OptimizationResult {
 import { createClient } from "@/lib/supabase/client";
 
 async function loadMetricsFromSupabase(userId: string): Promise<DailyMetric[]> {
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
   const { data } = await supabase
     .from("daily_performance_metrics")
     .select("date, spend, impressions, clicks, leads, calls, clients, revenue")

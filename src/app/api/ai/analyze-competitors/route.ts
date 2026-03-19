@@ -179,6 +179,7 @@ export async function POST(req: NextRequest) {
               marketAnalysis.country === "France"
                 ? "FR"
                 : marketAnalysis.country || "FR",
+            maxWaitSecs: 30,
           }).then((results: GoogleTrendsResult[]) => {
             if (results.length > 0) {
               trendsData = results;
@@ -212,6 +213,7 @@ export async function POST(req: NextRequest) {
                 ? "FR"
                 : marketAnalysis.country || "FR",
             limit: 15,
+            maxWaitSecs: 30,
           })
             .then((ads: MetaAdResult[]) => {
               if (ads.length > 0) {

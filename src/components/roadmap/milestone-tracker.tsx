@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo} from "react";
 import { cn } from "@/lib/utils/cn";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -100,14 +100,14 @@ export function MilestoneTracker({ className }: MilestoneTrackerProps) {
   const [milestones, setMilestones] = useState<Milestone[]>([]);
   const [userMilestones, setUserMilestones] = useState<UserMilestone[]>([]);
   const [autoDetectedCounts, setAutoDetectedCounts] = useState({ offers: 0, funnels: 0, leads: 0 });
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (!user) return;
 
     const fetchData = async () => {
       try {
-      const supabase = createClient();
+      const supabase = useMemo(() => createClient(), []);
 
       const [milestonesRes, userMilestonesRes, offersCount, funnelsCount, leadsCount] = await Promise.all([
         supabase

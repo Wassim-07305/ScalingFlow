@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo} from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -174,11 +174,11 @@ function DecisionsSkeleton() {
 export function AutoDecisionsLog() {
   const { user, loading: userLoading } = useUser();
   const [decisions, setDecisions] = useState<Decision[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
   const [automationEnabled, setAutomationEnabled] = useState(false);
   const [togglingAutomation, setTogglingAutomation] = useState(false);
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   const fetchDecisions = useCallback(async () => {
     if (!user) return;

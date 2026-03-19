@@ -97,7 +97,7 @@ const PREDEFINED_INTERESTS = [
 export function AudienceBuilder() {
   const { user } = useUser();
   const [audiences, setAudiences] = useState<Audience[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [creating, setCreating] = useState(false);
   const [metaConnected, setMetaConnected] = useState<boolean | null>(null);
 

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo} from "react";
 import { cn } from "@/lib/utils/cn";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -46,14 +46,14 @@ export function ContentCalendar({ className }: ContentCalendarProps) {
   const { user } = useUser();
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [events, setEvents] = useState<Record<string, CalendarEvent[]>>({});
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (!user) return;
 
     const fetchContent = async () => {
       setLoading(true);
-      const supabase = createClient();
+      const supabase = useMemo(() => createClient(), []);
 
       const year = currentMonth.getFullYear();
       const month = currentMonth.getMonth();

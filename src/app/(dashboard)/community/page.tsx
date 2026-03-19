@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo} from "react";
 import { PostFeed } from "@/components/community/post-feed";
 import { AutoWins } from "@/components/community/auto-wins";
 import { DirectMessages } from "@/components/community/direct-messages";
@@ -28,7 +28,7 @@ type TabId = (typeof TABS)[number]["id"];
 
 // ─── Stats bar component ────────────────────────────────────
 function CommunityStats({ streakDays }: { streakDays: number }) {
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
   const [stats, setStats] = useState({
     activeMembers: "—",
     postsThisMonth: "—",

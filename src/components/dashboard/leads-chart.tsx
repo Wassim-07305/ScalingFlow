@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo} from "react";
 import {
   BarChart,
   Bar,
@@ -25,7 +25,7 @@ interface WeekData {
 export function LeadsChart() {
   const { user, loading: userLoading } = useUser();
   const [data, setData] = useState<WeekData[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -33,7 +33,7 @@ export function LeadsChart() {
     const fetchCreationsPerWeek = async () => {
       setLoading(true);
       try {
-        const supabase = createClient();
+        const supabase = useMemo(() => createClient(), []);
         const now = new Date();
         const weeks: WeekData[] = [];
 

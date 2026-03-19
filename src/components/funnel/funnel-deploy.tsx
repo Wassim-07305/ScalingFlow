@@ -49,7 +49,7 @@ interface PublishedFunnel {
 
 export function FunnelDeploy() {
   const [funnels, setFunnels] = useState<PublishedFunnel[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [publishing, setPublishing] = useState<string | null>(null);
   const [slugInput, setSlugInput] = useState("");
   const [selectedFunnel, setSelectedFunnel] = useState<string | null>(null);

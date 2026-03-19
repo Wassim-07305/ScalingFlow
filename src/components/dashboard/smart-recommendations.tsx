@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo} from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -35,14 +35,14 @@ export function SmartRecommendations() {
   const { user, profile, loading: userLoading } = useUser();
   const router = useRouter();
   const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (!user || userLoading) return;
 
     const analyze = async () => {
       try {
-      const supabase = createClient();
+      const supabase = useMemo(() => createClient(), []);
 
       // Requêtes parallèles pour analyser la progression
       const [

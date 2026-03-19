@@ -72,7 +72,7 @@ interface KPI {
 
 // ─── Supabase helpers ────────────────────────────────────────
 async function loadMetricsFromDB(userId: string): Promise<DailyMetric[]> {
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
   const { data } = await supabase
     .from("daily_performance_metrics")
     .select("date, spend, impressions, clicks, leads, calls, clients, revenue")
@@ -162,7 +162,7 @@ function fmtPercent(n: number): string {
 export function PerformanceDashboard() {
   const { user } = useUser();
   const [metrics, setMetrics] = useState<DailyMetric[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [syncing, setSyncing] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState<DailyMetric>({

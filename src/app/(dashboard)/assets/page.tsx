@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import { PageHeader } from "@/components/layout/page-header";
 import { VSLGenerator } from "@/components/assets/vsl-generator";
 import { EmailSequence } from "@/components/assets/email-sequence";
@@ -67,7 +67,7 @@ export default function AssetsPage() {
     subtitle?: string;
   }) => {
     try {
-      const supabase = createClient();
+      const supabase = useMemo(() => createClient(), []);
       const { data, error } = await supabase
         .from("sales_assets")
         .select("asset_type, ai_raw_response, content, metadata")

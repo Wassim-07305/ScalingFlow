@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import { PageHeader } from "@/components/layout/page-header";
 import {
   Card,
@@ -106,7 +106,7 @@ export default function SalesPage() {
 
   const handleHistorySelect = async (item: { id: string }) => {
     try {
-      const supabase = createClient();
+      const supabase = useMemo(() => createClient(), []);
       const { data, error } = await supabase
         .from("sales_assets")
         .select("asset_type, ai_raw_response, content, metadata")

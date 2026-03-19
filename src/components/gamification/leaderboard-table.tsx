@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo} from "react";
 import { cn } from "@/lib/utils/cn";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -37,13 +37,13 @@ const PAGE_SIZE = 20;
 export function LeaderboardTable({ className }: LeaderboardTableProps) {
   const { user } = useUser();
   const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
 
   const fetchPage = async (offset: number) => {
-    const supabase = createClient();
+    const supabase = useMemo(() => createClient(), []);
 
     const { data, error, count } = await supabase
       .from("leaderboard_scores")

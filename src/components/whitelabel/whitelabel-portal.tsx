@@ -65,7 +65,7 @@ export function WhitelabelPortal({ className }: { className?: string }) {
   const supabase = useMemo(() => createClient(), []);
   const [config, setConfig] = useState<WhitelabelConfig>(DEFAULT_CONFIG);
   const [reports, setReports] = useState<WhitelabelReport[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [activeSection, setActiveSection] = useState<
     "branding" | "reports" | "embed"

@@ -264,7 +264,7 @@ export function OnboardingFlow() {
 
   const router = useRouter();
   const { user, profile, loading: userLoading } = useUser();
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   /* ── Visible questions (filter showWhen) ── */
 

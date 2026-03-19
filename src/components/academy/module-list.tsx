@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import { cn } from "@/lib/utils/cn";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -61,7 +61,7 @@ function formatDuration(minutes: number | null): string {
 
 export function ModuleList({ className }: ModuleListProps) {
   const { user, loading: userLoading } = useUser();
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   const [modules, setModules] = React.useState<AcademyModule[]>([]);
   const [loading, setLoading] = React.useState(true);

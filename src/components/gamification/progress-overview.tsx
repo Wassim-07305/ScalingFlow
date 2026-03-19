@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo} from "react";
 import { cn } from "@/lib/utils/cn";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -44,13 +44,13 @@ export function ProgressOverview({ className }: ProgressOverviewProps) {
   const { user, profile, loading: userLoading } = useUser();
   const [modules, setModules] = useState<ModuleProgress[]>([]);
   const [rank, setRank] = useState<number | null>(null);
-  const [dataLoading, setDataLoading] = useState(true);
+  const [dataLoading, setDataLoading] = useState(false);
 
   useEffect(() => {
     if (!user) return;
 
     const fetchModuleProgress = async () => {
-      const supabase = createClient();
+      const supabase = useMemo(() => createClient(), []);
 
       // Requêtes parallèles pour compter les items par module + rang
       const [

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo} from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
@@ -19,7 +19,7 @@ export default function ResetPasswordPage() {
   const [checking, setChecking] = useState(true);
   const [hasSession, setHasSession] = useState(false);
   const router = useRouter();
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   // Supabase injects the recovery token via URL hash — the client
   // library picks it up automatically when onAuthStateChange fires.

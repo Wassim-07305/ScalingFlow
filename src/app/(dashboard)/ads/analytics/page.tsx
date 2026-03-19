@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo} from "react";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { AnimatedCounter } from "@/components/shared/animated-counter";
@@ -38,7 +38,7 @@ interface AggregatedMetrics {
 export default function AnalyticsPage() {
   const { user, profile, loading: userLoading } = useUser();
   const [metrics, setMetrics] = useState<AggregatedMetrics | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [syncing, setSyncing] = useState(false);
 
   const hasMetaConfig = !!(
@@ -68,7 +68,7 @@ export default function AnalyticsPage() {
     if (userLoading || !user) return;
 
     const fetchMetrics = async () => {
-      const supabase = createClient();
+      const supabase = useMemo(() => createClient(), []);
 
       const [campaignsRes, creativesRes] = await Promise.all([
         supabase

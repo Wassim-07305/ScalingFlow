@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import { cn } from "@/lib/utils/cn";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -96,7 +96,7 @@ function getInitials(name: string | null | undefined) {
 // ─── Main Component ─────────────────────────────────────────
 export function AutoWins({ className }: { className?: string }) {
   const { user } = useUser();
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   const [wins, setWins] = React.useState<WinItem[]>([]);
   const [loading, setLoading] = React.useState(true);

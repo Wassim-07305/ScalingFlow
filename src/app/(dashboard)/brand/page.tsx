@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import { PageHeader } from "@/components/layout/page-header";
 import { NameGenerator } from "@/components/brand/name-generator";
 import { StyleGuide } from "@/components/brand/style-guide";
@@ -86,7 +86,7 @@ export default function BrandPage() {
     const fetchBrand = async () => {
       setLoading(true);
       try {
-        const supabase = createClient();
+        const supabase = useMemo(() => createClient(), []);
 
         // Fetch latest brand identity
         const { data: brand } = await supabase

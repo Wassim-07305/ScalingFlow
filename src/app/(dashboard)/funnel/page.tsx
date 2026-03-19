@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import { PageHeader } from "@/components/layout/page-header";
 import { TabBar } from "@/components/shared/tab-bar";
 import { FunnelBuilder } from "@/components/funnel/funnel-builder";
@@ -22,7 +22,7 @@ export default function FunnelPage() {
   const [activeTab, setActiveTab] = React.useState<string>("generate");
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [loadedData, setLoadedData] = React.useState<any>(null);
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   const handleHistorySelect = async (item: { id: string }) => {
     try {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo} from "react";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -173,15 +173,15 @@ const PAGE_SIZE = 20;
 export default function ActivityLogPage() {
   const { user, loading: userLoading } = useUser();
   const [activities, setActivities] = useState<ActivityItem[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(0);
   const [total, setTotal] = useState(0);
   const [category, setCategory] = useState("Tout");
+  const supabase = useMemo(() => createClient(), []);
 
   const fetchActivities = useCallback(async () => {
     if (!user) return;
     setLoading(true);
-    const supabase = createClient();
 
     // Construire les filtres par catégorie
     const categoryTypes =
@@ -219,7 +219,7 @@ export default function ActivityLogPage() {
     const { data } = await dataQuery;
     setActivities((data as ActivityItem[]) ?? []);
     setLoading(false);
-  }, [user, page, category]);
+  }, [user, page, category, supabase]);
 
   useEffect(() => {
     if (userLoading || !user) return;

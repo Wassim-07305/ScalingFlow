@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useEffect, useCallback } from "react";
+import React, { useRef, useEffect, useCallback, useMemo} from "react";
 import { cn } from "@/lib/utils/cn";
 import { Button } from "@/components/ui/button";
 import { useUser } from "@/hooks/use-user";
@@ -132,7 +132,7 @@ export function AIChat({
   className,
 }: AIChatProps) {
   const { user } = useUser();
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   const [messages, setMessages] = React.useState<ChatMessage[]>(
     initialMessages || [],

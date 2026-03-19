@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo} from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -297,10 +297,10 @@ function detectContextualBottlenecks(ctx: ContextualData): Bottleneck[] {
 // ─── Main Component ──────────────────────────────────────────
 export function BottleneckDetector() {
   const { user } = useUser();
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
   const [metrics, setMetrics] = useState<FunnelMetrics>(DEMO_METRICS);
   const [isDemo, setIsDemo] = useState(true);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
   const [contextualData, setContextualData] = useState<ContextualData>({
     creativeFatigue: false,

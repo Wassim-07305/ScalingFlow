@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useCallback } from "react";
+import React, { useEffect, useCallback, useMemo} from "react";
 import { PageHeader } from "@/components/layout/page-header";
 import { AIChat } from "@/components/shared/ai-chat";
 import { AGENTS, type AgentType } from "@/lib/ai/agents/index";
@@ -123,7 +123,7 @@ export default function AssistantPage() {
     setActiveConversationId(conv.id);
     try {
       const { createClient } = await import("@/lib/supabase/client");
-      const supabase = createClient();
+      const supabase = useMemo(() => createClient(), []);
       const { data } = await supabase
         .from("agent_conversations")
         .select("messages")
