@@ -415,7 +415,7 @@ export default function AffiliatePage() {
                 tickFormatter={(v) => `${v}€`}
               />
               <Tooltip
-                formatter={(value: number) => [`${value.toFixed(2)}€`, "Commission"]}
+                formatter={(value: number | undefined) => [`${(value ?? 0).toFixed(2)}€`, "Commission"]}
                 contentStyle={{
                   background: "#141719",
                   border: "1px solid #1C1F23",

@@ -50,7 +50,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.redirect(redirectUrl);
     }
 
-    const program = affiliate.affiliate_programs as {
+    const program = affiliate.affiliate_programs as unknown as {
       is_active: boolean;
       cookie_duration_days: number;
       name: string;

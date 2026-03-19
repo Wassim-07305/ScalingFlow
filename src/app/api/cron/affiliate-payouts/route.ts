@@ -59,7 +59,7 @@ export async function GET(req: NextRequest) {
       "https://scalingflow.com";
 
     for (const aff of eligibleAffiliates || []) {
-      const program = aff.affiliate_programs as { min_payout: number };
+      const program = aff.affiliate_programs as unknown as { min_payout: number };
       const minPayout = program.min_payout ?? 50;
 
       // Vérifier si des commissions approved existent

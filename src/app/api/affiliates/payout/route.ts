@@ -69,7 +69,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Affilié introuvable" }, { status: 404 });
     }
 
-    const program = affiliate.affiliate_programs as { min_payout: number };
+    const program = affiliate.affiliate_programs as unknown as { min_payout: number };
     const minPayout = program.min_payout ?? 50;
 
     // Récupérer les commissions approved

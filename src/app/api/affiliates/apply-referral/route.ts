@@ -109,10 +109,13 @@ export async function POST(req: NextRequest) {
       .eq("id", user.id);
 
     // Incrémenter total_referrals de l'affilié
-    await adminClient.rpc("increment_affiliate_referrals", {
-      p_affiliate_id: affiliate.id,
-    }).catch(async () => {
-      // Fallback si la fonction RPC n'existe pas
+    try {
+      const { error: rpcError } = await adminClient.rpc("increment_affiliate_referrals", {
+        p_affiliate_id: affiliate.id,
+      });
+      if (rpcError) throw rpcError;
+    } catch {
+      // Fallback direct si la fonction RPC n'existe pas
       const { data: aff } = await adminClient
         .from("affiliates")
         .select("total_referrals")
@@ -124,7 +127,7 @@ export async function POST(req: NextRequest) {
           .update({ total_referrals: (aff.total_referrals || 0) + 1 })
           .eq("id", affiliate.id);
       }
-    });
+    }
 
     // Envoyer email à l'affilié (non-bloquant)
     const affiliateProfile = affiliate.profiles as {
