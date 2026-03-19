@@ -205,14 +205,14 @@ export function CreativeGenerator({
       });
 
       if (!response.ok) {
-        if (response.status === 403) {
-          const errData = await response.json();
-          if (errData.usage) {
-            setUsageLimited(errData.usage);
-            return;
-          }
+        const errData = await response.json().catch(() => ({}));
+        if (response.status === 403 && errData.usage) {
+          setUsageLimited(errData.usage);
+          return;
         }
-        throw new Error("Erreur lors de la génération");
+        throw new Error(
+          errData.error || "Erreur lors de la génération",
+        );
       }
       const data = await response.json();
       const raw = data.ai_raw_response || data;

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useMemo } from "react";
 import { createClient } from "@/lib/supabase/client";
 import type { User } from "@supabase/supabase-js";
 import type { Database } from "@/types/database";
@@ -8,62 +8,69 @@ import type { Database } from "@/types/database";
 type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 
 // Select all columns — RLS already limits access to the user's own profile.
-// Sensitive fields (meta_access_token, claude_api_key, etc.) are the user's
-// own keys and are safe to fetch client-side. Using "*" prevents column
-// mismatch errors when the database schema evolves.
 const PROFILE_SELECT = "*";
 
 export function useUser() {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
-  const resolved = useRef(false);
-  const supabase = createClient();
-
-  const fetchProfile = async (userId: string, mounted: { current: boolean }) => {
-    const { data: profileData, error } = await supabase
-      .from("profiles")
-      .select(PROFILE_SELECT)
-      .eq("id", userId)
-      .single();
-    if (error) {
-      console.error("useUser: failed to load profile", error);
-    } else if (mounted.current && profileData) {
-      setProfile(profileData);
-    }
-  };
+  const initRef = useRef(false);
+  // Stable reference — createClient() is already a singleton but useMemo
+  // guarantees React won't re-trigger the effect on every render.
+  const supabase = useMemo(() => createClient(), []);
 
   useEffect(() => {
-    const mounted = { current: true };
+    // Prevent double-init in React StrictMode
+    if (initRef.current) return;
+    initRef.current = true;
 
-    const done = () => {
-      if (!resolved.current) {
-        resolved.current = true;
-        setLoading(false);
+    let mounted = true;
+
+    const fetchProfile = async (userId: string) => {
+      try {
+        const { data, error } = await supabase
+          .from("profiles")
+          .select(PROFILE_SELECT)
+          .eq("id", userId)
+          .single();
+        if (error) {
+          console.warn("useUser: profile load error", error.message);
+        } else if (mounted && data) {
+          setProfile(data);
+        }
+      } catch {
+        // Network error — non-blocking
       }
     };
 
     const init = async () => {
       try {
-        // 1. getSession() — lecture localStorage, instantané, débloque le loading
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!mounted.current) return;
+        // 1. getSession() — instant read from localStorage
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+        if (!mounted) return;
 
         if (session?.user) {
           setUser(session.user);
-          done();
-          // 2. Charge le profil + vérifie le JWT en arrière-plan (réseau)
-          fetchProfile(session.user.id, mounted);
-          void (async () => {
-            const res = await supabase.auth.getUser();
-            if (mounted.current && res.data.user) setUser(res.data.user);
-          })();
+          // 2. Fetch profile BEFORE resolving loading
+          await fetchProfile(session.user.id);
+          if (!mounted) return;
+          setLoading(false);
+          // 3. Verify JWT in background (network call)
+          supabase.auth
+            .getUser()
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            .then((r: any) => {
+              if (mounted && r.data?.user) setUser(r.data.user);
+            })
+            .catch(() => {});
         } else {
-          done();
+          setLoading(false);
         }
       } catch (err) {
         console.error("useUser: init error", err);
-        done();
+        if (mounted) setLoading(false);
       }
     };
 
@@ -71,20 +78,22 @@ export function useUser() {
 
     const {
       data: { subscription },
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } = supabase.auth.onAuthStateChange(async (_event: any, session: any) => {
-      if (!mounted.current) return;
-      setUser(session?.user ?? null);
-      done();
-      if (session?.user) {
-        fetchProfile(session.user.id, mounted);
-      } else {
-        setProfile(null);
-      }
-    });
+    } = supabase.auth.onAuthStateChange(
+      async (_event: string, session: { user: User } | null) => {
+        if (!mounted) return;
+        const u = session?.user ?? null;
+        setUser(u);
+        if (u) {
+          await fetchProfile(u.id);
+        } else {
+          setProfile(null);
+        }
+        setLoading(false);
+      },
+    );
 
     return () => {
-      mounted.current = false;
+      mounted = false;
       subscription.unsubscribe();
     };
   }, [supabase]);

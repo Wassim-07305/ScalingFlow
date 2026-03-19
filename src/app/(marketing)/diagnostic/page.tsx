@@ -819,7 +819,7 @@ export default function DiagnosticPage() {
                 >
                   {i < step ? <CheckCircle2 className="h-3.5 w-3.5" /> : i + 1}
                 </div>
-                <span className="hidden sm:inline">{s.label}</span>
+                <span className="text-xs sm:text-sm">{s.label}</span>
               </button>
               {i < STEPS.length - 1 && (
                 <div
@@ -1146,7 +1146,7 @@ function Navbar() {
         <div className="flex items-center gap-2 sm:gap-3">
           <Link
             href="/login"
-            className="hidden sm:inline text-sm font-medium text-text-secondary hover:text-text-primary transition-colors"
+            className="text-sm font-medium text-text-secondary hover:text-text-primary transition-colors"
           >
             Connexion
           </Link>

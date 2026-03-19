@@ -113,6 +113,28 @@ html {
   color-scheme: dark;
 }
 
+html:not(.dark) {
+  color-scheme: light;
+  --color-bg-primary: #f8f9fb;
+  --color-bg-secondary: #ffffff;
+  --color-bg-tertiary: #f0f1f3;
+  --color-bg-elevated: #ffffff;
+  --color-text-primary: #111827;
+  --color-text-secondary: #6b7280;
+  --color-text-muted: #9ca3af;
+  --color-border-default: rgba(0, 0, 0, 0.08);
+  --color-border-hover: rgba(0, 0, 0, 0.15);
+  --color-sidebar: #ffffff;
+  --color-sidebar-foreground: #111827;
+  --color-sidebar-accent: #f0f1f3;
+  --color-sidebar-accent-foreground: #111827;
+  --color-sidebar-border: rgba(0, 0, 0, 0.08);
+  --color-brand-dark: #ffffff;
+  --color-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --color-shadow-md: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --color-shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
 body {
   font-family: var(--font-sans);
   background-color: var(--color-bg-primary);

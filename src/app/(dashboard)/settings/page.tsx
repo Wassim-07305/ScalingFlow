@@ -81,8 +81,12 @@ export default function SettingsPage() {
   const [deleteConfirmText, setDeleteConfirmText] = useState("");
   const [deletingAccount, setDeletingAccount] = useState(false);
 
-  // Handle checkout success redirect
+  // Handle query-param driven tab selection
   useEffect(() => {
+    const tab = searchParams.get("tab") as TabId | null;
+    if (tab && TABS.some((t) => t.id === tab)) {
+      setActiveTab(tab);
+    }
     if (searchParams.get("checkout") === "success") {
       toast.success(
         "Abonnement activé avec succès ! Bienvenue dans le plan Pro.",

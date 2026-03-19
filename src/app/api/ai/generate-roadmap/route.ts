@@ -127,7 +127,6 @@ export async function POST(req: NextRequest) {
         related_module: task.related_module,
         estimated_minutes: task.estimated_minutes,
         task_order: task.task_order,
-        phase: task.phase || null,
         due_date: dueDate.toISOString().split("T")[0],
         completed: false,
       };
@@ -158,6 +157,7 @@ export async function POST(req: NextRequest) {
       recommended_pace: result.recommended_pace,
     });
   } catch (error) {
+    console.error("generate-roadmap error:", error);
     return NextResponse.json(
       { error: "Erreur lors de la génération de la roadmap" },
       { status: 500 },
