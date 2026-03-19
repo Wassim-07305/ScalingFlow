@@ -98,6 +98,13 @@ function RegisterForm() {
       // L'échec de l'email ne doit pas bloquer l'inscription
     }
 
+    // Lier le referral affilié si un cookie sf_ref est présent (non bloquant)
+    try {
+      await fetch("/api/affiliates/apply-referral", { method: "POST" });
+    } catch {
+      // Le referral ne doit pas bloquer l'inscription
+    }
+
     router.push("/onboarding");
     router.refresh();
   };

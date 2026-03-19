@@ -33,6 +33,8 @@ const XP_REWARDS: Record<string, number> = {
   "milestone.completed": 200,
   "onboarding.completed": 150,
   "streak.daily": 15,
+  "affiliate.referral_signup": 50,
+  "affiliate.conversion": 100,
 };
 
 const LEVEL_THRESHOLDS = [
@@ -53,6 +55,7 @@ interface BadgeStats {
   streak: number;
   communityPosts: number;
   maxRoas: number;
+  currentRevenue: number;
 }
 
 const BADGE_CONDITIONS: {
@@ -77,6 +80,11 @@ const BADGE_CONDITIONS: {
   // Ads performance badges
   { badge: "roas_2x", condition: (s) => s.maxRoas >= 2 },
   { badge: "roas_5x", condition: (s) => s.maxRoas >= 5 },
+  // Paliers de croissance (CA mensuel déclaratif)
+  { badge: "tier_5k", condition: (s) => s.currentRevenue >= 5000 },
+  { badge: "tier_10k", condition: (s) => s.currentRevenue >= 10000 },
+  { badge: "tier_30k", condition: (s) => s.currentRevenue >= 30000 },
+  { badge: "tier_50k", condition: (s) => s.currentRevenue >= 50000 },
 ];
 
 export async function awardXP(
@@ -138,7 +146,11 @@ export async function awardXP(
       .select("*", { count: "exact", head: true })
       .eq("user_id", userId),
     supabase.from("ad_campaigns").select("roas").eq("user_id", userId),
-    supabase.from("profiles").select("streak_days").eq("id", userId).single(),
+    supabase
+      .from("profiles")
+      .select("streak_days, current_revenue")
+      .eq("id", userId)
+      .single(),
   ]);
 
   const totalGenerations =
@@ -160,6 +172,7 @@ export async function awardXP(
     streak: profileStreakRes.data?.streak_days ?? 0,
     communityPosts: communityPostsCount ?? 0,
     maxRoas,
+    currentRevenue: profileStreakRes.data?.current_revenue ?? 0,
   };
   const newBadges: string[] = [];
 

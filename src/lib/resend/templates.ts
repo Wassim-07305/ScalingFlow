@@ -277,6 +277,131 @@ export function kpiAlertEmail(
   };
 }
 
+// ---------------------------------------------------------------------------
+// 9. Affiliation — Nouveau referral inscrit
+// ---------------------------------------------------------------------------
+export function affiliateNewReferralEmail(
+  affiliateFirstName: string,
+  referredFirstName: string,
+) {
+  const html = layout(`
+    <h1 style="margin:0 0 16px;font-size:22px;font-weight:700;color:#FFFFFF;">
+      Nouveau referral inscrit !
+    </h1>
+    <p style="margin:0 0 12px;font-size:15px;line-height:1.6;color:#D1D5DB;">
+      Bonne nouvelle ${affiliateFirstName} !
+      <strong style="color:#34D399;">${referredFirstName}</strong>
+      vient de s&rsquo;inscrire sur ScalingFlow via ton lien de referral.
+    </p>
+    <div style="background-color:#1C1F23;border-radius:8px;padding:20px;margin:16px 0;text-align:center;">
+      <p style="margin:0 0 4px;font-size:13px;color:#9CA3AF;">Prochaine &eacute;tape</p>
+      <p style="margin:0;font-size:15px;color:#FFFFFF;">
+        Une commission sera g&eacute;n&eacute;r&eacute;e si ${referredFirstName} souscrit un abonnement.
+      </p>
+    </div>
+    ${ctaButton("Voir mon dashboard partenaire", `${APP_URL}/affiliate`)}
+  `);
+  return {
+    subject: `\u{1F389} ${referredFirstName} vient de s'inscrire via ton lien !`,
+    html,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// 10. Affiliation — Commission générée
+// ---------------------------------------------------------------------------
+export function affiliateCommissionEmail(
+  firstName: string,
+  amount: number,
+  currency: string,
+) {
+  const formatted = new Intl.NumberFormat("fr-FR", {
+    style: "currency",
+    currency: currency.toUpperCase(),
+    minimumFractionDigits: 2,
+  }).format(amount);
+
+  const html = layout(`
+    <h1 style="margin:0 0 16px;font-size:22px;font-weight:700;color:#FFFFFF;">
+      Tu as gagn&eacute; une commission !
+    </h1>
+    <p style="margin:0 0 12px;font-size:15px;line-height:1.6;color:#D1D5DB;">
+      ${firstName}, un de tes filleuls vient de payer son abonnement.
+    </p>
+    <div style="background-color:#1C1F23;border-radius:8px;padding:24px;margin:16px 0;text-align:center;">
+      <p style="margin:0 0 4px;font-size:13px;color:#9CA3AF;">Commission g&eacute;n&eacute;r&eacute;e</p>
+      <p style="margin:0;font-size:32px;font-weight:700;color:#34D399;">${formatted}</p>
+    </div>
+    <p style="margin:0 0 12px;font-size:14px;line-height:1.6;color:#9CA3AF;">
+      La commission est en attente d&rsquo;approbation (automatique apr&egrave;s 30 jours sans remboursement).
+    </p>
+    ${ctaButton("Voir mes commissions", `${APP_URL}/affiliate`)}
+  `);
+  return {
+    subject: `\u{1F4B0} Tu as gagn\u00e9 ${formatted} de commission !`,
+    html,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// 11. Affiliation — Payout envoyé
+// ---------------------------------------------------------------------------
+export function affiliatePayoutEmail(
+  firstName: string,
+  amount: number,
+  currency: string,
+) {
+  const formatted = new Intl.NumberFormat("fr-FR", {
+    style: "currency",
+    currency: currency.toUpperCase(),
+    minimumFractionDigits: 2,
+  }).format(amount);
+
+  const html = layout(`
+    <h1 style="margin:0 0 16px;font-size:22px;font-weight:700;color:#FFFFFF;">
+      Paiement envoy&eacute; !
+    </h1>
+    <p style="margin:0 0 12px;font-size:15px;line-height:1.6;color:#D1D5DB;">
+      ${firstName}, ton paiement de commissions vient d&rsquo;&ecirc;tre initialis&eacute;.
+    </p>
+    <div style="background-color:#1C1F23;border-radius:8px;padding:24px;margin:16px 0;text-align:center;">
+      <p style="margin:0 0 4px;font-size:13px;color:#9CA3AF;">Montant pay&eacute;</p>
+      <p style="margin:0;font-size:32px;font-weight:700;color:#34D399;">${formatted}</p>
+    </div>
+    <p style="margin:0 0 12px;font-size:14px;line-height:1.6;color:#9CA3AF;">
+      Le virement arrivera sur ton compte Stripe sous 1&nbsp;&agrave;&nbsp;3 jours ouvr&eacute;s.
+    </p>
+    ${ctaButton("Voir l'historique des paiements", `${APP_URL}/affiliate`)}
+  `);
+  return {
+    subject: `\u{1F4B8} Ton paiement de ${formatted} a \u00e9t\u00e9 envoy\u00e9`,
+    html,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// 12. Admin — Nouvel affilié inscrit
+// ---------------------------------------------------------------------------
+export function adminNewAffiliateEmail(affiliateFullName: string) {
+  const html = layout(`
+    <h1 style="margin:0 0 16px;font-size:22px;font-weight:700;color:#FFFFFF;">
+      Nouvel affili&eacute; inscrit
+    </h1>
+    <p style="margin:0 0 12px;font-size:15px;line-height:1.6;color:#D1D5DB;">
+      <strong style="color:#34D399;">${affiliateFullName}</strong>
+      vient de rejoindre le programme partenaire ScalingFlow.
+    </p>
+    ${ctaButton("G\u00e9rer les affili\u00e9s", `${APP_URL}/admin/affiliates`)}
+  `);
+  return {
+    subject: `Nouvel affili\u00e9 : ${affiliateFullName}`,
+    html,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// streak reminder
+// ---------------------------------------------------------------------------
 export function streakReminderEmail(firstName: string, streakDays: number) {
   const html = layout(`
     <h1 style="margin:0 0 16px;font-size:22px;font-weight:700;color:#FFFFFF;">
