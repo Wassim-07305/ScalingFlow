@@ -54,8 +54,8 @@ export function useUser() {
           done();
           // 2. Charge le profil + vérifie le JWT en arrière-plan (réseau)
           fetchProfile(session.user.id, mounted);
-          supabase.auth.getUser().then(({ data: { user } }) => {
-            if (mounted.current && user) setUser(user);
+          supabase.auth.getUser().then(({ data }) => {
+            if (mounted.current && data.user) setUser(data.user);
           }).catch(() => {});
         } else {
           done();
