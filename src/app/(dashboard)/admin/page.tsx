@@ -80,7 +80,7 @@ export default function AdminPage() {
   });
   const [recentUsers, setRecentUsers] = useState<RecentUser[]>([]);
   const [recentActivity, setRecentActivity] = useState<RecentActivity[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   // ─── Role protection ─────────────────────────────────────────
   useEffect(() => {
@@ -236,8 +236,8 @@ export default function AdminPage() {
   }, [user, supabase]);
 
   useEffect(() => {
-    if (profile?.role === "admin") fetchStats();
-  }, [profile, fetchStats]);
+    if (user && profile?.role === "admin") fetchStats();
+  }, [user, profile, fetchStats]);
 
   const getInitials = (name: string | null) => {
     if (!name) return "?";
