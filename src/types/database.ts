@@ -1997,6 +1997,26 @@ export interface Database {
           task_order?: number | null;
         };
       };
+      system_settings: {
+        Row: {
+          key: string;
+          value: string;
+          is_secret: boolean;
+          updated_at: string;
+        };
+        Insert: {
+          key: string;
+          value: string;
+          is_secret?: boolean;
+          updated_at?: string;
+        };
+        Update: {
+          key?: string;
+          value?: string;
+          is_secret?: boolean;
+          updated_at?: string;
+        };
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;

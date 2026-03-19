@@ -1,7 +1,8 @@
 // Apify API integration for social media & web scraping
-// Requires env var: APIFY_TOKEN
+// Requires env var: APIFY_TOKEN (ou via system_settings DB)
 
 import { isFirecrawlConfigured } from "./firecrawl";
+import { getSetting } from "@/lib/settings/get-setting";
 
 const APIFY_BASE_URL = "https://api.apify.com/v2";
 
@@ -122,7 +123,7 @@ async function runActor<T>(
   input: Record<string, unknown>,
   maxWaitSecs = 60,
 ): Promise<T[]> {
-  const token = process.env.APIFY_TOKEN;
+  const token = await getSetting("APIFY_TOKEN");
   if (!token) {
     console.warn("[apify] APIFY_TOKEN not configured");
     return [];
@@ -682,7 +683,7 @@ export interface WebsiteScreenshot {
 export async function screenshotWebsite(
   url: string,
 ): Promise<WebsiteScreenshot | null> {
-  const token = process.env.APIFY_TOKEN;
+  const token = await getSetting("APIFY_TOKEN");
   if (!token) {
     console.warn("[apify] APIFY_TOKEN not configured");
     return null;

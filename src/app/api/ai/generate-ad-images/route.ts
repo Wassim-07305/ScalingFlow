@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { checkAIUsage } from "@/lib/stripe/check-usage";
 import { rateLimit } from "@/lib/utils/rate-limit";
+import { getSetting } from "@/lib/settings/get-setting";
 
 export const maxDuration = 300;
 
@@ -77,7 +78,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const token = process.env.REPLICATE_API_TOKEN;
+    const token = await getSetting("REPLICATE_API_TOKEN");
     if (!token) {
       return NextResponse.json(
         {

@@ -24,8 +24,10 @@ import {
   Zap,
   RefreshCw,
   BookOpen,
+  Key,
 } from "lucide-react";
 import { KnowledgeBaseAdmin } from "@/components/admin/knowledge-base-admin";
+import { ApiKeysAdmin } from "@/components/admin/api-keys-admin";
 import { formatDistanceToNow } from "date-fns";
 import { fr } from "date-fns/locale";
 
@@ -583,6 +585,19 @@ export default function AdminPage() {
               })}
             </div>
           )}
+        </CardContent>
+      </Card>
+
+      {/* ─── Clés API & Intégrations ───────────────────────────── */}
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Key className="h-5 w-5 text-accent" />
+            Clés API & Intégrations
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ApiKeysAdmin />
         </CardContent>
       </Card>
 

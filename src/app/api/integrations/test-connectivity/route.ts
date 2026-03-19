@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { getSetting } from "@/lib/settings/get-setting";
 
 // ─── F60 — Real API Connectivity Tests ───────────────────────
 // Tests actual API connectivity (not just config existence)
@@ -71,7 +72,7 @@ export async function GET() {
       .eq("provider", "meta")
       .single();
 
-    const metaToken = metaCreds?.access_token || process.env.META_ACCESS_TOKEN;
+    const metaToken = metaCreds?.access_token || await getSetting("META_ACCESS_TOKEN");
     if (metaToken) {
       tests.push(
         await testWithTimeout("Meta Ads API", async () => {
@@ -84,7 +85,7 @@ export async function GET() {
     }
 
     // 3. Test Stripe API
-    const stripeKey = process.env.STRIPE_SECRET_KEY;
+    const stripeKey = await getSetting("STRIPE_SECRET_KEY");
     if (stripeKey) {
       tests.push(
         await testWithTimeout("Stripe", async () => {
@@ -97,7 +98,7 @@ export async function GET() {
     }
 
     // 4. Test Anthropic (Claude AI)
-    const anthropicKey = process.env.ANTHROPIC_API_KEY;
+    const anthropicKey = await getSetting("ANTHROPIC_API_KEY");
     if (anthropicKey) {
       tests.push(
         await testWithTimeout("Claude AI", async () => {
@@ -121,8 +122,8 @@ export async function GET() {
     }
 
     // 5. Test Unipile
-    const unipileUrl = process.env.UNIPILE_API_URL;
-    const unipileToken = process.env.UNIPILE_ACCESS_TOKEN;
+    const unipileUrl = await getSetting("UNIPILE_API_URL");
+    const unipileToken = await getSetting("UNIPILE_ACCESS_TOKEN");
     if (unipileUrl && unipileToken) {
       tests.push(
         await testWithTimeout("Unipile", async () => {
@@ -135,7 +136,7 @@ export async function GET() {
     }
 
     // 6. Test Resend
-    const resendKey = process.env.RESEND_API_KEY;
+    const resendKey = await getSetting("RESEND_API_KEY");
     if (resendKey) {
       tests.push(
         await testWithTimeout("Resend (Email)", async () => {
