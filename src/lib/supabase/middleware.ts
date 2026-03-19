@@ -87,11 +87,12 @@ export async function updateSession(request: NextRequest) {
       },
     });
 
-    // ── getUser (network call) ──
+    // ── getSession (local cookie read, no network) ──
     const t_getUser = Date.now();
     const {
-      data: { user },
-    } = await supabase.auth.getUser();
+      data: { session },
+    } = await supabase.auth.getSession();
+    const user = session?.user ?? null;
     getUserMs = Date.now() - t_getUser;
 
     // Redirect unauthenticated users
