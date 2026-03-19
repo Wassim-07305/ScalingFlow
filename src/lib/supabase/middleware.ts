@@ -3,6 +3,9 @@ import { NextResponse, type NextRequest } from "next/server";
 import { resolveOrganization } from "@/lib/whitelabel/resolve-org";
 
 export async function updateSession(request: NextRequest) {
+  const t_total = Date.now();
+  const path = request.nextUrl.pathname;
+
   const publicRoutes = [
     "/login",
     "/register",
@@ -11,16 +14,12 @@ export async function updateSession(request: NextRequest) {
     "/reset-password",
     "/diagnostic",
   ];
-  const isPublicFunnel = request.nextUrl.pathname.startsWith("/f/");
-  const isPublicRoute = publicRoutes.some(
-    (route) => request.nextUrl.pathname === route,
-  );
-  const isOnboarding = request.nextUrl.pathname.startsWith("/onboarding");
-  const isApiRoute = request.nextUrl.pathname.startsWith("/api/");
+  const isPublicFunnel = path.startsWith("/f/");
+  const isPublicRoute = publicRoutes.some((route) => path === route);
+  const isOnboarding = path.startsWith("/onboarding");
+  const isApiRoute = path.startsWith("/api/");
 
-  let supabaseResponse = NextResponse.next({
-    request,
-  });
+  let supabaseResponse = NextResponse.next({ request });
 
   /* ── Custom domain / subdomain detection ── */
   let resolvedOrgId: string | null = null;
@@ -32,7 +31,6 @@ export async function updateSession(request: NextRequest) {
       ? new URL(process.env.NEXT_PUBLIC_APP_URL).hostname
       : "localhost";
 
-    // Ne pas résoudre pour le domaine principal ou localhost
     const isMainDomain =
       hostname.split(":")[0] === appHost ||
       hostname.startsWith("localhost") ||
@@ -50,6 +48,10 @@ export async function updateSession(request: NextRequest) {
   } catch {
     // La résolution d'org ne doit pas bloquer la navigation
   }
+
+  // Timing metrics
+  let getUserMs = 0;
+  let profileMs = 0;
 
   try {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -73,13 +75,10 @@ export async function updateSession(request: NextRequest) {
           cookiesToSet.forEach(({ name, value }) =>
             request.cookies.set(name, value),
           );
-          supabaseResponse = NextResponse.next({
-            request,
-          });
+          supabaseResponse = NextResponse.next({ request });
           cookiesToSet.forEach(({ name, value, options }) =>
             supabaseResponse.cookies.set(name, value, options),
           );
-          // Re-appliquer les headers org après recréation de la réponse
           if (resolvedOrgId) {
             supabaseResponse.headers.set("x-org-id", resolvedOrgId);
             supabaseResponse.headers.set("x-org-slug", resolvedOrgSlug!);
@@ -88,44 +87,44 @@ export async function updateSession(request: NextRequest) {
       },
     });
 
+    // ── getUser (network call) ──
+    const t_getUser = Date.now();
     const {
       data: { user },
     } = await supabase.auth.getUser();
+    getUserMs = Date.now() - t_getUser;
 
-    // Redirect unauthenticated users to landing page
-    // API routes handle their own auth (return 401 JSON, not redirect)
+    // Redirect unauthenticated users
     if (!user && !isPublicRoute && !isPublicFunnel && !isApiRoute) {
       const url = request.nextUrl.clone();
       url.pathname = "/welcome";
       return NextResponse.redirect(url);
     }
 
-    // Authenticated user on public route → check onboarding status
-    if (user && isPublicRoute) {
+    // ── Single profile fetch (replaces 2 duplicate queries) ──
+    if (user && !isApiRoute) {
+      const t_profile = Date.now();
       const { data: profile } = await supabase
         .from("profiles")
         .select("onboarding_completed")
         .eq("id", user.id)
         .maybeSingle();
+      profileMs = Date.now() - t_profile;
 
-      const url = request.nextUrl.clone();
-      url.pathname = profile?.onboarding_completed ? "/" : "/onboarding";
-      return NextResponse.redirect(url);
-    }
-
-    // Authenticated user on protected routes (not onboarding, not API)
-    // → if onboarding not completed, force them to /onboarding
-    if (user && !isOnboarding && !isApiRoute && !isPublicRoute) {
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("onboarding_completed")
-        .eq("id", user.id)
-        .maybeSingle();
-
-      if (!profile || !profile.onboarding_completed) {
+      if (isPublicRoute) {
+        // Authenticated user on public route → redirect
         const url = request.nextUrl.clone();
-        url.pathname = "/onboarding";
+        url.pathname = profile?.onboarding_completed ? "/" : "/onboarding";
         return NextResponse.redirect(url);
+      }
+
+      if (!isOnboarding && !isPublicFunnel) {
+        // Protected route → force onboarding if not completed
+        if (!profile || !profile.onboarding_completed) {
+          const url = request.nextUrl.clone();
+          url.pathname = "/onboarding";
+          return NextResponse.redirect(url);
+        }
       }
     }
   } catch {
@@ -135,6 +134,19 @@ export async function updateSession(request: NextRequest) {
       return NextResponse.redirect(url);
     }
   }
+
+  const totalMs = Date.now() - t_total;
+
+  // Log to Vercel Function Logs
+  console.log(
+    `[middleware] ${path} — total:${totalMs}ms getUser:${getUserMs}ms profile:${profileMs}ms`,
+  );
+
+  // Server-Timing header (visible in Chrome DevTools → Network → Timing)
+  supabaseResponse.headers.set(
+    "Server-Timing",
+    `total;dur=${totalMs}, getUser;dur=${getUserMs}, profile;dur=${profileMs}`,
+  );
 
   return supabaseResponse;
 }
