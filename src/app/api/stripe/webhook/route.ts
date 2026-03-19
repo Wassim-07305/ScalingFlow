@@ -13,6 +13,18 @@ import { sendCAPIIfConfigured } from "@/lib/tracking/meta-capi";
 
 const FROM = "ScalingFlow <noreply@scalingflow.com>";
 
+// Parse Meta ad IDs from utm_content if formatted as "campaign:{id}|adset:{id}|ad:{id}"
+function parseMetaIds(
+  utmContent: string | null,
+): { campaign_id: string; adset_id: string; ad_id: string } | null {
+  if (!utmContent) return null;
+  const match = utmContent.match(
+    /campaign:([^|]+)\|adset:([^|]+)\|ad:([^|]+)/,
+  );
+  if (!match) return null;
+  return { campaign_id: match[1], adset_id: match[2], ad_id: match[3] };
+}
+
 // Client admin Supabase (service role) pour les webhooks
 function getAdminClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -84,6 +96,27 @@ export async function POST(req: NextRequest) {
               stripe_customer_id: session.customer as string,
             })
             .eq("id", userId);
+
+          // Stocker l'attribution UTM → créative/campagne
+          const utmContent = session.metadata?.utm_content || null;
+          const parsedMetaIds = parseMetaIds(utmContent);
+          await supabase.from("payment_attributions").insert({
+            user_id: userId,
+            stripe_payment_id:
+              (session.payment_intent as string) || session.id,
+            stripe_session_id: session.id,
+            amount: (session.amount_total || 0) / 100,
+            currency: session.currency || "eur",
+            utm_source: session.metadata?.utm_source || null,
+            utm_medium: session.metadata?.utm_medium || null,
+            utm_campaign: session.metadata?.utm_campaign || null,
+            utm_content: utmContent,
+            utm_term: session.metadata?.utm_term || null,
+            fbclid: session.metadata?.fbclid || null,
+            meta_campaign_id: parsedMetaIds?.campaign_id || null,
+            meta_adset_id: parsedMetaIds?.adset_id || null,
+            meta_ad_id: parsedMetaIds?.ad_id || null,
+          });
 
           // Envoyer événement Purchase à Meta CAPI (non-bloquant)
           sendCAPIIfConfigured(

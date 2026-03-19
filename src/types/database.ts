@@ -2017,6 +2017,47 @@ export interface Database {
           updated_at?: string;
         };
       };
+      content_suggestions: {
+        Row: {
+          id: string;
+          user_id: string;
+          content_type: string;
+          script: Json;
+          source_insight: string | null;
+          angle: string | null;
+          pillar: string | null;
+          reasoning: string | null;
+          week_of: string;
+          status: "suggested" | "accepted" | "rejected" | "published";
+          created_at: string;
+          accepted_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          content_type: string;
+          script?: Json;
+          source_insight?: string | null;
+          angle?: string | null;
+          pillar?: string | null;
+          reasoning?: string | null;
+          week_of: string;
+          status?: "suggested" | "accepted" | "rejected" | "published";
+          created_at?: string;
+          accepted_at?: string | null;
+        };
+        Update: {
+          content_type?: string;
+          script?: Json;
+          source_insight?: string | null;
+          angle?: string | null;
+          pillar?: string | null;
+          reasoning?: string | null;
+          week_of?: string;
+          status?: "suggested" | "accepted" | "rejected" | "published";
+          accepted_at?: string | null;
+        };
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;

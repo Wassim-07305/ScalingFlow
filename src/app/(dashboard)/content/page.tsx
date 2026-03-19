@@ -17,6 +17,8 @@ import { ObjectionContent } from "@/components/content/objection-content";
 import { SocialPublisher } from "@/components/content/social-publisher";
 import { GenerationHistory } from "@/components/shared/generation-history";
 import { InstagramStats } from "@/components/integrations/instagram-stats";
+import { AISuggestions } from "@/components/content/ai-suggestions";
+import { ContentPerformanceWidget } from "@/components/content/content-performance-widget";
 import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
 import {
@@ -33,6 +35,7 @@ import {
   MessageSquareWarning,
   Share2,
   BarChart3,
+  Sparkles,
 } from "lucide-react";
 
 const CONTENT_TYPE_TO_TAB: Record<string, string> = {
@@ -54,6 +57,7 @@ const CONTENT_TYPE_TO_TAB: Record<string, string> = {
 };
 
 const TABS = [
+  { key: "suggestions", label: "Suggestions IA", icon: Sparkles },
   { key: "strategy", label: "Stratégie", icon: Target },
   { key: "reels", label: "Reels", icon: Film },
   { key: "youtube", label: "YouTube", icon: Youtube },
@@ -109,12 +113,22 @@ export default function ContentPage() {
 
       <TabBar tabs={TABS} activeTab={activeTab} onTabChange={setActiveTab} />
 
+      {activeTab === "suggestions" && (
+        <div
+          role="tabpanel"
+          id="tabpanel-suggestions"
+          aria-labelledby="tab-suggestions"
+        >
+          <AISuggestions />
+        </div>
+      )}
       {activeTab === "strategy" && (
         <div
           role="tabpanel"
           id="tabpanel-strategy"
           aria-labelledby="tab-strategy"
         >
+          <ContentPerformanceWidget className="mb-6" />
           <StrategyOverview initialData={loadedData.strategy} />
         </div>
       )}

@@ -33,6 +33,7 @@ interface AdCampaign {
   total_clicks: number;
   total_conversions: number;
   roas: number;
+  attributed_revenue?: number;
 }
 
 function getStatusLabel(status: AdCampaign["status"]): string {
@@ -82,11 +83,17 @@ export function CampaignDashboard({ className }: CampaignDashboardProps) {
 
     const fetchCampaigns = async () => {
       setLoading(true);
-      const { data, error } = await supabase
-        .from("ad_campaigns")
-        .select("*")
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: false });
+      const [{ data, error }, { data: attributions }] = await Promise.all([
+        supabase
+          .from("ad_campaigns")
+          .select("*")
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: false }),
+        supabase
+          .from("payment_attributions")
+          .select("utm_campaign, amount")
+          .eq("user_id", user.id),
+      ]);
 
       if (error) {
         toast.error("Impossible de charger les campagnes");
@@ -94,7 +101,27 @@ export function CampaignDashboard({ className }: CampaignDashboardProps) {
         return;
       }
 
-      setCampaigns(data ?? []);
+      // Aggregate attributed revenue by utm_campaign name
+      const revenueByUTMCampaign = new Map<string, number>();
+      for (const attr of attributions ?? []) {
+        if (attr.utm_campaign) {
+          revenueByUTMCampaign.set(
+            attr.utm_campaign,
+            (revenueByUTMCampaign.get(attr.utm_campaign) ?? 0) + (attr.amount ?? 0),
+          );
+        }
+      }
+
+      // Match campaigns by name (case-insensitive) to utm_campaign
+      const enriched = (data ?? []).map((c: (typeof data)[number]) => ({
+        ...c,
+        attributed_revenue:
+          revenueByUTMCampaign.get(c.campaign_name) ??
+          revenueByUTMCampaign.get(c.campaign_name?.toLowerCase()) ??
+          0,
+      }));
+
+      setCampaigns(enriched);
       setLoading(false);
     };
 
@@ -324,6 +351,16 @@ export function CampaignDashboard({ className }: CampaignDashboardProps) {
                         {campaign.total_conversions}
                       </p>
                     </div>
+                    {!isSimulation && (
+                      <div>
+                        <p className="text-xs text-text-muted">Rev. attribué</p>
+                        <p className="text-sm font-medium text-emerald-400">
+                          {campaign.attributed_revenue
+                            ? `${campaign.attributed_revenue.toFixed(2)}€`
+                            : "—"}
+                        </p>
+                      </div>
+                    )}
                   </div>
                 </div>
               );

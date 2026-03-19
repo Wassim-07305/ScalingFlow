@@ -14,6 +14,7 @@ import { AutoDecisionsLog } from "@/components/ads/auto-decisions-log";
 import { ScalingDashboard } from "@/components/ads/scaling-dashboard";
 import { AdSpy } from "@/components/ads/ad-spy";
 import { AdImageGenerator } from "@/components/ads/ad-image-generator";
+import { AdsScore } from "@/components/ads/ads-score";
 import { GenerationHistory } from "@/components/shared/generation-history";
 import { cn } from "@/lib/utils/cn";
 import { createClient } from "@/lib/supabase/client";
@@ -32,12 +33,14 @@ import {
   Activity,
   Scissors,
   Rocket,
+  Star,
 } from "lucide-react";
 
 const TABS = [
   { key: "creatives", label: "Creatives IA", icon: Sparkles },
   { key: "images", label: "Images IA", icon: ImagePlus },
   { key: "campaigns", label: "Campagnes", icon: BarChart3 },
+  { key: "score", label: "Score Ads", icon: Star },
   { key: "automation", label: "Automation", icon: Zap },
   { key: "video_ads", label: "Pubs Vidéo", icon: Video },
   { key: "dm_scripts", label: "Scripts DM", icon: MessageSquare },
@@ -140,6 +143,7 @@ export default function AdsPage() {
       )}
       {activeTab === "images" && <AdImageGenerator />}
       {activeTab === "campaigns" && <CampaignDashboard />}
+      {activeTab === "score" && <AdsScore />}
       {activeTab === "automation" && <AdsAutomation />}
       {activeTab === "video_ads" && (
         <VideoAdGenerator initialData={loadedData.video_ads} />

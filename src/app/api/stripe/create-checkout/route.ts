@@ -52,6 +52,15 @@ export async function POST(req: NextRequest) {
 
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
+    // Read UTM attribution cookie set by the funnel page
+    let utmMeta: Record<string, string> = {};
+    const utmCookie = req.cookies.get("_sf_utm")?.value;
+    if (utmCookie) {
+      try {
+        utmMeta = JSON.parse(decodeURIComponent(utmCookie));
+      } catch {}
+    }
+
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       mode: "subscription",
@@ -59,7 +68,15 @@ export async function POST(req: NextRequest) {
       line_items: [{ price: priceId, quantity: 1 }],
       success_url: `${appUrl}/settings?checkout=success`,
       cancel_url: `${appUrl}/settings?checkout=cancel`,
-      metadata: { supabase_user_id: user.id },
+      metadata: {
+        supabase_user_id: user.id,
+        utm_source: utmMeta.utm_source || "",
+        utm_medium: utmMeta.utm_medium || "",
+        utm_campaign: utmMeta.utm_campaign || "",
+        utm_content: utmMeta.utm_content || "",
+        utm_term: utmMeta.utm_term || "",
+        fbclid: utmMeta.fbclid || "",
+      },
     });
 
     return NextResponse.json({ url: session.url });

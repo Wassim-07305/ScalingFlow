@@ -113,6 +113,22 @@ export default async function PublicFunnelPage({
 
   return (
     <>
+      {/* UTM capture — store in cookie _sf_utm for 30 days */}
+      <Script id="utm-capture" strategy="afterInteractive">
+        {`(function() {
+  try {
+    var params = new URLSearchParams(window.location.search);
+    var utmKeys = ['utm_source','utm_medium','utm_campaign','utm_content','utm_term','fbclid'];
+    var hasUtm = utmKeys.some(function(k) { return params.get(k); });
+    if (hasUtm) {
+      var utmData = {};
+      utmKeys.forEach(function(k) { var v = params.get(k); if (v) utmData[k] = v; });
+      document.cookie = '_sf_utm=' + encodeURIComponent(JSON.stringify(utmData)) + '; max-age=2592000; path=/; SameSite=Lax';
+    }
+  } catch(e) {}
+})();`}
+      </Script>
+
       {/* Meta Pixel injection */}
       {pixelConfig && (
         <>

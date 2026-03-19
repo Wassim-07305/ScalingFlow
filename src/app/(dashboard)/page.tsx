@@ -13,6 +13,7 @@ import { ActivityFeed } from "@/components/dashboard/activity-feed";
 import { QuickActions } from "@/components/dashboard/quick-actions";
 import { SmartRecommendations } from "@/components/dashboard/smart-recommendations";
 import { WeeklyChallenges } from "@/components/dashboard/weekly-challenges";
+import { BusinessScoreWidget } from "@/components/dashboard/business-score-widget";
 import { SkeletonCard, SkeletonDashboard } from "@/components/ui/skeleton";
 
 function SectionFallback({ className }: { className?: string }) {
@@ -46,6 +47,10 @@ export default function DashboardPage() {
           </Suspense>
 
           <ProgressBar />
+
+          <Suspense fallback={<SectionFallback className="h-64" />}>
+            <BusinessScoreWidget />
+          </Suspense>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
             <Suspense fallback={<SectionFallback className="h-48" />}>

@@ -139,6 +139,27 @@ export interface BusinessAuditResult {
   plan_90_jours: string;
 }
 
+export interface BusinessScoreRecommendation {
+  texte: string;
+  priorite: "haute" | "moyenne" | "basse";
+}
+
+export interface BusinessScoreAxis {
+  score: number; // 0-100
+  forces: string[]; // 3 forces identifiées
+  recommandations: BusinessScoreRecommendation[];
+}
+
+export interface BusinessScoreResult {
+  global_score: number;
+  acquisition: BusinessScoreAxis;
+  offre: BusinessScoreAxis;
+  delivery: BusinessScoreAxis;
+  resume: string;
+  palier_ca: "0-5K" | "5-10K" | "10-30K" | "30K+";
+  donnees_manquantes: string[];
+}
+
 export interface SchwartzAnalysisResult {
   niveau: 1 | 2 | 3 | 4 | 5;
   description: string;
