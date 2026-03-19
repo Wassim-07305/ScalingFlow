@@ -188,7 +188,7 @@ function fmtNumber(n: number): string {
 }
 
 async function loadMetricsFromDB(userId: string): Promise<DailyMetric[]> {
-  const supabase = useMemo(() => createClient(), []);
+  const supabase = createClient();
   const { data } = await supabase
     .from("daily_performance_metrics")
     .select("date, spend, impressions, clicks, leads, calls, clients, revenue")

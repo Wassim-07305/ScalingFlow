@@ -597,7 +597,7 @@ export function AttributionModel() {
   useEffect(() => {
     if (!user || !isDemo) return;
     setLoadingSupabase(true);
-    const supabase = useMemo(() => createClient(), []);
+    const supabase = createClient();
 
     Promise.all([
       supabase

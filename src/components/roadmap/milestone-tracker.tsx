@@ -107,7 +107,7 @@ export function MilestoneTracker({ className }: MilestoneTrackerProps) {
 
     const fetchData = async () => {
       try {
-      const supabase = useMemo(() => createClient(), []);
+      const supabase = createClient();
 
       const [milestonesRes, userMilestonesRes, offersCount, funnelsCount, leadsCount] = await Promise.all([
         supabase

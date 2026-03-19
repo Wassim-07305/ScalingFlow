@@ -53,7 +53,7 @@ export function VaultDocuments() {
 
   const fetchDocuments = async () => {
     if (!user) return;
-    const supabase = useMemo(() => createClient(), []);
+    const supabase = createClient();
     const { data } = await supabase
       .from("vault_documents")
       .select("*")

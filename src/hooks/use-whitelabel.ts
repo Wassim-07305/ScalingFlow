@@ -41,7 +41,7 @@ export function useWhitelabel(): WhitelabelBranding {
     }
 
     const fetchBranding = async () => {
-      const supabase = useMemo(() => createClient(), []);
+      const supabase = createClient();
       const { data: org } = await supabase
         .from("organizations")
         .select("brand_name, logo_url, primary_color, accent_color, name")

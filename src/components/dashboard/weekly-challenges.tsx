@@ -185,7 +185,7 @@ export function WeeklyChallenges() {
     const fetchChallenges = async () => {
       setLoading(true);
       try {
-        const supabase = useMemo(() => createClient(), []);
+        const supabase = createClient();
         const weekStart = getWeekStart();
         const weekKey = getWeekKey();
 

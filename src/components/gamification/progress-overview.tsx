@@ -50,7 +50,7 @@ export function ProgressOverview({ className }: ProgressOverviewProps) {
     if (!user) return;
 
     const fetchModuleProgress = async () => {
-      const supabase = useMemo(() => createClient(), []);
+      const supabase = createClient();
 
       // Requêtes parallèles pour compter les items par module + rang
       const [

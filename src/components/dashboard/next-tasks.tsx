@@ -52,7 +52,7 @@ export function NextTasks() {
     const fetchTasks = async () => {
       setLoading(true);
       try {
-        const supabase = useMemo(() => createClient(), []);
+        const supabase = createClient();
         const { data } = await supabase
           .from("tasks")
           .select("*")

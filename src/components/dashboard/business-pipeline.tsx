@@ -39,7 +39,7 @@ export function BusinessPipeline() {
     const fetchPipeline = async () => {
       setLoading(true);
       try {
-        const supabase = useMemo(() => createClient(), []);
+        const supabase = createClient();
 
         const [
           { count: marketsCount },

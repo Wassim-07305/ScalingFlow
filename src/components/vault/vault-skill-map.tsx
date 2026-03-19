@@ -290,7 +290,7 @@ export function VaultSkillMap() {
   React.useEffect(() => {
     if (!user) return;
     const fetchData = async () => {
-      const supabase = useMemo(() => createClient(), []);
+      const supabase = createClient();
       const { data } = await supabase
         .from("profiles")
         .select("skills, vault_skills")

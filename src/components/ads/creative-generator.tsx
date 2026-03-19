@@ -331,7 +331,7 @@ export function CreativeGenerator({
     if (!user || savedIds.length === 0) return;
     setSaving(true);
     try {
-      const supabase = useMemo(() => createClient(), []);
+      const supabase = createClient();
       let hasError = false;
       for (let i = 0; i < variations.length; i++) {
         const id = savedIds[i];

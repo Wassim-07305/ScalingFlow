@@ -39,7 +39,7 @@ export function VaultCompetitiveAdvantage() {
   React.useEffect(() => {
     if (!user) return;
     const fetchExisting = async () => {
-      const supabase = useMemo(() => createClient(), []);
+      const supabase = createClient();
       const { data } = await supabase
         .from("profiles")
         .select("competitive_advantage")

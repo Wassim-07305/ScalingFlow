@@ -33,7 +33,7 @@ export function LeadsChart() {
     const fetchCreationsPerWeek = async () => {
       setLoading(true);
       try {
-        const supabase = useMemo(() => createClient(), []);
+        const supabase = createClient();
         const now = new Date();
         const weeks: WeekData[] = [];
 

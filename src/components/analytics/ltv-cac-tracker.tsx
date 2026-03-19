@@ -116,7 +116,7 @@ const DEMO_ENTRIES: LTVCACEntry[] = [
 
 // ─── Supabase helpers ────────────────────────────────────────
 async function loadEntriesFromDB(userId: string): Promise<LTVCACEntry[]> {
-  const supabase = useMemo(() => createClient(), []);
+  const supabase = createClient();
   const { data } = await supabase
     .from("ltv_cac_entries")
     .select(

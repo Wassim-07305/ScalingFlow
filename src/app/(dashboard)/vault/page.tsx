@@ -74,7 +74,7 @@ export default function VaultPage() {
     if (!user) return;
     const fetchData = async () => {
       setLoading(true);
-      const supabase = useMemo(() => createClient(), []);
+      const supabase = createClient();
 
       const [profileRes, resourcesRes] = await Promise.all([
         supabase

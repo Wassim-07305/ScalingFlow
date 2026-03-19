@@ -86,7 +86,7 @@ export default function BrandPage() {
     const fetchBrand = async () => {
       setLoading(true);
       try {
-        const supabase = useMemo(() => createClient(), []);
+        const supabase = createClient();
 
         // Fetch latest brand identity
         const { data: brand } = await supabase

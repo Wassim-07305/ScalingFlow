@@ -63,7 +63,7 @@ export function ParcoursSelector() {
   React.useEffect(() => {
     if (!user) return;
     const fetchParcours = async () => {
-      const supabase = useMemo(() => createClient(), []);
+      const supabase = createClient();
       const { data } = await supabase
         .from("profiles")
         .select("parcours")

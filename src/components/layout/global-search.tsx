@@ -106,7 +106,7 @@ export function GlobalSearch({
     const timeout = setTimeout(async () => {
       setSearching(true);
       try {
-        const supabase = useMemo(() => createClient(), []);
+        const supabase = createClient();
         const q = `%${query.trim()}%`;
 
         const [offers, funnels, ads, content, assets] = await Promise.all([

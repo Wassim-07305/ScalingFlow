@@ -93,7 +93,7 @@ export function StatsOverview() {
     const fetchCounts = async () => {
       setCountsLoading(true);
       try {
-        const supabase = useMemo(() => createClient(), []);
+        const supabase = createClient();
 
         const [
           offersRes,

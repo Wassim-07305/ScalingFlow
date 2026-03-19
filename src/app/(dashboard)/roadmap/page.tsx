@@ -99,7 +99,7 @@ export default function RoadmapPage() {
   const handleGenerate = async () => {
     // Check if tasks already exist and confirm before regenerating
     if (user) {
-      const supabase = useMemo(() => createClient(), []);
+      const supabase = createClient();
       const { count } = await supabase
         .from("tasks")
         .select("id", { count: "exact", head: true })

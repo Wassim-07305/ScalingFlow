@@ -197,7 +197,7 @@ export function GrowthTiers({
   // Fetch revenue entries from Supabase, grouped by month
   useEffect(() => {
     if (!user) return;
-    const supabase = useMemo(() => createClient(), []);
+    const supabase = createClient();
 
     const fetchRevenue = async () => {
       setLoading(true);

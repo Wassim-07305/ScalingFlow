@@ -121,7 +121,7 @@ export function EmailSequence({ className, initialData }: EmailSequenceProps) {
     if (!savedId || !user) return;
     setSaving(true);
     try {
-      const supabase = useMemo(() => createClient(), []);
+      const supabase = createClient();
       const { error } = await supabase
         .from("sales_assets")
         .update({

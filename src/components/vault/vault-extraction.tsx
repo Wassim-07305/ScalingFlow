@@ -61,7 +61,7 @@ export function VaultExtraction() {
   React.useEffect(() => {
     if (!user) return;
     const fetchExisting = async () => {
-      const supabase = useMemo(() => createClient(), []);
+      const supabase = createClient();
       const { data } = await supabase
         .from("profiles")
         .select("vault_extraction, claude_api_key")

@@ -57,7 +57,7 @@ export default function AdsPage() {
 
   const handleAssetHistorySelect = async (item: { id: string }) => {
     try {
-      const supabase = useMemo(() => createClient(), []);
+      const supabase = createClient();
       const { data, error } = await supabase
         .from("sales_assets")
         .select("asset_type, ai_raw_response, title")

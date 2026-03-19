@@ -25,7 +25,7 @@ export function useAchievementListener() {
   useEffect(() => {
     if (!user) return;
 
-    const supabase = useMemo(() => createClient(), []);
+    const supabase = createClient();
 
     // Ecouter les nouvelles notifications en temps reel
     const channel = supabase

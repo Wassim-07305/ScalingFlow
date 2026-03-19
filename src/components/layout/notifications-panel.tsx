@@ -64,7 +64,7 @@ export function NotificationsPanel({
   }, [unreadCount]);
 
   useEffect(() => {
-    const supabase = useMemo(() => createClient(), []);
+    const supabase = createClient();
 
     async function fetchNotifications() {
       const { data } = await supabase

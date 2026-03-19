@@ -42,7 +42,7 @@ export function SmartRecommendations() {
 
     const analyze = async () => {
       try {
-      const supabase = useMemo(() => createClient(), []);
+      const supabase = createClient();
 
       // Requêtes parallèles pour analyser la progression
       const [

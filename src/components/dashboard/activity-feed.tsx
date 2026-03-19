@@ -129,7 +129,7 @@ export function ActivityFeed() {
     const fetch = async () => {
       setLoading(true);
       try {
-        const supabase = useMemo(() => createClient(), []);
+        const supabase = createClient();
         const { data } = await supabase
           .from("activity_log")
           .select("id, activity_type, activity_data, created_at")

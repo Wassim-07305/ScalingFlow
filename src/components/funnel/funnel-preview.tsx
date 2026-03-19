@@ -101,7 +101,7 @@ export function FunnelPreview({
       setLoading(false);
       return;
     }
-    const supabase = useMemo(() => createClient(), []);
+    const supabase = createClient();
 
     const loadData = async () => {
       setLoading(true);

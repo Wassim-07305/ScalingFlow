@@ -68,7 +68,7 @@ export default function AnalyticsPage() {
     if (userLoading || !user) return;
 
     const fetchMetrics = async () => {
-      const supabase = useMemo(() => createClient(), []);
+      const supabase = createClient();
 
       const [campaignsRes, creativesRes] = await Promise.all([
         supabase

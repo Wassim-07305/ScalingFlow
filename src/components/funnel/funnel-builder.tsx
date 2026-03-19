@@ -108,7 +108,7 @@ export function FunnelBuilder({ className, initialData }: FunnelBuilderProps) {
     const fetchOffers = async () => {
       try {
         const { createClient } = await import("@/lib/supabase/client");
-        const supabase = useMemo(() => createClient(), []);
+        const supabase = createClient();
         const { data } = await supabase
           .from("offers")
           .select("id, offer_name")

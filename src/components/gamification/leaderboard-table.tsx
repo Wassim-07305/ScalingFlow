@@ -43,7 +43,7 @@ export function LeaderboardTable({ className }: LeaderboardTableProps) {
   const [totalCount, setTotalCount] = useState(0);
 
   const fetchPage = async (offset: number) => {
-    const supabase = useMemo(() => createClient(), []);
+    const supabase = createClient();
 
     const { data, error, count } = await supabase
       .from("leaderboard_scores")

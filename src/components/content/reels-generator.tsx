@@ -152,7 +152,7 @@ export function ReelsGenerator({
       // Fetch the IDs of the recently saved content_pieces
       if (generatedScripts.length > 0) {
         try {
-          const supabase = useMemo(() => createClient(), []);
+          const supabase = createClient();
           const { data: pieces } = await supabase
             .from("content_pieces")
             .select("id")

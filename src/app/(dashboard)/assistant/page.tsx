@@ -123,7 +123,7 @@ export default function AssistantPage() {
     setActiveConversationId(conv.id);
     try {
       const { createClient } = await import("@/lib/supabase/client");
-      const supabase = useMemo(() => createClient(), []);
+      const supabase = createClient();
       const { data } = await supabase
         .from("agent_conversations")
         .select("messages")

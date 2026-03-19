@@ -58,7 +58,7 @@ export function PerformanceChart({ className }: PerformanceChartProps) {
     if (userLoading || !user) return;
 
     const fetchData = async () => {
-      const supabase = useMemo(() => createClient(), []);
+      const supabase = createClient();
       const endDate = new Date();
       const startDate = subDays(endDate, 30);
 

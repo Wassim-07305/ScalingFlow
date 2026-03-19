@@ -33,7 +33,7 @@ export function RevenueChart() {
     const fetchGenerationsPerMonth = async () => {
       setLoading(true);
       try {
-        const supabase = useMemo(() => createClient(), []);
+        const supabase = createClient();
         const now = new Date();
         const months: MonthData[] = [];
 

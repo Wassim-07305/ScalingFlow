@@ -80,7 +80,7 @@ export default function ContentPage() {
 
   const handleHistorySelect = async (item: { id: string }) => {
     try {
-      const supabase = useMemo(() => createClient(), []);
+      const supabase = createClient();
       const { data, error } = await supabase
         .from("content_pieces")
         .select("content_type, ai_raw_response, title")

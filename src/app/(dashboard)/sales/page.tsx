@@ -106,7 +106,7 @@ export default function SalesPage() {
 
   const handleHistorySelect = async (item: { id: string }) => {
     try {
-      const supabase = useMemo(() => createClient(), []);
+      const supabase = createClient();
       const { data, error } = await supabase
         .from("sales_assets")
         .select("asset_type, ai_raw_response, content, metadata")

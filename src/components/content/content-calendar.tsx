@@ -53,7 +53,7 @@ export function ContentCalendar({ className }: ContentCalendarProps) {
 
     const fetchContent = async () => {
       setLoading(true);
-      const supabase = useMemo(() => createClient(), []);
+      const supabase = createClient();
 
       const year = currentMonth.getFullYear();
       const month = currentMonth.getMonth();

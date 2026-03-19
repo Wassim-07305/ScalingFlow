@@ -22,7 +22,7 @@ export function ProgressBar() {
     const fetchProgress = async () => {
       setLoading(true);
       try {
-        const supabase = useMemo(() => createClient(), []);
+        const supabase = createClient();
 
         const [completedRes, totalRes] = await Promise.all([
           supabase

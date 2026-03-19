@@ -145,7 +145,7 @@ export function PhaseProgression({ className }: PhaseProgressionProps) {
 
     const fetchMilestones = async () => {
       try {
-        const supabase = useMemo(() => createClient(), []);
+        const supabase = createClient();
 
         const [milestonesRes, userMilestonesRes] = await Promise.all([
           supabase
