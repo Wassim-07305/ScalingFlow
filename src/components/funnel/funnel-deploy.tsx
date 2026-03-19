@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
   Card,
   CardHeader,
@@ -54,7 +54,7 @@ export function FunnelDeploy() {
   const [slugInput, setSlugInput] = useState("");
   const [selectedFunnel, setSelectedFunnel] = useState<string | null>(null);
   const { user } = useUser();
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   const appUrl = typeof window !== "undefined" ? window.location.origin : "";
 

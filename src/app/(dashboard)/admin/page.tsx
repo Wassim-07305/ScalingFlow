@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
@@ -64,7 +64,8 @@ interface RecentActivity {
 export default function AdminPage() {
   const { user, profile, loading: userLoading } = useUser();
   const router = useRouter();
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
+  const fetchedRef = useRef(false);
 
   const [stats, setStats] = useState<AdminStats>({
     totalUsers: 0,
@@ -236,7 +237,10 @@ export default function AdminPage() {
   }, [user, supabase]);
 
   useEffect(() => {
-    if (user && profile?.role === "admin") fetchStats();
+    if (user && profile?.role === "admin" && !fetchedRef.current) {
+      fetchedRef.current = true;
+      fetchStats();
+    }
   }, [user, profile, fetchStats]);
 
   const getInitials = (name: string | null) => {

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -62,7 +62,7 @@ const DEFAULT_CONFIG: WhitelabelConfig = {
 
 export function WhitelabelPortal({ className }: { className?: string }) {
   const { user, profile } = useUser();
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
   const [config, setConfig] = useState<WhitelabelConfig>(DEFAULT_CONFIG);
   const [reports, setReports] = useState<WhitelabelReport[]>([]);
   const [loading, setLoading] = useState(true);

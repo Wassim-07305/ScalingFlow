@@ -102,30 +102,45 @@ export async function updateSession(request: NextRequest) {
       return NextResponse.redirect(url);
     }
 
-    // ── Single profile fetch (replaces 2 duplicate queries) ──
+    // ── Onboarding check (cookie-first, DB fallback) ──
     if (user && !isApiRoute) {
-      const t_profile = Date.now();
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("onboarding_completed")
-        .eq("id", user.id)
-        .maybeSingle();
-      profileMs = Date.now() - t_profile;
+      const hasCookie =
+        request.cookies.get("sf_onboarding")?.value === "1";
+
+      let onboardingCompleted = hasCookie;
+
+      if (!hasCookie) {
+        // Cookie absent → query DB (first visit or cookie cleared)
+        const t_profile = Date.now();
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("onboarding_completed")
+          .eq("id", user.id)
+          .maybeSingle();
+        profileMs = Date.now() - t_profile;
+        onboardingCompleted = profile?.onboarding_completed ?? false;
+
+        // Persist cookie so future requests skip the DB query
+        if (onboardingCompleted) {
+          supabaseResponse.cookies.set("sf_onboarding", "1", {
+            path: "/",
+            maxAge: 60 * 60 * 24 * 365,
+            sameSite: "lax",
+            httpOnly: true,
+          });
+        }
+      }
 
       if (isPublicRoute) {
-        // Authenticated user on public route → redirect
         const url = request.nextUrl.clone();
-        url.pathname = profile?.onboarding_completed ? "/" : "/onboarding";
+        url.pathname = onboardingCompleted ? "/" : "/onboarding";
         return NextResponse.redirect(url);
       }
 
-      if (!isOnboarding && !isPublicFunnel) {
-        // Protected route → force onboarding if not completed
-        if (!profile || !profile.onboarding_completed) {
-          const url = request.nextUrl.clone();
-          url.pathname = "/onboarding";
-          return NextResponse.redirect(url);
-        }
+      if (!isOnboarding && !isPublicFunnel && !onboardingCompleted) {
+        const url = request.nextUrl.clone();
+        url.pathname = "/onboarding";
+        return NextResponse.redirect(url);
       }
     }
   } catch {

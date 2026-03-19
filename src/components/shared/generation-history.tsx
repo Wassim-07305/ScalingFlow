@@ -48,7 +48,7 @@ export function GenerationHistory({
   const [confirmDeleteId, setConfirmDeleteId] = React.useState<string | null>(
     null,
   );
-  const supabase = createClient();
+  const supabase = React.useMemo(() => createClient(), []);
 
   React.useEffect(() => {
     if (!user) return;

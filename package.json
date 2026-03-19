@@ -9,7 +9,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "check:patterns": "node scripts/check-react-patterns.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.78.0",

@@ -152,7 +152,7 @@ function MiniProfileCard({
     created_at: string;
   } | null>(null);
   const [loading, setLoading] = React.useState(true);
-  const supabase = createClient();
+  const supabase = React.useMemo(() => createClient(), []);
   const cardRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
@@ -820,7 +820,7 @@ function PostCard({
 // ═══════════════════════════════════════════════════════════════
 export function PostFeed({ className }: { className?: string }) {
   const { user, profile } = useUser();
-  const supabase = createClient();
+  const supabase = React.useMemo(() => createClient(), []);
 
   const [posts, setPosts] = React.useState<Post[]>([]);
   const [loading, setLoading] = React.useState(true);

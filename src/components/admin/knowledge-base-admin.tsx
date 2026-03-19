@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { cn } from "@/lib/utils/cn";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -54,10 +54,10 @@ const CATEGORY_BADGE_VARIANT: Record<
 
 export function KnowledgeBaseAdmin() {
   const { user } = useUser();
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   const [entries, setEntries] = useState<KnowledgeBaseEntry[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterCategory, setFilterCategory] = useState<string>("all");
 
@@ -75,7 +75,6 @@ export function KnowledgeBaseAdmin() {
     setLoading(true);
 
     try {
-      // Récupérer les chunks groupés par document_id
       const { data, error } = await supabase
         .from("document_chunks")
         .select("document_id, metadata, content, created_at")
@@ -84,7 +83,6 @@ export function KnowledgeBaseAdmin() {
 
       if (error) throw error;
 
-      // Grouper par document_id
       const grouped = new Map<
         string,
         {

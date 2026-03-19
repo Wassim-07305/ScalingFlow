@@ -473,6 +473,9 @@ export function OnboardingFlow() {
       })
       .eq("id", user.id);
 
+    // Mark onboarding as complete in cookie (middleware fast-path)
+    document.cookie = "sf_onboarding=1; path=/; max-age=31536000; samesite=lax";
+
     confetti({
       particleCount: 150,
       spread: 70,

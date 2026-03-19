@@ -49,7 +49,14 @@ export async function POST(req: NextRequest) {
       await awardXP(user.id, "onboarding.completed");
     } catch {}
 
-    return NextResponse.json({ ok: true });
+    const response = NextResponse.json({ ok: true });
+    response.cookies.set("sf_onboarding", "1", {
+      path: "/",
+      maxAge: 60 * 60 * 24 * 365, // 1 year
+      sameSite: "lax",
+      httpOnly: true,
+    });
+    return response;
   } catch (err) {
     console.error("[onboarding/complete] Error:", err);
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
