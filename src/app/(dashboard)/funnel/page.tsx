@@ -28,9 +28,7 @@ export default function FunnelPage() {
     try {
       const { data, error } = await supabase
         .from("funnels")
-        .select(
-          "ai_raw_response, optin_page, vsl_page, thankyou_page, funnel_name",
-        )
+        .select("optin_page, vsl_page, thankyou_page, funnel_name")
         .eq("id", item.id)
         .single();
 
@@ -39,7 +37,7 @@ export default function FunnelPage() {
         return;
       }
 
-      setLoadedData(data.ai_raw_response || data);
+      setLoadedData(data);
       setActiveTab("generate");
       toast.success("Funnel chargé depuis l'historique");
     } catch {

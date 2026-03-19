@@ -40,8 +40,6 @@ interface PublishedFunnel {
   custom_domain: string | null;
   status: string;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ai_raw_response: any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   optin_page: any;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   vsl_page: any;
@@ -68,14 +66,15 @@ export function FunnelDeploy() {
 
   const loadFunnels = async () => {
     setLoading(true);
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from("funnels")
       .select(
-        "id, funnel_name, published, published_slug, published_at, custom_domain, status, ai_raw_response, optin_page, vsl_page, thankyou_page",
+        "id, funnel_name, published, published_slug, published_at, custom_domain, status, optin_page, vsl_page, thankyou_page",
       )
       .eq("user_id", user!.id)
       .order("created_at", { ascending: false });
 
+    if (error) console.error("[FunnelDeploy] loadFunnels error:", error);
     setFunnels((data as PublishedFunnel[]) || []);
     setLoading(false);
   };
@@ -128,7 +127,7 @@ export function FunnelDeploy() {
   };
 
   const handleDownloadHTML = (funnel: PublishedFunnel) => {
-    const funnelData = funnel.ai_raw_response || {
+    const funnelData = {
       optin_page: funnel.optin_page,
       vsl_page: funnel.vsl_page,
       thankyou_page: funnel.thankyou_page,

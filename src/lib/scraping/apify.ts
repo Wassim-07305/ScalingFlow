@@ -227,41 +227,80 @@ function sleep(ms: number): Promise<void> {
 // ---------------------------------------------------------------------------
 
 /**
- * Scrape Meta Ad Library — search competitor ads.
- * Uses actor: whoareyouanas/meta-ad-scraper
+ * Scrape Meta Ad Library — search competitor ads by keyword.
+ * Uses the official Meta Ad Library API (requires META_ACCESS_TOKEN).
  */
 export async function scrapeMetaAdLibrary(params: {
   searchQuery: string;
   country?: string;
   pageId?: string;
   limit?: number;
+  maxWaitSecs?: number;
 }): Promise<MetaAdResult[]> {
   const { searchQuery, country = "FR", pageId, limit = 20 } = params;
 
-  const input: Record<string, unknown> = {
-    searchQuery,
-    country,
-    activeStatus: "active",
-    maxConcurrency: 1,
-  };
-  if (pageId) input.pageId = pageId;
+  const token = process.env.META_ACCESS_TOKEN;
+  if (!token) {
+    console.warn("[meta-ad-library] META_ACCESS_TOKEN not configured");
+    return [];
+  }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const raw = await runActor<any>("whoareyouanas~meta-ad-scraper", input);
+  const fields = [
+    "id",
+    "page_name",
+    "ad_creative_bodies",
+    "ad_creative_link_captions",
+    "ad_creative_link_titles",
+    "ad_delivery_start_time",
+    "ad_delivery_stop_time",
+    "ad_snapshot_url",
+    "publisher_platforms",
+    "impressions",
+  ].join(",");
 
-  return raw.slice(0, limit).map((item) => ({
-    brand: item.brand ?? item.page_name ?? "",
-    body: item.body ?? item.ad_creative_body ?? "",
-    headline: item.headline ?? item.ad_creative_link_title ?? "",
-    ctaText: item.ctaText ?? item.cta_text ?? "",
-    ctaUrl: item.ctaUrl ?? item.ad_creative_link_url ?? "",
-    startDate: item.startDate ?? item.ad_delivery_start_time ?? "",
-    endDate: item.endDate ?? item.ad_delivery_stop_time ?? "",
-    format: item.format ?? item.ad_format ?? "unknown",
-    imageUrls: toStringArray(item.images ?? item.image_urls),
-    videoUrls: toStringArray(item.videos ?? item.video_urls),
-    platforms: toStringArray(item.platforms ?? item.publisher_platforms),
-  }));
+  const url = new URL("https://graph.facebook.com/v19.0/ads_archive");
+  url.searchParams.set("access_token", token);
+  url.searchParams.set("search_terms", searchQuery);
+  url.searchParams.set("ad_reached_countries", JSON.stringify([country]));
+  url.searchParams.set("ad_active_status", "ACTIVE");
+  url.searchParams.set("ad_type", "ALL");
+  url.searchParams.set("fields", fields);
+  url.searchParams.set("limit", String(limit));
+  if (pageId) url.searchParams.set("search_page_ids", JSON.stringify([pageId]));
+
+  try {
+    const res = await fetch(url.toString(), {
+      signal: AbortSignal.timeout(20000),
+    });
+
+    if (!res.ok) {
+      const err = await res.text();
+      console.warn(`[meta-ad-library] API error ${res.status}: ${err}`);
+      return [];
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const data: any = await res.json();
+    const items = data?.data ?? [];
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return items.slice(0, limit).map((item: any) => ({
+      brand: item.page_name ?? "",
+      body: item.ad_creative_bodies?.[0] ?? "",
+      headline: item.ad_creative_link_titles?.[0] ?? "",
+      ctaText: item.ad_creative_link_captions?.[0] ?? "",
+      ctaUrl: item.ad_snapshot_url ?? "",
+      startDate: item.ad_delivery_start_time ?? "",
+      endDate: item.ad_delivery_stop_time ?? "",
+      format: "unknown",
+      imageUrls: [],
+      videoUrls: [],
+      platforms: toStringArray(item.publisher_platforms),
+    }));
+  } catch (err) {
+    console.warn("[meta-ad-library] Fetch error:", err);
+    return [];
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -439,8 +478,9 @@ export async function crawlWebsite(
 export async function scrapeGoogleTrends(params: {
   terms: string[];
   geo?: string;
+  maxWaitSecs?: number;
 }): Promise<GoogleTrendsResult[]> {
-  const { terms, geo = "FR" } = params;
+  const { terms, geo = "FR", maxWaitSecs = 60 } = params;
 
   if (!terms.length) return [];
 
@@ -448,7 +488,7 @@ export async function scrapeGoogleTrends(params: {
   const raw = await runActor<any>("apify~google-trends-scraper", {
     searchTerms: terms,
     geo,
-  });
+  }, maxWaitSecs);
 
   return raw.map((item) => ({
     term: item.searchTerm ?? item.term ?? "",

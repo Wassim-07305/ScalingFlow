@@ -96,15 +96,15 @@ export async function POST(req: NextRequest) {
         optin_page: generatedFunnel.optin_page,
         vsl_page: generatedFunnel.vsl_page,
         thankyou_page: generatedFunnel.thankyou_page,
-        ai_raw_response: generatedFunnel,
         status: "draft",
       })
       .select()
       .single();
 
     if (saveError) {
+      console.error("[generate-funnel] Supabase save error:", saveError);
       return NextResponse.json(
-        { error: "Erreur lors de la sauvegarde du funnel" },
+        { error: "Erreur lors de la sauvegarde du funnel", detail: saveError.message },
         { status: 500 },
       );
     }
@@ -119,6 +119,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(funnel);
   } catch (error) {
+    console.error("[generate-funnel] Unhandled error:", error);
     return NextResponse.json(
       { error: "Erreur lors de la génération du funnel" },
       { status: 500 },

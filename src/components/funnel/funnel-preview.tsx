@@ -109,21 +109,18 @@ export function FunnelPreview({
         // Fetch latest funnel
         const { data: funnel } = await supabase
           .from("funnels")
-          .select(
-            "ai_raw_response, optin_page, vsl_page, thankyou_page, funnel_name",
-          )
+          .select("optin_page, vsl_page, thankyou_page, funnel_name")
           .eq("user_id", user.id)
           .order("created_at", { ascending: false })
           .limit(1)
           .single();
 
         if (funnel) {
-          const parsed = funnel.ai_raw_response || {
+          setInternalData({
             optin_page: funnel.optin_page,
             vsl_page: funnel.vsl_page,
             thankyou_page: funnel.thankyou_page,
-          };
-          setInternalData(parsed);
+          });
           setInternalName(funnel.funnel_name || "Mon Funnel");
         }
 

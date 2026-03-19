@@ -59,8 +59,6 @@ const PROFILE_COLUMNS = [
   "updated_at",
 ].join(", ");
 
-const AUTH_TIMEOUT_MS = 5000;
-
 export function useUser() {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -68,80 +66,70 @@ export function useUser() {
   const resolved = useRef(false);
   const supabase = createClient();
 
+  const fetchProfile = async (userId: string, mounted: { current: boolean }) => {
+    const { data: profileData, error } = await supabase
+      .from("profiles")
+      .select(PROFILE_COLUMNS)
+      .eq("id", userId)
+      .single();
+    if (error) {
+      console.error("useUser: failed to load profile", error);
+    } else if (mounted.current && profileData) {
+      setProfile(profileData);
+    }
+  };
+
   useEffect(() => {
-    let mounted = true;
+    const mounted = { current: true };
 
     const done = () => {
-      if (!resolved.current && mounted) {
+      if (!resolved.current) {
         resolved.current = true;
         setLoading(false);
       }
     };
 
-    // Safety timeout — force loading=false even if getUser() hangs
-    const timeout = setTimeout(() => {
-      if (!resolved.current) {
-        console.warn("useUser: auth timed out after", AUTH_TIMEOUT_MS, "ms");
-        done();
-      }
-    }, AUTH_TIMEOUT_MS);
-
-    const getUser = async () => {
+    const init = async () => {
       try {
-        const {
-          data: { user },
-        } = await supabase.auth.getUser();
-        if (!mounted) return;
-        setUser(user);
+        // 1. getSession() — lecture localStorage, instantané, débloque le loading
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!mounted.current) return;
 
-        if (user) {
-          const { data: profileData, error } = await supabase
-            .from("profiles")
-            .select(PROFILE_COLUMNS)
-            .eq("id", user.id)
-            .single();
-          if (error) {
-            console.error("useUser: failed to load profile", error);
-          } else if (mounted && profileData) {
-            setProfile(profileData);
-          }
+        if (session?.user) {
+          setUser(session.user);
+          done();
+          // 2. Charge le profil + vérifie le JWT en arrière-plan (réseau)
+          fetchProfile(session.user.id, mounted);
+          supabase.auth.getUser().then(({ data: { user } }) => {
+            if (mounted.current && user) setUser(user);
+          }).catch(() => {});
+        } else {
+          done();
         }
       } catch (err) {
-        console.error("useUser: failed to load user", err);
-      } finally {
+        console.error("useUser: init error", err);
         done();
       }
     };
 
-    getUser();
+    init();
 
     const {
       data: { subscription },
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } = supabase.auth.onAuthStateChange(async (_event: any, session: any) => {
-      if (!mounted) return;
+      if (!mounted.current) return;
       setUser(session?.user ?? null);
-      // If auth event fires before getUser resolves, mark as done
       done();
       if (session?.user) {
-        const { data: profileData, error } = await supabase
-          .from("profiles")
-          .select(PROFILE_COLUMNS)
-          .eq("id", session.user.id)
-          .single();
-        if (error) {
-          console.error("useUser: failed to load profile", error);
-        } else if (mounted && profileData) {
-          setProfile(profileData);
-        }
+        fetchProfile(session.user.id, mounted);
       } else {
         setProfile(null);
       }
     });
 
     return () => {
-      mounted = false;
-      clearTimeout(timeout);
+      mounted.current = false;
       subscription.unsubscribe();
     };
   }, [supabase]);

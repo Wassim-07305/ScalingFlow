@@ -198,11 +198,6 @@ export function FunnelBuilder({ className, initialData }: FunnelBuilderProps) {
           optin_page: funnelData.optin_page,
           vsl_page: funnelData.vsl_page,
           thankyou_page: funnelData.thankyou_page,
-          ai_raw_response: {
-            optin_page: funnelData.optin_page,
-            vsl_page: funnelData.vsl_page,
-            thankyou_page: funnelData.thankyou_page,
-          },
         })
         .eq("id", savedId)
         .eq("user_id", user.id);
