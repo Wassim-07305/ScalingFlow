@@ -21,7 +21,9 @@ import {
   Save,
   Trash2,
   Activity,
+  PhoneCall,
 } from "lucide-react";
+import Link from "next/link";
 import { toast } from "sonner";
 import type { PipelineLead } from "./pipeline-card";
 import { STATUSES } from "./pipeline-board";
@@ -283,6 +285,14 @@ export function LeadDetailPanel({
               className="w-full rounded-xl border border-border-default bg-bg-tertiary px-3.5 py-2.5 text-sm text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30 focus:shadow-sm focus:shadow-accent/10 resize-none transition-colors"
             />
           </div>
+
+          {/* Analyser un call */}
+          <Button variant="outline" asChild className="w-full">
+            <Link href={`/sales?lead=${encodeURIComponent(lead.name)}`}>
+              <PhoneCall className="h-4 w-4" />
+              Analyser un call
+            </Link>
+          </Button>
 
           {/* Save button */}
           <Button onClick={handleSave} disabled={saving} className="w-full">

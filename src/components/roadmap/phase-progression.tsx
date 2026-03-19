@@ -229,9 +229,9 @@ export function PhaseProgression({ className }: PhaseProgressionProps) {
     return Math.round((done / phase.milestoneKeys.length) * 100);
   };
 
-  // Find current phase (first not 100%)
+  // Find current phase (first not at 75% threshold)
   const currentPhaseIndex = PHASES.findIndex(
-    (p) => getPhaseCompletion(p) < 100,
+    (p) => getPhaseCompletion(p) < 75,
   );
   const activeIndex =
     currentPhaseIndex === -1 ? PHASES.length - 1 : currentPhaseIndex;
@@ -394,7 +394,7 @@ export function PhaseProgression({ className }: PhaseProgressionProps) {
                     <div
                       className={cn(
                         "absolute inset-y-0 left-0 rounded-full transition-all duration-500",
-                        getPhaseCompletion(PHASES[index]) === 100
+                        getPhaseCompletion(PHASES[index]) >= 75
                           ? "bg-accent w-full"
                           : "bg-border-default/30 w-0",
                       )}

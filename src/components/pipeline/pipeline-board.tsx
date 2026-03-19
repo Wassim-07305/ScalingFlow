@@ -6,10 +6,10 @@ import { useUser } from "@/hooks/use-user";
 import { toast } from "sonner";
 import {
   UserPlus,
-  DollarSign,
   TrendingUp,
   Users,
-  BarChart3,
+  EyeOff,
+  CheckCircle2,
 } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import { Button } from "@/components/ui/button";
@@ -22,21 +22,21 @@ import type { PipelineLead } from "./pipeline-card";
 export const STATUSES: ColumnConfig[] = [
   {
     key: "nouveau",
-    label: "Nouveau",
-    color: "text-blue-400",
-    bgColor: "bg-blue-500/15",
+    label: "Nouveau lead",
+    color: "text-gray-400",
+    bgColor: "bg-gray-500/15",
   },
   {
     key: "engage",
     label: "Engagé",
-    color: "text-violet-400",
-    bgColor: "bg-violet-500/15",
+    color: "text-blue-400",
+    bgColor: "bg-blue-500/15",
   },
   {
     key: "call_booke",
     label: "Call booké",
-    color: "text-cyan-400",
-    bgColor: "bg-cyan-500/15",
+    color: "text-violet-400",
+    bgColor: "bg-violet-500/15",
   },
   {
     key: "no_show",
@@ -46,19 +46,19 @@ export const STATUSES: ColumnConfig[] = [
   },
   {
     key: "follow_up",
-    label: "Follow-up",
+    label: "Follow-up (R2)",
     color: "text-yellow-400",
     bgColor: "bg-yellow-500/15",
   },
   {
     key: "depot_pose",
     label: "Dépôt posé",
-    color: "text-indigo-400",
-    bgColor: "bg-indigo-500/15",
+    color: "text-lime-400",
+    bgColor: "bg-lime-500/15",
   },
   {
     key: "close",
-    label: "Closé",
+    label: "Deal closé",
     color: "text-emerald-400",
     bgColor: "bg-emerald-500/15",
   },
@@ -200,16 +200,26 @@ export function PipelineBoard() {
   };
 
   // Stats
-  const totalLeads = leads.length;
+  const totalLeads = leads.filter((l) => l.status !== "perdu").length;
   const closedLeads = leads.filter((l) => l.status === "close").length;
   const conversionRate =
     totalLeads > 0 ? Math.round((closedLeads / totalLeads) * 100) : 0;
-  const potentialRevenue = leads
-    .filter((l) => l.status !== "perdu")
-    .reduce((sum, l) => sum + (l.amount || 0), 0);
-  const closedRevenue = leads
-    .filter((l) => l.status === "close")
-    .reduce((sum, l) => sum + (l.amount || 0), 0);
+
+  // No-shows cette semaine
+  const weekAgo = new Date();
+  weekAgo.setDate(weekAgo.getDate() - 7);
+  const noShowsThisWeek = leads.filter(
+    (l) =>
+      l.status === "no_show" &&
+      new Date(l.updated_at) >= weekAgo,
+  ).length;
+
+  const closedThisMonth = leads.filter((l) => {
+    if (l.status !== "close") return false;
+    const d = new Date(l.updated_at);
+    const now = new Date();
+    return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+  }).length;
 
   if (loading) {
     return (
@@ -271,7 +281,7 @@ export function PipelineBoard() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <StatCard
           icon={Users}
-          label="Total leads"
+          label="Total leads actifs"
           value={totalLeads.toString()}
           color="text-blue-400"
           bgColor="bg-blue-500/15"
@@ -284,16 +294,16 @@ export function PipelineBoard() {
           bgColor="bg-emerald-500/15"
         />
         <StatCard
-          icon={DollarSign}
-          label="CA potentiel"
-          value={`${potentialRevenue.toLocaleString("fr-FR")} \u20AC`}
-          color="text-violet-400"
-          bgColor="bg-violet-500/15"
+          icon={EyeOff}
+          label="No-shows cette semaine"
+          value={noShowsThisWeek.toString()}
+          color="text-orange-400"
+          bgColor="bg-orange-500/15"
         />
         <StatCard
-          icon={BarChart3}
-          label="CA closé"
-          value={`${closedRevenue.toLocaleString("fr-FR")} \u20AC`}
+          icon={CheckCircle2}
+          label="Deals closés ce mois"
+          value={closedThisMonth.toString()}
           color="text-accent"
           bgColor="bg-accent/10"
         />

@@ -6,6 +6,15 @@ import { createClient } from "@/lib/supabase/server";
 // GET: Get user's organization
 // PATCH: Update organization settings
 
+async function requirePremium(supabase: Awaited<ReturnType<typeof createClient>>, userId: string) {
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("subscription_plan")
+    .eq("id", userId)
+    .single();
+  return profile?.subscription_plan === "premium";
+}
+
 export async function POST(req: NextRequest) {
   try {
     const supabase = await createClient();
@@ -15,6 +24,14 @@ export async function POST(req: NextRequest) {
 
     if (!user) {
       return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+    }
+
+    // Server-side Premium gate
+    if (!(await requirePremium(supabase, user.id))) {
+      return NextResponse.json(
+        { error: "Un abonnement Premium est requis pour le White Label" },
+        { status: 403 },
+      );
     }
 
     const body = await req.json();
@@ -180,6 +197,14 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ error: "Non autorisé" }, { status: 403 });
     }
 
+    // Server-side Premium gate
+    if (!(await requirePremium(supabase, user.id))) {
+      return NextResponse.json(
+        { error: "Un abonnement Premium est requis pour le White Label" },
+        { status: 403 },
+      );
+    }
+
     const body = await req.json();
     const allowedFields = [
       "name",
@@ -190,6 +215,8 @@ export async function PATCH(req: NextRequest) {
       "custom_domain",
       "features",
       "limits",
+      "support_email",
+      "custom_welcome_message",
     ];
 
     const updates: Record<string, unknown> = {};

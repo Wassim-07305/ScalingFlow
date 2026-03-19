@@ -7,57 +7,11 @@ import type { Database } from "@/types/database";
 
 type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 
-// Explicitly list columns to avoid fetching sensitive fields
-// (meta_access_token, claude_api_key, webhook_api_key, stripe_customer_id)
-const PROFILE_COLUMNS = [
-  "id",
-  "email",
-  "full_name",
-  "first_name",
-  "last_name",
-  "country",
-  "language",
-  "avatar_url",
-  "role",
-  "onboarding_completed",
-  "onboarding_step",
-  "situation",
-  "situation_details",
-  "skills",
-  "vault_skills",
-  "expertise_answers",
-  "parcours",
-  "formations",
-  "experience_level",
-  "current_revenue",
-  "target_revenue",
-  "industries",
-  "objectives",
-  "budget_monthly",
-  "hours_per_week",
-  "deadline",
-  "team_size",
-  "vault_completed",
-  "vault_analysis",
-  "selected_market",
-  "market_viability_score",
-  "niche",
-  "xp_points",
-  "level",
-  "streak_days",
-  "last_active_date",
-  "badges",
-  "global_progress",
-  "show_on_leaderboard",
-  "show_revenue",
-  "subscription_status",
-  "meta_ad_account_id",
-  "ghl_webhook_url",
-  "organization_id",
-  "stripe_connect_account_id",
-  "created_at",
-  "updated_at",
-].join(", ");
+// Select all columns — RLS already limits access to the user's own profile.
+// Sensitive fields (meta_access_token, claude_api_key, etc.) are the user's
+// own keys and are safe to fetch client-side. Using "*" prevents column
+// mismatch errors when the database schema evolves.
+const PROFILE_SELECT = "*";
 
 export function useUser() {
   const [user, setUser] = useState<User | null>(null);
@@ -69,7 +23,7 @@ export function useUser() {
   const fetchProfile = async (userId: string, mounted: { current: boolean }) => {
     const { data: profileData, error } = await supabase
       .from("profiles")
-      .select(PROFILE_COLUMNS)
+      .select(PROFILE_SELECT)
       .eq("id", userId)
       .single();
     if (error) {

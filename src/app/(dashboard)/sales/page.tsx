@@ -245,7 +245,7 @@ export default function SalesPage() {
   };
 
   return (
-    <div className="overflow-x-hidden">
+    <div>
       <PageHeader
         title="Vente"
         description="Scripts et outils pour closer tes prospects."

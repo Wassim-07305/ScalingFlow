@@ -11,6 +11,7 @@ interface UIState {
   notificationsPanelOpen: boolean;
   searchOpen: boolean;
   theme: Theme;
+  collapsedSections: Record<string, boolean>;
   toggleSidebar: () => void;
   setSidebarCollapsed: (collapsed: boolean) => void;
   toggleMobileSidebar: () => void;
@@ -18,6 +19,7 @@ interface UIState {
   setNotificationsPanelOpen: (open: boolean) => void;
   setSearchOpen: (open: boolean) => void;
   setTheme: (theme: Theme) => void;
+  toggleSection: (label: string) => void;
 }
 
 export const useUIStore = create<UIState>()(
@@ -28,6 +30,7 @@ export const useUIStore = create<UIState>()(
       notificationsPanelOpen: false,
       searchOpen: false,
       theme: "dark" as Theme,
+      collapsedSections: {} as Record<string, boolean>,
       toggleSidebar: () =>
         set((state) => ({ sidebarCollapsed: !state.sidebarCollapsed })),
       setSidebarCollapsed: (collapsed) => set({ sidebarCollapsed: collapsed }),
@@ -38,12 +41,20 @@ export const useUIStore = create<UIState>()(
         set({ notificationsPanelOpen: open }),
       setSearchOpen: (open) => set({ searchOpen: open }),
       setTheme: (theme) => set({ theme }),
+      toggleSection: (label: string) =>
+        set((state) => ({
+          collapsedSections: {
+            ...state.collapsedSections,
+            [label]: !state.collapsedSections[label],
+          },
+        })),
     }),
     {
       name: "scalingflow-ui-store",
       partialize: (state) => ({
         sidebarCollapsed: state.sidebarCollapsed,
         theme: state.theme,
+        collapsedSections: state.collapsedSections,
       }),
     },
   ),

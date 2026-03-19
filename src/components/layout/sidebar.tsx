@@ -9,6 +9,7 @@ import {
   PanelLeft,
   Settings,
   UserCircle,
+  ChevronDown,
 } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import { Badge } from "@/components/ui/badge";
@@ -47,6 +48,7 @@ interface SidebarProps {
   logoHref?: string;
   adminRoles?: string[];
   settingsHref?: string;
+  disabledFeatures?: string[];
 }
 
 export function Sidebar({
@@ -59,6 +61,7 @@ export function Sidebar({
   logoHref = "/",
   adminRoles = ["admin"],
   settingsHref = "/settings",
+  disabledFeatures = [],
 }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
@@ -68,6 +71,8 @@ export function Sidebar({
     toggleSidebar,
     sidebarMobileOpen,
     setMobileSidebarOpen,
+    collapsedSections,
+    toggleSection,
   } = useUIStore();
 
   const subscriptionPlan = userProfile?.subscription_plan || "free";
@@ -91,16 +96,12 @@ export function Sidebar({
   async function handleLogout() {
     try {
       const supabase = createClient();
-      const { error } = await supabase.auth.signOut();
-      if (error) {
-        console.error("Logout error:", error);
-      }
-      router.push("/login");
-      router.refresh();
+      await supabase.auth.signOut();
     } catch (err) {
-      console.error("Unexpected logout error:", err);
-      router.push("/login");
-      router.refresh();
+      console.error("Logout error:", err);
+    } finally {
+      // Hard redirect to clear all cached state
+      window.location.href = "/login";
     }
   }
 
@@ -167,26 +168,67 @@ export function Sidebar({
           </Link>
         </div>
 
-        {/* Navigation with sections */}
+        {/* Navigation with collapsible sections */}
         <nav className="flex-1 overflow-y-auto px-3 py-4">
           {navSections.map((section, sIdx) => {
-            const visibleItems = section.items.filter((item) =>
-              item.roles.includes(role),
-            );
+            const visibleItems = section.items.filter((item) => {
+              if (!item.roles.includes(role)) return false;
+              // Hide items whose module is disabled by org features
+              if (disabledFeatures.length > 0) {
+                const featureKey = item.href.replace(/^\//, "");
+                if (featureKey && disabledFeatures.includes(featureKey)) return false;
+              }
+              return true;
+            });
             if (visibleItems.length === 0) return null;
+
+            const hasLabel = !!section.label;
+            const sectionHasActiveItem = visibleItems.some(
+              (item) =>
+                item.href === logoHref
+                  ? pathname === logoHref
+                  : pathname === item.href ||
+                    pathname.startsWith(item.href + "/"),
+            );
+            // Section is open if it has active item OR is not explicitly collapsed
+            const isOpen =
+              !hasLabel ||
+              sectionHasActiveItem ||
+              !collapsedSections[section.label];
 
             return (
               <div key={sIdx}>
                 {sIdx > 0 && (
-                  <div className="mx-2 mt-4 mb-2 border-t border-sidebar-border" />
-                )}
-                {section.label && !isCollapsed && (
-                  <p className="mb-1 px-3 text-[10px] font-semibold uppercase tracking-widest text-sidebar-foreground/40">
-                    {section.label}
-                  </p>
+                  <div className="mx-2 mt-3 mb-1.5 border-t border-sidebar-border" />
                 )}
 
-                <div className="space-y-0.5">
+                {/* Section header — clickable to toggle */}
+                {hasLabel && !isCollapsed && (
+                  <button
+                    onClick={() => toggleSection(section.label)}
+                    className="group/section mb-0.5 flex w-full items-center justify-between rounded-lg px-3 py-1.5 transition-colors hover:bg-sidebar-accent/50"
+                  >
+                    <span className="text-[10px] font-semibold uppercase tracking-widest text-sidebar-foreground/40 group-hover/section:text-sidebar-foreground/60 transition-colors">
+                      {section.label}
+                    </span>
+                    <ChevronDown
+                      className={cn(
+                        "h-3 w-3 text-sidebar-foreground/30 transition-transform duration-200 group-hover/section:text-sidebar-foreground/50",
+                        !isOpen && "-rotate-90",
+                      )}
+                    />
+                  </button>
+                )}
+
+                {/* Section items — animated collapse */}
+                <div
+                  className={cn(
+                    "space-y-0.5 overflow-hidden transition-all duration-200",
+                    hasLabel && !isOpen && !isCollapsed
+                      ? "max-h-0 opacity-0"
+                      : "max-h-[500px] opacity-100",
+                  )}
+                >
                   {visibleItems.map((item) => {
                     const Icon = item.icon;
                     const isActive =
@@ -200,7 +242,7 @@ export function Sidebar({
                         href={item.href}
                         onClick={closeMobile}
                         className={cn(
-                          "group relative flex items-center rounded-xl px-3 py-2.5 text-[13px] font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 focus-visible:ring-offset-1 focus-visible:ring-offset-sidebar",
+                          "group relative flex items-center rounded-xl px-3 py-2 text-[13px] font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 focus-visible:ring-offset-1 focus-visible:ring-offset-sidebar",
                           isActive
                             ? "bg-sidebar-accent text-accent"
                             : "text-sidebar-foreground/60 hover:bg-sidebar-accent hover:text-sidebar-foreground",

@@ -211,9 +211,11 @@ export function DailyActions({ className }: { className?: string }) {
         });
         if (res.ok) {
           toast.success(`+${currentAction.xp_reward} XP — ${currentAction.title}`);
+        } else {
+          toast.error("Erreur lors de l'attribution des XP");
         }
       } catch {
-        toast.success(`+${currentAction.xp_reward} XP — ${currentAction.title}`);
+        toast.error("Erreur lors de l'attribution des XP");
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
     },

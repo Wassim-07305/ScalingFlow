@@ -59,6 +59,7 @@ const TABS = [
   { id: "abonnement" as const, label: "Abonnement", icon: Settings },
   { id: "notifications" as const, label: "Notifications", icon: Bell },
   { id: "integrations" as const, label: "Intégrations", icon: Link2 },
+  { id: "whitelabel" as const, label: "White Label", icon: Building2 },
   { id: "apparence" as const, label: "Apparence", icon: Palette },
   { id: "securite" as const, label: "Sécurité", icon: Shield },
   { id: "donnees" as const, label: "Données", icon: Download },
@@ -838,23 +839,14 @@ export default function SettingsPage() {
           </Card>
         )}
 
+        {/* ─── White Label ──────────────────────────────────── */}
+        {activeTab === "whitelabel" && (
+          <WhitelabelSettings />
+        )}
+
         {/* ─── Données ─────────────────────────────────────── */}
         {activeTab === "donnees" && (
-          <>
-            <ExportDataCard />
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Building2 className="h-5 w-5 text-accent" />
-                  Whitelabel
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <WhitelabelSettings />
-              </CardContent>
-            </Card>
-          </>
+          <ExportDataCard />
         )}
       </div>
     </div>

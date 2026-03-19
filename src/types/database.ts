@@ -1074,6 +1074,7 @@ export interface Database {
           custom_onboarding_steps: Json | null;
           custom_welcome_message: string | null;
           custom_prompts: Json | null;
+          support_email: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -1092,6 +1093,7 @@ export interface Database {
           custom_onboarding_steps?: Json | null;
           custom_welcome_message?: string | null;
           custom_prompts?: Json | null;
+          support_email?: string | null;
         };
         Update: {
           name?: string;
@@ -1106,6 +1108,7 @@ export interface Database {
           custom_onboarding_steps?: Json | null;
           custom_welcome_message?: string | null;
           custom_prompts?: Json | null;
+          support_email?: string | null;
         };
       };
       organization_members: {
