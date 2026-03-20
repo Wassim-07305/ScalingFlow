@@ -96,7 +96,7 @@ export async function refreshSocialToken(
     .select("access_token, refresh_token, token_expires_at")
     .eq("user_id", userId)
     .eq("provider", provider)
-    .single();
+    .maybeSingle();
 
   if (fetchError || !connection) {
     console.warn(

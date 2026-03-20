@@ -65,7 +65,7 @@ export async function GET() {
       .select("access_token, refresh_token, token_expires_at")
       .eq("user_id", user.id)
       .eq("provider", "google_calendar")
-      .single();
+      .maybeSingle();
 
     if (!connection) {
       return NextResponse.json(

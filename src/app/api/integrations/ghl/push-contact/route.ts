@@ -62,7 +62,7 @@ export async function POST(req: NextRequest) {
       .select("*")
       .eq("user_id", user.id)
       .eq("provider", "ghl")
-      .single();
+      .maybeSingle();
 
     if (!connection) {
       // Fallback: try using the legacy webhook URL

@@ -21,7 +21,7 @@ export async function GET() {
       .select("provider_account_id, metadata")
       .eq("user_id", user.id)
       .eq("provider", "stripe_connect")
-      .single();
+      .maybeSingle();
 
     if (!connection?.provider_account_id) {
       return NextResponse.json({ connected: false });

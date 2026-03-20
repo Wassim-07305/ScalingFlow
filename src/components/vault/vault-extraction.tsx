@@ -1,175 +1,214 @@
 "use client";
 
-import React, { useMemo } from "react";
+import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { AILoading } from "@/components/shared/ai-loading";
-import { createClient } from "@/lib/supabase/client";
 import { useUser } from "@/hooks/use-user";
+import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
 import {
   Sparkles,
-  Send,
   CheckCircle,
   RotateCcw,
-  RefreshCw,
-  Key,
-  Eye,
-  EyeOff,
-  Loader2 as Loader2Icon,
+  Upload,
+  ClipboardPaste,
+  MessageSquare,
+  ChevronRight,
+  Loader2,
+  BookOpen,
+  Briefcase,
+  Lightbulb,
+  MessageCircle,
+  ArrowRight,
+  Pause,
 } from "lucide-react";
+import { cn } from "@/lib/utils";
+import type { ExtractedKnowledge } from "@/lib/ai/prompts/knowledge-extraction";
+import { INTERVIEW_QUESTIONS_COUNT } from "@/lib/ai/prompts/knowledge-extraction";
 
-const EXTRACTION_QUESTIONS = [
-  "Quel est le problème principal que tu résous pour tes clients ? Donne un exemple concret.",
-  "Quelle est ta méthodologie ou ton process unique pour obtenir des résultats ?",
-  "Quel est le résultat le plus impressionnant que tu as obtenu pour un client ?",
-  "Qu'est-ce qui te différencie de tes concurrents directs ?",
-  "Quelle erreur tes clients font-ils souvent avant de travailler avec toi ?",
-  "Si tu devais résumer ton expertise en une phrase, ce serait quoi ?",
-  "Quel est le moment 'déclic' que tes clients vivent en travaillant avec toi ?",
-  "Quels outils ou frameworks utilises-tu que d'autres n'utilisent pas ?",
-  "Quel est ton parcours qui te rend légitime dans ton domaine ?",
-  "Si un prospect hésitait, quel argument le convaincrait à coup sûr ?",
-];
+type Tab = "upload" | "paste" | "interview";
 
-interface ExtractionAnswer {
-  question: string;
-  answer: string;
+function ExtractionStats({ stats }: { stats: Record<string, number> }) {
+  const items = [
+    { label: "Frameworks", count: stats.frameworks, icon: BookOpen },
+    { label: "Cas clients", count: stats.case_studies, icon: Briefcase },
+    { label: "Insights uniques", count: stats.unique_insights, icon: Lightbulb },
+    {
+      label: "Réponses objections",
+      count: stats.objection_responses,
+      icon: MessageCircle,
+    },
+  ];
+  return (
+    <div className="grid grid-cols-2 gap-3">
+      {items.map(({ label, count, icon: Icon }) => (
+        <div
+          key={label}
+          className="flex items-center gap-2 p-3 rounded-lg bg-bg-tertiary"
+        >
+          <Icon className="h-4 w-4 text-accent shrink-0" />
+          <div>
+            <p className="text-lg font-bold text-text-primary">{count}</p>
+            <p className="text-xs text-text-muted">{label}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function ExtractionPreview({ extraction }: { extraction: ExtractedKnowledge }) {
+  return (
+    <div className="space-y-4 text-sm">
+      {extraction.frameworks?.length > 0 && (
+        <div>
+          <p className="text-xs font-semibold text-text-muted uppercase tracking-wider mb-2">
+            Frameworks ({extraction.frameworks.length})
+          </p>
+          <ul className="space-y-1">
+            {extraction.frameworks.map((f, i) => (
+              <li key={i} className="text-text-secondary">
+                <span className="font-medium text-text-primary">{f.name}</span>
+                {f.use_case && (
+                  <span className="text-text-muted"> — {f.use_case}</span>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+      {extraction.unique_insights?.length > 0 && (
+        <div>
+          <p className="text-xs font-semibold text-text-muted uppercase tracking-wider mb-2">
+            Insights uniques ({extraction.unique_insights.length})
+          </p>
+          <ul className="space-y-1">
+            {extraction.unique_insights.slice(0, 3).map((insight, i) => (
+              <li key={i} className="flex items-start gap-2 text-text-secondary">
+                <span className="text-accent mt-0.5">•</span>
+                {insight}
+              </li>
+            ))}
+            {extraction.unique_insights.length > 3 && (
+              <li className="text-text-muted text-xs">
+                + {extraction.unique_insights.length - 3} autres...
+              </li>
+            )}
+          </ul>
+        </div>
+      )}
+      {extraction.case_studies?.length > 0 && (
+        <div>
+          <p className="text-xs font-semibold text-text-muted uppercase tracking-wider mb-2">
+            Cas clients ({extraction.case_studies.length})
+          </p>
+          <ul className="space-y-1">
+            {extraction.case_studies.slice(0, 2).map((cs, i) => (
+              <li key={i} className="text-text-secondary">
+                <span className="font-medium text-text-primary">
+                  {cs.client_type}
+                </span>{" "}
+                → {cs.result}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
+  );
 }
 
 export function VaultExtraction() {
-  const { user } = useUser();
-  const [currentStep, setCurrentStep] = React.useState(0);
-  const [answers, setAnswers] = React.useState<ExtractionAnswer[]>([]);
-  const [currentAnswer, setCurrentAnswer] = React.useState("");
-  const [generating, setGenerating] = React.useState(false);
-  const [extractionResult, setExtractionResult] = React.useState<string | null>(
-    null,
-  );
-  const [existingExtraction, setExistingExtraction] = React.useState<
-    string | null
-  >(null);
+  const { user, loading: authLoading } = useUser();
+  const [activeTab, setActiveTab] = React.useState<Tab>("interview");
   const [loading, setLoading] = React.useState(true);
-  const [updating, setUpdating] = React.useState(false);
+  const [generating, setGenerating] = React.useState(false);
 
-  // Clé API Claude
-  const [apiKey, setApiKey] = React.useState("");
-  const [showApiKey, setShowApiKey] = React.useState(false);
-  const [savingKey, setSavingKey] = React.useState(false);
-  const [apiKeyLoaded, setApiKeyLoaded] = React.useState(false);
+  // Existing vault data
+  const [existingExtraction, setExistingExtraction] =
+    React.useState<ExtractedKnowledge | null>(null);
+  const [showExisting, setShowExisting] = React.useState(false);
 
+  // Preview state (before injecting)
+  const [preview, setPreview] = React.useState<ExtractedKnowledge | null>(null);
+  const [previewStats, setPreviewStats] = React.useState<Record<
+    string,
+    number
+  > | null>(null);
+
+  // Upload tab
+  const [uploadFile, setUploadFile] = React.useState<File | null>(null);
+
+  // Paste tab
+  const [pastedContent, setPastedContent] = React.useState("");
+  const MAX_CHARS = 190_000;
+
+  // Interview tab
+  const [interviewState, setInterviewState] = React.useState<{
+    in_progress: boolean;
+    question: string | null;
+    question_index: number;
+    ready_to_finalize: boolean;
+    answers_count: number;
+  } | null>(null);
+  const [currentAnswer, setCurrentAnswer] = React.useState("");
+  const [interviewLoading, setInterviewLoading] = React.useState(false);
+
+  // Load existing data + interview state
   React.useEffect(() => {
-    if (!user) return;
-    const fetchExisting = async () => {
-      const supabase = createClient();
-      const { data } = await supabase
+    if (authLoading) return;
+    if (!user) { setLoading(false); return; }
+
+    const supabase = createClient();
+
+    Promise.all([
+      fetch("/api/ai/knowledge-interview").then((r) => r.json()),
+      supabase
         .from("profiles")
-        .select("vault_extraction, claude_api_key")
+        .select("vault_extraction")
         .eq("id", user.id)
-        .single();
-      if (data?.vault_extraction) {
-        setExistingExtraction(
-          typeof data.vault_extraction === "string"
-            ? data.vault_extraction
-            : JSON.stringify(data.vault_extraction, null, 2),
-        );
-      }
-      if (data?.claude_api_key) {
-        setApiKey(data.claude_api_key);
-      }
-      setApiKeyLoaded(true);
-      setLoading(false);
-    };
-    fetchExisting();
-  }, [user]);
+        .single(),
+    ])
+      .then(([interviewData, profileRes]) => {
+        if (interviewData?.in_progress) {
+          setInterviewState({
+            in_progress: true,
+            question: interviewData.question,
+            question_index: interviewData.question_index ?? 0,
+            ready_to_finalize: false,
+            answers_count: Object.keys(
+              interviewData.state?.answers ?? {},
+            ).length,
+          });
+          setActiveTab("interview");
+        }
+        const vault = profileRes?.data?.vault_extraction;
+        if (vault) {
+          setExistingExtraction(vault as ExtractedKnowledge);
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, [user, authLoading]);
 
-  const handleSaveApiKey = async () => {
-    if (!user) return;
-    setSavingKey(true);
-    try {
-      const supabase = createClient();
-      const { error } = await supabase
-        .from("profiles")
-        .update({ claude_api_key: apiKey.trim() || null })
-        .eq("id", user.id);
-      if (error) throw error;
-      toast.success("Clé API sauvegardée !");
-    } catch {
-      toast.error("Erreur lors de la sauvegarde de la clé API");
-    } finally {
-      setSavingKey(false);
-    }
-  };
-
-  const handleUpdate = async () => {
-    if (!user) return;
-    setUpdating(true);
-    try {
-      const response = await fetch("/api/ai/vault-extraction", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ update: true }),
-      });
-
-      if (!response.ok) throw new Error("Erreur lors de la mise à jour");
-      const data = await response.json();
-      const result =
-        typeof data.extraction === "string"
-          ? data.extraction
-          : JSON.stringify(data.extraction, null, 2);
-      setExistingExtraction(result);
-      setExtractionResult(result);
-
-      // Update vault_updated_at
-      const supabase = createClient();
-      await supabase
-        .from("profiles")
-        .update({ vault_updated_at: new Date().toISOString() })
-        .eq("id", user.id);
-
-      toast.success("Extraction mise à jour avec les dernières données !");
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Erreur");
-    } finally {
-      setUpdating(false);
-    }
-  };
-
-  const handleSubmitAnswer = () => {
-    if (!currentAnswer.trim()) return;
-
-    const newAnswers = [
-      ...answers,
-      { question: EXTRACTION_QUESTIONS[currentStep], answer: currentAnswer },
-    ];
-    setAnswers(newAnswers);
-    setCurrentAnswer("");
-
-    if (currentStep < EXTRACTION_QUESTIONS.length - 1) {
-      setCurrentStep(currentStep + 1);
-    } else {
-      handleGenerateExtraction(newAnswers);
-    }
-  };
-
-  const handleGenerateExtraction = async (finalAnswers: ExtractionAnswer[]) => {
+  // --- Upload handler ---
+  const handleUpload = async () => {
+    if (!uploadFile) return;
     setGenerating(true);
     try {
-      const response = await fetch("/api/ai/vault-extraction", {
+      const text = await uploadFile.text();
+      const res = await fetch("/api/integrations/claude-extract", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ answers: finalAnswers }),
+        body: JSON.stringify({ content: text }),
       });
-
-      if (!response.ok) throw new Error("Erreur lors de la génération");
-      const data = await response.json();
-      const result =
-        typeof data.extraction === "string"
-          ? data.extraction
-          : JSON.stringify(data.extraction, null, 2);
-      setExtractionResult(result);
-      setExistingExtraction(result);
-      toast.success("Extraction d'expertise terminée !");
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Erreur");
+      setPreview(data.extracted);
+      setPreviewStats(data.stats);
+      setExistingExtraction(data.extracted);
+      toast.success("Extraction terminée !");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Erreur");
     } finally {
@@ -177,205 +216,457 @@ export function VaultExtraction() {
     }
   };
 
-  const handleRestart = () => {
-    setCurrentStep(0);
-    setAnswers([]);
-    setCurrentAnswer("");
-    setExtractionResult(null);
+  // --- Paste handler ---
+  const handlePaste = async () => {
+    if (!pastedContent.trim()) return;
+    setGenerating(true);
+    try {
+      const res = await fetch("/api/integrations/claude-extract", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ content: pastedContent }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Erreur");
+      setPreview(data.extracted);
+      setPreviewStats(data.stats);
+      setExistingExtraction(data.extracted);
+      toast.success("Extraction terminée !");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Erreur");
+    } finally {
+      setGenerating(false);
+    }
+  };
+
+  // --- Interview handlers ---
+  const handleInterviewStart = async () => {
+    setInterviewLoading(true);
+    try {
+      const res = await fetch("/api/ai/knowledge-interview", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "start" }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Erreur");
+      setInterviewState({
+        in_progress: true,
+        question: data.question,
+        question_index: 0,
+        ready_to_finalize: false,
+        answers_count: 0,
+      });
+      setCurrentAnswer("");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Erreur");
+    } finally {
+      setInterviewLoading(false);
+    }
+  };
+
+  const handleInterviewAnswer = async () => {
+    if (!currentAnswer.trim() || !interviewState) return;
+    setInterviewLoading(true);
+    try {
+      const res = await fetch("/api/ai/knowledge-interview", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "answer", answer: currentAnswer }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Erreur");
+      setCurrentAnswer("");
+      setInterviewState({
+        in_progress: !data.ready_to_finalize,
+        question: data.question,
+        question_index: data.question_index,
+        ready_to_finalize: !!data.ready_to_finalize,
+        answers_count: (interviewState.answers_count ?? 0) + 1,
+      });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Erreur");
+    } finally {
+      setInterviewLoading(false);
+    }
+  };
+
+  const handleInterviewPause = async () => {
+    // State is already saved on each answer — just clear local state
+    setInterviewState(null);
+    toast.success("Interview sauvegardée. Tu peux reprendre plus tard.");
+  };
+
+  const handleInterviewFinalize = async () => {
+    setGenerating(true);
+    try {
+      const res = await fetch("/api/ai/knowledge-interview", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "finalize" }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Erreur");
+      setPreview(data.extracted);
+      setPreviewStats(data.stats);
+      setExistingExtraction(data.extracted);
+      setInterviewState(null);
+      toast.success("Expertise extraite et injectée dans ton Vault !");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Erreur");
+    } finally {
+      setGenerating(false);
+    }
   };
 
   if (loading) return <AILoading text="Chargement" />;
 
   if (generating) {
     return (
-      <AILoading text="Analyse de tes réponses et création du document d'expertise" />
+      <AILoading text="Extraction et structuration de ton expertise en cours" />
     );
   }
 
-  // Show existing extraction if available and not in questionnaire mode
-  if (existingExtraction && answers.length === 0 && !extractionResult) {
+  // Show preview/result
+  if (preview && previewStats) {
     return (
       <div className="space-y-6">
         <div className="flex items-center justify-between flex-wrap gap-2">
           <h3 className="font-semibold text-text-primary flex items-center gap-2">
             <CheckCircle className="h-5 w-5 text-accent" />
-            Extraction d&apos;expertise complétée
+            Expertise extraite et injectée dans ton Vault
           </h3>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              onClick={handleUpdate}
-              disabled={updating}
-            >
-              {updating ? (
-                <Loader2Icon className="h-4 w-4 mr-2 animate-spin" />
-              ) : (
-                <RefreshCw className="h-4 w-4 mr-2" />
-              )}
-              Mettre à jour
-            </Button>
-            <Button variant="outline" onClick={handleRestart}>
-              <RotateCcw className="h-4 w-4 mr-2" />
-              Refaire l&apos;extraction
-            </Button>
-          </div>
-        </div>
-        <Card>
-          <CardContent className="pt-6">
-            <pre className="text-sm text-text-secondary whitespace-pre-wrap font-sans">
-              {existingExtraction}
-            </pre>
-          </CardContent>
-        </Card>
-
-        {/* Section clé API Claude */}
-        {apiKeyLoaded && (
-          <Card>
-            <CardContent className="pt-6 space-y-3">
-              <div className="flex items-center gap-2">
-                <Key className="h-4 w-4 text-accent" />
-                <h4 className="text-sm font-semibold text-text-primary">
-                  Clé API Claude personnelle
-                </h4>
-              </div>
-              <p className="text-xs text-text-muted">
-                Ta clé est utilisée uniquement pour l&apos;extraction de
-                mémoire. Elle est stockée de manière sécurisée.
-              </p>
-              <div className="flex items-center gap-2">
-                <div className="relative flex-1">
-                  <input
-                    type={showApiKey ? "text" : "password"}
-                    value={apiKey}
-                    onChange={(e) => setApiKey(e.target.value)}
-                    placeholder="sk-ant-..."
-                    className="w-full px-3 py-2 pr-10 rounded-lg bg-bg-tertiary border border-border-default text-sm text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none font-mono"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowApiKey(!showApiKey)}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded hover:bg-bg-secondary transition-colors"
-                  >
-                    {showApiKey ? (
-                      <EyeOff className="h-4 w-4 text-text-muted" />
-                    ) : (
-                      <Eye className="h-4 w-4 text-text-muted" />
-                    )}
-                  </button>
-                </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleSaveApiKey}
-                  disabled={savingKey}
-                >
-                  {savingKey ? (
-                    <Loader2Icon className="h-4 w-4 animate-spin" />
-                  ) : (
-                    "Sauvegarder"
-                  )}
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-      </div>
-    );
-  }
-
-  // Show result
-  if (extractionResult) {
-    return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h3 className="font-semibold text-text-primary flex items-center gap-2">
-            <CheckCircle className="h-5 w-5 text-accent" />
-            Extraction terminée
-          </h3>
-          <Button variant="outline" onClick={handleRestart}>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              setPreview(null);
+              setPreviewStats(null);
+              setPastedContent("");
+              setUploadFile(null);
+            }}
+          >
             <RotateCcw className="h-4 w-4 mr-2" />
-            Recommencer
+            Nouvelle extraction
           </Button>
         </div>
-        <Card>
-          <CardContent className="pt-6">
-            <pre className="text-sm text-text-secondary whitespace-pre-wrap font-sans">
-              {extractionResult}
-            </pre>
-          </CardContent>
-        </Card>
+
+        <ExtractionStats stats={previewStats} />
+        <ExtractionPreview extraction={preview} />
       </div>
     );
   }
 
-  // Questionnaire flow
+  const tabs = [
+    { id: "interview" as Tab, label: "Interview IA", icon: MessageSquare },
+    { id: "paste" as Tab, label: "Copier-coller", icon: ClipboardPaste },
+    { id: "upload" as Tab, label: "Upload fichier", icon: Upload },
+  ];
+
   return (
-    <div className="space-y-6">
-      {/* Progress */}
-      <div className="flex items-center gap-2">
-        <span className="text-sm text-text-muted">
-          Question {currentStep + 1} / {EXTRACTION_QUESTIONS.length}
-        </span>
-        <div className="flex-1 h-1.5 bg-bg-tertiary rounded-full overflow-hidden">
-          <div
-            className="h-full bg-accent rounded-full transition-all"
-            style={{
-              width: `${(currentStep / EXTRACTION_QUESTIONS.length) * 100}%`,
-            }}
-          />
-        </div>
+    <div className="space-y-5">
+      {/* Existing extraction summary */}
+      {existingExtraction && !showExisting && (
+        <Card className="border-accent/20 bg-accent/5">
+          <CardContent className="py-3 px-4 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <CheckCircle className="h-4 w-4 text-accent" />
+              <span className="text-sm text-text-secondary">
+                Ton Vault contient déjà une extraction. Tu peux en ajouter
+                une nouvelle.
+              </span>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowExisting(!showExisting)}
+            >
+              Voir
+              <ChevronRight className="h-3 w-3 ml-1" />
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
+      {showExisting && existingExtraction && (
+        <Card>
+          <CardContent className="pt-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <h4 className="text-sm font-semibold text-text-primary">
+                Extraction actuelle dans le Vault
+              </h4>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowExisting(false)}
+              >
+                Masquer
+              </Button>
+            </div>
+            <ExtractionPreview extraction={existingExtraction} />
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Tabs */}
+      <div className="flex gap-1 p-1 bg-bg-tertiary rounded-lg">
+        {tabs.map(({ id, label, icon: Icon }) => (
+          <button
+            key={id}
+            onClick={() => setActiveTab(id)}
+            className={cn(
+              "flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-all",
+              activeTab === id
+                ? "bg-bg-secondary text-text-primary shadow-sm"
+                : "text-text-muted hover:text-text-secondary",
+            )}
+          >
+            <Icon className="h-4 w-4 shrink-0" />
+            <span className="hidden sm:inline">{label}</span>
+          </button>
+        ))}
       </div>
 
-      {/* Previous answers */}
-      {answers.map((a, i) => (
-        <div key={i} className="space-y-2">
-          <div className="flex items-start gap-2">
-            <Sparkles className="h-4 w-4 text-accent mt-0.5 shrink-0" />
-            <p className="text-sm font-medium text-text-primary">
-              {a.question}
-            </p>
-          </div>
-          <div className="ml-6 p-3 rounded-lg bg-bg-tertiary">
-            <p className="text-sm text-text-secondary">{a.answer}</p>
+      {/* Tab content */}
+
+      {/* === Interview IA === */}
+      {activeTab === "interview" && (
+        <div className="space-y-4">
+          {!interviewState ? (
+            <Card>
+              <CardContent className="pt-6 text-center space-y-4">
+                <MessageSquare className="h-10 w-10 text-accent mx-auto" />
+                <div>
+                  <h3 className="font-semibold text-text-primary mb-1">
+                    Interview IA — Extraction conversationnelle
+                  </h3>
+                  <p className="text-sm text-text-muted max-w-md mx-auto">
+                    L&apos;IA te pose {INTERVIEW_QUESTIONS_COUNT} questions pour
+                    extraire ton expertise. L&apos;interview s&apos;adapte à tes
+                    réponses. Tu peux la mettre en pause et reprendre plus tard.
+                  </p>
+                </div>
+                <Button
+                  onClick={handleInterviewStart}
+                  disabled={interviewLoading}
+                >
+                  {interviewLoading ? (
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  ) : (
+                    <Sparkles className="h-4 w-4 mr-2" />
+                  )}
+                  Commencer l&apos;interview
+                </Button>
+              </CardContent>
+            </Card>
+          ) : interviewState.ready_to_finalize ? (
+            <Card>
+              <CardContent className="pt-6 text-center space-y-4">
+                <CheckCircle className="h-10 w-10 text-accent mx-auto" />
+                <div>
+                  <h3 className="font-semibold text-text-primary mb-1">
+                    Interview terminée !
+                  </h3>
+                  <p className="text-sm text-text-muted">
+                    {interviewState.answers_count} réponses collectées.
+                    L&apos;IA va maintenant analyser et structurer ton expertise.
+                  </p>
+                </div>
+                <Button onClick={handleInterviewFinalize} disabled={generating}>
+                  {generating ? (
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  ) : (
+                    <Sparkles className="h-4 w-4 mr-2" />
+                  )}
+                  Analyser et injecter dans mon Vault
+                </Button>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="space-y-4">
+              {/* Progress */}
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-text-muted whitespace-nowrap">
+                  Question {(interviewState.question_index ?? 0) + 1} /{" "}
+                  {INTERVIEW_QUESTIONS_COUNT}
+                </span>
+                <div className="flex-1 h-1.5 bg-bg-tertiary rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-accent rounded-full transition-all"
+                    style={{
+                      width: `${(((interviewState.question_index ?? 0) + 1) / INTERVIEW_QUESTIONS_COUNT) * 100}%`,
+                    }}
+                  />
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleInterviewPause}
+                  className="shrink-0 text-text-muted"
+                >
+                  <Pause className="h-3 w-3 mr-1" />
+                  Pause
+                </Button>
+              </div>
+
+              {/* Question */}
+              <Card className="border-accent/30">
+                <CardContent className="pt-5 space-y-4">
+                  <div className="flex items-start gap-2">
+                    <Sparkles className="h-5 w-5 text-accent mt-0.5 shrink-0" />
+                    <p className="font-medium text-text-primary">
+                      {interviewState.question}
+                    </p>
+                  </div>
+
+                  {interviewLoading ? (
+                    <div className="flex items-center gap-2 py-2">
+                      <Loader2 className="h-4 w-4 animate-spin text-accent" />
+                      <span className="text-sm text-text-muted">
+                        Génération de la prochaine question...
+                      </span>
+                    </div>
+                  ) : (
+                    <>
+                      <textarea
+                        value={currentAnswer}
+                        onChange={(e) => setCurrentAnswer(e.target.value)}
+                        placeholder="Ta réponse..."
+                        rows={4}
+                        className="w-full px-4 py-3 rounded-xl bg-bg-tertiary border border-border-default text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent resize-none text-sm"
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" && e.metaKey)
+                            handleInterviewAnswer();
+                        }}
+                      />
+                      <div className="flex justify-between items-center">
+                        <p className="text-xs text-text-muted">
+                          Cmd + Enter pour valider
+                        </p>
+                        <Button
+                          onClick={handleInterviewAnswer}
+                          disabled={!currentAnswer.trim() || interviewLoading}
+                        >
+                          <ArrowRight className="h-4 w-4 mr-2" />
+                          Suivant
+                        </Button>
+                      </div>
+                    </>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* === Copier-coller === */}
+      {activeTab === "paste" && (
+        <div className="space-y-4">
+          <p className="text-sm text-text-muted">
+            Colle tes conversations Claude/ChatGPT, tes notes, ou tout contenu
+            qui documente ton expertise.
+          </p>
+          <div className="space-y-2">
+            <textarea
+              value={pastedContent}
+              onChange={(e) => {
+                if (e.target.value.length <= MAX_CHARS)
+                  setPastedContent(e.target.value);
+              }}
+              placeholder="Colle ton contenu ici..."
+              rows={12}
+              className="w-full px-4 py-3 rounded-xl bg-bg-tertiary border border-border-default text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent resize-none text-sm font-mono"
+            />
+            <div className="flex justify-between items-center">
+              <span
+                className={cn(
+                  "text-xs",
+                  pastedContent.length > MAX_CHARS * 0.9
+                    ? "text-warning"
+                    : "text-text-muted",
+                )}
+              >
+                {pastedContent.length.toLocaleString("fr-FR")} /{" "}
+                {MAX_CHARS.toLocaleString("fr-FR")} caractères
+              </span>
+              <Button
+                onClick={handlePaste}
+                disabled={pastedContent.trim().length < 50 || generating}
+              >
+                {generating ? (
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                ) : (
+                  <Sparkles className="h-4 w-4 mr-2" />
+                )}
+                Extraire l&apos;expertise
+              </Button>
+            </div>
           </div>
         </div>
-      ))}
+      )}
 
-      {/* Current question */}
-      <Card className="border-accent/30">
-        <CardContent className="pt-6 space-y-4">
-          <div className="flex items-start gap-2">
-            <Sparkles className="h-5 w-5 text-accent mt-0.5 shrink-0" />
-            <p className="font-medium text-text-primary">
-              {EXTRACTION_QUESTIONS[currentStep]}
-            </p>
-          </div>
-
-          <textarea
-            value={currentAnswer}
-            onChange={(e) => setCurrentAnswer(e.target.value)}
-            placeholder="Ta réponse..."
-            rows={4}
-            className="w-full px-4 py-3 rounded-xl bg-bg-tertiary border border-border-default text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent resize-none text-sm"
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && e.metaKey) handleSubmitAnswer();
-            }}
-          />
-
-          <div className="flex justify-between items-center">
-            <p className="text-xs text-text-muted">Cmd + Enter pour valider</p>
-            <Button
-              onClick={handleSubmitAnswer}
-              disabled={!currentAnswer.trim()}
+      {/* === Upload === */}
+      {activeTab === "upload" && (
+        <div className="space-y-4">
+          <p className="text-sm text-text-muted">
+            Upload un fichier d&apos;export (.txt, .md, .json) contenant tes
+            conversations ou notes.
+          </p>
+          <div
+            className={cn(
+              "border-2 border-dashed rounded-xl p-8 text-center transition-colors",
+              uploadFile
+                ? "border-accent/50 bg-accent/5"
+                : "border-border-default hover:border-accent/40",
+            )}
+          >
+            <input
+              type="file"
+              accept=".txt,.md,.json,.csv"
+              onChange={(e) => setUploadFile(e.target.files?.[0] ?? null)}
+              className="hidden"
+              id="vault-file-upload"
+            />
+            <label
+              htmlFor="vault-file-upload"
+              className="cursor-pointer flex flex-col items-center gap-3"
             >
-              <Send className="h-4 w-4 mr-2" />
-              {currentStep < EXTRACTION_QUESTIONS.length - 1
-                ? "Suivant"
-                : "Terminer"}
+              <Upload className="h-8 w-8 text-text-muted" />
+              {uploadFile ? (
+                <div>
+                  <p className="text-sm font-medium text-text-primary">
+                    {uploadFile.name}
+                  </p>
+                  <p className="text-xs text-text-muted">
+                    {(uploadFile.size / 1024).toFixed(1)} KB
+                  </p>
+                </div>
+              ) : (
+                <div>
+                  <p className="text-sm text-text-secondary">
+                    Clique pour choisir un fichier
+                  </p>
+                  <p className="text-xs text-text-muted">.txt, .md, .json — max 10 MB</p>
+                </div>
+              )}
+            </label>
+          </div>
+          <div className="flex justify-end">
+            <Button
+              onClick={handleUpload}
+              disabled={!uploadFile || generating}
+            >
+              {generating ? (
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              ) : (
+                <Sparkles className="h-4 w-4 mr-2" />
+              )}
+              Analyser le fichier
             </Button>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      )}
     </div>
   );
 }

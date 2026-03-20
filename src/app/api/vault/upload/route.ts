@@ -77,8 +77,9 @@ export async function POST(req: NextRequest) {
       });
 
     if (uploadError) {
+      console.error("vault/upload storage error:", uploadError);
       return NextResponse.json(
-        { error: "Erreur lors de l'upload" },
+        { error: `Storage: ${uploadError.message}` },
         { status: 500 },
       );
     }
@@ -123,8 +124,9 @@ export async function POST(req: NextRequest) {
       .single();
 
     if (dbError) {
+      console.error("vault/upload DB error:", dbError);
       return NextResponse.json(
-        { error: "Erreur lors de la sauvegarde" },
+        { error: `DB: ${dbError.message}` },
         { status: 500 },
       );
     }

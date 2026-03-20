@@ -173,7 +173,7 @@ export async function getMetaPixelConfig(
     .select("access_token, provider_account_id, metadata")
     .eq("user_id", userId)
     .eq("provider", "meta")
-    .single();
+    .maybeSingle();
 
   if (!account?.access_token) return null;
 

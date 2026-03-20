@@ -5,6 +5,7 @@ import { getMetaPixelConfig } from "@/lib/tracking/meta-capi";
 import type { BrandTheme } from "@/lib/utils/export-html";
 import type { Metadata } from "next";
 import Script from "next/script";
+import { TrackPageview } from "@/components/tracking/track-pageview";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -113,6 +114,9 @@ export default async function PublicFunnelPage({
 
   return (
     <>
+      {/* Touchpoint tracking — records visit with UTMs in the touchpoints table */}
+      <TrackPageview skipConsent={true} />
+
       {/* UTM capture — store in cookie _sf_utm for 30 days */}
       <Script id="utm-capture" strategy="afterInteractive">
         {`(function() {

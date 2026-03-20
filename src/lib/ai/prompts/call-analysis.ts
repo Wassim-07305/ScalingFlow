@@ -7,6 +7,7 @@ export function callAnalysisPrompt(
     analysis_focus?: string;
     call_result?: string;
     recording_url?: string;
+    attribution_context?: string; // parcours multi-touch du lead
   },
 ): string {
   return `Tu es un expert en analyse de calls de vente B2B pour les services high-ticket (coaching, consulting, agence).
@@ -18,6 +19,11 @@ export function callAnalysisPrompt(
 - **Focus d'analyse** : ${context.analysis_focus || "Global"}
 - **Résultat du call** : ${context.call_result || "Non spécifié"}
 ${context.recording_url ? `- **Lien enregistrement** : ${context.recording_url}` : ""}
+${context.attribution_context ? `
+## Contexte d'attribution du prospect
+${context.attribution_context}
+Utilise ces informations pour adapter ton analyse du niveau de conscience du prospect (niveau Schwartz) et les recommandations de pitch. Un prospect venant de cold ads Meta (premier contact) est probablement niveau 1-2 (non-conscient ou conscient du problème), alors qu'un prospect venu via referral ou email nurturing long est probablement niveau 4-5 (conscient de la solution ou du produit). Mentionne le niveau de conscience probable dans ton verdict et adapte le playbook en conséquence.
+` : ""}
 
 ## Transcript de l'appel
 ${transcript}

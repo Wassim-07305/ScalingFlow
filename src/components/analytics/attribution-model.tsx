@@ -54,6 +54,7 @@ import {
 } from "recharts";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
+import { RealTouchpointsPanel } from "@/components/analytics/real-touchpoints-panel";
 
 // ─── Types ───────────────────────────────────────────────────
 type AttributionModel =
@@ -1038,6 +1039,7 @@ export function AttributionModel() {
             <TabsTrigger value="journeys">Parcours clients</TabsTrigger>
             <TabsTrigger value="paths">Chemins de conversion</TabsTrigger>
             <TabsTrigger value="compare">Comparaison</TabsTrigger>
+            <TabsTrigger value="real">Touchpoints réels</TabsTrigger>
           </TabsList>
           <div className="flex items-center gap-2">
             <Button variant="ghost" size="sm" onClick={handleExportJSON}>
@@ -1739,6 +1741,11 @@ export function AttributionModel() {
               )}
             </CardContent>
           </Card>
+        </TabsContent>
+
+        {/* ─── Tab: Touchpoints réels ──────────────────────────── */}
+        <TabsContent value="real">
+          <RealTouchpointsPanel />
         </TabsContent>
       </Tabs>
 

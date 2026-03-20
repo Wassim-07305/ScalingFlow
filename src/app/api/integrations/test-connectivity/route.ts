@@ -70,7 +70,7 @@ export async function GET() {
       .select("access_token, provider_account_id")
       .eq("user_id", user.id)
       .eq("provider", "meta")
-      .single();
+      .maybeSingle();
 
     const metaToken = metaCreds?.access_token || await getSetting("META_ACCESS_TOKEN");
     if (metaToken) {

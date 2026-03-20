@@ -4,9 +4,18 @@ import React from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { AILoading } from "@/components/shared/ai-loading";
 import { cn } from "@/lib/utils/cn";
 import { toast } from "sonner";
+import { createClient } from "@/lib/supabase/client";
+import { useUser } from "@/hooks/use-user";
 import {
   Sparkles,
   Mic,
@@ -27,6 +36,8 @@ import {
   ArrowUpRight,
   CheckCircle2,
   RotateCcw,
+  Users,
+  Route,
 } from "lucide-react";
 
 interface ScoreSection {
@@ -78,6 +89,12 @@ interface CallAnalysisResult {
   playbook?: PlaybookAction[];
   next_steps: string[];
   training_focus: string[];
+  attribution?: {
+    source_channel?: string;
+    source_campaign?: string;
+    source_creative?: string;
+    journey_summary?: string;
+  };
 }
 
 const SCORE_LABELS: Record<string, string> = {
@@ -202,6 +219,13 @@ function ScoreRing({
   );
 }
 
+interface PipelineLead {
+  id: string;
+  name: string;
+  email: string | null;
+  status: string;
+}
+
 interface CallAnalyzerProps {
   initialResult?: Record<string, unknown> | null;
   initialTranscript?: string | null;
@@ -209,6 +233,7 @@ interface CallAnalyzerProps {
 }
 
 export function CallAnalyzer({ initialResult, initialTranscript, onResultClear }: CallAnalyzerProps = {}) {
+  const { user } = useUser();
   const [loading, setLoading] = React.useState(false);
   const [result, setResult] = React.useState<CallAnalysisResult | null>(
     (initialResult as unknown as CallAnalysisResult | null) ?? null,
@@ -219,6 +244,9 @@ export function CallAnalyzer({ initialResult, initialTranscript, onResultClear }
   const [prospectOrigin, setProspectOrigin] = React.useState("");
   const [analysisFocus, setAnalysisFocus] = React.useState("global");
   const [callResult, setCallResult] = React.useState("");
+  const [selectedLeadId, setSelectedLeadId] = React.useState<string>("");
+  const [leads, setLeads] = React.useState<PipelineLead[]>([]);
+  const [leadsLoading, setLeadsLoading] = React.useState(false);
   const [expandedSection, setExpandedSection] = React.useState<string | null>(
     "discovery",
   );
@@ -228,6 +256,23 @@ export function CallAnalyzer({ initialResult, initialTranscript, onResultClear }
     null,
   );
   const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+  // Load pipeline leads for the selector
+  React.useEffect(() => {
+    if (!user) return;
+    setLeadsLoading(true);
+    const supabase = createClient();
+    supabase
+      .from("pipeline_leads")
+      .select("id, name, email, status")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false })
+      .limit(100)
+      .then(({ data }: { data: PipelineLead[] | null }) => {
+        setLeads(data || []);
+      })
+      .finally(() => setLeadsLoading(false));
+  }, [user]);
 
   // Load result from history
   React.useEffect(() => {
@@ -290,6 +335,7 @@ export function CallAnalyzer({ initialResult, initialTranscript, onResultClear }
           prospect_origin: prospectOrigin || undefined,
           analysis_focus: analysisFocus,
           call_result: callResult || undefined,
+          lead_id: selectedLeadId || undefined,
         }),
       });
 
@@ -435,6 +481,46 @@ export function CallAnalyzer({ initialResult, initialTranscript, onResultClear }
                   className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-bg-tertiary border border-border-default/50 text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent/40 text-sm transition-colors"
                 />
               </div>
+            </div>
+
+            {/* Lead selector */}
+            <div>
+              <label className="text-sm font-medium text-text-primary mb-2 block">
+                <span className="flex items-center gap-1.5">
+                  <Users className="h-4 w-4 text-text-muted" />
+                  Lier à un lead{" "}
+                  <span className="text-text-muted font-normal">(optionnel)</span>
+                </span>
+              </label>
+              {leads.length === 0 && !leadsLoading ? (
+                <p className="text-xs text-text-muted bg-bg-tertiary px-3.5 py-2.5 rounded-xl border border-border-default/50">
+                  Aucun lead dans ton pipeline. Ajoute des leads pour lier les calls à leur source d&apos;acquisition.
+                </p>
+              ) : (
+                <Select
+                  value={selectedLeadId || "none"}
+                  onValueChange={(v) => setSelectedLeadId(v === "none" ? "" : v)}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder={leadsLoading ? "Chargement…" : "Aucun lead sélectionné"} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">Aucun lead</SelectItem>
+                    {leads.map((lead) => (
+                      <SelectItem key={lead.id} value={lead.id}>
+                        {lead.name}
+                        {lead.email ? ` — ${lead.email}` : ""}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+              {selectedLeadId && (
+                <p className="text-xs text-accent mt-1.5 flex items-center gap-1">
+                  <Route className="h-3 w-3" />
+                  Le parcours d&apos;attribution de ce lead sera utilisé dans l&apos;analyse
+                </p>
+              )}
             </div>
 
             {/* Context fields row */}
@@ -651,6 +737,33 @@ export function CallAnalyzer({ initialResult, initialTranscript, onResultClear }
                   </a>
                 )}
               </div>
+
+              {/* Attribution panel — shown when lead was linked */}
+              {result.attribution && (result.attribution.source_channel || result.attribution.journey_summary) && (
+                <div className="mt-3 p-3 rounded-xl bg-accent/5 border border-accent/15">
+                  <p className="text-xs font-semibold text-accent mb-2 flex items-center gap-1.5">
+                    <Route className="h-3.5 w-3.5" />
+                    Source du prospect
+                  </p>
+                  <div className="flex flex-wrap gap-2 mb-2">
+                    {result.attribution.source_channel && (
+                      <Badge variant="muted" className="text-xs capitalize">
+                        {result.attribution.source_channel.replace(/_/g, " ")}
+                      </Badge>
+                    )}
+                    {result.attribution.source_campaign && (
+                      <Badge variant="muted" className="text-xs">
+                        {result.attribution.source_campaign}
+                      </Badge>
+                    )}
+                  </div>
+                  {result.attribution.journey_summary && (
+                    <p className="text-xs text-text-secondary">
+                      {result.attribution.journey_summary}
+                    </p>
+                  )}
+                </div>
+              )}
             </div>
 
             <Button

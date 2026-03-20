@@ -43,7 +43,7 @@ async function getMetaCredentials(
     .select("access_token, provider_account_id")
     .eq("user_id", userId)
     .eq("provider", "meta")
-    .single();
+    .maybeSingle();
 
   if (!data?.access_token || !data?.provider_account_id) {
     const { data: profile } = await supabase

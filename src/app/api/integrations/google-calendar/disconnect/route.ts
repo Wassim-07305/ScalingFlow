@@ -21,7 +21,7 @@ export async function POST() {
       .select("access_token")
       .eq("user_id", user.id)
       .eq("provider", "google_calendar")
-      .single();
+      .maybeSingle();
 
     if (connection?.access_token) {
       try {

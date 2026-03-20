@@ -25,7 +25,7 @@ export async function GET() {
       .select("access_token, provider_username, metadata")
       .eq("user_id", user.id)
       .eq("provider", "instagram")
-      .single();
+      .maybeSingle();
 
     if (!account) {
       return NextResponse.json(

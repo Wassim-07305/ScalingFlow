@@ -32,7 +32,12 @@ import {
   AlertTriangle,
   Megaphone,
   TrendingUp,
+  Route,
+  Star,
+  Loader2,
 } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
+import { useUser } from "@/hooks/use-user";
 import {
   LineChart,
   Line,
@@ -1391,6 +1396,198 @@ export function SalesMetrics() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Real call-source metrics from Supabase */}
+      <RealCallSourceMetrics />
     </div>
+  );
+}
+
+// ─── Real Call Source Metrics (Feature 2.2) ──────────────────────────────────
+
+interface CallAssetMeta {
+  source_channel?: string;
+  source_campaign?: string;
+  call_result?: string;
+  journey_summary?: string;
+}
+
+interface RealSourceStat {
+  channel: string;
+  calls: number;
+  closings: number;
+  close_rate: number;
+  revenue: number;
+  journey_summary?: string;
+}
+
+const CHANNEL_LABELS: Record<string, string> = {
+  meta_ads: "Meta Ads",
+  google_ads: "Google Ads",
+  organic_social: "Réseaux sociaux",
+  email: "Email",
+  organic: "Organique",
+  referral: "Référence",
+  direct: "Direct",
+};
+
+function RealCallSourceMetrics() {
+  const { user, loading: userLoading } = useUser();
+  const [loading, setLoading] = useState(false);
+  const [stats, setStats] = useState<RealSourceStat[]>([]);
+
+  useEffect(() => {
+    if (userLoading) return;
+    if (!user) return;
+    const supabase = createClient();
+    setLoading(true);
+
+    supabase
+      .from("sales_assets")
+      .select("id, metadata, lead_id")
+      .eq("user_id", user.id)
+      .eq("asset_type", "call_analysis")
+      .not("lead_id", "is", null)
+      .then(({ data }: { data: { id: string; metadata: unknown; lead_id: string | null }[] | null }) => {
+        if (!data || data.length === 0) {
+          setStats([]);
+          return;
+        }
+
+        // Group by source_channel
+        const byChannel: Record<string, { calls: number; closings: number; revenue: number }> = {};
+
+        for (const row of data) {
+          const meta = (row.metadata || {}) as CallAssetMeta;
+          const channel = meta.source_channel || "direct";
+          if (!byChannel[channel]) {
+            byChannel[channel] = { calls: 0, closings: 0, revenue: 0 };
+          }
+          byChannel[channel].calls++;
+          // Try to get call result from metadata
+          const callResult = meta.call_result || "";
+          if (callResult === "close") {
+            byChannel[channel].closings++;
+          }
+        }
+
+        const result: RealSourceStat[] = Object.entries(byChannel)
+          .map(([channel, s]) => ({
+            channel,
+            calls: s.calls,
+            closings: s.closings,
+            close_rate:
+              s.calls > 0 ? Math.round((s.closings / s.calls) * 100) : 0,
+            revenue: s.revenue,
+          }))
+          .sort((a, b) => b.calls - a.calls);
+
+        setStats(result);
+      })
+      .finally(() => setLoading(false));
+  }, [user]);
+
+  if (loading) {
+    return (
+      <Card>
+        <CardContent className="py-8 flex items-center justify-center gap-2 text-text-secondary">
+          <Loader2 className="h-4 w-4 animate-spin" />
+          Chargement des métriques par source…
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (stats.length === 0) {
+    return (
+      <Card className="border-dashed border-border-default">
+        <CardContent className="py-10 flex flex-col items-center gap-3 text-center">
+          <div className="p-3 rounded-full bg-bg-tertiary">
+            <Route className="h-6 w-6 text-text-muted" />
+          </div>
+          <div>
+            <p className="font-medium text-text-primary text-sm mb-1">
+              Métriques par source — données réelles
+            </p>
+            <p className="text-xs text-text-secondary max-w-sm">
+              Analyse tes calls en les liant à des leads (onglet &quot;Analyse de Call&quot;) pour voir ton taux de closing par canal d&apos;acquisition.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // Best source by close rate
+  const bestSource = [...stats].sort((a, b) => b.close_rate - a.close_rate)[0];
+
+  return (
+    <Card>
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-base flex items-center gap-2">
+            <Route className="h-4 w-4 text-accent" />
+            Performance par source (réelle)
+          </CardTitle>
+          {bestSource && (
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-accent/10 border border-accent/15">
+              <Star className="h-3.5 w-3.5 text-accent" />
+              <span className="text-xs text-accent font-medium">
+                Meilleure source :{" "}
+                {CHANNEL_LABELS[bestSource.channel] || bestSource.channel} (
+                {bestSource.close_rate}%)
+              </span>
+            </div>
+          )}
+        </div>
+      </CardHeader>
+      <CardContent>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="text-left text-text-muted border-b border-border-default text-xs">
+                <th className="pb-3 pr-4 font-medium">Source</th>
+                <th className="pb-3 px-4 font-medium text-right">Calls</th>
+                <th className="pb-3 px-4 font-medium text-right">Closings</th>
+                <th className="pb-3 pl-4 font-medium text-right">
+                  Taux de closing
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border-default/30">
+              {stats.map((s) => (
+                <tr key={s.channel}>
+                  <td className="py-3 pr-4">
+                    <span className="text-text-primary font-medium">
+                      {CHANNEL_LABELS[s.channel] || s.channel}
+                    </span>
+                  </td>
+                  <td className="py-3 px-4 text-right text-text-secondary">
+                    {s.calls}
+                  </td>
+                  <td className="py-3 px-4 text-right text-text-secondary">
+                    {s.closings}
+                  </td>
+                  <td className="py-3 pl-4 text-right">
+                    <span
+                      className={cn(
+                        "font-semibold",
+                        s.close_rate >= 40
+                          ? "text-emerald-400"
+                          : s.close_rate >= 20
+                            ? "text-yellow-400"
+                            : "text-text-secondary",
+                      )}
+                    >
+                      {s.close_rate}%
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </CardContent>
+    </Card>
   );
 }

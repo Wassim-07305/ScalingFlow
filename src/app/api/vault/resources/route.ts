@@ -24,7 +24,8 @@ export async function GET() {
       .order("created_at", { ascending: false });
 
     if (error) {
-      return NextResponse.json({ error: "Erreur interne" }, { status: 500 });
+      console.error("vault/resources GET error:", error);
+      return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
     // Don't send full extracted_text in list — just a flag

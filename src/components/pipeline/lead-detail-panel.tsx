@@ -22,6 +22,9 @@ import {
   Trash2,
   Activity,
   PhoneCall,
+  Mic,
+  Route,
+  Star,
 } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
@@ -57,6 +60,8 @@ export function LeadDetailPanel({
   const [amount, setAmount] = useState(String(lead.amount || 0));
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [linkedCalls, setLinkedCalls] = useState<{ id: string; title: string; overall_score?: number; source_channel?: string; created_at: string }[]>([]);
+  const [loadingCalls, setLoadingCalls] = useState(true);
 
   const statusConfig = STATUSES.find((s) => s.key === lead.status);
 
@@ -93,6 +98,33 @@ export function LeadDetailPanel({
       setLoadingActivities(false);
     };
     fetchActivities();
+  }, [lead.id, supabase]);
+
+  // Fetch linked call analyses
+  useEffect(() => {
+    setLoadingCalls(true);
+    supabase
+      .from("sales_assets")
+      .select("id, title, ai_raw_response, metadata, created_at")
+      .eq("lead_id", lead.id)
+      .eq("asset_type", "call_analysis")
+      .order("created_at", { ascending: false })
+      .limit(10)
+      .then(({ data }: { data: Record<string, unknown>[] | null }) => {
+        const calls = (data || []).map((row: Record<string, unknown>) => {
+          const raw = row.ai_raw_response as Record<string, unknown> | null;
+          const meta = row.metadata as Record<string, unknown> | null;
+          return {
+            id: row.id as string,
+            title: row.title as string,
+            overall_score: (raw?.overall_score as number) || undefined,
+            source_channel: (meta?.source_channel as string) || undefined,
+            created_at: row.created_at as string,
+          };
+        });
+        setLinkedCalls(calls);
+      })
+      .finally(() => setLoadingCalls(false));
   }, [lead.id, supabase]);
 
   const handleSave = async () => {
@@ -377,6 +409,73 @@ export function LeadDetailPanel({
                         {formatDate(activity.created_at)}
                       </p>
                     </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Linked call analyses */}
+          <div className="border-t border-border-default pt-4">
+            <h3 className="text-sm font-semibold text-text-primary mb-3 flex items-center gap-2">
+              <Mic className="h-4 w-4 text-accent" />
+              Calls analysés
+              {linkedCalls.length > 0 && (
+                <span className="ml-auto inline-flex items-center justify-center h-5 w-5 rounded-full bg-accent/10 text-accent text-xs font-bold">
+                  {linkedCalls.length}
+                </span>
+              )}
+            </h3>
+
+            {loadingCalls ? (
+              <div className="flex items-center gap-2 text-text-muted text-xs py-2">
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                Chargement…
+              </div>
+            ) : linkedCalls.length === 0 ? (
+              <p className="text-xs text-text-muted">
+                Aucun call analysé lié à ce lead. Dans l&apos;onglet &quot;Vente → Analyse de Call&quot;, sélectionne ce lead lors de l&apos;analyse.
+              </p>
+            ) : (
+              <div className="space-y-2">
+                {linkedCalls.map((call) => (
+                  <div
+                    key={call.id}
+                    className="flex items-center gap-3 p-3 rounded-xl bg-bg-tertiary border border-border-default/50"
+                  >
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-medium text-text-primary truncate">
+                        {call.title}
+                      </p>
+                      <div className="flex items-center gap-2 mt-1">
+                        {call.source_channel && (
+                          <span className="text-[11px] text-text-muted flex items-center gap-1">
+                            <Route className="h-3 w-3" />
+                            {call.source_channel.replace(/_/g, " ")}
+                          </span>
+                        )}
+                        <span className="text-[11px] text-text-muted">
+                          {new Date(call.created_at).toLocaleDateString("fr-FR")}
+                        </span>
+                      </div>
+                    </div>
+                    {call.overall_score !== undefined && (
+                      <div className="flex items-center gap-1 shrink-0">
+                        <Star className="h-3.5 w-3.5 text-yellow-400" />
+                        <span
+                          className={cn(
+                            "text-sm font-bold",
+                            call.overall_score >= 80
+                              ? "text-emerald-400"
+                              : call.overall_score >= 60
+                                ? "text-yellow-400"
+                                : "text-red-400",
+                          )}
+                        >
+                          {call.overall_score}
+                        </span>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>

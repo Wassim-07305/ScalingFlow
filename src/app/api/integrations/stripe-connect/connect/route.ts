@@ -26,7 +26,7 @@ export async function GET() {
       .select("provider_account_id")
       .eq("user_id", user.id)
       .eq("provider", "stripe_connect")
-      .single();
+      .maybeSingle();
 
     let accountId = connection?.provider_account_id;
 

@@ -194,7 +194,39 @@ export async function POST(req: NextRequest) {
       ? `\n## Dernière offre\n- Nom : ${latestOffer.offer_name}\n- Positionnement : ${latestOffer.positioning || "Non défini"}\n- Mecanisme unique : ${latestOffer.unique_mechanism || "Non défini"}\n`
       : "";
 
-    const fullSystemPrompt = `${agent.systemPrompt}\n\n${vaultContext}${offerBlock}${agentContext}${ragContext}`;
+    // Inject whitelabel owner's vault knowledge if enabled
+    let ownerVaultBlock = "";
+    try {
+      const { data: membership } = await supabase
+        .from("organization_members")
+        .select("organization_id, organizations(owner_id, custom_prompts)")
+        .eq("user_id", user.id)
+        .limit(1)
+        .maybeSingle();
+
+      const orgsRaw = membership?.organizations;
+      const org = (
+        Array.isArray(orgsRaw) ? orgsRaw[0] : orgsRaw
+      ) as { owner_id: string; custom_prompts: Record<string, unknown> } | null;
+      if (
+        org?.custom_prompts?.vault_knowledge_enabled !== false &&
+        org?.owner_id &&
+        org.owner_id !== user.id
+      ) {
+        const { data: ownerProfile } = await supabase
+          .from("profiles")
+          .select("vault_extraction")
+          .eq("id", org.owner_id)
+          .single();
+        if (ownerProfile?.vault_extraction) {
+          ownerVaultBlock = `\n\n## Expertise de ton coach (à utiliser pour personnaliser tes réponses)\n${JSON.stringify(ownerProfile.vault_extraction, null, 2).slice(0, 4000)}`;
+        }
+      }
+    } catch {
+      // Non-blocking — ignore whitelabel context errors
+    }
+
+    const fullSystemPrompt = `${agent.systemPrompt}\n\n${vaultContext}${offerBlock}${agentContext}${ragContext}${ownerVaultBlock}`;
 
     // Load previous messages if conversation exists
     let previousMessages: { role: string; content: string }[] = [];

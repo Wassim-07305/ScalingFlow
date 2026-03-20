@@ -702,6 +702,8 @@ function ModulesSection({
   onUpdated: () => void;
 }) {
   const features = (organization.features as Record<string, boolean>) || {};
+  const customPrompts =
+    (organization.custom_prompts as Record<string, unknown>) || {};
   const [modules, setModules] = useState<Record<string, boolean>>(() => {
     const initial: Record<string, boolean> = {};
     TOGGLEABLE_MODULES.forEach((m) => {
@@ -709,6 +711,9 @@ function ModulesSection({
     });
     return initial;
   });
+  const [vaultKnowledgeEnabled, setVaultKnowledgeEnabled] = useState<boolean>(
+    customPrompts.vault_knowledge_enabled !== false,
+  );
   const [saving, setSaving] = useState(false);
 
   const toggleModule = (key: string) => {
@@ -721,7 +726,13 @@ function ModulesSection({
       const res = await fetch("/api/integrations/whitelabel", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ features: modules }),
+        body: JSON.stringify({
+          features: modules,
+          custom_prompts: {
+            ...customPrompts,
+            vault_knowledge_enabled: vaultKnowledgeEnabled,
+          },
+        }),
       });
 
       if (!res.ok) {
@@ -778,6 +789,41 @@ function ModulesSection({
               )}
             </button>
           ))}
+        </div>
+
+        {/* Vault knowledge toggle */}
+        <div className="pt-2">
+          <p className="text-xs font-semibold text-text-muted uppercase tracking-wider mb-3">
+            IA personnalisée
+          </p>
+          <button
+            onClick={() => setVaultKnowledgeEnabled((v) => !v)}
+            className={cn(
+              "w-full flex items-center justify-between p-3 rounded-xl border transition-all duration-200",
+              vaultKnowledgeEnabled
+                ? "border-accent/30 bg-accent/5"
+                : "border-border-default bg-bg-tertiary opacity-60",
+            )}
+          >
+            <div className="text-left">
+              <p className="text-sm font-medium text-text-primary">
+                Utiliser mon Vault pour les réponses IA
+              </p>
+              <p className="text-xs text-text-muted mt-0.5">
+                Les agents IA de tes clients utilisent ton savoir-faire extrait
+                du Vault
+              </p>
+            </div>
+            {vaultKnowledgeEnabled ? (
+              <div className="flex h-6 w-10 items-center rounded-full bg-accent p-0.5 shrink-0 ml-3">
+                <div className="h-5 w-5 rounded-full bg-white translate-x-4 transition-transform" />
+              </div>
+            ) : (
+              <div className="flex h-6 w-10 items-center rounded-full bg-bg-secondary border border-border-default p-0.5 shrink-0 ml-3">
+                <div className="h-5 w-5 rounded-full bg-text-muted/30 transition-transform" />
+              </div>
+            )}
+          </button>
         </div>
 
         <Button onClick={handleSave} disabled={saving} className="w-full">

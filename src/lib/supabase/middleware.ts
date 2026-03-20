@@ -1,6 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { resolveOrganization } from "@/lib/whitelabel/resolve-org";
+import { resolveFunnelByHostname } from "@/lib/whitelabel/resolve-funnel-subdomain";
 
 export async function updateSession(request: NextRequest) {
   const t_total = Date.now();
@@ -37,6 +38,16 @@ export async function updateSession(request: NextRequest) {
       hostname.startsWith("127.0.0.1");
 
     if (!isMainDomain) {
+      // Funnel subdomain/custom domain rewrite — check BEFORE org resolution
+      // Uses NextResponse.rewrite (not redirect) to preserve the custom domain URL in browser
+      const funnelMatch = await resolveFunnelByHostname(hostname);
+      if (funnelMatch) {
+        const rewriteUrl = request.nextUrl.clone();
+        rewriteUrl.pathname = `/f/${funnelMatch.slug}`;
+        return NextResponse.rewrite(rewriteUrl);
+      }
+
+      // Org whitelabel resolution (unchanged)
       const org = await resolveOrganization(hostname);
       if (org) {
         resolvedOrgId = org.id;
@@ -46,7 +57,7 @@ export async function updateSession(request: NextRequest) {
       }
     }
   } catch {
-    // La résolution d'org ne doit pas bloquer la navigation
+    // La résolution ne doit pas bloquer la navigation
   }
 
   // Timing metrics
