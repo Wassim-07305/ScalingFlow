@@ -145,14 +145,30 @@ export async function POST(req: NextRequest) {
       const url = await getSetting("UNIPILE_API_URL");
       const token = await getSetting("UNIPILE_ACCESS_TOKEN");
       if (!url || !token) {
-        result = { status: "fail", latency_ms: 0, error: "Configuration incomplète" };
+        result = {
+          status: "fail",
+          latency_ms: 0,
+          error: `Configuration incomplète (URL: ${url ? "✓" : "✗"}, Token: ${token ? "✓" : "✗"})`,
+        };
         break;
       }
       result = await testWithTimeout(async () => {
-        const res = await fetch(`${url}/api/v1/users/me`, {
+        const endpoint = `${url}/api/v1/users/me`;
+        const res = await fetch(endpoint, {
           headers: { "X-API-KEY": token },
         });
-        return res.ok || res.status === 404;
+        if (res.ok || res.status === 404) return true;
+        const body = await res.text().catch(() => "");
+        let detail = "";
+        try {
+          const json = JSON.parse(body);
+          detail = json.message || json.error || body;
+        } catch {
+          detail = body;
+        }
+        throw new Error(
+          `HTTP ${res.status} ${res.statusText}${detail ? ` — ${detail.slice(0, 200)}` : ""}`,
+        );
       });
       break;
     }
