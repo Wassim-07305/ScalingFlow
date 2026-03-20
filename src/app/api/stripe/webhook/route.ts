@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe/client";
-import { getPlanByPriceId } from "@/lib/stripe/plans";
+import { getPlanByPriceId, resolvePlanId } from "@/lib/stripe/plans";
 import { createClient } from "@supabase/supabase-js";
 import { resend } from "@/lib/resend/client";
 import {
@@ -266,7 +266,7 @@ export async function POST(req: NextRequest) {
             .from("profiles")
             .update({
               subscription_status: "active",
-              subscription_plan: plan?.id || "pro",
+              subscription_plan: resolvePlanId(plan?.id || "pro"),
               stripe_customer_id: session.customer as string,
             })
             .eq("id", userId);

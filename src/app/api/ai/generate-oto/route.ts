@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { checkAIUsage } from "@/lib/stripe/check-usage";
+import { checkAIUsage, incrementAIUsage } from "@/lib/stripe/check-usage";
+import { getModelForGeneration } from "@/lib/ai/model-router";
 import { createClient } from "@/lib/supabase/server";
 import { generateJSON } from "@/lib/ai/generate";
 import { otoOfferPrompt } from "@/lib/ai/prompts/oto-offer";
@@ -75,7 +76,10 @@ export async function POST(req: NextRequest) {
       prompt = prompt + "\n" + vaultContext;
     }
 
+    const aiModel = getModelForGeneration("oto");
+
     const otoData = await generateJSON<Record<string, unknown>>({
+      model: aiModel,
       prompt,
       maxTokens: 6000,
     });
@@ -96,6 +100,8 @@ export async function POST(req: NextRequest) {
     } catch (e) {
       console.warn("generate-oto: XP award failed", e);
     }
+
+    incrementAIUsage(user.id, { generationType: "oto", model: aiModel }).catch(() => {});
 
     return NextResponse.json(otoData);
   } catch (error) {

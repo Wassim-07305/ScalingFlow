@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { generateText } from "@/lib/ai/generate";
+import { incrementAIUsage } from "@/lib/stripe/check-usage";
+import { getModelForGeneration } from "@/lib/ai/model-router";
 import { awardXP } from "@/lib/gamification/xp-engine";
 
 export const maxDuration = 60;
@@ -57,7 +59,9 @@ Structure ton document avec ces sections :
 
 Redige en francais, de maniere claire et structuree. Utilise des bullet points et des sous-sections pour faciliter la lecture.`;
 
-    const extraction = await generateText({ prompt, maxTokens: 4096 });
+    const aiModel = getModelForGeneration("vault_analysis");
+
+    const extraction = await generateText({ model: aiModel, prompt, maxTokens: 4096 });
 
     // Save to profile
     await supabase
@@ -70,6 +74,8 @@ Redige en francais, de maniere claire et structuree. Utilise des bullet points e
     } catch {
       /* ignore xp errors */
     }
+
+    incrementAIUsage(user.id, { generationType: "vault_analysis", model: aiModel }).catch(() => {});
 
     return NextResponse.json({ extraction });
   } catch (error) {

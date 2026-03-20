@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { checkAIUsage } from "@/lib/stripe/check-usage";
+import { checkAIUsage, incrementAIUsage } from "@/lib/stripe/check-usage";
+import { getModelForGeneration } from "@/lib/ai/model-router";
 import { createClient } from "@/lib/supabase/server";
 import { generateJSON } from "@/lib/ai/generate";
 import {
@@ -66,6 +67,8 @@ export async function POST(req: NextRequest) {
         { status: 403 },
       );
     }
+
+    const aiModel = getModelForGeneration("post_social");
 
     const body = await req.json();
     const { offerId, adType } = body;
@@ -245,6 +248,7 @@ export async function POST(req: NextRequest) {
         ) + (vaultContext ? "\n" + vaultContext : "");
 
       const result = await generateJSON<Record<string, unknown>>({
+        model: aiModel,
         prompt,
         maxTokens: 4096,
         temperature: 0.8,
@@ -260,6 +264,8 @@ export async function POST(req: NextRequest) {
       } catch (e) {
         console.warn("Notification failed:", e);
       }
+
+      incrementAIUsage(user.id, { generationType: "post_social", model: aiModel }).catch(() => {});
 
       return NextResponse.json({
         adType: "ad_spy",
@@ -277,6 +283,7 @@ export async function POST(req: NextRequest) {
         buildVideoAdScriptPrompt(offerContext, avatarContext) +
         (vaultContext ? "\n" + vaultContext : "");
       const result = await generateJSON<VideoAdScriptResult>({
+        model: aiModel,
         prompt,
         maxTokens: 4096,
       });
@@ -311,6 +318,8 @@ export async function POST(req: NextRequest) {
         console.warn("Notification failed:", e);
       }
 
+      incrementAIUsage(user.id, { generationType: "post_social", model: aiModel }).catch(() => {});
+
       return NextResponse.json({ adType: "video_ad", result });
     }
 
@@ -320,6 +329,7 @@ export async function POST(req: NextRequest) {
         buildDMScriptsPrompt(offerContext, avatarContext) +
         (vaultContext ? "\n" + vaultContext : "");
       const result = await generateJSON<DMScriptsResult>({
+        model: aiModel,
         prompt,
         maxTokens: 4096,
       });
@@ -353,6 +363,8 @@ export async function POST(req: NextRequest) {
       } catch (e) {
         console.warn("Notification failed:", e);
       }
+
+      incrementAIUsage(user.id, { generationType: "post_social", model: aiModel }).catch(() => {});
 
       return NextResponse.json({ adType: "dm_scripts", result });
     }
@@ -398,6 +410,7 @@ export async function POST(req: NextRequest) {
       }
 
       const result = await generateJSON<{ variations?: AdVariation[] }>({
+        model: aiModel,
         prompt,
         maxTokens: 8192,
         temperature: 0.85,
@@ -440,6 +453,8 @@ export async function POST(req: NextRequest) {
         console.warn("Notification failed:", e);
       }
 
+      incrementAIUsage(user.id, { generationType: "post_social", model: aiModel }).catch(() => {});
+
       return NextResponse.json({
         adType: "massive_batch",
         batch: massiveBatch,
@@ -475,6 +490,7 @@ export async function POST(req: NextRequest) {
       target_audience?: string;
     }
     const generatedAdCopy = await generateJSON<{ variations?: AdVariation[] }>({
+      model: aiModel,
       prompt: adCopyProm,
       maxTokens: 4096,
     });
@@ -482,6 +498,7 @@ export async function POST(req: NextRequest) {
     // Generate ad hooks
     const hooksProm = adHooksPrompt(market, avatar);
     const generatedHooks = await generateJSON<{ hooks?: string[] }>({
+      model: aiModel,
       prompt: hooksProm,
       maxTokens: 4096,
     });
@@ -524,6 +541,8 @@ export async function POST(req: NextRequest) {
     } catch (e) {
       console.warn("Notification failed:", e);
     }
+
+    incrementAIUsage(user.id, { generationType: "post_social", model: aiModel }).catch(() => {});
 
     return NextResponse.json({
       ad_creatives: adCreatives,

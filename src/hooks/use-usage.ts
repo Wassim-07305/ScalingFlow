@@ -2,13 +2,20 @@
 
 import { useState, useEffect } from "react";
 
-interface UsageData {
+export interface UsageData {
   allowed: boolean;
   currentUsage: number;
-  limit: number | null;
+  limit: number;
+  percentUsed: number;
+  remaining: number;
   plan: string;
   subscription_status: string;
+  resetDate: string;
+  costThisMonth?: number;
+  byType?: Record<string, number>;
 }
+
+export type PlanTier = "free" | "starter" | "pro" | "scale" | "agency";
 
 export function useUsage() {
   const [usage, setUsage] = useState<UsageData | null>(null);
@@ -24,5 +31,13 @@ export function useUsage() {
       .finally(() => setLoading(false));
   }, []);
 
-  return { usage, loading, isPro: usage?.plan !== "free" };
+  const planTier = (usage?.plan || "free") as PlanTier;
+
+  return {
+    usage,
+    loading,
+    planTier,
+    isPro: planTier !== "free" && planTier !== "starter",
+    isPaid: planTier !== "free",
+  };
 }

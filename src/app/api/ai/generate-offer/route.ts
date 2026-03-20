@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { checkAIUsage } from "@/lib/stripe/check-usage";
+import { checkAIUsage, incrementAIUsage } from "@/lib/stripe/check-usage";
 import { createClient } from "@/lib/supabase/server";
 import { generateJSON } from "@/lib/ai/generate";
 import { offerCreationPrompt } from "@/lib/ai/prompts/offer-creation";
@@ -7,6 +7,7 @@ import { buildFullVaultContext } from "@/lib/ai/vault-context";
 import { awardXP } from "@/lib/gamification/xp-engine";
 import { notifyGeneration } from "@/lib/notifications/create";
 import { rateLimit } from "@/lib/utils/rate-limit";
+import { getModelForGeneration } from "@/lib/ai/model-router";
 
 export async function POST(req: NextRequest) {
   try {
@@ -116,9 +117,11 @@ ${truncatedReviews}
       delivery?: Record<string, unknown>;
       full_document_markdown?: string;
     }
+    const aiModel = getModelForGeneration("offer");
     const generatedOffer = await generateJSON<GeneratedOffer>({
       prompt,
       maxTokens: 8192,
+      model: aiModel,
     });
 
     // Save offer to database
@@ -149,6 +152,9 @@ ${truncatedReviews}
         { status: 500 },
       );
     }
+
+    // Track AI usage (non-blocking)
+    incrementAIUsage(user.id, { generationType: "offer", model: aiModel }).catch(() => {});
 
     // Award XP (non-blocking)
     try {

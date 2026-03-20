@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { checkAIUsage } from "@/lib/stripe/check-usage";
+import { checkAIUsage, incrementAIUsage } from "@/lib/stripe/check-usage";
+import { getModelForGeneration } from "@/lib/ai/model-router";
 import { generateText } from "@/lib/ai/generate";
 import { rateLimit } from "@/lib/utils/rate-limit";
 
@@ -72,11 +73,13 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const aiModel = getModelForGeneration("logo");
     const results: { type: string; label: string; url: string }[] = [];
 
     for (const logoType of LOGO_TYPES) {
       try {
         const svgCode = await generateText({
+          model: aiModel,
           prompt: buildSVGPrompt(
             brandName,
             concept,
@@ -110,6 +113,8 @@ export async function POST(req: NextRequest) {
         { status: 500 },
       );
     }
+
+    incrementAIUsage(user.id, { generationType: "logo", model: aiModel }).catch(() => {});
 
     return NextResponse.json({
       images: results.map((r) => r.url),

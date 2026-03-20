@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { checkAIUsage } from "@/lib/stripe/check-usage";
+import { checkAIUsage, incrementAIUsage } from "@/lib/stripe/check-usage";
+import { getModelForGeneration } from "@/lib/ai/model-router";
 import { createClient } from "@/lib/supabase/server";
 import { generateJSON } from "@/lib/ai/generate";
 import {
@@ -82,7 +83,10 @@ export async function POST(req: NextRequest) {
 
     const prompt = vaultContext ? basePrompt + "\n" + vaultContext : basePrompt;
 
+    const aiModel = getModelForGeneration("scoring");
+
     const score = await generateJSON<OfferScoreResult>({
+      model: aiModel,
       prompt,
       maxTokens: 4096,
     });
@@ -94,6 +98,8 @@ export async function POST(req: NextRequest) {
     try {
       await notifyGeneration(user.id, "validation.offer");
     } catch {}
+
+    incrementAIUsage(user.id, { generationType: "scoring", model: aiModel }).catch(() => {});
 
     return NextResponse.json(score);
   } catch (error) {

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { generateJSON } from "@/lib/ai/generate";
+import { incrementAIUsage } from "@/lib/stripe/check-usage";
+import { getModelForGeneration } from "@/lib/ai/model-router";
 import { awardXP } from "@/lib/gamification/xp-engine";
 
 export const maxDuration = 60;
@@ -56,7 +58,10 @@ Reponds UNIQUEMENT en JSON valide :
 
 Génère entre 4 et 8 recommandations, triées par impact décroissant. Sois concret et actionnable.`;
 
+    const aiModel = getModelForGeneration("optimize_ads");
+
     const result = await generateJSON({
+      model: aiModel,
       prompt,
       maxTokens: 4096,
     });
@@ -66,6 +71,8 @@ Génère entre 4 et 8 recommandations, triées par impact décroissant. Sois con
     } catch {
       // XP award is non-critical
     }
+
+    incrementAIUsage(user.id, { generationType: "optimize_ads", model: aiModel }).catch(() => {});
 
     return NextResponse.json(result);
   } catch (error) {

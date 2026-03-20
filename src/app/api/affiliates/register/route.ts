@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
     const isPaidUser =
       profile.role === "admin" ||
       (profile.subscription_status === "active" &&
-        ["pro", "premium"].includes(profile.subscription_plan || ""));
+        ["starter", "pro", "scale", "agency", "premium"].includes(profile.subscription_plan || ""));
 
     if (!isPaidUser) {
       return NextResponse.json(

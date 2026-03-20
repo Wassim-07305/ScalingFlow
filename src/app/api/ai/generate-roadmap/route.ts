@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { checkAIUsage } from "@/lib/stripe/check-usage";
+import { checkAIUsage, incrementAIUsage } from "@/lib/stripe/check-usage";
+import { getModelForGeneration } from "@/lib/ai/model-router";
 import { createClient } from "@/lib/supabase/server";
 import { generateJSON } from "@/lib/ai/generate";
 import {
@@ -97,7 +98,10 @@ export async function POST(req: NextRequest) {
       hasContent: (contentCount || 0) > 0,
     });
 
+    const aiModel = getModelForGeneration("roadmap");
+
     const result = await generateJSON<RoadmapResult>({
+      model: aiModel,
       prompt: vaultContext ? userPrompt + "\n" + vaultContext : userPrompt,
       systemPrompt,
       maxTokens: 4096,
@@ -150,6 +154,8 @@ export async function POST(req: NextRequest) {
     try {
       await notifyGeneration(user.id, "generation.roadmap");
     } catch {}
+
+    incrementAIUsage(user.id, { generationType: "roadmap", model: aiModel }).catch(() => {});
 
     return NextResponse.json({
       tasks_count: result.tasks.length,

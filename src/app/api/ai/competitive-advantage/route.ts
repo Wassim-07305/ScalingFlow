@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { generateJSON } from "@/lib/ai/generate";
+import { incrementAIUsage } from "@/lib/stripe/check-usage";
+import { getModelForGeneration } from "@/lib/ai/model-router";
 import { awardXP } from "@/lib/gamification/xp-engine";
 
 export const maxDuration = 60;
@@ -81,7 +83,10 @@ Reponds UNIQUEMENT en JSON valide :
   ]
 }`;
 
+    const aiModel = getModelForGeneration("competitive_advantage");
+
     const result = await generateJSON<CompetitiveAdvantageResult>({
+      model: aiModel,
       prompt,
       maxTokens: 4096,
     });
@@ -97,6 +102,8 @@ Reponds UNIQUEMENT en JSON valide :
     } catch {
       /* ignore xp errors */
     }
+
+    incrementAIUsage(user.id, { generationType: "competitive_advantage", model: aiModel }).catch(() => {});
 
     return NextResponse.json(result);
   } catch (error) {

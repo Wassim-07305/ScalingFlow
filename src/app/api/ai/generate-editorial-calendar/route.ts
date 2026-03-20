@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { checkAIUsage } from "@/lib/stripe/check-usage";
+import { checkAIUsage, incrementAIUsage } from "@/lib/stripe/check-usage";
+import { getModelForGeneration } from "@/lib/ai/model-router";
 import { generateJSON } from "@/lib/ai/generate";
 import { buildFullVaultContext } from "@/lib/ai/vault-context";
 import {
@@ -82,7 +83,10 @@ export async function POST(req: NextRequest) {
       vaultContext,
     );
 
+    const aiModel = getModelForGeneration("editorial_calendar");
+
     const result = await generateJSON<EditorialCalendarResult>({
+      model: aiModel,
       prompt,
       systemPrompt:
         "Tu es un expert en stratégie de contenu digital. Génère un plan éditorial détaillé en JSON.",
@@ -98,6 +102,8 @@ export async function POST(req: NextRequest) {
       content: JSON.stringify(result),
       ai_raw_response: result as unknown as import("@/types/database").Json,
     });
+
+    incrementAIUsage(user.id, { generationType: "editorial_calendar", model: aiModel }).catch(() => {});
 
     return NextResponse.json({ result });
   } catch (error) {

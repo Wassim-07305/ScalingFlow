@@ -426,3 +426,104 @@ export function streakReminderEmail(firstName: string, streakDays: number) {
     html,
   };
 }
+
+// ─── Admin Monthly AI Report ────────────────────────────────────────────────
+
+interface MonthlyReportData {
+  month: string;
+  mrr: number;
+  aiCostUsd: number;
+  aiCostEur: number;
+  grossMargin: number;
+  totalGenerations: number;
+  activeUsers: number;
+  topUsers: { name: string; plan: string; cost: number; generations: number }[];
+  alerts: { message: string; severity: string }[];
+  vsLastMonth: number; // % change
+}
+
+export function monthlyAIReportEmail(data: MonthlyReportData) {
+  const alertRows = data.alerts
+    .map(
+      (a) =>
+        `<tr><td style="padding:8px 12px;font-size:13px;color:${a.severity === "critical" ? "#EF4444" : a.severity === "warning" ? "#FBBF24" : "#60A5FA"};">${a.message}</td></tr>`,
+    )
+    .join("");
+
+  const topUserRows = data.topUsers
+    .map(
+      (u) =>
+        `<tr>
+          <td style="padding:6px 12px;font-size:13px;color:#FFFFFF;">${u.name}</td>
+          <td style="padding:6px 12px;font-size:13px;color:#8b8f96;text-align:center;">${u.plan}</td>
+          <td style="padding:6px 12px;font-size:13px;color:#8b8f96;text-align:right;">${u.generations}</td>
+          <td style="padding:6px 12px;font-size:13px;color:#FFFFFF;text-align:right;">$${u.cost.toFixed(2)}</td>
+        </tr>`,
+    )
+    .join("");
+
+  const changeIcon = data.vsLastMonth >= 0 ? "&#x25B2;" : "&#x25BC;";
+  const changeColor = data.vsLastMonth >= 0 ? "#EF4444" : "#34D399";
+
+  const html = layout(`
+    <h1 style="margin:0 0 8px;font-size:22px;font-weight:700;color:#FFFFFF;">
+      Rapport IA Mensuel &mdash; ${data.month}
+    </h1>
+    <p style="margin:0 0 24px;font-size:14px;color:#8b8f96;">
+      R&eacute;sum&eacute; des co&ucirc;ts IA et de la rentabilit&eacute;.
+    </p>
+
+    <!-- KPIs -->
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;">
+      <tr>
+        <td style="padding:12px;background:#1C1F23;border-radius:8px 0 0 8px;text-align:center;">
+          <p style="margin:0;font-size:11px;color:#8b8f96;">MRR</p>
+          <p style="margin:4px 0 0;font-size:20px;font-weight:700;color:#34D399;">${data.mrr}&euro;</p>
+        </td>
+        <td style="padding:12px;background:#1C1F23;text-align:center;">
+          <p style="margin:0;font-size:11px;color:#8b8f96;">Co&ucirc;t IA</p>
+          <p style="margin:4px 0 0;font-size:20px;font-weight:700;color:#FFFFFF;">${data.aiCostEur.toFixed(2)}&euro;</p>
+          <p style="margin:2px 0 0;font-size:10px;color:${changeColor};">${changeIcon} ${Math.abs(data.vsLastMonth)}%</p>
+        </td>
+        <td style="padding:12px;background:#1C1F23;text-align:center;">
+          <p style="margin:0;font-size:11px;color:#8b8f96;">G&eacute;n&eacute;rations</p>
+          <p style="margin:4px 0 0;font-size:20px;font-weight:700;color:#FFFFFF;">${data.totalGenerations}</p>
+        </td>
+        <td style="padding:12px;background:#1C1F23;border-radius:0 8px 8px 0;text-align:center;">
+          <p style="margin:0;font-size:11px;color:#8b8f96;">Marge brute</p>
+          <p style="margin:4px 0 0;font-size:20px;font-weight:700;color:${data.grossMargin >= 50 ? "#34D399" : "#EF4444"};">${data.grossMargin}%</p>
+        </td>
+      </tr>
+    </table>
+
+    ${data.alerts.length > 0 ? `
+    <!-- Alerts -->
+    <h2 style="margin:0 0 8px;font-size:15px;font-weight:600;color:#FFFFFF;">Alertes</h2>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;background:#1C1F23;border-radius:8px;">
+      ${alertRows}
+    </table>
+    ` : ""}
+
+    <!-- Top consumers -->
+    <h2 style="margin:0 0 8px;font-size:15px;font-weight:600;color:#FFFFFF;">Top 5 Consumers</h2>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;background:#1C1F23;border-radius:8px;">
+      <tr style="border-bottom:1px solid #2a2d31;">
+        <td style="padding:8px 12px;font-size:11px;color:#8b8f96;font-weight:600;">User</td>
+        <td style="padding:8px 12px;font-size:11px;color:#8b8f96;font-weight:600;text-align:center;">Plan</td>
+        <td style="padding:8px 12px;font-size:11px;color:#8b8f96;font-weight:600;text-align:right;">Gen.</td>
+        <td style="padding:8px 12px;font-size:11px;color:#8b8f96;font-weight:600;text-align:right;">Co&ucirc;t</td>
+      </tr>
+      ${topUserRows}
+    </table>
+
+    <a href="${APP_URL}/admin/ai-monitoring"
+       style="display:inline-block;padding:12px 32px;background:#34D399;color:#0B0E11;font-weight:600;font-size:14px;border-radius:8px;text-decoration:none;">
+      Voir le dashboard complet
+    </a>
+  `);
+
+  return {
+    subject: `Rapport IA — ${data.month} | Coût ${data.aiCostEur.toFixed(2)}€ | Marge ${data.grossMargin}%`,
+    html,
+  };
+}

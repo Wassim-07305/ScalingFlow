@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { incrementAIUsage } from "@/lib/stripe/check-usage";
+import { getModelForGeneration } from "@/lib/ai/model-router";
 import Anthropic from "@anthropic-ai/sdk";
 
 // ─── F83 Roadmap personnalisée — Générateur de plan quotidien IA ───
@@ -106,6 +108,8 @@ export async function POST(req: Request) {
       alerts: activeAlerts.map((a) => `${a.severity}: ${a.title}`),
     };
 
+    const aiModel = getModelForGeneration("daily_plan");
+
     const response = await anthropic.messages.create({
       model: "claude-sonnet-4-20250514",
       max_tokens: 2000,
@@ -202,6 +206,8 @@ Génère le plan du jour au format JSON :
       )
       .select()
       .single();
+
+    incrementAIUsage(user.id, { generationType: "daily_plan", model: aiModel }).catch(() => {});
 
     return NextResponse.json({
       success: true,

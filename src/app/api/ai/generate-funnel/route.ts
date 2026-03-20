@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { checkAIUsage } from "@/lib/stripe/check-usage";
+import { checkAIUsage, incrementAIUsage } from "@/lib/stripe/check-usage";
+import { getModelForGeneration } from "@/lib/ai/model-router";
 import { createClient } from "@/lib/supabase/server";
 import { generateJSON } from "@/lib/ai/generate";
 import { funnelCopyPrompt } from "@/lib/ai/prompts/funnel-copy";
@@ -81,7 +82,10 @@ export async function POST(req: NextRequest) {
       vsl_page?: Record<string, unknown>;
       thankyou_page?: Record<string, unknown>;
     }
+    const aiModel = getModelForGeneration("funnel");
+
     const generatedFunnel = await generateJSON<GeneratedFunnel>({
+      model: aiModel,
       prompt,
       maxTokens: 4096,
     });
@@ -116,6 +120,8 @@ export async function POST(req: NextRequest) {
     try {
       await notifyGeneration(user.id, "generation.funnel");
     } catch {}
+
+    incrementAIUsage(user.id, { generationType: "funnel", model: aiModel }).catch(() => {});
 
     return NextResponse.json(funnel);
   } catch (error) {

@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { generateJSON } from "@/lib/ai/generate";
-import { checkAIUsage } from "@/lib/stripe/check-usage";
+import { checkAIUsage, incrementAIUsage } from "@/lib/stripe/check-usage";
+import { getModelForGeneration } from "@/lib/ai/model-router";
 import { rateLimit } from "@/lib/utils/rate-limit";
 
 interface QuizQuestion {
@@ -83,12 +84,17 @@ Réponds UNIQUEMENT en JSON valide avec cette structure :
   ]
 }`;
 
+    const aiModel = getModelForGeneration("quiz");
+
     const result = await generateJSON<QuizResult>({
+      model: aiModel,
       prompt: `Génère un quiz de 5 questions pour le module de formation intitulé : "${moduleTitle}". Les questions doivent couvrir les concepts clés enseignés dans ce module.`,
       systemPrompt,
       maxTokens: 4096,
       temperature: 0.8,
     });
+
+    incrementAIUsage(user.id, { generationType: "quiz", model: aiModel }).catch(() => {});
 
     return NextResponse.json(result);
   } catch (error) {

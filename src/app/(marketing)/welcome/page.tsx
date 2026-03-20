@@ -148,8 +148,18 @@ const TESTIMONIALS = [
 
 const PLAN_ICONS: Record<string, typeof Zap> = {
   free: Zap,
+  starter: Zap,
   pro: Sparkles,
-  premium: Crown,
+  scale: Crown,
+  agency: Crown,
+};
+
+const PLAN_COLORS: Record<string, { icon: string; check: string }> = {
+  free: { icon: "bg-bg-tertiary text-text-secondary", check: "text-accent" },
+  starter: { icon: "bg-blue-500/10 text-blue-400", check: "text-blue-400" },
+  pro: { icon: "bg-accent/10 text-accent", check: "text-accent" },
+  scale: { icon: "bg-[rgba(139,92,246,0.12)] text-[#A78BFA]", check: "text-[#A78BFA]" },
+  agency: { icon: "bg-amber-500/10 text-amber-400", check: "text-amber-400" },
 };
 
 export default function WelcomePage() {
@@ -391,13 +401,14 @@ export default function WelcomePage() {
             </p>
           </div>
 
-          <div className="grid gap-6 md:grid-cols-3">
+          <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-5">
             {PLANS.map((plan) => {
               const Icon = PLAN_ICONS[plan.id] || Zap;
+              const colors = PLAN_COLORS[plan.id] || PLAN_COLORS.free;
               return (
                 <div
                   key={plan.id}
-                  className={`relative p-6 rounded-2xl border transition-all duration-300 hover:shadow-xl ${
+                  className={`relative p-5 rounded-2xl border transition-all duration-300 hover:shadow-xl ${
                     plan.popular
                       ? "border-accent/50 shadow-[0_0_40px_rgba(52,211,153,0.1)] hover:shadow-accent/15"
                       : "border-border-default hover:border-border-hover"
@@ -405,54 +416,51 @@ export default function WelcomePage() {
                 >
                   {plan.popular && (
                     <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                      <span className="px-4 py-1.5 rounded-full bg-accent text-white text-xs font-semibold shadow-lg shadow-accent/25">
-                        Le plus populaire
+                      <span className="px-3 py-1 rounded-full bg-accent text-white text-[10px] font-semibold shadow-lg shadow-accent/25">
+                        Populaire
                       </span>
                     </div>
                   )}
 
-                  <div className="flex items-center gap-2 mb-4">
+                  <div className="flex items-center gap-2 mb-3">
                     <div
-                      className={`h-10 w-10 rounded-xl flex items-center justify-center ${
-                        plan.id === "free"
-                          ? "bg-bg-tertiary text-text-secondary"
-                          : plan.id === "pro"
-                            ? "bg-accent/10 text-accent"
-                            : "bg-[rgba(139,92,246,0.12)] text-[#A78BFA]"
-                      }`}
+                      className={`h-9 w-9 rounded-xl flex items-center justify-center ${colors.icon}`}
                     >
-                      <Icon className="h-5 w-5" />
+                      <Icon className="h-4 w-4" />
                     </div>
-                    <h3 className="font-semibold text-text-primary text-lg">
+                    <h3 className="font-semibold text-text-primary">
                       {plan.name}
                     </h3>
                   </div>
 
-                  <div className="flex items-baseline gap-1 mb-5">
-                    <span className="text-4xl font-bold text-text-primary">
-                      {plan.price}
+                  <div className="flex items-baseline gap-1 mb-1">
+                    <span className="text-3xl font-bold text-text-primary">
+                      {plan.price}€
                     </span>
-                    <span className="text-sm text-text-muted">
-                      {plan.price === 0 ? "EUR" : "EUR/mois"}
-                    </span>
+                    {plan.price > 0 && (
+                      <span className="text-xs text-text-muted">/mois</span>
+                    )}
                   </div>
 
-                  <p className="text-xs text-text-muted mb-5">
+                  {plan.annualPrice > 0 && plan.annualPrice < plan.price && (
+                    <p className="text-[10px] text-accent mb-3">
+                      ou {plan.annualPrice}€/mois en annuel
+                    </p>
+                  )}
+                  {plan.price === 0 && <div className="mb-3" />}
+
+                  <p className="text-[11px] text-text-muted mb-4 leading-relaxed">
                     {plan.description}
                   </p>
 
-                  <div className="space-y-2.5 mb-6">
+                  <div className="space-y-2 mb-5">
                     {plan.features.map((f) => (
                       <div
                         key={f}
-                        className="flex items-start gap-2.5 text-sm text-text-secondary"
+                        className="flex items-start gap-2 text-xs text-text-secondary"
                       >
                         <Check
-                          className={`h-4 w-4 mt-0.5 shrink-0 ${
-                            plan.id === "premium"
-                              ? "text-[#A78BFA]"
-                              : "text-accent"
-                          }`}
+                          className={`h-3.5 w-3.5 mt-0.5 shrink-0 ${colors.check}`}
                         />
                         <span className="leading-relaxed">{f}</span>
                       </div>
@@ -461,7 +469,7 @@ export default function WelcomePage() {
 
                   <Link
                     href="/register"
-                    className={`block w-full text-center py-3 rounded-xl text-sm font-medium transition-all ${
+                    className={`block w-full text-center py-2.5 rounded-xl text-sm font-medium transition-all ${
                       plan.popular
                         ? "bg-accent text-white hover:bg-accent/90 shadow-lg shadow-accent/15"
                         : "border border-border-default text-text-secondary hover:text-text-primary hover:border-border-hover"

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { checkAIUsage } from "@/lib/stripe/check-usage";
+import { checkAIUsage, incrementAIUsage } from "@/lib/stripe/check-usage";
+import { getModelForGeneration } from "@/lib/ai/model-router";
 import { createClient } from "@/lib/supabase/server";
 import { generateJSON } from "@/lib/ai/generate";
 import { contentIdeasPrompt } from "@/lib/ai/prompts/content-ideas";
@@ -224,6 +225,8 @@ export async function POST(req: NextRequest) {
         { status: 403 },
       );
     }
+
+    const aiModel = getModelForGeneration("post_social");
 
     const body = await req.json();
     const {
@@ -588,6 +591,7 @@ ${fbResults
       );
 
       const result = await generateJSON<Record<string, unknown>>({
+        model: aiModel,
         prompt,
         maxTokens: 4096,
         temperature: 0.8,
@@ -603,6 +607,8 @@ ${fbResults
       } catch (e) {
         console.warn("Non-blocking op failed:", e);
       }
+
+      incrementAIUsage(user.id, { generationType: "post_social", model: aiModel }).catch(() => {});
 
       return NextResponse.json({
         contentType: "content_spy",
@@ -636,6 +642,7 @@ ${fbResults
         ),
       );
       const result = await generateJSON<ContentStrategyResult>({
+        model: aiModel,
         prompt,
         maxTokens: 8192,
       });
@@ -677,6 +684,8 @@ ${fbResults
         console.warn("Non-blocking op failed:", e);
       }
 
+      incrementAIUsage(user.id, { generationType: "post_social", model: aiModel }).catch(() => {});
+
       return NextResponse.json({ contentType: "strategy", result });
     }
 
@@ -691,6 +700,7 @@ ${fbResults
         ),
       );
       const result = await generateJSON<ReelsScriptsResult>({
+        model: aiModel,
         prompt,
         maxTokens: 8192,
       });
@@ -727,6 +737,8 @@ ${fbResults
         console.warn("Non-blocking op failed:", e);
       }
 
+      incrementAIUsage(user.id, { generationType: "post_social", model: aiModel }).catch(() => {});
+
       return NextResponse.json({ contentType: "reels", result });
     }
 
@@ -742,6 +754,7 @@ ${fbResults
         buildYouTubeScriptPrompt(marketContext, offerContext, topic),
       );
       const result = await generateJSON<YouTubeScriptResult>({
+        model: aiModel,
         prompt,
         maxTokens: 8192,
       });
@@ -770,6 +783,8 @@ ${fbResults
         console.warn("Non-blocking op failed:", e);
       }
 
+      incrementAIUsage(user.id, { generationType: "post_social", model: aiModel }).catch(() => {});
+
       return NextResponse.json({ contentType: "youtube", result });
     }
 
@@ -779,6 +794,7 @@ ${fbResults
         buildStoriesPrompt(marketContext, offerContext),
       );
       const result = await generateJSON<StoriesResult>({
+        model: aiModel,
         prompt,
         maxTokens: 4096,
       });
@@ -809,6 +825,8 @@ ${fbResults
         console.warn("Non-blocking op failed:", e);
       }
 
+      incrementAIUsage(user.id, { generationType: "post_social", model: aiModel }).catch(() => {});
+
       return NextResponse.json({ contentType: "stories", result });
     }
 
@@ -824,6 +842,7 @@ ${fbResults
         buildCarouselPrompt(marketContext, offerContext, topic),
       );
       const result = await generateJSON<CarouselResult>({
+        model: aiModel,
         prompt,
         maxTokens: 4096,
       });
@@ -853,6 +872,8 @@ ${fbResults
       } catch (e) {
         console.warn("Non-blocking op failed:", e);
       }
+
+      incrementAIUsage(user.id, { generationType: "post_social", model: aiModel }).catch(() => {});
 
       return NextResponse.json({ contentType: "carousel", result });
     }
@@ -887,6 +908,7 @@ ${fbResults
     // Generate content ideas using AI
     const prompt = withContext(contentIdeasPrompt(marketContext, platform));
     const generatedContent = await generateJSON<{ ideas?: string[] }>({
+      model: aiModel,
       prompt,
       maxTokens: 4096,
     });
@@ -902,6 +924,8 @@ ${fbResults
     } catch (e) {
       console.warn("Non-blocking op failed:", e);
     }
+
+    incrementAIUsage(user.id, { generationType: "post_social", model: aiModel }).catch(() => {});
 
     return NextResponse.json({
       market: marketContext,

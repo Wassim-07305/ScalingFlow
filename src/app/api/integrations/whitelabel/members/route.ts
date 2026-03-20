@@ -33,9 +33,9 @@ export async function POST(req: NextRequest) {
       .select("subscription_plan")
       .eq("id", user.id)
       .single();
-    if (callerProfile?.subscription_plan !== "premium") {
+    if (!["scale", "agency", "premium"].includes(callerProfile?.subscription_plan || "")) {
       return NextResponse.json(
-        { error: "Un abonnement Premium est requis" },
+        { error: "Un abonnement Scale ou Agency est requis" },
         { status: 403 },
       );
     }

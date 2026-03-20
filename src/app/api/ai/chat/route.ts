@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { checkAIUsage } from "@/lib/stripe/check-usage";
+import { checkAIUsage, incrementAIUsage } from "@/lib/stripe/check-usage";
+import { hasFeatureAccess, getMinPlanForFeature } from "@/lib/stripe/feature-access";
 import { createClient } from "@/lib/supabase/server";
 import { createStreamingResponse, streamText } from "@/lib/ai/generate";
 import {
@@ -175,6 +176,22 @@ export async function POST(req: NextRequest) {
 
     const agent = getAgent(agentType || "general");
 
+    // Check agent access — free plan can only use "general" agent
+    if (agentType && agentType !== "general") {
+      const canUseAgents = await hasFeatureAccess(user.id, "specialized_agents");
+      if (!canUseAgents) {
+        const minPlan = getMinPlanForFeature("specialized_agents");
+        return NextResponse.json(
+          {
+            error: `L'agent "${agent.name}" est disponible à partir du plan ${minPlan.charAt(0).toUpperCase() + minPlan.slice(1)}. Upgrade ton plan pour y accéder.`,
+            upgradeRequired: true,
+            minPlan,
+          },
+          { status: 403 },
+        );
+      }
+    }
+
     // Fetch full vault context (profile + resources), latest offer, agent-specific context, and RAG context
     const [vaultContext, { data: latestOffer }, agentContext, ragContext] =
       await Promise.all([
@@ -268,6 +285,8 @@ export async function POST(req: NextRequest) {
       systemPrompt: fullSystemPrompt,
       maxTokens: 4096,
     });
+
+    incrementAIUsage(user.id, { generationType: "agent_chat", model: "haiku" }).catch(() => {});
 
     return new Response(createStreamingResponse(stream), {
       headers: {

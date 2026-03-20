@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { generateJSON } from "@/lib/ai/generate";
+import { incrementAIUsage } from "@/lib/stripe/check-usage";
+import { getModelForGeneration } from "@/lib/ai/model-router";
 import { bleedingNeckPainsPrompt } from "@/lib/ai/prompts/bleeding-neck-pains";
 import { awardXP } from "@/lib/gamification/xp-engine";
 
@@ -54,7 +56,9 @@ export async function POST(req: NextRequest) {
       avatar,
     );
 
-    const result = await generateJSON({ prompt, maxTokens: 4096 });
+    const aiModel = getModelForGeneration("identify_pains");
+
+    const result = await generateJSON({ model: aiModel, prompt, maxTokens: 4096 });
 
     // Sauvegarder les pains dans l'analyse de marché
     await supabase
@@ -68,6 +72,8 @@ export async function POST(req: NextRequest) {
     } catch {
       // silently ignore XP errors
     }
+
+    incrementAIUsage(user.id, { generationType: "identify_pains", model: aiModel }).catch(() => {});
 
     return NextResponse.json(result);
   } catch (error) {

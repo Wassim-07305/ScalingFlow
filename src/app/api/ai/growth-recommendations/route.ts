@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { checkAIUsage } from "@/lib/stripe/check-usage";
+import { checkAIUsage, incrementAIUsage } from "@/lib/stripe/check-usage";
+import { getModelForGeneration } from "@/lib/ai/model-router";
 import { rateLimit } from "@/lib/utils/rate-limit";
 import { generateJSON } from "@/lib/ai/generate";
 import { awardXP } from "@/lib/gamification/xp-engine";
@@ -149,8 +150,11 @@ export async function POST(_req: NextRequest) {
       has_offer: !!offerRes.data,
     };
 
+    const aiModel = getModelForGeneration("growth_recs");
+
     const prompt = buildGrowthRecommendationsPrompt(ctx);
     const result = await generateJSON<GrowthRecommendationsResult>({
+      model: aiModel,
       prompt,
       maxTokens: 3000,
       temperature: 0.4,
@@ -171,6 +175,8 @@ export async function POST(_req: NextRequest) {
     try {
       await notifyGeneration(user.id, "generation.growth_recommendations");
     } catch {}
+
+    incrementAIUsage(user.id, { generationType: "growth_recs", model: aiModel }).catch(() => {});
 
     return NextResponse.json({
       ...result,

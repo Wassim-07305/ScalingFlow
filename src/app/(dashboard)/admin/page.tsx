@@ -447,6 +447,34 @@ export default function AdminPage() {
         ))}
       </div>
 
+      {/* ─── Widget Monitoring IA ────────────────────────────── */}
+      <Card className="mb-6 border-accent/20">
+        <CardContent className="py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="h-10 w-10 rounded-xl bg-accent/10 flex items-center justify-center">
+                <Sparkles className="h-5 w-5 text-accent" />
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold text-text-primary">Monitoring IA & Coûts</h3>
+                <p className="text-xs text-text-muted">
+                  Suivre les coûts IA, la rentabilité par plan, et les top consumers
+                </p>
+              </div>
+            </div>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => router.push("/admin/ai-monitoring")}
+              className="gap-2"
+            >
+              <TrendingUp className="h-4 w-4" />
+              Voir le monitoring
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* ─── Abonnements & Conversion ────────────────────────── */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
         <Card>

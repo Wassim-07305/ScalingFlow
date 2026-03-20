@@ -12,7 +12,7 @@ async function requirePremium(supabase: Awaited<ReturnType<typeof createClient>>
     .select("subscription_plan")
     .eq("id", userId)
     .single();
-  return profile?.subscription_plan === "premium";
+  return ["scale", "agency", "premium"].includes(profile?.subscription_plan || "");
 }
 
 export async function POST(req: NextRequest) {

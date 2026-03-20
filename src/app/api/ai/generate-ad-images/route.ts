@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { checkAIUsage } from "@/lib/stripe/check-usage";
+import { checkAIUsage, incrementAIUsage } from "@/lib/stripe/check-usage";
+import { getModelForGeneration } from "@/lib/ai/model-router";
 import { rateLimit } from "@/lib/utils/rate-limit";
 import { getSetting } from "@/lib/settings/get-setting";
 
@@ -216,6 +217,9 @@ export async function POST(req: NextRequest) {
         { status: 500 },
       );
     }
+
+    const aiModel = getModelForGeneration("ad_images");
+    incrementAIUsage(user.id, { generationType: "ad_images", model: aiModel }).catch(() => {});
 
     return NextResponse.json({
       images: results,

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { checkAIUsage } from "@/lib/stripe/check-usage";
+import { checkAIUsage, incrementAIUsage } from "@/lib/stripe/check-usage";
+import { getModelForGeneration } from "@/lib/ai/model-router";
 import { createClient } from "@/lib/supabase/server";
 import { generateJSON } from "@/lib/ai/generate";
 import {
@@ -174,7 +175,10 @@ export async function POST(req: NextRequest) {
       .filter(Boolean)
       .join("\n");
 
+    const aiModel = getModelForGeneration("market_analysis");
+
     const result = await generateJSON<MarketAnalysisResult>({
+      model: aiModel,
       prompt: fullPrompt,
       maxTokens: 8192,
       temperature: 0.7,
@@ -244,6 +248,8 @@ export async function POST(req: NextRequest) {
               : ("neutre" as const),
       })),
     ];
+
+    incrementAIUsage(user.id, { generationType: "market_analysis", model: aiModel }).catch(() => {});
 
     return NextResponse.json({
       ...result,

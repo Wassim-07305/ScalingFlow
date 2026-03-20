@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { checkAIUsage } from "@/lib/stripe/check-usage";
+import { checkAIUsage, incrementAIUsage } from "@/lib/stripe/check-usage";
+import { getModelForGeneration } from "@/lib/ai/model-router";
 import { generateText, generateJSON } from "@/lib/ai/generate";
 import { awardXP } from "@/lib/gamification/xp-engine";
 import {
@@ -195,7 +196,10 @@ export async function POST(req: NextRequest) {
         )
         .join("\n\n");
 
+      const aiModel = getModelForGeneration("knowledge_extract");
+
       const extracted = await generateJSON<ExtractedKnowledge>({
+        model: aiModel,
         prompt: buildKnowledgeExtractionPrompt(answersText, userProfile),
         maxTokens: 4096,
         temperature: 0.3,
@@ -220,6 +224,8 @@ export async function POST(req: NextRequest) {
       try {
         await awardXP(user.id, "generation.vault_analysis", {}, 100);
       } catch {}
+
+      incrementAIUsage(user.id, { generationType: "knowledge_extract", model: aiModel }).catch(() => {});
 
       return NextResponse.json({
         state: finalState,

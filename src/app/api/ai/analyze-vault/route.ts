@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { checkAIUsage } from "@/lib/stripe/check-usage";
+import { checkAIUsage, incrementAIUsage } from "@/lib/stripe/check-usage";
+import { getModelForGeneration } from "@/lib/ai/model-router";
 import { createClient } from "@/lib/supabase/server";
 import { generateJSON } from "@/lib/ai/generate";
 import {
@@ -82,7 +83,10 @@ export async function POST(req: NextRequest) {
 
     const { systemPrompt, userPrompt } = buildVaultAnalysisPrompt(body);
 
+    const aiModel = getModelForGeneration("vault_analysis");
+
     const result = await generateJSON<VaultAnalysis>({
+      model: aiModel,
       prompt: userPrompt,
       systemPrompt,
       maxTokens: 4096,
@@ -115,6 +119,8 @@ export async function POST(req: NextRequest) {
     try {
       await notifyGeneration(user.id, "generation.vault_analysis");
     } catch {}
+
+    incrementAIUsage(user.id, { generationType: "vault_analysis", model: aiModel }).catch(() => {});
 
     return NextResponse.json({
       ...result,

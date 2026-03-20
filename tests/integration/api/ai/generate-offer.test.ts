@@ -16,8 +16,13 @@ vi.mock("@/lib/ai/generate", () => ({
   generateJSON: vi.fn(),
 }));
 
+vi.mock("@/lib/ai/model-router", () => ({
+  getModelForGeneration: vi.fn().mockReturnValue("sonnet"),
+}));
+
 vi.mock("@/lib/stripe/check-usage", () => ({
   checkAIUsage: vi.fn().mockResolvedValue({ allowed: true }),
+  incrementAIUsage: vi.fn().mockResolvedValue(undefined),
 }));
 
 vi.mock("@/lib/ai/prompts/offer-creation", () => ({

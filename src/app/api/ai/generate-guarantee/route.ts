@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { checkAIUsage } from "@/lib/stripe/check-usage";
+import { checkAIUsage, incrementAIUsage } from "@/lib/stripe/check-usage";
+import { getModelForGeneration } from "@/lib/ai/model-router";
 import { createClient } from "@/lib/supabase/server";
 import { generateJSON } from "@/lib/ai/generate";
 import {
@@ -46,11 +47,16 @@ export async function POST(req: NextRequest) {
     const vaultContext = await buildFullVaultContext(user.id);
     const basePrompt = guaranteeGeneratorPrompt(body);
 
+    const aiModel = getModelForGeneration("guarantee");
+
     const result = await generateJSON<GuaranteeResult>({
+      model: aiModel,
       prompt: vaultContext ? basePrompt + "\n" + vaultContext : basePrompt,
       maxTokens: 4096,
       temperature: 0.7,
     });
+
+    incrementAIUsage(user.id, { generationType: "guarantee", model: aiModel }).catch(() => {});
 
     return NextResponse.json(result);
   } catch (error) {

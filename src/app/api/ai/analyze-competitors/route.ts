@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { checkAIUsage } from "@/lib/stripe/check-usage";
+import { checkAIUsage, incrementAIUsage } from "@/lib/stripe/check-usage";
+import { getModelForGeneration } from "@/lib/ai/model-router";
 import { createClient } from "@/lib/supabase/server";
 import { generateJSON } from "@/lib/ai/generate";
 import {
@@ -367,7 +368,10 @@ export async function POST(req: NextRequest) {
     ]);
     const prompt = vaultContext ? basePrompt + "\n" + vaultContext : basePrompt;
 
+    const aiModel = getModelForGeneration("competitors");
+
     const result = await generateJSON<CompetitorAnalysisResult>({
+      model: aiModel,
       prompt,
       maxTokens: 8192,
       temperature: 0.7,
@@ -413,6 +417,8 @@ export async function POST(req: NextRequest) {
     } catch (e) {
       console.warn("Notification failed", e);
     }
+
+    incrementAIUsage(user.id, { generationType: "competitors", model: aiModel }).catch(() => {});
 
     return NextResponse.json({
       ...result,

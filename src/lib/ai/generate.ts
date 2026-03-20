@@ -1,6 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { jsonrepair } from "jsonrepair";
-import { AI_MODEL } from "./anthropic";
+import { AI_MODEL, ANTHROPIC_MODELS, OPENROUTER_MODELS } from "./anthropic";
 
 const OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1";
 const MAX_RETRIES = 3;
@@ -21,6 +21,8 @@ interface GenerateOptions {
   systemPrompt?: string;
   maxTokens?: number;
   temperature?: number;
+  /** Model tier to use. Defaults to 'sonnet'. */
+  model?: "haiku" | "sonnet";
 }
 
 interface ChatResponse {
@@ -32,11 +34,12 @@ async function anthropicGenerate(
   userPrompt: string,
   maxTokens: number,
   temperature: number,
+  model: "haiku" | "sonnet" = "sonnet",
 ): Promise<string> {
   if (!anthropic) throw new Error("Anthropic client not initialized");
 
   const response = await anthropic.messages.create({
-    model: "claude-sonnet-4-20250514",
+    model: ANTHROPIC_MODELS[model],
     max_tokens: maxTokens,
     temperature,
     system: systemPrompt || undefined,
@@ -90,6 +93,7 @@ export async function generateText({
   systemPrompt,
   maxTokens = 4096,
   temperature = 0.7,
+  model = "sonnet",
 }: GenerateOptions): Promise<string> {
   // Try Anthropic direct API first if available
   if (USE_ANTHROPIC_DIRECT) {
@@ -99,6 +103,7 @@ export async function generateText({
         prompt,
         maxTokens,
         temperature,
+        model,
       );
     } catch (err) {
       console.warn(
@@ -117,7 +122,7 @@ export async function generateText({
   messages.push({ role: "user", content: prompt });
 
   const data = await openRouterFetch({
-    model: AI_MODEL,
+    model: OPENROUTER_MODELS[model] || AI_MODEL,
     max_tokens: maxTokens,
     temperature,
     messages,
@@ -135,6 +140,7 @@ export async function generateJSON<T>({
   systemPrompt,
   maxTokens = 4096,
   temperature = 0.7,
+  model = "sonnet",
 }: GenerateOptions): Promise<T> {
   const text = await generateText({
     prompt,
@@ -143,6 +149,7 @@ export async function generateJSON<T>({
       "\n\nIMPORTANT: Réponds UNIQUEMENT en JSON valide, sans markdown, sans ```json, sans texte autour.",
     maxTokens,
     temperature,
+    model,
   });
 
   // Extract JSON from potential markdown code blocks
@@ -212,12 +219,13 @@ export async function* streamText({
   systemPrompt,
   maxTokens = 4096,
   temperature = 0.7,
+  model = "sonnet",
 }: GenerateOptions): AsyncGenerator<string> {
   // Try Anthropic direct streaming first if available
   if (USE_ANTHROPIC_DIRECT && anthropic) {
     try {
       const stream = anthropic.messages.stream({
-        model: "claude-sonnet-4-20250514",
+        model: ANTHROPIC_MODELS[model],
         max_tokens: maxTokens,
         temperature,
         system: systemPrompt || undefined,
@@ -253,7 +261,7 @@ export async function* streamText({
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      model: AI_MODEL,
+      model: OPENROUTER_MODELS[model] || AI_MODEL,
       max_tokens: maxTokens,
       temperature,
       messages,
