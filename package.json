@@ -10,7 +10,12 @@
     "build": "next build --webpack",
     "start": "next start",
     "lint": "next lint",
-    "check:patterns": "node scripts/check-react-patterns.mjs"
+    "check:patterns": "node scripts/check-react-patterns.mjs",
+    "test": "vitest",
+    "test:unit": "vitest run --dir tests/unit",
+    "test:integration": "vitest run --dir tests/integration",
+    "test:e2e": "npx playwright test",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.78.0",
@@ -70,9 +75,11 @@
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@types/web-push": "^3.6.4",
+    "@vitest/coverage-v8": "^4.1.0",
     "dotenv": "^17.3.1",
     "eslint": "^9.39.2",
     "eslint-config-next": "^16.1.6",
-    "supabase": "^2.82.0"
+    "supabase": "^2.82.0",
+    "vitest": "^4.1.0"
   }
 }

@@ -104,6 +104,14 @@ export default function DrivePage() {
   } | null>(null);
 
   const supabase = React.useMemo(() => createClient(), []);
+  const [userId, setUserId] = React.useState<string | null>(null);
+
+  // Fetch user ID on mount
+  React.useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      setUserId(data.user?.id ?? null);
+    });
+  }, [supabase]);
 
   // Load contents of current folder
   const loadContents = React.useCallback(async () => {
@@ -198,7 +206,13 @@ export default function DrivePage() {
 
   // Create folder
   const handleCreateFolder = async (name: string, color: string) => {
+    if (!userId) {
+      toast.error("Utilisateur non authentifié");
+      return;
+    }
+
     const { error } = await supabase.from("drive_folders").insert({
+      user_id: userId,
       name,
       color,
       parent_id: currentFolderId,
