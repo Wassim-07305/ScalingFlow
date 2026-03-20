@@ -64,7 +64,7 @@ async function anthropicGenerate(
   const usage: AIUsageInfo = {
     inputTokens: response.usage?.input_tokens ?? 0,
     outputTokens: response.usage?.output_tokens ?? 0,
-    cachedTokens: (response.usage as Record<string, number>)?.cache_read_input_tokens ?? 0,
+    cachedTokens: (response.usage as unknown as Record<string, number>)?.cache_read_input_tokens ?? 0,
   };
 
   return { text: textBlock.text, usage };
