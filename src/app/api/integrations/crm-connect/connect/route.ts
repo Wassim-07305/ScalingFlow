@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createOAuthState } from "@/lib/utils/oauth-state";
 
 // ─── GoHighLevel OAuth: Start Flow (#52) ─────────────────────
-// GET /api/integrations/ghl/connect
+// GET /api/integrations/crm-connect/connect
 
 export async function GET() {
   try {
@@ -24,7 +24,7 @@ export async function GET() {
       );
     }
 
-    const redirectUri = `${process.env.NEXT_PUBLIC_APP_URL}/api/integrations/ghl/callback`;
+    const redirectUri = `${process.env.NEXT_PUBLIC_APP_URL}/api/integrations/crm-connect/callback`;
     const scopes = [
       "contacts.readonly",
       "contacts.write",

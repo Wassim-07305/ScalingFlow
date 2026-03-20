@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { verifyOAuthState } from "@/lib/utils/oauth-state";
 
 // ─── GoHighLevel OAuth: Callback Handler ─────────────────────
-// GET /api/integrations/ghl/callback?code=xxx&state=xxx
+// GET /api/integrations/crm-connect/callback?code=xxx&state=xxx
 
 export async function GET(req: NextRequest) {
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || "";
@@ -48,7 +48,7 @@ export async function GET(req: NextRequest) {
           client_secret: process.env.GHL_CLIENT_SECRET!,
           grant_type: "authorization_code",
           code,
-          redirect_uri: `${appUrl}/api/integrations/ghl/callback`,
+          redirect_uri: `${appUrl}/api/integrations/crm-connect/callback`,
         }),
       },
     );

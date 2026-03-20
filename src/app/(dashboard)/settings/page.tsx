@@ -1251,8 +1251,8 @@ function IntegrationsCard() {
             <ConnectButton
               provider="ghl"
               label="GoHighLevel"
-              connectUrl="/api/integrations/ghl/connect"
-              disconnectUrl="/api/integrations/ghl/disconnect"
+              connectUrl="/api/integrations/crm-connect/connect"
+              disconnectUrl="/api/integrations/crm-connect/disconnect"
               badgeVariant="cyan"
             />
             <ConnectButton
