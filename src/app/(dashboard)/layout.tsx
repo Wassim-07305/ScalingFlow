@@ -4,11 +4,14 @@ import { unstable_cache } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { DashboardShell } from "@/components/layout/dashboard-shell";
 import { UserProvider } from "@/contexts/user-context";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 // Cache le profil utilisateur 60s — revalidé via revalidateTag(`profile-${userId}`) lors d'une mise à jour
+// Utilise le client admin (service role) car unstable_cache s'exécute hors contexte de requête
+// et ne peut pas accéder aux cookies de session.
 const getCachedProfile = unstable_cache(
   async (userId: string) => {
-    const supabase = await createClient();
+    const supabase = createAdminClient();
     const { data } = await supabase
       .from("profiles")
       .select("id, email, full_name, avatar_url, role, organization_id")
@@ -23,7 +26,7 @@ const getCachedProfile = unstable_cache(
 // Cache le branding organisation 5 min — change rarement
 const getCachedOrgBranding = unstable_cache(
   async (orgId: string) => {
-    const supabase = await createClient();
+    const supabase = createAdminClient();
     const { data } = await supabase
       .from("organizations")
       .select("brand_name, logo_url, primary_color, accent_color, features")
