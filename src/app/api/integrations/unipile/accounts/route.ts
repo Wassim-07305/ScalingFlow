@@ -18,10 +18,18 @@ export async function GET() {
 
     // Fetch accounts directly from Unipile API (source of truth)
     const unipile = getUnipileClient();
-    const result = await unipile.account.getAll();
-    const items = Array.isArray(result)
-      ? result
-      : (result as { items?: Array<Record<string, unknown>> }).items || [];
+    const result = await unipile.account.getAll() as Record<string, unknown>;
+
+    // The SDK may return { object: "AccountList", items: [...] } or an array
+    let items: Array<Record<string, unknown>> = [];
+    if (Array.isArray(result)) {
+      items = result;
+    } else if (result && typeof result === "object") {
+      const raw = (result as Record<string, unknown>).items;
+      if (Array.isArray(raw)) {
+        items = raw as Array<Record<string, unknown>>;
+      }
+    }
 
     const accounts = items.map((account: Record<string, unknown>) => {
       const connParams = account.connection_params as
@@ -30,12 +38,12 @@ export async function GET() {
       const im = connParams?.im as Record<string, unknown> | undefined;
 
       return {
-        id: String(account.id),
-        provider: String(account.type || "unknown").toLowerCase(),
-        name: im?.username || account.name || null,
+        id: String(account.id ?? ""),
+        provider: String(account.type || account.account_type || "unknown").toLowerCase(),
+        name: im?.username || account.name || account.id || null,
         username: im?.publicIdentifier || im?.username || null,
         connected_at: account.created_at || null,
-        status: "connected",
+        status: account.status || "connected",
       };
     });
 
