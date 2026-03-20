@@ -272,7 +272,7 @@ export function InstagramOptimizer({
         </CardHeader>
         <CardContent>
           <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-            {result.highlights.map((h, i) => (
+            {(result.highlights ?? []).map((h, i) => (
               <div
                 key={i}
                 className="p-3 rounded-lg bg-bg-tertiary border border-border-default"
@@ -335,7 +335,7 @@ export function InstagramOptimizer({
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
-            {result.bio_alternatives.map((alt, i) => (
+            {(result.bio_alternatives ?? []).map((alt, i) => (
               <div
                 key={i}
                 className="p-3 rounded-lg bg-bg-tertiary border border-border-default"

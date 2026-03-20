@@ -319,7 +319,7 @@ export function StrategyOverview({
             Plateformes prioritaires
           </p>
           <div className="flex flex-wrap gap-2">
-            {strategie_globale.plateformes_prioritaires.map((p, i) => (
+            {(strategie_globale.plateformes_prioritaires ?? []).map((p, i) => (
               <Badge key={i} variant="cyan">
                 {p}
               </Badge>

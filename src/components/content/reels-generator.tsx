@@ -773,7 +773,7 @@ export function ReelsGenerator({
 
         {/* Hashtags */}
         <div className="flex flex-wrap gap-1 mt-3">
-          {script.hashtags.map((h, j) => (
+          {(script.hashtags ?? []).map((h, j) => (
             <span key={j} className="text-xs text-info">
               {h.startsWith("#") ? h : `#${h}`}
             </span>

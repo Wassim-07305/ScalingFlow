@@ -461,7 +461,7 @@ export function CarouselGenerator({
               onClick={() => {
                 const fullText = [
                   result.hook_cover,
-                  ...result.slides.map(
+                  ...(result.slides ?? []).map(
                     (s) =>
                       `Slide ${s.numero}: ${s.texte_principal}\n${s.texte_secondaire}`,
                   ),
@@ -591,7 +591,7 @@ export function CarouselGenerator({
 
         {/* Slides */}
         <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-          {result.slides.map((slide) => (
+          {(result.slides ?? []).map((slide) => (
             <Card key={slide.numero}>
               <CardContent className="pt-4">
                 <div className="flex items-center justify-between mb-2">
@@ -647,7 +647,7 @@ export function CarouselGenerator({
 
         {/* Hashtags */}
         <div className="flex flex-wrap gap-1">
-          {result.hashtags.map((h, i) => (
+          {(result.hashtags ?? []).map((h, i) => (
             <Badge
               key={i}
               variant="muted"

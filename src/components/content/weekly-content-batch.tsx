@@ -521,7 +521,7 @@ export function WeeklyContentBatch({ className }: WeeklyContentBatchProps) {
 
         {/* Hashtags */}
         <div className="flex flex-wrap gap-1 mt-3">
-          {piece.hashtags.map((h, j) => (
+          {(piece.hashtags ?? []).map((h, j) => (
             <span key={j} className="text-xs text-info">
               {h.startsWith("#") ? h : `#${h}`}
             </span>
@@ -896,7 +896,7 @@ export function WeeklyContentBatch({ className }: WeeklyContentBatchProps) {
 
                 {/* Distribution bars */}
                 <div className="space-y-2">
-                  {adaptation_intelligente.repartition.map((item) => {
+                  {(adaptation_intelligente.repartition ?? []).map((item) => {
                     const config = TYPE_CONFIG[item.type] || TYPE_CONFIG.post;
                     const Icon = config.icon;
                     return (

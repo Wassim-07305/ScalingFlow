@@ -178,7 +178,7 @@ export function YouTubeGenerator({
               const fullText = [
                 result.titre,
                 `\n${result.hook}`,
-                result.plan
+                (result.plan ?? [])
                   .map((s) => `${s.section} (${s.duree}): ${s.contenu}`)
                   .join("\n"),
                 `\n${result.description_youtube}`,
@@ -252,7 +252,7 @@ export function YouTubeGenerator({
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
-            {result.plan.map((section, i) => (
+            {(result.plan ?? []).map((section, i) => (
               <div key={i} className="flex gap-4 p-3 rounded-lg bg-bg-tertiary">
                 <Badge variant="muted" className="shrink-0">
                   {section.duree}
@@ -353,7 +353,7 @@ export function YouTubeGenerator({
             {result.description_youtube}
           </p>
           <div className="flex flex-wrap gap-1">
-            {result.tags.map((tag, i) => (
+            {(result.tags ?? []).map((tag, i) => (
               <Badge key={i} variant="muted">
                 {tag}
               </Badge>

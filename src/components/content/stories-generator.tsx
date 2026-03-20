@@ -309,7 +309,7 @@ export function StoriesGenerator({
 
               {/* Slides */}
               <div className="space-y-3">
-                {story.slides.map((slide, j) => (
+                {(story.slides ?? []).map((slide, j) => (
                   <div
                     key={j}
                     className="p-3 rounded-lg bg-bg-tertiary border border-border-default"

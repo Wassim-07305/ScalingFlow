@@ -294,7 +294,7 @@ export function ObjectionContent({ className }: ObjectionContentProps) {
 
       {/* Objection cards */}
       <div className="space-y-8">
-        {result.contenus.map((piece, i) => {
+        {(result.contenus ?? []).map((piece, i) => {
           const isExpanded = expandedCard === i;
           const viewingType = expandedType[i] || "reel";
 
@@ -413,7 +413,7 @@ export function ObjectionContent({ className }: ObjectionContentProps) {
                       </div>
 
                       <div className="flex flex-wrap gap-1">
-                        {piece.reel.hashtags.map((h, j) => (
+                        {(piece.reel?.hashtags ?? []).map((h, j) => (
                           <span key={j} className="text-xs text-info">
                             {h.startsWith("#") ? h : `#${h}`}
                           </span>
@@ -454,7 +454,7 @@ export function ObjectionContent({ className }: ObjectionContentProps) {
 
                       {/* Slides */}
                       <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-                        {piece.carousel.slides.map((slide) => (
+                        {(piece.carousel?.slides ?? []).map((slide) => (
                           <Card key={slide.numero}>
                             <CardContent className="pt-4">
                               <Badge variant="muted" className="mb-2">
@@ -516,7 +516,7 @@ export function ObjectionContent({ className }: ObjectionContentProps) {
 
                       {/* Hashtags */}
                       <div className="flex flex-wrap gap-1">
-                        {piece.carousel.hashtags.map((h, j) => (
+                        {(piece.carousel?.hashtags ?? []).map((h, j) => (
                           <span key={j} className="text-xs text-info">
                             {h.startsWith("#") ? h : `#${h}`}
                           </span>
