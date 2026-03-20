@@ -15,19 +15,14 @@ export function createMockRequest(
 ): NextRequest {
   const url = options.url || "http://localhost:3000/api/test";
 
-  const init: RequestInit = {
+  const req = new NextRequest(url, {
     method,
     headers: {
       "Content-Type": "application/json",
       ...options.headers,
     },
-  };
-
-  if (body && method !== "GET") {
-    init.body = JSON.stringify(body);
-  }
-
-  const req = new NextRequest(url, init);
+    body: body && method !== "GET" ? JSON.stringify(body) : undefined,
+  });
 
   // Set cookies if provided
   if (options.cookies) {
