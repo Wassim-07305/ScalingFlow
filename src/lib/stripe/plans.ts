@@ -115,7 +115,7 @@ export const PLANS: Plan[] = [
       coachingCalls: 0,
       supportLevel: "email",
     },
-    stripePriceId: "price_xxx_starter_monthly",
+    stripePriceId: "price_1TD6WRPIprzhdbzlVC1LLdog",
     stripeAnnualPriceId: "price_xxx_starter_annual",
   },
   {
@@ -155,7 +155,7 @@ export const PLANS: Plan[] = [
       coachingCalls: 0,
       supportLevel: "priority",
     },
-    stripePriceId: "price_xxx_pro_monthly",
+    stripePriceId: "price_1TD6WcPIprzhdbzlG7SCovii",
     stripeAnnualPriceId: "price_xxx_pro_annual",
     popular: true,
   },
@@ -196,7 +196,7 @@ export const PLANS: Plan[] = [
       coachingCalls: 0,
       supportLevel: "priority",
     },
-    stripePriceId: "price_xxx_scale_monthly",
+    stripePriceId: "price_1TD6WmPIprzhdbzlwgJytiqG",
     stripeAnnualPriceId: "price_xxx_scale_annual",
   },
   {
@@ -235,7 +235,7 @@ export const PLANS: Plan[] = [
       coachingCalls: 2,
       supportLevel: "slack",
     },
-    stripePriceId: "price_xxx_agency_monthly",
+    stripePriceId: "price_1TD6WxPIprzhdbzlo1R16SKM",
     stripeAnnualPriceId: "price_xxx_agency_annual",
   },
 ];
