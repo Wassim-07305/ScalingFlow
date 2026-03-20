@@ -118,7 +118,7 @@ export async function POST(req: NextRequest) {
 
     const prompt = buildKnowledgeExtractionPrompt(trimmedContent, userProfile);
 
-    const extracted = await generateJSON<ExtractedKnowledge>({
+    const { data: extracted } = await generateJSON<ExtractedKnowledge>({
       prompt,
       maxTokens: 4096,
       temperature: 0.3,

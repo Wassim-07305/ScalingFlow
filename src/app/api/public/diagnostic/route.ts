@@ -135,7 +135,7 @@ export async function POST(req: NextRequest) {
     body.email = truncate(body.email);
     body.monthly_revenue = truncate(body.monthly_revenue);
 
-    const result = await generateJSON<DiagnosticResult>({
+    const { data: result } = await generateJSON<DiagnosticResult>({
       prompt: diagnosticPrompt(body),
       maxTokens: 4096,
       temperature: 0.6,

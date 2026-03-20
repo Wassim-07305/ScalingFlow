@@ -178,7 +178,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const result = await generateJSON<FunnelScanResult>({
+    const { data: result } = await generateJSON<FunnelScanResult>({
       prompt: funnelScanPrompt(html, url),
       maxTokens: 4096,
       temperature: 0.5,
