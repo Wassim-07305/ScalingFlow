@@ -98,7 +98,9 @@ export async function incrementAIUsage(
   userId: string,
   opts: IncrementOptions,
 ): Promise<void> {
-  const supabase = await createClient();
+  // Use admin client to bypass RLS — this is an internal logging operation
+  const { createAdminClient } = await import("@/lib/supabase/admin");
+  const supabase = createAdminClient();
 
   const { error } = await supabase.from("ai_generations").insert({
     user_id: userId,
