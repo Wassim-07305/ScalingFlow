@@ -33,10 +33,11 @@ export interface Plan {
   limits: PlanLimits;
   stripePriceId: string;
   stripeAnnualPriceId: string;
+  legacyPriceIds?: string[]; // anciens Stripe price IDs (pour webhook backward compat)
   popular?: boolean;
 }
 
-// ─── 5 Plans ────────────────────────────────────────────────────────────────
+// ─── 3 Plans (Free caché + 2 payants) ───────────────────────────────────────
 
 export const PLANS: Plan[] = [
   {
@@ -79,102 +80,30 @@ export const PLANS: Plan[] = [
     stripeAnnualPriceId: "price_xxx_free_annual",
   },
   {
-    id: "starter",
-    name: "Starter",
-    description: "Pour structurer ton business et créer tes premiers assets.",
-    price: 29,
-    annualPrice: 24, // 29 × 10 / 12 ≈ 24.17
-    features: [
-      "50 générations IA / mois",
-      "8 agents IA spécialisés",
-      "Offre complète + Brand",
-      "Funnel builder",
-      "Tous les assets de vente",
-      "Contenu (reels, youtube, stories, carousels)",
-      "Calendrier éditorial",
-      "Scoring offre & funnel",
-      "Academy complète",
-    ],
-    limits: {
-      aiGenerationsPerMonth: 50,
-      agents: "all",
-      metaAds: false,
-      crm: false,
-      crons: false,
-      whitelabel: false,
-      whitelabelSubAccounts: 0,
-      affiliateProgram: "none",
-      customDomain: false,
-      apiAccess: false,
-      priorityQueue: false,
-      scoringBusiness: false,
-      scoringAds: false,
-      multiTouchAttribution: false,
-      growthTiers: false,
-      claudeExtraction: false,
-      coachingCalls: 0,
-      supportLevel: "email",
-    },
-    stripePriceId: "price_1TD6WRPIprzhdbzlVC1LLdog",
-    stripeAnnualPriceId: "price_xxx_starter_annual",
-  },
-  {
-    id: "pro",
-    name: "Pro",
-    description: "Pour les entrepreneurs sérieux qui veulent scaler avec la pub et le CRM.",
-    price: 59,
-    annualPrice: 49, // 59 × 10 / 12 ≈ 49.17
-    features: [
-      "200 générations IA / mois",
-      "Tout le Starter +",
-      "Meta Ads complet (lancement, monitoring, auto-décisions, scaling)",
-      "CRM pipeline + prospection + gestion clients",
-      "CRONs : monitoring ads, alertes, contenu continu",
-      "Scoring business & ads",
-      "Attribution multi-touch + tracking calls",
-      "Gamification complète + leaderboard",
-      "Connect GHL + Socials (publication auto)",
-    ],
-    limits: {
-      aiGenerationsPerMonth: 200,
-      agents: "all",
-      metaAds: true,
-      crm: true,
-      crons: true,
-      whitelabel: false,
-      whitelabelSubAccounts: 0,
-      affiliateProgram: "none",
-      customDomain: false,
-      apiAccess: false,
-      priorityQueue: false,
-      scoringBusiness: true,
-      scoringAds: true,
-      multiTouchAttribution: true,
-      growthTiers: false,
-      claudeExtraction: false,
-      coachingCalls: 0,
-      supportLevel: "priority",
-    },
-    stripePriceId: "price_1TD6WcPIprzhdbzlG7SCovii",
-    stripeAnnualPriceId: "price_xxx_pro_annual",
-    popular: true,
-  },
-  {
     id: "scale",
     name: "Scale",
-    description: "Pour automatiser et déployer à grande échelle avec whitelabel.",
+    description:
+      "Tout ce dont tu as besoin pour structurer, lancer et scaler ton business avec l'IA.",
     price: 149,
-    annualPrice: 124, // 149 × 10 / 12 ≈ 124.17
+    annualPrice: 124, // 149 × 10 / 12 ≈ 124
     features: [
       "500 générations IA / mois",
-      "Tout le Pro +",
-      "Whitelabel complet (custom domain, branding, portails clients)",
+      "8 agents IA spécialisés",
+      "Offre complète + Brand + Funnel builder",
+      "Tous les assets de vente + contenu",
+      "Meta Ads complet (lancement, monitoring, scaling)",
+      "CRM pipeline + prospection + gestion clients",
+      "CRONs : monitoring ads, alertes, contenu continu",
+      "Scoring business, ads, offre & funnel",
+      "Attribution multi-touch + tracking calls",
+      "Whitelabel (custom domain, branding, portails)",
       "Paliers de croissance + recommandations",
       "Extraction mémoire Claude",
-      "Deploy funnel custom domain",
       "Programme d'affiliation (en tant qu'affilié)",
       "Export API",
-      "Connect Stripe avancé (attribution créative)",
+      "Calendrier éditorial + publication auto",
+      "Academy complète + Gamification + Leaderboard",
+      "Support prioritaire",
     ],
     limits: {
       aiGenerationsPerMonth: 500,
@@ -196,15 +125,21 @@ export const PLANS: Plan[] = [
       coachingCalls: 0,
       supportLevel: "priority",
     },
-    stripePriceId: "price_1TD6WmPIprzhdbzlwgJytiqG",
+    stripePriceId: "price_1TBYRxLzBHnogydhV4I41sES",
     stripeAnnualPriceId: "price_xxx_scale_annual",
+    legacyPriceIds: [
+      "price_1TD6WmPIprzhdbzlwgJytiqG", // ancien scale 149€
+      "price_xxx_scale_annual",
+    ],
+    popular: true,
   },
   {
     id: "agency",
     name: "Agency",
-    description: "Pour les agences et top performers qui veulent tout contrôler.",
-    price: 299,
-    annualPrice: 249, // 299 × 10 / 12 ≈ 249.17
+    description:
+      "Pour les agences et top performers qui veulent tout contrôler et gérer plusieurs clients.",
+    price: 297,
+    annualPrice: 247, // 297 × 10 / 12 ≈ 247
     features: [
       "1 500 générations IA / mois",
       "Tout le Scale +",
@@ -235,8 +170,12 @@ export const PLANS: Plan[] = [
       coachingCalls: 2,
       supportLevel: "slack",
     },
-    stripePriceId: "price_1TD6WxPIprzhdbzlo1R16SKM",
+    stripePriceId: "price_1TBYSOLzBHnogydhaimZzZP7",
     stripeAnnualPriceId: "price_xxx_agency_annual",
+    legacyPriceIds: [
+      "price_1TD6WxPIprzhdbzlo1R16SKM", // ancien agency 299€
+      "price_xxx_agency_annual",
+    ],
   },
 ];
 
@@ -248,13 +187,18 @@ export function getPlanById(id: string): Plan | undefined {
 
 export function getPlanByPriceId(priceId: string): Plan | undefined {
   return PLANS.find(
-    (plan) => plan.stripePriceId === priceId || plan.stripeAnnualPriceId === priceId,
+    (plan) =>
+      plan.stripePriceId === priceId ||
+      plan.stripeAnnualPriceId === priceId ||
+      plan.legacyPriceIds?.includes(priceId),
   );
 }
 
 /** Map ancien plan → nouveau plan (backward compat) */
 const LEGACY_PLAN_MAP: Record<string, string> = {
-  premium: "scale", // l'ancien "premium" à 149€ → nouveau "scale" à 149€
+  premium: "scale",
+  starter: "free",
+  pro: "free",
 };
 
 export function resolvePlanId(id: string): string {
@@ -269,7 +213,7 @@ export function getPlanLimits(planId: string): PlanLimits {
 }
 
 /** Ordre des plans pour comparaison (upgrade/downgrade) */
-export const PLAN_ORDER = ["free", "starter", "pro", "scale", "agency"] as const;
+export const PLAN_ORDER = ["free", "scale", "agency"] as const;
 export type PlanId = (typeof PLAN_ORDER)[number];
 
 export function isPlanHigherOrEqual(currentPlan: string, requiredPlan: string): boolean {

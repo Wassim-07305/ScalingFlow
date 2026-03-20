@@ -15,7 +15,7 @@ export interface UsageData {
   byType?: Record<string, number>;
 }
 
-export type PlanTier = "free" | "starter" | "pro" | "scale" | "agency";
+export type PlanTier = "free" | "scale" | "agency";
 
 export function useUsage() {
   const [usage, setUsage] = useState<UsageData | null>(null);
@@ -37,7 +37,7 @@ export function useUsage() {
     usage,
     loading,
     planTier,
-    isPro: planTier !== "free" && planTier !== "starter",
+    isPro: planTier !== "free",
     isPaid: planTier !== "free",
   };
 }

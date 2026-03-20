@@ -30,18 +30,6 @@ export function WelcomeBanner() {
       color: "bg-zinc-500/10 text-zinc-400",
       gradient: "from-zinc-500/10 to-transparent",
     },
-    starter: {
-      label: "Starter",
-      icon: Zap,
-      color: "bg-blue-500/15 text-blue-400",
-      gradient: "from-blue-500/10 via-cyan-500/5 to-transparent",
-    },
-    pro: {
-      label: "Pro",
-      icon: Sparkles,
-      color: "bg-emerald-500/15 text-emerald-400",
-      gradient: "from-emerald-500/10 via-teal-500/5 to-transparent",
-    },
     scale: {
       label: "Scale",
       icon: Crown,

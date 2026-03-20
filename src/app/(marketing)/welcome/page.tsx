@@ -147,17 +147,11 @@ const TESTIMONIALS = [
 ];
 
 const PLAN_ICONS: Record<string, typeof Zap> = {
-  free: Zap,
-  starter: Zap,
-  pro: Sparkles,
   scale: Crown,
   agency: Crown,
 };
 
 const PLAN_COLORS: Record<string, { icon: string; check: string }> = {
-  free: { icon: "bg-bg-tertiary text-text-secondary", check: "text-accent" },
-  starter: { icon: "bg-blue-500/10 text-blue-400", check: "text-blue-400" },
-  pro: { icon: "bg-accent/10 text-accent", check: "text-accent" },
   scale: { icon: "bg-[rgba(139,92,246,0.12)] text-[#A78BFA]", check: "text-[#A78BFA]" },
   agency: { icon: "bg-amber-500/10 text-amber-400", check: "text-amber-400" },
 };
@@ -191,7 +185,7 @@ export default function WelcomePage() {
               href="/register"
               className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-accent text-white text-sm font-medium hover:bg-accent/90 transition-all shadow-lg shadow-accent/15 hover:shadow-accent/25"
             >
-              Commencer gratuitement
+              Commencer
               <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
@@ -223,7 +217,7 @@ export default function WelcomePage() {
             Offre, funnel, ads, contenu, emails — tout ce dont tu as besoin pour
             lancer et scaler, généré par l&apos;IA en quelques clics.{" "}
             <span className="text-text-primary font-medium">
-              Gratuit pour commencer.
+              Commence dès maintenant.
             </span>
           </p>
 
@@ -232,7 +226,7 @@ export default function WelcomePage() {
               href="/register"
               className="group inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-accent text-white font-semibold text-base hover:bg-accent/90 transition-all shadow-[0_0_32px_rgba(52,211,153,0.2)] hover:shadow-[0_0_48px_rgba(52,211,153,0.3)]"
             >
-              Commencer gratuitement
+              Commencer maintenant
               <ArrowRight className="h-5 w-5 group-hover:translate-x-0.5 transition-transform" />
             </Link>
             <Link
@@ -244,7 +238,7 @@ export default function WelcomePage() {
           </div>
 
           <p className="text-xs text-text-muted mt-8">
-            5 générations IA gratuites &middot; Pas de carte bancaire requise
+            Accès immédiat &middot; Annulable à tout moment
           </p>
         </div>
       </section>
@@ -397,14 +391,14 @@ export default function WelcomePage() {
               Tarifs simples, pas de surprise
             </h2>
             <p className="text-text-secondary text-lg">
-              Commence gratuitement, upgrade quand tu es prêt.
+              Deux formules, tout inclus. Choisis celle qui te correspond.
             </p>
           </div>
 
-          <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-5">
-            {PLANS.map((plan) => {
-              const Icon = PLAN_ICONS[plan.id] || Zap;
-              const colors = PLAN_COLORS[plan.id] || PLAN_COLORS.free;
+          <div className="grid gap-6 md:grid-cols-2 max-w-3xl mx-auto">
+            {PLANS.filter((p) => p.price > 0).map((plan) => {
+              const Icon = PLAN_ICONS[plan.id] || Crown;
+              const colors = PLAN_COLORS[plan.id] || PLAN_COLORS.scale;
               return (
                 <div
                   key={plan.id}
@@ -475,7 +469,7 @@ export default function WelcomePage() {
                         : "border border-border-default text-text-secondary hover:text-text-primary hover:border-border-hover"
                     }`}
                   >
-                    {plan.price === 0 ? "Commencer gratuitement" : "Commencer"}
+                    Commencer
                   </Link>
                 </div>
               );
@@ -503,8 +497,8 @@ export default function WelcomePage() {
               a: "Absolument. Tous les textes générés (offres, funnels, ads, emails) sont entièrement éditables. L'IA te donne une base solide que tu peux affiner selon tes besoins.",
             },
             {
-              q: "Existe-t-il une période d'essai gratuite ?",
-              a: "Oui, le plan Free te permet de tester la plateforme avec 5 générations IA par mois. Tu peux upgrader à tout moment vers Pro ou Premium pour débloquer toutes les fonctionnalités.",
+              q: "Puis-je tester avant de m'engager ?",
+              a: "Tu peux créer ton compte et explorer la plateforme. L'abonnement Scale ou Agency débloque toutes les générations IA et les fonctionnalités avancées. Annulable à tout moment.",
             },
             {
               q: "Quels types de contenu l'IA peut-elle générer ?",
@@ -552,7 +546,7 @@ export default function WelcomePage() {
             href="/register"
             className="group inline-flex items-center gap-2 px-10 py-5 rounded-2xl bg-accent text-white font-semibold text-lg hover:bg-accent/90 transition-all shadow-[0_0_40px_rgba(52,211,153,0.2)] hover:shadow-[0_0_60px_rgba(52,211,153,0.3)]"
           >
-            Créer mon compte gratuitement
+            Commencer maintenant
             <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
           </Link>
         </div>

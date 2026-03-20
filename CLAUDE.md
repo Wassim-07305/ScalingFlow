@@ -70,14 +70,12 @@ AI module in `lib/ai/generate.ts` tries Anthropic direct API first, falls back t
 
 ### Plan & Quota System
 
-5 plans defined in `lib/stripe/plans.ts` with `PlanLimits` interface:
-- **Free** (0€): 10 gen/month, general agent only
-- **Starter** (29€): 50 gen/month, all agents
-- **Pro** (59€): 200 gen/month, Meta Ads, CRM, CRONs
-- **Scale** (149€): 500 gen/month, whitelabel, API
-- **Agency** (299€): 1500 gen/month, sub-accounts, priority queue
+3 plans defined in `lib/stripe/plans.ts` (free hidden + 2 paid):
+- **Free** (0€, hidden): 10 gen/month, general agent only — fallback for non-subscribed users
+- **Scale** (149€): 500 gen/month, all features (Meta Ads, CRM, CRONs, whitelabel, API, scoring, attribution)
+- **Agency** (297€): 1500 gen/month, everything + 5 sub-accounts, coaching, priority queue, Slack support
 
-Usage tracked in `ai_generations` table. Feature gating via `hasFeatureAccess(userId, feature)` in `lib/stripe/feature-access.ts`. Legacy "premium" plan maps to "scale" via `resolvePlanId()`.
+Usage tracked in `ai_generations` table. Feature gating via `hasFeatureAccess(userId, feature)` in `lib/stripe/feature-access.ts`. Legacy plans map via `resolvePlanId()`: premium→scale, starter→free, pro→free. Old Stripe price IDs kept in `legacyPriceIds` for webhook backward compat.
 
 ### Authentication & Authorization
 

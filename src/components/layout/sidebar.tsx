@@ -10,6 +10,7 @@ import {
   Settings,
   UserCircle,
   ChevronDown,
+  ShieldCheck,
 } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import { Badge } from "@/components/ui/badge";
@@ -76,18 +77,17 @@ export function Sidebar({
   } = useUIStore();
 
   const subscriptionPlan = userProfile?.subscription_plan || "free";
-  const planLabel =
-    subscriptionPlan === "premium"
-      ? "Premium"
-      : subscriptionPlan === "pro"
-        ? "Pro"
-        : "Free";
-  const planVariant =
-    subscriptionPlan === "premium"
-      ? "purple"
-      : subscriptionPlan === "pro"
-        ? "cyan"
-        : "muted";
+  const PLAN_DISPLAY: Record<string, { label: string; variant: string }> = {
+    free: { label: "Free", variant: "muted" },
+    scale: { label: "Scale", variant: "purple" },
+    agency: { label: "Agency", variant: "cyan" },
+    // Legacy
+    premium: { label: "Scale", variant: "purple" },
+    pro: { label: "Free", variant: "muted" },
+    starter: { label: "Free", variant: "muted" },
+  };
+  const { label: planLabel, variant: planVariant } =
+    PLAN_DISPLAY[subscriptionPlan] ?? PLAN_DISPLAY.free;
 
   function closeMobile() {
     setMobileSidebarOpen(false);
@@ -381,6 +381,43 @@ export function Sidebar({
               </TooltipContent>
             )}
           </Tooltip>
+
+          {/* Admin — visible only for admin role */}
+          {adminRoles.includes(role) && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Link
+                  href="/admin"
+                  onClick={closeMobile}
+                  className={cn(
+                    "mt-1 flex w-full items-center rounded-xl px-3 py-2 text-sm transition-all duration-200",
+                    pathname.startsWith("/admin")
+                      ? "bg-sidebar-accent text-accent"
+                      : "text-sidebar-foreground/50 hover:bg-sidebar-accent hover:text-sidebar-foreground",
+                    isCollapsed && "md:justify-center md:px-0",
+                  )}
+                >
+                  <ShieldCheck
+                    className={cn(
+                      "h-[18px] w-[18px] shrink-0",
+                      isCollapsed ? "" : "mr-3",
+                    )}
+                  />
+                  <span className={cn(isCollapsed && "md:hidden")}>
+                    Admin
+                  </span>
+                </Link>
+              </TooltipTrigger>
+              {isCollapsed && (
+                <TooltipContent
+                  side="right"
+                  className="bg-bg-secondary text-text-primary border-border-default"
+                >
+                  Admin
+                </TooltipContent>
+              )}
+            </Tooltip>
+          )}
 
           {/* Sign out */}
           <Tooltip>

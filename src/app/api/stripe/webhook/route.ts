@@ -266,7 +266,7 @@ export async function POST(req: NextRequest) {
             .from("profiles")
             .update({
               subscription_status: "active",
-              subscription_plan: resolvePlanId(plan?.id || "pro"),
+              subscription_plan: resolvePlanId(plan?.id || "scale"),
               stripe_customer_id: session.customer as string,
             })
             .eq("id", userId);

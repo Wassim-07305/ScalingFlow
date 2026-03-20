@@ -60,19 +60,19 @@ const FEATURE_LABELS: Record<FeatureKey, string> = {
 
 /** Minimum plan required for each feature */
 const FEATURE_MIN_PLAN: Record<FeatureKey, string> = {
-  meta_ads: "pro",
-  crm: "pro",
-  crons: "pro",
+  meta_ads: "scale",
+  crm: "scale",
+  crons: "scale",
   whitelabel: "scale",
   custom_domain: "scale",
   api_access: "scale",
-  scoring_business: "pro",
-  scoring_ads: "pro",
-  multi_touch_attribution: "pro",
+  scoring_business: "scale",
+  scoring_ads: "scale",
+  multi_touch_attribution: "scale",
   growth_tiers: "scale",
   claude_extraction: "scale",
+  specialized_agents: "scale",
   affiliate_admin: "agency",
-  specialized_agents: "starter",
   coaching_calls: "agency",
   priority_queue: "agency",
 };
