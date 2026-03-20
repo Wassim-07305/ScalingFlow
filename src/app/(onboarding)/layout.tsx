@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { UserProvider } from "@/contexts/user-context";
 
 export default async function OnboardingLayout({
   children,
@@ -17,7 +18,7 @@ export default async function OnboardingLayout({
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("onboarding_completed")
+    .select("id, email, full_name, avatar_url, role, onboarding_completed")
     .eq("id", user.id)
     .single();
 
@@ -25,5 +26,15 @@ export default async function OnboardingLayout({
     redirect("/");
   }
 
-  return <>{children}</>;
+  return (
+    <UserProvider
+      initialUserId={user.id}
+      initialEmail={profile?.email || user.email || ""}
+      initialFullName={profile?.full_name || null}
+      initialAvatarUrl={profile?.avatar_url || null}
+      initialRole={profile?.role || "user"}
+    >
+      {children}
+    </UserProvider>
+  );
 }
