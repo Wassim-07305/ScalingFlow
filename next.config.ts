@@ -26,8 +26,6 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
-  // Use webpack for build (PWA plugin uses webpack config)
-  turbopack: {},
   images: {
     remotePatterns: [
       {

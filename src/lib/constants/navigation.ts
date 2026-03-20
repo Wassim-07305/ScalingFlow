@@ -26,6 +26,7 @@ import {
   UserCheck,
   HardDrive,
   Calendar,
+  GitBranch,
 } from "lucide-react";
 import type { NavItem, NavSection } from "@/lib/types/appshell";
 
@@ -60,6 +61,12 @@ export const NAV_ITEMS: NavItem[] = [
     label: "Marque",
     href: "/brand",
     icon: Palette,
+    roles: ["user", "student", "admin", "coach"],
+  },
+  {
+    label: "Croissance",
+    href: "/growth",
+    icon: TrendingUp,
     roles: ["user", "student", "admin", "coach"],
   },
   {
@@ -182,6 +189,12 @@ export const NAV_ITEMS: NavItem[] = [
     icon: Building2,
     roles: ["user", "student", "admin", "coach"],
   },
+  {
+    label: "Partenaire",
+    href: "/affiliate",
+    icon: GitBranch,
+    roles: ["user", "student", "admin", "coach"],
+  },
   { label: "Admin", href: "/admin", icon: ShieldCheck, roles: ["admin"] },
 ];
 
@@ -195,7 +208,7 @@ export const NAV_SECTIONS: NavSection[] = [
   {
     label: "Business",
     items: NAV_ITEMS.filter((i) =>
-      ["/vault", "/market", "/offer", "/brand"].includes(i.href),
+      ["/vault", "/market", "/offer", "/brand", "/growth"].includes(i.href),
     ),
   },
   {
@@ -227,7 +240,7 @@ export const NAV_SECTIONS: NavSection[] = [
   {
     label: "Outils",
     items: NAV_ITEMS.filter((i) =>
-      ["/drive", "/assistant", "/activity-log", "/portal", "/admin"].includes(
+      ["/drive", "/assistant", "/activity-log", "/portal", "/affiliate", "/admin"].includes(
         i.href,
       ),
     ),
@@ -242,6 +255,7 @@ export const BREADCRUMB_LABELS: Record<string, string> = {
   market: "Marché",
   offer: "Offre",
   brand: "Marque",
+  growth: "Croissance",
   funnel: "Funnel",
   assets: "Assets",
   ads: "Publicités",
@@ -263,6 +277,7 @@ export const BREADCRUMB_LABELS: Record<string, string> = {
   assistant: "Assistant IA",
   settings: "Paramètres",
   admin: "Administration",
+  affiliate: "Programme Partenaire",
   portal: "Portail",
   campaigns: "Campagnes",
   creatives: "Créatifs",
@@ -295,5 +310,6 @@ export const QUICK_LINKS = [
   { label: "Activité", href: "/activity-log", icon: Activity },
   { label: "Paramètres", href: "/settings", icon: Settings },
   { label: "Portail", href: "/portal", icon: Building2 },
+  { label: "Partenaire", href: "/affiliate", icon: GitBranch },
   { label: "Admin", href: "/admin", icon: ShieldCheck },
 ];
