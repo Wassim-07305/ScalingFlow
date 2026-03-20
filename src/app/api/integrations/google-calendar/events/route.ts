@@ -11,6 +11,7 @@ interface GoogleCalendarEvent {
   end?: { dateTime?: string; date?: string };
   location?: string;
   description?: string;
+  htmlLink?: string;
 }
 
 interface CalendarEvent {
@@ -20,6 +21,7 @@ interface CalendarEvent {
   end: string;
   location: string;
   description: string;
+  htmlLink: string;
 }
 
 async function refreshAccessToken(
@@ -152,6 +154,7 @@ export async function GET() {
       end: item.end?.dateTime || item.end?.date || "",
       location: item.location || "",
       description: item.description || "",
+      htmlLink: item.htmlLink || "",
     }));
 
     return NextResponse.json({ events, connected: true });

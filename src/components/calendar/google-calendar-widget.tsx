@@ -21,6 +21,7 @@ interface CalendarEvent {
   end: string;
   location: string;
   description: string;
+  htmlLink?: string;
 }
 
 interface GroupedEvents {
@@ -277,7 +278,7 @@ export function GoogleCalendarWidget({ className }: { className?: string }) {
                           </div>
                         </div>
                         <a
-                          href={`https://calendar.google.com/calendar/event?eid=${btoa(evt.id)}`}
+                          href={evt.htmlLink || `https://calendar.google.com`}
                           target="_blank"
                           rel="noopener noreferrer"
                           aria-label={`Ouvrir ${evt.title} dans Google Calendar`}
