@@ -7,16 +7,17 @@ import { getUnipileClient } from "@/lib/unipile/client";
 // POST /api/integrations/unipile/messages
 
 async function verifyAccountExists(accountId: string) {
-  // Verify the account exists in Unipile (all accounts in this workspace are valid)
   try {
     const unipile = getUnipileClient();
-    const result = await unipile.account.getAll();
-    const items = Array.isArray(result)
-      ? result
-      : (result as { items?: Array<Record<string, unknown>> }).items || [];
-    return items.some(
-      (a: Record<string, unknown>) => String(a.id) === accountId,
-    );
+    const result = await unipile.account.getAll() as Record<string, unknown>;
+    let items: Array<Record<string, unknown>> = [];
+    if (Array.isArray(result)) {
+      items = result;
+    } else if (result && typeof result === "object") {
+      const raw = (result as Record<string, unknown>).items;
+      if (Array.isArray(raw)) items = raw as Array<Record<string, unknown>>;
+    }
+    return items.some((a) => String(a.id) === accountId);
   } catch {
     return false;
   }
@@ -65,9 +66,39 @@ export async function GET(request: NextRequest) {
     }
 
     // Return all chats for the account
-    const chats = await unipile.messaging.getAllChats({
+    const rawChats = await unipile.messaging.getAllChats({
       account_id: accountId,
-    });
+    }) as Record<string, unknown>;
+
+    // Normalize Unipile response — may be { object: "ChatList", items: [...] } or an array
+    let chatItems: Array<Record<string, unknown>> = [];
+    if (Array.isArray(rawChats)) {
+      chatItems = rawChats;
+    } else if (rawChats && typeof rawChats === "object") {
+      const items = (rawChats as Record<string, unknown>).items;
+      if (Array.isArray(items)) {
+        chatItems = items as Array<Record<string, unknown>>;
+      }
+    }
+
+    // Map to the shape the frontend expects
+    const chats = chatItems
+      .filter((c) => !c.archived)
+      .map((c) => ({
+        id: String(c.id ?? ""),
+        account_id: accountId,
+        provider: String(c.account_type || "LINKEDIN"),
+        participants: [
+          {
+            id: String(c.attendee_provider_id ?? ""),
+            name: String(c.name || c.subject || "Conversation"),
+          },
+        ],
+        last_message: null,
+        last_message_at: c.timestamp ? String(c.timestamp) : null,
+        unread_count: Number(c.unread_count ?? 0),
+      }));
+
     return NextResponse.json({ chats });
   } catch (error) {
     console.error("[Unipile Messages GET]", error);
