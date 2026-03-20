@@ -127,10 +127,10 @@ export async function GET() {
     if (unipileUrl && unipileToken) {
       tests.push(
         await testWithTimeout("Unipile", async () => {
-          const res = await fetch(`${unipileUrl}/api/v1/users/me`, {
+          const res = await fetch(`${unipileUrl}/api/v1/accounts`, {
             headers: { "X-API-KEY": unipileToken },
           });
-          return res.ok || res.status === 404; // 404 is OK — API is reachable
+          return res.ok;
         }),
       );
     }

@@ -153,7 +153,7 @@ export async function POST(req: NextRequest) {
         break;
       }
       result = await testWithTimeout(async () => {
-        const endpoint = `${url}/api/v1/users/me`;
+        const endpoint = `${url}/api/v1/accounts`;
         const res = await fetch(endpoint, {
           headers: { "X-API-KEY": token },
         });
