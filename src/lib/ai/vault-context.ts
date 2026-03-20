@@ -8,12 +8,12 @@ import { createClient } from "@/lib/supabase/server";
  * uploaded documents, testimonials, transcripts, etc.
  *
  * @param userId - The user's ID
- * @param maxChars - Maximum total characters to include (default 8000)
+ * @param maxChars - Maximum total characters to include (default 4000)
  * @returns A formatted context string, or empty string if no resources
  */
 export async function buildVaultResourcesContext(
   userId: string,
-  maxChars = 8000,
+  maxChars = 4000,
 ): Promise<string> {
   const supabase = await createClient();
 

@@ -644,7 +644,7 @@ ${fbResults
       const result = await generateJSON<ContentStrategyResult>({
         model: aiModel,
         prompt,
-        maxTokens: 8192,
+        maxTokens: 4096,
       });
 
       // Sauvegarder chaque element du calendrier comme content_piece
@@ -702,7 +702,7 @@ ${fbResults
       const result = await generateJSON<ReelsScriptsResult>({
         model: aiModel,
         prompt,
-        maxTokens: 8192,
+        maxTokens: 4096,
       });
 
       // Sauvegarder chaque script
@@ -756,7 +756,7 @@ ${fbResults
       const result = await generateJSON<YouTubeScriptResult>({
         model: aiModel,
         prompt,
-        maxTokens: 8192,
+        maxTokens: 4096,
       });
 
       const { error: ytErr } = await supabase.from("content_pieces").insert({

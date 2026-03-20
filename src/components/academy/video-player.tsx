@@ -9,10 +9,20 @@ interface VideoPlayerProps {
   className?: string;
 }
 
+function getLoomEmbedUrl(url: string): string {
+  // Extract the video ID from various Loom URL formats:
+  // https://www.loom.com/share/abc123
+  // https://www.loom.com/share/abc123?sid=xyz
+  // https://loom.com/share/abc123
+  const match = url.match(/loom\.com\/(?:share|embed)\/([a-zA-Z0-9]+)/);
+  if (!match) return url;
+  return `https://www.loom.com/embed/${match[1]}?hide_owner=true&hide_share=true&hide_title=true`;
+}
+
 export function VideoPlayer({ videoUrl, title, className }: VideoPlayerProps) {
   const isLoom = videoUrl?.includes("loom.com");
 
-  const embedUrl = isLoom ? videoUrl?.replace("share/", "embed/") : videoUrl;
+  const embedUrl = isLoom && videoUrl ? getLoomEmbedUrl(videoUrl) : videoUrl;
 
   return (
     <Card className={cn(className)}>

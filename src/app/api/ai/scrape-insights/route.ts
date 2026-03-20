@@ -195,7 +195,7 @@ export async function POST(req: NextRequest) {
     const result = await generateJSON<MarketInsightsResult>({
       model: aiModel,
       prompt: fullPrompt,
-      maxTokens: 10000,
+      maxTokens: 6000,
       temperature: 0.8,
     });
 

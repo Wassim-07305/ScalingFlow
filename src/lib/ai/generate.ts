@@ -42,7 +42,9 @@ async function anthropicGenerate(
     model: ANTHROPIC_MODELS[model],
     max_tokens: maxTokens,
     temperature,
-    system: systemPrompt || undefined,
+    system: systemPrompt
+      ? [{ type: "text" as const, text: systemPrompt, cache_control: { type: "ephemeral" as const } }]
+      : undefined,
     messages: [{ role: "user", content: userPrompt }],
   });
 
@@ -228,7 +230,9 @@ export async function* streamText({
         model: ANTHROPIC_MODELS[model],
         max_tokens: maxTokens,
         temperature,
-        system: systemPrompt || undefined,
+        system: systemPrompt
+          ? [{ type: "text" as const, text: systemPrompt, cache_control: { type: "ephemeral" as const } }]
+          : undefined,
         messages: [{ role: "user", content: prompt }],
       });
 

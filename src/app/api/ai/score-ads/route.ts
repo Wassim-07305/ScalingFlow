@@ -11,6 +11,8 @@ import {
   type AdsDataForScoring,
 } from "@/lib/ai/prompts/ads-scoring";
 
+export const maxDuration = 60;
+
 export async function POST(req: NextRequest) {
   try {
     const supabase = await createClient();

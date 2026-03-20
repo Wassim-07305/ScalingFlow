@@ -8,9 +8,9 @@ import { getModelForGeneration } from "@/lib/ai/model-router";
 import { rateLimit } from "@/lib/utils/rate-limit";
 import { getJourney, buildJourneySummary } from "@/lib/services/attribution-engine";
 
-export const maxDuration = 60;
+export const maxDuration = 120;
 
-const MAX_TRANSCRIPT_LENGTH = 100_000;
+const MAX_TRANSCRIPT_LENGTH = 30_000;
 
 export async function POST(req: NextRequest) {
   try {

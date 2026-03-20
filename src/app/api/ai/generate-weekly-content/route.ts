@@ -13,6 +13,8 @@ import { awardXP } from "@/lib/gamification/xp-engine";
 import { notifyGeneration } from "@/lib/notifications/create";
 import { rateLimit } from "@/lib/utils/rate-limit";
 
+export const maxDuration = 120;
+
 export async function GET(req: NextRequest) {
   try {
     const supabase = await createClient();
@@ -169,7 +171,7 @@ export async function POST(req: NextRequest) {
     const result = await generateJSON<WeeklyBatchResult>({
       model: aiModel,
       prompt,
-      maxTokens: 8192,
+      maxTokens: 4096,
       temperature: 0.8,
     });
 

@@ -29,20 +29,20 @@ create index if not exists idx_touchpoints_created on touchpoints(created_at des
 -- RLS
 alter table touchpoints enable row level security;
 
--- Users see only their own touchpoints
-create policy "Users can view own touchpoints"
-  on touchpoints for select
-  using (auth.uid() = user_id);
+do $$ begin
+  create policy "Users can view own touchpoints" on touchpoints for select using (auth.uid() = user_id);
+exception when duplicate_object then null;
+end $$;
 
--- Service role can insert (tracking API uses admin client)
-create policy "Service role can insert touchpoints"
-  on touchpoints for insert
-  with check (true);
+do $$ begin
+  create policy "Service role can insert touchpoints" on touchpoints for insert with check (true);
+exception when duplicate_object then null;
+end $$;
 
--- Service role can update (identify endpoint links visitor → user)
-create policy "Service role can update touchpoints"
-  on touchpoints for update
-  using (true);
+do $$ begin
+  create policy "Service role can update touchpoints" on touchpoints for update using (true);
+exception when duplicate_object then null;
+end $$;
 
 -- FK optionnelle vers pipeline_leads (créée si la table existe)
 do $$

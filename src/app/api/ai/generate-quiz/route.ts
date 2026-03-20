@@ -5,6 +5,8 @@ import { checkAIUsage, incrementAIUsage } from "@/lib/stripe/check-usage";
 import { getModelForGeneration } from "@/lib/ai/model-router";
 import { rateLimit } from "@/lib/utils/rate-limit";
 
+export const maxDuration = 60;
+
 interface QuizQuestion {
   question: string;
   options: string[];

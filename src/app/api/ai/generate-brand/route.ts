@@ -12,6 +12,8 @@ import { notifyGeneration } from "@/lib/notifications/create";
 import { buildFullVaultContext } from "@/lib/ai/vault-context";
 import { rateLimit } from "@/lib/utils/rate-limit";
 
+export const maxDuration = 120;
+
 export async function POST(req: NextRequest) {
   try {
     const supabase = await createClient();
@@ -133,7 +135,7 @@ export async function POST(req: NextRequest) {
     const brandIdentity = await generateJSON<BrandIdentityResult>({
       model: aiModel,
       prompt,
-      maxTokens: 8192,
+      maxTokens: 6000,
     });
 
     // Save to brand_identities table

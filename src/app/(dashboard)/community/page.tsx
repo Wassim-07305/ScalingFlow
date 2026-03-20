@@ -146,8 +146,7 @@ export default function CommunityPage() {
       );
     const btn = buttons[activeIndex];
     if (!btn) return;
-    const container = tabsContainerRef.current;
-    tabIndicatorRef.current.style.left = `${btn.offsetLeft - container.offsetLeft}px`;
+    tabIndicatorRef.current.style.left = `${btn.offsetLeft}px`;
     tabIndicatorRef.current.style.width = `${btn.offsetWidth}px`;
   }, [activeTab]);
 

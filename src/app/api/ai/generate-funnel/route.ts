@@ -9,6 +9,8 @@ import { notifyGeneration } from "@/lib/notifications/create";
 import { buildFullVaultContext } from "@/lib/ai/vault-context";
 import { rateLimit } from "@/lib/utils/rate-limit";
 
+export const maxDuration = 120;
+
 export async function POST(req: NextRequest) {
   try {
     const supabase = await createClient();

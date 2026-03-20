@@ -19,6 +19,8 @@ import {
   scrapeYouTubeTranscript,
 } from "@/lib/scraping/apify";
 
+export const maxDuration = 120;
+
 export async function POST(req: NextRequest) {
   try {
     const supabase = await createClient();
@@ -174,7 +176,7 @@ export async function POST(req: NextRequest) {
     const result = await generateJSON<PersonaForgeResult>({
       model: aiModel,
       prompt,
-      maxTokens: 10000,
+      maxTokens: 6000,
       temperature: 0.7,
     });
 

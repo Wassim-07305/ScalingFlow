@@ -127,7 +127,7 @@ function StatCard({
   color?: string;
 }) {
   return (
-    <Card className="bg-bg-secondary/50 border-border/50">
+    <Card className="bg-bg-secondary/50 border-border-default">
       <CardContent className="p-5">
         <div className="flex items-start justify-between">
           <div>
@@ -305,7 +305,7 @@ export default function AffiliatePage() {
           title="Programme Partenaire"
           description="Gagne des commissions en référant des clients à ScalingFlow."
         />
-        <Card className="max-w-xl mx-auto bg-bg-secondary/50 border-border/50">
+        <Card className="max-w-xl mx-auto bg-bg-secondary/50 border-border-default">
           <CardContent className="p-8 text-center space-y-6">
             <div className="h-16 w-16 rounded-2xl bg-accent/10 flex items-center justify-center mx-auto">
               <UserPlus className="h-8 w-8 text-accent" />
@@ -357,7 +357,7 @@ export default function AffiliatePage() {
       />
 
       {/* Lien de referral */}
-      <Card className="bg-bg-secondary/50 border-border/50">
+      <Card className="bg-bg-secondary/50 border-border-default">
         <CardContent className="p-5">
           <p className="text-xs text-text-muted mb-2 flex items-center gap-1.5">
             <Link2 className="h-3.5 w-3.5" />
@@ -420,7 +420,7 @@ export default function AffiliatePage() {
       </div>
 
       {/* Graphique */}
-      <Card className="bg-bg-secondary/50 border-border/50">
+      <Card className="bg-bg-secondary/50 border-border-default">
         <CardHeader>
           <CardTitle className="text-base">Commissions — 6 derniers mois</CardTitle>
         </CardHeader>
@@ -455,7 +455,7 @@ export default function AffiliatePage() {
       </Card>
 
       {/* Referrals */}
-      <Card className="bg-bg-secondary/50 border-border/50">
+      <Card className="bg-bg-secondary/50 border-border-default">
         <CardHeader className="flex flex-row items-center justify-between pb-3">
           <CardTitle className="text-base">Referrals</CardTitle>
           <div className="flex gap-1.5 flex-wrap">
@@ -466,7 +466,7 @@ export default function AffiliatePage() {
                 className={`text-xs px-2.5 py-1 rounded-full border transition-colors ${
                   statusFilter === s
                     ? "bg-accent/10 text-accent border-accent/30"
-                    : "text-text-muted border-border/50 hover:text-text-secondary"
+                    : "text-text-muted border-border-default hover:text-text-secondary"
                 }`}
               >
                 {s === "all" ? "Tous" : (STATUS_LABELS[s]?.label ?? s)}
@@ -483,7 +483,7 @@ export default function AffiliatePage() {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-border/50">
+                  <tr className="border-b border-border-default">
                     {["Date", "Visiteur", "Statut", "Page"].map((h) => (
                       <th key={h} className="text-left text-text-muted font-normal px-5 py-3 text-xs">
                         {h}
@@ -495,7 +495,7 @@ export default function AffiliatePage() {
                   {filteredReferrals.map((r) => {
                     const st = STATUS_LABELS[r.status] ?? { label: r.status, color: "" };
                     return (
-                      <tr key={r.id} className="border-b border-border/30 hover:bg-bg-tertiary/30">
+                      <tr key={r.id} className="border-b border-border-default/50 hover:bg-bg-tertiary/30">
                         <td className="px-5 py-3 text-text-secondary">
                           {new Date(r.created_at).toLocaleDateString("fr-FR")}
                         </td>
@@ -525,7 +525,7 @@ export default function AffiliatePage() {
       </Card>
 
       {/* Commissions */}
-      <Card className="bg-bg-secondary/50 border-border/50">
+      <Card className="bg-bg-secondary/50 border-border-default">
         <CardHeader>
           <CardTitle className="text-base">Commissions</CardTitle>
         </CardHeader>
@@ -538,7 +538,7 @@ export default function AffiliatePage() {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-border/50">
+                  <tr className="border-b border-border-default">
                     {["Date", "Montant source", "Taux", "Commission", "Statut"].map((h) => (
                       <th key={h} className="text-left text-text-muted font-normal px-5 py-3 text-xs">
                         {h}
@@ -550,7 +550,7 @@ export default function AffiliatePage() {
                   {commissions.map((c) => {
                     const st = COMMISSION_STATUS[c.status] ?? { label: c.status, color: "" };
                     return (
-                      <tr key={c.id} className="border-b border-border/30 hover:bg-bg-tertiary/30">
+                      <tr key={c.id} className="border-b border-border-default/50 hover:bg-bg-tertiary/30">
                         <td className="px-5 py-3 text-text-secondary">
                           {new Date(c.created_at).toLocaleDateString("fr-FR")}
                         </td>
@@ -579,7 +579,7 @@ export default function AffiliatePage() {
       </Card>
 
       {/* Payouts */}
-      <Card className="bg-bg-secondary/50 border-border/50">
+      <Card className="bg-bg-secondary/50 border-border-default">
         <CardHeader>
           <CardTitle className="text-base">Paiements reçus</CardTitle>
         </CardHeader>
@@ -598,7 +598,7 @@ export default function AffiliatePage() {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-border/50">
+                  <tr className="border-b border-border-default">
                     {["Date", "Montant", "Méthode", "Statut"].map((h) => (
                       <th key={h} className="text-left text-text-muted font-normal px-5 py-3 text-xs">
                         {h}
@@ -610,7 +610,7 @@ export default function AffiliatePage() {
                   {payouts.map((p) => {
                     const st = PAYOUT_STATUS[p.status] ?? { label: p.status, color: "" };
                     return (
-                      <tr key={p.id} className="border-b border-border/30 hover:bg-bg-tertiary/30">
+                      <tr key={p.id} className="border-b border-border-default/50 hover:bg-bg-tertiary/30">
                         <td className="px-5 py-3 text-text-secondary">
                           {new Date(p.created_at).toLocaleDateString("fr-FR")}
                         </td>
@@ -638,7 +638,7 @@ export default function AffiliatePage() {
       </Card>
 
       {/* Outils de promotion */}
-      <Card className="bg-bg-secondary/50 border-border/50">
+      <Card className="bg-bg-secondary/50 border-border-default">
         <CardHeader>
           <CardTitle className="text-base">Outils de promotion</CardTitle>
         </CardHeader>

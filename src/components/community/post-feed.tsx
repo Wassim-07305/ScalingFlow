@@ -163,7 +163,7 @@ function MiniProfileCard({
           "full_name, avatar_url, niche, experience_level, xp_points, badges, created_at",
         )
         .eq("id", userId)
-        .single();
+        .maybeSingle();
       if (data) {
         setFullProfile({
           full_name: data.full_name,

@@ -4,133 +4,131 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-ScalingFlow is an AI-powered SaaS platform for business scaling (French-language UI). Built with Next.js App Router and Supabase, it leverages Claude AI to generate marketing assets: market analysis, ad copy, sales funnels, content ideas, offers, and VSL scripts. Features: multi-step onboarding, AI content generation with streaming, learning academy, community, gamification (leaderboard, progress tracking), Stripe payments, and email notifications via Resend.
+ScalingFlow is an AI-powered SaaS platform for business scaling (French-language UI). Built with Next.js 16 App Router + Supabase + TypeScript strict mode. It uses Claude AI (Haiku/Sonnet routing) to generate marketing assets across 35+ API endpoints. Features include multi-step onboarding, 8 specialized AI agents, Stripe payments with 5 plan tiers, gamification, community, academy, Meta Ads integration, CRM pipeline, whitelabel, and affiliate program.
 
 ## Commands
 
-- `npm run dev` — Start Next.js dev server
-- `npm run build` — Production build
-- `npm run start` — Start production server
-- `npm run lint` — ESLint across the project
+```bash
+npm run dev              # Start dev server (webpack mode for PWA compat)
+npm run build            # Production build
+npm run lint             # ESLint
+npm run test             # Vitest (unit + integration, 169 tests)
+npm run test:unit        # Unit tests only (tests/unit/)
+npm run test:integration # Integration tests only (tests/integration/)
+npm run test:e2e         # Playwright E2E tests
+npm run test:coverage    # Vitest with coverage
+```
 
 ## Architecture
 
 ### Tech Stack
 
-React 19 + TypeScript 5.9 + Next.js 16 (App Router) + Tailwind CSS 4 + Supabase (PostgreSQL + Auth + RLS). State: Zustand (2 stores). AI: Anthropic Claude SDK (6 endpoints, 11 prompt templates). Payments: Stripe. Email: Resend. Charts: Recharts. PWA: @ducanh2912/next-pwa. Deployed on Vercel.
+React 19 + TypeScript 5.9 + Next.js 16 (App Router) + Tailwind CSS 4 + Supabase (PostgreSQL + Auth + RLS). State: Zustand (4 stores). AI: Anthropic Claude SDK with Haiku/Sonnet routing. Payments: Stripe. Email: Resend. Charts: Recharts. PWA: @ducanh2912/next-pwa. Deployed on Vercel. Node >=22.
 
-### Directory Layout
+### Key Directories
 
 ```
 src/
   app/
-    layout.tsx             # Root layout (fonts, providers, QueryClientProvider)
-    page.tsx               # Landing/redirect
-    (auth)/                # Public auth routes
-      login/, register/
-    (dashboard)/           # Protected routes
-      layout.tsx           # Dashboard layout with sidebar
-      page.tsx             # Main dashboard
-      academy/             # Learning content
-      admin/               # Admin overview
-      ads/                 # Ad generation (analytics, campaigns, creatives)
-      assets/              # Marketing asset generation
-      community/           # Community feed
-      content/             # Content idea generation
-      funnel/              # Sales funnel builder
-      leaderboard/         # Gamification rankings
-      offer/               # Offer packaging tool
-      onboarding/          # Multi-step onboarding wizard
-      progress/            # Progress tracking
-      roadmap/             # Business roadmap
-      sales/               # Sales tools
-      settings/            # User settings
-    api/
-      ai/
-        analyze-market/route.ts    # Market analysis (streaming)
-        generate-ads/route.ts      # Ad copy generation
-        generate-assets/route.ts   # Marketing asset creation
-        generate-content/route.ts  # Content idea generation
-        generate-funnel/route.ts   # Sales funnel copy
-        generate-offer/route.ts    # Complete offer packaging
+    (auth)/              # Public: login, register, forgot-password
+    (dashboard)/         # Protected: 32 feature areas (market, offer, funnel, ads, content, etc.)
+    (marketing)/         # Public: welcome/pricing page
+    api/                 # 124 route handlers
+      ai/                # 39 AI generation routes
+      stripe/            # Checkout, webhook, portal, usage
+      integrations/      # Meta, GHL, Google Calendar, Unipile, whitelabel
+      admin/             # Settings, ai-costs monitoring
+      affiliates/        # Register, track, payout
   components/
-    ui/                    # 16 shadcn/ui components
-    academy/, ads/, assets/, community/, content/, dashboard/,
-    funnel/, gamification/, layout/, offer/, onboarding/, shared/
-    providers.tsx          # QueryClientProvider wrapper
-  hooks/
-    use-user.ts            # Client-side auth state hook
+    ui/                  # 18 shadcn/ui primitives (Radix-based)
+    [feature]/           # Feature-specific components (30+ directories)
   lib/
-    ai/
-      anthropic.ts         # Anthropic client initialization
-      generate.ts          # generateText(), generateJSON(), streamText(), createStreamingResponse()
-      prompts/             # 11 prompt template files
-        market-analysis.ts, offer-creation.ts, funnel-copy.ts, vsl-script.ts,
-        email-sequence.ts, sms-sequence.ts, ad-copy.ts, ad-hooks.ts,
-        content-ideas.ts, sales-script.ts, case-study.ts
-    supabase/
-      client.ts            # Browser Supabase client
-      server.ts            # Server Supabase client
-      middleware.ts         # Session refresh
-    utils/                 # cn(), color constants
-  stores/
-    app-store.ts           # Sidebar collapsed/mobile states
-    onboarding-store.ts    # Multi-step onboarding data (skills, experience, revenue, industries, objectives, budget)
-  types/                   # TypeScript definitions
-  middleware.ts            # Next.js middleware entry
+    ai/                  # generate.ts, model-router.ts, agents/, prompts/ (51 templates)
+    stripe/              # plans.ts, check-usage.ts, feature-access.ts
+    supabase/            # client.ts, server.ts, admin.ts, middleware.ts
+    gamification/        # xp-engine.ts, badges.ts, feature-gates.ts
+    admin/               # cost-config.ts
+  hooks/                 # 10 custom hooks (use-user, use-usage, etc.)
+  stores/                # 4 Zustand stores
+  types/                 # database.ts, ai.ts
 ```
 
-### Key Patterns
+### AI Generation Pipeline
 
-**AI generation pipeline**: 6 API routes in `app/api/ai/`. Each route: authenticate user → build prompt from templates → call Claude API → stream response or return JSON. AI module in `lib/ai/` provides `generateText()` (basic), `generateJSON()` (structured output), `streamText()` (real-time), and `createStreamingResponse()` (ReadableStream conversion).
+Every AI route follows this pattern:
+1. Authenticate user via `createClient()` → `supabase.auth.getUser()`
+2. Rate limit via `rateLimit(userId, routeName)`
+3. Check quota via `checkAIUsage(userId)` — enforces monthly plan limits
+4. Select model via `getModelForGeneration(type)` — Haiku for light tasks, Sonnet for complex
+5. Build prompt from templates in `lib/ai/prompts/`
+6. Call `generateJSON()`, `generateText()`, or `streamText()` with `model` param
+7. Save result to Supabase
+8. Log usage via `incrementAIUsage()` (only on success)
+9. Award XP via `awardXP()` (non-blocking)
 
-**Prompt templates**: 11 specialized templates in `lib/ai/prompts/`. Each exports a function that builds a system prompt with user context (skills, market data, business profile). Templates cover: market analysis, offer creation (positioning, pricing, guarantees, risk reversal, OTO), funnel copy, VSL scripts, email/SMS sequences, ad copy, hooks, content ideas, sales scripts, case studies.
+AI module in `lib/ai/generate.ts` tries Anthropic direct API first, falls back to OpenRouter.
 
-**Onboarding flow**: Multi-step wizard managed by `useOnboardingStore` (Zustand). Collects: skills, experience level, revenue targets, target industries, business objectives, budget range. Data saved to Supabase profile + used as AI context.
+### Plan & Quota System
 
-**Streaming responses**: AI endpoints return `ReadableStream` for real-time text display. Client components consume streams for progressive rendering of generated content.
+5 plans defined in `lib/stripe/plans.ts` with `PlanLimits` interface:
+- **Free** (0€): 10 gen/month, general agent only
+- **Starter** (29€): 50 gen/month, all agents
+- **Pro** (59€): 200 gen/month, Meta Ads, CRM, CRONs
+- **Scale** (149€): 500 gen/month, whitelabel, API
+- **Agency** (299€): 1500 gen/month, sub-accounts, priority queue
 
-**Client-side dominant**: 64 files with `"use client"`. No Server Actions — mutations go through API routes or direct Supabase calls.
+Usage tracked in `ai_generations` table. Feature gating via `hasFeatureAccess(userId, feature)` in `lib/stripe/feature-access.ts`. Legacy "premium" plan maps to "scale" via `resolvePlanId()`.
 
-### Path Alias
+### Authentication & Authorization
 
-`@/*` maps to `./src/*` (configured in `tsconfig.json`). Always use `@/` imports.
+- Supabase Auth with cookie-based sessions
+- Middleware in `src/middleware.ts` refreshes sessions, redirects unauthenticated users
+- All tables use RLS (Row-Level Security) — **always include `user_id` in client-side inserts**
+- Admin routes check `profile.role === 'admin'`
+- API routes use `createClient()` from `lib/supabase/server.ts` (server-side, cookie-based)
+- Direct DB calls from client use `createClient()` from `lib/supabase/client.ts`
+- Admin operations use `createAdminClient()` from `lib/supabase/admin.ts` (service role)
 
-### Environment Variables
+### Stripe Integration
 
-Defined in `.env.local`:
-
-- `NEXT_PUBLIC_SUPABASE_URL` — Supabase project URL
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY` — Supabase anonymous key
-- `SUPABASE_SERVICE_ROLE_KEY` — Service role key (server-side only)
-- `ANTHROPIC_API_KEY` — Claude AI API key (server-side only)
-- `STRIPE_SECRET_KEY` — Stripe secret key (server-side only)
-- `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` — Stripe public key
-- `STRIPE_WEBHOOK_SECRET` — Stripe webhook signing secret
-- `RESEND_API_KEY` — Resend email API key (server-side only)
-- `META_ACCESS_TOKEN` — Meta/Facebook API token
-- `META_AD_ACCOUNT_ID` — Meta Ads account ID
-- `REPLICATE_API_TOKEN` — Replicate AI token
-- `UNIPILE_API_URL` — Unipile API base URL (e.g., https://api4.unipile.com:13443)
-- `UNIPILE_ACCESS_TOKEN` — Unipile API access token (server-side only)
-- `NEXT_PUBLIC_APP_URL` — Public app URL
-
-### Supabase
-
-- Browser client in `lib/supabase/client.ts`, server client in `lib/supabase/server.ts`
-- Session management via middleware
-- Single migration file (19KB)
-- Tables: profiles, market_analyses, offers, and related content tables
+- Webhook at `api/stripe/webhook/route.ts` handles: checkout.session.completed, subscription updates/deletions, invoice events
+- Webhook uses `@supabase/supabase-js` createClient directly (not the server.ts wrapper) with service role
+- `getPlanByPriceId()` searches both monthly and annual price IDs
+- Affiliate commission processing runs inside the webhook
 
 ## Conventions
 
-- All UI text is in French
-- TypeScript strict mode
-- Toast notifications via Sonner
-- Icons from `lucide-react`
-- Fonts: Inter (sans) + JetBrains Mono (mono) via Google Fonts
-- Theme: dark mode — emerald accent (#34D399), dark backgrounds (#0B0E11, #141719, #1C1F23)
-- `cn()` helper for conditional Tailwind classes
-- shadcn/ui for all UI primitives (16 components)
-- PWA via @ducanh2912/next-pwa
-- Never expose API keys client-side — all AI/Stripe/Resend calls go through API routes
+- All UI text in French
+- Path alias: `@/*` → `./src/*`
+- Theme: dark mode — emerald accent (#34D399), backgrounds (#0B0E11, #141719, #1C1F23)
+- `cn()` helper from `lib/utils/cn.ts` for conditional Tailwind classes
+- Icons: `lucide-react`
+- Toast: Sonner
+- Fonts: Inter (sans) + JetBrains Mono (mono)
+- Client-side dominant: mutations via API routes or direct Supabase calls (no Server Actions)
+- All AI/Stripe/Resend calls go through API routes (never client-side)
+
+## Testing
+
+Tests in `tests/` with helpers in `tests/helpers/`:
+- `supabase-mock.ts` — Chainable Supabase client mock with configurable returns
+- `supabase-spy-mock.ts` — Records all DB calls for argument verification
+- `auth.ts` — `mockAuthenticatedUser()` / `mockUnauthenticatedUser()`
+- `factories.ts` — Data factories for Profile, Offer, MarketAnalysis, etc.
+- `api-test-utils.ts` — `createMockRequest()` for route testing
+- `rls-safety.test.ts` — Static scan that catches missing `user_id` in client-side inserts
+
+Use `vi.hoisted()` for mock variables referenced inside `vi.mock()` factories (Vitest hoisting).
+
+## Database
+
+56 migrations in `supabase/migrations/`. Key tables:
+- `profiles` — Users with subscription, XP, badges, onboarding state
+- `ai_generations` — Every AI call logged (model, tokens, cost, is_cron)
+- `market_analyses`, `offers`, `funnels`, `sales_assets` — Generated content
+- `ad_creatives`, `ad_campaigns`, `content_pieces` — Marketing assets
+- `community_posts`, `community_comments` — Social features
+- `pipeline_leads`, `clients` — CRM
+- `affiliates`, `commissions`, `referrals` — Affiliate program
+- `rate_limits` — Persistent rate limiting (fail-closed)
+- `monthly_reports` — Archived admin AI cost reports

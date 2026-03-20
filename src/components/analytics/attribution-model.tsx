@@ -111,22 +111,22 @@ const CHANNELS = Object.keys(CHANNEL_CONFIG) as Channel[];
 const MODEL_LABELS: Record<AttributionModel, string> = {
   firstTouch: "Premier contact",
   lastTouch: "Dernier contact",
-  linear: "Lin\u00e9aire",
-  timeDecay: "D\u00e9croissance temporelle",
-  positionBased: "Bas\u00e9 sur la position",
+  linear: "Linéaire",
+  timeDecay: "Décroissance temporelle",
+  positionBased: "Basé sur la position",
 };
 
 const MODEL_DESCRIPTIONS: Record<AttributionModel, string> = {
   firstTouch:
-    "100\u00a0% du cr\u00e9dit au premier point de contact. Id\u00e9al pour mesurer l\u2019efficacit\u00e9 de la d\u00e9couverte.",
+    "100% du crédit au premier point de contact. Idéal pour mesurer l'efficacité de la découverte.",
   lastTouch:
-    "100\u00a0% du cr\u00e9dit au dernier point de contact avant conversion. Id\u00e9al pour mesurer le closing.",
+    "100% du crédit au dernier point de contact avant conversion. Idéal pour mesurer le closing.",
   linear:
-    "Cr\u00e9dit r\u00e9parti \u00e9galement entre tous les points de contact. Vue \u00e9quilibr\u00e9e du parcours client.",
+    "Crédit réparti également entre tous les points de contact. Vue équilibrée du parcours client.",
   timeDecay:
-    "Plus de cr\u00e9dit aux points de contact r\u00e9cents. Bon compromis entre premier et dernier contact.",
+    "Plus de crédit aux points de contact récents. Bon compromis entre premier et dernier contact.",
   positionBased:
-    "40\u00a0% au premier contact, 40\u00a0% au dernier, 20\u00a0% r\u00e9partis au milieu. Mod\u00e8le U-shape.",
+    "40% au premier contact, 40% au dernier, 20% répartis au milieu. Modèle U-shape.",
 };
 
 const MODEL_ICONS: Record<AttributionModel, React.ReactNode> = {
@@ -383,7 +383,7 @@ export function AttributionModel() {
             setIsDemo(false);
             saveJourneys(autoJourneys);
             toast.success(
-              "Donn\u00e9es d\u2019attribution charg\u00e9es depuis Supabase",
+              "Données d'attribution chargées depuis Supabase",
             );
           }
         }
@@ -441,7 +441,7 @@ export function AttributionModel() {
         touchpoints.push({
           id: generateId(),
           channel: "paid",
-          label: latest.headline || "Publicit\u00e9",
+          label: latest.headline || "Publicité",
           date: format(new Date(latest.created_at), "yyyy-MM-dd"),
           detail: `${latest.impressions || 0} impressions, ${latest.clicks || 0} clics`,
         });
@@ -508,7 +508,7 @@ export function AttributionModel() {
       converted: true,
       conversionDate: format(new Date(), "yyyy-MM-dd"),
     });
-    toast.success("Parcours client ajout\u00e9");
+    toast.success("Parcours client ajouté");
   }, [newJourney, journeys, isDemo]);
 
   const handleDeleteJourney = useCallback(
@@ -518,14 +518,14 @@ export function AttributionModel() {
       saveJourneys(updated);
       setIsDemo(false);
       if (editingJourneyId === journeyId) setEditingJourneyId(null);
-      toast.success("Parcours supprim\u00e9");
+      toast.success("Parcours supprimé");
     },
     [journeys, editingJourneyId],
   );
 
   const handleAddTouchpoint = useCallback(() => {
     if (!editingJourneyId || !newTouchpoint.label.trim()) {
-      toast.error("Le libell\u00e9 du point de contact est requis");
+      toast.error("Le libellé du point de contact est requis");
       return;
     }
     const tp: Touchpoint = {
@@ -551,7 +551,7 @@ export function AttributionModel() {
       date: format(new Date(), "yyyy-MM-dd"),
       detail: "",
     });
-    toast.success("Point de contact ajout\u00e9");
+    toast.success("Point de contact ajouté");
   }, [editingJourneyId, newTouchpoint, journeys]);
 
   const handleDeleteTouchpoint = useCallback(
@@ -686,7 +686,7 @@ export function AttributionModel() {
     a.download = `attribution-${model}-${new Date().toISOString().slice(0, 10)}.json`;
     a.click();
     URL.revokeObjectURL(url);
-    toast.success("Export JSON t\u00e9l\u00e9charg\u00e9");
+    toast.success("Export JSON téléchargé");
   };
 
   // ─── Render ────────────────────────────────────────────────
@@ -701,7 +701,7 @@ export function AttributionModel() {
             </div>
             <div>
               <div className="text-xs text-text-muted">
-                Revenu total attribu\u00e9
+                Revenu total attribué
               </div>
               <div className="text-xl font-bold text-text-primary">
                 {fmtCurrency(totalRevenue)}
@@ -761,18 +761,17 @@ export function AttributionModel() {
                 Attribution multi-touch
               </h3>
               <p className="text-xs text-text-secondary">
-                Suis le parcours complet de chaque client, de la d\u00e9couverte
-                \u00e0 la conversion. Compare 5 mod\u00e8les d&apos;attribution
-                pour comprendre la contribution r\u00e9elle de chaque canal.
-                {loadingSupabase && " Chargement des donn\u00e9es Supabase..."}
+                Suis le parcours complet de chaque client, de la découverte à la conversion. Compare 5 modèles d'attribution
+                pour comprendre la contribution réelle de chaque canal.
+                {loadingSupabase && " Chargement des données Supabase..."}
               </p>
             </div>
             <div className="flex flex-col gap-1 items-end">
               {isDemo && (
-                <Badge variant="yellow">Donn\u00e9es de d\u00e9mo</Badge>
+                <Badge variant="yellow">Données de démo</Badge>
               )}
               {!isDemo && (
-                <Badge variant="default">Donn\u00e9es r\u00e9elles</Badge>
+                <Badge variant="default">Données réelles</Badge>
               )}
             </div>
           </div>
@@ -837,7 +836,7 @@ export function AttributionModel() {
             <Card>
               <CardHeader>
                 <CardTitle>
-                  Attribution du revenu \u2014 {MODEL_LABELS[model]}
+                  Attribution du revenu — {MODEL_LABELS[model]}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -886,7 +885,7 @@ export function AttributionModel() {
                             const v = typeof value === "number" ? value : 0;
                             return [
                               `${fmtCurrency(v)} (${props?.payload?.pourcentage ?? 0}%)`,
-                              "Revenu attribu\u00e9",
+                              "Revenu attribué",
                             ];
                           }}
                         />
@@ -904,7 +903,7 @@ export function AttributionModel() {
                   </div>
                 ) : (
                   <p className="text-sm text-text-muted text-center py-12">
-                    Aucune donn\u00e9e d&apos;attribution. Ajoutez des parcours
+                    Aucune donnée d'attribution. Ajoute des parcours
                     clients pour commencer.
                   </p>
                 )}
@@ -931,7 +930,7 @@ export function AttributionModel() {
                     <div className="text-2xl font-bold text-text-primary">
                       {fmtCurrency(ch.revenu)}
                     </div>
-                    <div className="text-xs text-text-muted">attribu\u00e9</div>
+                    <div className="text-xs text-text-muted">attribué</div>
                   </div>
                   <div className="mt-3 h-1.5 bg-bg-tertiary rounded-full overflow-hidden">
                     <div
@@ -950,7 +949,7 @@ export function AttributionModel() {
             {chartData.length > 0 && (
               <Card>
                 <CardHeader>
-                  <CardTitle>R\u00e9partition des canaux</CardTitle>
+                  <CardTitle>Répartition des canaux</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="flex flex-col md:flex-row items-center gap-8">
@@ -999,7 +998,7 @@ export function AttributionModel() {
                               {ch.name}
                             </div>
                             <div className="text-xs text-text-muted">
-                              {ch.pourcentage}% \u2014 {fmtCurrency(ch.revenu)}
+                              {ch.pourcentage}% du {fmtCurrency(ch.revenu)}
                             </div>
                           </div>
                         </div>
@@ -1051,7 +1050,7 @@ export function AttributionModel() {
                           >
                             {editingJourneyId === journey.id
                               ? "Fermer"
-                              : "\u00c9diter"}
+                              : "Éditer"}
                           </Button>
                           <Button
                             variant="ghost"
@@ -1137,7 +1136,7 @@ export function AttributionModel() {
                                   {tp.detail && (
                                     <>
                                       <span className="text-text-muted">
-                                        \u00b7
+                                        ·
                                       </span>
                                       <span className="text-xs text-text-secondary">
                                         {tp.detail}
@@ -1167,7 +1166,7 @@ export function AttributionModel() {
                   ) : (
                     <p className="text-xs text-text-muted ml-4">
                       Aucun point de contact. Cliquez sur
-                      \u00ab\u00a0\u00c9diter\u00a0\u00bb pour en ajouter.
+                      «Éditer» pour en ajouter.
                     </p>
                   )}
 
@@ -1197,7 +1196,7 @@ export function AttributionModel() {
             <Card>
               <CardHeader>
                 <CardTitle>
-                  Chemins de conversion les plus fr\u00e9quents
+                  Chemins de conversion les plus fréquents
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -1257,7 +1256,7 @@ export function AttributionModel() {
                   </div>
                 ) : (
                   <p className="text-sm text-text-muted text-center py-12">
-                    Aucun chemin de conversion d\u00e9tect\u00e9.
+                    Aucun chemin de conversion détecté.
                   </p>
                 )}
               </CardContent>
@@ -1277,12 +1276,12 @@ export function AttributionModel() {
           </div>
         </TabsContent>
 
-        {/* ─── Tab: Comparaison des mod\u00e8les ─────────────────── */}
+        {/* ─── Tab: Comparaison des modèles ─────────────────── */}
         <TabsContent value="compare">
           <Card>
             <CardHeader>
               <CardTitle>
-                Comparaison des 5 mod\u00e8les d&apos;attribution
+                Comparaison des 5 modèles d&apos;attribution
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -1300,10 +1299,10 @@ export function AttributionModel() {
                         Dernier contact
                       </th>
                       <th className="text-right text-text-secondary font-medium py-3 px-2">
-                        Lin\u00e9aire
+                        Linéaire
                       </th>
                       <th className="text-right text-text-secondary font-medium py-3 px-2">
-                        D\u00e9croissance
+                        Décroissance
                       </th>
                       <th className="text-right text-text-secondary font-medium py-3 px-2">
                         Position
@@ -1348,7 +1347,7 @@ export function AttributionModel() {
                                   : "text-text-secondary",
                               )}
                             >
-                              {data[m] > 0 ? `${data[m]}%` : "\u2014"}
+                              {data[m] > 0 ? `${data[m]}%` : "—"}
                             </td>
                           ))}
                         </tr>
@@ -1402,8 +1401,8 @@ export function AttributionModel() {
                           name: CHANNEL_CONFIG[ch].label,
                           "Premier contact": allModelsData[ch].firstTouch,
                           "Dernier contact": allModelsData[ch].lastTouch,
-                          "Lin\u00e9aire": allModelsData[ch].linear,
-                          "D\u00e9croissance": allModelsData[ch].timeDecay,
+                          "Linéaire": allModelsData[ch].linear,
+                          "Décroissance": allModelsData[ch].timeDecay,
                           Position: allModelsData[ch].positionBased,
                         }))}
                       >
@@ -1446,12 +1445,12 @@ export function AttributionModel() {
                           radius={[2, 2, 0, 0]}
                         />
                         <Bar
-                          dataKey="Lin\u00e9aire"
+                          dataKey="Linéaire"
                           fill="#F59E0B"
                           radius={[2, 2, 0, 0]}
                         />
                         <Bar
-                          dataKey="D\u00e9croissance"
+                          dataKey="Décroissance"
                           fill="#8B5CF6"
                           radius={[2, 2, 0, 0]}
                         />
@@ -1467,8 +1466,8 @@ export function AttributionModel() {
                     {[
                       { label: "Premier contact", color: "#34D399" },
                       { label: "Dernier contact", color: "#3B82F6" },
-                      { label: "Lin\u00e9aire", color: "#F59E0B" },
-                      { label: "D\u00e9croissance", color: "#8B5CF6" },
+                      { label: "Linéaire", color: "#F59E0B" },
+                      { label: "Décroissance", color: "#8B5CF6" },
                       { label: "Position", color: "#EC4899" },
                     ].map((item) => (
                       <div
@@ -1503,7 +1502,7 @@ export function AttributionModel() {
           <DialogHeader>
             <DialogTitle>Nouveau parcours client</DialogTitle>
             <DialogDescription>
-              Cr\u00e9ez un parcours pour suivre les points de contact d&apos;un
+              Créez un parcours pour suivre les points de contact d&apos;un
               client.
             </DialogDescription>
           </DialogHeader>
@@ -1519,7 +1518,7 @@ export function AttributionModel() {
               />
             </div>
             <div>
-              <Label>Revenu g\u00e9n\u00e9r\u00e9 (\u20ac)</Label>
+              <Label>Revenu généré (€)</Label>
               <Input
                 type="number"
                 placeholder="0"
@@ -1569,7 +1568,7 @@ export function AttributionModel() {
             <Button variant="ghost" onClick={() => setShowAddJourney(false)}>
               Annuler
             </Button>
-            <Button onClick={handleAddJourney}>Cr\u00e9er le parcours</Button>
+            <Button onClick={handleAddJourney}>Créer le parcours</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -1611,9 +1610,9 @@ export function AttributionModel() {
               </Select>
             </div>
             <div>
-              <Label>Libell\u00e9</Label>
+              <Label>Libellé</Label>
               <Input
-                placeholder="ex. Reel Instagram, Email #3, Appel d\u00e9couverte..."
+                placeholder="ex. Reel Instagram, Email #3, Appel découverte..."
                 value={newTouchpoint.label}
                 onChange={(e) =>
                   setNewTouchpoint((p) => ({ ...p, label: e.target.value }))
@@ -1631,9 +1630,9 @@ export function AttributionModel() {
               />
             </div>
             <div>
-              <Label>D\u00e9tail (optionnel)</Label>
+              <Label>Détail (optionnel)</Label>
               <Input
-                placeholder="ex. Campagne Scaling Mars, T\u00e9moignage client..."
+                placeholder="ex. Campagne Scaling Mars, Témoignage client..."
                 value={newTouchpoint.detail}
                 onChange={(e) =>
                   setNewTouchpoint((p) => ({ ...p, detail: e.target.value }))
@@ -1683,7 +1682,7 @@ function ChannelFlowViz({ journeys }: { journeys: CustomerJourney[] }) {
   if (transitions.length === 0) {
     return (
       <p className="text-sm text-text-muted text-center py-8">
-        Pas assez de donn\u00e9es pour afficher les flux entre canaux.
+        Pas assez de données pour afficher les flux entre canaux.
       </p>
     );
   }
@@ -1693,7 +1692,7 @@ function ChannelFlowViz({ journeys }: { journeys: CustomerJourney[] }) {
   return (
     <div className="space-y-3">
       <p className="text-xs text-text-secondary mb-4">
-        Les transitions les plus fr\u00e9quentes entre canaux dans les parcours
+        Les transitions les plus fréquentes entre canaux dans les parcours
         de conversion.
       </p>
       {transitions.map((t, idx) => {

@@ -100,7 +100,7 @@ export async function incrementAIUsage(
 ): Promise<void> {
   const supabase = await createClient();
 
-  await supabase.from("ai_generations").insert({
+  const { error } = await supabase.from("ai_generations").insert({
     user_id: userId,
     generation_type: opts.generationType,
     model: opts.model,
@@ -111,6 +111,10 @@ export async function incrementAIUsage(
     is_cron: opts.isCron ?? false,
     metadata: opts.metadata ?? null,
   });
+
+  if (error) {
+    console.error("[incrementAIUsage] Failed to log generation:", error.message, { userId, type: opts.generationType });
+  }
 }
 
 /**

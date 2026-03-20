@@ -216,7 +216,7 @@ export async function POST(req: NextRequest) {
     const result = await generateJSON<BusinessAuditResult>({
       model: aiModel,
       prompt: fullPrompt,
-      maxTokens: 8192,
+      maxTokens: 6000,
       temperature: 0.7,
     });
 

@@ -9,6 +9,8 @@ import Anthropic from "@anthropic-ai/sdk";
 
 const anthropic = new Anthropic();
 
+export const maxDuration = 60;
+
 export async function POST(req: Request) {
   try {
     const supabase = await createClient();

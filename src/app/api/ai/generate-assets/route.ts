@@ -49,6 +49,8 @@ const VALID_ASSET_TYPES: AssetType[] = [
   "dm_retargeting",
 ];
 
+export const maxDuration = 120;
+
 export async function POST(req: NextRequest) {
   try {
     const supabase = await createClient();

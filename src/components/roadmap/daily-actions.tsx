@@ -71,7 +71,7 @@ export function DailyActions({ className }: { className?: string }) {
         .select("*")
         .eq("user_id", user.id)
         .eq("date", today)
-        .single();
+        .maybeSingle();
 
       if (data) {
         setPlan({

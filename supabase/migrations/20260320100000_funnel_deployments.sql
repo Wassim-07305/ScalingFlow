@@ -28,10 +28,13 @@ create index if not exists idx_funnel_deployments_custom_domain
 
 alter table funnel_deployments enable row level security;
 
-create policy "Users manage own deployments"
-  on funnel_deployments for all
-  using (auth.uid() = user_id)
-  with check (auth.uid() = user_id);
+do $$ begin
+  create policy "Users manage own deployments"
+    on funnel_deployments for all
+    using (auth.uid() = user_id)
+    with check (auth.uid() = user_id);
+exception when duplicate_object then null;
+end $$;
 
 -- updated_at auto-update trigger
 create or replace function update_funnel_deployment_updated_at()
@@ -42,6 +45,7 @@ begin
 end;
 $$;
 
+drop trigger if exists trg_funnel_deployments_updated on funnel_deployments;
 create trigger trg_funnel_deployments_updated
   before update on funnel_deployments
   for each row execute function update_funnel_deployment_updated_at();

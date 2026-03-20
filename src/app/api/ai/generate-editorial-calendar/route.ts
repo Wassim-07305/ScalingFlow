@@ -9,6 +9,8 @@ import {
   type EditorialCalendarResult,
 } from "@/lib/ai/prompts/editorial-calendar";
 
+export const maxDuration = 60;
+
 export async function POST(req: NextRequest) {
   try {
     const supabase = await createClient();
@@ -90,7 +92,7 @@ export async function POST(req: NextRequest) {
       prompt,
       systemPrompt:
         "Tu es un expert en stratégie de contenu digital. Génère un plan éditorial détaillé en JSON.",
-      maxTokens: 8192,
+      maxTokens: 4096,
       temperature: 0.8,
     });
 

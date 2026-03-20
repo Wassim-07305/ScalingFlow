@@ -201,7 +201,7 @@ export function PhaseProgression({ className }: PhaseProgressionProps) {
             .from("funnel_leads")
             .select("id", { count: "exact", head: true })
             .eq("user_id", user.id)
-            .eq("status", "converted"),
+            .eq("converted", true),
         ]);
 
         if ((offersRes.count ?? 0) > 0) completed.add("Offre créée");

@@ -117,7 +117,7 @@ export function GoogleCalendarWidget({ className }: { className?: string }) {
       const res = await fetch("/api/integrations/google-calendar/events");
       const data = await res.json();
 
-      if (data.connected === false) {
+      if (data.connected === false || data.error?.includes("non configuré") || data.error?.includes("CLIENT_ID")) {
         setConnected(false);
         setEvents([]);
         return;
