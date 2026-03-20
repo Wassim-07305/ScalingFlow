@@ -52,66 +52,6 @@ interface ABTest {
   winner: "A" | "B" | null;
 }
 
-// ─── Demo tests ──────────────────────────────────────────────
-const DEMO_TESTS: ABTest[] = [
-  {
-    id: "demo-1",
-    name: "Hook video vs Hook texte",
-    variantA: {
-      description: "Hook video 3 secondes avec témoignage",
-      conversions: 47,
-      traffic: 520,
-    },
-    variantB: {
-      description: "Hook texte avec promesse forte",
-      conversions: 38,
-      traffic: 510,
-    },
-    metric: "CTR",
-    targetSampleSize: 1000,
-    status: "active",
-    createdAt: "2026-02-20",
-    winner: null,
-  },
-  {
-    id: "demo-2",
-    name: "Page de vente longue vs courte",
-    variantA: {
-      description: "Page longue avec 12 témoignages + VSL",
-      conversions: 23,
-      traffic: 300,
-    },
-    variantB: {
-      description: "Page courte avec 3 témoignages + CTA direct",
-      conversions: 31,
-      traffic: 305,
-    },
-    metric: "Taux de conversion",
-    targetSampleSize: 600,
-    status: "completed",
-    createdAt: "2026-02-10",
-    winner: "B",
-  },
-  {
-    id: "demo-3",
-    name: "CTA 'Réserver un appel' vs 'Découvrir l'offre'",
-    variantA: {
-      description: "CTA : Réserver un appel strategique gratuit",
-      conversions: 15,
-      traffic: 200,
-    },
-    variantB: {
-      description: "CTA : Découvrir l'offre maintenant",
-      conversions: 12,
-      traffic: 195,
-    },
-    metric: "Taux de clic CTA",
-    targetSampleSize: 500,
-    status: "active",
-    createdAt: "2026-02-25",
-    winner: null,
-  },
-];
 
 // ─── Supabase helpers ────────────────────────────────────────
 function mapRowToTest(row: Record<string, unknown>): ABTest {
@@ -204,11 +144,8 @@ export function ABTestManager() {
 
       if (data && data.length > 0) {
         setTests(data.map(mapRowToTest));
-        setIsDemo(false);
-      } else {
-        setTests(DEMO_TESTS);
-        setIsDemo(true);
       }
+      setIsDemo(false);
       setLoading(false);
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -85,135 +85,6 @@ function saveEntries(entries: SaleEntry[]) {
 }
 
 // ─── Demo data ───────────────────────────────────────────────
-const DEMO_ENTRIES: SaleEntry[] = [
-  {
-    id: "d1",
-    date: "2026-03-01",
-    amount: 997,
-    source: "Meta Ads",
-    campaign: "Scaling Mars",
-    creative: "VSL Témoignage",
-    audience: "Lookalike 1%",
-  },
-  {
-    id: "d2",
-    date: "2026-03-02",
-    amount: 1497,
-    source: "Meta Ads",
-    campaign: "Scaling Mars",
-    creative: "Carrousel Résultat",
-    audience: "Intérêt Business",
-  },
-  {
-    id: "d3",
-    date: "2026-03-03",
-    amount: 997,
-    source: "Instagram",
-    campaign: "DM Outreach",
-    creative: "Story CTA",
-    audience: "Followers engagés",
-  },
-  {
-    id: "d4",
-    date: "2026-03-04",
-    amount: 2497,
-    source: "YouTube",
-    campaign: "Vidéo longue",
-    creative: "Tuto Scaling",
-    audience: "Abonnés",
-  },
-  {
-    id: "d5",
-    date: "2026-03-05",
-    amount: 997,
-    source: "Meta Ads",
-    campaign: "Retargeting",
-    creative: "Vidéo Objection",
-    audience: "Visiteurs site",
-  },
-  {
-    id: "d6",
-    date: "2026-03-06",
-    amount: 1497,
-    source: "Referral",
-    campaign: "Parrainage",
-    creative: "-",
-    audience: "Clients existants",
-  },
-  {
-    id: "d7",
-    date: "2026-03-07",
-    amount: 997,
-    source: "Meta Ads",
-    campaign: "Scaling Mars",
-    creative: "VSL Témoignage",
-    audience: "Lookalike 1%",
-  },
-  {
-    id: "d8",
-    date: "2026-03-08",
-    amount: 2497,
-    source: "Meta Ads",
-    campaign: "Scaling Mars",
-    creative: "Carrousel Résultat",
-    audience: "Intérêt Business",
-  },
-  {
-    id: "d9",
-    date: "2026-03-09",
-    amount: 997,
-    source: "Organique",
-    campaign: "-",
-    creative: "-",
-    audience: "-",
-  },
-  {
-    id: "d10",
-    date: "2026-03-10",
-    amount: 1497,
-    source: "Meta Ads",
-    campaign: "Retargeting",
-    creative: "Vidéo Objection",
-    audience: "Visiteurs site",
-  },
-  {
-    id: "d11",
-    date: "2026-03-11",
-    amount: 997,
-    source: "Instagram",
-    campaign: "DM Outreach",
-    creative: "Reel Hook",
-    audience: "Followers engagés",
-  },
-  {
-    id: "d12",
-    date: "2026-03-12",
-    amount: 2497,
-    source: "Meta Ads",
-    campaign: "Scaling Mars",
-    creative: "VSL Témoignage",
-    audience: "Lookalike 1%",
-  },
-  {
-    id: "d13",
-    date: "2026-03-13",
-    amount: 997,
-    source: "Meta Ads",
-    campaign: "Scaling Mars",
-    creative: "Carrousel Résultat",
-    audience: "Lookalike 1%",
-  },
-  {
-    id: "d14",
-    date: "2026-03-14",
-    amount: 1497,
-    source: "YouTube",
-    campaign: "Vidéo longue",
-    creative: "Tuto Scaling",
-    audience: "Abonnés",
-  },
-];
-
 // ─── Formatting helpers ──────────────────────────────────────
 function fmtCurrency(n: number): string {
   return new Intl.NumberFormat("fr-FR", {
@@ -243,11 +114,8 @@ export function RevenueTracker() {
     const stored = loadEntries();
     if (stored.length > 0) {
       setEntries(stored);
-      setIsDemo(false);
-    } else {
-      setEntries(DEMO_ENTRIES);
-      setIsDemo(true);
     }
+    setIsDemo(false);
   }, []);
 
   // Filter by date range
@@ -348,8 +216,8 @@ export function RevenueTracker() {
 
   const handleClear = useCallback(() => {
     localStorage.removeItem(STORAGE_KEY);
-    setEntries(DEMO_ENTRIES);
-    setIsDemo(true);
+    setEntries([]);
+    setIsDemo(false);
     toast.success("Données réinitialisées");
   }, []);
 

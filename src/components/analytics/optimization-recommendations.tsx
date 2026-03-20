@@ -143,14 +143,14 @@ export function OptimizationRecommendations() {
             },
           )
         : {
-            spend: 2710,
-            impressions: 271200,
-            clicks: 4615,
-            leads: 245,
-            calls: 85,
-            clients: 29,
-            revenue: 32813,
-            days: 14,
+            spend: 0,
+            impressions: 0,
+            clicks: 0,
+            leads: 0,
+            calls: 0,
+            clients: 0,
+            revenue: 0,
+            days: 0,
           };
 
     const summary = {

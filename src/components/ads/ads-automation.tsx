@@ -1339,12 +1339,12 @@ Génère des variations innovantes qui reprennent ces patterns gagnants avec de 
         toast.success("Nouvelles créatives générées !");
       } else {
         // Fallback demo content
-        setGeneratedCreatives(DEMO_GENERATED_CREATIVES);
-        toast.info("Mode démo — connectez l'API pour la génération réelle");
+        setGeneratedCreatives("");
+        toast.error("Erreur lors de la génération des créatives");
       }
     } catch {
-      setGeneratedCreatives(DEMO_GENERATED_CREATIVES);
-      toast.info("Mode démo — connectez l'API pour la génération réelle");
+      setGeneratedCreatives("");
+      toast.error("Erreur lors de la génération des créatives");
     } finally {
       setGenerating(false);
     }
@@ -1924,37 +1924,6 @@ function ScalingTab() {
   );
 }
 
-// ─── Demo content for creative generation ───────────────────
-
-const DEMO_GENERATED_CREATIVES = `**Creative 1 — Hook Résultat Chiffré**
-Hook : "J'ai généré 47 000\u20AC en 30 jours avec cette méthode simple"
-Body : Découvrez la stratégie exacte que j'utilise pour scaler mes revenus sans travailler plus. Résultats prouvés, méthode testée.
-CTA : Accédez à la méthode \u2192
-Angle : Preuve sociale + chiffres concrets
-
-**Creative 2 — Hook Question Provocante**
-Hook : "Pourquoi 95% des entrepreneurs ne dépasseront jamais 5 000\u20AC/mois ?"
-Body : La réponse va vous surprendre. Ce n'est pas le travail, c'est la stratégie. Voici les 3 erreurs qui vous bloquent.
-CTA : Découvrir les 3 erreurs \u2192
-Angle : Curiosité + gap de connaissance
-
-**Creative 3 — Hook Témoignage Direct**
-Hook : "Il y a 6 mois, je facturais 2 000\u20AC. Aujourd'hui, 25 000\u20AC/mois."
-Body : Pas de hack, pas de secret. Juste un système. Marie, 34 ans, coach business. Sa transformation en détail.
-CTA : Voir sa méthode \u2192
-Angle : Transformation + témoignage authentique
-
-**Creative 4 — Hook Contrarian**
-Hook : "Arrêtez de publier du contenu. Ça ne sert à rien."
-Body : 90% du contenu que vous créez ne génère aucun lead. Voici comment créer les 10% qui convertissent réellement.
-CTA : Obtenir le framework \u2192
-Angle : Contrarian + solution concrète
-
-**Creative 5 — Hook Urgence**
-Hook : "Cette stratégie fonctionne encore en mars 2026. Mais plus pour longtemps."
-Body : Les algorithmes changent. Les coûts pub augmentent. Ceux qui agissent maintenant ont 6 mois d'avance.
-CTA : Agir maintenant \u2192
-Angle : Urgence + FOMO`;
 
 // ─── Main Component ─────────────────────────────────────────
 

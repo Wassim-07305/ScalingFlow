@@ -64,16 +64,6 @@ const BENCHMARKS = {
   overallConversion: 0.4, // % impression → sale
 };
 
-// ─── Demo data ───────────────────────────────────────────────
-const DEMO_METRICS: FunnelMetrics = {
-  impressions: 50000,
-  clicks: 1100,
-  pageViews: 950,
-  leads: 120,
-  calls: 28,
-  sales: 4,
-};
-
 // ─── Helpers ─────────────────────────────────────────────────
 function buildFunnelSteps(metrics: FunnelMetrics): FunnelStep[] {
   const steps: FunnelStep[] = [
@@ -298,7 +288,7 @@ function detectContextualBottlenecks(ctx: ContextualData): Bottleneck[] {
 export function BottleneckDetector() {
   const { user } = useUser();
   const supabase = useMemo(() => createClient(), []);
-  const [metrics, setMetrics] = useState<FunnelMetrics>(DEMO_METRICS);
+  const [metrics, setMetrics] = useState<FunnelMetrics>({ impressions: 0, clicks: 0, pageViews: 0, leads: 0, calls: 0, sales: 0 });
   const [isDemo, setIsDemo] = useState(true);
   const [loading, setLoading] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);

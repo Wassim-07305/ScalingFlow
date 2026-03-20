@@ -61,59 +61,6 @@ interface ComputedMetrics {
   monthlyRevenuePerCustomer: number;
 }
 
-// ─── Demo data ───────────────────────────────────────────────
-const DEMO_ENTRIES: LTVCACEntry[] = [
-  {
-    date: "2025-09",
-    avgDealValue: 997,
-    monthlyChurnRate: 0.08,
-    monthlyAdSpend: 3200,
-    newCustomers: 8,
-  },
-  {
-    date: "2025-10",
-    avgDealValue: 997,
-    monthlyChurnRate: 0.07,
-    monthlyAdSpend: 3500,
-    newCustomers: 10,
-  },
-  {
-    date: "2025-11",
-    avgDealValue: 1497,
-    monthlyChurnRate: 0.06,
-    monthlyAdSpend: 4000,
-    newCustomers: 11,
-  },
-  {
-    date: "2025-12",
-    avgDealValue: 1497,
-    monthlyChurnRate: 0.06,
-    monthlyAdSpend: 4200,
-    newCustomers: 13,
-  },
-  {
-    date: "2026-01",
-    avgDealValue: 1997,
-    monthlyChurnRate: 0.05,
-    monthlyAdSpend: 4500,
-    newCustomers: 14,
-  },
-  {
-    date: "2026-02",
-    avgDealValue: 1997,
-    monthlyChurnRate: 0.05,
-    monthlyAdSpend: 5000,
-    newCustomers: 16,
-  },
-  {
-    date: "2026-03",
-    avgDealValue: 2497,
-    monthlyChurnRate: 0.04,
-    monthlyAdSpend: 5500,
-    newCustomers: 18,
-  },
-];
-
 // ─── Supabase helpers ────────────────────────────────────────
 async function loadEntriesFromDB(userId: string): Promise<LTVCACEntry[]> {
   const supabase = createClient();
@@ -275,11 +222,8 @@ export function LTVCACTracker() {
     loadEntriesFromDB(user.id).then((rows) => {
       if (rows.length > 0) {
         setEntries(rows);
-        setIsDemo(false);
-      } else {
-        setEntries(DEMO_ENTRIES);
-        setIsDemo(true);
       }
+      setIsDemo(false);
     });
   }, [user]);
 
@@ -307,8 +251,8 @@ export function LTVCACTracker() {
   const handleClear = useCallback(async () => {
     if (!user) return;
     await clearEntriesFromDB(user.id);
-    setEntries(DEMO_ENTRIES);
-    setIsDemo(true);
+    setEntries([]);
+    setIsDemo(false);
     toast.success("Données réinitialisées");
   }, [user]);
 

@@ -69,57 +69,6 @@ function saveEntries(entries: ROASEntry[]) {
 }
 
 // ─── Demo data ───────────────────────────────────────────────
-const DEMO_ENTRIES: ROASEntry[] = [
-  {
-    id: "r1",
-    week: "S06",
-    adSpend: 1200,
-    revenue: 2994,
-    metaROAS: 4.2,
-    campaign: "Scaling Mars",
-  },
-  {
-    id: "r2",
-    week: "S07",
-    adSpend: 1400,
-    revenue: 3991,
-    metaROAS: 4.8,
-    campaign: "Scaling Mars",
-  },
-  {
-    id: "r3",
-    week: "S08",
-    adSpend: 1350,
-    revenue: 2997,
-    metaROAS: 3.9,
-    campaign: "Retargeting",
-  },
-  {
-    id: "r4",
-    week: "S09",
-    adSpend: 1600,
-    revenue: 5488,
-    metaROAS: 5.5,
-    campaign: "Scaling Mars",
-  },
-  {
-    id: "r5",
-    week: "S10",
-    adSpend: 1500,
-    revenue: 3994,
-    metaROAS: 4.5,
-    campaign: "Scaling Mars",
-  },
-  {
-    id: "r6",
-    week: "S11",
-    adSpend: 1800,
-    revenue: 5985,
-    metaROAS: 5.8,
-    campaign: "Retargeting",
-  },
-];
-
 // ─── Formatting helpers ──────────────────────────────────────
 function fmtCurrency(n: number): string {
   return new Intl.NumberFormat("fr-FR", {
@@ -164,11 +113,8 @@ export function RealRoas() {
     const stored = loadEntries();
     if (stored.length > 0) {
       setEntries(stored);
-      setIsDemo(false);
-    } else {
-      setEntries(DEMO_ENTRIES);
-      setIsDemo(true);
     }
+    setIsDemo(false);
   }, []);
 
   // ─── Aggregated stats ──────────────────────────────────────────
@@ -292,8 +238,8 @@ export function RealRoas() {
 
   const handleClear = useCallback(() => {
     localStorage.removeItem(STORAGE_KEY);
-    setEntries(DEMO_ENTRIES);
-    setIsDemo(true);
+    setEntries([]);
+    setIsDemo(false);
     toast.success("Données réinitialisées");
   }, []);
 

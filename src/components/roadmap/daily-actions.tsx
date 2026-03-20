@@ -44,82 +44,17 @@ interface DailyPlan {
   total_xp: number;
 }
 
-// ─── Demo data ───────────────────────────────────────────────
-const DEMO_PLAN: DailyPlan = {
-  date: new Date().toISOString().split("T")[0],
-  motivation_message:
-    "Tu es à 70% de ton objectif mensuel. 3 actions ciblées aujourd'hui et tu finis la semaine en avance !",
-  focus_theme: "Optimisation du funnel",
-  actions: [
-    {
-      id: "1",
-      title: "Analyse les bottlenecks du funnel",
-      description:
-        "Vérifie les taux de conversion à chaque étape et identifie le point de blocage principal.",
-      duration_minutes: 15,
-      priority: "high",
-      category: "Analytics",
-      action_url: "/analytics",
-      completed: false,
-      xp_reward: 25,
-    },
-    {
-      id: "2",
-      title: "Génère 2 nouvelles variantes de hook",
-      description:
-        "Base-toi sur le hook gagnant de la semaine et crée 2 angles différents.",
-      duration_minutes: 10,
-      priority: "high",
-      category: "Créatives",
-      action_url: "/ads",
-      completed: false,
-      xp_reward: 20,
-    },
-    {
-      id: "3",
-      title: "Publie un contenu Know",
-      description:
-        "Partage un insight éducatif sur ton expertise. Format recommandé : Reel 30s.",
-      duration_minutes: 20,
-      priority: "medium",
-      category: "Contenu",
-      action_url: "/content",
-      completed: false,
-      xp_reward: 15,
-    },
-    {
-      id: "4",
-      title: "Réponds aux DMs en attente",
-      description:
-        "Tu as 3 conversations en cours. Qualifie et propose un appel si pertinent.",
-      duration_minutes: 10,
-      priority: "medium",
-      category: "Prospection",
-      action_url: "/sales",
-      completed: false,
-      xp_reward: 10,
-    },
-    {
-      id: "5",
-      title: "Revois tes métriques de la veille",
-      description:
-        "CPL, ROAS, taux de closing — 5 min pour savoir où tu en es.",
-      duration_minutes: 5,
-      priority: "low",
-      category: "Analytics",
-      action_url: "/analytics",
-      completed: false,
-      xp_reward: 10,
-    },
-  ],
-  total_xp: 80,
-};
-
 // ─── Main Component ──────────────────────────────────────────
 export function DailyActions({ className }: { className?: string }) {
   const { user } = useUser();
   const supabase = useMemo(() => createClient(), []);
-  const [plan, setPlan] = useState<DailyPlan>(DEMO_PLAN);
+  const [plan, setPlan] = useState<DailyPlan>({
+    date: new Date().toISOString().split("T")[0],
+    motivation_message: "",
+    focus_theme: "",
+    actions: [],
+    total_xp: 0,
+  });
   const [isDemo, setIsDemo] = useState(true);
   const [loading, setLoading] = useState(false);
   const [generating, setGenerating] = useState(false);
