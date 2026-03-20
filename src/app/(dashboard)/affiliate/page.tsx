@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
+import { useUser } from "@/hooks/use-user";
 import { toast } from "sonner";
 import {
   Copy,
@@ -147,27 +148,39 @@ function StatCard({
 
 export default function AffiliatePage() {
   const supabase = createClient();
+  const { user } = useUser();
   const [affiliate, setAffiliate] = useState<AffiliateData | null>(null);
   const [referrals, setReferrals] = useState<Referral[]>([]);
   const [commissions, setCommissions] = useState<Commission[]>([]);
   const [payouts, setPayouts] = useState<Payout[]>([]);
-  const [chartData, setChartData] = useState<{ month: string; amount: number }[]>([]);
   const [loading, setLoading] = useState(true);
   const [joining, setJoining] = useState(false);
   const [copied, setCopied] = useState(false);
   const [statusFilter, setStatusFilter] = useState("all");
 
   const loadData = useCallback(async () => {
+    if (!user) return;
     setLoading(true);
     try {
-      const res = await fetch("/api/affiliates/register");
-      const json = await res.json();
-      if (!json.affiliate) {
+      // Requête directe Supabase (évite le roundtrip HTTP vers /api/affiliates/register)
+      const { data: affiliateData } = await supabase
+        .from("affiliates")
+        .select(
+          `id, affiliate_code, referral_link, status, tier,
+           custom_commission_rate, total_earned, total_paid,
+           total_referrals, total_conversions, created_at, stripe_account_id,
+           affiliate_programs(name, commission_rate, commission_type,
+             recurring_months, min_payout, payout_frequency, terms_url)`,
+        )
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      if (!affiliateData) {
         setAffiliate(null);
         return;
       }
-      setAffiliate(json.affiliate);
-      const affId = json.affiliate.id;
+      setAffiliate(affiliateData as AffiliateData);
+      const affId = affiliateData.id;
 
       const [refRes, commRes, payRes] = await Promise.all([
         supabase
@@ -195,27 +208,10 @@ export default function AffiliatePage() {
       setReferrals(refRes.data || []);
       setCommissions(commRes.data || []);
       setPayouts(payRes.data || []);
-
-      // Graphique 6 mois
-      const monthlyMap: Record<string, number> = {};
-      const now = new Date();
-      for (let i = 5; i >= 0; i--) {
-        const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-        const key = d.toLocaleDateString("fr-FR", { month: "short", year: "2-digit" });
-        monthlyMap[key] = 0;
-      }
-      for (const c of commRes.data || []) {
-        if (["pending", "approved", "paid"].includes(c.status)) {
-          const d = new Date(c.created_at);
-          const key = d.toLocaleDateString("fr-FR", { month: "short", year: "2-digit" });
-          if (key in monthlyMap) monthlyMap[key] += c.amount;
-        }
-      }
-      setChartData(Object.entries(monthlyMap).map(([month, amount]) => ({ month, amount })));
     } finally {
       setLoading(false);
     }
-  }, [supabase]);
+  }, [user, supabase]);
 
   useEffect(() => {
     loadData();
@@ -244,25 +240,54 @@ export default function AffiliatePage() {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const pendingAmount = commissions
-    .filter((c) => c.status === "pending" || c.status === "approved")
-    .reduce((sum, c) => sum + c.amount, 0);
+  const pendingAmount = useMemo(
+    () =>
+      commissions
+        .filter((c) => c.status === "pending" || c.status === "approved")
+        .reduce((sum, c) => sum + c.amount, 0),
+    [commissions],
+  );
 
-  const now = new Date();
-  const thisMonthReferrals = referrals.filter((r) => {
-    const d = new Date(r.created_at);
-    return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
-  }).length;
+  const thisMonthReferrals = useMemo(() => {
+    const now = new Date();
+    return referrals.filter((r) => {
+      const d = new Date(r.created_at);
+      return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+    }).length;
+  }, [referrals]);
 
-  const conversionRate =
-    referrals.length > 0
-      ? Math.round(
-          (referrals.filter((r) => r.status === "converted").length / referrals.length) * 100,
-        )
-      : 0;
+  const conversionRate = useMemo(
+    () =>
+      referrals.length > 0
+        ? Math.round(
+            (referrals.filter((r) => r.status === "converted").length / referrals.length) * 100,
+          )
+        : 0,
+    [referrals],
+  );
 
-  const filteredReferrals =
-    statusFilter === "all" ? referrals : referrals.filter((r) => r.status === statusFilter);
+  const filteredReferrals = useMemo(
+    () => (statusFilter === "all" ? referrals : referrals.filter((r) => r.status === statusFilter)),
+    [referrals, statusFilter],
+  );
+
+  const chartData = useMemo(() => {
+    const now = new Date();
+    const monthlyMap: Record<string, number> = {};
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const key = d.toLocaleDateString("fr-FR", { month: "short", year: "2-digit" });
+      monthlyMap[key] = 0;
+    }
+    for (const c of commissions) {
+      if (["pending", "approved", "paid"].includes(c.status)) {
+        const d = new Date(c.created_at);
+        const key = d.toLocaleDateString("fr-FR", { month: "short", year: "2-digit" });
+        if (key in monthlyMap) monthlyMap[key] += c.amount;
+      }
+    }
+    return Object.entries(monthlyMap).map(([month, amount]) => ({ month, amount }));
+  }, [commissions]);
 
   if (loading) {
     return (

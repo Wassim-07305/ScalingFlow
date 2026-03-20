@@ -35,53 +35,59 @@ export function RevenueChart() {
       try {
         const supabase = createClient();
         const now = new Date();
-        const months: MonthData[] = [];
 
-        for (let i = 5; i >= 0; i--) {
-          const monthDate = subMonths(now, i);
-          const start = startOfMonth(monthDate).toISOString();
-          const end = endOfMonth(monthDate).toISOString();
+        // Calcul des plages de dates pour les 6 mois
+        const monthRanges = Array.from({ length: 6 }, (_, i) => {
+          const monthDate = subMonths(now, 5 - i);
           const label = format(monthDate, "MMM", { locale: fr });
-          // Capitaliser la première lettre
-          const capitalizedLabel =
-            label.charAt(0).toUpperCase() + label.slice(1);
+          return {
+            start: startOfMonth(monthDate).toISOString(),
+            end: endOfMonth(monthDate).toISOString(),
+            label: label.charAt(0).toUpperCase() + label.slice(1),
+          };
+        });
 
+        // Toutes les 24 requêtes en parallèle (au lieu de 6 boucles séquentielles)
+        const allResults = await Promise.all(
+          monthRanges.flatMap(({ start, end }) => [
+            supabase
+              .from("offers")
+              .select("id", { count: "exact", head: true })
+              .eq("user_id", user.id)
+              .gte("created_at", start)
+              .lte("created_at", end),
+            supabase
+              .from("ad_creatives")
+              .select("id", { count: "exact", head: true })
+              .eq("user_id", user.id)
+              .gte("created_at", start)
+              .lte("created_at", end),
+            supabase
+              .from("funnels")
+              .select("id", { count: "exact", head: true })
+              .eq("user_id", user.id)
+              .gte("created_at", start)
+              .lte("created_at", end),
+            supabase
+              .from("sales_assets")
+              .select("id", { count: "exact", head: true })
+              .eq("user_id", user.id)
+              .gte("created_at", start)
+              .lte("created_at", end),
+          ])
+        );
+
+        // Regroupement des résultats par mois (4 requêtes par mois)
+        const months: MonthData[] = monthRanges.map(({ label }, i) => {
           const [offersRes, creativesRes, funnelsRes, assetsRes] =
-            await Promise.all([
-              supabase
-                .from("offers")
-                .select("id", { count: "exact", head: true })
-                .eq("user_id", user.id)
-                .gte("created_at", start)
-                .lte("created_at", end),
-              supabase
-                .from("ad_creatives")
-                .select("id", { count: "exact", head: true })
-                .eq("user_id", user.id)
-                .gte("created_at", start)
-                .lte("created_at", end),
-              supabase
-                .from("funnels")
-                .select("id", { count: "exact", head: true })
-                .eq("user_id", user.id)
-                .gte("created_at", start)
-                .lte("created_at", end),
-              supabase
-                .from("sales_assets")
-                .select("id", { count: "exact", head: true })
-                .eq("user_id", user.id)
-                .gte("created_at", start)
-                .lte("created_at", end),
-            ]);
-
+            allResults.slice(i * 4, i * 4 + 4);
           const total =
             (offersRes.count ?? 0) +
             (creativesRes.count ?? 0) +
             (funnelsRes.count ?? 0) +
             (assetsRes.count ?? 0);
-
-          months.push({ month: capitalizedLabel, generations: total });
-        }
+          return { month: label, generations: total };
+        });
 
         setData(months);
       } catch {

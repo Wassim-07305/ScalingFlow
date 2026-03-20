@@ -1,20 +1,30 @@
 "use client";
 
 import { Suspense } from "react";
+import dynamic from "next/dynamic";
 import { PageHeader } from "@/components/layout/page-header";
 import { WelcomeBanner } from "@/components/dashboard/welcome-banner";
 import { StatsOverview } from "@/components/dashboard/stats-overview";
 import { BusinessPipeline } from "@/components/dashboard/business-pipeline";
 import { ProgressBar } from "@/components/dashboard/progress-bar";
-import { RevenueChart } from "@/components/dashboard/revenue-chart";
-import { LeadsChart } from "@/components/dashboard/leads-chart";
 import { NextTasks } from "@/components/dashboard/next-tasks";
 import { ActivityFeed } from "@/components/dashboard/activity-feed";
 import { QuickActions } from "@/components/dashboard/quick-actions";
 import { SmartRecommendations } from "@/components/dashboard/smart-recommendations";
 import { WeeklyChallenges } from "@/components/dashboard/weekly-challenges";
 import { BusinessScoreWidget } from "@/components/dashboard/business-score-widget";
+import { GrowthTierWidget } from "@/components/dashboard/growth-tier-widget";
 import { SkeletonCard, SkeletonDashboard } from "@/components/ui/skeleton";
+
+// Chargement différé des composants Recharts (bundle lourd, non critique au premier rendu)
+const RevenueChart = dynamic(
+  () => import("@/components/dashboard/revenue-chart").then((m) => ({ default: m.RevenueChart })),
+  { ssr: false, loading: () => <SkeletonCard className="h-64" /> },
+);
+const LeadsChart = dynamic(
+  () => import("@/components/dashboard/leads-chart").then((m) => ({ default: m.LeadsChart })),
+  { ssr: false, loading: () => <SkeletonCard className="h-64" /> },
+);
 
 function SectionFallback({ className }: { className?: string }) {
   return <SkeletonCard className={className} />;
@@ -47,6 +57,10 @@ export default function DashboardPage() {
           </Suspense>
 
           <ProgressBar />
+
+          <Suspense fallback={<SectionFallback className="h-16" />}>
+            <GrowthTierWidget />
+          </Suspense>
 
           <Suspense fallback={<SectionFallback className="h-64" />}>
             <BusinessScoreWidget />

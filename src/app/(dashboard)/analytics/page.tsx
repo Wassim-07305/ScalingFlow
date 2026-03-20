@@ -1,18 +1,54 @@
 "use client";
 
-import React from "react";
+import React, { Suspense } from "react";
+import dynamic from "next/dynamic";
 import { PageHeader } from "@/components/layout/page-header";
 import { TabBar } from "@/components/shared/tab-bar";
-import { PerformanceDashboard } from "@/components/analytics/performance-dashboard";
-import { OptimizationRecommendations } from "@/components/analytics/optimization-recommendations";
-import { ABTestManager } from "@/components/analytics/ab-test-manager";
-import { AttributionModel } from "@/components/analytics/attribution-model";
-import { LTVCACTracker } from "@/components/analytics/ltv-cac-tracker";
-import { MetricsHistory } from "@/components/analytics/metrics-history";
-import { GrowthTiers } from "@/components/analytics/growth-tiers";
-import { RevenueTracker } from "@/components/analytics/revenue-tracker";
-import { RealRoas } from "@/components/analytics/real-roas";
-import { BottleneckDetector } from "@/components/analytics/bottleneck-detector";
+import { SkeletonCard } from "@/components/ui/skeleton";
+
+const tabFallback = <SkeletonCard className="h-96 mt-6" />;
+
+// Chargement différé de chaque onglet — le JS n'est téléchargé qu'au premier clic
+const PerformanceDashboard = dynamic(
+  () => import("@/components/analytics/performance-dashboard").then((m) => ({ default: m.PerformanceDashboard })),
+  { loading: () => tabFallback },
+);
+const OptimizationRecommendations = dynamic(
+  () => import("@/components/analytics/optimization-recommendations").then((m) => ({ default: m.OptimizationRecommendations })),
+  { loading: () => tabFallback },
+);
+const ABTestManager = dynamic(
+  () => import("@/components/analytics/ab-test-manager").then((m) => ({ default: m.ABTestManager })),
+  { loading: () => tabFallback },
+);
+const AttributionModel = dynamic(
+  () => import("@/components/analytics/attribution-model").then((m) => ({ default: m.AttributionModel })),
+  { loading: () => tabFallback },
+);
+const LTVCACTracker = dynamic(
+  () => import("@/components/analytics/ltv-cac-tracker").then((m) => ({ default: m.LTVCACTracker })),
+  { loading: () => tabFallback },
+);
+const MetricsHistory = dynamic(
+  () => import("@/components/analytics/metrics-history").then((m) => ({ default: m.MetricsHistory })),
+  { loading: () => tabFallback },
+);
+const GrowthTiers = dynamic(
+  () => import("@/components/analytics/growth-tiers").then((m) => ({ default: m.GrowthTiers })),
+  { loading: () => tabFallback },
+);
+const RevenueTracker = dynamic(
+  () => import("@/components/analytics/revenue-tracker").then((m) => ({ default: m.RevenueTracker })),
+  { loading: () => tabFallback },
+);
+const RealRoas = dynamic(
+  () => import("@/components/analytics/real-roas").then((m) => ({ default: m.RealRoas })),
+  { loading: () => tabFallback },
+);
+const BottleneckDetector = dynamic(
+  () => import("@/components/analytics/bottleneck-detector").then((m) => ({ default: m.BottleneckDetector })),
+  { loading: () => tabFallback },
+);
 import {
   BarChart3,
   Sparkles,
@@ -78,7 +114,9 @@ export default function AnalyticsPage() {
 
       <TabBar tabs={TABS} activeTab={activeTab} onTabChange={setActiveTab} />
 
-      {renderContent()}
+      <Suspense fallback={tabFallback}>
+        {renderContent()}
+      </Suspense>
     </div>
   );
 }

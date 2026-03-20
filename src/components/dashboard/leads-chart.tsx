@@ -35,53 +35,60 @@ export function LeadsChart() {
       try {
         const supabase = createClient();
         const now = new Date();
-        const weeks: WeekData[] = [];
 
-        for (let i = 5; i >= 0; i--) {
-          const weekDate = subWeeks(now, i);
-          const start = startOfWeek(weekDate, { locale: fr }).toISOString();
-          const end = endOfWeek(weekDate, { locale: fr }).toISOString();
-          // Format : "3 Fév" pour le début de la semaine
-          const label = format(startOfWeek(weekDate, { locale: fr }), "d MMM", {
-            locale: fr,
-          });
+        // Calcul des plages de dates pour les 6 semaines
+        const weekRanges = Array.from({ length: 6 }, (_, i) => {
+          const weekDate = subWeeks(now, 5 - i);
+          return {
+            start: startOfWeek(weekDate, { locale: fr }).toISOString(),
+            end: endOfWeek(weekDate, { locale: fr }).toISOString(),
+            label: format(startOfWeek(weekDate, { locale: fr }), "d MMM", {
+              locale: fr,
+            }),
+          };
+        });
 
+        // Toutes les 24 requêtes en parallèle (au lieu de 6 boucles séquentielles)
+        const allResults = await Promise.all(
+          weekRanges.flatMap(({ start, end }) => [
+            supabase
+              .from("offers")
+              .select("id", { count: "exact", head: true })
+              .eq("user_id", user.id)
+              .gte("created_at", start)
+              .lte("created_at", end),
+            supabase
+              .from("ad_creatives")
+              .select("id", { count: "exact", head: true })
+              .eq("user_id", user.id)
+              .gte("created_at", start)
+              .lte("created_at", end),
+            supabase
+              .from("funnels")
+              .select("id", { count: "exact", head: true })
+              .eq("user_id", user.id)
+              .gte("created_at", start)
+              .lte("created_at", end),
+            supabase
+              .from("sales_assets")
+              .select("id", { count: "exact", head: true })
+              .eq("user_id", user.id)
+              .gte("created_at", start)
+              .lte("created_at", end),
+          ])
+        );
+
+        // Regroupement des résultats par semaine (4 requêtes par semaine)
+        const weeks: WeekData[] = weekRanges.map(({ label }, i) => {
           const [offersRes, creativesRes, funnelsRes, assetsRes] =
-            await Promise.all([
-              supabase
-                .from("offers")
-                .select("id", { count: "exact", head: true })
-                .eq("user_id", user.id)
-                .gte("created_at", start)
-                .lte("created_at", end),
-              supabase
-                .from("ad_creatives")
-                .select("id", { count: "exact", head: true })
-                .eq("user_id", user.id)
-                .gte("created_at", start)
-                .lte("created_at", end),
-              supabase
-                .from("funnels")
-                .select("id", { count: "exact", head: true })
-                .eq("user_id", user.id)
-                .gte("created_at", start)
-                .lte("created_at", end),
-              supabase
-                .from("sales_assets")
-                .select("id", { count: "exact", head: true })
-                .eq("user_id", user.id)
-                .gte("created_at", start)
-                .lte("created_at", end),
-            ]);
-
+            allResults.slice(i * 4, i * 4 + 4);
           const total =
             (offersRes.count ?? 0) +
             (creativesRes.count ?? 0) +
             (funnelsRes.count ?? 0) +
             (assetsRes.count ?? 0);
-
-          weeks.push({ week: label, creations: total });
-        }
+          return { week: label, creations: total };
+        });
 
         setData(weeks);
       } catch {

@@ -1,7 +1,39 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+import { unstable_cache } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { DashboardShell } from "@/components/layout/dashboard-shell";
+import { UserProvider } from "@/contexts/user-context";
+
+// Cache le profil utilisateur 60s — revalidé via revalidateTag(`profile-${userId}`) lors d'une mise à jour
+const getCachedProfile = unstable_cache(
+  async (userId: string) => {
+    const supabase = await createClient();
+    const { data } = await supabase
+      .from("profiles")
+      .select("id, email, full_name, avatar_url, role, organization_id")
+      .eq("id", userId)
+      .single();
+    return data;
+  },
+  ["user-profile"],
+  { revalidate: 60 },
+);
+
+// Cache le branding organisation 5 min — change rarement
+const getCachedOrgBranding = unstable_cache(
+  async (orgId: string) => {
+    const supabase = await createClient();
+    const { data } = await supabase
+      .from("organizations")
+      .select("brand_name, logo_url, primary_color, accent_color, features")
+      .eq("id", orgId)
+      .single();
+    return data;
+  },
+  ["org-branding"],
+  { revalidate: 300 },
+);
 
 export const metadata: Metadata = {
   title: {
@@ -34,11 +66,7 @@ export default async function DashboardLayout({
     redirect("/login");
   }
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("id", user.id)
-    .single();
+  const profile = await getCachedProfile(user.id);
 
   const userProfile = profile || {
     id: user.id,
@@ -52,7 +80,7 @@ export default async function DashboardLayout({
     organization_id: null,
   };
 
-  // Fetch organization branding + features if user belongs to one
+  // Fetch organization branding + features if user belongs to one (caché 5 min)
   let orgBranding: {
     brand_name: string | null;
     logo_url: string | null;
@@ -62,27 +90,28 @@ export default async function DashboardLayout({
   } | null = null;
 
   if (userProfile.organization_id) {
-    const { data: org } = await supabase
-      .from("organizations")
-      .select("brand_name, logo_url, primary_color, accent_color, features")
-      .eq("id", userProfile.organization_id)
-      .single();
-
-    if (org) {
-      orgBranding = org;
-    }
+    const org = await getCachedOrgBranding(userProfile.organization_id);
+    if (org) orgBranding = org;
   }
 
   return (
-    <DashboardShell
-      role={userProfile.role || "user"}
-      userName={userProfile.full_name || "Utilisateur"}
-      email={userProfile.email || user.email || ""}
-      avatarUrl={userProfile.avatar_url}
-      userId={user.id}
-      orgBranding={orgBranding}
+    <UserProvider
+      initialUserId={user.id}
+      initialEmail={userProfile.email || user.email || ""}
+      initialFullName={userProfile.full_name || "Utilisateur"}
+      initialAvatarUrl={userProfile.avatar_url}
+      initialRole={userProfile.role || "user"}
     >
-      {children}
-    </DashboardShell>
+      <DashboardShell
+        role={userProfile.role || "user"}
+        userName={userProfile.full_name || "Utilisateur"}
+        email={userProfile.email || user.email || ""}
+        avatarUrl={userProfile.avatar_url}
+        userId={user.id}
+        orgBranding={orgBranding}
+      >
+        {children}
+      </DashboardShell>
+    </UserProvider>
   );
 }

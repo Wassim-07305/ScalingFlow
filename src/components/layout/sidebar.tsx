@@ -318,9 +318,11 @@ export function Sidebar({
           >
             <div className="relative">
               {avatarUrl ? (
-                <img
+                <Image
                   src={avatarUrl}
                   alt={userName}
+                  width={36}
+                  height={36}
                   className="h-9 w-9 shrink-0 rounded-full object-cover ring-2 ring-accent/10"
                 />
               ) : (

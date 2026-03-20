@@ -41,6 +41,10 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "oaidalleapiprodscus.blob.core.windows.net",
       },
+      {
+        protocol: "https",
+        hostname: "lh3.googleusercontent.com",
+      },
     ],
   },
   async headers() {
