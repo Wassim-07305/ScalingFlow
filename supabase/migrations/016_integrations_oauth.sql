@@ -32,20 +32,20 @@ CREATE TABLE IF NOT EXISTS connected_accounts (
 -- RLS
 ALTER TABLE connected_accounts ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Users can view own connected accounts"
-  ON connected_accounts FOR SELECT
+DROP POLICY IF EXISTS "Users can view own connected accounts" ON connected_accounts;
+CREATE POLICY "Users can view own connected accounts" ON connected_accounts FOR SELECT
   USING (auth.uid() = user_id);
 
-CREATE POLICY "Users can insert own connected accounts"
-  ON connected_accounts FOR INSERT
+DROP POLICY IF EXISTS "Users can insert own connected accounts" ON connected_accounts;
+CREATE POLICY "Users can insert own connected accounts" ON connected_accounts FOR INSERT
   WITH CHECK (auth.uid() = user_id);
 
-CREATE POLICY "Users can update own connected accounts"
-  ON connected_accounts FOR UPDATE
+DROP POLICY IF EXISTS "Users can update own connected accounts" ON connected_accounts;
+CREATE POLICY "Users can update own connected accounts" ON connected_accounts FOR UPDATE
   USING (auth.uid() = user_id);
 
-CREATE POLICY "Users can delete own connected accounts"
-  ON connected_accounts FOR DELETE
+DROP POLICY IF EXISTS "Users can delete own connected accounts" ON connected_accounts;
+CREATE POLICY "Users can delete own connected accounts" ON connected_accounts FOR DELETE
   USING (auth.uid() = user_id);
 
 -- 2. Add webhook_api_key to profiles (referenced but missing)
@@ -76,19 +76,19 @@ CREATE TABLE IF NOT EXISTS organizations (
 
 ALTER TABLE organizations ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Org members can view their org"
-  ON organizations FOR SELECT
+DROP POLICY IF EXISTS "Org members can view their org" ON organizations;
+CREATE POLICY "Org members can view their org" ON organizations FOR SELECT
   USING (
     id IN (SELECT organization_id FROM organization_members WHERE user_id = auth.uid())
     OR owner_id = auth.uid()
   );
 
-CREATE POLICY "Org owners can update their org"
-  ON organizations FOR UPDATE
+DROP POLICY IF EXISTS "Org owners can update their org" ON organizations;
+CREATE POLICY "Org owners can update their org" ON organizations FOR UPDATE
   USING (owner_id = auth.uid());
 
-CREATE POLICY "Authenticated users can create orgs"
-  ON organizations FOR INSERT
+DROP POLICY IF EXISTS "Authenticated users can create orgs" ON organizations;
+CREATE POLICY "Authenticated users can create orgs" ON organizations FOR INSERT
   WITH CHECK (auth.uid() = owner_id);
 
 CREATE TABLE IF NOT EXISTS organization_members (
@@ -105,14 +105,14 @@ CREATE TABLE IF NOT EXISTS organization_members (
 
 ALTER TABLE organization_members ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Org members can view members"
-  ON organization_members FOR SELECT
+DROP POLICY IF EXISTS "Org members can view members" ON organization_members;
+CREATE POLICY "Org members can view members" ON organization_members FOR SELECT
   USING (
     organization_id IN (SELECT organization_id FROM organization_members WHERE user_id = auth.uid())
   );
 
-CREATE POLICY "Org admins can manage members"
-  ON organization_members FOR ALL
+DROP POLICY IF EXISTS "Org admins can manage members" ON organization_members;
+CREATE POLICY "Org admins can manage members" ON organization_members FOR ALL
   USING (
     organization_id IN (
       SELECT organization_id FROM organization_members
@@ -146,8 +146,8 @@ CREATE TABLE IF NOT EXISTS meta_audiences (
 
 ALTER TABLE meta_audiences ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Users can manage own audiences"
-  ON meta_audiences FOR ALL
+DROP POLICY IF EXISTS "Users can manage own audiences" ON meta_audiences;
+CREATE POLICY "Users can manage own audiences" ON meta_audiences FOR ALL
   USING (auth.uid() = user_id);
 
 -- 5. Indexes

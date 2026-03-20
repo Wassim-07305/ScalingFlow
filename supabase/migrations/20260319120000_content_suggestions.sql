@@ -25,5 +25,6 @@ CREATE INDEX IF NOT EXISTS idx_content_suggestions_status
 -- RLS
 ALTER TABLE content_suggestions ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users manage own suggestions" ON content_suggestions;
 CREATE POLICY "Users manage own suggestions" ON content_suggestions
   FOR ALL USING (auth.uid() = user_id);

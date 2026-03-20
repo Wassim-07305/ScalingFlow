@@ -13,8 +13,8 @@ ALTER TABLE public.system_settings ENABLE ROW LEVEL SECURITY;
 
 -- Politique : seuls les admins peuvent lire et écrire
 -- Utilise une sous-requête sur profiles car le JWT Supabase n'inclut pas la colonne role
-CREATE POLICY "Admins can read system settings"
-  ON public.system_settings
+DROP POLICY IF EXISTS "Admins can read system settings" ON public.system_settings;
+CREATE POLICY "Admins can read system settings" ON public.system_settings
   FOR SELECT
   USING (
     EXISTS (
@@ -23,8 +23,8 @@ CREATE POLICY "Admins can read system settings"
     )
   );
 
-CREATE POLICY "Admins can write system settings"
-  ON public.system_settings
+DROP POLICY IF EXISTS "Admins can write system settings" ON public.system_settings;
+CREATE POLICY "Admins can write system settings" ON public.system_settings
   FOR ALL
   USING (
     EXISTS (

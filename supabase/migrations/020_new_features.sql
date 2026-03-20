@@ -22,6 +22,7 @@ CREATE TABLE IF NOT EXISTS revenue_entries (
 
 CREATE INDEX IF NOT EXISTS idx_revenue_entries_user ON revenue_entries(user_id);
 ALTER TABLE revenue_entries ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Users manage own revenue" ON revenue_entries;
 CREATE POLICY "Users manage own revenue" ON revenue_entries
   FOR ALL USING (auth.uid() = user_id);
 
@@ -43,6 +44,7 @@ CREATE TABLE IF NOT EXISTS sales_call_logs (
 
 CREATE INDEX IF NOT EXISTS idx_sales_calls_user ON sales_call_logs(user_id);
 ALTER TABLE sales_call_logs ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Users manage own calls" ON sales_call_logs;
 CREATE POLICY "Users manage own calls" ON sales_call_logs
   FOR ALL USING (auth.uid() = user_id);
 
@@ -62,6 +64,7 @@ CREATE TABLE IF NOT EXISTS ad_automation_config (
 );
 
 ALTER TABLE ad_automation_config ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Users manage own ad config" ON ad_automation_config;
 CREATE POLICY "Users manage own ad config" ON ad_automation_config
   FOR ALL USING (auth.uid() = user_id);
 
@@ -80,6 +83,7 @@ CREATE TABLE IF NOT EXISTS ad_automation_log (
 
 CREATE INDEX IF NOT EXISTS idx_ad_auto_log_user ON ad_automation_log(user_id);
 ALTER TABLE ad_automation_log ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Users manage own ad log" ON ad_automation_log;
 CREATE POLICY "Users manage own ad log" ON ad_automation_log
   FOR ALL USING (auth.uid() = user_id);
 
@@ -100,6 +104,7 @@ CREATE TABLE IF NOT EXISTS launch_checklist (
 );
 
 ALTER TABLE launch_checklist ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Users manage own checklist" ON launch_checklist;
 CREATE POLICY "Users manage own checklist" ON launch_checklist
   FOR ALL USING (auth.uid() = user_id);
 
@@ -118,6 +123,7 @@ CREATE TABLE IF NOT EXISTS content_batches (
 
 CREATE INDEX IF NOT EXISTS idx_content_batches_user ON content_batches(user_id);
 ALTER TABLE content_batches ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Users manage own batches" ON content_batches;
 CREATE POLICY "Users manage own batches" ON content_batches
   FOR ALL USING (auth.uid() = user_id);
 
@@ -135,5 +141,6 @@ CREATE TABLE IF NOT EXISTS meta_audiences (
 
 CREATE INDEX IF NOT EXISTS idx_meta_audiences_user ON meta_audiences(user_id);
 ALTER TABLE meta_audiences ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Users manage own audiences" ON meta_audiences;
 CREATE POLICY "Users manage own audiences" ON meta_audiences
   FOR ALL USING (auth.uid() = user_id);

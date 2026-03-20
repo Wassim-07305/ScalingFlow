@@ -26,17 +26,17 @@ CREATE TABLE IF NOT EXISTS payment_attributions (
 -- RLS
 ALTER TABLE payment_attributions ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Users see own payment attributions"
-  ON payment_attributions FOR SELECT
+DROP POLICY IF EXISTS "Users see own payment attributions" ON payment_attributions;
+CREATE POLICY "Users see own payment attributions" ON payment_attributions FOR SELECT
   USING (auth.uid() = user_id);
 
 -- Service role can insert (webhook uses service role key)
-CREATE POLICY "Service role can insert payment attributions"
-  ON payment_attributions FOR INSERT
+DROP POLICY IF EXISTS "Service role can insert payment attributions" ON payment_attributions;
+CREATE POLICY "Service role can insert payment attributions" ON payment_attributions FOR INSERT
   WITH CHECK (true);
 
 -- Indexes for aggregation queries
-CREATE INDEX idx_payment_attributions_user_id ON payment_attributions (user_id);
-CREATE INDEX idx_payment_attributions_utm_campaign ON payment_attributions (utm_campaign);
-CREATE INDEX idx_payment_attributions_utm_content ON payment_attributions (utm_content);
-CREATE INDEX idx_payment_attributions_created_at ON payment_attributions (created_at);
+CREATE INDEX IF NOT EXISTS idx_payment_attributions_user_id ON payment_attributions (user_id);
+CREATE INDEX IF NOT EXISTS idx_payment_attributions_utm_campaign ON payment_attributions (utm_campaign);
+CREATE INDEX IF NOT EXISTS idx_payment_attributions_utm_content ON payment_attributions (utm_content);
+CREATE INDEX IF NOT EXISTS idx_payment_attributions_created_at ON payment_attributions (created_at);

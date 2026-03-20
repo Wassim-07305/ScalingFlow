@@ -17,7 +17,7 @@ ALTER TABLE connected_accounts
     'unipile_linkedin', 'unipile_whatsapp', 'unipile_instagram',
     'unipile_messenger', 'unipile_telegram', 'unipile_twitter',
     'unipile_mail', 'unipile_google', 'unipile_outlook', 'unipile_imap'
-  ));
+  )) NOT VALID;
 
 -- Make access_token nullable for Unipile accounts (tokens managed by Unipile)
 ALTER TABLE connected_accounts

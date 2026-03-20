@@ -19,27 +19,27 @@ CREATE TABLE IF NOT EXISTS document_chunks (
 );
 
 -- Indexes for performance
-CREATE INDEX idx_document_chunks_user_id ON document_chunks(user_id);
-CREATE INDEX idx_document_chunks_document_id ON document_chunks(document_id);
+CREATE INDEX IF NOT EXISTS idx_document_chunks_user_id ON document_chunks(user_id);
+CREATE INDEX IF NOT EXISTS idx_document_chunks_document_id ON document_chunks(document_id);
 
 -- IVFFlat index for fast vector similarity search
 -- Uses cosine distance operator for normalized vectors
-CREATE INDEX idx_document_chunks_embedding ON document_chunks
+CREATE INDEX IF NOT EXISTS idx_document_chunks_embedding ON document_chunks
   USING ivfflat (embedding vector_cosine_ops) WITH (lists = 100);
 
 -- RLS policies
 ALTER TABLE document_chunks ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Users can read own chunks"
-  ON document_chunks FOR SELECT
+DROP POLICY IF EXISTS "Users can read own chunks" ON document_chunks;
+CREATE POLICY "Users can read own chunks" ON document_chunks FOR SELECT
   USING (auth.uid() = user_id);
 
-CREATE POLICY "Users can insert own chunks"
-  ON document_chunks FOR INSERT
+DROP POLICY IF EXISTS "Users can insert own chunks" ON document_chunks;
+CREATE POLICY "Users can insert own chunks" ON document_chunks FOR INSERT
   WITH CHECK (auth.uid() = user_id);
 
-CREATE POLICY "Users can delete own chunks"
-  ON document_chunks FOR DELETE
+DROP POLICY IF EXISTS "Users can delete own chunks" ON document_chunks;
+CREATE POLICY "Users can delete own chunks" ON document_chunks FOR DELETE
   USING (auth.uid() = user_id);
 
 -- RPC function for vector similarity search
@@ -84,6 +84,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS trigger_document_chunks_updated_at ON document_chunks;
 CREATE TRIGGER trigger_document_chunks_updated_at
   BEFORE UPDATE ON document_chunks
   FOR EACH ROW

@@ -46,6 +46,7 @@ CREATE TABLE IF NOT EXISTS public.vault_resources (
 );
 
 ALTER TABLE public.vault_resources ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Users manage own vault resources" ON public.vault_resources;
 CREATE POLICY "Users manage own vault resources" ON public.vault_resources FOR ALL USING (auth.uid() = user_id);
 
 -- ============================================
@@ -69,6 +70,7 @@ CREATE TABLE IF NOT EXISTS public.competitors (
 );
 
 ALTER TABLE public.competitors ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Users manage own competitors" ON public.competitors;
 CREATE POLICY "Users manage own competitors" ON public.competitors FOR ALL USING (auth.uid() = user_id);
 
 -- ============================================
@@ -92,7 +94,9 @@ CREATE TABLE IF NOT EXISTS public.brand_identities (
 );
 
 ALTER TABLE public.brand_identities ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Users manage own brand identities" ON public.brand_identities;
 CREATE POLICY "Users manage own brand identities" ON public.brand_identities FOR ALL USING (auth.uid() = user_id);
+DROP TRIGGER IF EXISTS update_brand_identities_updated_at ON public.brand_identities;
 CREATE TRIGGER update_brand_identities_updated_at BEFORE UPDATE ON public.brand_identities FOR EACH ROW EXECUTE FUNCTION public.update_updated_at();
 
 -- ============================================
@@ -112,7 +116,9 @@ CREATE TABLE IF NOT EXISTS public.agent_conversations (
 );
 
 ALTER TABLE public.agent_conversations ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Users manage own agent conversations" ON public.agent_conversations;
 CREATE POLICY "Users manage own agent conversations" ON public.agent_conversations FOR ALL USING (auth.uid() = user_id);
+DROP TRIGGER IF EXISTS update_agent_conversations_updated_at ON public.agent_conversations;
 CREATE TRIGGER update_agent_conversations_updated_at BEFORE UPDATE ON public.agent_conversations FOR EACH ROW EXECUTE FUNCTION public.update_updated_at();
 
 -- Index pour performance

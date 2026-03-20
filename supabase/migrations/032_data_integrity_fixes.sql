@@ -122,8 +122,8 @@ CREATE INDEX IF NOT EXISTS idx_connected_accounts_user_provider ON public.connec
 -- Currently leaderboard_scores only has SELECT for all + no INSERT/UPDATE policies.
 -- The handle_new_user() trigger uses SECURITY DEFINER so it bypasses RLS for INSERT.
 -- Add UPDATE policy so users can update their own scores (from xp-engine).
-CREATE POLICY "Users can update own leaderboard"
-  ON public.leaderboard_scores
+DROP POLICY IF EXISTS "Users can update own leaderboard" ON public.leaderboard_scores;
+CREATE POLICY "Users can update own leaderboard" ON public.leaderboard_scores
   FOR UPDATE
   USING (auth.uid() = user_id);
 

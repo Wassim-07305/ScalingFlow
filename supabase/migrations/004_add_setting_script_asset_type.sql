@@ -4,4 +4,4 @@ ALTER TABLE public.sales_assets ADD CONSTRAINT sales_assets_asset_type_check CHE
   'vsl_script', 'thankyou_video_script', 'case_study',
   'email_sequence', 'sms_sequence', 'sales_letter',
   'pitch_deck', 'sales_script', 'lead_magnet', 'setting_script'
-));
+)) NOT VALID;

@@ -28,14 +28,17 @@ CREATE INDEX IF NOT EXISTS idx_dm_unread ON public.direct_messages(receiver_id, 
 -- RLS
 ALTER TABLE public.direct_messages ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "dm_select" ON public.direct_messages;
 CREATE POLICY "dm_select" ON public.direct_messages
   FOR SELECT
   USING (sender_id = auth.uid() OR receiver_id = auth.uid());
 
+DROP POLICY IF EXISTS "dm_insert" ON public.direct_messages;
 CREATE POLICY "dm_insert" ON public.direct_messages
   FOR INSERT
   WITH CHECK (sender_id = auth.uid());
 
+DROP POLICY IF EXISTS "dm_update_read" ON public.direct_messages;
 CREATE POLICY "dm_update_read" ON public.direct_messages
   FOR UPDATE
   USING (receiver_id = auth.uid())

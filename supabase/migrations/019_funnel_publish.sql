@@ -8,6 +8,6 @@ ALTER TABLE funnels ADD COLUMN IF NOT EXISTS custom_domain text;
 CREATE INDEX IF NOT EXISTS idx_funnels_published_slug ON funnels (published_slug) WHERE published = true;
 
 -- Allow public read access to published funnels (for /f/[slug] page)
-CREATE POLICY IF NOT EXISTS "Public can read published funnels"
-  ON funnels FOR SELECT
+DROP POLICY IF EXISTS "Public can read published funnels" ON funnels;
+CREATE POLICY "Public can read published funnels" ON funnels FOR SELECT
   USING (published = true);

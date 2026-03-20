@@ -24,13 +24,13 @@ CREATE INDEX IF NOT EXISTS idx_challenge_completions_user_week
 -- RLS : chaque utilisateur ne voit que ses propres completions
 ALTER TABLE challenge_completions ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Users can view their own challenge completions"
-  ON challenge_completions
+DROP POLICY IF EXISTS "Users can view their own challenge completions" ON challenge_completions;
+CREATE POLICY "Users can view their own challenge completions" ON challenge_completions
   FOR SELECT
   USING (auth.uid() = user_id);
 
-CREATE POLICY "Users can insert their own challenge completions"
-  ON challenge_completions
+DROP POLICY IF EXISTS "Users can insert their own challenge completions" ON challenge_completions;
+CREATE POLICY "Users can insert their own challenge completions" ON challenge_completions
   FOR INSERT
   WITH CHECK (auth.uid() = user_id);
 

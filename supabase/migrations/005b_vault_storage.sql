@@ -22,14 +22,14 @@ VALUES (
 ON CONFLICT (id) DO NOTHING;
 
 -- Storage RLS: users can only access their own files
-CREATE POLICY "Users upload own vault files"
-  ON storage.objects FOR INSERT
+DROP POLICY IF EXISTS "Users upload own vault files" ON storage.objects;
+CREATE POLICY "Users upload own vault files" ON storage.objects FOR INSERT
   WITH CHECK (bucket_id = 'vault-resources' AND (storage.foldername(name))[1] = auth.uid()::text);
 
-CREATE POLICY "Users read own vault files"
-  ON storage.objects FOR SELECT
+DROP POLICY IF EXISTS "Users read own vault files" ON storage.objects;
+CREATE POLICY "Users read own vault files" ON storage.objects FOR SELECT
   USING (bucket_id = 'vault-resources' AND (storage.foldername(name))[1] = auth.uid()::text);
 
-CREATE POLICY "Users delete own vault files"
-  ON storage.objects FOR DELETE
+DROP POLICY IF EXISTS "Users delete own vault files" ON storage.objects;
+CREATE POLICY "Users delete own vault files" ON storage.objects FOR DELETE
   USING (bucket_id = 'vault-resources' AND (storage.foldername(name))[1] = auth.uid()::text);

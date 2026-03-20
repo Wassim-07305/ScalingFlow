@@ -31,20 +31,20 @@ CREATE INDEX IF NOT EXISTS idx_pipeline_leads_created  ON pipeline_leads(created
 -- RLS
 ALTER TABLE pipeline_leads ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Users can view own leads"
-  ON pipeline_leads FOR SELECT
+DROP POLICY IF EXISTS "Users can view own leads" ON pipeline_leads;
+CREATE POLICY "Users can view own leads" ON pipeline_leads FOR SELECT
   USING (user_id = auth.uid());
 
-CREATE POLICY "Users can insert own leads"
-  ON pipeline_leads FOR INSERT
+DROP POLICY IF EXISTS "Users can insert own leads" ON pipeline_leads;
+CREATE POLICY "Users can insert own leads" ON pipeline_leads FOR INSERT
   WITH CHECK (user_id = auth.uid());
 
-CREATE POLICY "Users can update own leads"
-  ON pipeline_leads FOR UPDATE
+DROP POLICY IF EXISTS "Users can update own leads" ON pipeline_leads;
+CREATE POLICY "Users can update own leads" ON pipeline_leads FOR UPDATE
   USING (user_id = auth.uid());
 
-CREATE POLICY "Users can delete own leads"
-  ON pipeline_leads FOR DELETE
+DROP POLICY IF EXISTS "Users can delete own leads" ON pipeline_leads;
+CREATE POLICY "Users can delete own leads" ON pipeline_leads FOR DELETE
   USING (user_id = auth.uid());
 
 -- Auto-update updated_at
@@ -56,6 +56,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS pipeline_leads_updated_at ON pipeline_leads;
 CREATE TRIGGER pipeline_leads_updated_at
   BEFORE UPDATE ON pipeline_leads
   FOR EACH ROW
@@ -81,10 +82,10 @@ CREATE INDEX IF NOT EXISTS idx_pipeline_activities_created ON pipeline_activitie
 -- RLS
 ALTER TABLE pipeline_activities ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Users can view own pipeline activities"
-  ON pipeline_activities FOR SELECT
+DROP POLICY IF EXISTS "Users can view own pipeline activities" ON pipeline_activities;
+CREATE POLICY "Users can view own pipeline activities" ON pipeline_activities FOR SELECT
   USING (user_id = auth.uid());
 
-CREATE POLICY "Users can insert own pipeline activities"
-  ON pipeline_activities FOR INSERT
+DROP POLICY IF EXISTS "Users can insert own pipeline activities" ON pipeline_activities;
+CREATE POLICY "Users can insert own pipeline activities" ON pipeline_activities FOR INSERT
   WITH CHECK (user_id = auth.uid());

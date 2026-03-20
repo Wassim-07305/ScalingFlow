@@ -10,8 +10,8 @@
 DROP POLICY IF EXISTS "Profiles are viewable by authenticated users" ON public.profiles;
 
 -- Users can only read their own full profile
-CREATE POLICY "Users can view own profile"
-  ON public.profiles FOR SELECT
+DROP POLICY IF EXISTS "Users can view own profile" ON public.profiles;
+CREATE POLICY "Users can view own profile" ON public.profiles FOR SELECT
   USING (auth.uid() = id);
 
 -- 2. Create a safe public view for leaderboard/community display
@@ -35,8 +35,8 @@ ALTER TABLE rate_limits ENABLE ROW LEVEL SECURITY;
 
 -- Rate limits are managed by the server via the anon key user session,
 -- so we allow authenticated users to manage their own entries
-CREATE POLICY "Service can manage rate limits"
-  ON rate_limits FOR ALL
+DROP POLICY IF EXISTS "Service can manage rate limits" ON rate_limits;
+CREATE POLICY "Service can manage rate limits" ON rate_limits FOR ALL
   USING (true)
   WITH CHECK (true);
 

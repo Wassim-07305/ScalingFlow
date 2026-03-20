@@ -77,34 +77,34 @@ ALTER TABLE client_deals       ENABLE ROW LEVEL SECURITY;
 ALTER TABLE client_activities  ENABLE ROW LEVEL SECURITY;
 
 -- clients
-CREATE POLICY "Users can view own clients"
-  ON clients FOR SELECT USING (auth.uid() = user_id);
-CREATE POLICY "Users can insert own clients"
-  ON clients FOR INSERT WITH CHECK (auth.uid() = user_id);
-CREATE POLICY "Users can update own clients"
-  ON clients FOR UPDATE USING (auth.uid() = user_id);
-CREATE POLICY "Users can delete own clients"
-  ON clients FOR DELETE USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can view own clients" ON clients;
+CREATE POLICY "Users can view own clients" ON clients FOR SELECT USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can insert own clients" ON clients;
+CREATE POLICY "Users can insert own clients" ON clients FOR INSERT WITH CHECK (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can update own clients" ON clients;
+CREATE POLICY "Users can update own clients" ON clients FOR UPDATE USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can delete own clients" ON clients;
+CREATE POLICY "Users can delete own clients" ON clients FOR DELETE USING (auth.uid() = user_id);
 
 -- client_deals
-CREATE POLICY "Users can view own deals"
-  ON client_deals FOR SELECT USING (auth.uid() = user_id);
-CREATE POLICY "Users can insert own deals"
-  ON client_deals FOR INSERT WITH CHECK (auth.uid() = user_id);
-CREATE POLICY "Users can update own deals"
-  ON client_deals FOR UPDATE USING (auth.uid() = user_id);
-CREATE POLICY "Users can delete own deals"
-  ON client_deals FOR DELETE USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can view own deals" ON client_deals;
+CREATE POLICY "Users can view own deals" ON client_deals FOR SELECT USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can insert own deals" ON client_deals;
+CREATE POLICY "Users can insert own deals" ON client_deals FOR INSERT WITH CHECK (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can update own deals" ON client_deals;
+CREATE POLICY "Users can update own deals" ON client_deals FOR UPDATE USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can delete own deals" ON client_deals;
+CREATE POLICY "Users can delete own deals" ON client_deals FOR DELETE USING (auth.uid() = user_id);
 
 -- client_activities
-CREATE POLICY "Users can view own activities"
-  ON client_activities FOR SELECT USING (auth.uid() = user_id);
-CREATE POLICY "Users can insert own activities"
-  ON client_activities FOR INSERT WITH CHECK (auth.uid() = user_id);
-CREATE POLICY "Users can update own activities"
-  ON client_activities FOR UPDATE USING (auth.uid() = user_id);
-CREATE POLICY "Users can delete own activities"
-  ON client_activities FOR DELETE USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can view own activities" ON client_activities;
+CREATE POLICY "Users can view own activities" ON client_activities FOR SELECT USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can insert own activities" ON client_activities;
+CREATE POLICY "Users can insert own activities" ON client_activities FOR INSERT WITH CHECK (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can update own activities" ON client_activities;
+CREATE POLICY "Users can update own activities" ON client_activities FOR UPDATE USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can delete own activities" ON client_activities;
+CREATE POLICY "Users can delete own activities" ON client_activities FOR DELETE USING (auth.uid() = user_id);
 
 -- ─── Trigger : updated_at auto ───────────────────────────────
 CREATE OR REPLACE FUNCTION update_clients_updated_at()
@@ -115,6 +115,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS trg_clients_updated_at ON clients;
 DROP TRIGGER IF EXISTS trg_clients_updated_at ON clients;
 CREATE TRIGGER trg_clients_updated_at
   BEFORE UPDATE ON clients

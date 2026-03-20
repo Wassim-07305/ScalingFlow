@@ -9,4 +9,5 @@ CREATE TABLE IF NOT EXISTS academy_quiz_results (
 );
 CREATE INDEX IF NOT EXISTS idx_quiz_results_user ON academy_quiz_results(user_id);
 ALTER TABLE academy_quiz_results ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Users manage own quiz results" ON academy_quiz_results;
 CREATE POLICY "Users manage own quiz results" ON academy_quiz_results FOR ALL USING (auth.uid() = user_id);

@@ -151,38 +151,46 @@ END $$;
 
 -- Smart alerts policies
 DO $$ BEGIN
-  CREATE POLICY "Users see own alerts" ON smart_alerts FOR SELECT USING (auth.uid() = user_id);
-  CREATE POLICY "Users update own alerts" ON smart_alerts FOR UPDATE USING (auth.uid() = user_id);
+  DROP POLICY IF EXISTS "Users see own alerts" ON smart_alerts;
+CREATE POLICY "Users see own alerts" ON smart_alerts FOR SELECT USING (auth.uid() = user_id);
+  DROP POLICY IF EXISTS "Users update own alerts" ON smart_alerts;
+CREATE POLICY "Users update own alerts" ON smart_alerts FOR UPDATE USING (auth.uid() = user_id);
 EXCEPTION WHEN duplicate_object THEN NULL;
 END $$;
 
 -- Content adaptations policies
 DO $$ BEGIN
-  CREATE POLICY "Users see own adaptations" ON content_adaptations FOR SELECT USING (auth.uid() = user_id);
+  DROP POLICY IF EXISTS "Users see own adaptations" ON content_adaptations;
+CREATE POLICY "Users see own adaptations" ON content_adaptations FOR SELECT USING (auth.uid() = user_id);
 EXCEPTION WHEN duplicate_object THEN NULL;
 END $$;
 
 -- Daily plans policies
 DO $$ BEGIN
-  CREATE POLICY "Users manage own plans" ON daily_plans FOR ALL USING (auth.uid() = user_id);
+  DROP POLICY IF EXISTS "Users manage own plans" ON daily_plans;
+CREATE POLICY "Users manage own plans" ON daily_plans FOR ALL USING (auth.uid() = user_id);
 EXCEPTION WHEN duplicate_object THEN NULL;
 END $$;
 
 -- Whitelabel policies
 DO $$ BEGIN
-  CREATE POLICY "Users manage own wl config" ON whitelabel_config FOR ALL USING (auth.uid() = user_id);
-  CREATE POLICY "Users manage own wl reports" ON whitelabel_reports FOR ALL USING (auth.uid() = user_id);
+  DROP POLICY IF EXISTS "Users manage own wl config" ON whitelabel_config;
+CREATE POLICY "Users manage own wl config" ON whitelabel_config FOR ALL USING (auth.uid() = user_id);
+  DROP POLICY IF EXISTS "Users manage own wl reports" ON whitelabel_reports;
+CREATE POLICY "Users manage own wl reports" ON whitelabel_reports FOR ALL USING (auth.uid() = user_id);
 EXCEPTION WHEN duplicate_object THEN NULL;
 END $$;
 
 -- Funnel leads policies
 DO $$ BEGIN
-  CREATE POLICY "Users see own leads" ON funnel_leads FOR ALL USING (auth.uid() = user_id);
+  DROP POLICY IF EXISTS "Users see own leads" ON funnel_leads;
+CREATE POLICY "Users see own leads" ON funnel_leads FOR ALL USING (auth.uid() = user_id);
 EXCEPTION WHEN duplicate_object THEN NULL;
 END $$;
 
 -- Revenue entries policies
 DO $$ BEGIN
-  CREATE POLICY "Users manage own revenue" ON revenue_entries FOR ALL USING (auth.uid() = user_id);
+  DROP POLICY IF EXISTS "Users manage own revenue" ON revenue_entries;
+CREATE POLICY "Users manage own revenue" ON revenue_entries FOR ALL USING (auth.uid() = user_id);
 EXCEPTION WHEN duplicate_object THEN NULL;
 END $$;

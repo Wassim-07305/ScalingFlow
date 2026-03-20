@@ -19,7 +19,7 @@ ALTER TABLE connected_accounts
     'unipile_linkedin', 'unipile_whatsapp', 'unipile_instagram',
     'unipile_messenger', 'unipile_telegram', 'unipile_twitter',
     'unipile_mail', 'unipile_google', 'unipile_outlook', 'unipile_imap'
-  ));
+  )) NOT VALID;
 
 -- 2. Extend audience_type constraint to include audience builder types
 ALTER TABLE meta_audiences
@@ -30,7 +30,7 @@ ALTER TABLE meta_audiences
   CHECK (audience_type IN (
     'custom', 'lookalike', 'saved',
     'cold', 'warm', 'hot', 'exclusion'
-  ));
+  )) NOT VALID;
 
 -- 3. Extend audience status constraint to include 'targeting' (interest-based)
 ALTER TABLE meta_audiences
@@ -38,4 +38,4 @@ ALTER TABLE meta_audiences
 
 ALTER TABLE meta_audiences
   ADD CONSTRAINT meta_audiences_status_check
-  CHECK (status IN ('draft', 'ready', 'active', 'error', 'targeting'));
+  CHECK (status IN ('draft', 'ready', 'active', 'error', 'targeting')) NOT VALID;

@@ -22,6 +22,7 @@ CREATE TABLE IF NOT EXISTS public.ab_tests (
 );
 
 ALTER TABLE public.ab_tests ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Users manage own AB tests" ON public.ab_tests;
 CREATE POLICY "Users manage own AB tests" ON public.ab_tests
   FOR ALL USING (auth.uid() = user_id);
 
@@ -41,6 +42,7 @@ CREATE TABLE IF NOT EXISTS public.ltv_cac_entries (
 );
 
 ALTER TABLE public.ltv_cac_entries ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Users manage own LTV/CAC entries" ON public.ltv_cac_entries;
 CREATE POLICY "Users manage own LTV/CAC entries" ON public.ltv_cac_entries
   FOR ALL USING (auth.uid() = user_id);
 
@@ -63,6 +65,7 @@ CREATE TABLE IF NOT EXISTS public.daily_performance_metrics (
 );
 
 ALTER TABLE public.daily_performance_metrics ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Users manage own daily metrics" ON public.daily_performance_metrics;
 CREATE POLICY "Users manage own daily metrics" ON public.daily_performance_metrics
   FOR ALL USING (auth.uid() = user_id);
 
@@ -79,5 +82,6 @@ CREATE TABLE IF NOT EXISTS public.growth_checkpoints (
 );
 
 ALTER TABLE public.growth_checkpoints ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Users manage own growth checkpoints" ON public.growth_checkpoints;
 CREATE POLICY "Users manage own growth checkpoints" ON public.growth_checkpoints
   FOR ALL USING (auth.uid() = user_id);

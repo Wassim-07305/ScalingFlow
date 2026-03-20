@@ -10,7 +10,7 @@ CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 -- USERS & PROFILES
 -- ============================================
 
-CREATE TABLE public.profiles (
+CREATE TABLE IF NOT EXISTS public.profiles (
   id UUID REFERENCES auth.users(id) ON DELETE CASCADE PRIMARY KEY,
   email TEXT NOT NULL,
   full_name TEXT,
@@ -63,7 +63,7 @@ CREATE TABLE public.profiles (
 -- MARKET ANALYSIS
 -- ============================================
 
-CREATE TABLE public.market_analyses (
+CREATE TABLE IF NOT EXISTS public.market_analyses (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
 
@@ -87,7 +87,7 @@ CREATE TABLE public.market_analyses (
 -- OFFERS
 -- ============================================
 
-CREATE TABLE public.offers (
+CREATE TABLE IF NOT EXISTS public.offers (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
   market_analysis_id UUID REFERENCES public.market_analyses(id),
@@ -115,7 +115,7 @@ CREATE TABLE public.offers (
 -- FUNNELS
 -- ============================================
 
-CREATE TABLE public.funnels (
+CREATE TABLE IF NOT EXISTS public.funnels (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
   offer_id UUID REFERENCES public.offers(id),
@@ -142,7 +142,7 @@ CREATE TABLE public.funnels (
 -- SALES ASSETS
 -- ============================================
 
-CREATE TABLE public.sales_assets (
+CREATE TABLE IF NOT EXISTS public.sales_assets (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
   offer_id UUID REFERENCES public.offers(id),
@@ -167,7 +167,7 @@ CREATE TABLE public.sales_assets (
 -- ADS & CAMPAIGNS
 -- ============================================
 
-CREATE TABLE public.ad_creatives (
+CREATE TABLE IF NOT EXISTS public.ad_creatives (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
 
@@ -196,7 +196,7 @@ CREATE TABLE public.ad_creatives (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE TABLE public.ad_campaigns (
+CREATE TABLE IF NOT EXISTS public.ad_campaigns (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
 
@@ -228,7 +228,7 @@ CREATE TABLE public.ad_campaigns (
 -- CONTENT
 -- ============================================
 
-CREATE TABLE public.content_pieces (
+CREATE TABLE IF NOT EXISTS public.content_pieces (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
 
@@ -261,7 +261,7 @@ CREATE TABLE public.content_pieces (
 -- ACADEMY & VIDEOS
 -- ============================================
 
-CREATE TABLE public.academy_modules (
+CREATE TABLE IF NOT EXISTS public.academy_modules (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
 
   module_name TEXT NOT NULL,
@@ -277,7 +277,7 @@ CREATE TABLE public.academy_modules (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE TABLE public.academy_videos (
+CREATE TABLE IF NOT EXISTS public.academy_videos (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   module_id UUID REFERENCES public.academy_modules(id) ON DELETE CASCADE NOT NULL,
 
@@ -293,7 +293,7 @@ CREATE TABLE public.academy_videos (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE TABLE public.video_progress (
+CREATE TABLE IF NOT EXISTS public.video_progress (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
   video_id UUID REFERENCES public.academy_videos(id) ON DELETE CASCADE NOT NULL,
@@ -309,7 +309,7 @@ CREATE TABLE public.video_progress (
 -- ROADMAP & TASKS
 -- ============================================
 
-CREATE TABLE public.milestones (
+CREATE TABLE IF NOT EXISTS public.milestones (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
 
   title TEXT NOT NULL,
@@ -322,7 +322,7 @@ CREATE TABLE public.milestones (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE TABLE public.user_milestones (
+CREATE TABLE IF NOT EXISTS public.user_milestones (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
   milestone_id UUID REFERENCES public.milestones(id) ON DELETE CASCADE NOT NULL,
@@ -333,7 +333,7 @@ CREATE TABLE public.user_milestones (
   UNIQUE(user_id, milestone_id)
 );
 
-CREATE TABLE public.tasks (
+CREATE TABLE IF NOT EXISTS public.tasks (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
 
@@ -360,7 +360,7 @@ CREATE TABLE public.tasks (
 -- COMMUNITY
 -- ============================================
 
-CREATE TABLE public.community_posts (
+CREATE TABLE IF NOT EXISTS public.community_posts (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
 
@@ -379,7 +379,7 @@ CREATE TABLE public.community_posts (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE TABLE public.community_comments (
+CREATE TABLE IF NOT EXISTS public.community_comments (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   post_id UUID REFERENCES public.community_posts(id) ON DELETE CASCADE NOT NULL,
   user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
@@ -389,7 +389,7 @@ CREATE TABLE public.community_comments (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE TABLE public.community_likes (
+CREATE TABLE IF NOT EXISTS public.community_likes (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   post_id UUID REFERENCES public.community_posts(id) ON DELETE CASCADE NOT NULL,
   user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
@@ -402,7 +402,7 @@ CREATE TABLE public.community_likes (
 -- LEADERBOARD
 -- ============================================
 
-CREATE TABLE public.leaderboard_scores (
+CREATE TABLE IF NOT EXISTS public.leaderboard_scores (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL UNIQUE,
 
@@ -424,7 +424,7 @@ CREATE TABLE public.leaderboard_scores (
 -- NOTIFICATIONS
 -- ============================================
 
-CREATE TABLE public.notifications (
+CREATE TABLE IF NOT EXISTS public.notifications (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
 
@@ -442,7 +442,7 @@ CREATE TABLE public.notifications (
 -- ACTIVITY LOG (for streaks & heatmap)
 -- ============================================
 
-CREATE TABLE public.activity_log (
+CREATE TABLE IF NOT EXISTS public.activity_log (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
 
@@ -452,7 +452,7 @@ CREATE TABLE public.activity_log (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE INDEX idx_activity_log_user_date ON public.activity_log (user_id, created_at);
+CREATE INDEX IF NOT EXISTS idx_activity_log_user_date ON public.activity_log (user_id, created_at);
 
 -- ============================================
 -- ROW LEVEL SECURITY (RLS)
@@ -477,41 +477,69 @@ ALTER TABLE public.notifications ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.activity_log ENABLE ROW LEVEL SECURITY;
 
 -- Profiles
+DROP POLICY IF EXISTS "Profiles are viewable by authenticated users" ON public.profiles;
 CREATE POLICY "Profiles are viewable by authenticated users" ON public.profiles FOR SELECT USING (auth.role() = 'authenticated');
+DROP POLICY IF EXISTS "Users can update own profile" ON public.profiles;
 CREATE POLICY "Users can update own profile" ON public.profiles FOR UPDATE USING (auth.uid() = id);
+DROP POLICY IF EXISTS "Users can insert own profile" ON public.profiles;
 CREATE POLICY "Users can insert own profile" ON public.profiles FOR INSERT WITH CHECK (auth.uid() = id);
 
 -- User-owned tables
+DROP POLICY IF EXISTS "Users manage own market analyses" ON public.market_analyses;
 CREATE POLICY "Users manage own market analyses" ON public.market_analyses FOR ALL USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users manage own offers" ON public.offers;
 CREATE POLICY "Users manage own offers" ON public.offers FOR ALL USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users manage own funnels" ON public.funnels;
 CREATE POLICY "Users manage own funnels" ON public.funnels FOR ALL USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users manage own sales assets" ON public.sales_assets;
 CREATE POLICY "Users manage own sales assets" ON public.sales_assets FOR ALL USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users manage own ad creatives" ON public.ad_creatives;
 CREATE POLICY "Users manage own ad creatives" ON public.ad_creatives FOR ALL USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users manage own ad campaigns" ON public.ad_campaigns;
 CREATE POLICY "Users manage own ad campaigns" ON public.ad_campaigns FOR ALL USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users manage own content" ON public.content_pieces;
 CREATE POLICY "Users manage own content" ON public.content_pieces FOR ALL USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users manage own video progress" ON public.video_progress;
 CREATE POLICY "Users manage own video progress" ON public.video_progress FOR ALL USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users manage own tasks" ON public.tasks;
 CREATE POLICY "Users manage own tasks" ON public.tasks FOR ALL USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users manage own milestones" ON public.user_milestones;
 CREATE POLICY "Users manage own milestones" ON public.user_milestones FOR ALL USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users manage own notifications" ON public.notifications;
 CREATE POLICY "Users manage own notifications" ON public.notifications FOR ALL USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users manage own activity log" ON public.activity_log;
 CREATE POLICY "Users manage own activity log" ON public.activity_log FOR ALL USING (auth.uid() = user_id);
 
 -- Community
+DROP POLICY IF EXISTS "Community posts are viewable by all" ON public.community_posts;
 CREATE POLICY "Community posts are viewable by all" ON public.community_posts FOR SELECT USING (auth.role() = 'authenticated');
+DROP POLICY IF EXISTS "Users manage own posts" ON public.community_posts;
 CREATE POLICY "Users manage own posts" ON public.community_posts FOR INSERT WITH CHECK (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users update own posts" ON public.community_posts;
 CREATE POLICY "Users update own posts" ON public.community_posts FOR UPDATE USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users delete own posts" ON public.community_posts;
 CREATE POLICY "Users delete own posts" ON public.community_posts FOR DELETE USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Comments are viewable by all" ON public.community_comments;
 CREATE POLICY "Comments are viewable by all" ON public.community_comments FOR SELECT USING (auth.role() = 'authenticated');
+DROP POLICY IF EXISTS "Users manage own comments" ON public.community_comments;
 CREATE POLICY "Users manage own comments" ON public.community_comments FOR INSERT WITH CHECK (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users delete own comments" ON public.community_comments;
 CREATE POLICY "Users delete own comments" ON public.community_comments FOR DELETE USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Likes are viewable by all" ON public.community_likes;
 CREATE POLICY "Likes are viewable by all" ON public.community_likes FOR SELECT USING (auth.role() = 'authenticated');
+DROP POLICY IF EXISTS "Users manage own likes" ON public.community_likes;
 CREATE POLICY "Users manage own likes" ON public.community_likes FOR ALL USING (auth.uid() = user_id);
 
 -- Leaderboard & Academy
+DROP POLICY IF EXISTS "Leaderboard viewable by all" ON public.leaderboard_scores;
 CREATE POLICY "Leaderboard viewable by all" ON public.leaderboard_scores FOR SELECT USING (auth.role() = 'authenticated');
+DROP POLICY IF EXISTS "Academy modules viewable by all" ON public.academy_modules;
 CREATE POLICY "Academy modules viewable by all" ON public.academy_modules FOR SELECT USING (auth.role() = 'authenticated');
+DROP POLICY IF EXISTS "Academy videos viewable by all" ON public.academy_videos;
 CREATE POLICY "Academy videos viewable by all" ON public.academy_videos FOR SELECT USING (auth.role() = 'authenticated');
+DROP POLICY IF EXISTS "Milestones viewable by all" ON public.milestones;
 CREATE POLICY "Milestones viewable by all" ON public.milestones FOR SELECT USING (auth.role() = 'authenticated');
 
 -- ============================================
@@ -528,15 +556,18 @@ BEGIN
     NEW.email,
     NEW.raw_user_meta_data->>'full_name',
     NEW.raw_user_meta_data->>'avatar_url'
-  );
+  )
+ON CONFLICT DO NOTHING;
 
   INSERT INTO public.leaderboard_scores (user_id)
-  VALUES (NEW.id);
+  VALUES (NEW.id)
+ON CONFLICT DO NOTHING;
 
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
@@ -550,11 +581,17 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS update_profiles_updated_at ON public.profiles;
 CREATE TRIGGER update_profiles_updated_at BEFORE UPDATE ON public.profiles FOR EACH ROW EXECUTE FUNCTION public.update_updated_at();
+DROP TRIGGER IF EXISTS update_offers_updated_at ON public.offers;
 CREATE TRIGGER update_offers_updated_at BEFORE UPDATE ON public.offers FOR EACH ROW EXECUTE FUNCTION public.update_updated_at();
+DROP TRIGGER IF EXISTS update_funnels_updated_at ON public.funnels;
 CREATE TRIGGER update_funnels_updated_at BEFORE UPDATE ON public.funnels FOR EACH ROW EXECUTE FUNCTION public.update_updated_at();
+DROP TRIGGER IF EXISTS update_sales_assets_updated_at ON public.sales_assets;
 CREATE TRIGGER update_sales_assets_updated_at BEFORE UPDATE ON public.sales_assets FOR EACH ROW EXECUTE FUNCTION public.update_updated_at();
+DROP TRIGGER IF EXISTS update_ad_creatives_updated_at ON public.ad_creatives;
 CREATE TRIGGER update_ad_creatives_updated_at BEFORE UPDATE ON public.ad_creatives FOR EACH ROW EXECUTE FUNCTION public.update_updated_at();
+DROP TRIGGER IF EXISTS update_ad_campaigns_updated_at ON public.ad_campaigns;
 CREATE TRIGGER update_ad_campaigns_updated_at BEFORE UPDATE ON public.ad_campaigns FOR EACH ROW EXECUTE FUNCTION public.update_updated_at();
 
 -- Update streak on activity
@@ -575,6 +612,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
+DROP TRIGGER IF EXISTS on_activity_logged ON public.activity_log;
 CREATE TRIGGER on_activity_logged
   AFTER INSERT ON public.activity_log
   FOR EACH ROW EXECUTE FUNCTION public.update_user_streak();

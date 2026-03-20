@@ -122,34 +122,34 @@ alter table commissions enable row level security;
 alter table payouts enable row level security;
 
 -- affiliate_programs
-create policy "Owner can manage their affiliate program"
-  on affiliate_programs for all
+DROP POLICY IF EXISTS "Owner can manage their affiliate program" ON affiliate_programs;
+CREATE POLICY "Owner can manage their affiliate program" ON affiliate_programs for all
   using (auth.uid() = owner_id);
 
-create policy "Admins can view all affiliate programs"
-  on affiliate_programs for select
+DROP POLICY IF EXISTS "Admins can view all affiliate programs" ON affiliate_programs;
+CREATE POLICY "Admins can view all affiliate programs" ON affiliate_programs for select
   using (
     exists (
       select 1 from profiles where id = auth.uid() and role = 'admin'
     )
   );
 
-create policy "Active programs are publicly readable"
-  on affiliate_programs for select
+DROP POLICY IF EXISTS "Active programs are publicly readable" ON affiliate_programs;
+CREATE POLICY "Active programs are publicly readable" ON affiliate_programs for select
   using (is_active = true);
 
 -- affiliates
-create policy "Affiliates can view their own record"
-  on affiliates for select
+DROP POLICY IF EXISTS "Affiliates can view their own record" ON affiliates;
+CREATE POLICY "Affiliates can view their own record" ON affiliates for select
   using (auth.uid() = user_id);
 
-create policy "Affiliates can update their own record (limited)"
-  on affiliates for update
+DROP POLICY IF EXISTS "Affiliates can update their own record (limited)" ON affiliates;
+CREATE POLICY "Affiliates can update their own record (limited)" ON affiliates for update
   using (auth.uid() = user_id)
   with check (auth.uid() = user_id);
 
-create policy "Program owners can view all affiliates of their program"
-  on affiliates for select
+DROP POLICY IF EXISTS "Program owners can view all affiliates of their program" ON affiliates;
+CREATE POLICY "Program owners can view all affiliates of their program" ON affiliates for select
   using (
     exists (
       select 1 from affiliate_programs
@@ -158,8 +158,8 @@ create policy "Program owners can view all affiliates of their program"
     )
   );
 
-create policy "Program owners can manage affiliates of their program"
-  on affiliates for update
+DROP POLICY IF EXISTS "Program owners can manage affiliates of their program" ON affiliates;
+CREATE POLICY "Program owners can manage affiliates of their program" ON affiliates for update
   using (
     exists (
       select 1 from affiliate_programs
@@ -168,21 +168,21 @@ create policy "Program owners can manage affiliates of their program"
     )
   );
 
-create policy "Admins can manage all affiliates"
-  on affiliates for all
+DROP POLICY IF EXISTS "Admins can manage all affiliates" ON affiliates;
+CREATE POLICY "Admins can manage all affiliates" ON affiliates for all
   using (
     exists (
       select 1 from profiles where id = auth.uid() and role = 'admin'
     )
   );
 
-create policy "Service role can insert affiliates"
-  on affiliates for insert
+DROP POLICY IF EXISTS "Service role can insert affiliates" ON affiliates;
+CREATE POLICY "Service role can insert affiliates" ON affiliates for insert
   with check (true);
 
 -- referrals
-create policy "Affiliates can view their own referrals"
-  on referrals for select
+DROP POLICY IF EXISTS "Affiliates can view their own referrals" ON referrals;
+CREATE POLICY "Affiliates can view their own referrals" ON referrals for select
   using (
     exists (
       select 1 from affiliates
@@ -191,8 +191,8 @@ create policy "Affiliates can view their own referrals"
     )
   );
 
-create policy "Program owners can view referrals of their program"
-  on referrals for select
+DROP POLICY IF EXISTS "Program owners can view referrals of their program" ON referrals;
+CREATE POLICY "Program owners can view referrals of their program" ON referrals for select
   using (
     exists (
       select 1 from affiliates a
@@ -202,25 +202,25 @@ create policy "Program owners can view referrals of their program"
     )
   );
 
-create policy "Admins can view all referrals"
-  on referrals for select
+DROP POLICY IF EXISTS "Admins can view all referrals" ON referrals;
+CREATE POLICY "Admins can view all referrals" ON referrals for select
   using (
     exists (
       select 1 from profiles where id = auth.uid() and role = 'admin'
     )
   );
 
-create policy "Service role can insert and update referrals"
-  on referrals for insert
+DROP POLICY IF EXISTS "Service role can insert and update referrals" ON referrals;
+CREATE POLICY "Service role can insert and update referrals" ON referrals for insert
   with check (true);
 
-create policy "Service role can update referrals"
-  on referrals for update
+DROP POLICY IF EXISTS "Service role can update referrals" ON referrals;
+CREATE POLICY "Service role can update referrals" ON referrals for update
   using (true);
 
 -- commissions
-create policy "Affiliates can view their own commissions"
-  on commissions for select
+DROP POLICY IF EXISTS "Affiliates can view their own commissions" ON commissions;
+CREATE POLICY "Affiliates can view their own commissions" ON commissions for select
   using (
     exists (
       select 1 from affiliates
@@ -229,8 +229,8 @@ create policy "Affiliates can view their own commissions"
     )
   );
 
-create policy "Program owners can view commissions of their program"
-  on commissions for select
+DROP POLICY IF EXISTS "Program owners can view commissions of their program" ON commissions;
+CREATE POLICY "Program owners can view commissions of their program" ON commissions for select
   using (
     exists (
       select 1 from affiliates a
@@ -240,25 +240,25 @@ create policy "Program owners can view commissions of their program"
     )
   );
 
-create policy "Admins can manage all commissions"
-  on commissions for all
+DROP POLICY IF EXISTS "Admins can manage all commissions" ON commissions;
+CREATE POLICY "Admins can manage all commissions" ON commissions for all
   using (
     exists (
       select 1 from profiles where id = auth.uid() and role = 'admin'
     )
   );
 
-create policy "Service role can insert commissions"
-  on commissions for insert
+DROP POLICY IF EXISTS "Service role can insert commissions" ON commissions;
+CREATE POLICY "Service role can insert commissions" ON commissions for insert
   with check (true);
 
-create policy "Service role can update commissions"
-  on commissions for update
+DROP POLICY IF EXISTS "Service role can update commissions" ON commissions;
+CREATE POLICY "Service role can update commissions" ON commissions for update
   using (true);
 
 -- payouts
-create policy "Affiliates can view their own payouts"
-  on payouts for select
+DROP POLICY IF EXISTS "Affiliates can view their own payouts" ON payouts;
+CREATE POLICY "Affiliates can view their own payouts" ON payouts for select
   using (
     exists (
       select 1 from affiliates
@@ -267,8 +267,8 @@ create policy "Affiliates can view their own payouts"
     )
   );
 
-create policy "Program owners can view payouts of their program"
-  on payouts for select
+DROP POLICY IF EXISTS "Program owners can view payouts of their program" ON payouts;
+CREATE POLICY "Program owners can view payouts of their program" ON payouts for select
   using (
     exists (
       select 1 from affiliates a
@@ -278,27 +278,28 @@ create policy "Program owners can view payouts of their program"
     )
   );
 
-create policy "Admins can manage all payouts"
-  on payouts for all
+DROP POLICY IF EXISTS "Admins can manage all payouts" ON payouts;
+CREATE POLICY "Admins can manage all payouts" ON payouts for all
   using (
     exists (
       select 1 from profiles where id = auth.uid() and role = 'admin'
     )
   );
 
-create policy "Service role can insert and update payouts"
-  on payouts for insert
+DROP POLICY IF EXISTS "Service role can insert and update payouts" ON payouts;
+CREATE POLICY "Service role can insert and update payouts" ON payouts for insert
   with check (true);
 
-create policy "Service role can update payouts"
-  on payouts for update
+DROP POLICY IF EXISTS "Service role can update payouts" ON payouts;
+CREATE POLICY "Service role can update payouts" ON payouts for update
   using (true);
 
 -- ─── 9. Trigger updated_at pour affiliate_programs ───────────────────────────
 
+DROP TRIGGER IF EXISTS set_updated_at_affiliate_programs ON affiliate_programs;
 create trigger set_updated_at_affiliate_programs
   before update on affiliate_programs
-  for each row execute function update_updated_at_column();
+  for each row execute function update_updated_at();
 
 -- ─── 10. Programme par défaut (sera créé via API au 1er usage) ───────────────
 -- Note: Le programme est créé automatiquement via /api/affiliates/register

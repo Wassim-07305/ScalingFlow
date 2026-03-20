@@ -15,19 +15,19 @@ VALUES (
 ON CONFLICT (id) DO NOTHING;
 
 -- Storage RLS: users can only upload/update their own avatar
-CREATE POLICY "Users upload own avatar"
-  ON storage.objects FOR INSERT
+DROP POLICY IF EXISTS "Users upload own avatar" ON storage.objects;
+CREATE POLICY "Users upload own avatar" ON storage.objects FOR INSERT
   WITH CHECK (bucket_id = 'avatars' AND (storage.foldername(name))[1] = auth.uid()::text);
 
-CREATE POLICY "Users update own avatar"
-  ON storage.objects FOR UPDATE
+DROP POLICY IF EXISTS "Users update own avatar" ON storage.objects;
+CREATE POLICY "Users update own avatar" ON storage.objects FOR UPDATE
   USING (bucket_id = 'avatars' AND (storage.foldername(name))[1] = auth.uid()::text);
 
-CREATE POLICY "Users delete own avatar"
-  ON storage.objects FOR DELETE
+DROP POLICY IF EXISTS "Users delete own avatar" ON storage.objects;
+CREATE POLICY "Users delete own avatar" ON storage.objects FOR DELETE
   USING (bucket_id = 'avatars' AND (storage.foldername(name))[1] = auth.uid()::text);
 
 -- Public read access for avatars (since bucket is public)
-CREATE POLICY "Public read avatars"
-  ON storage.objects FOR SELECT
+DROP POLICY IF EXISTS "Public read avatars" ON storage.objects;
+CREATE POLICY "Public read avatars" ON storage.objects FOR SELECT
   USING (bucket_id = 'avatars');

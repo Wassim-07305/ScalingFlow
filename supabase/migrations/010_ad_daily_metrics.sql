@@ -30,18 +30,18 @@ CREATE INDEX IF NOT EXISTS idx_ad_daily_metrics_user_date
 -- RLS
 ALTER TABLE ad_daily_metrics ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Users can view their own ad metrics"
-  ON ad_daily_metrics
+DROP POLICY IF EXISTS "Users can view their own ad metrics" ON ad_daily_metrics;
+CREATE POLICY "Users can view their own ad metrics" ON ad_daily_metrics
   FOR SELECT
   USING (auth.uid() = user_id);
 
-CREATE POLICY "Users can insert their own ad metrics"
-  ON ad_daily_metrics
+DROP POLICY IF EXISTS "Users can insert their own ad metrics" ON ad_daily_metrics;
+CREATE POLICY "Users can insert their own ad metrics" ON ad_daily_metrics
   FOR INSERT
   WITH CHECK (auth.uid() = user_id);
 
-CREATE POLICY "Users can update their own ad metrics"
-  ON ad_daily_metrics
+DROP POLICY IF EXISTS "Users can update their own ad metrics" ON ad_daily_metrics;
+CREATE POLICY "Users can update their own ad metrics" ON ad_daily_metrics
   FOR UPDATE
   USING (auth.uid() = user_id);
 
@@ -54,6 +54,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS trigger_ad_daily_metrics_updated_at ON ad_daily_metrics;
 CREATE TRIGGER trigger_ad_daily_metrics_updated_at
   BEFORE UPDATE ON ad_daily_metrics
   FOR EACH ROW

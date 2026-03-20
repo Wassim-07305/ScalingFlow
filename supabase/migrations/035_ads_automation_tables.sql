@@ -38,8 +38,8 @@ CREATE INDEX IF NOT EXISTS idx_ad_alerts_unresolved
 
 ALTER TABLE public.ad_alerts ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Users manage own ad alerts"
-  ON public.ad_alerts FOR ALL USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users manage own ad alerts" ON public.ad_alerts;
+CREATE POLICY "Users manage own ad alerts" ON public.ad_alerts FOR ALL USING (auth.uid() = user_id);
 
 -- ─── Table: ad_decisions (Décisions automatiques #70) ───────────
 CREATE TABLE IF NOT EXISTS public.ad_decisions (
@@ -77,8 +77,8 @@ CREATE INDEX IF NOT EXISTS idx_ad_decisions_status
 
 ALTER TABLE public.ad_decisions ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Users manage own ad decisions"
-  ON public.ad_decisions FOR ALL USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users manage own ad decisions" ON public.ad_decisions;
+CREATE POLICY "Users manage own ad decisions" ON public.ad_decisions FOR ALL USING (auth.uid() = user_id);
 
 -- ─── Table: ad_scaling_history (Scaling progressif #72) ─────────
 CREATE TABLE IF NOT EXISTS public.ad_scaling_history (
@@ -119,8 +119,8 @@ CREATE INDEX IF NOT EXISTS idx_ad_scaling_pending_check
 
 ALTER TABLE public.ad_scaling_history ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Users manage own ad scaling history"
-  ON public.ad_scaling_history FOR ALL USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users manage own ad scaling history" ON public.ad_scaling_history;
+CREATE POLICY "Users manage own ad scaling history" ON public.ad_scaling_history FOR ALL USING (auth.uid() = user_id);
 
 -- ─── Table: ad_automation_config (paramètres par utilisateur) ───
 CREATE TABLE IF NOT EXISTS public.ad_automation_config (
@@ -156,9 +156,10 @@ CREATE TABLE IF NOT EXISTS public.ad_automation_config (
 
 ALTER TABLE public.ad_automation_config ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Users manage own ad automation config"
-  ON public.ad_automation_config FOR ALL USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users manage own ad automation config" ON public.ad_automation_config;
+CREATE POLICY "Users manage own ad automation config" ON public.ad_automation_config FOR ALL USING (auth.uid() = user_id);
 
+DROP TRIGGER IF EXISTS update_ad_automation_config_updated_at ON public.ad_automation_config;
 CREATE TRIGGER update_ad_automation_config_updated_at
   BEFORE UPDATE ON public.ad_automation_config
   FOR EACH ROW
