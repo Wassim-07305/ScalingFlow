@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { checkAIUsage, incrementAIUsage } from "@/lib/stripe/check-usage";
-import { getModelForGeneration } from "@/lib/ai/model-router";
+import { getModelForGeneration, estimateCostUSD } from "@/lib/ai/model-router";
 import { generateJSON } from "@/lib/ai/generate";
 import { buildFullVaultContext } from "@/lib/ai/vault-context";
 import {
@@ -87,7 +87,7 @@ export async function POST(req: NextRequest) {
 
     const aiModel = getModelForGeneration("editorial_calendar");
 
-    const result = await generateJSON<EditorialCalendarResult>({
+    const { data: result, usage: aiUsage } = await generateJSON<EditorialCalendarResult>({
       model: aiModel,
       prompt,
       systemPrompt:
@@ -105,7 +105,7 @@ export async function POST(req: NextRequest) {
       ai_raw_response: result as unknown as import("@/types/database").Json,
     });
 
-    incrementAIUsage(user.id, { generationType: "editorial_calendar", model: aiModel }).catch(() => {});
+    incrementAIUsage(user.id, { generationType: "editorial_calendar", model: aiModel, inputTokens: aiUsage.inputTokens, outputTokens: aiUsage.outputTokens, cachedTokens: aiUsage.cachedTokens, costUsd: estimateCostUSD(aiModel, aiUsage.inputTokens, aiUsage.outputTokens, aiUsage.cachedTokens) }).catch(() => {});
 
     return NextResponse.json({ result });
   } catch (error) {

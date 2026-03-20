@@ -81,6 +81,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ url: session.url });
   } catch (error) {
+    console.error("[create-checkout] Error:", error);
     return NextResponse.json(
       { error: "Erreur lors de la création de la session de paiement" },
       { status: 500 },

@@ -4,7 +4,7 @@ import { generateJSON } from "@/lib/ai/generate";
 import { callAnalysisPrompt } from "@/lib/ai/prompts/call-analysis";
 import { awardXP } from "@/lib/gamification/xp-engine";
 import { checkAIUsage, incrementAIUsage } from "@/lib/stripe/check-usage";
-import { getModelForGeneration } from "@/lib/ai/model-router";
+import { getModelForGeneration, estimateCostUSD } from "@/lib/ai/model-router";
 import { rateLimit } from "@/lib/utils/rate-limit";
 import { getJourney, buildJourneySummary } from "@/lib/services/attribution-engine";
 
@@ -116,7 +116,7 @@ ${firstTp.content ? `- Créative : ${firstTp.content}` : ""}`;
 
     const aiModel = getModelForGeneration("call_analysis");
 
-    const result = await generateJSON({ model: aiModel, prompt, maxTokens: 6000 });
+    const { data: result, usage: aiUsage } = await generateJSON({ model: aiModel, prompt, maxTokens: 6000 });
 
     // Build metadata with enriched data (including transcript for history reload)
     const metadata: Record<string, unknown> = {
@@ -155,7 +155,7 @@ ${firstTp.content ? `- Créative : ${firstTp.content}` : ""}`;
     const responseData =
       typeof result === "object" && result !== null ? (result as Record<string, unknown>) : {};
 
-    incrementAIUsage(user.id, { generationType: "call_analysis", model: aiModel }).catch(() => {});
+    incrementAIUsage(user.id, { generationType: "call_analysis", model: aiModel, inputTokens: aiUsage.inputTokens, outputTokens: aiUsage.outputTokens, cachedTokens: aiUsage.cachedTokens, costUsd: estimateCostUSD(aiModel, aiUsage.inputTokens, aiUsage.outputTokens, aiUsage.cachedTokens) }).catch(() => {});
 
     return NextResponse.json({
       ...responseData,

@@ -18,6 +18,7 @@ vi.mock("@/lib/ai/generate", () => ({
 
 vi.mock("@/lib/ai/model-router", () => ({
   getModelForGeneration: vi.fn().mockReturnValue("sonnet"),
+  estimateCostUSD: vi.fn().mockReturnValue(0.05),
 }));
 
 vi.mock("@/lib/stripe/check-usage", () => ({
@@ -110,7 +111,7 @@ describe("POST /api/ai/generate-offer", () => {
     });
 
     // Mock AI response
-    generateJSONMock.mockResolvedValue({
+    generateJSONMock.mockResolvedValue({ data: {
       packaging: {
         offer_name: "Programme Scale",
         positioning: "Le #1",
@@ -123,7 +124,7 @@ describe("POST /api/ai/generate-offer", () => {
       },
       delivery: { modules: 6 },
       full_document_markdown: "# Offre",
-    });
+    }, usage: { inputTokens: 100, outputTokens: 200, cachedTokens: 0 } });
 
     const req = createMockRequest("POST", { marketAnalysisId: "ma-test-123" });
     const res = await POST(req);
@@ -144,7 +145,7 @@ describe("POST /api/ai/generate-offer", () => {
       data: buildOffer(),
       error: null,
     });
-    generateJSONMock.mockResolvedValue({ packaging: { offer_name: "Test" } });
+    generateJSONMock.mockResolvedValue({ data: { packaging: { offer_name: "Test" } }, usage: { inputTokens: 100, outputTokens: 200, cachedTokens: 0 } });
 
     const req = createMockRequest("POST", { marketAnalysisId: "ma-test-123" });
     await POST(req);

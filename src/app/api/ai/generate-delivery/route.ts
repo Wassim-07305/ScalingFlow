@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { checkAIUsage, incrementAIUsage } from "@/lib/stripe/check-usage";
-import { getModelForGeneration } from "@/lib/ai/model-router";
+import { getModelForGeneration, estimateCostUSD } from "@/lib/ai/model-router";
 import { createClient } from "@/lib/supabase/server";
 import { generateJSON } from "@/lib/ai/generate";
 import { deliveryStructurePrompt } from "@/lib/ai/prompts/delivery-structure";
@@ -80,7 +80,7 @@ export async function POST(req: NextRequest) {
 
     const aiModel = getModelForGeneration("delivery");
 
-    const delivery = await generateJSON<Record<string, unknown>>({
+    const { data: delivery, usage: aiUsage } = await generateJSON<Record<string, unknown>>({
       model: aiModel,
       prompt,
       maxTokens: 6000,
@@ -102,7 +102,7 @@ export async function POST(req: NextRequest) {
       console.warn("generate-delivery: XP award failed", e);
     }
 
-    incrementAIUsage(user.id, { generationType: "delivery", model: aiModel }).catch(() => {});
+    incrementAIUsage(user.id, { generationType: "delivery", model: aiModel, inputTokens: aiUsage.inputTokens, outputTokens: aiUsage.outputTokens, cachedTokens: aiUsage.cachedTokens, costUsd: estimateCostUSD(aiModel, aiUsage.inputTokens, aiUsage.outputTokens, aiUsage.cachedTokens) }).catch(() => {});
 
     return NextResponse.json(delivery);
   } catch (error) {

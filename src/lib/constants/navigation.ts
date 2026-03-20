@@ -195,7 +195,6 @@ export const NAV_ITEMS: NavItem[] = [
     icon: GitBranch,
     roles: ["user", "student", "admin", "coach"],
   },
-  { label: "Admin", href: "/admin", icon: ShieldCheck, roles: ["admin"] },
 ];
 
 // ─── Sections sidebar ─────────────────────────────────────────

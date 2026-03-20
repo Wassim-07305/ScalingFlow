@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { checkAIUsage, incrementAIUsage } from "@/lib/stripe/check-usage";
-import { getModelForGeneration } from "@/lib/ai/model-router";
+import { getModelForGeneration, estimateCostUSD } from "@/lib/ai/model-router";
 import { createClient } from "@/lib/supabase/server";
 import { generateJSON } from "@/lib/ai/generate";
 import {
@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
 
     const aiModel = getModelForGeneration("mechanism");
 
-    const result = await generateJSON<{
+    const { data: result, usage: aiUsage } = await generateJSON<{
       mechanisms: {
         name: string;
         tagline: string;
@@ -69,7 +69,7 @@ export async function POST(req: NextRequest) {
       temperature: 0.7,
     });
 
-    incrementAIUsage(user.id, { generationType: "mechanism", model: aiModel }).catch(() => {});
+    incrementAIUsage(user.id, { generationType: "mechanism", model: aiModel, inputTokens: aiUsage.inputTokens, outputTokens: aiUsage.outputTokens, cachedTokens: aiUsage.cachedTokens, costUsd: estimateCostUSD(aiModel, aiUsage.inputTokens, aiUsage.outputTokens, aiUsage.cachedTokens) }).catch(() => {});
 
     return NextResponse.json(result);
   } catch (error) {

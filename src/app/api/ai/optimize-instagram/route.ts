@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { checkAIUsage, incrementAIUsage } from "@/lib/stripe/check-usage";
-import { getModelForGeneration } from "@/lib/ai/model-router";
+import { getModelForGeneration, estimateCostUSD } from "@/lib/ai/model-router";
 import { createClient } from "@/lib/supabase/server";
 import { generateJSON } from "@/lib/ai/generate";
 import {
@@ -94,7 +94,7 @@ export async function POST(req: NextRequest) {
 
     const aiModel = getModelForGeneration("optimize_instagram");
 
-    const result = await generateJSON<InstagramProfileResult>({
+    const { data: result, usage: aiUsage } = await generateJSON<InstagramProfileResult>({
       model: aiModel,
       prompt,
       maxTokens: 4096,
@@ -108,7 +108,7 @@ export async function POST(req: NextRequest) {
       await notifyGeneration(user.id, "generation.content_strategy");
     } catch {}
 
-    incrementAIUsage(user.id, { generationType: "optimize_instagram", model: aiModel }).catch(() => {});
+    incrementAIUsage(user.id, { generationType: "optimize_instagram", model: aiModel, inputTokens: aiUsage.inputTokens, outputTokens: aiUsage.outputTokens, cachedTokens: aiUsage.cachedTokens, costUsd: estimateCostUSD(aiModel, aiUsage.inputTokens, aiUsage.outputTokens, aiUsage.cachedTokens) }).catch(() => {});
 
     return NextResponse.json({ result });
   } catch (error) {

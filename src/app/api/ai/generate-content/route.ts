@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { checkAIUsage, incrementAIUsage } from "@/lib/stripe/check-usage";
-import { getModelForGeneration } from "@/lib/ai/model-router";
+import { getModelForGeneration, estimateCostUSD } from "@/lib/ai/model-router";
 import { createClient } from "@/lib/supabase/server";
 import { generateJSON } from "@/lib/ai/generate";
 import { contentIdeasPrompt } from "@/lib/ai/prompts/content-ideas";
@@ -590,7 +590,7 @@ ${fbResults
         ),
       );
 
-      const result = await generateJSON<Record<string, unknown>>({
+      const { data: result, usage: aiUsage } = await generateJSON<Record<string, unknown>>({
         model: aiModel,
         prompt,
         maxTokens: 4096,
@@ -608,7 +608,7 @@ ${fbResults
         console.warn("Non-blocking op failed:", e);
       }
 
-      incrementAIUsage(user.id, { generationType: "post_social", model: aiModel }).catch(() => {});
+      incrementAIUsage(user.id, { generationType: "post_social", model: aiModel, inputTokens: aiUsage.inputTokens, outputTokens: aiUsage.outputTokens, cachedTokens: aiUsage.cachedTokens, costUsd: estimateCostUSD(aiModel, aiUsage.inputTokens, aiUsage.outputTokens, aiUsage.cachedTokens) }).catch(() => {});
 
       return NextResponse.json({
         contentType: "content_spy",
@@ -641,7 +641,7 @@ ${fbResults
           parcoursContext,
         ),
       );
-      const result = await generateJSON<ContentStrategyResult>({
+      const { data: result, usage: aiUsage } = await generateJSON<ContentStrategyResult>({
         model: aiModel,
         prompt,
         maxTokens: 4096,
@@ -684,7 +684,7 @@ ${fbResults
         console.warn("Non-blocking op failed:", e);
       }
 
-      incrementAIUsage(user.id, { generationType: "post_social", model: aiModel }).catch(() => {});
+      incrementAIUsage(user.id, { generationType: "post_social", model: aiModel, inputTokens: aiUsage.inputTokens, outputTokens: aiUsage.outputTokens, cachedTokens: aiUsage.cachedTokens, costUsd: estimateCostUSD(aiModel, aiUsage.inputTokens, aiUsage.outputTokens, aiUsage.cachedTokens) }).catch(() => {});
 
       return NextResponse.json({ contentType: "strategy", result });
     }
@@ -699,7 +699,7 @@ ${fbResults
           batchNumber || 1,
         ),
       );
-      const result = await generateJSON<ReelsScriptsResult>({
+      const { data: result, usage: aiUsage } = await generateJSON<ReelsScriptsResult>({
         model: aiModel,
         prompt,
         maxTokens: 4096,
@@ -737,7 +737,7 @@ ${fbResults
         console.warn("Non-blocking op failed:", e);
       }
 
-      incrementAIUsage(user.id, { generationType: "post_social", model: aiModel }).catch(() => {});
+      incrementAIUsage(user.id, { generationType: "post_social", model: aiModel, inputTokens: aiUsage.inputTokens, outputTokens: aiUsage.outputTokens, cachedTokens: aiUsage.cachedTokens, costUsd: estimateCostUSD(aiModel, aiUsage.inputTokens, aiUsage.outputTokens, aiUsage.cachedTokens) }).catch(() => {});
 
       return NextResponse.json({ contentType: "reels", result });
     }
@@ -753,7 +753,7 @@ ${fbResults
       const prompt = withContext(
         buildYouTubeScriptPrompt(marketContext, offerContext, topic),
       );
-      const result = await generateJSON<YouTubeScriptResult>({
+      const { data: result, usage: aiUsage } = await generateJSON<YouTubeScriptResult>({
         model: aiModel,
         prompt,
         maxTokens: 4096,
@@ -783,7 +783,7 @@ ${fbResults
         console.warn("Non-blocking op failed:", e);
       }
 
-      incrementAIUsage(user.id, { generationType: "post_social", model: aiModel }).catch(() => {});
+      incrementAIUsage(user.id, { generationType: "post_social", model: aiModel, inputTokens: aiUsage.inputTokens, outputTokens: aiUsage.outputTokens, cachedTokens: aiUsage.cachedTokens, costUsd: estimateCostUSD(aiModel, aiUsage.inputTokens, aiUsage.outputTokens, aiUsage.cachedTokens) }).catch(() => {});
 
       return NextResponse.json({ contentType: "youtube", result });
     }
@@ -793,7 +793,7 @@ ${fbResults
       const prompt = withContext(
         buildStoriesPrompt(marketContext, offerContext),
       );
-      const result = await generateJSON<StoriesResult>({
+      const { data: result, usage: aiUsage } = await generateJSON<StoriesResult>({
         model: aiModel,
         prompt,
         maxTokens: 4096,
@@ -825,7 +825,7 @@ ${fbResults
         console.warn("Non-blocking op failed:", e);
       }
 
-      incrementAIUsage(user.id, { generationType: "post_social", model: aiModel }).catch(() => {});
+      incrementAIUsage(user.id, { generationType: "post_social", model: aiModel, inputTokens: aiUsage.inputTokens, outputTokens: aiUsage.outputTokens, cachedTokens: aiUsage.cachedTokens, costUsd: estimateCostUSD(aiModel, aiUsage.inputTokens, aiUsage.outputTokens, aiUsage.cachedTokens) }).catch(() => {});
 
       return NextResponse.json({ contentType: "stories", result });
     }
@@ -841,7 +841,7 @@ ${fbResults
       const prompt = withContext(
         buildCarouselPrompt(marketContext, offerContext, topic),
       );
-      const result = await generateJSON<CarouselResult>({
+      const { data: result, usage: aiUsage } = await generateJSON<CarouselResult>({
         model: aiModel,
         prompt,
         maxTokens: 4096,
@@ -873,7 +873,7 @@ ${fbResults
         console.warn("Non-blocking op failed:", e);
       }
 
-      incrementAIUsage(user.id, { generationType: "post_social", model: aiModel }).catch(() => {});
+      incrementAIUsage(user.id, { generationType: "post_social", model: aiModel, inputTokens: aiUsage.inputTokens, outputTokens: aiUsage.outputTokens, cachedTokens: aiUsage.cachedTokens, costUsd: estimateCostUSD(aiModel, aiUsage.inputTokens, aiUsage.outputTokens, aiUsage.cachedTokens) }).catch(() => {});
 
       return NextResponse.json({ contentType: "carousel", result });
     }
@@ -907,7 +907,7 @@ ${fbResults
 
     // Generate content ideas using AI
     const prompt = withContext(contentIdeasPrompt(marketContext, platform));
-    const generatedContent = await generateJSON<{ ideas?: string[] }>({
+    const { data: generatedContent, usage: aiUsage } = await generateJSON<{ ideas?: string[] }>({
       model: aiModel,
       prompt,
       maxTokens: 4096,
@@ -925,7 +925,7 @@ ${fbResults
       console.warn("Non-blocking op failed:", e);
     }
 
-    incrementAIUsage(user.id, { generationType: "post_social", model: aiModel }).catch(() => {});
+    incrementAIUsage(user.id, { generationType: "post_social", model: aiModel, inputTokens: aiUsage.inputTokens, outputTokens: aiUsage.outputTokens, cachedTokens: aiUsage.cachedTokens, costUsd: estimateCostUSD(aiModel, aiUsage.inputTokens, aiUsage.outputTokens, aiUsage.cachedTokens) }).catch(() => {});
 
     return NextResponse.json({
       market: marketContext,

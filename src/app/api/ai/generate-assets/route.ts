@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { checkAIUsage, incrementAIUsage } from "@/lib/stripe/check-usage";
-import { getModelForGeneration } from "@/lib/ai/model-router";
+import { getModelForGeneration, estimateCostUSD } from "@/lib/ai/model-router";
 import { createClient } from "@/lib/supabase/server";
 import { generateJSON } from "@/lib/ai/generate";
 import { vslScriptPrompt } from "@/lib/ai/prompts/vsl-script";
@@ -257,7 +257,7 @@ export async function POST(req: NextRequest) {
     // Generate asset using AI
     const aiModel = getModelForGeneration("vsl");
 
-    const generatedAsset = await generateJSON<Record<string, unknown>>({
+    const { data: generatedAsset, usage: aiUsage } = await generateJSON<Record<string, unknown>>({
       model: aiModel,
       prompt,
       maxTokens,
@@ -313,7 +313,7 @@ export async function POST(req: NextRequest) {
       await awardXP(user.id, assetXPMap[assetType] || "generation.vsl");
     } catch {}
 
-    incrementAIUsage(user.id, { generationType: "vsl", model: aiModel }).catch(() => {});
+    incrementAIUsage(user.id, { generationType: "vsl", model: aiModel, inputTokens: aiUsage.inputTokens, outputTokens: aiUsage.outputTokens, cachedTokens: aiUsage.cachedTokens, costUsd: estimateCostUSD(aiModel, aiUsage.inputTokens, aiUsage.outputTokens, aiUsage.cachedTokens) }).catch(() => {});
 
     return NextResponse.json(asset);
   } catch (error) {

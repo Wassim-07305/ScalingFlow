@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { checkAIUsage, incrementAIUsage } from "@/lib/stripe/check-usage";
-import { getModelForGeneration } from "@/lib/ai/model-router";
+import { getModelForGeneration, estimateCostUSD } from "@/lib/ai/model-router";
 import { createClient } from "@/lib/supabase/server";
 import { generateJSON } from "@/lib/ai/generate";
 import {
@@ -49,14 +49,14 @@ export async function POST(req: NextRequest) {
 
     const aiModel = getModelForGeneration("guarantee");
 
-    const result = await generateJSON<GuaranteeResult>({
+    const { data: result, usage: aiUsage } = await generateJSON<GuaranteeResult>({
       model: aiModel,
       prompt: vaultContext ? basePrompt + "\n" + vaultContext : basePrompt,
       maxTokens: 4096,
       temperature: 0.7,
     });
 
-    incrementAIUsage(user.id, { generationType: "guarantee", model: aiModel }).catch(() => {});
+    incrementAIUsage(user.id, { generationType: "guarantee", model: aiModel, inputTokens: aiUsage.inputTokens, outputTokens: aiUsage.outputTokens, cachedTokens: aiUsage.cachedTokens, costUsd: estimateCostUSD(aiModel, aiUsage.inputTokens, aiUsage.outputTokens, aiUsage.cachedTokens) }).catch(() => {});
 
     return NextResponse.json(result);
   } catch (error) {

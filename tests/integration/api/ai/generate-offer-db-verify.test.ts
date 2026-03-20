@@ -60,18 +60,21 @@ vi.mock("@/lib/supabase/server", () => ({
 
 vi.mock("@/lib/ai/generate", () => ({
   generateJSON: vi.fn().mockResolvedValue({
-    packaging: {
-      offer_name: "Programme Scale Engine",
-      positioning: "Le #1 pour scaler",
-      unique_mechanism: { name: "Scale Engine Method" },
-      pricing: { price: 997, currency: "EUR" },
-      guarantees: [{ type: "money-back", duration: "30 jours" }],
-      no_brainer: "Bonus coaching",
-      risk_reversal: "Remboursement intégral",
-      oto: { name: "VIP", price: 497 },
+    data: {
+      packaging: {
+        offer_name: "Programme Scale Engine",
+        positioning: "Le #1 pour scaler",
+        unique_mechanism: { name: "Scale Engine Method" },
+        pricing: { price: 997, currency: "EUR" },
+        guarantees: [{ type: "money-back", duration: "30 jours" }],
+        no_brainer: "Bonus coaching",
+        risk_reversal: "Remboursement intégral",
+        oto: { name: "VIP", price: 497 },
+      },
+      delivery: { modules: 6, format: "online" },
+      full_document_markdown: "# Mon Offre",
     },
-    delivery: { modules: 6, format: "online" },
-    full_document_markdown: "# Mon Offre",
+    usage: { inputTokens: 500, outputTokens: 1000, cachedTokens: 0 },
   }),
 }));
 

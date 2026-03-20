@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { generateJSON } from "@/lib/ai/generate";
 import { checkAIUsage, incrementAIUsage } from "@/lib/stripe/check-usage";
-import { getModelForGeneration } from "@/lib/ai/model-router";
+import { getModelForGeneration, estimateCostUSD } from "@/lib/ai/model-router";
 import { rateLimit } from "@/lib/utils/rate-limit";
 import { awardXP } from "@/lib/gamification/xp-engine";
 import {
@@ -105,7 +105,7 @@ export async function POST(req: NextRequest) {
 
     const aiModel = getModelForGeneration("scoring");
 
-    const score = await generateJSON<AdsScoreResult>({
+    const { data: score, usage: aiUsage } = await generateJSON<AdsScoreResult>({
       model: aiModel,
       prompt,
       maxTokens: 4096,
@@ -116,7 +116,7 @@ export async function POST(req: NextRequest) {
       await awardXP(user.id, "validation.ads");
     } catch {}
 
-    incrementAIUsage(user.id, { generationType: "scoring", model: aiModel }).catch(() => {});
+    incrementAIUsage(user.id, { generationType: "scoring", model: aiModel, inputTokens: aiUsage.inputTokens, outputTokens: aiUsage.outputTokens, cachedTokens: aiUsage.cachedTokens, costUsd: estimateCostUSD(aiModel, aiUsage.inputTokens, aiUsage.outputTokens, aiUsage.cachedTokens) }).catch(() => {});
 
     return NextResponse.json(score);
   } catch {

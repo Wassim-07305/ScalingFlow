@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { checkAIUsage, incrementAIUsage } from "@/lib/stripe/check-usage";
-import { getModelForGeneration } from "@/lib/ai/model-router";
+import { getModelForGeneration, estimateCostUSD } from "@/lib/ai/model-router";
 import { createClient } from "@/lib/supabase/server";
 import { generateJSON } from "@/lib/ai/generate";
 import {
@@ -103,7 +103,7 @@ export async function POST(req: NextRequest) {
 
     const aiModel = getModelForGeneration("objections");
 
-    const result = await generateJSON<ObjectionContentResult>({
+    const { data: result, usage: aiUsage } = await generateJSON<ObjectionContentResult>({
       model: aiModel,
       prompt,
       maxTokens: 4096,
@@ -158,7 +158,7 @@ export async function POST(req: NextRequest) {
       console.warn("Non-blocking op failed:", e);
     }
 
-    incrementAIUsage(user.id, { generationType: "objections", model: aiModel }).catch(() => {});
+    incrementAIUsage(user.id, { generationType: "objections", model: aiModel, inputTokens: aiUsage.inputTokens, outputTokens: aiUsage.outputTokens, cachedTokens: aiUsage.cachedTokens, costUsd: estimateCostUSD(aiModel, aiUsage.inputTokens, aiUsage.outputTokens, aiUsage.cachedTokens) }).catch(() => {});
 
     return NextResponse.json({ result });
   } catch (error) {

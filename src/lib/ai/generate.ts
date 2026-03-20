@@ -25,8 +25,16 @@ interface GenerateOptions {
   model?: "haiku" | "sonnet";
 }
 
+/** Token usage returned alongside generated text */
+export interface AIUsageInfo {
+  inputTokens: number;
+  outputTokens: number;
+  cachedTokens: number;
+}
+
 interface ChatResponse {
   choices: { message: { content: string }; finish_reason: string }[];
+  usage?: { prompt_tokens?: number; completion_tokens?: number };
 }
 
 async function anthropicGenerate(
@@ -35,7 +43,7 @@ async function anthropicGenerate(
   maxTokens: number,
   temperature: number,
   model: "haiku" | "sonnet" = "sonnet",
-): Promise<string> {
+): Promise<{ text: string; usage: AIUsageInfo }> {
   if (!anthropic) throw new Error("Anthropic client not initialized");
 
   const response = await anthropic.messages.create({
@@ -52,7 +60,14 @@ async function anthropicGenerate(
   if (!textBlock || textBlock.type !== "text") {
     throw new Error("No text response from Anthropic");
   }
-  return textBlock.text;
+
+  const usage: AIUsageInfo = {
+    inputTokens: response.usage?.input_tokens ?? 0,
+    outputTokens: response.usage?.output_tokens ?? 0,
+    cachedTokens: (response.usage as Record<string, number>)?.cache_read_input_tokens ?? 0,
+  };
+
+  return { text: textBlock.text, usage };
 }
 
 async function openRouterFetch(
@@ -90,13 +105,19 @@ async function openRouterFetch(
   throw lastError;
 }
 
+/** Result from generateText including token usage */
+export interface GenerateResult {
+  text: string;
+  usage: AIUsageInfo;
+}
+
 export async function generateText({
   prompt,
   systemPrompt,
   maxTokens = 4096,
   temperature = 0.7,
   model = "sonnet",
-}: GenerateOptions): Promise<string> {
+}: GenerateOptions): Promise<GenerateResult> {
   // Try Anthropic direct API first if available
   if (USE_ANTHROPIC_DIRECT) {
     try {
@@ -134,7 +155,19 @@ export async function generateText({
   if (!content) {
     throw new Error("Pas de réponse de l'IA");
   }
-  return content;
+
+  const usage: AIUsageInfo = {
+    inputTokens: data.usage?.prompt_tokens ?? 0,
+    outputTokens: data.usage?.completion_tokens ?? 0,
+    cachedTokens: 0,
+  };
+
+  return { text: content, usage };
+}
+
+export interface GenerateJSONResult<T> {
+  data: T;
+  usage: AIUsageInfo;
 }
 
 export async function generateJSON<T>({
@@ -143,8 +176,8 @@ export async function generateJSON<T>({
   maxTokens = 4096,
   temperature = 0.7,
   model = "sonnet",
-}: GenerateOptions): Promise<T> {
-  const text = await generateText({
+}: GenerateOptions): Promise<GenerateJSONResult<T>> {
+  const result = await generateText({
     prompt,
     systemPrompt:
       (systemPrompt || "") +
@@ -153,6 +186,8 @@ export async function generateJSON<T>({
     temperature,
     model,
   });
+
+  const text = result.text;
 
   // Extract JSON from potential markdown code blocks
   const jsonMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/);
@@ -174,12 +209,14 @@ export async function generateJSON<T>({
     }),
   );
 
+  const wrap = (data: T): GenerateJSONResult<T> => ({ data, usage: result.usage });
+
   try {
-    return JSON.parse(jsonStr) as T;
+    return wrap(JSON.parse(jsonStr) as T);
   } catch {
     // Try jsonrepair to fix truncated/malformed JSON
     try {
-      return JSON.parse(jsonrepair(jsonStr)) as T;
+      return wrap(JSON.parse(jsonrepair(jsonStr)) as T);
     } catch {
       // Last resort: find the first { } or [ ] block and repair it
       const objectMatch = jsonStr.match(/\{[\s\S]*/);
@@ -188,7 +225,7 @@ export async function generateJSON<T>({
 
       if (fallback) {
         try {
-          return JSON.parse(jsonrepair(fallback)) as T;
+          return wrap(JSON.parse(jsonrepair(fallback)) as T);
         } catch {
           // All attempts failed
         }

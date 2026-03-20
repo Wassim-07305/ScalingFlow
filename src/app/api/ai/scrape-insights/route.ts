@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { checkAIUsage, incrementAIUsage } from "@/lib/stripe/check-usage";
-import { getModelForGeneration } from "@/lib/ai/model-router";
+import { getModelForGeneration, estimateCostUSD } from "@/lib/ai/model-router";
 import { createClient } from "@/lib/supabase/server";
 import { generateJSON } from "@/lib/ai/generate";
 import {
@@ -192,7 +192,7 @@ export async function POST(req: NextRequest) {
 
     const aiModel = getModelForGeneration("scrape_insights");
 
-    const result = await generateJSON<MarketInsightsResult>({
+    const { data: result, usage: aiUsage } = await generateJSON<MarketInsightsResult>({
       model: aiModel,
       prompt: fullPrompt,
       maxTokens: 6000,
@@ -207,7 +207,7 @@ export async function POST(req: NextRequest) {
       await notifyGeneration(user.id, "generation.market_analysis");
     } catch {}
 
-    incrementAIUsage(user.id, { generationType: "scrape_insights", model: aiModel }).catch(() => {});
+    incrementAIUsage(user.id, { generationType: "scrape_insights", model: aiModel, inputTokens: aiUsage.inputTokens, outputTokens: aiUsage.outputTokens, cachedTokens: aiUsage.cachedTokens, costUsd: estimateCostUSD(aiModel, aiUsage.inputTokens, aiUsage.outputTokens, aiUsage.cachedTokens) }).catch(() => {});
 
     return NextResponse.json({
       result,

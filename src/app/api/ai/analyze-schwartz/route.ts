@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { checkAIUsage, incrementAIUsage } from "@/lib/stripe/check-usage";
-import { getModelForGeneration } from "@/lib/ai/model-router";
+import { getModelForGeneration, estimateCostUSD } from "@/lib/ai/model-router";
 import { createClient } from "@/lib/supabase/server";
 import { generateJSON } from "@/lib/ai/generate";
 import {
@@ -84,7 +84,7 @@ export async function POST(req: NextRequest) {
 
     const aiModel = getModelForGeneration("schwartz");
 
-    const result = await generateJSON<SchwartzAnalysisResult>({
+    const { data: result, usage: aiUsage } = await generateJSON<SchwartzAnalysisResult>({
       model: aiModel,
       prompt,
       maxTokens: 2048,
@@ -107,7 +107,7 @@ export async function POST(req: NextRequest) {
       await notifyGeneration(user.id, "generation.market_analysis");
     } catch {}
 
-    incrementAIUsage(user.id, { generationType: "schwartz", model: aiModel }).catch(() => {});
+    incrementAIUsage(user.id, { generationType: "schwartz", model: aiModel, inputTokens: aiUsage.inputTokens, outputTokens: aiUsage.outputTokens, cachedTokens: aiUsage.cachedTokens, costUsd: estimateCostUSD(aiModel, aiUsage.inputTokens, aiUsage.outputTokens, aiUsage.cachedTokens) }).catch(() => {});
 
     return NextResponse.json(result);
   } catch (error) {

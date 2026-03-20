@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { checkAIUsage, incrementAIUsage } from "@/lib/stripe/check-usage";
-import { getModelForGeneration } from "@/lib/ai/model-router";
+import { getModelForGeneration, estimateCostUSD } from "@/lib/ai/model-router";
 import { createClient } from "@/lib/supabase/server";
 import { generateJSON } from "@/lib/ai/generate";
 import {
@@ -247,7 +247,7 @@ export async function POST(req: NextRequest) {
           scrapedContext || undefined,
         ) + (vaultContext ? "\n" + vaultContext : "");
 
-      const result = await generateJSON<Record<string, unknown>>({
+      const { data: result, usage: aiUsage } = await generateJSON<Record<string, unknown>>({
         model: aiModel,
         prompt,
         maxTokens: 4096,
@@ -265,7 +265,7 @@ export async function POST(req: NextRequest) {
         console.warn("Notification failed:", e);
       }
 
-      incrementAIUsage(user.id, { generationType: "post_social", model: aiModel }).catch(() => {});
+      incrementAIUsage(user.id, { generationType: "post_social", model: aiModel, inputTokens: aiUsage.inputTokens, outputTokens: aiUsage.outputTokens, cachedTokens: aiUsage.cachedTokens, costUsd: estimateCostUSD(aiModel, aiUsage.inputTokens, aiUsage.outputTokens, aiUsage.cachedTokens) }).catch(() => {});
 
       return NextResponse.json({
         adType: "ad_spy",
@@ -282,7 +282,7 @@ export async function POST(req: NextRequest) {
       const prompt =
         buildVideoAdScriptPrompt(offerContext, avatarContext) +
         (vaultContext ? "\n" + vaultContext : "");
-      const result = await generateJSON<VideoAdScriptResult>({
+      const { data: result, usage: aiUsage } = await generateJSON<VideoAdScriptResult>({
         model: aiModel,
         prompt,
         maxTokens: 4096,
@@ -318,7 +318,7 @@ export async function POST(req: NextRequest) {
         console.warn("Notification failed:", e);
       }
 
-      incrementAIUsage(user.id, { generationType: "post_social", model: aiModel }).catch(() => {});
+      incrementAIUsage(user.id, { generationType: "post_social", model: aiModel, inputTokens: aiUsage.inputTokens, outputTokens: aiUsage.outputTokens, cachedTokens: aiUsage.cachedTokens, costUsd: estimateCostUSD(aiModel, aiUsage.inputTokens, aiUsage.outputTokens, aiUsage.cachedTokens) }).catch(() => {});
 
       return NextResponse.json({ adType: "video_ad", result });
     }
@@ -328,7 +328,7 @@ export async function POST(req: NextRequest) {
       const prompt =
         buildDMScriptsPrompt(offerContext, avatarContext) +
         (vaultContext ? "\n" + vaultContext : "");
-      const result = await generateJSON<DMScriptsResult>({
+      const { data: result, usage: aiUsage } = await generateJSON<DMScriptsResult>({
         model: aiModel,
         prompt,
         maxTokens: 4096,
@@ -364,7 +364,7 @@ export async function POST(req: NextRequest) {
         console.warn("Notification failed:", e);
       }
 
-      incrementAIUsage(user.id, { generationType: "post_social", model: aiModel }).catch(() => {});
+      incrementAIUsage(user.id, { generationType: "post_social", model: aiModel, inputTokens: aiUsage.inputTokens, outputTokens: aiUsage.outputTokens, cachedTokens: aiUsage.cachedTokens, costUsd: estimateCostUSD(aiModel, aiUsage.inputTokens, aiUsage.outputTokens, aiUsage.cachedTokens) }).catch(() => {});
 
       return NextResponse.json({ adType: "dm_scripts", result });
     }
@@ -409,7 +409,7 @@ export async function POST(req: NextRequest) {
         target_audience?: string;
       }
 
-      const result = await generateJSON<{ variations?: AdVariation[] }>({
+      const { data: result, usage: aiUsage } = await generateJSON<{ variations?: AdVariation[] }>({
         model: aiModel,
         prompt,
         maxTokens: 8192,
@@ -453,7 +453,7 @@ export async function POST(req: NextRequest) {
         console.warn("Notification failed:", e);
       }
 
-      incrementAIUsage(user.id, { generationType: "post_social", model: aiModel }).catch(() => {});
+      incrementAIUsage(user.id, { generationType: "post_social", model: aiModel, inputTokens: aiUsage.inputTokens, outputTokens: aiUsage.outputTokens, cachedTokens: aiUsage.cachedTokens, costUsd: estimateCostUSD(aiModel, aiUsage.inputTokens, aiUsage.outputTokens, aiUsage.cachedTokens) }).catch(() => {});
 
       return NextResponse.json({
         adType: "massive_batch",
@@ -489,7 +489,7 @@ export async function POST(req: NextRequest) {
       angle?: string;
       target_audience?: string;
     }
-    const generatedAdCopy = await generateJSON<{ variations?: AdVariation[] }>({
+    const { data: generatedAdCopy, usage: adCopyUsage } = await generateJSON<{ variations?: AdVariation[] }>({
       model: aiModel,
       prompt: adCopyProm,
       maxTokens: 4096,
@@ -497,11 +497,16 @@ export async function POST(req: NextRequest) {
 
     // Generate ad hooks
     const hooksProm = adHooksPrompt(market, avatar);
-    const generatedHooks = await generateJSON<{ hooks?: string[] }>({
+    const { data: generatedHooks, usage: hooksUsage } = await generateJSON<{ hooks?: string[] }>({
       model: aiModel,
       prompt: hooksProm,
       maxTokens: 4096,
     });
+    const aiUsage = {
+      inputTokens: adCopyUsage.inputTokens + hooksUsage.inputTokens,
+      outputTokens: adCopyUsage.outputTokens + hooksUsage.outputTokens,
+      cachedTokens: adCopyUsage.cachedTokens + hooksUsage.cachedTokens,
+    };
 
     // Save each ad variation to the database
     const adCreatives = [];
@@ -542,7 +547,7 @@ export async function POST(req: NextRequest) {
       console.warn("Notification failed:", e);
     }
 
-    incrementAIUsage(user.id, { generationType: "post_social", model: aiModel }).catch(() => {});
+    incrementAIUsage(user.id, { generationType: "post_social", model: aiModel, inputTokens: aiUsage.inputTokens, outputTokens: aiUsage.outputTokens, cachedTokens: aiUsage.cachedTokens, costUsd: estimateCostUSD(aiModel, aiUsage.inputTokens, aiUsage.outputTokens, aiUsage.cachedTokens) }).catch(() => {});
 
     return NextResponse.json({
       ad_creatives: adCreatives,

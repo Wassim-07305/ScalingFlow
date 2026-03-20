@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { checkAIUsage, incrementAIUsage } from "@/lib/stripe/check-usage";
-import { getModelForGeneration } from "@/lib/ai/model-router";
+import { getModelForGeneration, estimateCostUSD } from "@/lib/ai/model-router";
 import { generateText } from "@/lib/ai/generate";
 import { rateLimit } from "@/lib/utils/rate-limit";
 
@@ -75,10 +75,11 @@ export async function POST(req: NextRequest) {
 
     const aiModel = getModelForGeneration("logo");
     const results: { type: string; label: string; url: string }[] = [];
+    const totalUsage = { inputTokens: 0, outputTokens: 0, cachedTokens: 0 };
 
     for (const logoType of LOGO_TYPES) {
       try {
-        const svgCode = await generateText({
+        const { text: svgCode, usage: logoUsage } = await generateText({
           model: aiModel,
           prompt: buildSVGPrompt(
             brandName,
@@ -90,6 +91,9 @@ export async function POST(req: NextRequest) {
           maxTokens: 4096,
           temperature: 0.8,
         });
+        totalUsage.inputTokens += logoUsage.inputTokens;
+        totalUsage.outputTokens += logoUsage.outputTokens;
+        totalUsage.cachedTokens += logoUsage.cachedTokens;
 
         // Extract SVG from response
         const svgMatch = svgCode.match(/<svg[\s\S]*?<\/svg>/i);
@@ -114,7 +118,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    incrementAIUsage(user.id, { generationType: "logo", model: aiModel }).catch(() => {});
+    incrementAIUsage(user.id, { generationType: "logo", model: aiModel, inputTokens: totalUsage.inputTokens, outputTokens: totalUsage.outputTokens, cachedTokens: totalUsage.cachedTokens, costUsd: estimateCostUSD(aiModel, totalUsage.inputTokens, totalUsage.outputTokens, totalUsage.cachedTokens) }).catch(() => {});
 
     return NextResponse.json({
       images: results.map((r) => r.url),

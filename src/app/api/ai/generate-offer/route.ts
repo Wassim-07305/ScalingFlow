@@ -7,7 +7,7 @@ import { buildFullVaultContext } from "@/lib/ai/vault-context";
 import { awardXP } from "@/lib/gamification/xp-engine";
 import { notifyGeneration } from "@/lib/notifications/create";
 import { rateLimit } from "@/lib/utils/rate-limit";
-import { getModelForGeneration } from "@/lib/ai/model-router";
+import { getModelForGeneration, estimateCostUSD } from "@/lib/ai/model-router";
 
 export const maxDuration = 120;
 
@@ -120,7 +120,7 @@ ${truncatedReviews}
       full_document_markdown?: string;
     }
     const aiModel = getModelForGeneration("offer");
-    const generatedOffer = await generateJSON<GeneratedOffer>({
+    const { data: generatedOffer, usage: aiUsage } = await generateJSON<GeneratedOffer>({
       prompt,
       maxTokens: 8192,
       model: aiModel,
@@ -156,7 +156,7 @@ ${truncatedReviews}
     }
 
     // Track AI usage (non-blocking)
-    incrementAIUsage(user.id, { generationType: "offer", model: aiModel }).catch(() => {});
+    incrementAIUsage(user.id, { generationType: "offer", model: aiModel, inputTokens: aiUsage.inputTokens, outputTokens: aiUsage.outputTokens, cachedTokens: aiUsage.cachedTokens, costUsd: estimateCostUSD(aiModel, aiUsage.inputTokens, aiUsage.outputTokens, aiUsage.cachedTokens) }).catch(() => {});
 
     // Award XP (non-blocking)
     try {

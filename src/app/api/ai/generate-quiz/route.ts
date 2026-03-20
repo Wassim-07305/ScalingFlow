@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { generateJSON } from "@/lib/ai/generate";
 import { checkAIUsage, incrementAIUsage } from "@/lib/stripe/check-usage";
-import { getModelForGeneration } from "@/lib/ai/model-router";
+import { getModelForGeneration, estimateCostUSD } from "@/lib/ai/model-router";
 import { rateLimit } from "@/lib/utils/rate-limit";
 
 export const maxDuration = 60;
@@ -88,7 +88,7 @@ Réponds UNIQUEMENT en JSON valide avec cette structure :
 
     const aiModel = getModelForGeneration("quiz");
 
-    const result = await generateJSON<QuizResult>({
+    const { data: result, usage: aiUsage } = await generateJSON<QuizResult>({
       model: aiModel,
       prompt: `Génère un quiz de 5 questions pour le module de formation intitulé : "${moduleTitle}". Les questions doivent couvrir les concepts clés enseignés dans ce module.`,
       systemPrompt,
@@ -96,7 +96,7 @@ Réponds UNIQUEMENT en JSON valide avec cette structure :
       temperature: 0.8,
     });
 
-    incrementAIUsage(user.id, { generationType: "quiz", model: aiModel }).catch(() => {});
+    incrementAIUsage(user.id, { generationType: "quiz", model: aiModel, inputTokens: aiUsage.inputTokens, outputTokens: aiUsage.outputTokens, cachedTokens: aiUsage.cachedTokens, costUsd: estimateCostUSD(aiModel, aiUsage.inputTokens, aiUsage.outputTokens, aiUsage.cachedTokens) }).catch(() => {});
 
     return NextResponse.json(result);
   } catch (error) {

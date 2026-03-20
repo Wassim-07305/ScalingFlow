@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { generateJSON } from "@/lib/ai/generate";
 import { incrementAIUsage } from "@/lib/stripe/check-usage";
-import { getModelForGeneration } from "@/lib/ai/model-router";
+import { getModelForGeneration, estimateCostUSD } from "@/lib/ai/model-router";
 import { awardXP } from "@/lib/gamification/xp-engine";
 
 export const maxDuration = 60;
@@ -60,7 +60,7 @@ Génère entre 4 et 8 recommandations, triées par impact décroissant. Sois con
 
     const aiModel = getModelForGeneration("optimize_ads");
 
-    const result = await generateJSON({
+    const { data: result, usage: aiUsage } = await generateJSON({
       model: aiModel,
       prompt,
       maxTokens: 4096,
@@ -72,7 +72,7 @@ Génère entre 4 et 8 recommandations, triées par impact décroissant. Sois con
       // XP award is non-critical
     }
 
-    incrementAIUsage(user.id, { generationType: "optimize_ads", model: aiModel }).catch(() => {});
+    incrementAIUsage(user.id, { generationType: "optimize_ads", model: aiModel, inputTokens: aiUsage.inputTokens, outputTokens: aiUsage.outputTokens, cachedTokens: aiUsage.cachedTokens, costUsd: estimateCostUSD(aiModel, aiUsage.inputTokens, aiUsage.outputTokens, aiUsage.cachedTokens) }).catch(() => {});
 
     return NextResponse.json(result);
   } catch (error) {

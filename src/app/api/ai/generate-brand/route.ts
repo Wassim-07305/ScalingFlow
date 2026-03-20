@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { checkAIUsage, incrementAIUsage } from "@/lib/stripe/check-usage";
-import { getModelForGeneration } from "@/lib/ai/model-router";
+import { getModelForGeneration, estimateCostUSD } from "@/lib/ai/model-router";
 import { createClient } from "@/lib/supabase/server";
 import { generateJSON } from "@/lib/ai/generate";
 import {
@@ -132,7 +132,7 @@ export async function POST(req: NextRequest) {
 
     const aiModel = getModelForGeneration("brand");
 
-    const brandIdentity = await generateJSON<BrandIdentityResult>({
+    const { data: brandIdentity, usage: aiUsage } = await generateJSON<BrandIdentityResult>({
       model: aiModel,
       prompt,
       maxTokens: 6000,
@@ -174,7 +174,7 @@ export async function POST(req: NextRequest) {
       await notifyGeneration(user.id, "generation.brand");
     } catch {}
 
-    incrementAIUsage(user.id, { generationType: "brand", model: aiModel }).catch(() => {});
+    incrementAIUsage(user.id, { generationType: "brand", model: aiModel, inputTokens: aiUsage.inputTokens, outputTokens: aiUsage.outputTokens, cachedTokens: aiUsage.cachedTokens, costUsd: estimateCostUSD(aiModel, aiUsage.inputTokens, aiUsage.outputTokens, aiUsage.cachedTokens) }).catch(() => {});
 
     return NextResponse.json({ ...brand, generated: brandIdentity });
   } catch (error) {

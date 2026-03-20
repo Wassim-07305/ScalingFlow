@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { generateText } from "@/lib/ai/generate";
 import { incrementAIUsage } from "@/lib/stripe/check-usage";
-import { getModelForGeneration } from "@/lib/ai/model-router";
+import { getModelForGeneration, estimateCostUSD } from "@/lib/ai/model-router";
 import { awardXP } from "@/lib/gamification/xp-engine";
 
 export const maxDuration = 60;
@@ -61,7 +61,7 @@ Redige en francais, de maniere claire et structuree. Utilise des bullet points e
 
     const aiModel = getModelForGeneration("vault_analysis");
 
-    const extraction = await generateText({ model: aiModel, prompt, maxTokens: 4096 });
+    const { text: extraction, usage: aiUsage } = await generateText({ model: aiModel, prompt, maxTokens: 4096 });
 
     // Save to profile
     await supabase
@@ -75,7 +75,7 @@ Redige en francais, de maniere claire et structuree. Utilise des bullet points e
       /* ignore xp errors */
     }
 
-    incrementAIUsage(user.id, { generationType: "vault_analysis", model: aiModel }).catch(() => {});
+    incrementAIUsage(user.id, { generationType: "vault_analysis", model: aiModel, inputTokens: aiUsage.inputTokens, outputTokens: aiUsage.outputTokens, cachedTokens: aiUsage.cachedTokens, costUsd: estimateCostUSD(aiModel, aiUsage.inputTokens, aiUsage.outputTokens, aiUsage.cachedTokens) }).catch(() => {});
 
     return NextResponse.json({ extraction });
   } catch (error) {

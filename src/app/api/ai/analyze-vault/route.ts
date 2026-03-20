@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { checkAIUsage, incrementAIUsage } from "@/lib/stripe/check-usage";
-import { getModelForGeneration } from "@/lib/ai/model-router";
+import { getModelForGeneration, estimateCostUSD } from "@/lib/ai/model-router";
 import { createClient } from "@/lib/supabase/server";
 import { generateJSON } from "@/lib/ai/generate";
 import {
@@ -87,7 +87,7 @@ export async function POST(req: NextRequest) {
 
     const aiModel = getModelForGeneration("vault_analysis");
 
-    const result = await generateJSON<VaultAnalysis>({
+    const { data: result, usage: aiUsage } = await generateJSON<VaultAnalysis>({
       model: aiModel,
       prompt: userPrompt,
       systemPrompt,
@@ -122,7 +122,7 @@ export async function POST(req: NextRequest) {
       await notifyGeneration(user.id, "generation.vault_analysis");
     } catch {}
 
-    incrementAIUsage(user.id, { generationType: "vault_analysis", model: aiModel }).catch(() => {});
+    incrementAIUsage(user.id, { generationType: "vault_analysis", model: aiModel, inputTokens: aiUsage.inputTokens, outputTokens: aiUsage.outputTokens, cachedTokens: aiUsage.cachedTokens, costUsd: estimateCostUSD(aiModel, aiUsage.inputTokens, aiUsage.outputTokens, aiUsage.cachedTokens) }).catch(() => {});
 
     return NextResponse.json({
       ...result,

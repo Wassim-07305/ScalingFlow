@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { checkAIUsage, incrementAIUsage } from "@/lib/stripe/check-usage";
-import { getModelForGeneration } from "@/lib/ai/model-router";
+import { getModelForGeneration, estimateCostUSD } from "@/lib/ai/model-router";
 import { generateText, generateJSON } from "@/lib/ai/generate";
 import { awardXP } from "@/lib/gamification/xp-engine";
 import {
@@ -153,7 +153,7 @@ export async function POST(req: NextRequest) {
       try {
         const usage = await checkAIUsage(user.id);
         if (usage.allowed) {
-          const adaptiveQ = await generateText({
+          const { text: adaptiveQ } = await generateText({
             prompt: buildInterviewNextQuestionPrompt(
               updatedAnswers,
               nextQ,
@@ -198,7 +198,7 @@ export async function POST(req: NextRequest) {
 
       const aiModel = getModelForGeneration("knowledge_extract");
 
-      const extracted = await generateJSON<ExtractedKnowledge>({
+      const { data: extracted, usage: aiUsage } = await generateJSON<ExtractedKnowledge>({
         model: aiModel,
         prompt: buildKnowledgeExtractionPrompt(answersText, userProfile),
         maxTokens: 4096,
@@ -225,7 +225,7 @@ export async function POST(req: NextRequest) {
         await awardXP(user.id, "generation.vault_analysis", {}, 100);
       } catch {}
 
-      incrementAIUsage(user.id, { generationType: "knowledge_extract", model: aiModel }).catch(() => {});
+      incrementAIUsage(user.id, { generationType: "knowledge_extract", model: aiModel, inputTokens: aiUsage.inputTokens, outputTokens: aiUsage.outputTokens, cachedTokens: aiUsage.cachedTokens, costUsd: estimateCostUSD(aiModel, aiUsage.inputTokens, aiUsage.outputTokens, aiUsage.cachedTokens) }).catch(() => {});
 
       return NextResponse.json({
         state: finalState,

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { checkAIUsage, incrementAIUsage } from "@/lib/stripe/check-usage";
-import { getModelForGeneration } from "@/lib/ai/model-router";
+import { getModelForGeneration, estimateCostUSD } from "@/lib/ai/model-router";
 import { rateLimit } from "@/lib/utils/rate-limit";
 import { generateJSON } from "@/lib/ai/generate";
 import { awardXP } from "@/lib/gamification/xp-engine";
@@ -153,7 +153,7 @@ export async function POST(_req: NextRequest) {
     const aiModel = getModelForGeneration("growth_recs");
 
     const prompt = buildGrowthRecommendationsPrompt(ctx);
-    const result = await generateJSON<GrowthRecommendationsResult>({
+    const { data: result, usage: aiUsage } = await generateJSON<GrowthRecommendationsResult>({
       model: aiModel,
       prompt,
       maxTokens: 3000,
@@ -176,7 +176,7 @@ export async function POST(_req: NextRequest) {
       await notifyGeneration(user.id, "generation.growth_recommendations");
     } catch {}
 
-    incrementAIUsage(user.id, { generationType: "growth_recs", model: aiModel }).catch(() => {});
+    incrementAIUsage(user.id, { generationType: "growth_recs", model: aiModel, inputTokens: aiUsage.inputTokens, outputTokens: aiUsage.outputTokens, cachedTokens: aiUsage.cachedTokens, costUsd: estimateCostUSD(aiModel, aiUsage.inputTokens, aiUsage.outputTokens, aiUsage.cachedTokens) }).catch(() => {});
 
     return NextResponse.json({
       ...result,
