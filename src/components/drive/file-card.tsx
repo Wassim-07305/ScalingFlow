@@ -109,7 +109,7 @@ export function FileCard({
       <div className="flex items-start justify-between">
         <button
           onClick={handleClick}
-          className="flex-1 text-left"
+          className="flex-1 min-w-0 text-left"
           aria-label={`Ouvrir le fichier ${name}`}
         >
           <div

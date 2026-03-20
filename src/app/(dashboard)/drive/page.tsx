@@ -12,6 +12,7 @@ import { FilePreviewModal } from "@/components/drive/file-preview-modal";
 import { CreateFolderModal } from "@/components/drive/create-folder-modal";
 import { UploadFileModal } from "@/components/drive/upload-file-modal";
 import { createClient } from "@/lib/supabase/client";
+import { useUser } from "@/hooks/use-user";
 import { toast } from "sonner";
 import {
   FolderPlus,
@@ -104,14 +105,7 @@ export default function DrivePage() {
   } | null>(null);
 
   const supabase = React.useMemo(() => createClient(), []);
-  const [userId, setUserId] = React.useState<string | null>(null);
-
-  // Fetch user ID on mount
-  React.useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
-      setUserId(data.user?.id ?? null);
-    });
-  }, [supabase]);
+  const { user } = useUser();
 
   // Load contents of current folder
   const loadContents = React.useCallback(async () => {
@@ -206,13 +200,13 @@ export default function DrivePage() {
 
   // Create folder
   const handleCreateFolder = async (name: string, color: string) => {
-    if (!userId) {
+    if (!user) {
       toast.error("Utilisateur non authentifié");
       return;
     }
 
     const { error } = await supabase.from("drive_folders").insert({
-      user_id: userId,
+      user_id: user.id,
       name,
       color,
       parent_id: currentFolderId,
