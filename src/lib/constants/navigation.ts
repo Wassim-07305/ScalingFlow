@@ -203,7 +203,7 @@ export const NAV_ITEMS: NavItem[] = [
 export const NAV_SECTIONS: NavSection[] = [
   {
     label: "",
-    items: NAV_ITEMS.filter((i) => i.href === "/"),
+    items: NAV_ITEMS.filter((i) => ["/", "/launch"].includes(i.href)),
   },
   {
     label: "Business",
@@ -227,7 +227,7 @@ export const NAV_SECTIONS: NavSection[] = [
   },
   {
     label: "Performance",
-    items: NAV_ITEMS.filter((i) => ["/launch", "/analytics"].includes(i.href)),
+    items: NAV_ITEMS.filter((i) => ["/analytics"].includes(i.href)),
   },
   {
     label: "Apprentissage",

@@ -22,6 +22,15 @@ interface UIState {
   toggleSection: (label: string) => void;
 }
 
+const DEFAULT_COLLAPSED_SECTIONS: Record<string, boolean> = {
+  Business: true,
+  Marketing: true,
+  Commercial: true,
+  Performance: true,
+  Apprentissage: true,
+  Outils: true,
+};
+
 export const useUIStore = create<UIState>()(
   persist(
     (set) => ({
@@ -30,7 +39,7 @@ export const useUIStore = create<UIState>()(
       notificationsPanelOpen: false,
       searchOpen: false,
       theme: "dark" as Theme,
-      collapsedSections: {} as Record<string, boolean>,
+      collapsedSections: { ...DEFAULT_COLLAPSED_SECTIONS },
       toggleSidebar: () =>
         set((state) => ({ sidebarCollapsed: !state.sidebarCollapsed })),
       setSidebarCollapsed: (collapsed) => set({ sidebarCollapsed: collapsed }),
@@ -51,6 +60,11 @@ export const useUIStore = create<UIState>()(
     }),
     {
       name: "scalingflow-ui-store",
+      version: 2,
+      migrate: (persistedState: unknown) => {
+        const state = persistedState as Partial<UIState>;
+        return { ...state, collapsedSections: { ...DEFAULT_COLLAPSED_SECTIONS } };
+      },
       partialize: (state) => ({
         sidebarCollapsed: state.sidebarCollapsed,
         theme: state.theme,
