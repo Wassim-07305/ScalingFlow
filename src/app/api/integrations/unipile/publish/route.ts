@@ -77,22 +77,32 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const postBody: Record<string, unknown> = {
-      account_id,
-      text,
-    };
+    const formData = new FormData();
+    formData.append("account_id", account_id);
+    formData.append("text", text);
 
     if (media_urls && media_urls.length > 0) {
-      postBody.media_urls = media_urls;
+      for (const url of media_urls) {
+        try {
+          const res = await fetch(url);
+          if (!res.ok) continue;
+          const buffer = await res.arrayBuffer();
+          const contentType = res.headers.get("content-type") || "image/jpeg";
+          const ext = contentType.split("/")[1]?.split(";")[0] || "jpg";
+          const filename = `media_${Date.now()}.${ext}`;
+          formData.append("attachments", new Blob([buffer], { type: contentType }), filename);
+        } catch {
+          console.warn("[Unipile Publish] Impossible de télécharger le média:", url);
+        }
+      }
     }
 
     const response = await fetch(`${apiUrl}/api/v1/posts`, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
         "X-API-KEY": accessToken,
       },
-      body: JSON.stringify(postBody),
+      body: formData,
     });
 
     if (!response.ok) {
@@ -102,8 +112,17 @@ export async function POST(request: NextRequest) {
         response.status,
         errorData,
       );
+      let detail = "";
+      try {
+        const json = JSON.parse(errorData);
+        detail = json.detail || json.message || json.error || errorData;
+      } catch {
+        detail = errorData;
+      }
       return NextResponse.json(
-        { error: "Erreur lors de la publication du contenu" },
+        {
+          error: `Erreur publication: HTTP ${response.status} — ${typeof detail === "string" ? detail.slice(0, 300) : JSON.stringify(detail).slice(0, 300)}`,
+        },
         { status: response.status >= 500 ? 502 : response.status },
       );
     }
