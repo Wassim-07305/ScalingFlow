@@ -99,7 +99,45 @@ export default function AdsPage() {
         toast.error("Impossible de charger ce creative");
         return;
       }
-      const parsed = data.ai_raw_response || data;
+      // Use ai_raw_response if available, otherwise reconstruct from flat columns
+      let parsed = data.ai_raw_response;
+      if (!parsed) {
+        if (data.creative_type === "video_script") {
+          parsed = {
+            scripts: [{
+              duree: "30s",
+              hook: data.hook || "",
+              corps: data.video_script || data.ad_copy || "",
+              cta: data.cta || "",
+              angle: data.angle || "",
+            }],
+          };
+        } else if (data.creative_type === "dm_script") {
+          // Parse concatenated DM text back into structured format
+          const parts = (data.ad_copy || "").split(/(?:Opener:|Follow-up \d:|Closing:)/i).filter(Boolean);
+          parsed = {
+            prospection: [{
+              opener: parts[0]?.trim() || data.hook || "",
+              follow_up_1: parts[1]?.trim() || "",
+              follow_up_2: parts[2]?.trim() || "",
+              closing: parts[3]?.trim() || data.cta || "",
+            }],
+            retargeting: [],
+          };
+        } else {
+          // image/carousel — wrap as variation array
+          parsed = {
+            variations: [{
+              hook: data.hook || "",
+              ad_copy: data.ad_copy || "",
+              headline: data.headline || "",
+              cta: data.cta || "",
+              angle: data.angle || "",
+              creative_type: data.creative_type,
+            }],
+          };
+        }
+      }
       const typeMap: Record<string, string> = {
         image: "creatives",
         carousel: "creatives",

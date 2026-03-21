@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { unstable_cache } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { DashboardShell } from "@/components/layout/dashboard-shell";
+import { OrgFeatureGate } from "@/components/layout/org-feature-gate";
 import { UserProvider } from "@/contexts/user-context";
 import { createAdminClient } from "@/lib/supabase/admin";
 
@@ -92,9 +93,18 @@ export default async function DashboardLayout({
     features: Record<string, boolean> | null;
   } | null = null;
 
+  // Compute disabled features for org members
+  const disabledFeatures: string[] = [];
   if (userProfile.organization_id) {
     const org = await getCachedOrgBranding(userProfile.organization_id);
-    if (org) orgBranding = org;
+    if (org) {
+      orgBranding = org;
+      if (org.features) {
+        for (const [key, enabled] of Object.entries(org.features)) {
+          if (enabled === false) disabledFeatures.push(key);
+        }
+      }
+    }
   }
 
   return (
@@ -113,7 +123,9 @@ export default async function DashboardLayout({
         userId={user.id}
         orgBranding={orgBranding}
       >
-        {children}
+        <OrgFeatureGate disabledFeatures={disabledFeatures}>
+          {children}
+        </OrgFeatureGate>
       </DashboardShell>
     </UserProvider>
   );
