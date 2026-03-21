@@ -74,11 +74,43 @@ export async function GET(request: NextRequest) {
         }
       }
 
-      const messages = messageItems.map((m) => ({
+      // Resolve sender names for non-self messages
+      const senderIds = [
+        ...new Set(
+          messageItems
+            .filter((m) => !m.is_sender && m.sender_id)
+            .map((m) => String(m.sender_id)),
+        ),
+      ];
+
+      const senderNameMap = new Map<string, string>();
+      if (apiUrl && accessToken && senderIds.length > 0) {
+        await Promise.allSettled(
+          senderIds.slice(0, 10).map(async (senderId) => {
+            try {
+              const res = await fetch(
+                `${apiUrl}/api/v1/users/${encodeURIComponent(senderId)}?account_id=${encodeURIComponent(accountId!)}`,
+                { headers: { "X-API-KEY": accessToken } },
+              );
+              if (!res.ok) return;
+              const profile = (await res.json()) as Record<string, unknown>;
+              const name =
+                profile.first_name && profile.last_name
+                  ? `${profile.first_name} ${profile.last_name}`
+                  : null;
+              if (name) senderNameMap.set(senderId, name);
+            } catch {}
+          }),
+        );
+      }
+
+      const messages = messageItems.reverse().map((m) => ({
         id: String(m.id ?? ""),
         text: String(m.text ?? ""),
         sender_id: String(m.sender_id ?? ""),
-        sender_name: m.is_sender ? "Moi" : "Contact",
+        sender_name: m.is_sender
+          ? "Moi"
+          : senderNameMap.get(String(m.sender_id)) || "Contact",
         is_me: Boolean(m.is_sender),
         created_at: String(m.timestamp ?? new Date().toISOString()),
       }));
@@ -102,11 +134,10 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // Resolve attendee names from Unipile API
+    // Resolve attendee names from Unipile /users API (needs account_id)
     const apiUrl = process.env.UNIPILE_API_URL;
     const accessToken = process.env.UNIPILE_ACCESS_TOKEN;
 
-    // Batch fetch attendee names (best effort, parallel)
     const attendeeIds = [
       ...new Set(
         chatItems
@@ -115,16 +146,14 @@ export async function GET(request: NextRequest) {
       ),
     ];
 
-    const nameMap = new Map<string, string>();
+    const nameMap = new Map<string, { name: string; avatar?: string }>();
     if (apiUrl && accessToken && attendeeIds.length > 0) {
-      const nameResults = await Promise.allSettled(
+      await Promise.allSettled(
         attendeeIds.slice(0, 30).map(async (attendeeId) => {
           try {
             const res = await fetch(
-              `${apiUrl}/api/v1/users/${encodeURIComponent(attendeeId)}`,
-              {
-                headers: { "X-API-KEY": accessToken },
-              },
+              `${apiUrl}/api/v1/users/${encodeURIComponent(attendeeId)}?account_id=${encodeURIComponent(accountId!)}`,
+              { headers: { "X-API-KEY": accessToken } },
             );
             if (!res.ok) return;
             const profile = (await res.json()) as Record<string, unknown>;
@@ -134,7 +163,12 @@ export async function GET(request: NextRequest) {
                 : (profile.display_name as string) ||
                   (profile.name as string) ||
                   null;
-            if (name) nameMap.set(attendeeId, name);
+            if (name) {
+              nameMap.set(attendeeId, {
+                name,
+                avatar: (profile.profile_picture_url as string) || undefined,
+              });
+            }
           } catch {
             // skip individual failures
           }
@@ -147,7 +181,7 @@ export async function GET(request: NextRequest) {
       .filter((c) => !c.archived)
       .map((c) => {
         const attendeeId = String(c.attendee_provider_id ?? "");
-        const resolvedName = nameMap.get(attendeeId);
+        const resolved = nameMap.get(attendeeId);
         return {
           id: String(c.id ?? ""),
           account_id: accountId,
@@ -155,7 +189,8 @@ export async function GET(request: NextRequest) {
           participants: [
             {
               id: attendeeId,
-              name: resolvedName || String(c.name || c.subject || "Conversation"),
+              name: resolved?.name || String(c.name || c.subject || "Conversation"),
+              avatar_url: resolved?.avatar || null,
             },
           ],
           last_message: null,
