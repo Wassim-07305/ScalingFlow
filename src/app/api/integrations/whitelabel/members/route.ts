@@ -21,18 +21,18 @@ export async function POST(req: NextRequest) {
       .from("organization_members")
       .select("organization_id, role")
       .eq("user_id", user.id)
-      .single();
+      .maybeSingle();
 
     if (!membership || !["owner", "admin"].includes(membership.role)) {
       return NextResponse.json({ error: "Non autorisé" }, { status: 403 });
     }
 
-    // Server-side Premium gate
+    // Server-side plan gate
     const { data: callerProfile } = await supabase
       .from("profiles")
       .select("subscription_plan")
       .eq("id", user.id)
-      .single();
+      .maybeSingle();
     if (!["scale", "agency", "premium"].includes(callerProfile?.subscription_plan || "")) {
       return NextResponse.json(
         { error: "Un abonnement Scale ou Agency est requis" },
@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
       .from("profiles")
       .select("id")
       .eq("email", email)
-      .single();
+      .maybeSingle();
 
     if (!targetProfile) {
       return NextResponse.json(
@@ -117,7 +117,7 @@ export async function DELETE(req: NextRequest) {
       .from("organization_members")
       .select("organization_id, role")
       .eq("user_id", user.id)
-      .single();
+      .maybeSingle();
 
     if (!membership || !["owner", "admin"].includes(membership.role)) {
       return NextResponse.json({ error: "Non autorisé" }, { status: 403 });
@@ -142,7 +142,7 @@ export async function DELETE(req: NextRequest) {
       .select("role")
       .eq("organization_id", membership.organization_id)
       .eq("user_id", user_id)
-      .single();
+      .maybeSingle();
 
     if (targetMember && ["owner", "admin"].includes(targetMember.role)) {
       const { count } = await supabase
