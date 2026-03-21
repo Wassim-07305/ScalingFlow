@@ -179,7 +179,10 @@ export default function AffiliatePage() {
         setAffiliate(null);
         return;
       }
-      setAffiliate(affiliateData as AffiliateData);
+      // Always use current app URL for referral link (fixes localhost links)
+      const appUrl = process.env.NEXT_PUBLIC_APP_URL || window.location.origin;
+      const correctLink = `${appUrl}/r/${affiliateData.affiliate_code}`;
+      setAffiliate({ ...affiliateData, referral_link: correctLink } as AffiliateData);
       const affId = affiliateData.id;
 
       const [refRes, commRes, payRes] = await Promise.all([
