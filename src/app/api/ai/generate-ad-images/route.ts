@@ -7,7 +7,8 @@ import { getSetting } from "@/lib/settings/get-setting";
 
 export const maxDuration = 300;
 
-const REPLICATE_API_URL = "https://api.replicate.com/v1/predictions";
+const REPLICATE_MODEL = "black-forest-labs/flux-schnell";
+const REPLICATE_API_URL = `https://api.replicate.com/v1/models/${REPLICATE_MODEL}/predictions`;
 
 interface ReplicateResponse {
   id: string;
@@ -171,7 +172,6 @@ export async function POST(req: NextRequest) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "black-forest-labs/flux-schnell",
           input: {
             prompt,
             num_outputs: 1,
@@ -183,8 +183,9 @@ export async function POST(req: NextRequest) {
       });
 
       if (!createRes.ok) {
+        const errBody = await createRes.text().catch(() => "");
         console.error(
-          `[generate-ad-images] Replicate error for variation ${i + 1}`,
+          `[generate-ad-images] Replicate error for variation ${i + 1}: HTTP ${createRes.status} — ${errBody.slice(0, 500)}`,
         );
         continue;
       }
@@ -213,7 +214,7 @@ export async function POST(req: NextRequest) {
 
     if (results.length === 0) {
       return NextResponse.json(
-        { error: "La génération des images publicitaires a échoué" },
+        { error: "La génération des images a échoué. Vérifie que le token Replicate est valide dans les paramètres admin." },
         { status: 500 },
       );
     }
