@@ -7,7 +7,7 @@ import { getSetting } from "@/lib/settings/get-setting";
 
 export const maxDuration = 300;
 
-const REPLICATE_MODEL = "black-forest-labs/flux-schnell";
+const REPLICATE_MODEL = "black-forest-labs/flux-1.1-pro";
 const REPLICATE_API_URL = `https://api.replicate.com/v1/models/${REPLICATE_MODEL}/predictions`;
 
 interface ReplicateResponse {
