@@ -155,6 +155,9 @@ export async function POST(req: NextRequest) {
     const results: { url: string; variation: number }[] = [];
 
     for (let i = 0; i < VARIATIONS.length; i++) {
+      // Wait between variations to avoid Replicate rate limiting (burst=1 under $5 credit)
+      if (i > 0) await new Promise((r) => setTimeout(r, 8000));
+
       const variation = VARIATIONS[i];
       const prompt = buildAdImagePrompt(
         ad_text,
