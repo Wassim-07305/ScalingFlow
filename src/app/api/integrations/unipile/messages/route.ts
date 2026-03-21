@@ -59,9 +59,30 @@ export async function GET(request: NextRequest) {
 
     if (chatId) {
       // Return messages from a specific chat
-      const messages = await unipile.messaging.getAllMessagesFromChat({
+      const rawMessages = await unipile.messaging.getAllMessagesFromChat({
         chat_id: chatId,
-      });
+      }) as Record<string, unknown>;
+
+      // Normalize — may be { object: "MessageList", items: [...] } or an array
+      let messageItems: Array<Record<string, unknown>> = [];
+      if (Array.isArray(rawMessages)) {
+        messageItems = rawMessages;
+      } else if (rawMessages && typeof rawMessages === "object") {
+        const items = (rawMessages as Record<string, unknown>).items;
+        if (Array.isArray(items)) {
+          messageItems = items as Array<Record<string, unknown>>;
+        }
+      }
+
+      const messages = messageItems.map((m) => ({
+        id: String(m.id ?? ""),
+        text: String(m.text ?? ""),
+        sender_id: String(m.sender_id ?? ""),
+        sender_name: m.is_sender ? "Moi" : "Contact",
+        is_me: Boolean(m.is_sender),
+        created_at: String(m.timestamp ?? new Date().toISOString()),
+      }));
+
       return NextResponse.json({ messages });
     }
 
