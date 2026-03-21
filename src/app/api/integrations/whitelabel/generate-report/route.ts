@@ -67,7 +67,7 @@ export async function POST(req: NextRequest) {
         // Appels de vente
         supabase
           .from("sales_call_logs")
-          .select("id, call_result, revenue_generated, created_at")
+          .select("id, outcome, revenue, created_at")
           .eq("user_id", user.id)
           .gte("created_at", periodStart),
         // Contenu généré
@@ -95,9 +95,9 @@ export async function POST(req: NextRequest) {
     );
     const totalLeads = leads.length;
     const totalCalls = calls.length;
-    const closedCalls = calls.filter((c) => c.call_result === "closing").length;
+    const closedCalls = calls.filter((c) => c.outcome === "closing").length;
     const callRevenue = calls.reduce(
-      (s, c) => s + ((c.revenue_generated as number) || 0),
+      (s, c) => s + ((c.revenue as number) || 0),
       0,
     );
     const conversionRate =

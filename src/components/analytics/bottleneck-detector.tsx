@@ -319,7 +319,7 @@ export function BottleneckDetector() {
       ] = await Promise.all([
         supabase
           .from("ad_campaigns")
-          .select("impressions, clicks, daily_budget")
+          .select("total_impressions, total_clicks, daily_budget")
           .eq("user_id", user.id),
         supabase
           .from("funnel_leads")
@@ -327,7 +327,7 @@ export function BottleneckDetector() {
           .eq("user_id", user.id),
         supabase
           .from("sales_call_logs")
-          .select("id, call_result", { count: "exact" })
+          .select("id, outcome", { count: "exact" })
           .eq("user_id", user.id),
         supabase
           .from("revenue_entries")
@@ -362,11 +362,11 @@ export function BottleneckDetector() {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const campaigns: any[] = impressionsRes.data ?? [];
       const totalImpressions = campaigns.reduce(
-        (s: number, c: any) => s + ((c.impressions as number) ?? 0),
+        (s: number, c: any) => s + ((c.total_impressions as number) ?? 0),
         0,
       );
       const totalClicks = campaigns.reduce(
-        (s: number, c: any) => s + ((c.clicks as number) ?? 0),
+        (s: number, c: any) => s + ((c.total_clicks as number) ?? 0),
         0,
       );
 
@@ -395,7 +395,7 @@ export function BottleneckDetector() {
       const calls = (callsRes.data as any[]) ?? [];
       const totalCalls = calls.length;
       const noShowCalls = calls.filter(
-        (c) => c.call_result === "no_show",
+        (c) => c.outcome === "no_show",
       ).length;
       const showUpRate =
         totalCalls > 0 ? ((totalCalls - noShowCalls) / totalCalls) * 100 : 100;

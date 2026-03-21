@@ -31,6 +31,9 @@ import {
 import { PARCOURS, type ParcoursId } from "@/lib/parcours";
 import { UpgradeWall } from "@/components/shared/upgrade-wall";
 import { VaultSkillMap } from "@/components/vault/vault-skill-map";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { VaultExtraction } from "@/components/vault/vault-extraction";
+import { VaultCompetitiveAdvantage } from "@/components/vault/vault-competitive-advantage";
 
 interface VaultResource {
   id: string;
@@ -310,6 +313,14 @@ export default function VaultPage() {
         }
       />
 
+      <Tabs defaultValue="vault" className="mt-6">
+        <TabsList>
+          <TabsTrigger value="vault">Coffre-Fort</TabsTrigger>
+          <TabsTrigger value="extraction">Extraction</TabsTrigger>
+          <TabsTrigger value="competitive">Avantage concurrentiel</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="vault" className="mt-6">
       <div className="grid gap-6 md:grid-cols-2">
         {/* Skills */}
         <Card className="group hover:border-accent/20 transition-all duration-300 hover:shadow-lg hover:shadow-accent/5">
@@ -682,6 +693,16 @@ export default function VaultPage() {
           </CardContent>
         </Card>
       )}
+        </TabsContent>
+
+        <TabsContent value="extraction" className="mt-6">
+          <VaultExtraction />
+        </TabsContent>
+
+        <TabsContent value="competitive" className="mt-6">
+          <VaultCompetitiveAdvantage />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
