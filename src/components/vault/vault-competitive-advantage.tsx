@@ -44,7 +44,7 @@ export function VaultCompetitiveAdvantage() {
         .from("profiles")
         .select("competitive_advantage")
         .eq("id", user.id)
-        .single();
+        .maybeSingle();
       if (data?.competitive_advantage) {
         setAdvantage(
           data.competitive_advantage as unknown as CompetitiveAdvantage,

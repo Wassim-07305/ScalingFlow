@@ -55,7 +55,7 @@ export async function POST(req: NextRequest) {
         "parcours, situation, skills, experience_level, objectives, hours_per_week, deadline",
       )
       .eq("id", user.id)
-      .single();
+      .maybeSingle();
 
     // Check current progress
     const [

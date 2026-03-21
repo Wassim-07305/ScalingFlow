@@ -223,7 +223,7 @@ export function AIChat({
         .select("id, title, messages")
         .eq("id", id)
         .eq("user_id", user.id)
-        .single();
+        .maybeSingle();
 
       if (data) {
         setConversationId(data.id);
@@ -259,7 +259,7 @@ export function AIChat({
             messages: msgs as unknown as Record<string, unknown>[],
           })
           .select("id")
-          .single();
+          .maybeSingle();
 
         if (data) {
           setConversationId(data.id);

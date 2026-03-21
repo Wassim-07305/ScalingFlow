@@ -76,7 +76,7 @@ async function processUser(
 
   // ── Recent sales objections (14 days) ─────────────────────────────────────
   const { data: recentCalls } = await supabase
-    .from("sales_calls")
+    .from("sales_call_logs")
     .select("objections")
     .eq("user_id", userId)
     .gte("created_at", new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString())
@@ -96,7 +96,7 @@ async function processUser(
     .select("target_avatar")
     .eq("user_id", userId)
     .eq("selected", true)
-    .single();
+    .maybeSingle();
 
   const persona =
     (market?.target_avatar as string) ?? profile.target_audience ?? "Entrepreneurs";

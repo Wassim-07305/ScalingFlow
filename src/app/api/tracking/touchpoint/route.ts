@@ -110,14 +110,14 @@ export async function POST(req: NextRequest) {
         channel,
       })
       .select("id")
-      .single();
+      .maybeSingle();
 
     if (error) {
       console.error("[tracking/touchpoint] insert error:", error);
       return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
     }
 
-    return NextResponse.json({ ok: true, id: data.id });
+    return NextResponse.json({ ok: true, id: data?.id });
   } catch (err) {
     console.error("[tracking/touchpoint] error:", err);
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });

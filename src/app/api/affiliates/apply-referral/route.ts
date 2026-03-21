@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
       .from("profiles")
       .select("referred_by, full_name, email")
       .eq("id", user.id)
-      .single();
+      .maybeSingle();
 
     if (existingProfile?.referred_by) {
       return NextResponse.json({ applied: false, reason: "already_referred" });
@@ -120,7 +120,7 @@ export async function POST(req: NextRequest) {
         .from("affiliates")
         .select("total_referrals")
         .eq("id", affiliate.id)
-        .single();
+        .maybeSingle();
       if (aff) {
         await adminClient
           .from("affiliates")

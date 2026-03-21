@@ -36,7 +36,7 @@ export async function GET() {
         .from("profiles")
         .select("email, full_name")
         .eq("id", user.id)
-        .single();
+        .maybeSingle();
 
       const account = await stripe.accounts.create({
         type: "express",

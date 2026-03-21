@@ -73,7 +73,7 @@ export async function POST(req: NextRequest) {
       .from("profiles")
       .select("vault_analysis")
       .eq("id", user.id)
-      .single();
+      .maybeSingle();
 
     const previousAnalysis =
       (profileData?.vault_analysis as VaultAnalysis | null) ?? null;

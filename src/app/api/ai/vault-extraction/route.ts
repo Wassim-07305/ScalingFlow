@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
       .from("profiles")
       .select("skills, situation, experience_level, industries")
       .eq("id", user.id)
-      .single();
+      .maybeSingle();
 
     const prompt = `Tu es un expert en extraction et structuration d'expertise professionnelle.
 

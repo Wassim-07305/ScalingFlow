@@ -71,7 +71,7 @@ export async function POST(req: NextRequest) {
       .select("*")
       .eq("id", market_analysis_id)
       .eq("user_id", user.id)
-      .single();
+      .maybeSingle();
 
     if (maError || !marketAnalysis) {
       return NextResponse.json(
@@ -85,7 +85,7 @@ export async function POST(req: NextRequest) {
       .from("profiles")
       .select("skills, vault_skills, expertise_answers, situation, parcours")
       .eq("id", user.id)
-      .single();
+      .maybeSingle();
 
     const marketData: MarketAnalysisData = {
       market_name: marketAnalysis.market_name,

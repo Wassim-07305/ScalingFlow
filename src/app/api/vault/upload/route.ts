@@ -121,7 +121,7 @@ export async function POST(req: NextRequest) {
         content_type: file.type,
       })
       .select()
-      .single();
+      .maybeSingle();
 
     if (dbError) {
       console.error("vault/upload DB error:", dbError);

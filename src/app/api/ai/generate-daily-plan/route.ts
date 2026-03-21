@@ -41,7 +41,7 @@ export async function POST(req: Request) {
           "niche, offer_name, target_audience, xp_points, level, streak_days, onboarding_completed, revenue_target",
         )
         .eq("id", user.id)
-        .single(),
+        .maybeSingle(),
       supabase
         .from("offers")
         .select("id", { count: "exact", head: true })
@@ -63,7 +63,7 @@ export async function POST(req: Request) {
           new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
         ),
       supabase
-        .from("sales_calls")
+        .from("sales_call_logs")
         .select("id", { count: "exact", head: true })
         .eq("user_id", user.id),
       supabase
@@ -207,7 +207,7 @@ Génère le plan du jour au format JSON :
         { onConflict: "user_id,date" },
       )
       .select()
-      .single();
+      .maybeSingle();
 
     incrementAIUsage(user.id, { generationType: "daily_plan", model: aiModel }).catch(() => {});
 

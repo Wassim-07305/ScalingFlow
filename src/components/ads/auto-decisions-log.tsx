@@ -202,7 +202,7 @@ export function AutoDecisionsLog() {
       .from("ad_automation_config")
       .select("enabled")
       .eq("user_id", user.id)
-      .single();
+      .maybeSingle();
 
     setAutomationEnabled(config?.enabled ?? false);
     setLoading(false);

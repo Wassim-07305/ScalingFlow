@@ -98,7 +98,7 @@ export async function POST(req: NextRequest) {
       .select("*")
       .eq("id", market_analysis_id)
       .eq("user_id", user.id)
-      .single();
+      .maybeSingle();
 
     if (maError || !marketAnalysis) {
       return NextResponse.json(
@@ -112,7 +112,7 @@ export async function POST(req: NextRequest) {
       .from("profiles")
       .select("skills")
       .eq("id", user.id)
-      .single();
+      .maybeSingle();
 
     // Phase 1 : Scraping réel via Apify (prioritaire) puis Firecrawl (fallback)
     let scrapedContext = "";

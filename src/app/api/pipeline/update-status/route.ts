@@ -45,7 +45,7 @@ export async function POST(req: NextRequest) {
       .select("id, user_id, name")
       .eq("id", leadId)
       .eq("user_id", user.id)
-      .single();
+      .maybeSingle();
 
     if (leadError || !lead) {
       return NextResponse.json({ error: "Lead introuvable" }, { status: 404 });

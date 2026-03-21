@@ -145,7 +145,7 @@ export default function MarketPage() {
         .from("market_analyses")
         .select("id, ai_raw_response, competitor_analysis, persona, schwartz_analysis")
         .eq("id", selected.id)
-        .single();
+        .maybeSingle();
 
       if (fullData) {
         setSelectedAnalysis((prev) =>

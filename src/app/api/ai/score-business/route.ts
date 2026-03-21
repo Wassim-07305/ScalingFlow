@@ -35,7 +35,7 @@ async function fetchBusinessData(
         "current_revenue, target_revenue, experience_level, niche, objectives, selected_market",
       )
       .eq("id", userId)
-      .single(),
+      .maybeSingle(),
     supabase
       .from("offers")
       .select(

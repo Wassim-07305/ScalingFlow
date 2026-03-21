@@ -326,7 +326,7 @@ export function BottleneckDetector() {
           .select("id", { count: "exact", head: true })
           .eq("user_id", user.id),
         supabase
-          .from("sales_calls")
+          .from("sales_call_logs")
           .select("id, call_result", { count: "exact" })
           .eq("user_id", user.id),
         supabase

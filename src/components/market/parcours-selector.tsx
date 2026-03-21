@@ -68,7 +68,7 @@ export function ParcoursSelector() {
         .from("profiles")
         .select("parcours")
         .eq("id", user.id)
-        .single();
+        .maybeSingle();
       if (data?.parcours) setSelectedParcours(data.parcours as string);
       setLoading(false);
     };

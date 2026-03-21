@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
         "organization_id, organizations(name, brand_name, logo_url, primary_color)",
       )
       .eq("user_id", user.id)
-      .single();
+      .maybeSingle();
 
     const org = orgMember?.organizations as unknown as {
       name: string;
@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
           .gte("created_at", periodStart),
         // Appels de vente
         supabase
-          .from("sales_calls")
+          .from("sales_call_logs")
           .select("id, call_result, revenue_generated, created_at")
           .eq("user_id", user.id)
           .gte("created_at", periodStart),

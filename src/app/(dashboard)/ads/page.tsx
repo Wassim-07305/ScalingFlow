@@ -67,7 +67,7 @@ export default function AdsPage() {
         .from("sales_assets")
         .select("asset_type, ai_raw_response, title")
         .eq("id", item.id)
-        .single();
+        .maybeSingle();
       if (error || !data) {
         toast.error("Impossible de charger cet asset");
         return;
@@ -94,7 +94,7 @@ export default function AdsPage() {
           "creative_type, ai_raw_response, ad_copy, headline, hook, cta, video_script, angle",
         )
         .eq("id", item.id)
-        .single();
+        .maybeSingle();
       if (error || !data) {
         toast.error("Impossible de charger ce creative");
         return;

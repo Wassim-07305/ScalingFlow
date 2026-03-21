@@ -62,10 +62,10 @@ export async function POST(req: NextRequest) {
         .eq("id", conversationId)
         .eq("user_id", user.id)
         .select("id")
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
-      return NextResponse.json({ id: data.id });
+      return NextResponse.json({ id: data?.id });
     }
 
     // Create new conversation
@@ -78,10 +78,10 @@ export async function POST(req: NextRequest) {
         messages: messages || [],
       })
       .select("id")
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
-    return NextResponse.json({ id: data.id });
+    return NextResponse.json({ id: data?.id });
   } catch (error) {
     console.error("Error saving conversation:", error);
     return NextResponse.json(

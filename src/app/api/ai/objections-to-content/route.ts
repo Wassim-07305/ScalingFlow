@@ -59,7 +59,7 @@ export async function POST(req: NextRequest) {
 
     // Fetch profile + vault context
     const [{ data: profile }, vaultContext] = await Promise.all([
-      supabase.from("profiles").select("*").eq("id", user.id).single(),
+      supabase.from("profiles").select("*").eq("id", user.id).maybeSingle(),
       buildFullVaultContext(user.id),
     ]);
 
@@ -69,7 +69,7 @@ export async function POST(req: NextRequest) {
       .eq("user_id", user.id)
       .order("created_at", { ascending: false })
       .limit(1)
-      .single();
+      .maybeSingle();
 
     const { data: latestOffer } = await supabase
       .from("offers")
@@ -77,7 +77,7 @@ export async function POST(req: NextRequest) {
       .eq("user_id", user.id)
       .order("created_at", { ascending: false })
       .limit(1)
-      .single();
+      .maybeSingle();
 
     // Build context
     const context: ObjectionContext = {

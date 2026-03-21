@@ -82,7 +82,7 @@ export function ProgressOverview({ className }: ProgressOverviewProps) {
           .from("leaderboard_scores")
           .select("rank_position")
           .eq("user_id", user.id)
-          .single(),
+          .maybeSingle(),
         supabase
           .from("academy_videos")
           .select("id", { count: "exact", head: true }),

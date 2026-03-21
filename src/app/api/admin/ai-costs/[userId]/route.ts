@@ -26,7 +26,7 @@ export async function GET(
       .from("profiles")
       .select("role")
       .eq("id", user.id)
-      .single();
+      .maybeSingle();
 
     if (adminProfile?.role !== "admin") {
       return NextResponse.json({ error: "Accès refusé" }, { status: 403 });
@@ -47,7 +47,7 @@ export async function GET(
         .from("profiles")
         .select("id, full_name, email, subscription_plan, subscription_status, created_at")
         .eq("id", userId)
-        .single(),
+        .maybeSingle(),
       supabase
         .from("ai_generations")
         .select("generation_type, model, cost_usd, input_tokens, output_tokens, cached_tokens, is_cron, created_at")

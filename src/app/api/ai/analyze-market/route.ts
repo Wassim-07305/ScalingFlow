@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
       .from("profiles")
       .select("onboarding_completed")
       .eq("id", user.id)
-      .single();
+      .maybeSingle();
 
     if (prof?.onboarding_completed) {
       const usage = await checkAIUsage(user.id);

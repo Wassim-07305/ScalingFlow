@@ -113,7 +113,7 @@ export function FunnelPreview({
           .eq("user_id", user.id)
           .order("created_at", { ascending: false })
           .limit(1)
-          .single();
+          .maybeSingle();
 
         if (funnel) {
           setInternalData({
@@ -131,7 +131,7 @@ export function FunnelPreview({
           .eq("user_id", user.id)
           .order("created_at", { ascending: false })
           .limit(1)
-          .single();
+          .maybeSingle();
 
         if (brand?.brand_kit && typeof brand.brand_kit === "object") {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any

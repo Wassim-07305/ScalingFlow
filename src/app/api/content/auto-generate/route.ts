@@ -69,7 +69,7 @@ async function runContentGeneration() {
 
     // Récupérer les objections de vente récentes (F75 : contenu depuis data vente)
     const { data: recentCalls } = await supabase
-      .from("sales_calls")
+      .from("sales_call_logs")
       .select("objections, key_moments")
       .eq("user_id", profile.id)
       .gte(

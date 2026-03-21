@@ -127,7 +127,7 @@ export function PipelineBoard() {
       .from("pipeline_leads")
       .insert(newLead)
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) {
       toast.error("Erreur lors de l'ajout du lead");

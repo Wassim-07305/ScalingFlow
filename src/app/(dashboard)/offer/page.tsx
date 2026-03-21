@@ -72,7 +72,7 @@ export default function OfferPage() {
         .select("id, market_name")
         .eq("user_id", user.id)
         .eq("selected", true)
-        .single();
+        .maybeSingle();
 
       if (market) {
         setMarketAnalysisId(market.id);
@@ -115,7 +115,7 @@ export default function OfferPage() {
           "ai_raw_response, offer_name, positioning, unique_mechanism, pricing_strategy, guarantees, risk_reversal, delivery_structure, oto_offer, full_document",
         )
         .eq("id", item.id)
-        .single();
+        .maybeSingle();
 
       if (error || !data) {
         toast.error("Impossible de charger cette offre");

@@ -22,7 +22,7 @@ async function getMetaCredentials(
       .from("profiles")
       .select("meta_access_token, meta_ad_account_id")
       .eq("id", userId)
-      .single();
+      .maybeSingle();
 
     return {
       token: profile?.meta_access_token,
@@ -67,7 +67,7 @@ export async function POST(req: NextRequest) {
       .select("*")
       .eq("id", campaign_id)
       .eq("user_id", user.id)
-      .single();
+      .maybeSingle();
 
     if (!campaign) {
       return NextResponse.json(
@@ -81,7 +81,7 @@ export async function POST(req: NextRequest) {
       .from("ad_automation_config")
       .select("*")
       .eq("user_id", user.id)
-      .single();
+      .maybeSingle();
 
     const effectiveScalePercent =
       scale_percent ?? configData?.scale_increment_percent ?? 20;
@@ -171,7 +171,7 @@ export async function POST(req: NextRequest) {
         meta_action_result: metaResult,
       })
       .select()
-      .single();
+      .maybeSingle();
 
     return NextResponse.json({
       success: true,
@@ -243,7 +243,7 @@ export async function GET(req: NextRequest) {
           .from("ad_campaigns")
           .select("roas")
           .eq("id", scaling.campaign_id)
-          .single();
+          .maybeSingle();
         currentRoas = campaign?.roas ?? 0;
       }
 
@@ -304,7 +304,7 @@ async function rollbackScaling(
     .select("*")
     .eq("id", scalingId)
     .eq("user_id", userId)
-    .single();
+    .maybeSingle();
 
   if (!scaling) {
     return NextResponse.json(

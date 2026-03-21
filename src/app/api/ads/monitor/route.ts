@@ -50,7 +50,7 @@ async function getMetaCredentials(
       .from("profiles")
       .select("meta_access_token, meta_ad_account_id")
       .eq("id", userId)
-      .single();
+      .maybeSingle();
 
     return {
       token: profile?.meta_access_token,
@@ -223,7 +223,7 @@ async function runMonitoring(
     .from("ad_automation_config")
     .select("*")
     .eq("user_id", userId)
-    .single();
+    .maybeSingle();
 
   const config = {
     ctr_min: configData?.ctr_min ?? 1.0,

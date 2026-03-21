@@ -168,7 +168,7 @@ export function VaultExtraction() {
         .from("profiles")
         .select("vault_extraction")
         .eq("id", user.id)
-        .single(),
+        .maybeSingle(),
     ])
       .then(([interviewData, profileRes]) => {
         if (interviewData?.in_progress) {

@@ -32,7 +32,7 @@ async function fetchAgentContext(
       .eq("user_id", userId)
       .order("created_at", { ascending: false })
       .limit(1)
-      .single();
+      .maybeSingle();
     if (data) {
       const problems = Array.isArray(data.problems)
         ? data.problems.join(", ")
@@ -58,7 +58,7 @@ async function fetchAgentContext(
       .eq("user_id", userId)
       .order("created_at", { ascending: false })
       .limit(1)
-      .single();
+      .maybeSingle();
     if (data?.competitors) {
       blocks.push(
         `## Concurrents identifiés\n${JSON.stringify(data.competitors, null, 2).slice(0, 2000)}`,
@@ -80,7 +80,7 @@ async function fetchAgentContext(
       .eq("user_id", userId)
       .order("created_at", { ascending: false })
       .limit(1)
-      .single();
+      .maybeSingle();
     if (data) {
       blocks.push(
         `## Dernier funnel\n- Nom : ${data.funnel_name || "N/A"}\n- Statut : ${data.status || "N/A"}\n- Visites : ${data.total_visits || 0}\n- Optins : ${data.total_optins || 0}\n- Taux conversion : ${((data.conversion_rate || 0) * 100).toFixed(1)}%`,
@@ -202,7 +202,7 @@ export async function POST(req: NextRequest) {
           .eq("user_id", user.id)
           .order("created_at", { ascending: false })
           .limit(1)
-          .single(),
+          .maybeSingle(),
         fetchAgentContext(supabase, user.id, agent),
         buildRAGContext(user.id, message).catch(() => ""),
       ]);
@@ -234,7 +234,7 @@ export async function POST(req: NextRequest) {
           .from("profiles")
           .select("vault_extraction")
           .eq("id", org.owner_id)
-          .single();
+          .maybeSingle();
         if (ownerProfile?.vault_extraction) {
           ownerVaultBlock = `\n\n## Expertise de ton coach (à utiliser pour personnaliser tes réponses)\n${JSON.stringify(ownerProfile.vault_extraction, null, 2).slice(0, 4000)}`;
         }
@@ -253,7 +253,7 @@ export async function POST(req: NextRequest) {
         .select("messages")
         .eq("id", conversationId)
         .eq("user_id", user.id)
-        .single();
+        .maybeSingle();
 
       if (conversation?.messages) {
         previousMessages = conversation.messages as {

@@ -11,7 +11,7 @@ async function requirePremium(supabase: Awaited<ReturnType<typeof createClient>>
     .from("profiles")
     .select("subscription_plan")
     .eq("id", userId)
-    .single();
+    .maybeSingle();
   return ["scale", "agency", "premium"].includes(profile?.subscription_plan || "");
 }
 
@@ -77,7 +77,7 @@ export async function POST(req: NextRequest) {
         owner_id: user.id,
       })
       .select()
-      .single();
+      .maybeSingle();
 
     if (orgError) {
       if (orgError.code === "23505") {
@@ -142,7 +142,7 @@ export async function GET() {
       .from("organizations")
       .select("*")
       .eq("id", membership.organization_id)
-      .single();
+      .maybeSingle();
 
     // Get members
     const { data: members } = await supabase
@@ -193,7 +193,7 @@ export async function PATCH(req: NextRequest) {
       .from("organization_members")
       .select("organization_id, role")
       .eq("user_id", user.id)
-      .single();
+      .maybeSingle();
 
     if (!membership || !["owner", "admin"].includes(membership.role)) {
       return NextResponse.json({ error: "Non autorisé" }, { status: 403 });
@@ -240,7 +240,7 @@ export async function PATCH(req: NextRequest) {
       .update(updates)
       .eq("id", membership.organization_id)
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) {
       console.error("[whitelabel] Update error:", error);

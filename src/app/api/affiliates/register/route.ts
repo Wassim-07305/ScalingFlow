@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
       .from("profiles")
       .select("id, full_name, subscription_status, subscription_plan, role")
       .eq("id", user.id)
-      .single();
+      .maybeSingle();
 
     if (!profile) {
       return NextResponse.json({ error: "Profil introuvable" }, { status: 404 });
@@ -77,7 +77,7 @@ export async function POST(req: NextRequest) {
           is_active: true,
         })
         .select("id")
-        .single();
+        .maybeSingle();
 
       if (programError || !newProgram) {
         return NextResponse.json(
@@ -133,7 +133,7 @@ export async function POST(req: NextRequest) {
         tier: "standard",
       })
       .select("id, affiliate_code, referral_link, tier, total_earned, total_referrals")
-      .single();
+      .maybeSingle();
 
     if (affiliateError || !newAffiliate) {
       return NextResponse.json(

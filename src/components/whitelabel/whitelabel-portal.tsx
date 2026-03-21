@@ -81,7 +81,7 @@ export function WhitelabelPortal({ className }: { className?: string }) {
         .from("whitelabel_config")
         .select("*")
         .eq("user_id", user.id)
-        .single();
+        .maybeSingle();
 
       if (wlConfig) {
         setConfig({

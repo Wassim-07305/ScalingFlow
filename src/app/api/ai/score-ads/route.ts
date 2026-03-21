@@ -79,7 +79,7 @@ export async function POST(req: NextRequest) {
         .from("profiles")
         .select("niche")
         .eq("id", user.id)
-        .single(),
+        .maybeSingle(),
     ]);
 
     // Return early if no data at all

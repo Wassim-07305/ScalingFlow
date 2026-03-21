@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
       .from("profiles")
       .select("id")
       .eq("webhook_api_key", apiKey)
-      .single();
+      .maybeSingle();
 
     if (!profile) {
       return NextResponse.json({ error: "Invalid API key" }, { status: 401 });

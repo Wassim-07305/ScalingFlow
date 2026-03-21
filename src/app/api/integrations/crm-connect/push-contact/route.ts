@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
         .from("profiles")
         .select("ghl_webhook_url")
         .eq("id", user.id)
-        .single();
+        .maybeSingle();
 
       if (profile?.ghl_webhook_url) {
         // SECURITY: Validate webhook URL to prevent SSRF

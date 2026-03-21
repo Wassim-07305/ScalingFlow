@@ -75,7 +75,7 @@ export async function POST() {
             .from("profiles")
             .select("full_name, email")
             .eq("id", user.id)
-            .single();
+            .maybeSingle();
 
           const email = profile?.email || user.email;
           const firstName = profile?.full_name?.split(" ")[0] || "Utilisateur";

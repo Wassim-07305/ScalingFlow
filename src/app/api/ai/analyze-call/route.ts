@@ -73,7 +73,7 @@ export async function POST(req: NextRequest) {
       .eq("user_id", user.id)
       .order("created_at", { ascending: false })
       .limit(1)
-      .single();
+      .maybeSingle();
 
     // Fetch lead attribution journey if lead_id provided
     let attributionContext: string | undefined;

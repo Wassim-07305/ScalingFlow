@@ -183,7 +183,7 @@ export default function DrivePage() {
         .from("drive_folders")
         .select("id, name, parent_id")
         .eq("id", currentId)
-        .single();
+        .maybeSingle();
 
       const folder = folderData as {
         id: string;

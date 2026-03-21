@@ -24,7 +24,7 @@ async function getMetaCredentials(
       .from("profiles")
       .select("meta_access_token, meta_ad_account_id")
       .eq("id", userId)
-      .single();
+      .maybeSingle();
 
     return {
       token: profile?.meta_access_token,
@@ -136,7 +136,7 @@ export async function POST(req: NextRequest) {
         status: metaAudienceId ? "ready" : "draft",
       })
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 });

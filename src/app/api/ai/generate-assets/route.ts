@@ -129,7 +129,7 @@ export async function POST(req: NextRequest) {
         .eq("user_id", user.id)
         .order("created_at", { ascending: false })
         .limit(1)
-        .single();
+        .maybeSingle();
       offerId = latestOffer?.id;
     }
 
@@ -146,7 +146,7 @@ export async function POST(req: NextRequest) {
       .select("*, market_analyses(*)")
       .eq("id", offerId)
       .eq("user_id", user.id)
-      .single();
+      .maybeSingle();
 
     if (offerError || !offer) {
       return NextResponse.json({ error: "Offre introuvable" }, { status: 404 });
@@ -285,7 +285,7 @@ export async function POST(req: NextRequest) {
         status: "draft",
       })
       .select()
-      .single();
+      .maybeSingle();
 
     if (saveError) {
       return NextResponse.json(

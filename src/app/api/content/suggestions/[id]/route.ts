@@ -28,7 +28,7 @@ export async function PATCH(
     .select("*")
     .eq("id", id)
     .eq("user_id", user.id)
-    .single();
+    .maybeSingle();
 
   if (fetchError || !suggestion) {
     return NextResponse.json({ error: "Suggestion introuvable" }, { status: 404 });

@@ -39,7 +39,7 @@ export async function POST() {
         "skills, vault_skills, situation, experience_level, industries, objectives, vault_analysis, vault_extraction, formations",
       )
       .eq("id", user.id)
-      .single();
+      .maybeSingle();
 
     if (!profile) {
       return NextResponse.json(

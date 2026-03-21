@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
         .from("profiles")
         .select("role")
         .eq("id", user.id)
-        .single();
+        .maybeSingle();
 
       if (profile?.role !== "admin") {
         return NextResponse.json({ error: "Accès refusé" }, { status: 403 });
@@ -63,7 +63,7 @@ export async function POST(req: NextRequest) {
          affiliate_programs!inner(min_payout, commission_type)`,
       )
       .eq("id", affiliateId)
-      .single();
+      .maybeSingle();
 
     if (!affiliate) {
       return NextResponse.json({ error: "Affilié introuvable" }, { status: 404 });
@@ -140,7 +140,7 @@ export async function POST(req: NextRequest) {
         processed_at: payoutStatus === "completed" ? now : null,
       })
       .select("id")
-      .single();
+      .maybeSingle();
 
     if (payoutError || !payout) {
       return NextResponse.json({ error: "Impossible de créer le payout" }, { status: 500 });
@@ -171,7 +171,7 @@ export async function POST(req: NextRequest) {
           .from("profiles")
           .select("full_name, email")
           .eq("id", affiliate.user_id)
-          .single();
+          .maybeSingle();
 
         if (affProfile?.email) {
           const firstName = affProfile.full_name?.split(" ")[0] || "Partenaire";

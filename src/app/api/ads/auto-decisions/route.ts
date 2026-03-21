@@ -45,7 +45,7 @@ async function getMetaCredentials(
       .from("profiles")
       .select("meta_access_token, meta_ad_account_id")
       .eq("id", userId)
-      .single();
+      .maybeSingle();
 
     return {
       token: profile?.meta_access_token,
@@ -193,7 +193,7 @@ async function applyDecision(
     .select("*")
     .eq("id", decisionId)
     .eq("user_id", userId)
-    .single();
+    .maybeSingle();
 
   if (!decision) {
     return NextResponse.json(
@@ -264,14 +264,14 @@ async function runAutoDecisions(
     .from("ad_automation_config")
     .select("*")
     .eq("user_id", userId)
-    .single();
+    .maybeSingle();
 
   // F69 — Market-adapted thresholds : ajuster les seuils par défaut selon la niche
   const { data: profileData } = await supabase
     .from("profiles")
     .select("niche")
     .eq("id", userId)
-    .single();
+    .maybeSingle();
 
   const niche = ((profileData?.niche as string) || "").toLowerCase();
 

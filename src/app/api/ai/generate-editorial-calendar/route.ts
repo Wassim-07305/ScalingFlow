@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
           .eq("user_id", user.id)
           .order("created_at", { ascending: false })
           .limit(1)
-          .single(),
+          .maybeSingle(),
         supabase
           .from("market_analyses")
           .select(
@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
           .eq("user_id", user.id)
           .order("created_at", { ascending: false })
           .limit(1)
-          .single(),
+          .maybeSingle(),
       ]);
 
     const personaJson = latestMarket?.persona || latestMarket?.target_avatar;

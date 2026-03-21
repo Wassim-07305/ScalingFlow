@@ -37,7 +37,7 @@ const FEATURE_LINKS: Record<string, string> = {
   "Funnel Builder": "/funnel",
   Vault: "/vault",
   "Plan Quotidien": "/",
-  Pipeline: "/sales/pipeline",
+  Pipeline: "/pipeline",
   Offre: "/offer",
   Contenu: "/content",
 };
@@ -72,7 +72,7 @@ export default function GrowthPage() {
     if (authLoading) return;
     if (!user) { setLoading(false); return; }
     fetch("/api/ai/growth-recommendations")
-      .then((r) => r.json())
+      .then((r) => { if (!r.ok) throw new Error("fetch failed"); return r.json(); })
       .then((d) => {
         if (!d.error) {
           setPageData(d);
@@ -81,7 +81,7 @@ export default function GrowthPage() {
           }
         }
       })
-      .catch(() => {})
+      .catch(() => { /* Growth data unavailable — non-blocking */ })
       .finally(() => setLoading(false));
   }, [user, authLoading]);
 

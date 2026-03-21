@@ -51,7 +51,7 @@ export async function POST(req: NextRequest) {
       .from("profiles")
       .select("*")
       .eq("id", user.id)
-      .single();
+      .maybeSingle();
 
     // Récupérer la dernière analyse de marché
     const { data: latestAnalysis } = await supabase
@@ -60,7 +60,7 @@ export async function POST(req: NextRequest) {
       .eq("user_id", user.id)
       .order("created_at", { ascending: false })
       .limit(1)
-      .single();
+      .maybeSingle();
 
     // Récupérer la dernière offre
     const { data: latestOffer } = await supabase
@@ -69,7 +69,7 @@ export async function POST(req: NextRequest) {
       .eq("user_id", user.id)
       .order("created_at", { ascending: false })
       .limit(1)
-      .single();
+      .maybeSingle();
 
     const marketContext =
       latestAnalysis?.market ||

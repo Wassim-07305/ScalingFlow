@@ -30,7 +30,7 @@ export default function FunnelPage() {
         .from("funnels")
         .select("optin_page, vsl_page, thankyou_page, funnel_name")
         .eq("id", item.id)
-        .single();
+        .maybeSingle();
 
       if (error || !data) {
         toast.error("Impossible de charger ce funnel");

@@ -76,7 +76,7 @@ export function MechanismGenerator({ offerId }: MechanismGeneratorProps) {
         .from("profiles")
         .select("niche, selected_market")
         .eq("id", user.id)
-        .single();
+        .maybeSingle();
 
       if (profile) {
         setNiche(profile.niche || profile.selected_market || "");
@@ -87,7 +87,7 @@ export function MechanismGenerator({ offerId }: MechanismGeneratorProps) {
           .from("offers")
           .select("offer_name, unique_mechanism")
           .eq("id", offerId)
-          .single();
+          .maybeSingle();
 
         if (offer) {
           setOfferName(offer.offer_name || "");
@@ -100,7 +100,7 @@ export function MechanismGenerator({ offerId }: MechanismGeneratorProps) {
         .select("target_avatar, market_description")
         .eq("user_id", user.id)
         .eq("selected", true)
-        .single();
+        .maybeSingle();
 
       if (market) {
         setTargetAvatar(

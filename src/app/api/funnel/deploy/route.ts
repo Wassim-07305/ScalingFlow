@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
       .select("*")
       .eq("id", funnel_id)
       .eq("user_id", user.id)
-      .single();
+      .maybeSingle();
 
     if (fetchError || !funnel) {
       return NextResponse.json({ error: "Funnel introuvable" }, { status: 404 });
@@ -179,7 +179,7 @@ export async function POST(req: NextRequest) {
         { onConflict: "funnel_id" },
       )
       .select("id")
-      .single();
+      .maybeSingle();
 
     if (deployError) {
       console.error("[funnel/deploy] Deployment upsert error:", deployError);

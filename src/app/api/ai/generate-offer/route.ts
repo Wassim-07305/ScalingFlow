@@ -62,7 +62,7 @@ export async function POST(req: NextRequest) {
       .select("*")
       .eq("id", marketAnalysisId)
       .eq("user_id", user.id)
-      .single();
+      .maybeSingle();
 
     if (fetchError || !marketAnalysis) {
       return NextResponse.json(
@@ -76,7 +76,7 @@ export async function POST(req: NextRequest) {
       .from("profiles")
       .select("skills")
       .eq("id", user.id)
-      .single();
+      .maybeSingle();
 
     // Fetch vault resources context for personalization
     const vaultContext = await buildFullVaultContext(user.id);
@@ -146,7 +146,7 @@ ${truncatedReviews}
         status: "draft",
       })
       .select()
-      .single();
+      .maybeSingle();
 
     if (saveError) {
       return NextResponse.json(

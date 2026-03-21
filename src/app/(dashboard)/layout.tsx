@@ -16,7 +16,7 @@ const getCachedProfile = unstable_cache(
       .from("profiles")
       .select("id, email, full_name, avatar_url, role, organization_id")
       .eq("id", userId)
-      .single();
+      .maybeSingle();
     return data;
   },
   ["user-profile"],
@@ -31,7 +31,7 @@ const getCachedOrgBranding = unstable_cache(
       .from("organizations")
       .select("brand_name, logo_url, primary_color, accent_color, features")
       .eq("id", orgId)
-      .single();
+      .maybeSingle();
     return data;
   },
   ["org-branding"],

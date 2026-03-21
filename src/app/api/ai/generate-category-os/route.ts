@@ -62,7 +62,7 @@ export async function POST(req: NextRequest) {
       .select("*, market_analyses(*)")
       .eq("id", offerId)
       .eq("user_id", user.id)
-      .single();
+      .maybeSingle();
 
     if (offerError || !offer) {
       return NextResponse.json({ error: "Offre introuvable" }, { status: 404 });
@@ -83,7 +83,7 @@ export async function POST(req: NextRequest) {
       .from("profiles")
       .select("skills, vault_skills, expertise_answers")
       .eq("id", user.id)
-      .single();
+      .maybeSingle();
 
     const vaultContext = await buildFullVaultContext(user.id);
 

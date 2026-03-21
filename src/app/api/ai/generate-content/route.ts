@@ -248,7 +248,7 @@ export async function POST(req: NextRequest) {
             "id, full_name, skills, target_market, niche, situation, parcours, target_revenue, industries, objectives",
           )
           .eq("id", user.id)
-          .single(),
+          .maybeSingle(),
         buildFullVaultContext(user.id),
         fetchAdInsights(supabase, user.id),
         fetchSalesInsights(supabase, user.id),
@@ -260,7 +260,7 @@ export async function POST(req: NextRequest) {
       .eq("user_id", user.id)
       .order("created_at", { ascending: false })
       .limit(1)
-      .single();
+      .maybeSingle();
 
     const { data: latestOffer } = await supabase
       .from("offers")
@@ -268,7 +268,7 @@ export async function POST(req: NextRequest) {
       .eq("user_id", user.id)
       .order("created_at", { ascending: false })
       .limit(1)
-      .single();
+      .maybeSingle();
 
     // Helper to enrich prompts with vault + ad insights + sales insights
     const withContext = (prompt: string) => {

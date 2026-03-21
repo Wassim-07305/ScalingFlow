@@ -1056,7 +1056,7 @@ export function PostFeed({ className }: { className?: string }) {
       .from("community_comments")
       .insert({ post_id: postId, user_id: user.id, content })
       .select("*, profiles:user_id(full_name, avatar_url)")
-      .single();
+      .maybeSingle();
 
     if (error) {
       toast.error("Impossible de poster le commentaire");

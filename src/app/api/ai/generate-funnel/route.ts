@@ -59,7 +59,7 @@ export async function POST(req: NextRequest) {
       .select("*, market_analyses(*)")
       .eq("id", offerId)
       .eq("user_id", user.id)
-      .single();
+      .maybeSingle();
 
     if (offerError || !offer) {
       return NextResponse.json({ error: "Offre introuvable" }, { status: 404 });
@@ -105,7 +105,7 @@ export async function POST(req: NextRequest) {
         status: "draft",
       })
       .select()
-      .single();
+      .maybeSingle();
 
     if (saveError) {
       console.error("[generate-funnel] Supabase save error:", saveError);

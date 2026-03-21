@@ -57,7 +57,7 @@ async function processAffiliateCommission(
     .from("profiles")
     .select("referred_by, email")
     .eq("id", userId)
-    .single();
+    .maybeSingle();
 
   if (!profile?.referred_by) return;
 
@@ -74,7 +74,7 @@ async function processAffiliateCommission(
     )
     .eq("affiliate_code", profile.referred_by)
     .eq("status", "active")
-    .single();
+    .maybeSingle();
 
   if (!affiliate || !affiliate.affiliate_programs) return;
 
@@ -154,7 +154,7 @@ async function processAffiliateCommission(
       .from("affiliates")
       .select("total_earned, total_conversions")
       .eq("id", affiliate.id)
-      .single();
+      .maybeSingle();
 
     if (aff) {
       await supabase
@@ -174,7 +174,7 @@ async function processAffiliateCommission(
       .from("affiliates")
       .select("total_earned")
       .eq("id", affiliate.id)
-      .single();
+      .maybeSingle();
 
     if (aff) {
       await supabase
@@ -190,7 +190,7 @@ async function processAffiliateCommission(
       .from("profiles")
       .select("full_name, email")
       .eq("id", affiliate.user_id)
-      .single();
+      .maybeSingle();
 
     if (affiliateProfile?.email) {
       const firstName = affiliateProfile.full_name?.split(" ")[0] || "Partenaire";
@@ -333,7 +333,7 @@ export async function POST(req: NextRequest) {
               .from("profiles")
               .select("full_name")
               .eq("id", userId)
-              .single();
+              .maybeSingle();
 
             const firstName =
               profile?.full_name?.split(" ")[0] || "Utilisateur";
@@ -436,7 +436,7 @@ export async function POST(req: NextRequest) {
               .from("profiles")
               .select("full_name, email")
               .eq("id", profiles[0].id)
-              .single();
+              .maybeSingle();
 
             if (profile?.email) {
               const firstName =

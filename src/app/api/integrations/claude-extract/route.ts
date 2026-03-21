@@ -100,7 +100,7 @@ export async function POST(req: NextRequest) {
         "niche, selected_market, vault_extraction, situation",
       )
       .eq("id", user.id)
-      .single();
+      .maybeSingle();
 
     const offerRes = await supabase
       .from("offers")

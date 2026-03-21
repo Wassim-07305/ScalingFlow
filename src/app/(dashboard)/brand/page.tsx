@@ -95,7 +95,7 @@ export default function BrandPage() {
           .eq("user_id", user.id)
           .order("created_at", { ascending: false })
           .limit(1)
-          .single();
+          .maybeSingle();
 
         if (brand) {
           setBrandId(brand.id);
@@ -217,7 +217,7 @@ export default function BrandPage() {
         .from("brand_identities")
         .select("*")
         .eq("id", item.id)
-        .single();
+        .maybeSingle();
       if (error || !data) {
         toast.error("Impossible de charger cette identité");
         return;

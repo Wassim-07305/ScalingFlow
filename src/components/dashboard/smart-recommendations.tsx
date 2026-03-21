@@ -61,7 +61,7 @@ export function SmartRecommendations() {
             "vault_completed, vault_analysis, selected_market, market_viability_score",
           )
           .eq("id", user.id)
-          .single(),
+          .maybeSingle(),
         supabase
           .from("market_analyses")
           .select("id", { count: "exact", head: true })

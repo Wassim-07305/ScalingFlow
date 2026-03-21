@@ -228,7 +228,7 @@ export default function ClientDetailPage() {
           .select("*")
           .eq("id", clientId)
           .eq("user_id", user.id)
-          .single(),
+          .maybeSingle(),
         supabase
           .from("client_deals")
           .select("*")
@@ -353,7 +353,7 @@ export default function ClientDetailPage() {
           closed_at: data.status === "close" ? new Date().toISOString() : null,
         })
         .select("id")
-        .single();
+        .maybeSingle();
 
       if (error) {
         toast.error("Erreur lors de la création du deal");

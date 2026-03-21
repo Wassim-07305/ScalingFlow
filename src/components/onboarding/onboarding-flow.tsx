@@ -291,7 +291,7 @@ export function OnboardingFlow() {
           .from("profiles")
           .select("*")
           .eq("id", user.id)
-          .single();
+          .maybeSingle();
 
         if (profile) {
           const r: Record<string, unknown> = { ...INITIAL_FORM_DATA };

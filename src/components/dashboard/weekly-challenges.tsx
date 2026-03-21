@@ -133,7 +133,7 @@ const CHALLENGE_DEFINITIONS: {
         .from("profiles")
         .select("streak_days")
         .eq("id", userId)
-        .single();
+        .maybeSingle();
       return data?.streak_days ?? 0;
     },
   },

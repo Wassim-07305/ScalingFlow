@@ -45,7 +45,7 @@ export async function POST(req: NextRequest) {
         .from("profiles")
         .select("interview_state, niche, selected_market, situation")
         .eq("id", user.id)
-        .single(),
+        .maybeSingle(),
       supabase
         .from("offers")
         .select("offer_name")
@@ -266,7 +266,7 @@ export async function GET(_req: NextRequest) {
       .from("profiles")
       .select("interview_state")
       .eq("id", user.id)
-      .single();
+      .maybeSingle();
 
     const state = profile?.interview_state as InterviewState | null;
 

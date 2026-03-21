@@ -36,7 +36,7 @@ export async function POST() {
       .from("profiles")
       .select("meta_access_token, meta_ad_account_id")
       .eq("id", user.id)
-      .single();
+      .maybeSingle();
 
     if (!profile?.meta_access_token || !profile?.meta_ad_account_id) {
       return NextResponse.json(

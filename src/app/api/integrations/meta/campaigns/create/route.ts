@@ -23,7 +23,7 @@ async function getMetaCredentials(
       .from("profiles")
       .select("meta_access_token, meta_ad_account_id, meta_page_id")
       .eq("id", userId)
-      .single();
+      .maybeSingle();
 
     return {
       token: profile?.meta_access_token,
@@ -263,7 +263,7 @@ export async function POST(req: NextRequest) {
         { onConflict: "meta_campaign_id" },
       )
       .select()
-      .single();
+      .maybeSingle();
 
     return NextResponse.json({
       success: true,

@@ -99,7 +99,7 @@ export async function GET() {
       .eq("user_id", ownerId)
       .order("created_at", { ascending: false })
       .limit(1)
-      .single();
+      .maybeSingle();
 
     // Fetch content calendar (next 30 days)
     const { data: contentPieces } = await supabase

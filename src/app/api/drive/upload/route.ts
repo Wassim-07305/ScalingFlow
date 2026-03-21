@@ -172,7 +172,7 @@ export async function POST(req: NextRequest) {
         mime_type: mimeType,
       })
       .select()
-      .single();
+      .maybeSingle();
 
     if (dbError) {
       console.error("DB insert error:", dbError);

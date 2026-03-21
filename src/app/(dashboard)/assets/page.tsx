@@ -72,7 +72,7 @@ export default function AssetsPage() {
         .from("sales_assets")
         .select("asset_type, ai_raw_response, content, metadata")
         .eq("id", item.id)
-        .single();
+        .maybeSingle();
 
       if (error || !data) {
         toast.error("Impossible de charger cet asset");

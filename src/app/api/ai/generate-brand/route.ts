@@ -55,7 +55,7 @@ export async function POST(req: NextRequest) {
       .select("*")
       .eq("user_id", user.id)
       .eq("selected", true)
-      .single();
+      .maybeSingle();
 
     if (!marketAnalysis) {
       return NextResponse.json(
@@ -84,7 +84,7 @@ export async function POST(req: NextRequest) {
         .select("*")
         .eq("id", offerId)
         .eq("user_id", user.id)
-        .single();
+        .maybeSingle();
 
       if (offerData) {
         offer = offerData;
@@ -157,7 +157,7 @@ export async function POST(req: NextRequest) {
         status: "draft" as const,
       })
       .select()
-      .single();
+      .maybeSingle();
 
     if (saveError) {
       return NextResponse.json(

@@ -83,7 +83,7 @@ export default function VaultPage() {
             "first_name, skills, vault_skills, situation, situation_details, formations, experience_level, current_revenue, target_revenue, industries, objectives, budget_monthly, hours_per_week, deadline, team_size, vault_analysis, parcours, niche, selected_market, expertise_answers",
           )
           .eq("id", user.id)
-          .single(),
+          .maybeSingle(),
         fetch("/api/vault/resources").then((r) => r.json()),
       ]);
 

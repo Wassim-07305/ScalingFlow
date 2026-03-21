@@ -75,7 +75,7 @@ export async function POST(req: NextRequest) {
         extracted_text: extracted_text?.slice(0, 50000) || null,
       })
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) {
       return NextResponse.json({ error: "Erreur interne" }, { status: 500 });
@@ -113,7 +113,7 @@ export async function DELETE(req: NextRequest) {
       .select("file_path")
       .eq("id", id)
       .eq("user_id", user.id)
-      .single();
+      .maybeSingle();
 
     // Delete from storage if file exists
     if (resource?.file_path) {

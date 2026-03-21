@@ -81,7 +81,7 @@ export async function POST(req: NextRequest) {
           "id, full_name, skills, target_market, niche, situation, parcours, target_revenue, industries, objectives",
         )
         .eq("id", user.id)
-        .single(),
+        .maybeSingle(),
       buildFullVaultContext(user.id),
     ]);
 
@@ -93,7 +93,7 @@ export async function POST(req: NextRequest) {
         .select("*, market_analyses(*)")
         .eq("id", offerId)
         .eq("user_id", user.id)
-        .single();
+        .maybeSingle();
 
       if (offerError || !data) {
         return NextResponse.json(
@@ -109,7 +109,7 @@ export async function POST(req: NextRequest) {
         .eq("user_id", user.id)
         .order("created_at", { ascending: false })
         .limit(1)
-        .single();
+        .maybeSingle();
       offer = data;
     }
 
@@ -433,7 +433,7 @@ export async function POST(req: NextRequest) {
             status: "draft",
           })
           .select()
-          .single();
+          .maybeSingle();
 
         if (saveError) {
           console.error("[generate-ads] Failed to save creative:", saveError.message);
@@ -526,7 +526,7 @@ export async function POST(req: NextRequest) {
           status: "draft",
         })
         .select()
-        .single();
+        .maybeSingle();
 
       if (saveError) {
         continue;

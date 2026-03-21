@@ -109,7 +109,7 @@ async function fetchImportedData(
         .from("profiles")
         .select("current_revenue")
         .eq("id", userId)
-        .single();
+        .maybeSingle();
 
       result.stripe = {
         revenue_30d: profile?.current_revenue || 0,
@@ -124,7 +124,7 @@ async function fetchImportedData(
       .from("profiles")
       .select("ghl_webhook_url")
       .eq("id", userId)
-      .single();
+      .maybeSingle();
 
     result.ghl = {
       connected: true,

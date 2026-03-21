@@ -128,7 +128,7 @@ export default function AssistantPage() {
         .from("agent_conversations")
         .select("messages")
         .eq("id", conv.id)
-        .single();
+        .maybeSingle();
 
       if (data?.messages) {
         setActiveMessages(data.messages as ChatMessage[]);

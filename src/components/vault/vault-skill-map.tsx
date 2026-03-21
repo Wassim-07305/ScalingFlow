@@ -295,7 +295,7 @@ export function VaultSkillMap() {
         .from("profiles")
         .select("skills, vault_skills")
         .eq("id", user.id)
-        .single();
+        .maybeSingle();
       setSkills((data?.skills as string[]) || []);
       setVaultSkills((data?.vault_skills as Record<string, string>) || null);
       setLoading(false);

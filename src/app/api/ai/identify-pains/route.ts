@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
       .select("*")
       .eq("id", market_analysis_id)
       .eq("user_id", user.id)
-      .single();
+      .maybeSingle();
 
     if (fetchError || !analysis) {
       return NextResponse.json(

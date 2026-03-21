@@ -59,7 +59,7 @@ export async function POST(_req: NextRequest) {
             "current_revenue, target_revenue, niche, experience_level, selected_market",
           )
           .eq("id", user.id)
-          .single(),
+          .maybeSingle(),
         supabase
           .from("ad_campaigns")
           .select("total_spend, roas, total_conversions")
@@ -209,7 +209,7 @@ export async function GET(_req: NextRequest) {
       .from("profiles")
       .select("growth_recommendations, current_revenue")
       .eq("id", user.id)
-      .single();
+      .maybeSingle();
 
     const currentRevenue = profile?.current_revenue ?? 0;
     const currentTier = getCurrentTier(currentRevenue);

@@ -58,7 +58,7 @@ async function runCreativeCycle() {
       .from("profiles")
       .select("niche, offer_name, target_audience")
       .eq("id", userId)
-      .single();
+      .maybeSingle();
 
     // Analyser les patterns winners
     const winnerPatterns = campaigns.map((c) => ({

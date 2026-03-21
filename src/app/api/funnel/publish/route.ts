@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
       .select("*")
       .eq("id", funnel_id)
       .eq("user_id", user.id)
-      .single();
+      .maybeSingle();
 
     if (fetchError || !funnel) {
       return NextResponse.json(

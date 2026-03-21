@@ -44,7 +44,7 @@ export async function GET(req: NextRequest) {
       )
       .eq("affiliate_code", code)
       .eq("status", "active")
-      .single();
+      .maybeSingle();
 
     if (!affiliate || !affiliate.affiliate_programs) {
       return NextResponse.redirect(redirectUrl);
