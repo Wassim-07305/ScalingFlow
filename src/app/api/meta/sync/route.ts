@@ -46,8 +46,12 @@ export async function POST() {
 
     const { meta_access_token, meta_ad_account_id } = profile;
 
+    // Normalize ad account ID — remove act_ prefix if already present
+    const adAccountId = meta_ad_account_id.replace(/^act_/, "");
+
     // Appeler l'API Meta Ads pour recuperer les campagnes
-    const campaignsUrl = `${META_GRAPH_URL}/act_${meta_ad_account_id}/campaigns?fields=id,name,status,objective&access_token=${meta_access_token}&limit=50`;
+    const campaignsUrl = `${META_GRAPH_URL}/act_${adAccountId}/campaigns?fields=id,name,status,objective&access_token=${meta_access_token}&limit=50`;
+    console.log("[meta-sync] Fetching campaigns for ad account:", adAccountId);
 
     const campaignsResponse = await fetch(campaignsUrl);
 
@@ -61,6 +65,7 @@ export async function POST() {
     }
 
     const campaignsData = await campaignsResponse.json();
+    console.log("[meta-sync] Meta API response:", JSON.stringify(campaignsData).slice(0, 500));
     const campaigns: MetaCampaign[] = campaignsData.data || [];
 
     // Pour chaque campagne, recuperer les insights
