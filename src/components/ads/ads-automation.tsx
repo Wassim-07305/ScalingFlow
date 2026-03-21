@@ -130,230 +130,6 @@ const DEFAULT_THRESHOLDS: ThresholdConfig = {
 
 // ─── Mock Data ──────────────────────────────────────────────
 
-const MOCK_CREATIVES: CreativeKPI[] = [
-  {
-    id: "cr_001",
-    name: "Hook Douleur v3",
-    campaignName: "Acquisition Cold",
-    status: "performant",
-    cpm: 8.5,
-    ctr: 2.8,
-    cpc: 0.31,
-    cpa: 18.5,
-    roas: 4.2,
-    spend: 342,
-    conversions: 18,
-    impressions: 40235,
-    frequency: 1.4,
-    anomalies: [],
-    trend: "up",
-  },
-  {
-    id: "cr_002",
-    name: "Témoignage Client A",
-    campaignName: "Acquisition Cold",
-    status: "performant",
-    cpm: 9.2,
-    ctr: 2.1,
-    cpc: 0.44,
-    cpa: 22.0,
-    roas: 3.5,
-    spend: 286,
-    conversions: 13,
-    impressions: 31087,
-    frequency: 1.6,
-    anomalies: [],
-    trend: "stable",
-  },
-  {
-    id: "cr_003",
-    name: "Carrousel Résultats",
-    campaignName: "Retargeting Chaud",
-    status: "a_surveiller",
-    cpm: 12.4,
-    ctr: 1.2,
-    cpc: 1.03,
-    cpa: 35.0,
-    roas: 1.8,
-    spend: 210,
-    conversions: 6,
-    impressions: 16935,
-    frequency: 2.3,
-    anomalies: ["CPM en hausse", "CTR en baisse"],
-    trend: "down",
-  },
-  {
-    id: "cr_004",
-    name: "UGC Transformation",
-    campaignName: "Acquisition Lookalike",
-    status: "a_surveiller",
-    cpm: 11.0,
-    ctr: 1.5,
-    cpc: 0.73,
-    cpa: 28.0,
-    roas: 2.1,
-    spend: 196,
-    conversions: 7,
-    impressions: 17818,
-    frequency: 2.8,
-    anomalies: ["Fatigue créative"],
-    trend: "down",
-  },
-  {
-    id: "cr_005",
-    name: "Before/After Static",
-    campaignName: "Retargeting Chaud",
-    status: "sous_performant",
-    cpm: 15.3,
-    ctr: 0.6,
-    cpc: 2.55,
-    cpa: 52.0,
-    roas: 0.8,
-    spend: 156,
-    conversions: 3,
-    impressions: 10196,
-    frequency: 3.2,
-    anomalies: ["Fatigue créative", "CPM en hausse", "CTR en baisse"],
-    trend: "down",
-  },
-  {
-    id: "cr_006",
-    name: "Hook Question v1",
-    campaignName: "Acquisition Cold",
-    status: "sous_performant",
-    cpm: 14.1,
-    ctr: 0.7,
-    cpc: 2.01,
-    cpa: 48.0,
-    roas: 1.1,
-    spend: 144,
-    conversions: 3,
-    impressions: 10213,
-    frequency: 1.9,
-    anomalies: ["CPA en hausse"],
-    trend: "down",
-  },
-];
-
-const MOCK_DECISIONS: Decision[] = [
-  {
-    id: "dec_001",
-    timestamp: "2026-03-15T14:30:00",
-    actionType: "couper",
-    creativeName: "Before/After Static",
-    reason: "CPA 52€ > seuil 30€ — ROAS 0.8x insuffisant",
-    status: "en_attente",
-    details: "Budget quotidien de 22€ à réallouer",
-  },
-  {
-    id: "dec_002",
-    timestamp: "2026-03-15T14:30:00",
-    actionType: "scaler",
-    creativeName: "Hook Douleur v3",
-    reason: "ROAS 4.2x — Performance exceptionnelle",
-    status: "en_attente",
-    details: "Augmenter le budget de 48€/j à 58€/j (+20%)",
-  },
-  {
-    id: "dec_003",
-    timestamp: "2026-03-15T14:30:00",
-    actionType: "realloquer",
-    creativeName: "Acquisition Cold → Retargeting Chaud",
-    reason:
-      "Retargeting sous-performant — réallocation depuis la campagne la plus performante",
-    status: "en_attente",
-    details:
-      "Réalloquer 30€ du budget Before/After Static vers Témoignage Client A",
-  },
-  {
-    id: "dec_004",
-    timestamp: "2026-03-15T14:30:00",
-    actionType: "fatigue",
-    creativeName: "UGC Transformation",
-    reason: "Fréquence 2.8 > seuil 2.5 — Fatigue créative détectée",
-    status: "en_attente",
-    details: "Préparer de nouvelles variations basées sur le même angle",
-  },
-  {
-    id: "dec_005",
-    timestamp: "2026-03-15T08:00:00",
-    actionType: "couper",
-    creativeName: "Hook Question v1",
-    reason: "CPA 48€ > seuil 30€ après 3 jours de test",
-    status: "applique",
-    details: "Creative mise en pause, budget réalloué",
-  },
-  {
-    id: "dec_006",
-    timestamp: "2026-03-14T14:30:00",
-    actionType: "scaler",
-    creativeName: "Hook Douleur v3",
-    reason: "ROAS stable à 3.8x — passage au palier suivant",
-    status: "applique",
-    details: "Budget passé de 40€/j à 48€/j",
-  },
-];
-
-const MOCK_CYCLES: CreativeCycle[] = [
-  {
-    week: 12,
-    startDate: "2026-03-16",
-    endDate: "2026-03-22",
-    winnersCount: 0,
-    losersCount: 0,
-    newCreatives: 5,
-    status: "planifie",
-  },
-  {
-    week: 11,
-    startDate: "2026-03-09",
-    endDate: "2026-03-15",
-    winnersCount: 2,
-    losersCount: 2,
-    newCreatives: 4,
-    status: "en_cours",
-  },
-  {
-    week: 10,
-    startDate: "2026-03-02",
-    endDate: "2026-03-08",
-    winnersCount: 3,
-    losersCount: 1,
-    newCreatives: 6,
-    status: "termine",
-  },
-  {
-    week: 9,
-    startDate: "2026-02-23",
-    endDate: "2026-03-01",
-    winnersCount: 2,
-    losersCount: 3,
-    newCreatives: 5,
-    status: "termine",
-  },
-];
-
-const MOCK_WINNER_PATTERNS: WinnerPattern[] = [
-  {
-    element: "Hook émotionnel (douleur/frustration)",
-    category: "Hook",
-    score: 92,
-  },
-  { element: "Témoignage client réel", category: "Format", score: 88 },
-  {
-    element: "Chiffres concrets dans le titre",
-    category: "Copywriting",
-    score: 85,
-  },
-  { element: "CTA urgence (places limitées)", category: "CTA", score: 82 },
-  { element: "Format vidéo < 30 secondes", category: "Format", score: 78 },
-  {
-    element: "Angle transformation (avant/après)",
-    category: "Angle",
-    score: 75,
-  },
-];
-
 const SCALING_TIERS: ScalingTier[] = [
   {
     id: 1,
@@ -391,19 +167,6 @@ const SCALING_TIERS: ScalingTier[] = [
     roasRequired: 3.5,
     active: false,
   },
-];
-
-const MOCK_BUDGET_HISTORY: BudgetHistory[] = [
-  { date: "01 Mar", budget: 20, roas: 1.8, tier: 1 },
-  { date: "03 Mar", budget: 24, roas: 2.3, tier: 1 },
-  { date: "05 Mar", budget: 29, roas: 2.5, tier: 1 },
-  { date: "07 Mar", budget: 35, roas: 2.8, tier: 1 },
-  { date: "09 Mar", budget: 42, roas: 3.1, tier: 1 },
-  { date: "11 Mar", budget: 50, roas: 2.7, tier: 2 },
-  { date: "12 Mar", budget: 42, roas: 1.9, tier: 1 },
-  { date: "13 Mar", budget: 42, roas: 2.4, tier: 1 },
-  { date: "14 Mar", budget: 48, roas: 3.2, tier: 1 },
-  { date: "15 Mar", budget: 48, roas: 4.2, tier: 1 },
 ];
 
 // ─── Helper functions ───────────────────────────────────────
@@ -985,7 +748,7 @@ function MonitoringTab() {
 // ─── Tab 2: Décisions Auto (#70) ────────────────────────────
 
 function DecisionsAutoTab() {
-  const [decisions, setDecisions] = useState<Decision[]>(MOCK_DECISIONS);
+  const [decisions, setDecisions] = useState<Decision[]>([]);
   const [thresholds, setThresholds] = useState<ThresholdConfig>(() => {
     try {
       const saved = localStorage.getItem("sf_ads_thresholds");
@@ -1280,8 +1043,8 @@ function DecisionsAutoTab() {
 // ─── Tab 3: Cycle Créatif (#71) ─────────────────────────────
 
 function CycleCreatifTab() {
-  const [cycles] = useState<CreativeCycle[]>(MOCK_CYCLES);
-  const [patterns] = useState<WinnerPattern[]>(MOCK_WINNER_PATTERNS);
+  const [cycles] = useState<CreativeCycle[]>([]);
+  const [patterns] = useState<WinnerPattern[]>([]);
   const [generating, setGenerating] = useState(false);
   const [generatedCreatives, setGeneratedCreatives] = useState<string | null>(
     null,
@@ -1567,7 +1330,7 @@ Génère des variations innovantes qui reprennent ces patterns gagnants avec de 
 
 function ScalingTab() {
   const [tiers] = useState<ScalingTier[]>(SCALING_TIERS);
-  const [budgetHistory] = useState<BudgetHistory[]>(MOCK_BUDGET_HISTORY);
+  const [budgetHistory] = useState<BudgetHistory[]>([]);
 
   const currentBudget = budgetHistory[budgetHistory.length - 1]?.budget ?? 0;
   const currentRoas = budgetHistory[budgetHistory.length - 1]?.roas ?? 0;
