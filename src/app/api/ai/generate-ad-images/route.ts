@@ -1,9 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { checkAIUsage, incrementAIUsage } from "@/lib/stripe/check-usage";
 import { getModelForGeneration } from "@/lib/ai/model-router";
 import { rateLimit } from "@/lib/utils/rate-limit";
 import { getSetting } from "@/lib/settings/get-setting";
+
+const AD_IMAGES_BUCKET = "ad-images";
+const AD_IMAGES_TTL_DAYS = 30;
 
 export const maxDuration = 300;
 
@@ -208,10 +212,40 @@ export async function POST(req: NextRequest) {
       }
 
       if (result.status === "succeeded" && result.output) {
-        const url = Array.isArray(result.output)
+        const replicateUrl = Array.isArray(result.output)
           ? result.output[0]
           : result.output;
-        results.push({ url, variation: i + 1 });
+
+        // Upload to Supabase Storage for permanent URL
+        let permanentUrl = replicateUrl;
+        try {
+          const imageRes = await fetch(replicateUrl);
+          if (imageRes.ok) {
+            const imageBuffer = await imageRes.arrayBuffer();
+            const admin = createAdminClient();
+            const filePath = `${user.id}/${Date.now()}_v${i + 1}.png`;
+
+            const { error: uploadError } = await admin.storage
+              .from(AD_IMAGES_BUCKET)
+              .upload(filePath, Buffer.from(imageBuffer), {
+                contentType: "image/png",
+                upsert: true,
+              });
+
+            if (!uploadError) {
+              const { data: publicUrl } = admin.storage
+                .from(AD_IMAGES_BUCKET)
+                .getPublicUrl(filePath);
+              permanentUrl = publicUrl.publicUrl;
+            } else {
+              console.error("[generate-ad-images] Storage upload error:", uploadError);
+            }
+          }
+        } catch (storageErr) {
+          console.error("[generate-ad-images] Failed to persist image:", storageErr);
+        }
+
+        results.push({ url: permanentUrl, variation: i + 1 });
       }
     }
 

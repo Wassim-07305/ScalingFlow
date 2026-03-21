@@ -519,7 +519,7 @@ function formatTimestamp(ts: string): string {
 
 function MonitoringTab() {
   const [lastCheck] = useState(new Date().toLocaleString("fr-FR"));
-  const [creatives, setCreatives] = useState<CreativeKPI[]>(MOCK_CREATIVES);
+  const [creatives, setCreatives] = useState<CreativeKPI[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
@@ -1287,7 +1287,7 @@ function CycleCreatifTab() {
     null,
   );
 
-  const winners = MOCK_CREATIVES.filter((c) => c.status === "performant");
+  const winners: CreativeKPI[] = [];
 
   const handleGenerateCreatives = async () => {
     setGenerating(true);
