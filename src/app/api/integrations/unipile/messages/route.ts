@@ -81,23 +81,67 @@ export async function GET(request: NextRequest) {
       }
     }
 
+    // Resolve attendee names from Unipile API
+    const apiUrl = process.env.UNIPILE_API_URL;
+    const accessToken = process.env.UNIPILE_ACCESS_TOKEN;
+
+    // Batch fetch attendee names (best effort, parallel)
+    const attendeeIds = [
+      ...new Set(
+        chatItems
+          .filter((c) => !c.archived && c.attendee_provider_id)
+          .map((c) => String(c.attendee_provider_id)),
+      ),
+    ];
+
+    const nameMap = new Map<string, string>();
+    if (apiUrl && accessToken && attendeeIds.length > 0) {
+      const nameResults = await Promise.allSettled(
+        attendeeIds.slice(0, 30).map(async (attendeeId) => {
+          try {
+            const res = await fetch(
+              `${apiUrl}/api/v1/users/${encodeURIComponent(attendeeId)}`,
+              {
+                headers: { "X-API-KEY": accessToken },
+              },
+            );
+            if (!res.ok) return;
+            const profile = (await res.json()) as Record<string, unknown>;
+            const name =
+              profile.first_name && profile.last_name
+                ? `${profile.first_name} ${profile.last_name}`
+                : (profile.display_name as string) ||
+                  (profile.name as string) ||
+                  null;
+            if (name) nameMap.set(attendeeId, name);
+          } catch {
+            // skip individual failures
+          }
+        }),
+      );
+    }
+
     // Map to the shape the frontend expects
     const chats = chatItems
       .filter((c) => !c.archived)
-      .map((c) => ({
-        id: String(c.id ?? ""),
-        account_id: accountId,
-        provider: String(c.account_type || "LINKEDIN"),
-        participants: [
-          {
-            id: String(c.attendee_provider_id ?? ""),
-            name: String(c.name || c.subject || "Conversation"),
-          },
-        ],
-        last_message: null,
-        last_message_at: c.timestamp ? String(c.timestamp) : null,
-        unread_count: Number(c.unread_count ?? 0),
-      }));
+      .map((c) => {
+        const attendeeId = String(c.attendee_provider_id ?? "");
+        const resolvedName = nameMap.get(attendeeId);
+        return {
+          id: String(c.id ?? ""),
+          account_id: accountId,
+          provider: String(c.account_type || "LINKEDIN"),
+          participants: [
+            {
+              id: attendeeId,
+              name: resolvedName || String(c.name || c.subject || "Conversation"),
+            },
+          ],
+          last_message: null,
+          last_message_at: c.timestamp ? String(c.timestamp) : null,
+          unread_count: Number(c.unread_count ?? 0),
+        };
+      });
 
     return NextResponse.json({ chats });
   } catch (error) {

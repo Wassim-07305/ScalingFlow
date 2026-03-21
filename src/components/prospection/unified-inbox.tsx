@@ -180,10 +180,12 @@ export function UnifiedInbox() {
         );
         if (!res.ok) continue;
         const data = await res.json();
-        const accountChats = (data.chats || []).map((c: Chat) => ({
+        const raw = data.chats;
+        const chatArray = Array.isArray(raw) ? raw : (raw?.items || []);
+        const accountChats = chatArray.map((c: Chat) => ({
           ...c,
-          account_id: account.id,
-          provider: account.provider,
+          account_id: c.account_id || account.id,
+          provider: c.provider || account.provider,
         }));
         allChats.push(...accountChats);
       }
