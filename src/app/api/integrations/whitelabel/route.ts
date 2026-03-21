@@ -150,9 +150,11 @@ export async function GET() {
       .select("user_id, role, joined_at, invited_at")
       .eq("organization_id", membership.organization_id);
 
-    // Get member profiles
+    // Get member profiles (admin client to bypass RLS — need to see other users)
+    const { createAdminClient } = await import("@/lib/supabase/admin");
+    const adminDb = createAdminClient();
     const memberIds = members?.map((m) => m.user_id) || [];
-    const { data: profiles } = await supabase
+    const { data: profiles } = await adminDb
       .from("profiles")
       .select("id, full_name, email, avatar_url")
       .in("id", memberIds);
