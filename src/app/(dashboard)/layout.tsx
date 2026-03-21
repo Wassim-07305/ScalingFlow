@@ -4,6 +4,7 @@ import { unstable_cache } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { DashboardShell } from "@/components/layout/dashboard-shell";
 import { OrgFeatureGate } from "@/components/layout/org-feature-gate";
+import { BugReportButton } from "@/components/shared/bug-report-button";
 import { UserProvider } from "@/contexts/user-context";
 import { createAdminClient } from "@/lib/supabase/admin";
 
@@ -126,6 +127,7 @@ export default async function DashboardLayout({
         <OrgFeatureGate disabledFeatures={disabledFeatures}>
           {children}
         </OrgFeatureGate>
+        <BugReportButton />
       </DashboardShell>
     </UserProvider>
   );
