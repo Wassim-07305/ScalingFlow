@@ -142,7 +142,12 @@ export function AcquisitionStrategy() {
           });
         }
       } else {
-        setResult(parsed);
+        setResult({
+          ...parsed,
+          channel_allocations: Array.isArray(parsed.channel_allocations) ? parsed.channel_allocations : [],
+          weekly_plan: Array.isArray(parsed.weekly_plan) ? parsed.weekly_plan : [],
+          tips: Array.isArray(parsed.tips) ? parsed.tips : [],
+        });
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erreur");

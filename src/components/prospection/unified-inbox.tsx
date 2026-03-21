@@ -200,8 +200,8 @@ export function UnifiedInbox() {
         return dateB - dateA;
       });
       setChats(allChats);
-    } catch {
-      toast.error("Erreur lors du chargement des conversations");
+    } catch (err) {
+      console.error("[UnifiedInbox] fetchChats error:", err);
     } finally {
       setLoadingChats(false);
     }
