@@ -132,7 +132,7 @@ export async function GET() {
       .from("organization_members")
       .select("organization_id, role")
       .eq("user_id", user.id)
-      .single();
+      .maybeSingle();
 
     if (!membership) {
       return NextResponse.json({ organization: null });
