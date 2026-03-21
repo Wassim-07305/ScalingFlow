@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 const META_GRAPH_URL = "https://graph.facebook.com/v21.0";
 
@@ -68,6 +69,8 @@ export async function POST() {
     console.log("[meta-sync] Meta API response:", JSON.stringify(campaignsData).slice(0, 500));
     const campaigns: MetaCampaign[] = campaignsData.data || [];
 
+    const admin = createAdminClient();
+
     // Pour chaque campagne, recuperer les insights
     let synced = 0;
     for (const campaign of campaigns) {
@@ -102,22 +105,34 @@ export async function POST() {
       const roas =
         spend > 0 && conversions > 0 ? (conversions * 50) / spend : 0;
 
-      // Upsert dans ad_campaigns
-      await supabase.from("ad_campaigns").upsert(
-        {
-          user_id: user.id,
-          campaign_name: campaign.name,
-          campaign_type: "meta_ads",
-          status: campaign.status === "ACTIVE" ? "active" : "paused",
-          total_spend: spend,
-          total_impressions: impressions,
-          total_clicks: clicks,
-          total_conversions: conversions,
-          roas,
-          meta_campaign_id: campaign.id,
-        },
-        { onConflict: "meta_campaign_id" },
-      );
+      // Check if campaign already exists
+      const { data: existing } = await admin
+        .from("ad_campaigns")
+        .select("id")
+        .eq("user_id", user.id)
+        .eq("meta_campaign_id", campaign.id)
+        .maybeSingle();
+
+      const campaignData = {
+        user_id: user.id,
+        campaign_name: campaign.name,
+        campaign_type: "meta_ads",
+        status: campaign.status === "ACTIVE" ? "active" : "paused",
+        total_spend: spend,
+        total_impressions: impressions,
+        total_clicks: clicks,
+        total_conversions: conversions,
+        roas,
+        meta_campaign_id: campaign.id,
+      };
+
+      if (existing) {
+        const { error } = await admin.from("ad_campaigns").update(campaignData).eq("id", existing.id);
+        if (error) console.error("[meta-sync] Update error:", error);
+      } else {
+        const { error } = await admin.from("ad_campaigns").insert(campaignData);
+        if (error) console.error("[meta-sync] Insert error:", error);
+      }
 
       synced++;
     }
