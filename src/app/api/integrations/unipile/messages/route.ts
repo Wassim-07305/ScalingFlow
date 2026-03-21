@@ -56,6 +56,8 @@ export async function GET(request: NextRequest) {
     }
 
     const unipile = getUnipileClient();
+    const apiUrl = process.env.UNIPILE_API_URL;
+    const accessToken = process.env.UNIPILE_ACCESS_TOKEN;
 
     if (chatId) {
       // Return messages from a specific chat
@@ -135,9 +137,6 @@ export async function GET(request: NextRequest) {
     }
 
     // Resolve attendee names from Unipile /users API (needs account_id)
-    const apiUrl = process.env.UNIPILE_API_URL;
-    const accessToken = process.env.UNIPILE_ACCESS_TOKEN;
-
     const attendeeIds = [
       ...new Set(
         chatItems
