@@ -150,16 +150,35 @@ export function WelcomeBanner() {
               </motion.div>
             )}
 
-            {!isLoading && isPro && (
-              <motion.p
+            {!isLoading && isPro && usage && (
+              <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
-                className="text-sm text-emerald-400/80 flex items-center gap-1.5"
+                className="space-y-1.5"
               >
-                <Sparkles className="h-3.5 w-3.5" />
-                Générations IA illimitées
-              </motion.p>
+                <div className="flex items-center gap-2 text-sm text-text-muted">
+                  <Sparkles className="h-3.5 w-3.5 text-emerald-400" />
+                  <span>
+                    {usage.currentUsage}/{usage.limit ?? 500} générations IA ce mois
+                  </span>
+                </div>
+                <div className="w-32 sm:w-48 h-1.5 bg-bg-tertiary rounded-full overflow-hidden">
+                  <motion.div
+                    className={cn(
+                      "h-full rounded-full",
+                      usagePercent >= 100
+                        ? "bg-red-500"
+                        : usagePercent >= 80
+                          ? "bg-amber-500"
+                          : "bg-emerald-500",
+                    )}
+                    initial={{ width: 0 }}
+                    animate={{ width: `${usagePercent}%` }}
+                    transition={{ duration: 0.5, delay: 0.3 }}
+                  />
+                </div>
+              </motion.div>
             )}
           </div>
         </div>
