@@ -223,12 +223,31 @@ export function PixelCAPIGenerator() {
 
       if (account) {
         const metadata = account.metadata as Record<string, string> | null;
+        let pixelId = metadata?.pixel_id || "";
+        const accessToken = account.access_token || "";
+
+        // Auto-fetch pixel ID from Meta API if not saved yet
+        if (!pixelId && accessToken && account.provider_account_id) {
+          try {
+            const adAccountId = account.provider_account_id.replace(/^act_/, "");
+            const pixelRes = await fetch(
+              `https://graph.facebook.com/v21.0/act_${adAccountId}/adspixels?fields=id,name&access_token=${accessToken}`
+            );
+            if (pixelRes.ok) {
+              const pixelData = await pixelRes.json();
+              if (pixelData.data?.[0]?.id) {
+                pixelId = pixelData.data[0].id;
+              }
+            }
+          } catch { /* pixel fetch failed — user can enter manually */ }
+        }
+
         setConfig({
-          pixelId: metadata?.pixel_id || account.provider_account_id || "",
-          accessToken: account.access_token || "",
+          pixelId,
+          accessToken,
           domain: metadata?.domain || "",
         });
-        setSavedConfig(true);
+        if (pixelId) setSavedConfig(true);
       }
     } catch (err) {
       console.error("Erreur chargement config pixel:", err);
