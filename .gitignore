@@ -49,3 +49,6 @@ public/swe-worker-*.js
 
 # Supabase temp
 supabase/.temp/
+
+# Playwright test results
+test-results/
