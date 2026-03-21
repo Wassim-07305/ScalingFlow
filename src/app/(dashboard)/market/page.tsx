@@ -334,25 +334,13 @@ export default function MarketPage() {
     setLoadingReviews(true);
 
     try {
-      const res = await fetch("/api/ai/analyze-market", {
+      const res = await fetch("/api/ai/scrape-reviews", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          skills: profile?.vault_skills || [],
-          experienceLevel: profile?.experience_level || "intermediaire",
-          currentRevenue: profile?.current_revenue || 0,
-          targetRevenue: profile?.target_revenue || 0,
-          industries: [selectedAnalysis.market_name],
-          objectives: profile?.objectives || [],
-          budgetMonthly: profile?.budget_monthly || 0,
-          parcours: profile?.parcours || undefined,
-          situation: profile?.situation || undefined,
-          situationDetails: profile?.situation_details || undefined,
-          parcoursAnswers: profile?.parcours_answers || undefined,
-          expertiseProfonde: profile?.expertise_profonde || undefined,
-          hoursPerWeek: profile?.hours_per_week || undefined,
-          competitor_google_maps_urls: validGoogleUrls,
-          competitor_trustpilot_urls: validTrustpilotUrls,
+          google_maps_urls: validGoogleUrls,
+          trustpilot_urls: validTrustpilotUrls,
+          market_name: selectedAnalysis.market_name,
         }),
       });
 
@@ -374,7 +362,7 @@ export default function MarketPage() {
           `${data.review_verbatims.length} avis clients récupérés !`,
         );
       } else {
-        toast.info("Aucun avis trouvé pour les URLs fournies.");
+        toast.info(data.message || "Aucun avis trouvé pour les URLs fournies.");
       }
     } catch (error) {
       toast.error(
