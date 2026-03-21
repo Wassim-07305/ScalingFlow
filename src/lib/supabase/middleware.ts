@@ -150,7 +150,7 @@ export async function updateSession(request: NextRequest) {
         return NextResponse.redirect(url);
       }
 
-      if (!isOnboarding && !isPublicFunnel && !onboardingCompleted) {
+      if (!isOnboarding && !isPublicFunnel && path !== "/reset-password" && !onboardingCompleted) {
         const url = request.nextUrl.clone();
         url.pathname = "/onboarding";
         return NextResponse.redirect(url);
