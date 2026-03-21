@@ -222,8 +222,17 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const aiModel = getModelForGeneration("ad_images");
-    incrementAIUsage(user.id, { generationType: "ad_images", model: aiModel }).catch(() => {});
+    // Flux 1.1 Pro costs ~$0.04 per image
+    const imageCount = results.length;
+    const costPerImage = 0.04;
+    const totalCost = imageCount * costPerImage;
+
+    incrementAIUsage(user.id, {
+      generationType: "ad_images",
+      model: "sonnet", // logged as sonnet tier for cost tracking
+      costUsd: totalCost,
+      metadata: { provider: "replicate", model: REPLICATE_MODEL, image_count: imageCount },
+    }).catch(() => {});
 
     return NextResponse.json({
       images: results,
