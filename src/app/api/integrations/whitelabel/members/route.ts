@@ -53,11 +53,13 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Find user by email
-    const { data: targetProfile } = await supabase
+    // Find user by email (use admin client to bypass RLS — need to search across all profiles)
+    const { createAdminClient } = await import("@/lib/supabase/admin");
+    const adminDb = createAdminClient();
+    const { data: targetProfile } = await adminDb
       .from("profiles")
       .select("id")
-      .eq("email", email)
+      .eq("email", email.trim().toLowerCase())
       .maybeSingle();
 
     if (!targetProfile) {
