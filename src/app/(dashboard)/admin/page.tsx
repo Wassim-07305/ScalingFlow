@@ -36,8 +36,8 @@ interface AdminStats {
   activeUsers: number;
   totalGenerations: number;
   totalXP: number;
-  proUsers: number;
-  premiumUsers: number;
+  scaleUsers: number;
+  agencyUsers: number;
   freeUsers: number;
   onboardingCompleted: number;
   generationsThisMonth: number;
@@ -74,8 +74,8 @@ export default function AdminPage() {
     activeUsers: 0,
     totalGenerations: 0,
     totalXP: 0,
-    proUsers: 0,
-    premiumUsers: 0,
+    scaleUsers: 0,
+    agencyUsers: 0,
     freeUsers: 0,
     onboardingCompleted: 0,
     generationsThisMonth: 0,
@@ -112,18 +112,19 @@ export default function AdminPage() {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const profiles = allProfiles as any[] | null;
       const totalUsers = profiles?.length || 0;
-      const proUsers =
+      const scaleUsers =
         profiles?.filter(
           (p) =>
-            p.subscription_plan === "pro" && p.subscription_status === "active",
-        ).length || 0;
-      const premiumUsers =
-        profiles?.filter(
-          (p) =>
-            p.subscription_plan === "premium" &&
+            (p.subscription_plan === "scale" || p.subscription_plan === "premium") &&
             p.subscription_status === "active",
         ).length || 0;
-      const freeUsers = totalUsers - proUsers - premiumUsers;
+      const agencyUsers =
+        profiles?.filter(
+          (p) =>
+            p.subscription_plan === "agency" &&
+            p.subscription_status === "active",
+        ).length || 0;
+      const freeUsers = totalUsers - scaleUsers - agencyUsers;
       const onboardingCompleted =
         profiles?.filter((p) => p.onboarding_completed).length || 0;
       const totalXP =
@@ -184,8 +185,8 @@ export default function AdminPage() {
         activeUsers: uniqueActiveUsers,
         totalGenerations,
         totalXP,
-        proUsers,
-        premiumUsers,
+        scaleUsers,
+        agencyUsers,
         freeUsers,
         onboardingCompleted,
         generationsThisMonth: generationsThisMonth || 0,
@@ -291,14 +292,15 @@ export default function AdminPage() {
 
   const getPlanBadge = (plan: string) => {
     switch (plan) {
-      case "pro":
-        return <Badge variant="cyan">Pro</Badge>;
+      case "scale":
       case "premium":
         return (
           <Badge className="bg-[rgba(139,92,246,0.15)] text-[#A78BFA] border-[rgba(139,92,246,0.3)]">
-            Premium
+            Scale
           </Badge>
         );
+      case "agency":
+        return <Badge variant="cyan">Agency</Badge>;
       default:
         return <Badge variant="muted">Free</Badge>;
     }
@@ -357,7 +359,7 @@ export default function AdminPage() {
   const conversionRate =
     stats.totalUsers > 0
       ? Math.round(
-          ((stats.proUsers + stats.premiumUsers) / stats.totalUsers) * 100,
+          ((stats.scaleUsers + stats.agencyUsers) / stats.totalUsers) * 100,
         )
       : 0;
 
@@ -481,12 +483,12 @@ export default function AdminPage() {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs text-text-muted">Abonnés Pro</p>
+                <p className="text-xs text-text-muted">Abonnés Scale</p>
                 <p className="text-2xl font-bold text-text-primary">
                   {loading ? (
                     <Loader2 className="h-5 w-5 animate-spin text-text-muted" />
                   ) : (
-                    <AnimatedCounter value={stats.proUsers} />
+                    <AnimatedCounter value={stats.scaleUsers} />
                   )}
                 </p>
               </div>
@@ -499,12 +501,12 @@ export default function AdminPage() {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs text-text-muted">Abonnés Premium</p>
+                <p className="text-xs text-text-muted">Abonnés Agency</p>
                 <p className="text-2xl font-bold text-text-primary">
                   {loading ? (
                     <Loader2 className="h-5 w-5 animate-spin text-text-muted" />
                   ) : (
-                    <AnimatedCounter value={stats.premiumUsers} />
+                    <AnimatedCounter value={stats.agencyUsers} />
                   )}
                 </p>
               </div>
@@ -578,14 +580,14 @@ export default function AdminPage() {
                   total: stats.totalUsers,
                 },
                 {
-                  label: "Pro",
-                  count: stats.proUsers,
-                  color: "bg-accent",
+                  label: "Scale",
+                  count: stats.scaleUsers,
+                  color: "bg-[#A78BFA]",
                   total: stats.totalUsers,
                 },
                 {
-                  label: "Premium",
-                  count: stats.premiumUsers,
+                  label: "Agency",
+                  count: stats.agencyUsers,
                   color: "bg-[#A78BFA]",
                   total: stats.totalUsers,
                 },

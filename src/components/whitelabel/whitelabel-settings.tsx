@@ -874,9 +874,9 @@ export function WhitelabelSettings() {
     useOrganization();
 
   const subscriptionPlan = profile?.subscription_plan || "free";
-  const isPremium = subscriptionPlan === "premium";
+  const isPremium = subscriptionPlan === "scale" || subscriptionPlan === "agency" || subscriptionPlan === "premium";
 
-  // Premium gate — show upgrade CTA for Free/Pro users
+  // Plan gate — show upgrade CTA for Free users
   if (!loading && !isPremium && !organization) {
     return <PremiumGate />;
   }
