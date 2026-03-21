@@ -237,6 +237,41 @@ export async function POST(req: NextRequest) {
   }
 }
 
+function inferSceneFromContent(headline: string, body: string): string {
+  const text = `${headline} ${body}`.toLowerCase();
+
+  // Tech / dev / code
+  if (/dev|code|program|tech|saas|app|logiciel|software|api|web|digital/.test(text)) {
+    return "Modern tech workspace with glowing screens, code editor on monitor, dark ambient lighting, neon accents, futuristic developer setup";
+  }
+  // IA / automation
+  if (/ia\b|ai\b|intelligen|automat|machine|robot|chatbot|claude|gpt/.test(text)) {
+    return "Abstract AI neural network visualization, glowing nodes and connections, futuristic digital brain, dark background with blue and purple light trails";
+  }
+  // Marketing / ads / growth
+  if (/market|pub|ads|growth|scale|croiss|acqui|lead|funnel|conversion/.test(text)) {
+    return "Dynamic upward trending graph with glowing data points, marketing dashboard on screen, modern office with city view at night";
+  }
+  // Business / entrepreneur / coaching
+  if (/business|entrepreneur|coach|mentor|consult|freelance|indépen/.test(text)) {
+    return "Confident professional in modern minimalist office, warm golden hour lighting, clean desk with laptop, success and ambition atmosphere";
+  }
+  // Formation / cours / apprendre
+  if (/forma|cours|learn|appren|éduca|certif|compéten|skill|boost/.test(text)) {
+    return "Modern e-learning setup with tablet and laptop showing course interface, notebook and coffee, warm study environment with bokeh lights";
+  }
+  // Finance / argent / revenu
+  if (/argent|revenu|€|euro|money|profit|chiffre|salaire|freelan|client/.test(text)) {
+    return "Luxurious modern workspace, premium laptop, financial charts on screen, warm ambient lighting, wealth and success atmosphere";
+  }
+  // Fitness / santé / bien-être
+  if (/fitness|santé|sport|yoga|bien.?être|nutrition|perte|muscl/.test(text)) {
+    return "Energetic fitness scene, athletic environment with warm natural light, health and vitality atmosphere, clean modern gym";
+  }
+  // Default: abstract professional
+  return "Abstract gradient background with soft geometric shapes, professional and modern atmosphere, clean composition with depth of field";
+}
+
 function buildAdImagePrompt(
   adText: { headline: string; body: string },
   brandColors: string[],
@@ -245,29 +280,20 @@ function buildAdImagePrompt(
   formatConfig: { label: string; width: number; height: number },
   variationSuffix: string,
 ): string {
-  let prompt = `Professional advertisement creative for social media. `;
-  prompt += `Format: ${formatConfig.label} (${formatConfig.width}x${formatConfig.height}px). `;
+  const scene = inferSceneFromContent(adText.headline, adText.body || "");
 
-  if (brandName) {
-    prompt += `Brand: "${brandName}". `;
-  }
-
-  prompt += `Design style: ${styleDesc} `;
+  let prompt = `${scene}. `;
+  prompt += `${styleDesc} `;
+  prompt += `${variationSuffix}. `;
 
   if (brandColors && brandColors.length > 0) {
-    prompt += `Color palette: ${brandColors.join(", ")}. Use these colors prominently in the design. `;
+    prompt += `Dominant color palette: ${brandColors.join(", ")}. `;
   }
 
-  prompt += `The image should be a polished advertisement visual with space for text overlay. `;
-  prompt += `Ad headline concept: "${adText.headline}". `;
-
-  if (adText.body) {
-    prompt += `Ad message: "${adText.body.slice(0, 100)}". `;
-  }
-
-  prompt += `${variationSuffix}. `;
-  prompt += `High quality, professional advertising creative. Clean design suitable for paid social media campaigns. No actual text rendered in the image — only visual design elements and background. `;
-  prompt += `PNG format, sharp rendering, advertising-grade quality.`;
+  prompt += `Aspect ratio: ${formatConfig.width}x${formatConfig.height}. `;
+  prompt += `This is a background visual for a social media advertisement. `;
+  prompt += `CRITICAL: Do NOT render any text, letters, words, numbers, logos, watermarks, or typography in the image. The image must contain ZERO text of any kind. Only visual elements, textures, lighting, and scenery. `;
+  prompt += `Ultra high quality, 4K, professional photography, cinematic lighting, sharp focus.`;
 
   return prompt;
 }
