@@ -16,6 +16,7 @@ import {
   Lock,
   Users,
   Target,
+  RefreshCw,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
@@ -72,6 +73,8 @@ export function CampaignDashboard({ className }: CampaignDashboardProps) {
   const { user, loading: userLoading } = useUser();
   const [campaigns, setCampaigns] = React.useState<AdCampaign[]>([]);
   const [loading, setLoading] = React.useState(true);
+  const [syncing, setSyncing] = React.useState(false);
+  const [metaConnected, setMetaConnected] = React.useState(false);
   const supabase = useMemo(() => createClient(), []);
 
   React.useEffect(() => {
@@ -83,6 +86,15 @@ export function CampaignDashboard({ className }: CampaignDashboardProps) {
 
     const fetchCampaigns = async () => {
       setLoading(true);
+
+      // Check if Meta is connected
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("meta_access_token")
+        .eq("id", user.id)
+        .maybeSingle();
+      setMetaConnected(!!profile?.meta_access_token);
+
       const [{ data, error }, { data: attributions }] = await Promise.all([
         supabase
           .from("ad_campaigns")
@@ -137,6 +149,26 @@ export function CampaignDashboard({ className }: CampaignDashboardProps) {
       </div>
     );
   }
+
+  const handleSync = async () => {
+    setSyncing(true);
+    try {
+      const res = await fetch("/api/meta/sync", { method: "POST" });
+      if (!res.ok) throw new Error("Sync failed");
+      toast.success("Campagnes synchronisées depuis Meta");
+      // Re-fetch campaigns
+      const { data } = await supabase
+        .from("ad_campaigns")
+        .select("*")
+        .eq("user_id", user!.id)
+        .order("created_at", { ascending: false });
+      setCampaigns(data ?? []);
+    } catch {
+      toast.error("Erreur lors de la synchronisation Meta");
+    } finally {
+      setSyncing(false);
+    }
+  };
 
   // ─── Mode Simulation (no real campaigns) ───
   const isSimulation = campaigns.length === 0;
@@ -204,8 +236,8 @@ export function CampaignDashboard({ className }: CampaignDashboardProps) {
 
   return (
     <div className={cn("space-y-6", className)}>
-      {/* Simulation banner */}
-      {isSimulation && (
+      {/* Simulation banner or sync button */}
+      {isSimulation && !metaConnected && (
         <div className="flex items-center justify-between rounded-2xl border border-orange-500/20 bg-orange-500/5 p-4">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-500/15">
@@ -220,12 +252,30 @@ export function CampaignDashboard({ className }: CampaignDashboardProps) {
               </p>
             </div>
           </div>
-          <Button variant="outline" size="sm" disabled className="gap-2 shrink-0">
+          <Button variant="outline" size="sm" className="gap-2 shrink-0" onClick={() => window.location.href = "/api/integrations/meta/connect"}>
             <LinkIcon className="h-3.5 w-3.5" />
             Connecter Meta
-            <Badge variant="muted" className="text-[9px] ml-1">
-              Bientôt
-            </Badge>
+          </Button>
+        </div>
+      )}
+      {metaConnected && (
+        <div className="flex items-center justify-between rounded-2xl border border-accent/20 bg-accent/5 p-4">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent/15">
+              <Megaphone className="h-5 w-5 text-accent" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-text-primary">
+                Meta Ads connecté
+              </p>
+              <p className="text-xs text-text-muted">
+                {isSimulation ? "Synchronise tes campagnes pour voir tes vraies performances." : `${campaigns.length} campagne${campaigns.length > 1 ? "s" : ""} importée${campaigns.length > 1 ? "s" : ""}`}
+              </p>
+            </div>
+          </div>
+          <Button variant="outline" size="sm" className="gap-2 shrink-0" onClick={handleSync} disabled={syncing}>
+            <RefreshCw className={cn("h-3.5 w-3.5", syncing && "animate-spin")} />
+            {syncing ? "Synchronisation..." : "Synchroniser"}
           </Button>
         </div>
       )}
