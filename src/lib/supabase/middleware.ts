@@ -16,7 +16,9 @@ export async function updateSession(request: NextRequest) {
     "/diagnostic",
   ];
   const isPublicFunnel = path.startsWith("/f/");
-  const isPublicRoute = publicRoutes.some((route) => path === route);
+  const isAuthCallback = path.startsWith("/auth/callback");
+  const isPublicRoute =
+    publicRoutes.some((route) => path === route) || isAuthCallback;
   const isOnboarding = path.startsWith("/onboarding");
   const isApiRoute = path.startsWith("/api/");
 
@@ -142,7 +144,7 @@ export async function updateSession(request: NextRequest) {
         }
       }
 
-      if (isPublicRoute) {
+      if (isPublicRoute && !isAuthCallback && path !== "/reset-password") {
         const url = request.nextUrl.clone();
         url.pathname = onboardingCompleted ? "/" : "/onboarding";
         return NextResponse.redirect(url);
