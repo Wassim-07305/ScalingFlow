@@ -112,7 +112,6 @@ export async function GET(req: NextRequest) {
           "ads_read",
           "business_management",
           "pages_read_engagement",
-          "instagram_basic",
         ],
         metadata: { ad_accounts: adAccounts },
       },

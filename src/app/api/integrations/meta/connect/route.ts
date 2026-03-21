@@ -31,8 +31,6 @@ export async function GET() {
       "ads_read",
       "business_management",
       "pages_read_engagement",
-      "instagram_basic",
-      "instagram_manage_insights",
     ].join(",");
 
     // SECURITY: HMAC-signed state to prevent CSRF
