@@ -15,12 +15,16 @@ export async function GET() {
       return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
     }
 
+    // Use admin client to bypass RLS — members need to see the org they belong to
+    const { createAdminClient } = await import("@/lib/supabase/admin");
+    const adminDb = createAdminClient();
+
     // Get user's org membership
-    const { data: membership } = await supabase
+    const { data: membership } = await adminDb
       .from("organization_members")
       .select("organization_id, role")
       .eq("user_id", user.id)
-      .single();
+      .maybeSingle();
 
     if (!membership) {
       return NextResponse.json(
@@ -30,11 +34,11 @@ export async function GET() {
     }
 
     // Get org info
-    const { data: org } = await supabase
+    const { data: org } = await adminDb
       .from("organizations")
       .select("*")
       .eq("id", membership.organization_id)
-      .single();
+      .maybeSingle();
 
     if (!org) {
       return NextResponse.json(
