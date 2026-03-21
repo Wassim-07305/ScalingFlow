@@ -25,6 +25,7 @@ import {
   RefreshCw,
   BookOpen,
   Key,
+  Bug,
 } from "lucide-react";
 import { KnowledgeBaseAdmin } from "@/components/admin/knowledge-base-admin";
 import { ApiKeysAdmin } from "@/components/admin/api-keys-admin";
@@ -472,6 +473,32 @@ export default function AdminPage() {
             >
               <TrendingUp className="h-4 w-4" />
               Voir le monitoring
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* ─── Widget Bug Reports ────────────────────────────── */}
+      <Card className="mb-6">
+        <CardContent className="pt-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-red-500/15">
+                <Bug className="h-5 w-5 text-red-400" />
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold text-text-primary">Tickets de bugs</h3>
+                <p className="text-xs text-text-muted">Voir et gérer les signalements utilisateurs</p>
+              </div>
+            </div>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => router.push("/admin/bug-reports")}
+              className="gap-2"
+            >
+              <Bug className="h-4 w-4" />
+              Voir les tickets
             </Button>
           </div>
         </CardContent>

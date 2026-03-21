@@ -1,9 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { Resend } from "resend";
-
-const resend = new Resend(process.env.RESEND_API_KEY);
-const FEEDBACK_EMAIL = "lucas.adamymartin@gmail.com";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 export async function POST(req: NextRequest) {
   try {
@@ -29,71 +26,44 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Get user profile for context
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("full_name, email, subscription_plan")
-      .eq("id", user.id)
-      .maybeSingle();
+    const admin = createAdminClient();
 
-    const userName = profile?.full_name || user.email || "Utilisateur";
-    const userEmail = profile?.email || user.email || "";
-
-    // Build email HTML
-    const html = `
-      <div style="font-family: Inter, sans-serif; max-width: 600px; margin: 0 auto; background: #0B0E11; color: #E5E7EB; padding: 32px; border-radius: 16px;">
-        <h2 style="color: #34D399; margin-top: 0;">Bug Report — ScalingFlow</h2>
-
-        <div style="background: #141719; border-radius: 12px; padding: 20px; margin-bottom: 16px;">
-          <p style="margin: 0 0 8px; color: #9CA3AF; font-size: 12px;">Signalé par</p>
-          <p style="margin: 0; font-weight: 600;">${userName} (${userEmail})</p>
-        </div>
-
-        <div style="background: #141719; border-radius: 12px; padding: 20px; margin-bottom: 16px;">
-          <p style="margin: 0 0 8px; color: #9CA3AF; font-size: 12px;">Objet</p>
-          <p style="margin: 0; font-weight: 600;">${subject}</p>
-        </div>
-
-        <div style="background: #141719; border-radius: 12px; padding: 20px; margin-bottom: 16px;">
-          <p style="margin: 0 0 8px; color: #9CA3AF; font-size: 12px;">Description</p>
-          <p style="margin: 0; white-space: pre-wrap;">${description}</p>
-        </div>
-
-        ${page ? `
-        <div style="background: #141719; border-radius: 12px; padding: 20px; margin-bottom: 16px;">
-          <p style="margin: 0 0 8px; color: #9CA3AF; font-size: 12px;">Page</p>
-          <p style="margin: 0; font-family: monospace; font-size: 13px;">${page}</p>
-        </div>` : ""}
-
-        <div style="background: #141719; border-radius: 12px; padding: 20px;">
-          <p style="margin: 0 0 8px; color: #9CA3AF; font-size: 12px;">Détails techniques</p>
-          <p style="margin: 0; font-family: monospace; font-size: 11px; color: #6B7280;">
-            User ID: ${user.id}<br>
-            Plan: ${profile?.subscription_plan || "free"}<br>
-            Date: ${new Date().toLocaleString("fr-FR", { timeZone: "Europe/Paris" })}
-          </p>
-        </div>
-      </div>
-    `;
-
-    // Prepare attachments
-    const attachments: { filename: string; content: Buffer }[] = [];
+    // Upload screenshot if provided
+    let screenshotUrl: string | null = null;
     if (screenshot && screenshot.size > 0) {
       const buffer = Buffer.from(await screenshot.arrayBuffer());
-      attachments.push({
-        filename: `screenshot-${Date.now()}.${screenshot.type.split("/")[1] || "png"}`,
-        content: buffer,
-      });
+      const ext = screenshot.type.split("/")[1] || "png";
+      const filePath = `${user.id}/${Date.now()}.${ext}`;
+
+      const { error: uploadError } = await admin.storage
+        .from("feedback-screenshots")
+        .upload(filePath, buffer, { contentType: screenshot.type, upsert: true });
+
+      if (!uploadError) {
+        const { data: urlData } = admin.storage
+          .from("feedback-screenshots")
+          .getPublicUrl(filePath);
+        screenshotUrl = urlData.publicUrl;
+      }
     }
 
-    await resend.emails.send({
-      from: "ScalingFlow <bugs@scalingflow.com>",
-      to: FEEDBACK_EMAIL,
-      replyTo: userEmail,
-      subject: `[Bug] ${subject}`,
-      html,
-      ...(attachments.length > 0 ? { attachments } : {}),
+    // Insert into bug_reports table
+    const { error } = await admin.from("bug_reports").insert({
+      user_id: user.id,
+      subject: subject.trim(),
+      description: description.trim(),
+      page: page || null,
+      screenshot_url: screenshotUrl,
+      status: "new",
     });
+
+    if (error) {
+      console.error("[feedback] Insert error:", error);
+      return NextResponse.json(
+        { error: "Erreur lors de l'enregistrement" },
+        { status: 500 },
+      );
+    }
 
     return NextResponse.json({ success: true });
   } catch (error) {
