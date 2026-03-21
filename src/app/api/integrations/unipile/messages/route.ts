@@ -283,12 +283,16 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { account_id, chat_id, attendee_id, text } = body as {
+    const { account_id, chat_id, attendee_id, attendees_ids, text } = body as {
       account_id?: string;
       chat_id?: string;
       attendee_id?: string;
+      attendees_ids?: string[];
       text?: string;
     };
+
+    // Support both attendee_id (single) and attendees_ids (array from dialog)
+    const resolvedAttendeeId = attendee_id || attendees_ids?.[0];
 
     if (!account_id) {
       return NextResponse.json(
@@ -304,7 +308,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!chat_id && !attendee_id) {
+    if (!chat_id && !resolvedAttendeeId) {
       return NextResponse.json(
         { error: "Le champ chat_id ou attendee_id est requis" },
         { status: 400 },
@@ -334,7 +338,7 @@ export async function POST(request: NextRequest) {
     // Start a new chat
     const result = await unipile.messaging.startNewChat({
       account_id,
-      attendees_ids: [attendee_id!],
+      attendees_ids: [resolvedAttendeeId!],
       text,
     });
     return NextResponse.json({ chat: result });
