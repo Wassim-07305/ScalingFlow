@@ -19,6 +19,7 @@ import { GenerationHistory } from "@/components/shared/generation-history";
 import { cn } from "@/lib/utils/cn";
 import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
+import Link from "next/link";
 import {
   Sparkles,
   BarChart3,
@@ -34,6 +35,7 @@ import {
   Scissors,
   Rocket,
   Star,
+  TrendingUp,
 } from "lucide-react";
 
 const TABS = [
@@ -115,10 +117,19 @@ export default function AdsPage() {
 
   return (
     <div>
-      <PageHeader
-        title="Publicités"
-        description="Crée et gère tes campagnes publicitaires."
-      />
+      <div className="flex items-center justify-between mb-2">
+        <PageHeader
+          title="Publicités"
+          description="Crée et gère tes campagnes publicitaires."
+        />
+        <Link
+          href="/ads/analytics"
+          className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium bg-bg-tertiary text-text-secondary hover:text-text-primary hover:bg-bg-secondary transition-all shrink-0"
+        >
+          <TrendingUp className="h-4 w-4" />
+          Analytics
+        </Link>
+      </div>
 
       <div className="flex gap-2 mb-6 overflow-x-auto pb-1">
         {TABS.map((tab) => (
