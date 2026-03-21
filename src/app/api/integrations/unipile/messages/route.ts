@@ -175,6 +175,68 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // For chats where /users API didn't resolve a name (WhatsApp, etc.),
+    // fetch the latest message to get the sender name from the conversation
+    const unresolvedChats = chatItems.filter((c) => {
+      if (c.archived) return false;
+      const id = String(c.attendee_provider_id ?? "");
+      return !nameMap.has(id) && !c.name && !c.subject;
+    });
+
+    if (unresolvedChats.length > 0) {
+      await Promise.allSettled(
+        unresolvedChats.slice(0, 15).map(async (chat) => {
+          try {
+            const chatId = String(chat.id);
+            const rawMsgs = await unipile.messaging.getAllMessagesFromChat({
+              chat_id: chatId,
+              limit: 1,
+            }) as Record<string, unknown>;
+
+            let msgs: Array<Record<string, unknown>> = [];
+            if (Array.isArray(rawMsgs)) {
+              msgs = rawMsgs;
+            } else if (rawMsgs && typeof rawMsgs === "object") {
+              const items = (rawMsgs as Record<string, unknown>).items;
+              if (Array.isArray(items)) msgs = items as Array<Record<string, unknown>>;
+            }
+
+            // Find a message that is NOT from us to get the contact's sender info
+            const otherMsg = msgs.find((m) => !m.is_sender);
+            if (otherMsg?.sender_id) {
+              const senderId = String(otherMsg.sender_id);
+              // Try /users API with this sender_id
+              if (apiUrl && accessToken) {
+                try {
+                  const res = await fetch(
+                    `${apiUrl}/api/v1/users/${encodeURIComponent(senderId)}?account_id=${encodeURIComponent(accountId!)}`,
+                    { headers: { "X-API-KEY": accessToken } },
+                  );
+                  if (res.ok) {
+                    const profile = (await res.json()) as Record<string, unknown>;
+                    const name =
+                      profile.first_name && profile.last_name
+                        ? `${profile.first_name} ${profile.last_name}`
+                        : (profile.display_name as string) ||
+                          (profile.name as string) ||
+                          (profile.phone_number as string) ||
+                          null;
+                    if (name) {
+                      const attendeeId = String(chat.attendee_provider_id ?? "");
+                      nameMap.set(attendeeId, {
+                        name,
+                        avatar: (profile.profile_picture_url as string) || undefined,
+                      });
+                    }
+                  }
+                } catch {}
+              }
+            }
+          } catch {}
+        }),
+      );
+    }
+
     // Map to the shape the frontend expects
     const chats = chatItems
       .filter((c) => !c.archived)
