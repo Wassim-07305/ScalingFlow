@@ -71,6 +71,27 @@ export async function POST() {
 
     const admin = createAdminClient();
 
+    // Map Meta objective to valid campaign_type
+    const objectiveToType = (objective: string): string => {
+      switch (objective) {
+        case "OUTCOME_AWARENESS":
+        case "BRAND_AWARENESS":
+        case "REACH":
+          return "awareness";
+        case "OUTCOME_TRAFFIC":
+        case "LINK_CLICKS":
+          return "traffic";
+        case "OUTCOME_SALES":
+        case "CONVERSIONS":
+        case "PRODUCT_CATALOG_SALES":
+          return "conversions";
+        case "OUTCOME_ENGAGEMENT":
+        case "OUTCOME_LEADS":
+        default:
+          return "retargeting";
+      }
+    };
+
     // Pour chaque campagne, recuperer les insights
     let synced = 0;
     for (const campaign of campaigns) {
@@ -116,7 +137,7 @@ export async function POST() {
       const campaignData = {
         user_id: user.id,
         campaign_name: campaign.name,
-        campaign_type: "meta_ads",
+        campaign_type: objectiveToType(campaign.objective),
         status: campaign.status === "ACTIVE" ? "active" : "paused",
         total_spend: spend,
         total_impressions: impressions,
