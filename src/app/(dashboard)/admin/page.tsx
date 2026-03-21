@@ -477,6 +477,32 @@ export default function AdminPage() {
         </CardContent>
       </Card>
 
+      {/* ─── Widget Affiliés ────────────────────────────── */}
+      <Card className="mb-6">
+        <CardContent className="pt-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-violet-500/15">
+                <Users className="h-5 w-5 text-violet-400" />
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold text-text-primary">Programme Affiliés</h3>
+                <p className="text-xs text-text-muted">Gérer les affiliés, commissions et payouts</p>
+              </div>
+            </div>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => router.push("/admin/affiliates")}
+              className="gap-2"
+            >
+              <Users className="h-4 w-4" />
+              Gérer les affiliés
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* ─── Abonnements & Conversion ────────────────────────── */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
         <Card>

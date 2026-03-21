@@ -91,7 +91,7 @@ export default function AdsPage() {
       const { data, error } = await supabase
         .from("ad_creatives")
         .select(
-          "creative_type, ai_raw_response, ad_copy, headline, hook, cta, video_script, angle",
+          "creative_type, ad_copy, headline, hook, cta, video_script, angle",
         )
         .eq("id", item.id)
         .single();
@@ -99,7 +99,7 @@ export default function AdsPage() {
         toast.error("Impossible de charger ce creative");
         return;
       }
-      const parsed = data.ai_raw_response || data;
+      const parsed = data;
       const typeMap: Record<string, string> = {
         image: "creatives",
         carousel: "creatives",
