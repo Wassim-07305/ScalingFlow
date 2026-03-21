@@ -141,7 +141,7 @@ export function AdsScore() {
   }
 
   // No data state — only show if there's truly nothing (no dimensions)
-  if (result && !result.has_data && !result.dimensions) {
+  if (result && !result.has_data && !("dimensions" in result)) {
     return (
       <Card>
         <CardContent className="flex flex-col items-center justify-center py-16 gap-4">
