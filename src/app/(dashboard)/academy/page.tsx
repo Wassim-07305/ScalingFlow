@@ -1,10 +1,13 @@
 "use client";
 
 import { Suspense } from "react";
+import Link from "next/link";
 import { PageHeader } from "@/components/layout/page-header";
 import { ModuleList } from "@/components/academy/module-list";
 import { SkeletonCard } from "@/components/ui/skeleton";
-import { GraduationCap, Clock, Trophy } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useUser } from "@/hooks/use-user";
+import { GraduationCap, Clock, Trophy, Settings } from "lucide-react";
 
 function AcademyStats() {
   return (
@@ -60,12 +63,25 @@ function ModuleListFallback() {
   );
 }
 
+function AdminButton() {
+  const { profile } = useUser();
+  if (profile?.role !== "admin") return null;
+  return (
+    <Link href="/admin/academy">
+      <Button variant="ghost" size="sm">
+        <Settings className="h-4 w-4 mr-1" /> Gérer
+      </Button>
+    </Link>
+  );
+}
+
 export default function AcademyPage() {
   return (
     <div>
       <PageHeader
         title="Académie"
         description="Formation vidéo étape par étape pour scaler ton business."
+        actions={<AdminButton />}
       />
       <AcademyStats />
       <Suspense fallback={<ModuleListFallback />}>
