@@ -27,6 +27,7 @@ import {
   TrendingUp,
   TrendingDown,
   Minus,
+  Rocket,
 } from "lucide-react";
 import { PARCOURS, type ParcoursId } from "@/lib/parcours";
 import { UpgradeWall } from "@/components/shared/upgrade-wall";
@@ -263,23 +264,45 @@ export default function VaultPage() {
           title="Coffre-Fort"
           description="Ton coffre-fort de compétences et ressources."
         />
-        <Card className="mt-6 border-border-default/50 bg-bg-secondary/30 backdrop-blur-sm">
-          <CardContent className="flex flex-col items-center justify-center py-20 text-center">
-            <div className="h-16 w-16 rounded-2xl bg-accent/10 border border-accent/20 flex items-center justify-center mb-5">
-              <Archive className="h-8 w-8 text-accent" />
+        <div className="mt-6 rounded-2xl border border-accent/20 bg-gradient-to-br from-accent/5 via-bg-secondary/50 to-teal-500/5 backdrop-blur-sm overflow-hidden">
+          <div className="flex flex-col items-center justify-center py-20 px-6 text-center relative">
+            {/* Background glow */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-accent/5 rounded-full blur-[120px] pointer-events-none" />
+
+            <div className="relative">
+              <div className="h-20 w-20 rounded-2xl bg-accent/10 border border-accent/20 flex items-center justify-center mb-6 mx-auto">
+                <Archive className="h-10 w-10 text-accent" />
+              </div>
+              <h3 className="text-2xl font-bold text-text-primary mb-3">
+                Bienvenue dans ton Vault
+              </h3>
+              <p className="text-sm text-text-secondary max-w-lg mb-4 leading-relaxed">
+                Ton Vault est le coeur de ScalingFlow. Décris tes compétences, ton expertise
+                et tes objectifs pour que l&apos;IA puisse générer des assets sur-mesure pour ton business.
+              </p>
+              <div className="flex items-center justify-center gap-6 text-xs text-text-muted mb-8">
+                <span className="flex items-center gap-1.5">
+                  <span className="h-1.5 w-1.5 rounded-full bg-accent" />
+                  5 minutes
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <span className="h-1.5 w-1.5 rounded-full bg-accent" />
+                  4 étapes simples
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <span className="h-1.5 w-1.5 rounded-full bg-accent" />
+                  Analyse IA incluse
+                </span>
+              </div>
+              <Button asChild size="lg" className="gap-2 shadow-lg shadow-accent/20">
+                <a href="/onboarding">
+                  Commencer l&apos;onboarding
+                  <Rocket className="h-4 w-4" />
+                </a>
+              </Button>
             </div>
-            <h3 className="text-lg font-bold text-text-primary mb-2">
-              Vault non disponible
-            </h3>
-            <p className="text-sm text-text-secondary max-w-md mb-6 leading-relaxed">
-              Complète l&apos;onboarding pour initialiser ton vault et débloquer
-              l&apos;analyse IA de tes compétences.
-            </p>
-            <Button asChild>
-              <a href="/onboarding">Commencer l&apos;onboarding</a>
-            </Button>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
     );
   }

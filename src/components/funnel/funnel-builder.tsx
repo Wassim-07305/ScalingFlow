@@ -272,12 +272,23 @@ export function FunnelBuilder({ className, initialData }: FunnelBuilderProps) {
               </div>
             )}
             {error && <p className="text-sm text-danger">{error}</p>}
-            <GenerateButton
-              onClick={handleGenerate}
-              disabled={!selectedOfferId}
-            >
-              Générer le funnel complet
-            </GenerateButton>
+            {offers.length === 0 ? (
+              <div className="text-center py-6 rounded-xl border border-dashed border-border-default bg-bg-secondary/30">
+                <p className="text-sm text-text-secondary mb-3">
+                  Crée d&apos;abord une offre pour pouvoir générer ton funnel.
+                </p>
+                <Button variant="outline" size="sm" asChild>
+                  <a href="/offer">Créer une offre</a>
+                </Button>
+              </div>
+            ) : (
+              <GenerateButton
+                onClick={handleGenerate}
+                disabled={!selectedOfferId}
+              >
+                Générer le funnel complet
+              </GenerateButton>
+            )}
           </CardContent>
         </Card>
       </div>

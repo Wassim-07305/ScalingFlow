@@ -213,7 +213,7 @@ export const NAV_SECTIONS: NavSection[] = [
   {
     label: "Marketing",
     items: NAV_ITEMS.filter((i) =>
-      ["/funnel", "/assets", "/ads", "/content"].includes(i.href),
+      ["/funnel", "/assets", "/ads", "/content", "/analytics"].includes(i.href),
     ),
   },
   {
@@ -223,10 +223,6 @@ export const NAV_SECTIONS: NavSection[] = [
         i.href,
       ),
     ),
-  },
-  {
-    label: "Performance",
-    items: NAV_ITEMS.filter((i) => ["/analytics"].includes(i.href)),
   },
   {
     label: "Apprentissage",

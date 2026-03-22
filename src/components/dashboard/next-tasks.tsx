@@ -122,13 +122,16 @@ export function NextTasks() {
           </div>
         ) : tasks.length === 0 ? (
           <div className="text-center py-6">
-            <CheckCircle2 className="h-10 w-10 text-accent mx-auto mb-2" />
+            <ListTodo className="h-10 w-10 text-text-muted mx-auto mb-2" />
             <p className="text-sm text-text-secondary">
-              Toutes les tâches sont complétées !
+              Aucune tâche pour le moment.
+            </p>
+            <p className="text-xs text-text-muted mt-1">
+              Génère une roadmap pour obtenir tes premières tâches.
             </p>
             <Link href="/roadmap">
               <Button variant="outline" size="sm" className="mt-3">
-                Générer une nouvelle roadmap
+                Générer ma roadmap
               </Button>
             </Link>
           </div>

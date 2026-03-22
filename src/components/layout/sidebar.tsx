@@ -66,7 +66,7 @@ export function Sidebar({
 }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
-  const { profile: userProfile } = useUser();
+  const { profile: userProfile, loading: profileLoading } = useUser();
   const {
     sidebarCollapsed: isCollapsed,
     toggleSidebar,
@@ -338,12 +338,16 @@ export function Sidebar({
               <p className="truncate text-sm font-semibold text-text-primary">
                 {userName}
               </p>
-              <Badge
-                variant={planVariant as "cyan" | "purple" | "muted"}
-                className="text-[10px] mt-0.5"
-              >
-                {planLabel}
-              </Badge>
+              {profileLoading && !userProfile?.subscription_plan ? (
+                <div className="h-4 w-12 bg-bg-tertiary rounded animate-pulse mt-0.5" />
+              ) : (
+                <Badge
+                  variant={planVariant as "cyan" | "purple" | "muted"}
+                  className="text-[10px] mt-0.5"
+                >
+                  {planLabel}
+                </Badge>
+              )}
             </div>
           </div>
 

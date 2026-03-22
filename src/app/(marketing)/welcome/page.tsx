@@ -14,7 +14,6 @@ import {
   Bot,
   Shield,
   Crown,
-  Star,
 } from "lucide-react";
 
 import type { Metadata } from "next";
@@ -125,24 +124,21 @@ const STEPS = [
   },
 ];
 
-const TESTIMONIALS = [
+const RESULTS = [
   {
-    name: "Thomas D.",
-    role: "Coach business",
-    text: "En 2 heures j'avais mon offre, mon funnel et mes 5 premières pubs. Ce qui m'aurait pris 3 semaines.",
-    stars: 5,
+    metric: "2h",
+    description:
+      "Pour générer une offre complète avec funnel, au lieu de 3 semaines manuellement.",
   },
   {
-    name: "Sarah M.",
-    role: "Consultante marketing",
-    text: "La qualité des textes générés est bluffante. Mes clients pensent que j'ai une équipe de copywriters.",
-    stars: 5,
+    metric: "15+",
+    description:
+      "Types d'assets marketing générés automatiquement par l'IA.",
   },
   {
-    name: "Kevin L.",
-    role: "Agence digitale",
-    text: "On utilise ScalingFlow pour onboarder nos clients 10x plus vite. Un game-changer pour notre agence.",
-    stars: 5,
+    metric: "11",
+    description:
+      "Agents IA spécialisés qui travaillent sur ton business 24/7.",
   },
 ];
 
@@ -243,6 +239,37 @@ export default function WelcomePage() {
         </div>
       </section>
 
+      {/* ─── Dashboard Preview ─── */}
+      <section className="relative -mt-10 mb-0 px-4 pb-16">
+        <div className="max-w-5xl mx-auto">
+          <div className="relative rounded-2xl border border-border-default/50 overflow-hidden shadow-2xl shadow-accent/10">
+            <div className="absolute inset-0 rounded-2xl bg-gradient-to-b from-accent/10 via-transparent to-transparent pointer-events-none" />
+            <div className="relative bg-bg-secondary/80 backdrop-blur-sm p-1 rounded-2xl">
+              {/* Browser-like top bar */}
+              <div className="flex items-center gap-2 px-4 py-2 border-b border-border-default/30">
+                <div className="flex gap-1.5">
+                  <div className="h-2.5 w-2.5 rounded-full bg-red-400/60" />
+                  <div className="h-2.5 w-2.5 rounded-full bg-yellow-400/60" />
+                  <div className="h-2.5 w-2.5 rounded-full bg-green-400/60" />
+                </div>
+                <div className="flex-1 flex justify-center">
+                  <div className="px-4 py-1 rounded-md bg-bg-tertiary text-xs text-text-muted">
+                    scalingflow.vercel.app/dashboard
+                  </div>
+                </div>
+              </div>
+              <Image
+                src="/images/dashboard-preview.png"
+                alt="Aperçu du dashboard ScalingFlow"
+                width={1200}
+                height={675}
+                className="w-full rounded-b-xl"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ─── Social proof bar ─── */}
       <section className="border-y border-border-default/50 bg-bg-secondary/30 backdrop-blur-sm">
         <div className="max-w-4xl mx-auto px-4 py-6 flex flex-wrap items-center justify-center gap-8 text-sm text-text-muted">
@@ -338,43 +365,27 @@ export default function WelcomePage() {
         </div>
       </section>
 
-      {/* ─── Testimonials ─── */}
+      {/* ─── Results ─── */}
       <section className="max-w-6xl mx-auto px-4 py-28">
         <div className="text-center mb-16">
           <h2 className="text-3xl sm:text-4xl font-bold text-text-primary mb-4">
-            Ils scalent avec ScalingFlow
+            Des résultats concrets
           </h2>
+          <p className="text-text-secondary max-w-xl mx-auto text-lg">
+            ScalingFlow accélère chaque étape de la création et du scaling de ton business.
+          </p>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-3">
-          {TESTIMONIALS.map((t, i) => (
+        <div className="grid gap-6 md:grid-cols-3 max-w-4xl mx-auto">
+          {RESULTS.map((r, i) => (
             <div
               key={i}
-              className="group p-6 rounded-2xl border border-border-default/50 bg-bg-secondary/30 hover:border-accent/20 hover:shadow-xl hover:shadow-accent/5 transition-all duration-300 backdrop-blur-sm"
+              className="text-center p-8 rounded-2xl border border-border-default/50 bg-bg-secondary/30 hover:border-accent/20 hover:shadow-xl hover:shadow-accent/5 transition-all duration-300 backdrop-blur-sm"
             >
-              {/* Stars */}
-              <div className="flex gap-1 mb-4">
-                {Array.from({ length: t.stars }).map((_, si) => (
-                  <Star
-                    key={si}
-                    className="h-4 w-4 fill-yellow-400 text-yellow-400"
-                  />
-                ))}
-              </div>
-              <p className="text-sm text-text-secondary leading-relaxed mb-5">
-                &ldquo;{t.text}&rdquo;
+              <p className="text-5xl font-bold text-accent mb-3">{r.metric}</p>
+              <p className="text-sm text-text-secondary leading-relaxed">
+                {r.description}
               </p>
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-full bg-accent/10 flex items-center justify-center text-accent font-bold text-sm">
-                  {t.name[0]}
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-text-primary">
-                    {t.name}
-                  </p>
-                  <p className="text-xs text-text-muted">{t.role}</p>
-                </div>
-              </div>
             </div>
           ))}
         </div>
