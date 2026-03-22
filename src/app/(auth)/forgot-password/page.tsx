@@ -49,7 +49,7 @@ export default function ForgotPasswordPage() {
           />
           <h1 className="text-3xl font-bold text-text-primary">ScalingFlow</h1>
         </div>
-        <p className="text-text-secondary">Reinitialise ton mot de passe.</p>
+        <p className="text-text-secondary">Réinitialise ton mot de passe.</p>
       </div>
 
       {sent ? (
@@ -57,12 +57,12 @@ export default function ForgotPasswordPage() {
           <div className="rounded-[8px] bg-accent/10 border border-accent/20 p-4 text-center space-y-2">
             <CheckCircle2 className="h-8 w-8 text-accent mx-auto" />
             <p className="text-sm text-text-primary font-medium">
-              Email envoye !
+              Email envoyé !
             </p>
             <p className="text-sm text-text-secondary">
               Si un compte existe avec{" "}
               <span className="font-medium text-text-primary">{email}</span>, tu
-              recevras un lien de reinitialisation.
+              recevras un lien de réinitialisation.
             </p>
           </div>
           <p className="text-xs text-text-muted text-center">
@@ -71,7 +71,7 @@ export default function ForgotPasswordPage() {
               onClick={() => setSent(false)}
               className="text-info hover:underline font-medium"
             >
-              reessaye
+              réessaye
             </button>
             .
           </p>
@@ -106,7 +106,7 @@ export default function ForgotPasswordPage() {
       <div className="text-center space-y-2">
         <p className="text-sm text-text-secondary">
           <Link href="/login" className="text-info hover:underline font-medium">
-            Retour a la connexion
+            Retour à la connexion
           </Link>
         </p>
         <p className="text-xs text-text-muted">
@@ -114,7 +114,7 @@ export default function ForgotPasswordPage() {
             href="/welcome"
             className="hover:text-text-secondary transition-colors"
           >
-            Retour a l&apos;accueil
+            Retour à l&apos;accueil
           </Link>
         </p>
       </div>

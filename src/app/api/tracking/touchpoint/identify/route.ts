@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { createClient } from "@/lib/supabase/server";
 
 /**
  * POST /api/tracking/touchpoint/identify
@@ -8,6 +9,15 @@ import { createAdminClient } from "@/lib/supabase/admin";
  */
 export async function POST(req: NextRequest) {
   try {
+    // Verify authentication
+    const supabaseAuth = await createClient();
+    const {
+      data: { user },
+    } = await supabaseAuth.auth.getUser();
+    if (!user) {
+      return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+    }
+
     const { visitor_id, user_id, lead_id } = await req.json();
 
     if (!visitor_id || typeof visitor_id !== "string") {
@@ -18,6 +28,11 @@ export async function POST(req: NextRequest) {
         { error: "user_id ou lead_id requis" },
         { status: 400 },
       );
+    }
+
+    // Ensure user can only identify themselves
+    if (user_id && user_id !== user.id) {
+      return NextResponse.json({ error: "Non autorisé" }, { status: 403 });
     }
 
     const supabase = createAdminClient();

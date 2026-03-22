@@ -170,10 +170,10 @@ export default function WelcomePage() {
               ScalingFlow
             </span>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             <Link
               href="/login"
-              className="text-sm font-medium text-text-secondary hover:text-text-primary transition-colors"
+              className="hidden sm:inline text-sm font-medium text-text-secondary hover:text-text-primary transition-colors"
             >
               Connexion
             </Link>
@@ -197,7 +197,7 @@ export default function WelcomePage() {
 
         <div className="max-w-4xl mx-auto px-4 pt-28 pb-24 text-center relative">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-accent/20 bg-accent/5 text-accent text-xs font-medium mb-8 backdrop-blur-sm">
-            <Sparkles className="h-3.5 w-3.5" />
+            <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
             Infrastructure IA Plug &amp; Play
           </div>
 
@@ -223,7 +223,7 @@ export default function WelcomePage() {
               className="group inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-accent text-white font-semibold text-base hover:bg-accent/90 transition-all shadow-[0_0_32px_rgba(52,211,153,0.2)] hover:shadow-[0_0_48px_rgba(52,211,153,0.3)]"
             >
               Commencer maintenant
-              <ArrowRight className="h-5 w-5 group-hover:translate-x-0.5 transition-transform" />
+              <ArrowRight className="h-5 w-5 group-hover:translate-x-0.5 transition-transform" aria-hidden="true" />
             </Link>
             <Link
               href="#features"
@@ -274,21 +274,21 @@ export default function WelcomePage() {
       <section className="border-y border-border-default/50 bg-bg-secondary/30 backdrop-blur-sm">
         <div className="max-w-4xl mx-auto px-4 py-6 flex flex-wrap items-center justify-center gap-8 text-sm text-text-muted">
           <div className="flex items-center gap-2">
-            <BarChart3 className="h-4 w-4 text-accent" />
+            <BarChart3 className="h-4 w-4 text-accent" aria-hidden="true" />
             <span>
               <span className="text-text-primary font-semibold">11</span> agents
               IA spécialisés
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <FileText className="h-4 w-4 text-accent" />
+            <FileText className="h-4 w-4 text-accent" aria-hidden="true" />
             <span>
               <span className="text-text-primary font-semibold">15+</span> types
               d&apos;assets générés
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <Zap className="h-4 w-4 text-accent" />
+            <Zap className="h-4 w-4 text-accent" aria-hidden="true" />
             <span>
               Résultats en{" "}
               <span className="text-text-primary font-semibold">
@@ -318,7 +318,7 @@ export default function WelcomePage() {
               className="group p-6 rounded-2xl border border-border-default/50 bg-bg-secondary/30 hover:border-accent/20 hover:shadow-xl hover:shadow-accent/5 transition-all duration-300 backdrop-blur-sm"
             >
               <div className="h-12 w-12 rounded-xl bg-accent/10 flex items-center justify-center mb-5 group-hover:bg-accent/15 group-hover:scale-110 transition-all duration-300">
-                <feature.icon className="h-6 w-6 text-accent" />
+                <feature.icon className="h-6 w-6 text-accent" aria-hidden="true" />
               </div>
               <h3 className="font-semibold text-text-primary mb-2 text-lg">
                 {feature.title}
@@ -431,7 +431,7 @@ export default function WelcomePage() {
                     <div
                       className={`h-9 w-9 rounded-xl flex items-center justify-center ${colors.icon}`}
                     >
-                      <Icon className="h-4 w-4" />
+                      <Icon className="h-4 w-4" aria-hidden="true" />
                     </div>
                     <h3 className="font-semibold text-text-primary">
                       {plan.name}
@@ -466,6 +466,7 @@ export default function WelcomePage() {
                       >
                         <Check
                           className={`h-3.5 w-3.5 mt-0.5 shrink-0 ${colors.check}`}
+                          aria-hidden="true"
                         />
                         <span className="leading-relaxed">{f}</span>
                       </div>
@@ -558,7 +559,7 @@ export default function WelcomePage() {
             className="group inline-flex items-center gap-2 px-10 py-5 rounded-2xl bg-accent text-white font-semibold text-lg hover:bg-accent/90 transition-all shadow-[0_0_40px_rgba(52,211,153,0.2)] hover:shadow-[0_0_60px_rgba(52,211,153,0.3)]"
           >
             Commencer maintenant
-            <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
+            <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
           </Link>
         </div>
       </section>
@@ -592,7 +593,7 @@ export default function WelcomePage() {
               Inscription
             </Link>
             <div className="flex items-center gap-1">
-              <Shield className="h-3 w-3" />
+              <Shield className="h-3 w-3" aria-hidden="true" />
               Paiements sécurisés via Stripe
             </div>
           </div>
