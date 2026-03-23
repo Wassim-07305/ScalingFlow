@@ -269,9 +269,10 @@ export async function* streamText({
   model = "sonnet",
 }: GenerateOptions): AsyncGenerator<string> {
   // Try Anthropic direct streaming first if available
-  if (USE_ANTHROPIC_DIRECT && anthropic) {
+  const client = await getAnthropicClient();
+  if (client) {
     try {
-      const stream = anthropic.messages.stream({
+      const stream = client.messages.stream({
         model: ANTHROPIC_MODELS[model],
         max_tokens: maxTokens,
         temperature,
