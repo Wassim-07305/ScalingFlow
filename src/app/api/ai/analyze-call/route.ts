@@ -170,14 +170,9 @@ ${firstTp.content ? `- Créative : ${firstTp.content}` : ""}`;
       }),
     });
   } catch (error) {
-    const errMsg = error instanceof Error ? error.message : String(error);
-    const errStack = error instanceof Error ? error.stack : undefined;
-    console.error("Call analysis error:", errMsg);
-    if (errStack) console.error("Stack:", errStack);
-    console.error("ANTHROPIC_API_KEY set:", Boolean(process.env.ANTHROPIC_API_KEY));
-    console.error("OPENROUTER_API_KEY set:", Boolean(process.env.OPENROUTER_API_KEY));
+    console.error("Call analysis error:", error);
     return NextResponse.json(
-      { error: "Erreur lors de l'analyse", detail: errMsg },
+      { error: "Erreur lors de l'analyse" },
       { status: 500 },
     );
   }

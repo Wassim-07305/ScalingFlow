@@ -1,20 +1,25 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { jsonrepair } from "jsonrepair";
 import { AI_MODEL, ANTHROPIC_MODELS, OPENROUTER_MODELS } from "./anthropic";
+import { getSetting } from "@/lib/settings/get-setting";
 
 const OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1";
 const MAX_RETRIES = 3;
 const RETRY_DELAY_MS = 1000;
 
-// Initialize Anthropic client if API key is available
-const anthropic = process.env.ANTHROPIC_API_KEY
-  ? new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
-  : null;
+// Lazy-initialized Anthropic client (reads key from DB via getSetting)
+let _anthropicClient: Anthropic | null = null;
+let _anthropicKeyResolved = false;
 
-// Use Anthropic API directly when available, otherwise fallback to OpenRouter
-const USE_ANTHROPIC_DIRECT = Boolean(
-  anthropic && process.env.ANTHROPIC_API_KEY,
-);
+async function getAnthropicClient(): Promise<Anthropic | null> {
+  if (_anthropicKeyResolved) return _anthropicClient;
+  _anthropicKeyResolved = true;
+  const key = await getSetting("ANTHROPIC_API_KEY");
+  if (key) {
+    _anthropicClient = new Anthropic({ apiKey: key });
+  }
+  return _anthropicClient;
+}
 
 interface GenerateOptions {
   prompt: string;
@@ -44,9 +49,10 @@ async function anthropicGenerate(
   temperature: number,
   model: "haiku" | "sonnet" = "sonnet",
 ): Promise<{ text: string; usage: AIUsageInfo }> {
-  if (!anthropic) throw new Error("Anthropic client not initialized");
+  const client = await getAnthropicClient();
+  if (!client) throw new Error("Anthropic client not initialized");
 
-  const response = await anthropic.messages.create({
+  const response = await client.messages.create({
     model: ANTHROPIC_MODELS[model],
     max_tokens: maxTokens,
     temperature,
@@ -77,10 +83,11 @@ async function openRouterFetch(
 
   for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
     try {
+      const openRouterKey = await getSetting("OPENROUTER_API_KEY");
       const res = await fetch(`${OPENROUTER_BASE_URL}/chat/completions`, {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
+          Authorization: `Bearer ${openRouterKey || ""}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify(body),
@@ -118,8 +125,9 @@ export async function generateText({
   temperature = 0.7,
   model = "sonnet",
 }: GenerateOptions): Promise<GenerateResult> {
-  // Try Anthropic direct API first if available
-  if (USE_ANTHROPIC_DIRECT) {
+  // Try Anthropic direct API first if available (key from DB or env)
+  const anthropicClient = await getAnthropicClient();
+  if (anthropicClient) {
     try {
       return await anthropicGenerate(
         systemPrompt,
@@ -295,10 +303,11 @@ export async function* streamText({
   }
   messages.push({ role: "user", content: prompt });
 
+  const orKey = await getSetting("OPENROUTER_API_KEY");
   const res = await fetch(`${OPENROUTER_BASE_URL}/chat/completions`, {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
+      Authorization: `Bearer ${orKey || ""}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
