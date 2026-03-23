@@ -106,6 +106,12 @@ export const NAV_ITEMS: NavItem[] = [
     roles: ["user", "student", "admin", "coach"],
   },
   {
+    label: "Clients",
+    href: "/clients",
+    icon: UserCheck,
+    roles: ["user", "student", "admin", "coach"],
+  },
+  {
     label: "Vente",
     href: "/sales",
     icon: Handshake,
@@ -213,7 +219,7 @@ export const NAV_SECTIONS: NavSection[] = [
   {
     label: "Commercial",
     items: NAV_ITEMS.filter((i) =>
-      ["/prospection", "/pipeline", "/sales", "/calendar"].includes(
+      ["/prospection", "/pipeline", "/clients", "/sales", "/calendar"].includes(
         i.href,
       ),
     ),
